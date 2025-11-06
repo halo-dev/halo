@@ -46,14 +46,6 @@ async function registerEnabledPlugins(
       registerPluginIfAvailable(app, pluginModuleStore, plugin.name)
     );
   }
-
-  // @Deprecated: Compatibility solution, will be removed in the future
-  const enabledPluginNames = window["enabledPluginNames"] as string[];
-  if (enabledPluginNames) {
-    enabledPluginNames.forEach((name) =>
-      registerPluginIfAvailable(app, pluginModuleStore, name)
-    );
-  }
 }
 
 function registerPluginIfAvailable(

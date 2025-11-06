@@ -3,14 +3,14 @@ import { useElementSize, useThrottleFn } from "@vueuse/core";
 import type { ComputedRef } from "vue";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
-import type { ArrowShow, Direction, Type } from "./interface";
+import type { TabsArrowShow, TabsDirection, TabsType } from "./types";
 
 const props = withDefaults(
   defineProps<{
     activeId?: number | string;
     items?: Array<Record<string, string>>;
-    type?: Type;
-    direction?: Direction;
+    type?: TabsType;
+    direction?: TabsDirection;
     idKey?: string;
     labelKey?: string;
   }>(),
@@ -46,8 +46,8 @@ const indicatorRef = ref<HTMLElement | undefined>();
 const arrowFlag = ref(false);
 const { width: tabbarWidth } = useElementSize(tabbarItemsRef);
 
-const arrowShow: ComputedRef<ArrowShow> = computed(() => {
-  const show: ArrowShow = { left: false, right: false };
+const arrowShow: ComputedRef<TabsArrowShow> = computed(() => {
+  const show: TabsArrowShow = { left: false, right: false };
   if (!tabbarItemsRef.value) return show;
   void arrowFlag.value;
   void tabbarWidth.value;

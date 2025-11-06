@@ -8,9 +8,9 @@ import {
   IconErrorWarning,
   IconInformation,
 } from "../../icons/icons";
-import type { Type } from "./interface";
+import type { AlertType } from "./types";
 
-const TypeIcons: Record<Type, Raw<FunctionalComponent<SVGAttributes>>> = {
+const TypeIcons: Record<AlertType, Raw<FunctionalComponent<SVGAttributes>>> = {
   success: markRaw(IconCheckboxCircle),
   info: markRaw(IconInformation),
   default: markRaw(IconInformation),
@@ -20,7 +20,7 @@ const TypeIcons: Record<Type, Raw<FunctionalComponent<SVGAttributes>>> = {
 
 const props = withDefaults(
   defineProps<{
-    type?: Type;
+    type?: AlertType;
     title?: string;
     description?: string;
     closable?: boolean;

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { VButton } from "../button";
 import { VSpace } from "../space";
-import type { Type } from "./interface";
 import { Toast } from "./toast-manager";
+import type { ToastType } from "./types";
 
-function handleShowToast(type: Type, content: string) {
+function handleShowToast(type: ToastType, content: string) {
   Toast[type](content);
 }
 </script>
