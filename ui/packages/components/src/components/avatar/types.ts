@@ -1,11 +1,11 @@
 import type { InjectionKey } from "vue";
 
-export type Size = "lg" | "md" | "sm" | "xs";
+export type AvatarSize = "lg" | "md" | "sm" | "xs";
 
 export interface AvatarProps {
   src?: string;
   alt?: string;
-  size?: Size;
+  size?: AvatarSize;
   width?: string;
   height?: string;
   circle?: boolean;

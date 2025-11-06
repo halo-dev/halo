@@ -72,7 +72,7 @@ export const setupLibraryExternal = (
       rename: `vueuse.router.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/components/dist/halo-components.iife.js",
+      src: "./node_modules/@halo-dev/components/dist/index.iife.js",
       dest: "assets/components",
       rename: `components.[hash].js`,
     },

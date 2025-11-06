@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { Align, Direction, Spacing } from "./interface";
-import { SpacingSize } from "./interface";
+import type { SpaceAlign, SpaceDirection, SpaceSpacing } from "./types";
+import { SpaceSpacingSize } from "./types";
 
 const props = withDefaults(
   defineProps<{
-    spacing?: Spacing;
-    direction?: Direction;
-    align?: Align;
+    spacing?: SpaceSpacing;
+    direction?: SpaceDirection;
+    align?: SpaceAlign;
   }>(),
   {
     spacing: "xs",
@@ -24,7 +24,7 @@ const wrapperClasses = computed(() => {
 <template>
   <div
     :class="wrapperClasses"
-    :style="`gap: ${SpacingSize[spacing]}px`"
+    :style="`gap: ${SpaceSpacingSize[spacing]}px`"
     class="space-wrapper"
   >
     <slot />

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, inject, onMounted, ref, watch } from "vue";
 import { IconErrorWarning } from "../../icons/icons";
-import { AvatarGroupContextInjectionKey, type AvatarProps } from "./interface";
+import { AvatarGroupContextInjectionKey, type AvatarProps } from "./types";
 
 const props = withDefaults(defineProps<AvatarProps>(), {
   size: "md",

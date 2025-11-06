@@ -1,9 +1,6 @@
 <script lang="ts" setup>
 import { provide } from "vue";
-import {
-  AvatarGroupContextInjectionKey,
-  type AvatarGroupProps,
-} from "./interface";
+import { AvatarGroupContextInjectionKey, type AvatarGroupProps } from "./types";
 
 const props = withDefaults(defineProps<AvatarGroupProps>(), {
   size: "md",

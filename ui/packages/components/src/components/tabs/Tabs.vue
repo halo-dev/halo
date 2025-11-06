@@ -2,13 +2,13 @@
 import type { ComputedRef } from "vue";
 import { computed, provide, useSlots } from "vue";
 import { VTabbar } from "./index";
-import type { Direction, Type } from "./interface";
+import type { TabsDirection, TabsType } from "./types";
 
 const props = withDefaults(
   defineProps<{
     activeId?: number | string;
-    type?: Type;
-    direction?: Direction;
+    type?: TabsType;
+    direction?: TabsDirection;
     idKey?: string;
     labelKey?: string;
   }>(),
