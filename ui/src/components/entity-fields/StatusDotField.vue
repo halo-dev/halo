@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import { VEntityField, VStatusDot } from "@halo-dev/components";
+import {
+  VEntityField,
+  VStatusDot,
+  type StatusDotState,
+} from "@halo-dev/components";
 
 withDefaults(
   defineProps<{
     tooltip?: string;
-    state?: "default" | "success" | "warning" | "error";
+    state?: StatusDotState;
     animate?: boolean;
     text?: string;
   }>(),

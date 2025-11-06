@@ -11,6 +11,7 @@ import {
   VEntityField,
   VSpace,
   VStatusDot,
+  type StatusDotState,
 } from "@halo-dev/components";
 import { utils, type OperationItem } from "@halo-dev/console-shared";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -35,7 +36,7 @@ const { backup } = toRefs(props);
 
 type Phase = {
   text: string;
-  state: "default" | "warning" | "success" | "error";
+  state: StatusDotState;
   animate: boolean;
   value: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 };
