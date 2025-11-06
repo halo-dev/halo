@@ -155,7 +155,7 @@ const Audio = Node.create<ExtensionOptions>({
       },
       getToolboxItems({ editor }: { editor: Editor }) {
         return {
-          priority: 20,
+          priority: 30,
           component: markRaw(ToolboxItemVue),
           props: {
             editor,
