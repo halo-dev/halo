@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { CSSProperties } from "vue";
 import { computed } from "vue";
-import type { Theme } from "./interface";
+import type { TagTheme } from "./types";
 
 const props = withDefaults(
   defineProps<{
-    theme?: Theme;
+    theme?: TagTheme;
     rounded?: boolean;
     styles?: CSSProperties;
   }>(),

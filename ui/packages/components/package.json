@@ -26,14 +26,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/halo-components.es.js"
+      "import": "./dist/index.es.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/halo-components.iife.js",
-  "jsdelivr": "./dist/halo-components.iife.js",
-  "unpkg": "./dist/halo-components.iife.js",
-  "module": "./dist/halo-components.es.js",
+  "main": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
+  "unpkg": "./dist/index.iife.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -64,7 +64,8 @@
     "@storybook/vue3-vite": "^7.6.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^7.6.3"
+    "storybook": "^7.6.3",
+    "vite": "npm:rolldown-vite@7.2.0"
   },
   "peerDependencies": {
     "vue": "^3.5.16",

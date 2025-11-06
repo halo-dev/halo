@@ -1,7 +1,7 @@
-export type Type = "success" | "info" | "warning" | "error";
+export type ToastType = "success" | "info" | "warning" | "error";
 
 export interface ToastProps {
-  type?: Type;
+  type?: ToastType;
   content?: string;
   duration?: number;
   closable?: boolean;

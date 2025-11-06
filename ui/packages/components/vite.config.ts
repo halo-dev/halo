@@ -1,15 +1,14 @@
-import { fileURLToPath, URL } from "node:url";
-
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import path from "node:path";
+import { fileURLToPath, URL } from "node:url";
 import Icons from "unplugin-icons/vite";
 import { defineConfig, type Plugin } from "vite";
 import Dts from "vite-plugin-dts";
 
 export default defineConfig({
   experimental: {
-    enableNativePlugin: false,
+    enableNativePlugin: true,
   },
   plugins: [
     Vue(),
@@ -36,7 +35,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "HaloComponents",
       formats: ["es", "iife"],
-      fileName: (format) => `halo-components.${format}.js`,
+      fileName: (format) => `index.${format}.js`,
       cssFileName: "style",
     },
     rollupOptions: {

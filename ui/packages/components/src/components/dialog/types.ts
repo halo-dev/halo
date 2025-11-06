@@ -1,9 +1,9 @@
-export type Type = "success" | "info" | "warning" | "error";
+export type DialogType = "success" | "info" | "warning" | "error";
 export const DialogProviderProvideKey = "DIALOG_PROVIDER_PROVIDE_KEY";
-import type { Type as ButtonType } from "../button/interface";
+import type { ButtonType } from "../button/types";
 
 export interface DialogProps {
-  type?: Type;
+  type?: DialogType;
   visible?: boolean;
   title?: string;
   description?: string;

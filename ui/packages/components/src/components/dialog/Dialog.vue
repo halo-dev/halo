@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { DialogProps, Type } from "@/components/dialog/interface";
+import type { DialogProps, DialogType } from "@/components/dialog/types";
 import { markRaw, ref, type Component, type Raw } from "vue";
 import {
   IconCheckboxCircle,
@@ -33,7 +33,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const icons: Record<Type, { icon: Raw<Component>; color: string }> = {
+const icons: Record<DialogType, { icon: Raw<Component>; color: string }> = {
   success: {
     icon: markRaw(IconCheckboxCircle),
     color: "green",
