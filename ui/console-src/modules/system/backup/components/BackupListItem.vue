@@ -105,7 +105,7 @@ function handleDelete() {
   });
 }
 
-const { operationItems } = useOperationItemExtensionPoint<Backup>(
+const { data: operationItems } = useOperationItemExtensionPoint<Backup>(
   "backup:list-item:operation:create",
   backup,
   computed((): OperationItem<Backup>[] => [
@@ -192,7 +192,10 @@ const { operationItems } = useOperationItemExtensionPoint<Backup>(
       <slot name="end"></slot>
     </template>
     <template v-if="showOperations" #dropdownItems>
-      <EntityDropdownItems :dropdown-items="operationItems" :item="backup" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="backup"
+      />
     </template>
   </VEntity>
 </template>

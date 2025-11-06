@@ -78,7 +78,7 @@ const handleDelete = () => {
   });
 };
 
-const { operationItems } = useOperationItemExtensionPoint<Attachment>(
+const { data: operationItems } = useOperationItemExtensionPoint<Attachment>(
   "attachment:list-item:operation:create",
   attachment,
   computed((): OperationItem<Attachment>[] => [
@@ -212,7 +212,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
     </template>
     <template #dropdownItems>
       <EntityDropdownItems
-        :dropdown-items="operationItems"
+        :dropdown-items="operationItems || []"
         :item="attachment"
       />
     </template>
