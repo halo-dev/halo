@@ -43,6 +43,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "dayjs": "^1.11.19",
     "uuid": "^13.0.0"
   }
 }
