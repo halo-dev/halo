@@ -78,7 +78,7 @@ const handleCreateTheme = async () => {
   }
 };
 
-const { operationItems } = useOperationItemExtensionPoint<Theme>(
+const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
   "theme:list-item:operation:create",
   theme,
   computed((): OperationItem<Theme>[] => [

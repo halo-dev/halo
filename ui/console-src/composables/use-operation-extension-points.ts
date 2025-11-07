@@ -1,6 +1,7 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { OperationItem, PluginModule } from "@halo-dev/console-shared";
-import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
+import type { OperationItem } from "@halo-dev/console-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, toValue, type ComputedRef, type Ref } from "vue";
 
 export function useOperationItemExtensionPoint<T>(
   extensionPointName: string,
@@ -9,28 +10,31 @@ export function useOperationItemExtensionPoint<T>(
 ) {
   const { pluginModules } = usePluginModuleStore();
 
-  const itemsFromPlugins = ref<OperationItem<T>[]>([]);
+  return useQuery({
+    queryKey: computed(() => [
+      "core:extension-points:operation-items",
+      extensionPointName,
+      toValue(entity),
+    ]),
+    queryFn: async () => {
+      const itemsFromPlugins: OperationItem<T>[] = [];
+      for (const pluginModule of pluginModules) {
+        const { extensionPoints } = pluginModule;
+        if (!extensionPoints?.[extensionPointName]) {
+          continue;
+        }
 
-  onMounted(() => {
-    pluginModules.forEach((pluginModule: PluginModule) => {
-      const { extensionPoints } = pluginModule;
-      if (!extensionPoints?.[extensionPointName]) {
-        return;
+        const items = extensionPoints[extensionPointName](
+          entity
+        ) as OperationItem<T>[];
+
+        itemsFromPlugins.push(...items);
       }
 
-      const items = extensionPoints[extensionPointName](
-        entity
-      ) as OperationItem<T>[];
-
-      itemsFromPlugins.value.push(...items);
-    });
+      return [...presets.value, ...itemsFromPlugins].sort(
+        (a, b) => a.priority - b.priority
+      );
+    },
+    enabled: computed(() => !!presets.value && !!entity.value),
   });
-
-  const operationItems = computed(() => {
-    return [...presets.value, ...itemsFromPlugins.value].sort((a, b) => {
-      return a.priority - b.priority;
-    });
-  });
-
-  return { operationItems };
 }
