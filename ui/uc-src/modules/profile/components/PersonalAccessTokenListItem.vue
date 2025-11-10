@@ -9,6 +9,7 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  type StatusDotState,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -76,7 +77,7 @@ const statusText = computed(() => {
   );
 });
 
-const statusTheme = computed(() => {
+const statusTheme = computed<StatusDotState>(() => {
   const { expiresAt } = props.token.spec || {};
   if (expiresAt && new Date(expiresAt) < new Date()) {
     return "warning";

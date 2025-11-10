@@ -11,6 +11,7 @@ import {
   VEntityField,
   VSpace,
   VStatusDot,
+  type StatusDotState,
 } from "@halo-dev/components";
 import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -35,7 +36,7 @@ const { backup } = toRefs(props);
 
 type Phase = {
   text: string;
-  state: "default" | "warning" | "success" | "error";
+  state: StatusDotState;
   animate: boolean;
   value: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
 };
@@ -105,7 +106,7 @@ function handleDelete() {
   });
 }
 
-const { operationItems } = useOperationItemExtensionPoint<Backup>(
+const { data: operationItems } = useOperationItemExtensionPoint<Backup>(
   "backup:list-item:operation:create",
   backup,
   computed((): OperationItem<Backup>[] => [
@@ -192,7 +193,10 @@ const { operationItems } = useOperationItemExtensionPoint<Backup>(
       <slot name="end"></slot>
     </template>
     <template v-if="showOperations" #dropdownItems>
-      <EntityDropdownItems :dropdown-items="operationItems" :item="backup" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="backup"
+      />
     </template>
   </VEntity>
 </template>

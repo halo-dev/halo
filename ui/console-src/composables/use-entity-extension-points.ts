@@ -1,6 +1,7 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { EntityFieldItem, PluginModule } from "@halo-dev/ui-shared";
-import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
+import type { EntityFieldItem } from "@halo-dev/ui-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, toValue, type ComputedRef, type Ref } from "vue";
 
 export function useEntityFieldItemExtensionPoint<T>(
   extensionPointName: string,
@@ -8,40 +9,47 @@ export function useEntityFieldItemExtensionPoint<T>(
   presets: ComputedRef<EntityFieldItem[]>
 ) {
   const { pluginModules } = usePluginModuleStore();
-  const itemsFromPlugins = ref<EntityFieldItem[]>([]);
 
-  const allItems = computed(() => {
-    return [...presets.value, ...itemsFromPlugins.value];
-  });
+  return useQuery({
+    queryKey: computed(() => [
+      "core:extension-points:list-item:fields",
+      extensionPointName,
+      toValue(entity),
+    ]),
+    queryFn: async () => {
+      const itemsFromPlugins: EntityFieldItem[] = [];
 
-  onMounted(() => {
-    pluginModules.forEach((pluginModule: PluginModule) => {
-      const { extensionPoints } = pluginModule;
-      if (!extensionPoints?.[extensionPointName]) {
-        return;
+      for (const pluginModule of pluginModules) {
+        const { extensionPoints } = pluginModule;
+        if (!extensionPoints?.[extensionPointName]) {
+          continue;
+        }
+        const items = extensionPoints[extensionPointName](
+          entity
+        ) as EntityFieldItem[];
+        itemsFromPlugins.push(...items);
       }
-      const items = extensionPoints[extensionPointName](
-        entity
-      ) as EntityFieldItem[];
-      itemsFromPlugins.value.push(...items);
-    });
-  });
 
-  const startFields = computed(() => {
-    return allItems.value
-      .filter((item) => item.position === "start")
-      .sort((a, b) => {
-        return a.priority - b.priority;
-      });
-  });
+      const allItems = [...presets.value, ...itemsFromPlugins].sort(
+        (a, b) => a.priority - b.priority
+      );
 
-  const endFields = computed(() => {
-    return allItems.value
-      .filter((item) => item.position === "end")
-      .sort((a, b) => {
-        return a.priority - b.priority;
-      });
-  });
+      const start: EntityFieldItem[] = [];
+      const end: EntityFieldItem[] = [];
 
-  return { startFields, endFields };
+      for (const item of allItems) {
+        if (item.position === "start") {
+          start.push(item);
+        } else if (item.position === "end") {
+          end.push(item);
+        }
+      }
+
+      return {
+        start,
+        end,
+      };
+    },
+    enabled: computed(() => !!presets.value && !!entity.value),
+  });
 }

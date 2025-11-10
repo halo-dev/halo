@@ -71,7 +71,7 @@ const handleDelete = async () => {
   });
 };
 
-const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
+const { data: operationItems } = useOperationItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
   post,
   computed((): OperationItem<ListedPost>[] => [
@@ -156,7 +156,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
   ])
 );
 
-const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedPost>(
   "post:list-item:field:create",
   post,
   computed((): EntityFieldItem[] => [
@@ -237,16 +237,19 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       />
     </template>
     <template #start>
-      <EntityFieldItems :fields="startFields" />
+      <EntityFieldItems :fields="fields?.start || []" />
     </template>
     <template #end>
-      <EntityFieldItems :fields="endFields" />
+      <EntityFieldItems :fields="fields?.end || []" />
     </template>
     <template
       v-if="utils.permission.has(['system:posts:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="post" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="post"
+      />
     </template>
   </VEntity>
 </template>

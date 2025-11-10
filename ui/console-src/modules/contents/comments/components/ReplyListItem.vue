@@ -143,7 +143,7 @@ function onReplyCreationModalClose() {
   detailModalVisible.value = false;
 }
 
-const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
+const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
   "reply:list-item:operation:create",
   reply,
   computed((): OperationItem<ListedReply>[] => [
@@ -288,7 +288,10 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       v-if="utils.permission.has(['system:comments:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="reply"
+      />
     </template>
   </VEntity>
 </template>

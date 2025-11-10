@@ -80,7 +80,7 @@ const handleResetSettingConfig = async () => {
   });
 };
 
-const { operationItems } = useOperationItemExtensionPoint<Plugin>(
+const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
   "plugin:list-item:operation:create",
   plugin,
   computed((): OperationItem<Plugin>[] => [
@@ -157,7 +157,7 @@ const { operationItems } = useOperationItemExtensionPoint<Plugin>(
   ])
 );
 
-const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
+const { data: fields } = useEntityFieldItemExtensionPoint<Plugin>(
   "plugin:list-item:field:create",
   plugin,
   computed((): EntityFieldItem[] => {
@@ -255,16 +255,19 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       />
     </template>
     <template #start>
-      <EntityFieldItems :fields="startFields" />
+      <EntityFieldItems :fields="fields?.start || []" />
     </template>
     <template #end>
-      <EntityFieldItems :fields="endFields" />
+      <EntityFieldItems :fields="fields?.end || []" />
     </template>
     <template
       v-if="utils.permission.has(['system:plugins:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="plugin" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="plugin"
+      />
     </template>
   </VEntity>
 
