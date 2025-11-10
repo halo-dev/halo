@@ -58,7 +58,6 @@ public class FileTypeDetectUtils {
     }
 
     public static List<String> detectFileExtensions(String mimeType) throws MimeTypeException {
-        //这里新增一个方法，不直接修改detectFileExtension，以防有其他软件使用了该API
         MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
         return mimeTypes.forName(mimeType).getExtensions();
     }
