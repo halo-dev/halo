@@ -1,6 +1,6 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconPlug } from "@halo-dev/components";
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import PluginDetail from "./PluginDetail.vue";

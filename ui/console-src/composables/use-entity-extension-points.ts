@@ -1,7 +1,7 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { EntityFieldItem } from "@halo-dev/console-shared";
+import type { EntityFieldItem } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, type ComputedRef, type Ref, toValue } from "vue";
+import { computed, toValue, type ComputedRef, type Ref } from "vue";
 
 export function useEntityFieldItemExtensionPoint<T>(
   extensionPointName: string,

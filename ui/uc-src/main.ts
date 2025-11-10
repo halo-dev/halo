@@ -6,7 +6,7 @@ import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useRoleStore } from "@/stores/role";
 import { getCookie } from "@/utils/cookie";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import router from "@uc/router";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import "core-js/es/object/has-own";

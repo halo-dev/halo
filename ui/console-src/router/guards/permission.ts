@@ -1,7 +1,7 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import type { Role } from "@halo-dev/api-client";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import type { RouteLocationNormalized, Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {

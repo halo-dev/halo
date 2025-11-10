@@ -9,7 +9,7 @@ import {
   VDropdownItem,
   VTabbar,
 } from "@halo-dev/components";
-import type { UserProfileTab } from "@halo-dev/console-shared";
+import type { UserProfileTab } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {

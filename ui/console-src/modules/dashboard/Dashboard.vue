@@ -5,7 +5,7 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import type { DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { computed, type ComputedRef, provide, ref, toRaw } from "vue";
 import WidgetViewItem from "./components/WidgetViewItem.vue";
 import { useDashboardExtensionPoint } from "./composables/use-dashboard-extension-point";

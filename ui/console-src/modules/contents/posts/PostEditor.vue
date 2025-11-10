@@ -27,8 +27,8 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { FormType, utils } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";

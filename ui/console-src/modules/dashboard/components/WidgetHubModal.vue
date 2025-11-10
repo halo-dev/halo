@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import {
-  utils,
-  type DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+import { utils, type DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { computed, inject, ref, useTemplateRef, type ComputedRef } from "vue";
 
 const emit = defineEmits<{

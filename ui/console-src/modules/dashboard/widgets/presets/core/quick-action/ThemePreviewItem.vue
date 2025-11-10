@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import ThemePreviewModal from "@console/modules/interface/themes/components/preview/ThemePreviewModal.vue";
-import type { DashboardWidgetQuickActionItem } from "@halo-dev/console-shared";
+import type { DashboardWidgetQuickActionItem } from "@halo-dev/ui-shared";
 import { ref } from "vue";
 import QuickActionItem from "./QuickActionItem.vue";
 

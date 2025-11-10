@@ -9,7 +9,7 @@ import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";

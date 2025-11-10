@@ -1,6 +1,6 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconPages } from "@halo-dev/components";
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import DeletedSinglePageList from "./DeletedSinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";

@@ -1,5 +1,5 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { OperationItem } from "@halo-dev/console-shared";
+import type { OperationItem } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, toValue, type ComputedRef, type Ref } from "vue";
 

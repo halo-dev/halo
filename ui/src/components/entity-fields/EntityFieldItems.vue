@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { utils, type EntityFieldItem } from "@halo-dev/console-shared";
+import { utils, type EntityFieldItem } from "@halo-dev/ui-shared";
 
 withDefaults(
   defineProps<{

@@ -8,7 +8,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {

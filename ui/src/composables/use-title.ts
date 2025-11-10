@@ -1,5 +1,5 @@
 import { AppName } from "@/constants/app";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useTitle } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { computed, type Ref } from "vue";

@@ -18,7 +18,7 @@ import {
   utils,
   type EntityFieldItem,
   type OperationItem,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";

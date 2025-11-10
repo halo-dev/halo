@@ -24,7 +24,7 @@ export const stores = {
    *
    * @example
    * ```typescript
-   * import { stores } from "@halo-dev/console-shared";
+   * import { stores } from "@halo-dev/ui-shared";
    *
    * const userStore = stores.currentUser();
    *
@@ -73,7 +73,7 @@ export const stores = {
    *
    * @example
    * ```typescript
-   * import { stores } from "@halo-dev/console-shared";
+   * import { stores } from "@halo-dev/ui-shared";
    *
    * const globalInfoStore = stores.globalInfo();
    *

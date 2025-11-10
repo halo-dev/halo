@@ -1,7 +1,7 @@
 // image drag and paste upload
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
-import { utils } from "@halo-dev/console-shared";
 import { Editor, PMNode } from "@halo-dev/richtext-editor";
+import { utils } from "@halo-dev/ui-shared";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "es-toolkit";
 import ExtensionAudio from "../extensions/audio";

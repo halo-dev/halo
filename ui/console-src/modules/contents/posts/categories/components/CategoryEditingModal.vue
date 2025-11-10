@@ -14,7 +14,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType } from "@halo-dev/console-shared";
+import { FormType } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";

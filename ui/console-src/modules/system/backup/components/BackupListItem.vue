@@ -13,7 +13,7 @@ import {
   VStatusDot,
   type StatusDotState,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, markRaw, toRefs } from "vue";

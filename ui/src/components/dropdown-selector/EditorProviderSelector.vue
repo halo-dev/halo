@@ -6,7 +6,7 @@ import {
   VDropdown,
   VDropdownItem,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
 
 withDefaults(
   defineProps<{

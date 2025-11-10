@@ -1,5 +1,5 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import RoleDetail from "./RoleDetail.vue";
 import RoleList from "./RoleList.vue";
 

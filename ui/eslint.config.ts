@@ -15,6 +15,8 @@ export default defineConfigWithVueTs(
       "**/dist/**",
       "**/node_modules/**",
       "packages/api-client/src/",
+      // TODO: Remove this in the future, only for compatibility.
+      "packages/console-shared/**",
       "**/build/**",
     ],
   },

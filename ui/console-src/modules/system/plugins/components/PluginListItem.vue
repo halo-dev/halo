@@ -23,7 +23,7 @@ import {
   utils,
   type EntityFieldItem,
   type OperationItem,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";

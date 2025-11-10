@@ -10,7 +10,7 @@ import {
   VEntityField,
   VLoading,
 } from "@halo-dev/components";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import sanitize from "sanitize-html";

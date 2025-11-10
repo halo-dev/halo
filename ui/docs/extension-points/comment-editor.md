@@ -8,7 +8,7 @@
 ## 定义方式
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import CommentEditor from "./components/CommentEditor.vue";
 

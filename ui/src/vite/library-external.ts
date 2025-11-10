@@ -82,7 +82,13 @@ export const setupLibraryExternal = (
       rename: `api-client.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/console-shared/dist/index.iife.js",
+      src: "./node_modules/@halo-dev/ui-shared/dist/index.iife.js",
+      dest: "assets/ui-shared",
+      rename: `ui-shared.[hash].js`,
+    },
+    // TODO: Remove this in the future, only for compatibility.
+    {
+      src: "./node_modules/@halo-dev/console-shared/index.js",
       dest: "assets/console-shared",
       rename: `console-shared.[hash].js`,
     },
@@ -121,7 +127,7 @@ export const setupLibraryExternal = (
       "vue-router": "VueRouter",
       pinia: "Pinia",
       axios: "axios",
-      "@halo-dev/console-shared": "HaloConsoleShared",
+      "@halo-dev/ui-shared": "HaloUiShared",
       "@halo-dev/components": "HaloComponents",
       "@vueuse/core": "VueUse",
       "@vueuse/components": "VueUse",

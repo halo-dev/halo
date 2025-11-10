@@ -14,7 +14,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useFileDialog } from "@vueuse/core";
 import { computed, defineAsyncComponent, ref, toRefs, type Ref } from "vue";

@@ -1,7 +1,7 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import BlankLayout from "@console/layouts/BlankLayout.vue";
 import { IconBookRead } from "@halo-dev/components";
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import DeletedPostList from "./DeletedPostList.vue";
 import PostEditor from "./PostEditor.vue";

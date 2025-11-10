@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Contributor } from "@halo-dev/api-client";
 import { VAvatar, VAvatarGroup } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 

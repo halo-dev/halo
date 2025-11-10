@@ -75,7 +75,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { utils, type AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";

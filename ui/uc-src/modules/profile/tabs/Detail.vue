@@ -12,7 +12,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import { computed, ref } from "vue";

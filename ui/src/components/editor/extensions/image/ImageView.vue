@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
-import type { AttachmentSimple } from "@halo-dev/console-shared";
 import { type NodeViewProps } from "@halo-dev/richtext-editor";
+import type { AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, onMounted, ref } from "vue";
 import { EditorLinkObtain } from "../../components";
 import InlineBlockBox from "../../components/InlineBlockBox.vue";

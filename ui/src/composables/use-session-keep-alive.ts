@@ -1,4 +1,4 @@
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
 
