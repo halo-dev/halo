@@ -93,12 +93,7 @@ public class FileTypeDetectUtils {
         String fileExtension = getFileExtension(fileName);
         try {
             List<String> detectedExtByMime = detectFileExtensions(mimeType);
-            for (String ext : detectedExtByMime) {
-                if (ext.equalsIgnoreCase(fileExtension)) {
-                    return true;
-                }
-            }
-            return false;
+            return detectedExtByMime.stream().anyMatch(ext -> ext.equalsIgnoreCase(fileExtension));
         } catch (MimeTypeException e) {
             return false;
         }
