@@ -1,4 +1,4 @@
-import { FormType, stores, utils } from "@halo-dev/console-shared";
+import { FormType, stores, utils } from "@halo-dev/ui-shared";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, watch, type Ref } from "vue";

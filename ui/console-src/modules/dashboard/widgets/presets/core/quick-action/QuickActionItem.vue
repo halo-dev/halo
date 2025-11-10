@@ -3,7 +3,7 @@ import { IconArrowRight } from "@halo-dev/components";
 import {
   utils,
   type DashboardWidgetQuickActionItem,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 defineProps<{
   item: DashboardWidgetQuickActionItem;
 }>();

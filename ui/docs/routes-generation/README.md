@@ -11,10 +11,10 @@
 
 ## 定义方式
 
-统一由 `@halo-dev/console-shared` 包中的 `definePlugin` 方法配置。如：
+统一由 `@halo-dev/ui-shared` 包中的 `definePlugin` 方法配置。如：
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import AttachmentList from "./AttachmentList.vue";
 import AttachmentSelectorModal from "./components/AttachmentSelectorModal.vue";

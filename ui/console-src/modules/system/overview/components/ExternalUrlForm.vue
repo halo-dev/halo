@@ -2,7 +2,7 @@
 import { setFocus } from "@/formkit/utils/focus";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VLoading, VSpace } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import { storeToRefs } from "pinia";

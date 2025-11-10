@@ -8,7 +8,7 @@ import type {
 import type {
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { computed, onMounted, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 

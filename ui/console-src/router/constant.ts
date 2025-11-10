@@ -1,4 +1,4 @@
-import type { MenuGroupType } from "@halo-dev/console-shared";
+import type { MenuGroupType } from "@halo-dev/ui-shared";
 
 export const coreMenuGroups: MenuGroupType[] = [
   {

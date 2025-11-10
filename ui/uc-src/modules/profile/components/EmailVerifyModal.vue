@@ -2,7 +2,7 @@
 import type { VerifyCodeRequest } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";
 import { computed, ref } from "vue";

@@ -18,7 +18,7 @@ import {
   setupPluginModules,
 } from "@console/setup/setupModules";
 import { useThemeStore } from "@console/stores/theme";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import "core-js/es/object/has-own";
 
 const app = createApp(App);

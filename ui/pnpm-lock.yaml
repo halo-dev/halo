@@ -80,10 +80,13 @@ importers:
         version: link:packages/components
       '@halo-dev/console-shared':
         specifier: workspace:*
-        version: link:packages/shared
+        version: link:packages/console-shared
       '@halo-dev/richtext-editor':
         specifier: workspace:*
         version: link:packages/editor
+      '@halo-dev/ui-shared':
+        specifier: workspace:*
+        version: link:packages/shared
       '@he-tree/tree-utils':
         specifier: 0.1.0-alpha.6
         version: 0.1.0-alpha.6
@@ -462,6 +465,8 @@ importers:
       vite:
         specifier: npm:rolldown-vite@7.2.0
         version: rolldown-vite@7.2.0(@types/node@22.18.12)(esbuild@0.18.20)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.83.0)(terser@5.37.0)(yaml@2.8.0)
+
+  packages/console-shared: {}
 
   packages/editor:
     dependencies:

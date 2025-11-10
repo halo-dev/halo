@@ -9,7 +9,7 @@
 > 此示例为添加一个安装选项卡用于从 GitHub 上下载主题。
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import GitHubDownloadTab from "./components/GitHubDownloadTab.vue";
 

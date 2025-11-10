@@ -67,6 +67,7 @@
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "workspace:*",
+    "@halo-dev/ui-shared": "workspace:*",
     "@he-tree/tree-utils": "0.1.0-alpha.6",
     "@he-tree/vue": "^2.9.4",
     "@number-flow/vue": "^0.4.8",

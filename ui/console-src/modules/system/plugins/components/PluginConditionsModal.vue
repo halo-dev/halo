@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VModal } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { ref } from "vue";
 
 withDefaults(defineProps<{ plugin: Plugin }>(), {});

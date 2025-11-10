@@ -1,10 +1,10 @@
-import { utils } from "@halo-dev/console-shared";
 import {
   getExtensionField,
   type AnyConfig,
   type AnyExtension,
   type Extensions,
 } from "@halo-dev/richtext-editor";
+import { utils } from "@halo-dev/ui-shared";
 
 export function useExtension() {
   const filterDuplicateExtensions = (extensions: Extensions | undefined) => {

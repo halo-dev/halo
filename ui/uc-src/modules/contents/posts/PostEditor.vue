@@ -20,8 +20,8 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { FormType, utils } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";

@@ -16,7 +16,7 @@
 > 此示例是在插件列表项中添加一个显示插件启动时间的字段。
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw, type Ref } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import { VEntityField } from "@halo-dev/components"

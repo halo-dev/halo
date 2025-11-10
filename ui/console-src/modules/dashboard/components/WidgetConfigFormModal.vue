@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormKitSchemaDefinition } from "@formkit/core";
 import { VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import type { DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { onMounted, ref, toRaw, useTemplateRef } from "vue";
 
 const props = defineProps<{

@@ -1,4 +1,4 @@
-import type { DashboardResponsiveLayout } from "@halo-dev/console-shared";
+import type { DashboardResponsiveLayout } from "@halo-dev/ui-shared";
 
 const DefaultResponsiveLayouts: DashboardResponsiveLayout = {
   lg: [

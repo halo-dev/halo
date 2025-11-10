@@ -13,7 +13,7 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { stores, utils, type UserTab } from "@halo-dev/console-shared";
+import { stores, utils, type UserTab } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {

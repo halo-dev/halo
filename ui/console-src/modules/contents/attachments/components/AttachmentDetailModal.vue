@@ -13,7 +13,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref, toRefs, useTemplateRef } from "vue";

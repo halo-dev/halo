@@ -1,5 +1,5 @@
 import { IconPalette } from "@halo-dev/components";
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import ThemeDetail from "./ThemeDetail.vue";
 import ThemeSetting from "./ThemeSetting.vue";

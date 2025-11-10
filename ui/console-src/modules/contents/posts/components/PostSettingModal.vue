@@ -13,7 +13,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType, utils } from "@halo-dev/console-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

@@ -1,4 +1,4 @@
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import type { Router } from "vue-router";
 
 export function setupAuthCheckGuard(router: Router) {

@@ -7,7 +7,7 @@ import {
   type SettingForm,
 } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
-import { utils, type PluginTab } from "@halo-dev/console-shared";
+import { utils, type PluginTab } from "@halo-dev/ui-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";

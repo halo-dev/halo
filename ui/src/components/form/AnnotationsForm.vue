@@ -11,7 +11,7 @@ import { getValidationMessages } from "@formkit/validation";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 

@@ -1,5 +1,5 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { OperationItem, PluginModule } from "@halo-dev/console-shared";
+import type { OperationItem, PluginModule } from "@halo-dev/ui-shared";
 import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
 
 export function useOperationItemExtensionPoint<T>(

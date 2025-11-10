@@ -7,7 +7,7 @@
 ## 定义方式
 
 ```ts
-import { definePlugin, PluginTab } from "@halo-dev/console-shared";
+import { definePlugin, PluginTab } from "@halo-dev/ui-shared";
 import MyComponent from "@/views/my-component.vue";
 import { markRaw } from "vue";
 export default definePlugin({

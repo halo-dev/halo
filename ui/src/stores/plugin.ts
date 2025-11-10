@@ -1,4 +1,4 @@
-import type { PluginModule } from "@halo-dev/console-shared";
+import type { PluginModule } from "@halo-dev/ui-shared";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 

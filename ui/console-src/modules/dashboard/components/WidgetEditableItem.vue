@@ -4,7 +4,7 @@ import {
   utils,
   type DashboardWidget,
   type DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
 import ActionButton from "./ActionButton.vue";
 import WidgetConfigFormModal from "./WidgetConfigFormModal.vue";

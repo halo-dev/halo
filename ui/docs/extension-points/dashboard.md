@@ -14,7 +14,7 @@
 ### 定义方式
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import MyCustomWidget from "./components/MyCustomWidget.vue";
 
@@ -173,7 +173,7 @@ const emit = defineEmits<{
 ### 定义方式
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import { IconPlug } from "@halo-dev/components";
 import { useRouter } from "vue-router";
@@ -237,7 +237,7 @@ export default definePlugin({
 </template>
 
 <script lang="ts" setup>
-import type { DashboardWidgetQuickActionItem } from "@halo-dev/console-shared";
+import type { DashboardWidgetQuickActionItem } from "@halo-dev/ui-shared";
 
 defineProps<{
   item: DashboardWidgetQuickActionItem;

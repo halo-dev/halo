@@ -12,7 +12,7 @@ import {
   VDropdown,
   VTag,
 } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";

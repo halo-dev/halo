@@ -21,7 +21,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";

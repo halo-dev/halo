@@ -3,12 +3,12 @@ import HasPermission from "@/components/permission/HasPermission.vue";
 import { i18n } from "@/locales";
 import type { Attachment } from "@halo-dev/api-client";
 import { VButton, VDropdown, VSpace } from "@halo-dev/components";
+import type { Editor } from "@halo-dev/richtext-editor";
 import {
   utils,
   type AttachmentLike,
   type AttachmentSimple,
-} from "@halo-dev/console-shared";
-import type { Editor } from "@halo-dev/richtext-editor";
+} from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";

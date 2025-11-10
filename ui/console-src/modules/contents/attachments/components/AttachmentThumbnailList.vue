@@ -5,7 +5,7 @@ import {
   type Attachment,
 } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
-import { THUMBNAIL_WIDTH_MAP } from "@halo-dev/console-shared";
+import { THUMBNAIL_WIDTH_MAP } from "@halo-dev/ui-shared";
 import { computed, ref, toRefs } from "vue";
 
 const props = withDefaults(

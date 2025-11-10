@@ -273,7 +273,7 @@ Both Vite and Rsbuild are excellent build tools, but they have different strengt
 **Example with dynamic imports:**
 
 ```typescript
-import { definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
 import { defineAsyncComponent } from "vue";
 import { VLoading } from "@halo-dev/components";
 

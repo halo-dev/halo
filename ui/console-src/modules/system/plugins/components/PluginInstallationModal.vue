@@ -2,7 +2,7 @@
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import { utils, type PluginInstallationTab } from "@halo-dev/console-shared";
+import { utils, type PluginInstallationTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
