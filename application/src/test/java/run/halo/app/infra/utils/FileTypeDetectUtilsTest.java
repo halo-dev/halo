@@ -138,5 +138,32 @@ class FileTypeDetectUtilsTest {
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/bmp", "hello.bmp"))
             .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.html"))
+            .isFalse();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpeg"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.JPEG"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpg"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpe"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.html"))
+            .isFalse();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.mp3"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.MPGA"))
+            .isTrue();
+
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.m3a"))
+            .isTrue();
     }
 }
