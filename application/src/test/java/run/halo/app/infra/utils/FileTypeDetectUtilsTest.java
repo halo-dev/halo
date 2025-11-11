@@ -103,7 +103,9 @@ class FileTypeDetectUtilsTest {
 
     @Test
     void detectFileExtensionsTest() throws MimeTypeException {
-        var extensions = FileTypeDetectUtils.detectFileExtensions("application/x-x509-key; format=pem");
+        var extensions = FileTypeDetectUtils.detectFileExtensions(
+            "application/x-x509-key; format=pem"
+        );
         assertThat(extensions).isEmpty();
 
         extensions = FileTypeDetectUtils.detectFileExtensions("text/plain");
