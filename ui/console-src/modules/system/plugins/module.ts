@@ -3,9 +3,6 @@ import { IconPlug } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import PluginDetail from "./PluginDetail.vue";
-import PluginExtensionPointSettings from "./PluginExtensionPointSettings.vue";
-import PluginList from "./PluginList.vue";
 import PluginDetailModal from "./components/PluginDetailModal.vue";
 
 export default definePlugin({
@@ -32,12 +29,12 @@ export default definePlugin({
         {
           path: "",
           name: "Plugins",
-          component: PluginList,
+          component: () => import("./PluginList.vue"),
         },
         {
           path: "extension-point-settings",
           name: "PluginExtensionPointSettings",
-          component: PluginExtensionPointSettings,
+          component: () => import("./PluginExtensionPointSettings.vue"),
           meta: {
             title: "core.plugin.extension-settings.title",
             hideFooter: true,
@@ -47,7 +44,7 @@ export default definePlugin({
         {
           path: ":name",
           name: "PluginDetail",
-          component: PluginDetail,
+          component: () => import("./PluginDetail.vue"),
           meta: {
             title: "core.plugin.detail.title",
             permissions: ["system:plugins:view"],

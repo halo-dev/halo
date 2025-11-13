@@ -137,7 +137,7 @@ importers:
         version: 12.8.2(typescript@5.8.3)
       '@vueuse/integrations':
         specifier: ^12.8.2
-        version: 12.8.2(axios@1.12.2)(change-case@5.4.4)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(typescript@5.8.3)
+        version: 12.8.2(axios@1.12.2)(change-case@5.4.4)(fuse.js@6.6.2)(nprogress@0.2.0)(qrcode@1.5.3)(sortablejs@1.14.0)(typescript@5.8.3)
       '@vueuse/router':
         specifier: ^12.8.2
         version: 12.8.2(typescript@5.8.3)(vue-router@4.5.1(vue@3.5.16(typescript@5.8.3)))
@@ -177,6 +177,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      nprogress:
+        specifier: ^0.2.0
+        version: 0.2.0
       object-hash:
         specifier: ^3.0.0
         version: 3.0.0
@@ -262,6 +265,9 @@ importers:
       '@types/node':
         specifier: ^22.18.12
         version: 22.18.12
+      '@types/nprogress':
+        specifier: ^0.2.3
+        version: 0.2.3
       '@types/object-hash':
         specifier: ^3.0.6
         version: 3.0.6
@@ -4163,6 +4169,9 @@ packages:
   '@types/normalize-package-data@2.4.1':
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
 
+  '@types/nprogress@0.2.3':
+    resolution: {integrity: sha512-k7kRA033QNtC+gLc4VPlfnue58CM1iQLgn1IMAU8VPHGOj7oIHPp9UlhedEnD/Gl8evoCjwkZjlBORtZ3JByUA==}
+
   '@types/object-hash@3.0.6':
     resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
 
@@ -8006,6 +8015,9 @@ packages:
   npm-run-path@5.1.0:
     resolution: {integrity: sha512-sJOdmRGrY2sjNTRMbSvluQqg+8X7ZK61yvzBEIDhz4f8z1TZFYABsqjjCBd/0PUNE9M6QDgHJXQkGUEm7Q+l9Q==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  nprogress@0.2.0:
+    resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
@@ -15194,6 +15206,8 @@ snapshots:
 
   '@types/normalize-package-data@2.4.1': {}
 
+  '@types/nprogress@0.2.3': {}
+
   '@types/object-hash@3.0.6': {}
 
   '@types/pretty-hrtime@1.0.3': {}
@@ -15849,7 +15863,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@vueuse/integrations@12.8.2(axios@1.12.2)(change-case@5.4.4)(fuse.js@6.6.2)(qrcode@1.5.3)(sortablejs@1.14.0)(typescript@5.8.3)':
+  '@vueuse/integrations@12.8.2(axios@1.12.2)(change-case@5.4.4)(fuse.js@6.6.2)(nprogress@0.2.0)(qrcode@1.5.3)(sortablejs@1.14.0)(typescript@5.8.3)':
     dependencies:
       '@vueuse/core': 12.8.2(typescript@5.8.3)
       '@vueuse/shared': 12.8.2(typescript@5.8.3)
@@ -15858,6 +15872,7 @@ snapshots:
       axios: 1.12.2(debug@4.3.2)
       change-case: 5.4.4
       fuse.js: 6.6.2
+      nprogress: 0.2.0
       qrcode: 1.5.3
       sortablejs: 1.14.0
     transitivePeerDependencies:
@@ -19408,6 +19423,8 @@ snapshots:
   npm-run-path@5.1.0:
     dependencies:
       path-key: 4.0.0
+
+  nprogress@0.2.0: {}
 
   nth-check@2.1.1:
     dependencies:

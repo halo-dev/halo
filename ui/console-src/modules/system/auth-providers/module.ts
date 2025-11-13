@@ -1,7 +1,5 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { definePlugin } from "@halo-dev/ui-shared";
-import AuthProviderDetail from "./AuthProviderDetail.vue";
-import AuthProviders from "./AuthProviders.vue";
 
 export default definePlugin({
   routes: [
@@ -12,7 +10,7 @@ export default definePlugin({
         {
           path: "",
           name: "AuthProviders",
-          component: AuthProviders,
+          component: () => import("./AuthProviders.vue"),
           meta: {
             title: "core.identity_authentication.title",
             searchable: true,
@@ -22,7 +20,7 @@ export default definePlugin({
         {
           path: ":name",
           name: "AuthProviderDetail",
-          component: AuthProviderDetail,
+          component: () => import("./AuthProviderDetail.vue"),
           meta: {
             title: "core.identity_authentication.detail.title",
             permissions: ["*"],

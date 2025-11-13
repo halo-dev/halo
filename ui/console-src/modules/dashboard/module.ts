@@ -3,8 +3,6 @@ import { IconDashboard } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import WidgetCard from "./components/WidgetCard.vue";
-import Dashboard from "./Dashboard.vue";
-import DashboardDesigner from "./DashboardDesigner.vue";
 
 export default definePlugin({
   components: {
@@ -20,7 +18,7 @@ export default definePlugin({
         {
           path: "dashboard",
           name: "Dashboard",
-          component: Dashboard,
+          component: () => import("./Dashboard.vue"),
           meta: {
             title: "core.dashboard.title",
             searchable: true,
@@ -36,7 +34,7 @@ export default definePlugin({
         {
           path: "dashboard/designer",
           name: "DashboardDesigner",
-          component: DashboardDesigner,
+          component: () => import("./DashboardDesigner.vue"),
           meta: {
             title: "core.dashboard_designer.title",
             searchable: false,

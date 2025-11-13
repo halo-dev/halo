@@ -1,3 +1,4 @@
+import { setupProcessBarGuard } from "@/router/process-bar";
 import routesConfig from "@uc/router/routes.config";
 import {
   createRouter,
@@ -23,5 +24,6 @@ const router = createRouter({
 
 setupAuthCheckGuard(router);
 setupPermissionGuard(router);
+setupProcessBarGuard(router);
 
 export default router;
