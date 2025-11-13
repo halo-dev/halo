@@ -1,7 +1,5 @@
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { definePlugin } from "@halo-dev/ui-shared";
-import RoleDetail from "./RoleDetail.vue";
-import RoleList from "./RoleList.vue";
 
 export default definePlugin({
   components: {},
@@ -13,7 +11,7 @@ export default definePlugin({
         {
           path: "",
           name: "Roles",
-          component: RoleList,
+          component: () => import("./RoleList.vue"),
           meta: {
             title: "core.role.title",
             searchable: true,
@@ -23,7 +21,7 @@ export default definePlugin({
         {
           path: ":name",
           name: "RoleDetail",
-          component: RoleDetail,
+          component: () => import("./RoleDetail.vue"),
           meta: {
             title: "core.role.detail.title",
             permissions: ["system:roles:view"],

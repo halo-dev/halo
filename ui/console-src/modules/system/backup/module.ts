@@ -2,7 +2,6 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconServerLine } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import Backups from "./Backups.vue";
 
 export default definePlugin({
   components: {},
@@ -26,7 +25,7 @@ export default definePlugin({
         {
           path: "",
           name: "Backup",
-          component: Backups,
+          component: () => import("./Backups.vue"),
         },
       ],
     },

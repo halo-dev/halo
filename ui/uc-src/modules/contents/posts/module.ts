@@ -2,8 +2,6 @@ import { IconBookRead } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import BasicLayout from "@uc/layouts/BasicLayout.vue";
 import { markRaw } from "vue";
-import PostEditor from "./PostEditor.vue";
-import PostList from "./PostList.vue";
 
 export default definePlugin({
   ucRoutes: [
@@ -27,12 +25,12 @@ export default definePlugin({
         {
           path: "",
           name: "Posts",
-          component: PostList,
+          component: () => import("./PostList.vue"),
         },
         {
           path: "editor",
           name: "PostEditor",
-          component: PostEditor,
+          component: () => import("./PostEditor.vue"),
           meta: {
             title: "core.post_editor.title",
             searchable: true,
