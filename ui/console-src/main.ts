@@ -1,25 +1,22 @@
-import { consoleApiClient } from "@halo-dev/api-client";
-import { createPinia } from "pinia";
-import type { DirectiveBinding } from "vue";
-import { createApp } from "vue";
-import App from "./App.vue";
-import router from "./router";
-// setup
-import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
+import { setLanguage, setupI18n } from "@/locales";
+import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
 import "@/setup/setupStyles";
-// core modules
-import { setupApiClient } from "@/setup/setupApiClient";
 import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useRoleStore } from "@/stores/role";
-import { getCookie } from "@/utils/cookie";
 import {
   setupCoreModules,
   setupPluginModules,
 } from "@console/setup/setupModules";
 import { useThemeStore } from "@console/stores/theme";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { stores, utils } from "@halo-dev/ui-shared";
 import "core-js/es/object/has-own";
+import { createPinia } from "pinia";
+import type { DirectiveBinding } from "vue";
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
 
 const app = createApp(App);
 
@@ -74,12 +71,10 @@ async function initApp() {
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
 
-    // set locale
-    i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
-    utils.date.setLocale(i18n.global.locale.value);
-
     const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
+
+    await setLanguage();
 
     if (currentUserStore.isAnonymous) {
       return;
