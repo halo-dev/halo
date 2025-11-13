@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import HasPermission from "@/components/permission/HasPermission.vue";
 import CommentDetailModal from "@console/modules/contents/comments/components/CommentDetailModal.vue";
 import OwnerButton from "@console/modules/contents/comments/components/OwnerButton.vue";
 import { useContentProviderExtensionPoint } from "@console/modules/contents/comments/composables/use-content-provider-extension-point";

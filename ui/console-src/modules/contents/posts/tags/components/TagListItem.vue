@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import type { Tag } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,

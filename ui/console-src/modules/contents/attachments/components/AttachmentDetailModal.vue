@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
 import LazyImage from "@/components/image/LazyImage.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { isImage } from "@/utils/image";
 import { coreApiClient } from "@halo-dev/api-client";
 import {

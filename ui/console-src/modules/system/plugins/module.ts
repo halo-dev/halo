@@ -5,6 +5,12 @@ import { markRaw } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import PluginDetailModal from "./components/PluginDetailModal.vue";
 
+declare module "vue" {
+  interface GlobalComponents {
+    PluginDetailModal: (typeof import("./components/PluginDetailModal.vue"))["default"];
+  }
+}
+
 export default definePlugin({
   components: {
     PluginDetailModal,

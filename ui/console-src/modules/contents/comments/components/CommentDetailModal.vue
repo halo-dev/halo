@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import HasPermission from "@/components/permission/HasPermission.vue";
 import {
   consoleApiClient,
   coreApiClient,
