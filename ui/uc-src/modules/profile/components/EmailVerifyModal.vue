@@ -3,12 +3,11 @@ import type { VerifyCodeRequest } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useMutation } from "@tanstack/vue-query";
 import { useIntervalFn } from "@vueuse/shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-const queryClient = useQueryClient();
 const { t } = useI18n();
 
 const { currentUser, fetchCurrentUser } = stores.currentUser();
@@ -91,7 +90,6 @@ const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
     Toast.success(
       t("core.uc_profile.email_verify_modal.operations.verify.toast_success")
     );
-    queryClient.invalidateQueries({ queryKey: ["user-detail"] });
     fetchCurrentUser();
     modal.value?.close();
   },

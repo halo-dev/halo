@@ -5,14 +5,12 @@ import type { User } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
-import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();
-const queryClient = useQueryClient();
 const currentUserStore = stores.currentUser();
 
 const emit = defineEmits<{
@@ -52,8 +50,6 @@ const handleUpdateUser = async () => {
     });
 
     modal.value?.close();
-
-    queryClient.invalidateQueries({ queryKey: ["user-detail"] });
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {

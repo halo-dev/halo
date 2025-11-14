@@ -14,7 +14,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/ui-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useFileDialog } from "@vueuse/core";
 import { computed, defineAsyncComponent, ref, toRefs, type Ref } from "vue";
@@ -32,6 +32,7 @@ const props = withDefaults(
 );
 
 const { isCurrentUser, name } = toRefs(props);
+const { fetchCurrentUser } = stores.currentUser();
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -102,6 +103,9 @@ const handleUploadAvatar = () => {
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
         queryClient.invalidateQueries({ queryKey: ["user-detail"] });
+        if (props.isCurrentUser) {
+          fetchCurrentUser();
+        }
         handleCloseCropperModal();
       })
       .catch(() => {
@@ -128,6 +132,9 @@ const handleRemoveCurrentAvatar = () => {
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });
+          if (props.isCurrentUser) {
+            fetchCurrentUser();
+          }
         })
         .catch(() => {
           Toast.error(t("core.components.user_avatar.toast_remove_failed"));

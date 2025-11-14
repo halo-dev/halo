@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { DetailedUser } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
@@ -10,17 +8,15 @@ import {
   VLoading,
   VTabbar,
 } from "@halo-dev/components";
-import type { UserProfileTab } from "@halo-dev/ui-shared";
-import { useQuery } from "@tanstack/vue-query";
+import { stores, type UserProfileTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
+import { storeToRefs } from "pinia";
 import {
   computed,
   defineAsyncComponent,
   onMounted,
-  provide,
   ref,
   shallowRef,
-  type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
@@ -31,19 +27,9 @@ const { t } = useI18n();
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
-const {
-  data: user,
-  isLoading,
-  refetch,
-} = useQuery({
-  queryKey: ["user-detail"],
-  queryFn: async () => {
-    const { data } = await consoleApiClient.user.getCurrentUserDetail();
-    return data;
-  },
-});
-
-provide<Ref<DetailedUser | undefined>>("user", user);
+const { currentUser } = storeToRefs(stores.currentUser());
+const { fetchCurrentUser } = stores.currentUser();
+fetchCurrentUser();
 
 const tabs = shallowRef<UserProfileTab[]>([
   {
@@ -126,19 +112,13 @@ const tabbarItems = computed(() => {
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
   mode: "push",
 });
-
-function onPasswordChangeModalClose() {
-  passwordChangeModal.value = false;
-  refetch();
-}
 </script>
 <template>
   <ProfileEditingModal v-if="editingModal" @close="editingModal = false" />
 
   <PasswordChangeModal
     v-if="passwordChangeModal"
-    :user="user?.user"
-    @close="onPasswordChangeModalClose"
+    @close="passwordChangeModal = false"
   />
 
   <header class="bg-white">
@@ -146,14 +126,17 @@ function onPasswordChangeModalClose() {
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <UserAvatar :name="user?.user.metadata.name" is-current-user />
+            <UserAvatar
+              :name="currentUser?.user.metadata.name"
+              is-current-user
+            />
           </div>
           <div class="block">
             <h1 class="truncate text-lg font-bold text-gray-900">
-              {{ user?.user.spec.displayName }}
+              {{ currentUser?.user.spec.displayName }}
             </h1>
-            <span v-if="!isLoading" class="text-sm text-gray-600">
-              @{{ user?.user.metadata.name }}
+            <span class="text-sm text-gray-600">
+              @{{ currentUser?.user.metadata.name }}
             </span>
           </div>
         </div>
@@ -184,11 +167,7 @@ function onPasswordChangeModalClose() {
     ></VTabbar>
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-if="activeTab === tab.id"
-          :user="user"
-        />
+        <component :is="tab.component" v-if="activeTab === tab.id" />
       </template>
     </div>
   </section>
