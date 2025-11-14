@@ -1798,6 +1798,8 @@ core:
             title: Input Link
             placeholder: Input link and press Enter to confirm
           operations:
+            remove:
+              button: Delete
             replace:
               button: Replace
             transfer:

@@ -17,6 +17,7 @@ import {
   ExtensionDropcursor,
   ExtensionFontSize,
   ExtensionFormatBrush,
+  ExtensionGallery,
   ExtensionGapcursor,
   ExtensionHardBreak,
   ExtensionHeading,
@@ -115,6 +116,7 @@ const editor = useEditor({
     ExtensionDetails.configure({
       persist: true,
     }),
+    ExtensionGallery,
   ],
   parseOptions: {
     preserveWhitespace: true,
