@@ -162,7 +162,12 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <UserAvatar :name="user?.user.metadata.name" />
+            <UserAvatar
+              :name="user?.user.metadata.name"
+              :is-current-user="
+                user?.user.metadata.name === currentUser?.user.metadata.name
+              "
+            />
           </div>
           <div class="block">
             <div class="flex items-center gap-2">
