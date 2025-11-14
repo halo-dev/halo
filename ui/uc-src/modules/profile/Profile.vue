@@ -5,20 +5,22 @@ import {
   VButton,
   VDropdown,
   VDropdownItem,
+  VLoading,
   VTabbar,
 } from "@halo-dev/components";
 import { stores, type UserProfileTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
 import { storeToRefs } from "pinia";
-import { computed, markRaw, onMounted, ref, shallowRef } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  ref,
+  shallowRef,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
-import DetailTab from "./tabs/Detail.vue";
-import Devices from "./tabs/Devices.vue";
-import NotificationPreferences from "./tabs/NotificationPreferences.vue";
-import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
-import TwoFactor from "./tabs/TwoFactor.vue";
 
 const { t } = useI18n();
 
@@ -33,31 +35,46 @@ const tabs = shallowRef<UserProfileTab[]>([
   {
     id: "detail",
     label: t("core.uc_profile.tabs.detail"),
-    component: markRaw(DetailTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Detail.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 10,
   },
   {
     id: "notification-preferences",
     label: t("core.uc_profile.tabs.notification-preferences"),
-    component: markRaw(NotificationPreferences),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/NotificationPreferences.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 20,
   },
   {
     id: "pat",
     label: t("core.uc_profile.tabs.pat"),
-    component: markRaw(PersonalAccessTokensTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/PersonalAccessTokens.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 30,
   },
   {
     id: "2fa",
     label: t("core.uc_profile.tabs.2fa"),
-    component: markRaw(TwoFactor),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/TwoFactor.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 40,
   },
   {
     id: "devices",
     label: t("core.uc_profile.tabs.devices"),
-    component: markRaw(Devices),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Devices.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 50,
   },
 ]);
