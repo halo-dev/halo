@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
 import type { NodeViewProps } from "@halo-dev/richtext-editor";
 import type { AttachmentSimple } from "@halo-dev/ui-shared";

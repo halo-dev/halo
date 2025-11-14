@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";

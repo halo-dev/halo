@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
   convertTreeToCategories,

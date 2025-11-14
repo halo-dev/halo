@@ -4,6 +4,12 @@ import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import WidgetCard from "./components/WidgetCard.vue";
 
+declare module "vue" {
+  interface GlobalComponents {
+    WidgetCard: (typeof import("./components/WidgetCard.vue"))["default"];
+  }
+}
+
 export default definePlugin({
   components: {
     WidgetCard,

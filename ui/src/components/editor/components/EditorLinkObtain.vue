@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { i18n } from "@/locales";
 import type { Attachment } from "@halo-dev/api-client";
 import { VButton, VDropdown, VSpace } from "@halo-dev/components";

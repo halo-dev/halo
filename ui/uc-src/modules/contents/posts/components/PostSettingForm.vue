@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import useSlugify from "@console/composables/use-slugify";
 import type { FormKitNode } from "@formkit/core";
 import { publicApiClient } from "@halo-dev/api-client";

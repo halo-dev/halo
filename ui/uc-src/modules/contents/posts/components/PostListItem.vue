@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import PostContributorList from "@/components/user/PostContributorList.vue";
 import { postLabels } from "@/constants/labels";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";

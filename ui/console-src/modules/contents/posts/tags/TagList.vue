@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
-import SearchInput from "@/components/input/SearchInput.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import type { Tag } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {

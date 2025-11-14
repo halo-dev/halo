@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";

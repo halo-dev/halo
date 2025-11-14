@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
-import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import SearchInput from "@/components/input/SearchInput.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import {
   IconRefreshLine,
   VButton,

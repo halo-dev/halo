@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import { setLanguage } from "@/locales";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";

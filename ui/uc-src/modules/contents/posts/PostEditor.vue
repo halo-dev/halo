@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
