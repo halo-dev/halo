@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import type { ReasonTypeNotifierRequest } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
