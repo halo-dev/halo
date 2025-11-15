@@ -23,7 +23,6 @@ import type { DashboardWidgetQuickActionItem } from "@halo-dev/ui-shared";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 import QuickActionItem from "./QuickActionItem.vue";
 import ThemePreviewItem from "./ThemePreviewItem.vue";
 import { useDashboardQuickActionExtensionPoint } from "./composables/use-dashboard-extension-point";
@@ -35,7 +34,6 @@ const props = defineProps<{
   };
 }>();
 
-const router = useRouter();
 const { t } = useI18n();
 
 const emit = defineEmits<{
@@ -68,10 +66,8 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.new_post.title"
     ),
-    action: () => {
-      router.push({
-        name: "PostEditor",
-      });
+    route: {
+      name: "PostEditor",
     },
     permissions: ["system:posts:manage"],
   },
@@ -81,10 +77,8 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.new_page.title"
     ),
-    action: () => {
-      router.push({
-        name: "SinglePageEditor",
-      });
+    route: {
+      name: "SinglePageEditor",
     },
     permissions: ["system:singlepages:manage"],
   },
@@ -94,13 +88,11 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.upload_attachment.title"
     ),
-    action: () => {
-      router.push({
-        name: "Attachments",
-        query: {
-          action: "upload",
-        },
-      });
+    route: {
+      name: "Attachments",
+      query: {
+        action: "upload",
+      },
     },
     permissions: ["system:attachments:manage"],
   },
@@ -110,10 +102,8 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.theme_manage.title"
     ),
-    action: () => {
-      router.push({
-        name: "ThemeDetail",
-      });
+    route: {
+      name: "ThemeDetail",
     },
     permissions: ["system:themes:view"],
   },
@@ -123,10 +113,8 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.plugin_manage.title"
     ),
-    action: () => {
-      router.push({
-        name: "Plugins",
-      });
+    route: {
+      name: "Plugins",
     },
     permissions: ["system:plugins:view"],
   },
@@ -136,13 +124,11 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
     title: t(
       "core.dashboard.widgets.presets.quickaction.actions.new_user.title"
     ),
-    action: () => {
-      router.push({
-        name: "Users",
-        query: {
-          action: "create",
-        },
-      });
+    route: {
+      name: "Users",
+      query: {
+        action: "create",
+      },
     },
     permissions: ["system:users:manage"],
   },
@@ -172,7 +158,7 @@ const presetItems: DashboardWidgetQuickActionItem[] = [
         },
       });
     },
-    permissions: ["system:posts:manage"],
+    permissions: ["*"],
   },
 ];
 

@@ -1,4 +1,5 @@
 import type { Component, Raw } from "vue";
+import type { RouteLocationRaw } from "vue-router";
 
 /**
  * Defines responsive layout configurations for dashboard widgets across different screen sizes.
@@ -279,6 +280,37 @@ interface DashboardWidgetQuickActionStandardItem
 }
 
 /**
+ * A quick action item that navigates to a route when triggered.
+ */
+interface DashboardWidgetQuickActionRouteItem
+  extends DashboardWidgetQuickActionBaseItem {
+  /**
+   * Cannot provide a custom component for route items.
+   */
+  component?: never;
+
+  /**
+   * Cannot provide an action handler for route items.
+   */
+  action?: never;
+
+  /**
+   * Icon component displayed with the action (required for route items).
+   */
+  icon: Raw<Component>;
+
+  /**
+   * Display title for the action (required for route items).
+   */
+  title: string;
+
+  /**
+   * Route to navigate to when the action is triggered (required for route items).
+   */
+  route: RouteLocationRaw;
+}
+
+/**
  * Represents a quick action button that can be added to dashboard widgets.
  *
  * @remarks
@@ -288,4 +320,5 @@ interface DashboardWidgetQuickActionStandardItem
  */
 export type DashboardWidgetQuickActionItem =
   | DashboardWidgetQuickActionComponentItem
-  | DashboardWidgetQuickActionStandardItem;
+  | DashboardWidgetQuickActionStandardItem
+  | DashboardWidgetQuickActionRouteItem;
