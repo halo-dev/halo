@@ -44,7 +44,7 @@ export default ({ mode }: { mode: string }) => {
         entry: path.resolve(__dirname, "src/index.ts"),
         name: "RichTextEditor",
         formats: ["es", "iife"],
-        fileName: (format) => `rich-text-editor.${format}.js`,
+        fileName: (format) => `index.${format}.js`,
         cssFileName: "style",
       },
       minify: isProduction,

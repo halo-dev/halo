@@ -17,14 +17,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/rich-text-editor.es.js"
+      "import": "./dist/index.es.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/rich-text-editor.iife.js",
-  "jsdelivr": "./dist/rich-text-editor.iife.js",
-  "unpkg": "./dist/rich-text-editor.iife.js",
-  "module": "./dist/rich-text-editor.es.js",
+  "main": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
+  "unpkg": "./dist/index.iife.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"

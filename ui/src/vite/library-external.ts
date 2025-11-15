@@ -93,7 +93,7 @@ export const setupLibraryExternal = (
       rename: `console-shared.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/richtext-editor/dist/rich-text-editor.iife.js",
+      src: "./node_modules/@halo-dev/richtext-editor/dist/index.iife.js",
       dest: "assets/editor",
       rename: `editor.[hash].js`,
     },
