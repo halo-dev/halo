@@ -269,9 +269,20 @@ interface DashboardWidgetQuickActionStandardItem
   action: () => void;            // 点击操作（必需）
 }
 
+interface DashboardWidgetQuickActionRouteItem
+  extends DashboardWidgetQuickActionBaseItem {
+  component?: never;             // 不使用自定义组件
+  action?: never;                // 不使用 action 回调
+  icon: Raw<Component>;          // 图标组件（必需）
+  title: string;                 // 标题文本（必需）
+  route: RouteLocationRaw;       // 导航目标路由（必需），可以是路由名称、路径或完整路由配置
+}
+
+
 export type DashboardWidgetQuickActionItem =
   | DashboardWidgetQuickActionComponentItem
-  | DashboardWidgetQuickActionStandardItem;
+  | DashboardWidgetQuickActionStandardItem
+  | DashboardWidgetQuickActionRouteItem;
 ```
 
 ## 权限控制
