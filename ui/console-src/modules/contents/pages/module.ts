@@ -2,7 +2,6 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconPages } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import SinglePageList from "./SinglePageList.vue";
 
 export default definePlugin({
   routes: [
@@ -25,7 +24,7 @@ export default definePlugin({
         {
           path: "",
           name: "SinglePages",
-          component: SinglePageList,
+          component: () => import("./SinglePageList.vue"),
         },
         {
           path: "deleted",

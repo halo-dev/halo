@@ -10,6 +10,7 @@ import {
   VDropdown,
   VDropdownDivider,
   VDropdownItem,
+  VLoading,
   VTabbar,
   VTag,
 } from "@halo-dev/components";
@@ -18,7 +19,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
-  markRaw,
+  defineAsyncComponent,
   onMounted,
   provide,
   ref,
@@ -31,7 +32,6 @@ import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { useUserEnableDisable } from "./composables/use-user";
-import DetailTab from "./tabs/Detail.vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -61,7 +61,10 @@ const tabs = shallowRef<UserTab[]>([
   {
     id: "detail",
     label: t("core.user.detail.tabs.detail"),
-    component: markRaw(DetailTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Detail.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 10,
   },
 ]);

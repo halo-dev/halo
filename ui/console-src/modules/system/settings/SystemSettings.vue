@@ -4,6 +4,7 @@ import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconSettings,
   VCard,
+  VLoading,
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
@@ -11,9 +12,14 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Component, Raw } from "vue";
-import { markRaw, provide, shallowRef, type Ref } from "vue";
+import {
+  defineAsyncComponent,
+  markRaw,
+  provide,
+  shallowRef,
+  type Ref,
+} from "vue";
 import { useI18n } from "vue-i18n";
-import NotificationsTab from "./tabs/Notifications.vue";
 import SettingTab from "./tabs/Setting.vue";
 
 const { t } = useI18n();
@@ -65,7 +71,10 @@ const { data: setting } = useQuery({
           {
             id: "notification",
             label: "通知设置",
-            component: markRaw(NotificationsTab),
+            component: defineAsyncComponent({
+              loader: () => import("./tabs/Notifications.vue"),
+              loadingComponent: VLoading,
+            }),
           },
         ];
       }

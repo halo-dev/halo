@@ -6,15 +6,13 @@ import {
   type Plugin,
   type SettingForm,
 } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
+import { Dialog, Toast, VLoading } from "@halo-dev/components";
 import { utils, type PluginTab } from "@halo-dev/ui-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
-import { computed, markRaw, ref, shallowRef } from "vue";
+import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
-import DetailTab from "../components/tabs/Detail.vue";
-import SettingTab from "../components/tabs/Setting.vue";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -286,7 +284,10 @@ export function usePluginDetailTabs(
     {
       id: "detail",
       label: t("core.plugin.tabs.detail"),
-      component: markRaw(DetailTab),
+      component: defineAsyncComponent({
+        loader: () => import("../components/tabs/Detail.vue"),
+        loadingComponent: VLoading,
+      }),
     },
   ];
 
@@ -338,7 +339,10 @@ export function usePluginDetailTabs(
             return {
               id: item.group,
               label: item.label || "",
-              component: markRaw(SettingTab),
+              component: defineAsyncComponent({
+                loader: () => import("../components/tabs/Setting.vue"),
+                loadingComponent: VLoading,
+              }),
             };
           }),
         ] as PluginTab[];

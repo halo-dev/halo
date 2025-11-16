@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import MenuLoading from "@/components/menu/MenuLoading.vue";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
@@ -14,7 +13,7 @@ import {
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
 import { defineStore } from "pinia";
-import { onMounted, reactive, ref } from "vue";
+import { defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { RouterView, useRoute } from "vue-router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
@@ -22,6 +21,11 @@ const route = useRoute();
 
 // Global Search
 const globalSearchVisible = ref(false);
+
+const GlobalSearchModal = defineAsyncComponent(
+  () => import("@/components/global-search/GlobalSearchModal.vue")
+);
+
 useEventListener(document, "keydown", (e: KeyboardEvent) => {
   const { key, ctrlKey, metaKey } = e;
   if (key === "k" && ((ctrlKey && !isMac) || metaKey)) {

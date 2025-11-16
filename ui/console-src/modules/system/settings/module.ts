@@ -2,7 +2,6 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import { IconSettings } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import SystemSettings from "./SystemSettings.vue";
 
 export default definePlugin({
   components: {},
@@ -25,7 +24,7 @@ export default definePlugin({
         {
           path: "",
           name: "SystemSetting",
-          component: SystemSettings,
+          component: () => import("./SystemSettings.vue"),
         },
       ],
     },
