@@ -25,6 +25,7 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     onConfirm: async () => {
       try {
         await coreApiClient.theme.theme.deleteTheme({
