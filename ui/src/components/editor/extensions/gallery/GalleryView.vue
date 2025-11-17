@@ -59,6 +59,10 @@ const groupSize = computed(() => {
   return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
 });
 
+const layout = computed(() => {
+  return props.node?.attrs.layout || "auto";
+});
+
 const groups = computed(() => {
   return images.value.reduce(
     (acc: GalleryImage[][], image: GalleryImage, index: number) => {
@@ -115,12 +119,17 @@ const groups = computed(() => {
           v-for="(image, imgIndex) in group"
           :key="groupIndex * groupSize + imgIndex"
           class="group/image relative"
-          :style="{ flex: `${image.aspectRatio} 1 0%` }"
+          :class="{
+            'aspect-1': layout === 'square',
+          }"
+          :style="{
+            flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
+          }"
         >
           <img
             :src="image.src"
             :alt="`Gallery image ${groupIndex * groupSize + imgIndex + 1}`"
-            class="pointer-events-none block size-full"
+            class="pointer-events-none block size-full object-cover"
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />
           <div

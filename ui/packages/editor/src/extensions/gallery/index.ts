@@ -18,6 +18,7 @@ import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
+import BubbleItemLayout from "./BubbleItemLayout.vue";
 import GalleryView from "./GalleryView.vue";
 
 declare module "@/tiptap" {
@@ -76,6 +77,12 @@ const Gallery = Node.create<
           return Number(element.getAttribute("data-group-size")) || 3;
         },
       },
+      layout: {
+        default: "auto",
+        parseHTML: (element) => {
+          return element.getAttribute("data-layout") || "auto";
+        },
+      },
     };
   },
 
@@ -90,6 +97,7 @@ const Gallery = Node.create<
   renderHTML({ node }) {
     const images: GalleryImage[] = node.attrs.images || [];
     const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
+    const layout = node.attrs.layout || "auto";
     const imageGroups: GalleryImage[][] = images.reduce(
       (acc: GalleryImage[][], image: GalleryImage, index: number) => {
         const groupIndex = Math.floor(index / groupSize);
@@ -110,7 +118,7 @@ const Gallery = Node.create<
         return [
           "div",
           {
-            style: `flex: ${image.aspectRatio} 1 0%`,
+            style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
             "data-aspect-ratio": image.aspectRatio.toString(),
           },
           [
@@ -118,7 +126,7 @@ const Gallery = Node.create<
             {
               src: image.src,
               "data-type": "gallery-image",
-              style: "width: 100%; height: 100%",
+              style: "width: 100%; height: 100%; margin: 0; object-fit: cover;",
             },
           ],
         ];
@@ -130,6 +138,7 @@ const Gallery = Node.create<
       {
         "data-type": "gallery",
         "data-group-size": groupSize.toString(),
+        "data-layout": layout,
       },
       ["div", { style: "display: grid; gap: 0.5rem;" }, ...imageGroupElements],
     ];
@@ -216,6 +225,10 @@ const Gallery = Node.create<
             },
             {
               priority: 40,
+              component: markRaw(BubbleItemLayout),
+            },
+            {
+              priority: 50,
               props: {
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),

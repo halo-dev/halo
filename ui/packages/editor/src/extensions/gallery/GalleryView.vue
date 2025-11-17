@@ -104,6 +104,10 @@ const groupSize = computed(() => {
   return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
 });
 
+const layout = computed(() => {
+  return props.node?.attrs.layout || "auto";
+});
+
 const groups = computed(() => {
   return images.value.reduce(
     (acc: GalleryImage[][], image: GalleryImage, index: number) => {
@@ -160,12 +164,17 @@ const groups = computed(() => {
           v-for="(image, imgIndex) in group"
           :key="groupIndex * groupSize + imgIndex"
           class="group/image relative"
-          :style="{ flex: `${image.aspectRatio} 1 0%` }"
+          :class="{
+            'aspect-1': layout === 'square',
+          }"
+          :style="{
+            flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
+          }"
         >
           <img
             :src="image.src"
             :alt="`Gallery image ${groupIndex * groupSize + imgIndex + 1}`"
-            class="pointer-events-none block size-full"
+            class="pointer-events-none block size-full object-cover"
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />
           <div
@@ -182,9 +191,9 @@ const groups = computed(() => {
                 <div
                   class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
                 >
-                  <span>{{
-                    i18n.global.t("editor.common.button.delete")
-                  }}</span>
+                  <span>
+                    {{ i18n.global.t("editor.common.button.delete") }}
+                  </span>
                 </div>
               </button>
             </div>

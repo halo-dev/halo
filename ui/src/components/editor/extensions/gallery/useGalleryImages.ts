@@ -1,6 +1,6 @@
 import type { Attachment } from "@halo-dev/api-client";
-import { utils, type AttachmentLike } from "@halo-dev/console-shared";
 import type { Editor } from "@halo-dev/richtext-editor";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { uploadFile } from "../../utils/upload";
