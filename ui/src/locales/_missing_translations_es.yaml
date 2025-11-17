@@ -217,18 +217,17 @@ core:
         original_comment: Original comment
         content: Reply content
   attachment:
+    common:
+      text:
+        original: Original
     filters:
       sort:
         items:
           display_name_asc: Ascending order by display name
           display_name_desc: Descending order by display name
     detail_modal:
-      fields:
-        thumbnails: Thumbnails
       display_name_form:
         help: Custom attachment name, only for display in the management interface, does not affect the file name and access link itself
-      preview:
-        not_support_thumbnail: This image does not support generating thumbnails.
     permalink_list:
       relative: Relative path
       absolute: Absolute path
@@ -332,7 +331,7 @@ core:
   plugin:
     list:
       fields:
-        builtin: Built-in
+        system_reserved: System Reserved
     operations:
       uninstall_in_batch:
         title: Uninstall the selected plugins
