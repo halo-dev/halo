@@ -3,8 +3,6 @@ import BlankLayout from "@console/layouts/BlankLayout.vue";
 import { IconBookRead } from "@halo-dev/components";
 import { definePlugin } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
-import PostEditor from "./PostEditor.vue";
-import PostList from "./PostList.vue";
 
 export default definePlugin({
   routes: [
@@ -28,7 +26,7 @@ export default definePlugin({
         {
           path: "",
           name: "Posts",
-          component: PostList,
+          component: () => import("./PostList.vue"),
         },
         {
           path: "deleted",
@@ -43,7 +41,7 @@ export default definePlugin({
         {
           path: "editor",
           name: "PostEditor",
-          component: PostEditor,
+          component: () => import("./PostEditor.vue"),
           meta: {
             title: "core.post_editor.title",
             searchable: true,
