@@ -10,7 +10,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import prettyBytes from "pretty-bytes";
 import { useTemplateRef } from "vue";
 

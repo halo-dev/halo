@@ -5,6 +5,7 @@ export default defineConfig({
   entry: ["./src/index.ts"],
   format: ["esm", "iife"],
   external: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
+  noExternal: ["mitt"],
   outputOptions: {
     globals: {
       vue: "Vue",
@@ -14,7 +15,7 @@ export default defineConfig({
     },
   },
   platform: "browser",
-  globalName: "HaloConsoleShared",
+  globalName: "HaloUiShared",
   tsconfig: "./tsconfig.app.json",
   alias: {
     "@": fileURLToPath(new URL("./src", import.meta.url)),

@@ -75,7 +75,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { utils, type AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
@@ -99,7 +99,6 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
-import HasPermission from "../permission/HasPermission.vue";
 import { useAttachmentSelect } from "./composables/use-attachment";
 import { useExtension } from "./composables/use-extension";
 import {

@@ -1,5 +1,5 @@
 import { i18n } from "@/locales";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import type { DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { markRaw } from "vue";
 import CommentStatsWidget from "./presets/comments/CommentStatsWidget.vue";
 import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue";

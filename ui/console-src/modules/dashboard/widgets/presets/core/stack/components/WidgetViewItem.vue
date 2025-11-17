@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  utils,
-  type DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+import { utils, type DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { computed, inject, type ComputedRef } from "vue";
 import type { SimpleWidget } from "../types";
 

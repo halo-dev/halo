@@ -1,6 +1,6 @@
 import { createVNode, render, type Component } from "vue";
 import DialogComponent from "./Dialog.vue";
-import type { DialogProps } from "./interface";
+import type { DialogProps } from "./types";
 
 export type DialogApiProps = Omit<DialogProps, "type" | "visible">;
 

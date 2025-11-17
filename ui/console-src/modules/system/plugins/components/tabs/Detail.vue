@@ -14,7 +14,7 @@ import {
   VDescriptionItem,
   VSwitch,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";

@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { randomUUID } from "@/utils/id";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
@@ -21,14 +19,14 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { FormType, utils } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import { AxiosError, type AxiosRequestConfig } from "axios";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import ShortUniqueId from "short-unique-id";
 import type { ComputedRef } from "vue";
 import {
@@ -56,7 +54,7 @@ const formState = ref<Post>({
   kind: "Post",
   metadata: {
     annotations: {},
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
   spec: {
     allowComment: true,

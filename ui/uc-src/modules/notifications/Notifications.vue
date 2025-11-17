@@ -13,10 +13,10 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";

@@ -25,6 +25,7 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.time.Duration;
 import java.util.Collection;
@@ -282,9 +283,11 @@ public class UserEndpoint implements CustomEndpoint {
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED)
-                                     @Email
-                                     String email) {
+    public record EmailVerifyRequest(
+        @Schema(requiredMode = REQUIRED)
+        @Email
+        @NotBlank
+        String email) {
     }
 
     public record VerifyCodeRequest(
@@ -305,7 +308,8 @@ public class UserEndpoint implements CustomEndpoint {
                     throw new ServerWebInputException("validation.error.email.pattern");
                 }
             })
-            .map(EmailVerifyRequest::email);
+            .map(EmailVerifyRequest::email)
+            .map(String::toLowerCase);
         return Mono.zip(emailMono, getAuthenticatedUserName())
             .flatMap(tuple -> {
                 var email = tuple.getT1();

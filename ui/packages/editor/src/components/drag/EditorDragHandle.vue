@@ -15,8 +15,8 @@ import type {
 import { isBlockEmpty } from "@/utils";
 import { offset } from "@floating-ui/dom";
 import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
+import { sortBy } from "es-toolkit";
 import { Dropdown as VDropdown, vTooltip } from "floating-vue";
-import { sortBy } from "lodash-es";
 import { computed, ref, shallowRef, type PropType } from "vue";
 import MaterialSymbolsAddRounded from "~icons/material-symbols/add-rounded";
 import MaterialSymbolsDragIndicator from "~icons/material-symbols/drag-indicator";
@@ -399,7 +399,7 @@ const mergeRootDragButtonVisibleProps = (
  * @returns Sorted items by priority (lower priority values appear first)
  */
 const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
-  return sortBy(items, "priority");
+  return sortBy(items, ["priority"]);
 };
 </script>
 

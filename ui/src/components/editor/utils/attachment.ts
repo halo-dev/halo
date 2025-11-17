@@ -1,5 +1,5 @@
-import { utils, type AttachmentLike } from "@halo-dev/console-shared";
 import type { Content } from "@halo-dev/richtext-editor";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 
 export function convertToMediaContents(
   attachments: AttachmentLike[]

@@ -1,10 +1,10 @@
-import { randomUUID } from "@/utils/id";
 import {
   getExtensionField,
   type AnyConfig,
   type AnyExtension,
   type Extensions,
 } from "@halo-dev/richtext-editor";
+import { utils } from "@halo-dev/ui-shared";
 
 export function useExtension() {
   const filterDuplicateExtensions = (extensions: Extensions | undefined) => {
@@ -18,7 +18,7 @@ export function useExtension() {
         console.warn(
           `Extension name is missing for Extension, type: ${extension.type}.`
         );
-        const key = randomUUID().toString();
+        const key = utils.id.uuid();
         map.set(key, extension);
         return;
       }

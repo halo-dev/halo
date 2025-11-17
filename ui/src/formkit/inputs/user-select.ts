@@ -16,7 +16,7 @@ const search = async ({ page, size, keyword }) => {
     options: data.items?.map((user) => {
       return {
         value: user.user.metadata.name,
-        label: user.user.spec.displayName,
+        label: `${user.user.spec.displayName}(${user.user.metadata.name})`,
       };
     }),
     total: data.total,

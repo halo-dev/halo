@@ -172,6 +172,7 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                 "Generating thumbnail for path: {}, target: {}, size: {}",
                 sourcePath, thumbnailPath, size);
         }
+        boolean shouldCleanup = true;
         try (var inputStream = Files.newInputStream(sourcePath, READ)) {
             Files.createDirectories(thumbnailPath.getParent());
             // Pass InputStream or File here.
@@ -188,7 +189,6 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             builder.toFile(thumbnailPath.toFile());
             log.info("Generated thumbnail for path: {}, target: {}, size: {}",
                 sourcePath, thumbnailPath, size);
-
             // check size of thumbnails
             var attachmentFileSize = Files.size(sourcePath);
             var thumbnailFileSize = Files.size(thumbnailPath);
@@ -200,20 +200,24 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                         """,
                     thumbnailPath, attachmentFileSize, thumbnailFileSize);
             }
+            shouldCleanup = false;
             return thumbnailPath;
         } catch (IOException e) {
             log.warn("Failed to generate thumbnail for path: {}",
                 sourcePath, e);
-            // delete the possibly created file
-            try {
-                Files.deleteIfExists(thumbnailPath);
-            } catch (IOException ex) {
-                // ignore this error
-                log.warn("Failed to delete possibly created thumbnail file: {}",
-                    thumbnailPath, ex);
-            }
             // return the original attachment path
             return null;
+        } finally {
+            if (shouldCleanup) {
+                // delete the possibly created file
+                try {
+                    Files.deleteIfExists(thumbnailPath);
+                } catch (IOException ex) {
+                    // ignore this error
+                    log.warn("Failed to delete possibly created thumbnail file: {}",
+                        thumbnailPath, ex);
+                }
+            }
         }
     }
 

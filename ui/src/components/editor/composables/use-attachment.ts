@@ -4,7 +4,7 @@ import {
   stores,
   type AttachmentLike,
   type AttachmentSimple,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { computed, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 

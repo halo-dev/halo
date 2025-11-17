@@ -20,10 +20,10 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";

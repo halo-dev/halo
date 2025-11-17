@@ -15,8 +15,8 @@ import {
   VPageHeader,
   VTag,
 } from "@halo-dev/components";
-import type { Info, Startup } from "@halo-dev/console-shared";
-import { stores, utils } from "@halo-dev/console-shared";
+import type { Info, Startup } from "@halo-dev/ui-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import axios from "axios";

@@ -1,12 +1,11 @@
-import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
+import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
 import "@/setup/setupStyles";
 import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useRoleStore } from "@/stores/role";
-import { getCookie } from "@/utils/cookie";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import router from "@uc/router";
 import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import "core-js/es/object/has-own";
@@ -62,12 +61,10 @@ async function initApp() {
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
 
-    // set locale
-    i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
-    utils.date.setLocale(i18n.global.locale.value);
-
     const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
+
+    await setLanguage();
 
     if (currentUserStore.isAnonymous) {
       return;

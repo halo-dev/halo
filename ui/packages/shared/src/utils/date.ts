@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import _dayjs from "dayjs";
 import "dayjs/locale/en";
 import "dayjs/locale/zh-cn";
 import "dayjs/locale/zh-tw";
@@ -6,13 +6,13 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-dayjs.extend(timezone);
-dayjs.extend(utc);
-dayjs.extend(relativeTime);
+_dayjs.extend(timezone);
+_dayjs.extend(utc);
+_dayjs.extend(relativeTime);
 
 const DEFAULT_FORMAT = "YYYY-MM-DD HH:mm";
 
-const dayjsLocales: Record<string, string> = {
+const locales: Record<string, string> = {
   en: "en",
   zh: "zh-cn",
   "en-US": "en",
@@ -21,6 +21,12 @@ const dayjsLocales: Record<string, string> = {
 };
 
 export class DateUtils {
+  readonly dayjs: typeof _dayjs;
+
+  constructor() {
+    this.dayjs = _dayjs;
+  }
+
   /**
    * Formats a date to a string according to the specified format
    *
@@ -30,7 +36,7 @@ export class DateUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    * utils.date.format(new Date()); // "2025-10-22 14:30"
    * utils.date.format("2025-10-22", "YYYY/MM/DD"); // "2025/10/22"
    * ```
@@ -39,7 +45,7 @@ export class DateUtils {
     if (!date) {
       return "";
     }
-    return dayjs(date).format(format || DEFAULT_FORMAT);
+    return this.dayjs(date).format(format || DEFAULT_FORMAT);
   }
 
   /**
@@ -50,7 +56,7 @@ export class DateUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    * utils.date.toISOString(new Date("2025-10-22")); // "2025-10-22T00:00:00.000Z"
    * ```
    */
@@ -58,7 +64,7 @@ export class DateUtils {
     if (!date) {
       return "";
     }
-    return dayjs(date).utc(false).toISOString();
+    return this.dayjs(date).utc(false).toISOString();
   }
 
   /**
@@ -71,7 +77,7 @@ export class DateUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    * utils.date.toDatetimeLocal(new Date("2025-10-22 14:30")); // "2025-10-22T14:30"
    * ```
    */
@@ -80,7 +86,7 @@ export class DateUtils {
       return "";
     }
     // see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local#the_y10k_problem_often_client-side
-    return dayjs(date).format("YYYY-MM-DDTHH:mm");
+    return this.dayjs(date).format("YYYY-MM-DDTHH:mm");
   }
 
   /**
@@ -91,7 +97,7 @@ export class DateUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    * // Assuming now is 2025-10-22
    * utils.date.timeAgo("2025-10-23"); // "in a day"
    * utils.date.timeAgo("2025-10-21"); // "a day ago"
@@ -103,7 +109,7 @@ export class DateUtils {
       return;
     }
 
-    return dayjs().to(dayjs(date));
+    return this.dayjs().to(this.dayjs(date));
   }
 
   /**
@@ -121,7 +127,7 @@ export class DateUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    * utils.date.setLocale("zh-CN");
    * utils.date.timeAgo("2025-10-21"); // "1 天前"
    * utils.date.setLocale("en");
@@ -129,6 +135,48 @@ export class DateUtils {
    * ```
    */
   setLocale(locale: string): void {
-    dayjs.locale(dayjsLocales[locale] || dayjsLocales["en"]);
+    this.dayjs.locale(locales[locale] || locales["en"]);
   }
+}
+
+// See https://github.com/iamkun/dayjs/issues/364
+declare module "dayjs" {
+  interface Dayjs {
+    fromNow(withoutSuffix?: boolean): string;
+    from(compared: _dayjs.ConfigType, withoutSuffix?: boolean): string;
+    toNow(withoutSuffix?: boolean): string;
+    to(compared: _dayjs.ConfigType, withoutSuffix?: boolean): string;
+  }
+}
+
+declare module "dayjs" {
+  interface Dayjs {
+    tz(timezone?: string, keepLocalTime?: boolean): _dayjs.Dayjs;
+    offsetName(type?: "short" | "long"): string | undefined;
+  }
+
+  interface DayjsTimezone {
+    (date?: _dayjs.ConfigType, timezone?: string): _dayjs.Dayjs;
+    (date: _dayjs.ConfigType, format: string, timezone?: string): _dayjs.Dayjs;
+    guess(): string;
+    setDefault(timezone?: string): void;
+  }
+}
+
+declare module "dayjs" {
+  interface Dayjs {
+    utc(keepLocalTime?: boolean): _dayjs.Dayjs;
+
+    local(): _dayjs.Dayjs;
+
+    isUTC(): boolean;
+
+    utcOffset(offset: number | string, keepLocalTime?: boolean): _dayjs.Dayjs;
+  }
+
+  export function utc(
+    config?: _dayjs.ConfigType,
+    format?: string,
+    strict?: boolean
+  ): _dayjs.Dayjs;
 }

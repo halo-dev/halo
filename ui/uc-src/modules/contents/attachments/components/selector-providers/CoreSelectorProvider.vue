@@ -21,7 +21,7 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
 import { computed, nextTick, ref, watch } from "vue";
