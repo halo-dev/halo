@@ -583,6 +583,7 @@ core:
     common:
       text:
         ungrouped: 未分組
+        original: 原始
     actions:
       storage_policies: 存儲策略
     empty:
@@ -638,14 +639,12 @@ core:
         owner: 上傳者
         creation_time: 上傳時間
         permalink: 連結
-        thumbnails: 縮略圖
       display_name_form:
         help: 自定義附件名稱，僅用於管理介面顯示，不會影響文件本身名稱以及訪問連結
       preview:
         video_not_support: 當前瀏覽器不支援該影片播放
         audio_not_support: 當前瀏覽器不支援該音頻播放
         not_support: 此文件不支援預覽
-        not_support_thumbnail: 此圖片不支持生成縮略圖
     group_editing_modal:
       titles:
         create: 新增附件分組

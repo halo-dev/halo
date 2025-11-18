@@ -48,5 +48,7 @@ onMounted(async () => {
   <template v-else-if="error">
     <slot name="error"> error </slot>
   </template>
-  <img v-else :src="src" :alt="alt" :class="classes" />
+  <Transition v-else appear name="fade">
+    <img :src="src" :alt="alt" :class="classes" />
+  </Transition>
 </template>
