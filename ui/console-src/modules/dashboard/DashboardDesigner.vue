@@ -18,7 +18,7 @@ import {
   utils,
   type DashboardWidget,
   type DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useEventListener } from "@vueuse/core";
 import { cloneDeep, isEqual } from "es-toolkit";

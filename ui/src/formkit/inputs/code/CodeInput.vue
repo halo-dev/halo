@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { CodemirrorProps } from "@/components/codemirror/supports";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { VButton, VPageHeader } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
@@ -14,7 +15,7 @@ const props = defineProps({
 
 const codeInputWrapperRef = ref();
 
-const language = props.context.language as string;
+const language = props.context.language as CodemirrorProps["language"];
 
 const onChange = (value: string) => {
   props.context.node.input(value);

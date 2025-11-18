@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { Post } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";

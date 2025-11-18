@@ -20,7 +20,7 @@ import {
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";

@@ -9,8 +9,9 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  type StatusDotState,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -29,6 +30,9 @@ function handleDelete() {
   Dialog.warning({
     title: t("core.uc_profile.pat.operations.delete.title"),
     description: t("core.uc_profile.pat.operations.delete.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.deletePat({
         name: props.token.metadata.name,
@@ -44,6 +48,9 @@ function handleRevoke() {
   Dialog.warning({
     title: t("core.uc_profile.pat.operations.revoke.title"),
     description: t("core.uc_profile.pat.operations.revoke.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.revokePat({
         name: props.token.metadata.name,
@@ -76,7 +83,7 @@ const statusText = computed(() => {
   );
 });
 
-const statusTheme = computed(() => {
+const statusTheme = computed<StatusDotState>(() => {
   const { expiresAt } = props.token.spec || {};
   if (expiresAt && new Date(expiresAt) < new Date()) {
     return "warning";

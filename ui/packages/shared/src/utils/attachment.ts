@@ -33,7 +33,7 @@ export class AttachmentUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    *
    * // Local image
    * utils.attachment.getThumbnailUrl("/uploads/image.jpg", "M");
@@ -81,7 +81,7 @@ export class AttachmentUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    *
    * // String URL
    * utils.attachment.getUrl("https://example.com/image.jpg");
@@ -124,7 +124,7 @@ export class AttachmentUtils {
    *
    * @example
    * ```ts
-   * import { utils } from "@halo-dev/console-shared"
+   * import { utils } from "@halo-dev/ui-shared"
    *
    * // String URL
    * utils.attachment.convertToSimple("https://example.com/image.jpg");

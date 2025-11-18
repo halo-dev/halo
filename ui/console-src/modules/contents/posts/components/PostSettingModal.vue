@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { postLabels } from "@/constants/labels";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
@@ -13,7 +13,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType, utils } from "@halo-dev/console-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

@@ -18,7 +18,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import {
@@ -76,6 +76,7 @@ const handleDelete = async (policy: Policy) => {
     description: t(
       "core.attachment.policies_modal.operations.delete.description"
     ),
+    confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {

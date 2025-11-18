@@ -2,7 +2,7 @@ import { ucApiClient } from "@halo-dev/api-client";
 import type {
   DashboardResponsiveLayout,
   DashboardWidget,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { computed, ref, type Ref } from "vue";

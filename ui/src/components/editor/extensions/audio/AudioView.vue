@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { VButton } from "@halo-dev/components";
-import type { AttachmentSimple } from "@halo-dev/console-shared";
-import { NodeViewWrapper, type NodeViewProps } from "@halo-dev/richtext-editor";
+import type { NodeViewProps } from "@halo-dev/richtext-editor";
+import type { AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";

@@ -1,5 +1,5 @@
 import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
-import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/ui-shared";
 import type { Component, PropType } from "vue";
 import { computed, defineComponent } from "vue";
 import { useI18n } from "vue-i18n";

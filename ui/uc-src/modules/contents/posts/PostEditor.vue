@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
@@ -20,8 +19,8 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { FormType, utils } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { useLocalStorage } from "@vueuse/core";

@@ -11,7 +11,7 @@ import {
   IconUserSettings,
   VModal,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useEventListener } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { storeToRefs } from "pinia";

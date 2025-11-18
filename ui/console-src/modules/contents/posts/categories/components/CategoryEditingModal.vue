@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
@@ -14,7 +14,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType } from "@halo-dev/console-shared";
+import { FormType } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";

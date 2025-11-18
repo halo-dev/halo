@@ -1,41 +1,16 @@
 <script lang="ts" setup>
-import { css } from "@codemirror/lang-css";
-import { html } from "@codemirror/lang-html";
-import { javascript } from "@codemirror/lang-javascript";
-import { json } from "@codemirror/lang-json";
-import { LanguageSupport, StreamLanguage } from "@codemirror/language";
-import { yaml } from "@codemirror/legacy-modes/mode/yaml";
-import type { EditorStateConfig } from "@codemirror/state";
 import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { onBeforeUnmount, onMounted, shallowRef, watch } from "vue";
+import { presetLanguages, type CodemirrorProps } from "./supports";
 
-const presetLanguages = {
-  yaml: StreamLanguage.define(yaml),
-  html: html(),
-  javascript: javascript({
-    jsx: true,
-    typescript: true,
-  }),
-  css: css(),
-  json: json(),
-};
-
-const props = withDefaults(
-  defineProps<{
-    modelValue?: string;
-    height?: string;
-    language: keyof typeof presetLanguages | LanguageSupport;
-    extensions?: EditorStateConfig["extensions"];
-  }>(),
-  {
-    modelValue: "",
-    height: "auto",
-    language: "yaml",
-    extensions: () => [],
-  }
-);
+const props = withDefaults(defineProps<CodemirrorProps>(), {
+  modelValue: "",
+  height: "auto",
+  language: "yaml",
+  extensions: () => [],
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;

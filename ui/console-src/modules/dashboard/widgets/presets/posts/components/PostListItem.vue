@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { postLabels } from "@/constants/labels";
-import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -9,7 +8,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 

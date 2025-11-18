@@ -1,5 +1,5 @@
 {
-  "name": "@halo-dev/console-shared",
+  "name": "@halo-dev/ui-shared",
   "type": "module",
   "version": "2.21.0",
   "description": "",
@@ -43,6 +43,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "dayjs": "^1.11.19",
     "uuid": "^13.0.0"
   }
 }

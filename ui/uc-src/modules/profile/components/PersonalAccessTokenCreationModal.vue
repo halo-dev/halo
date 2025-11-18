@@ -7,7 +7,7 @@ import { useRoleStore } from "@/stores/role";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import { computed, ref } from "vue";

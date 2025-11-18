@@ -2,10 +2,7 @@
 import ActionButton from "@console/modules/dashboard/components/ActionButton.vue";
 import WidgetConfigFormModal from "@console/modules/dashboard/components/WidgetConfigFormModal.vue";
 import { IconCloseCircle, IconSettings } from "@halo-dev/components";
-import {
-  utils,
-  type DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+import { utils, type DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
 import type { SimpleWidget } from "../types";
 

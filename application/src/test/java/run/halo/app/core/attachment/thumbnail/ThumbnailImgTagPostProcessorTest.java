@@ -13,11 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.StandardModelFactory;
 import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -38,7 +38,7 @@ class ThumbnailImgTagPostProcessorTest {
 
     @BeforeEach
     void setUp() {
-        var templateEngine = new TemplateEngine();
+        var templateEngine = new SpringTemplateEngine();
         this.modelFactory = new StandardModelFactory(templateEngine.getConfiguration(), HTML);
     }
 

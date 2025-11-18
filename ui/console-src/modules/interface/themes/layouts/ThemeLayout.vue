@@ -17,7 +17,7 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { cloneDeep } from "es-toolkit";

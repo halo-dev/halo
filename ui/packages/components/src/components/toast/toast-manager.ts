@@ -1,6 +1,6 @@
 import { createVNode, render, type Component, type VNode } from "vue";
 import ToastComponent from "./Toast.vue";
-import type { ToastProps } from "./interface";
+import type { ToastProps } from "./types";
 
 export type ToastApiProps = Omit<ToastProps, "type" | "content">;
 

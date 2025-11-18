@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
   convertTreeToCategories,
@@ -9,7 +8,7 @@ import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";

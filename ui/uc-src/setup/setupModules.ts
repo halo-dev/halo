@@ -2,7 +2,7 @@ import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { loadStyle } from "@/utils/load-style";
 import { Toast } from "@halo-dev/components";
-import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
+import type { PluginModule, RouteRecordAppend } from "@halo-dev/ui-shared";
 import modules from "@uc/modules";
 import router from "@uc/router";
 import { useScriptTag } from "@vueuse/core";
@@ -44,14 +44,6 @@ async function registerEnabledPlugins(
   if (enabledPlugins) {
     enabledPlugins.forEach((plugin) =>
       registerPluginIfAvailable(app, pluginModuleStore, plugin.name)
-    );
-  }
-
-  // @Deprecated: Compatibility solution, will be removed in the future
-  const enabledPluginNames = window["enabledPluginNames"] as string[];
-  if (enabledPluginNames) {
-    enabledPluginNames.forEach((name) =>
-      registerPluginIfAvailable(app, pluginModuleStore, name)
     );
   }
 }

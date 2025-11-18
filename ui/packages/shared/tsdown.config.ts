@@ -15,7 +15,7 @@ export default defineConfig({
     },
   },
   platform: "browser",
-  globalName: "HaloConsoleShared",
+  globalName: "HaloUiShared",
   tsconfig: "./tsconfig.app.json",
   alias: {
     "@": fileURLToPath(new URL("./src", import.meta.url)),

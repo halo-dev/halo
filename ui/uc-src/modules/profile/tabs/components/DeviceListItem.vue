@@ -8,7 +8,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { computed, markRaw, ref, type Component, type Raw } from "vue";
 import RiComputerLine from "~icons/ri/computer-line";
 import RiSmartphoneLine from "~icons/ri/smartphone-line";

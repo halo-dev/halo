@@ -4,7 +4,7 @@ import { loadStyle } from "@/utils/load-style";
 import modules from "@console/modules";
 import router from "@console/router";
 import { Toast } from "@halo-dev/components";
-import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
+import type { PluginModule, RouteRecordAppend } from "@halo-dev/ui-shared";
 import { useScriptTag } from "@vueuse/core";
 import type { App } from "vue";
 import type { RouteRecordRaw } from "vue-router";
@@ -44,14 +44,6 @@ async function registerEnabledPlugins(
   if (enabledPlugins) {
     enabledPlugins.forEach((plugin) =>
       registerPluginIfAvailable(app, pluginModuleStore, plugin.name)
-    );
-  }
-
-  // @Deprecated: Compatibility solution, will be removed in the future
-  const enabledPluginNames = window["enabledPluginNames"] as string[];
-  if (enabledPluginNames) {
-    enabledPluginNames.forEach((name) =>
-      registerPluginIfAvailable(app, pluginModuleStore, name)
     );
   }
 }

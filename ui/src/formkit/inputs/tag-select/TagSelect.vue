@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
@@ -10,7 +9,7 @@ import {
   IconCheckboxCircle,
   IconClose,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";

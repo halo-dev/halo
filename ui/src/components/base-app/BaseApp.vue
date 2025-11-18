@@ -2,7 +2,7 @@
 import { useAppTitle } from "@/composables/use-title";
 import { i18n } from "@/locales";
 import type { FormKitConfig } from "@formkit/core";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useFavicon } from "@vueuse/core";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import {

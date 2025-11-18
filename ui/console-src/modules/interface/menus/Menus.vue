@@ -19,7 +19,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { Draggable } from "@he-tree/vue";
 import "@he-tree/vue/style/default.css";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";

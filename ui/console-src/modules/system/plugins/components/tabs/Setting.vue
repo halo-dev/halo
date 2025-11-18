@@ -4,7 +4,7 @@ import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Plugin, Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton } from "@halo-dev/components";
-import { events } from "@halo-dev/console-shared";
+import { events } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { set } from "es-toolkit/compat";

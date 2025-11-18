@@ -3,17 +3,29 @@ import { IconArrowRight } from "@halo-dev/components";
 import {
   utils,
   type DashboardWidgetQuickActionItem,
-} from "@halo-dev/console-shared";
-defineProps<{
+} from "@halo-dev/ui-shared";
+import { useRouter } from "vue-router";
+
+const props = defineProps<{
   item: DashboardWidgetQuickActionItem;
 }>();
+
+const router = useRouter();
+
+function handleClick() {
+  if ("action" in props.item && props.item.action) {
+    props.item.action();
+  } else if ("route" in props.item && props.item.route) {
+    router.push(props.item.route);
+  }
+}
 </script>
 
 <template>
   <template v-if="utils.permission.has(item.permissions || [])">
     <div
       class="group relative cursor-pointer rounded-lg bg-gray-50 p-4 transition-all hover:bg-gray-100"
-      @click="item.action"
+      @click="handleClick"
     >
       <div>
         <span

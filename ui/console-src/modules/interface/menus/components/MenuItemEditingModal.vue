@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";

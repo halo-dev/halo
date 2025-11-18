@@ -1,5 +1,3 @@
-import Forbidden from "@/views/exceptions/Forbidden.vue";
-import NotFound from "@/views/exceptions/NotFound.vue";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import type { RouteRecordRaw } from "vue-router";
 
@@ -7,7 +5,13 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/:pathMatch(.*)*",
     component: BasicLayout,
-    children: [{ path: "", name: "NotFound", component: NotFound }],
+    children: [
+      {
+        path: "",
+        name: "NotFound",
+        component: () => import("@/views/exceptions/NotFound.vue"),
+      },
+    ],
   },
   {
     path: "/403",
@@ -16,7 +20,7 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: "",
         name: "Forbidden",
-        component: Forbidden,
+        component: () => import("@/views/exceptions/Forbidden.vue"),
       },
     ],
   },
