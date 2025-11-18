@@ -105,6 +105,7 @@ import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import { useAttachmentSelect } from "./composables/use-attachment";
 import {
   UiExtensionAudio,
+  UiExtensionGallery,
   UiExtensionImage,
   UiExtensionUpload,
   UiExtensionVideo,
@@ -247,6 +248,10 @@ const presetExtensions = [
     HTMLAttributes: {
       loading: "lazy",
     },
+    uploadImage: props.uploadImage,
+  }),
+  UiExtensionGallery.configure({
+    allowBase64: false,
     uploadImage: props.uploadImage,
   }),
   ExtensionTaskList,

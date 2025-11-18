@@ -18,6 +18,7 @@ import {
   ExtensionFigure,
   ExtensionFontSize,
   ExtensionFormatBrush,
+  ExtensionGallery,
   ExtensionGapcursor,
   ExtensionHardBreak,
   ExtensionHeading,
@@ -117,6 +118,7 @@ const extensions = [
   ExtensionDetails.configure({
     persist: true,
   }),
+  ExtensionGallery,
   ExtensionFigure,
 ];
 
