@@ -4,6 +4,7 @@ import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
+  findChildren,
   findParentNode,
   isActive,
   mergeAttributes,
@@ -598,8 +599,14 @@ const Video = Node.create<ExtensionOptions>({
                     editor.chain().focus().setTextSelection(captionPos).run();
                     return;
                   }
+                  const imageNodePos = findChildren(
+                    editor.state.selection.$from.node(),
+                    (node) => node.type.name === Video.name
+                  )[0];
                   const figureCaptionNode =
-                    editor.schema.nodes.figureCaption.create();
+                    editor.schema.nodes.figureCaption.create({
+                      width: imageNodePos.node.attrs.width,
+                    });
                   editor
                     .chain()
                     .focus()

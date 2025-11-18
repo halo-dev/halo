@@ -3,6 +3,7 @@ import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.v
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
+  findChildren,
   findParentNode,
   isActive,
   mergeAttributes,
@@ -386,7 +387,6 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
 
                   const { node, pos } = figureParent;
                   let captionPos = -1;
-
                   node.forEach((child, offset) => {
                     if (child.type.name === FigureCaption.name) {
                       captionPos = pos + offset + 1;
@@ -396,8 +396,14 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                     editor.chain().focus().setTextSelection(captionPos).run();
                     return;
                   }
+                  const imageNodePos = findChildren(
+                    editor.state.selection.$from.node(),
+                    (node) => node.type.name === Image.name
+                  )[0];
                   const figureCaptionNode =
-                    editor.schema.nodes.figureCaption.create();
+                    editor.schema.nodes.figureCaption.create({
+                      width: imageNodePos.node.attrs.width,
+                    });
                   editor
                     .chain()
                     .focus()
