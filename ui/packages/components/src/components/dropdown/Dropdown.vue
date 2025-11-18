@@ -47,6 +47,7 @@ defineExpose({
     :placement="placement"
     :triggers="triggers"
     :dispose-timeout="null"
+    class="dropdown-wrapper"
     @show="emit('show')"
   >
     <slot />
@@ -64,3 +65,9 @@ defineExpose({
     </template>
   </FloatingDropdown>
 </template>
+
+<style>
+.dropdown-wrapper {
+  display: inline-block;
+}
+</style>
