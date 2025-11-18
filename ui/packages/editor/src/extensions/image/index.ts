@@ -23,7 +23,6 @@ import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiFileImageBox from "~icons/mdi/file-image-box";
 import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
 import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
 import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiLink from "~icons/mdi/link";
@@ -97,6 +96,20 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
           };
         },
       },
+      position: {
+        default: "left",
+        parseHTML: (element) => {
+          return (
+            element.getAttribute("data-position") ||
+            element.getAttribute("text-align")
+          );
+        },
+        renderHTML: (attributes) => {
+          return {
+            "data-position": attributes.position,
+          };
+        },
+      },
     };
   },
 
@@ -135,7 +148,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
               return;
             }
 
-            let alignItems = "center";
+            let position = "left";
             let deletePreviousNode = false;
             let previousNodePos = -1;
             let previousNodeSize = 0;
@@ -143,13 +156,13 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             const previousNode = $pos.nodeBefore;
             if (previousNode && previousNode.type.name === Paragraph.name) {
               if (previousNode.attrs.textAlign) {
-                const alignMap: Record<string, string> = {
-                  left: "start",
+                const positionMap: Record<string, string> = {
+                  left: "left",
                   center: "center",
-                  right: "end",
-                  justify: "stretch",
+                  right: "right",
+                  justify: "center",
                 };
-                alignItems = alignMap[previousNode.attrs.textAlign] || "center";
+                position = positionMap[previousNode.attrs.textAlign] || "left";
               }
               if (previousNode.textContent?.trim().length === 0) {
                 deletePreviousNode = true;
@@ -161,7 +174,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
             const figureNode = newState.schema.nodes.figure.create(
               {
                 contentType: "image",
-                alignItems,
+                position,
               },
               [node]
             );
@@ -263,16 +276,10 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                   return !isEmpty(editor.getAttributes(Image.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "start";
-                  }
-                  return editor.isActive({ textAlign: "left" });
+                  return editor.isActive({ position: "left" });
                 },
                 icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetTextAlign(editor, "start"),
+                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
@@ -282,16 +289,10 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                   return !isEmpty(editor.getAttributes(Image.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "center";
-                  }
-                  return editor.isActive({ textAlign: "center" });
+                  return editor.isActive({ position: "center" });
                 },
                 icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetTextAlign(editor, "center"),
+                action: () => handleSetPosition(editor, "center"),
               },
             },
             {
@@ -301,35 +302,10 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
                   return !isEmpty(editor.getAttributes(Image.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "end";
-                  }
-                  return editor.isActive({ textAlign: "right" });
+                  return editor.isActive({ position: "right" });
                 },
                 icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetTextAlign(editor, "end"),
-              },
-            },
-            {
-              priority: 50,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
-                },
-                isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "stretch";
-                  }
-                  return editor.isActive({ textAlign: "justify" });
-                },
-                icon: markRaw(MdiFormatAlignJustify),
-                action: () => handleSetTextAlign(editor, "stretch"),
+                action: () => handleSetPosition(editor, "right"),
               },
             },
             {
@@ -472,35 +448,15 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
   },
 });
 
-const handleSetTextAlign = (
+const handleSetPosition = (
   editor: Editor,
-  align: "start" | "center" | "end" | "stretch"
+  position: "left" | "center" | "right"
 ) => {
-  const figureParent = findParentNode((node) => node.type.name === Figure.name)(
-    editor.state.selection
-  );
-
-  const alignMap: Record<string, string> = {
-    start: "left",
-    center: "center",
-    end: "right",
-    stretch: "justify",
-  };
-
-  if (!figureParent) {
-    return editor.chain().focus().setTextAlign(alignMap[align]).run();
-  }
-
   return editor
     .chain()
     .focus()
-    .command(({ tr }) => {
-      tr.setNodeMarkup(figureParent.pos, undefined, {
-        ...figureParent.node.attrs,
-        alignItems: align,
-      });
-      return true;
-    })
+    .updateAttributes(Image.name, { position })
+    .updateAttributes(Figure.name, { position })
     .run();
 };
 

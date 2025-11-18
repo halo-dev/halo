@@ -36,6 +36,10 @@ const href = computed({
   },
 });
 
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
+});
+
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos() || 0);
 }
@@ -199,10 +203,11 @@ const isPercentageWidth = computed(() => {
 <template>
   <node-view-wrapper
     as="div"
-    class="w-full"
+    class="flex w-full"
     :class="{
-      'w-fit': !isPercentageWidth && src,
-      flex: isPercentageWidth,
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
     }"
   >
     <div
@@ -243,6 +248,10 @@ const isPercentageWidth = computed(() => {
         :width="isPercentageWidth ? '100%' : node.attrs.width"
         :height="isPercentageWidth ? '100%' : node.attrs.height"
         class="max-w-full rounded-md"
+        :style="{
+          width: isPercentageWidth ? '100%' : node.attrs.width,
+          height: isPercentageWidth ? '100%' : node.attrs.height,
+        }"
         @load="onImageLoaded"
         @error="onImageError"
       />

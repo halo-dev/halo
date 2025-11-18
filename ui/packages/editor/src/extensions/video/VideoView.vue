@@ -15,6 +15,10 @@ const src = computed({
   },
 });
 
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
+});
+
 const controls = computed(() => {
   return props.node.attrs.controls;
 });
@@ -47,10 +51,11 @@ const isPercentageWidth = computed(() => {
 <template>
   <node-view-wrapper
     as="div"
-    class="w-full"
+    class="flex"
     :class="{
-      'w-fit': !isPercentageWidth && src,
-      flex: isPercentageWidth,
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
     }"
   >
     <div

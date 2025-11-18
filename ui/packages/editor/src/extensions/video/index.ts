@@ -24,7 +24,6 @@ import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
 import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
 import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
 import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
@@ -125,14 +124,17 @@ const Video = Node.create<ExtensionOptions>({
           };
         },
       },
-      textAlign: {
-        default: null,
+      position: {
+        default: "left",
         parseHTML: (element) => {
-          return element.getAttribute("text-align");
+          return (
+            element.getAttribute("data-position") ||
+            element.getAttribute("text-align")
+          );
         },
         renderHTML: (attributes) => {
           return {
-            "text-align": attributes.textAlign,
+            "data-position": attributes.position,
           };
         },
       },
@@ -200,7 +202,7 @@ const Video = Node.create<ExtensionOptions>({
               return;
             }
 
-            let alignItems = "center";
+            let position = "left";
             let deletePreviousNode = false;
             let previousNodePos = -1;
             let previousNodeSize = 0;
@@ -208,13 +210,13 @@ const Video = Node.create<ExtensionOptions>({
             const previousNode = $pos.nodeBefore;
             if (previousNode && previousNode.type.name === Paragraph.name) {
               if (previousNode.attrs.textAlign) {
-                const alignMap: Record<string, string> = {
-                  left: "start",
+                const positionMap: Record<string, string> = {
+                  left: "left",
                   center: "center",
-                  right: "end",
-                  justify: "stretch",
+                  right: "right",
+                  justify: "center",
                 };
-                alignItems = alignMap[previousNode.attrs.textAlign] || "center";
+                position = positionMap[previousNode.attrs.textAlign] || "left";
               }
               if (previousNode.textContent?.trim().length === 0) {
                 deletePreviousNode = true;
@@ -226,7 +228,7 @@ const Video = Node.create<ExtensionOptions>({
             const figureNode = newState.schema.nodes.figure.create(
               {
                 contentType: "video",
-                alignItems,
+                position,
               },
               [node]
             );
@@ -502,16 +504,10 @@ const Video = Node.create<ExtensionOptions>({
                   return !isEmpty(editor.getAttributes(Video.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "start";
-                  }
-                  return editor.isActive({ textAlign: "left" });
+                  return editor.isActive({ position: "left" });
                 },
                 icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetTextAlign(editor, "start"),
+                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
@@ -521,16 +517,10 @@ const Video = Node.create<ExtensionOptions>({
                   return !isEmpty(editor.getAttributes(Video.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "center";
-                  }
-                  return editor.isActive({ textAlign: "center" });
+                  return editor.isActive({ position: "center" });
                 },
                 icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetTextAlign(editor, "center"),
+                action: () => handleSetPosition(editor, "center"),
               },
             },
             {
@@ -540,35 +530,10 @@ const Video = Node.create<ExtensionOptions>({
                   return !isEmpty(editor.getAttributes(Video.name).src);
                 },
                 isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "end";
-                  }
-                  return editor.isActive({ textAlign: "right" });
+                  return editor.isActive({ position: "right" });
                 },
                 icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetTextAlign(editor, "end"),
-              },
-            },
-            {
-              priority: 140,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
-                },
-                isActive: () => {
-                  const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
-                  )(editor.state.selection);
-                  if (figureParent) {
-                    return figureParent.node.attrs.alignItems === "stretch";
-                  }
-                  return editor.isActive({ textAlign: "justify" });
-                },
-                icon: markRaw(MdiFormatAlignJustify),
-                action: () => handleSetTextAlign(editor, "stretch"),
+                action: () => handleSetPosition(editor, "right"),
               },
             },
             {
@@ -738,35 +703,15 @@ export const handleSetSize = (
     .run();
 };
 
-const handleSetTextAlign = (
+const handleSetPosition = (
   editor: Editor,
-  align: "start" | "center" | "end" | "stretch"
+  position: "left" | "center" | "right"
 ) => {
-  const figureParent = findParentNode((node) => node.type.name === Figure.name)(
-    editor.state.selection
-  );
-
-  const alignMap: Record<string, string> = {
-    start: "left",
-    center: "center",
-    end: "right",
-    stretch: "justify",
-  };
-
-  if (!figureParent) {
-    return editor.chain().focus().setTextAlign(alignMap[align]).run();
-  }
-
   return editor
     .chain()
     .focus()
-    .command(({ tr }) => {
-      tr.setNodeMarkup(figureParent.pos, undefined, {
-        ...figureParent.node.attrs,
-        alignItems: align,
-      });
-      return true;
-    })
+    .updateAttributes(Video.name, { position })
+    .updateAttributes(Figure.name, { position })
     .run();
 };
 

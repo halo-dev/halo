@@ -30,6 +30,10 @@ const loop = computed(() => {
   return props.node.attrs.loop;
 });
 
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
+});
+
 const initialization = computed(() => {
   return !src.value;
 });
@@ -81,10 +85,11 @@ const isPercentageWidth = computed(() => {
 <template>
   <node-view-wrapper
     as="div"
-    class="w-full"
+    class="flex w-full"
     :class="{
-      'w-fit': !isPercentageWidth && src,
-      flex: isPercentageWidth,
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
     }"
   >
     <div

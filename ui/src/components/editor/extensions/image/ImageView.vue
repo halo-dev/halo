@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { IconImageAddLine, VButton } from "@halo-dev/components";
-import { type NodeViewProps } from "@halo-dev/richtext-editor";
+import { type NodeViewProps, NodeViewWrapper } from "@halo-dev/richtext-editor";
 import type { AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { EditorLinkObtain } from "../../components";
@@ -37,6 +37,10 @@ const href = computed({
   set: (href: string) => {
     props.updateAttributes({ href: href });
   },
+});
+
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
 });
 
 const fileBase64 = ref<string>();
@@ -244,6 +248,16 @@ watch([src, resizeHandleRef], () => {
   }
 });
 
+watch(
+  () => props.node?.attrs.width,
+  (newWidth) => {
+    if (newWidth) {
+      props.editor.commands.updateFigureContainerWidth(newWidth);
+    }
+  },
+  { immediate: false }
+);
+
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
 
@@ -253,12 +267,13 @@ const isPercentageWidth = computed(() => {
 </script>
 
 <template>
-  <node-view-wrapper
+  <NodeViewWrapper
     as="div"
-    class="w-full"
+    class="flex w-full"
     :class="{
-      'w-fit': !isPercentageWidth && src,
-      flex: isPercentageWidth,
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
     }"
   >
     <div
@@ -269,7 +284,6 @@ const isPercentageWidth = computed(() => {
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
-        height: initialization ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="src || fileBase64" class="relative">
@@ -279,7 +293,6 @@ const isPercentageWidth = computed(() => {
           :alt="alt"
           :href="href"
           :width="isPercentageWidth ? '100%' : node.attrs.width"
-          :height="isPercentageWidth ? '100%' : node.attrs.height"
           class="max-w-full rounded-md"
           @load="onImageLoaded"
         />
@@ -417,5 +430,5 @@ const isPercentageWidth = computed(() => {
         </EditorLinkObtain>
       </div>
     </div>
-  </node-view-wrapper>
+  </NodeViewWrapper>
 </template>

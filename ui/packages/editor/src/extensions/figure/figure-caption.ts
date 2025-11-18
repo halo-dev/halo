@@ -6,7 +6,9 @@ import {
   Plugin,
   PluginKey,
   TextSelection,
+  VueNodeViewRenderer,
 } from "@/tiptap";
+import FigureCaptionView from "./FigureCaptionView.vue";
 
 const FigureCaption = Node.create({
   name: "figureCaption",
@@ -201,129 +203,7 @@ const FigureCaption = Node.create({
   },
 
   addNodeView() {
-    const getMetaElement = (dom: HTMLElement) => {
-      const figureElement = dom.parentElement;
-      if (!figureElement || figureElement.tagName.toLowerCase() !== "figure") {
-        return null;
-      }
-      const mediaElement = Array.from(figureElement.children).find(
-        (child) => child.tagName.toLowerCase() !== "figcaption"
-      ) as HTMLElement | undefined;
-      if (!mediaElement) {
-        return null;
-      }
-      let element = mediaElement;
-      while (element.children.length > 0) {
-        element = element.children[0] as HTMLElement;
-      }
-      return element as HTMLElement;
-    };
-
-    return ({ node, HTMLAttributes, editor, getPos }) => {
-      const dom = document.createElement("figcaption");
-
-      const attrs = mergeAttributes(
-        this.options.HTMLAttributes,
-        HTMLAttributes
-      );
-
-      Object.entries(attrs).forEach(([key, value]) => {
-        if (typeof value === "string") {
-          dom.setAttribute(key, value);
-        }
-      });
-
-      const updateEmptyState = (currentNode: typeof node) => {
-        const isEmpty = currentNode.textContent.trim().length === 0;
-        if (isEmpty) {
-          dom.setAttribute("data-empty", "true");
-        } else {
-          dom.removeAttribute("data-empty");
-        }
-      };
-
-      updateEmptyState(node);
-
-      const syncWidth = () => {
-        const mediaElement = getMetaElement(dom);
-        if (!mediaElement) {
-          return;
-        }
-        const width = mediaElement.offsetWidth;
-        if (width > 0) {
-          const widthValue = `${width}px`;
-          dom.style.width = widthValue;
-          dom.style.maxWidth = "100%";
-
-          if (getPos) {
-            const pos = getPos();
-            const currentWidth = node.attrs.width;
-            if (pos && currentWidth !== widthValue) {
-              editor.view.dispatch(
-                editor.view.state.tr.setNodeMarkup(pos, undefined, {
-                  ...node.attrs,
-                  width: widthValue,
-                })
-              );
-            }
-          }
-        }
-      };
-
-      let resizeObserver: ResizeObserver | null = null;
-
-      const setupObserver = () => {
-        const mediaElement = getMetaElement(dom);
-        if (mediaElement && window.ResizeObserver) {
-          resizeObserver = new ResizeObserver(() => {
-            syncWidth();
-          });
-          resizeObserver.observe(mediaElement);
-        }
-      };
-      setTimeout(() => {
-        syncWidth();
-        setupObserver();
-      }, 0);
-
-      const figureElement = dom.parentElement;
-      if (figureElement) {
-        const mediaElement = Array.from(figureElement.children).find(
-          (child) => child.tagName.toLowerCase() !== "figcaption"
-        ) as HTMLElement;
-
-        if (mediaElement) {
-          const img = mediaElement.querySelector("img");
-          if (img) {
-            img.addEventListener("load", syncWidth);
-            if (img.complete) {
-              syncWidth();
-            }
-          }
-        }
-      }
-
-      const destroy = () => {
-        if (resizeObserver) {
-          resizeObserver.disconnect();
-          resizeObserver = null;
-        }
-      };
-
-      return {
-        dom,
-        contentDOM: dom,
-        destroy,
-        update: (updatedNode) => {
-          if (updatedNode.type.name !== this.name) {
-            return false;
-          }
-          updateEmptyState(updatedNode);
-          setTimeout(syncWidth, 0);
-          return true;
-        },
-      };
-    };
+    return VueNodeViewRenderer(FigureCaptionView);
   },
 });
 

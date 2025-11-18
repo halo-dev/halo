@@ -1,4 +1,5 @@
 import {
+  findChildren,
   mergeAttributes,
   Node,
   Plugin,
@@ -6,7 +7,6 @@ import {
   type CommandProps,
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import { isEmpty } from "lodash-es";
 import Paragraph from "../paragraph";
 import { RangeSelection } from "../range-selection";
 import FigureCaption from "./figure-caption";
@@ -16,9 +16,7 @@ declare module "@/tiptap" {
     figure: {
       setFigure: (attrs?: Record<string, unknown>) => ReturnType;
       unsetFigure: () => ReturnType;
-      setFigureAlignItems: (
-        align: "start" | "center" | "end" | "stretch"
-      ) => ReturnType;
+      updateFigureContainerWidth: (width: string) => ReturnType;
     };
   }
 }
@@ -55,24 +53,13 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           };
         },
       },
-      alignItems: {
-        default: null,
+      position: {
+        default: "left",
         parseHTML: (element) => {
-          const style = element.getAttribute("style") || "";
-          const match = style.match(/align-items:\s*([^;]+)/);
-          if (match) {
-            return match[1].trim();
-          }
-          return null;
+          return element.getAttribute("data-position");
         },
         renderHTML: (attributes) => {
-          const alignItems = attributes.alignItems;
-          if (isEmpty(alignItems)) {
-            return {};
-          }
-          return {
-            style: `align-items: ${alignItems};`,
-          };
+          return { "data-position": attributes.position };
         },
       },
     };
@@ -87,10 +74,17 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
+    const alignItemsMap: Record<string, string> = {
+      left: "start",
+      center: "center",
+      right: "end",
+    };
+    const alignItems =
+      alignItemsMap[HTMLAttributes["data-position"]] || "start";
     return [
       "figure",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        style: `display: flex; flex-direction: column;`,
+        style: `display: flex; flex-direction: column; align-items: ${alignItems}`,
       }),
       0,
     ];
@@ -207,10 +201,31 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
         ({ commands }: CommandProps) => {
           return commands.lift(this.name);
         },
-      setFigureAlignItems:
-        (align: "start" | "center" | "end" | "stretch") =>
-        ({ commands }: CommandProps) => {
-          return commands.updateAttributes(this.name, { alignItems: align });
+      updateFigureContainerWidth:
+        (width: string) =>
+        ({ state }: CommandProps) => {
+          // Here we need to use this.editor instead of the dispatch and tr obtained from CommandProps
+          // Because the dispatch and tr in CommandProps are outdated
+          const { dispatch } = this.editor.view;
+          const { tr } = this.editor.state;
+          const { selection } = state;
+          const { $from } = selection;
+
+          const figureCaptionNodes = findChildren(
+            $from.node(),
+            (node) => node.type.name === FigureCaption.name
+          );
+
+          if (figureCaptionNodes.length === 0) {
+            return false;
+          }
+
+          const figureCaptionNode = figureCaptionNodes[0];
+          tr.setNodeMarkup(figureCaptionNode.pos + 1, undefined, {
+            width: width,
+          });
+          dispatch?.(tr);
+          return true;
         },
     };
   },
