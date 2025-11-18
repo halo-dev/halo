@@ -64,19 +64,19 @@ function removeImage(index: number) {
   images.value = newImages;
 }
 
-function handleDragOver(event: DragEvent) {
+function handleDragUploadOver(event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
   isDragging.value = true;
 }
 
-function handleDragLeave(event: DragEvent) {
+function handleDragUploadLeave(event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
   isDragging.value = false;
 }
 
-function handleDrop(event: DragEvent) {
+function handleDragUploadDrop(event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
   isDragging.value = false;
@@ -119,6 +119,59 @@ const groups = computed(() => {
     []
   );
 });
+
+const draggedIndex = ref<number | null>(null);
+const dragOverIndex = ref<number | null>(null);
+
+function handleDragStart(index: number, event: DragEvent) {
+  draggedIndex.value = index;
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/html", String(index));
+  }
+  (event.target as HTMLElement).classList.add("opacity-50");
+}
+
+function handleDragEnd(event: DragEvent) {
+  (event.target as HTMLElement).classList.remove("opacity-50");
+  draggedIndex.value = null;
+  dragOverIndex.value = null;
+}
+
+function handleDragOver(event: DragEvent) {
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move";
+  }
+}
+
+function handleDragEnter(index: number, event: DragEvent) {
+  event.preventDefault();
+  dragOverIndex.value = index;
+  const target = event.currentTarget as HTMLElement;
+  target.classList.add("ring-2", "ring-blue-500");
+}
+
+function handleDragLeave(event: DragEvent) {
+  const target = event.currentTarget as HTMLElement;
+  target.classList.remove("ring-2", "ring-blue-500");
+}
+
+function handleDrop(targetIndex: number, event: DragEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  const target = event.currentTarget as HTMLElement;
+  target.classList.remove("ring-2", "ring-blue-500");
+  if (draggedIndex.value === null || draggedIndex.value === targetIndex) {
+    return;
+  }
+  const newImages = [...images.value];
+  const [movedImage] = newImages.splice(draggedIndex.value, 1);
+  newImages.splice(targetIndex, 0, movedImage);
+  images.value = newImages;
+  draggedIndex.value = null;
+  dragOverIndex.value = null;
+}
 </script>
 
 <template>
@@ -136,9 +189,9 @@ const groups = computed(() => {
       <div
         class="group flex cursor-pointer select-none flex-col items-center justify-center p-20"
         @click.stop="openFileDialog()"
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
+        @dragover="handleDragUploadOver"
+        @dragleave="handleDragUploadLeave"
+        @drop="handleDragUploadDrop"
       >
         <ClarityImageGalleryLine class="h-16 w-16 text-gray-400" />
         <p
@@ -151,9 +204,9 @@ const groups = computed(() => {
     <div
       v-else
       class="relative grid gap-2"
-      @dragover="handleDragOver"
-      @dragleave="handleDragLeave"
-      @drop="handleDrop"
+      @dragover="handleDragUploadOver"
+      @dragleave="handleDragUploadLeave"
+      @drop="handleDragUploadDrop"
     >
       <div
         v-for="(group, groupIndex) in groups"
@@ -163,13 +216,24 @@ const groups = computed(() => {
         <div
           v-for="(image, imgIndex) in group"
           :key="groupIndex * groupSize + imgIndex"
-          class="group/image relative"
+          draggable="true"
+          class="group/image relative cursor-grab transition-all active:cursor-grabbing"
           :class="{
             'aspect-1': layout === 'square',
           }"
           :style="{
             flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
           }"
+          @dragstart="
+            handleDragStart(groupIndex * groupSize + imgIndex, $event)
+          "
+          @dragend="handleDragEnd($event)"
+          @dragover="handleDragOver($event)"
+          @dragenter="
+            handleDragEnter(groupIndex * groupSize + imgIndex, $event)
+          "
+          @dragleave="handleDragLeave($event)"
+          @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
         >
           <img
             :src="image.src"

@@ -105,6 +105,10 @@ editor:
       add_image: Add image
       empty_prompt: Click to select images or drag images here
       group_size: Images per row
+      layout:
+        title: Layout
+        auto: Auto
+        square: Square
   components:
     color_picker:
       more_color: More

@@ -22,7 +22,16 @@ const layout = computed(() => {
   return props.editor.getAttributes(Gallery.name).layout || "auto";
 });
 
-const options = ["auto", "square"];
+const options = [
+  {
+    label: i18n.global.t("editor.extensions.gallery.layout.auto"),
+    value: "auto",
+  },
+  {
+    label: i18n.global.t("editor.extensions.gallery.layout.square"),
+    value: "square",
+  },
+];
 
 function handleSetLayout(layout: string) {
   props.editor.chain().updateAttributes(Gallery.name, { layout }).run();
@@ -38,25 +47,27 @@ function handleSetLayout(layout: string) {
     :distance="10"
   >
     <button
-      v-tooltip="i18n.global.t('editor.extensions.gallery.group_size')"
+      v-tooltip="i18n.global.t('editor.extensions.gallery.layout.title')"
       class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
     >
-      <span>{{ layout }}</span>
+      <span>{{
+        options.find((option) => option.value === layout)?.label
+      }}</span>
       <IconArrowDownLine class="h-4 w-4" />
     </button>
 
     <template #popper>
-      <div class="w-16 rounded-md bg-white p-1 shadow">
+      <div class="rounded-md bg-white p-1 shadow">
         <div
           v-for="option in options"
-          :key="option"
+          :key="option.value"
           class="flex cursor-pointer items-center justify-center rounded-md px-3 py-2 text-sm hover:bg-gray-100"
           :class="{
-            '!bg-gray-200 font-medium': option === layout,
+            '!bg-gray-200 font-medium': option.value === layout,
           }"
-          @click="handleSetLayout(option)"
+          @click="handleSetLayout(option.value)"
         >
-          {{ option }}
+          {{ option.label }}
         </div>
       </div>
     </template>
