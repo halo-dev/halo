@@ -51,6 +51,7 @@ function handleDelete() {
     description: t("core.page_snapshots.operations.delete.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     async onConfirm() {
       await consoleApiClient.content.singlePage.deleteSinglePageContent({
         name: props.singlePage?.metadata.name as string,
