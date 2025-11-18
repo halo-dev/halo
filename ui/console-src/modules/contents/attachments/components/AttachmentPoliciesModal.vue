@@ -76,6 +76,7 @@ const handleDelete = async (policy: Policy) => {
     description: t(
       "core.attachment.policies_modal.operations.delete.description"
     ),
+    confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {

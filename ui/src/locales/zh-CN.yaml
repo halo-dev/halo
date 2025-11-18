@@ -598,6 +598,7 @@ core:
     common:
       text:
         ungrouped: 未分组
+        original: 原始
     actions:
       storage_policies: 存储策略
     empty:
@@ -653,14 +654,12 @@ core:
         owner: 上传者
         creation_time: 上传时间
         permalink: 链接
-        thumbnails: 缩略图
       display_name_form:
         help: 自定义附件名称，仅用于管理界面显示，不会影响文件本身名称以及访问链接
       preview:
         video_not_support: 当前浏览器不支持该视频播放
         audio_not_support: 当前浏览器不支持该音频播放
         not_support: 此文件不支持预览
-        not_support_thumbnail: 此图片不支持生成缩略图
     group_editing_modal:
       titles:
         create: 新增附件分组

@@ -47,6 +47,7 @@ const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
     }),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     onConfirm: async () => {
       await axios.put(`${authProvider.unbindingUrl}`, {
         withCredentials: true,

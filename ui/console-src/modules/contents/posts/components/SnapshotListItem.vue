@@ -49,6 +49,7 @@ function handleDelete() {
     description: t("core.post_snapshots.operations.delete.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     async onConfirm() {
       await consoleApiClient.content.post.deletePostContent({
         name: props.post?.metadata.name as string,

@@ -629,6 +629,7 @@ core:
     common:
       text:
         ungrouped: Ungrouped
+        original: Original
     actions:
       storage_policies: Storage Policies
     empty:
@@ -686,14 +687,12 @@ core:
         owner: Owner
         creation_time: Creation time
         permalink: Permalink
-        thumbnails: Thumbnails
       display_name_form:
         help: Custom attachment name, only for display in the management interface, does not affect the file name and access link itself
       preview:
         video_not_support: The current browser does not support video playback.
         audio_not_support: The current browser does not support audio playback.
         not_support: This file does not support preview.
-        not_support_thumbnail: This image does not support generating thumbnails.
     permalink_list:
       relative: Relative path
       absolute: Absolute path
