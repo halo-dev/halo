@@ -120,7 +120,7 @@
   },
   "devDependencies": {
     "@iconify/json": "^2.2.343",
-    "@intlify/unplugin-vue-i18n": "^6.0.8",
+    "@intlify/unplugin-vue-i18n": "^11.0.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",

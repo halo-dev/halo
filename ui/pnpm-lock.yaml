@@ -239,8 +239,8 @@ importers:
         specifier: ^2.2.343
         version: 2.2.350
       '@intlify/unplugin-vue-i18n':
-        specifier: ^6.0.8
-        version: 6.0.8(@vue/compiler-dom@3.5.24)(eslint@9.29.0(jiti@2.6.1))(rollup@4.43.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
+        specifier: ^11.0.1
+        version: 11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.29.0(jiti@2.6.1))(rollup@4.43.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
       '@tailwindcss/aspect-ratio':
         specifier: ^0.4.2
         version: 0.4.2(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.18.12)(typescript@5.9.3)))
@@ -1933,9 +1933,9 @@ packages:
   '@interactjs/utils@1.10.17':
     resolution: {integrity: sha512-sZAW08CkqgvqRjUIaLRjScjObcCzN9D75yekLA21EClYAZIhi4A+GEt2z/WqOCOksTaEPLYmQyhkpXcboc0LhQ==}
 
-  '@intlify/bundle-utils@10.0.1':
-    resolution: {integrity: sha512-WkaXfSevtpgtUR4t8K2M6lbR7g03mtOxFeh+vXp5KExvPqS12ppaRj1QxzwRuRI5VUto54A22BjKoBMLyHILWQ==}
-    engines: {node: '>= 18'}
+  '@intlify/bundle-utils@11.0.1':
+    resolution: {integrity: sha512-5l10G5wE2cQRsZMS9y0oSFMOLW5IG/SgbkIUltqnwF1EMRrRbUAHFiPabXdGTHeexCsMTcxj/1w9i0rzjJU9IQ==}
+    engines: {node: '>= 20'}
     peerDependencies:
       petite-vue-i18n: '*'
       vue-i18n: '*'
@@ -1957,9 +1957,9 @@ packages:
     resolution: {integrity: sha512-Om86EjuQtA69hdNj3GQec9ZC0L0vPSAnXzB3gP/gyJ7+mA7t06d9aOAiqMZ+xEOsumGP4eEBlfl8zF2LOTzf2A==}
     engines: {node: '>= 16'}
 
-  '@intlify/unplugin-vue-i18n@6.0.8':
-    resolution: {integrity: sha512-Vvm3KhjE6TIBVUQAk37rBiaYy2M5OcWH0ZcI1XKEsOTeN1o0bErk+zeuXmcrcMc/73YggfI8RoxOUz9EB/69JQ==}
-    engines: {node: '>= 18'}
+  '@intlify/unplugin-vue-i18n@11.0.1':
+    resolution: {integrity: sha512-nH5NJdNjy/lO6Ne8LDtZzv4SbpVsMhPE+LbvBDmMeIeJDiino8sOJN2QB3MXzTliYTnqe3aB9Fw5+LJ/XVaXCg==}
+    engines: {node: '>= 20'}
     peerDependencies:
       petite-vue-i18n: '*'
       vue: ^3.2.25
@@ -11128,15 +11128,15 @@ snapshots:
 
   '@interactjs/utils@1.10.17': {}
 
-  '@intlify/bundle-utils@10.0.1(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))':
+  '@intlify/bundle-utils@11.0.1(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))':
     dependencies:
       '@intlify/message-compiler': 11.1.12
       '@intlify/shared': 11.1.12
       acorn: 8.15.0
+      esbuild: 0.25.5
       escodegen: 2.1.0
       estree-walker: 2.0.2
       jsonc-eslint-parser: 2.4.0
-      mlly: 1.7.4
       source-map-js: 1.2.1
       yaml-eslint-parser: 1.2.2
     optionalDependencies:
@@ -11154,10 +11154,10 @@ snapshots:
 
   '@intlify/shared@11.1.12': {}
 
-  '@intlify/unplugin-vue-i18n@6.0.8(@vue/compiler-dom@3.5.24)(eslint@9.29.0(jiti@2.6.1))(rollup@4.43.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))':
+  '@intlify/unplugin-vue-i18n@11.0.1(@vue/compiler-dom@3.5.24)(eslint@9.29.0(jiti@2.6.1))(rollup@4.43.0)(typescript@5.9.3)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@9.29.0(jiti@2.6.1))
-      '@intlify/bundle-utils': 10.0.1(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))
+      '@intlify/bundle-utils': 11.0.1(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))
       '@intlify/shared': 11.1.12
       '@intlify/vue-i18n-extensions': 8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.24)(vue-i18n@11.1.12(vue@3.5.24(typescript@5.9.3)))(vue@3.5.24(typescript@5.9.3))
       '@rollup/pluginutils': 5.2.0(rollup@4.43.0)
@@ -11165,12 +11165,9 @@ snapshots:
       '@typescript-eslint/typescript-estree': 8.47.0(typescript@5.9.3)
       debug: 4.4.3
       fast-glob: 3.3.3
-      js-yaml: 4.1.0
-      json5: 2.2.3
-      pathe: 1.1.2
+      pathe: 2.0.3
       picocolors: 1.1.1
-      source-map-js: 1.2.1
-      unplugin: 1.12.1
+      unplugin: 2.3.5
       vue: 3.5.24(typescript@5.9.3)
     optionalDependencies:
       vue-i18n: 11.1.12(vue@3.5.24(typescript@5.9.3))
@@ -15229,7 +15226,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.5
       '@esbuild/win32-ia32': 0.25.5
       '@esbuild/win32-x64': 0.25.5
-    optional: true
 
   escalade@3.2.0: {}
 
