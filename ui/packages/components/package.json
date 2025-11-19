@@ -68,7 +68,7 @@
     "vite": "npm:rolldown-vite@7.2.0"
   },
   "peerDependencies": {
-    "vue": "^3.5.16",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.x",
+    "vue-router": "^4.6.x"
   }
 }

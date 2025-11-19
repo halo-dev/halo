@@ -39,8 +39,8 @@
     "mitt": "^3.0.1"
   },
   "peerDependencies": {
-    "vue": "^3.5.16",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.x",
+    "vue-router": "^4.6.x"
   },
   "devDependencies": {
     "dayjs": "^1.11.19",
