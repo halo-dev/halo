@@ -60,10 +60,10 @@ const tabs = shallowRef<UserProfileTab[]>([
     priority: 30,
   },
   {
-    id: "2fa",
-    label: t("core.uc_profile.tabs.2fa"),
+    id: "authentication",
+    label: t("core.uc_profile.tabs.authentication"),
     component: defineAsyncComponent({
-      loader: () => import("./tabs/TwoFactor.vue"),
+      loader: () => import("./tabs/Authentication.vue"),
       loadingComponent: VLoading,
     }),
     priority: 40,

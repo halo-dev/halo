@@ -6,16 +6,15 @@ import {
   VEntity,
   VEntityContainer,
   VEntityField,
-  VLoading,
   VSpace,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
 import RiShieldKeyholeLine from "~icons/ri/shield-keyhole-line";
-import TotpConfigureModal from "./components/TotpConfigureModal.vue";
-import TotpDeletionModal from "./components/TotpDeletionModal.vue";
-import TwoFactorDisableModal from "./components/TwoFactorDisableModal.vue";
-import TwoFactorEnableModal from "./components/TwoFactorEnableModal.vue";
+import TotpConfigureModal from "./TotpConfigureModal.vue";
+import TotpDeletionModal from "./TotpDeletionModal.vue";
+import TwoFactorDisableModal from "./TwoFactorDisableModal.vue";
+import TwoFactorEnableModal from "./TwoFactorEnableModal.vue";
 
 const { data: settings, isLoading } = useQuery({
   queryKey: ["two-factor-settings"],
@@ -45,27 +44,22 @@ const totpDeletionModalVisible = ref(false);
 </script>
 
 <template>
-  <div class="my-5">
-    <label class="flex cursor-pointer items-center space-x-2">
-      <input
-        type="checkbox"
-        :checked="settings?.enabled"
-        @change="onEnabledChange"
-      />
-      <span class="text-sm font-medium text-gray-700">
-        {{ $t("core.uc_profile.2fa.operations.enable.button") }}
-      </span>
-    </label>
-  </div>
-
-  <VLoading v-if="isLoading" />
-
-  <Transition v-else appear name="fade">
+  <Transition v-if="!isLoading" appear name="fade">
     <div class="overflow-hidden rounded-base border">
-      <div class="bg-gray-50 px-4 py-3">
+      <div class="flex items-center justify-between bg-gray-50 px-4 py-3">
         <span class="text-sm font-semibold text-gray-900">
           {{ $t("core.uc_profile.2fa.methods.title") }}
         </span>
+        <label class="flex cursor-pointer items-center space-x-2">
+          <input
+            type="checkbox"
+            :checked="settings?.enabled"
+            @change="onEnabledChange"
+          />
+          <span class="text-sm font-medium text-gray-700">
+            {{ $t("core.uc_profile.2fa.operations.enable.button") }}
+          </span>
+        </label>
       </div>
       <VEntityContainer>
         <VEntity>
@@ -123,7 +117,6 @@ const totpDeletionModalVisible = ref(false);
       </VEntityContainer>
     </div>
   </Transition>
-
   <TotpConfigureModal
     v-if="totpConfigureModalVisible"
     @close="totpConfigureModalVisible = false"
