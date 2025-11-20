@@ -1,4 +1,5 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
+import type { FormKitInputs } from "@formkit/inputs";
 import { coreApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
 
@@ -25,3 +26,12 @@ export const menuItemSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    menuItemSelect: {
+      type: "menuItemSelect";
+      value?: string;
+    };
+  }
+}
