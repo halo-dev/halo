@@ -16,10 +16,10 @@
       "@/*": ["./src/*"],
       "@uc/*": ["./uc-src/*"],
       "@console/*": ["./console-src/*"],
-      "@halo-dev/api-client": ["./packages/api-client/entry/index.ts"],
-      "@halo-dev/components": ["./packages/components/src/index.ts"],
-      "@halo-dev/richtext-editor": ["./packages/editor/src/index.ts"],
-      "@halo-dev/ui-shared": ["./packages/shared/src/index.ts"]
+      "@halo-dev/api-client": ["./packages/api-client/dist/index"],
+      "@halo-dev/components": ["./packages/components/dist/index"],
+      "@halo-dev/richtext-editor": ["./packages/editor/dist/index"],
+      "@halo-dev/ui-shared": ["./packages/shared/dist/index"]
     },
     "ignoreDeprecations": "5.0",
     "types": ["unplugin-icons/types/vue"]
