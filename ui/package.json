@@ -44,15 +44,15 @@
     "axios": "^1.12.2"
   },
   "dependencies": {
-    "@codemirror/commands": "^6.1.2",
-    "@codemirror/lang-css": "^6.0.1",
-    "@codemirror/lang-html": "^6.2.0",
-    "@codemirror/lang-javascript": "^6.1.1",
-    "@codemirror/lang-json": "^6.0.1",
-    "@codemirror/language": "^6.3.1",
-    "@codemirror/legacy-modes": "^6.3.0",
-    "@codemirror/state": "^6.1.4",
-    "@codemirror/view": "^6.5.1",
+    "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-yaml": "^6.1.2",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
     "@emoji-mart/data": "^1.2.1",
     "@formkit/addons": "^1.6.9",
     "@formkit/core": "^1.6.9",
@@ -88,7 +88,7 @@
     "@vueuse/router": "^12.8.2",
     "@vueuse/shared": "^12.8.2",
     "axios": "^1.12.2",
-    "codemirror": "^6.0.1",
+    "codemirror": "^6.0.2",
     "colorjs.io": "^0.4.3",
     "core-js": "^3.43.0",
     "cropperjs": "^1.5.13",
@@ -181,7 +181,8 @@
       "prosemirror-model": "1.25.1",
       "prosemirror-transform": "1.10.4",
       "prosemirror-view": "1.40.0",
-      "vite": "npm:rolldown-vite@7.2.5"
+      "vite": "npm:rolldown-vite@7.2.5",
+      "@lezer/javascript": "1.5.4"
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
