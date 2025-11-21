@@ -1,5 +1,6 @@
 import { postLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
+import type { FormKitInputs } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
 
@@ -63,3 +64,12 @@ export const postSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    postSelect: {
+      type: "postSelect";
+      value?: string;
+    };
+  }
+}

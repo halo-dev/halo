@@ -10,6 +10,7 @@ import {
   prefix,
   suffix,
   wrapper,
+  type FormKitInputs,
 } from "@formkit/inputs";
 import TagSelect from "./TagSelect.vue";
 import { TagSelectSection } from "./sections";
@@ -36,3 +37,12 @@ export const tagSelect: FormKitTypeDefinition = {
   },
   schemaMemoKey: "custom-tag-select",
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    tagSelect: {
+      type: "tagSelect";
+      value?: string | string[];
+    };
+  }
+}

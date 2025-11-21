@@ -10,6 +10,7 @@ import {
   prefix,
   suffix,
   wrapper,
+  type FormKitInputs,
 } from "@formkit/inputs";
 import CategorySelect from "./CategorySelect.vue";
 import { CategorySelectSection } from "./sections";
@@ -36,3 +37,12 @@ export const categorySelect: FormKitTypeDefinition = {
   },
   schemaMemoKey: "custom-category-select",
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    categorySelect: {
+      type: "categorySelect";
+      value?: string | string[];
+    };
+  }
+}

@@ -54,15 +54,15 @@
     "@codemirror/state": "^6.1.4",
     "@codemirror/view": "^6.5.1",
     "@emoji-mart/data": "^1.2.1",
-    "@formkit/addons": "^1.5.9",
-    "@formkit/core": "^1.5.9",
+    "@formkit/addons": "^1.6.9",
+    "@formkit/core": "^1.6.9",
     "@formkit/drag-and-drop": "^0.1.6",
-    "@formkit/i18n": "^1.5.9",
-    "@formkit/inputs": "^1.5.9",
-    "@formkit/themes": "^1.5.9",
-    "@formkit/utils": "^1.5.9",
-    "@formkit/validation": "^1.5.9",
-    "@formkit/vue": "^1.5.9",
+    "@formkit/i18n": "^1.6.9",
+    "@formkit/inputs": "^1.6.9",
+    "@formkit/themes": "^1.6.9",
+    "@formkit/utils": "^1.6.9",
+    "@formkit/validation": "^1.6.9",
+    "@formkit/vue": "^1.6.9",
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
@@ -175,13 +175,13 @@
     "vitest": "^3.2.4",
     "vue-tsc": "^3.1.4"
   },
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
+  "packageManager": "pnpm@10.12.4",
   "pnpm": {
     "overrides": {
-      "vite": "npm:rolldown-vite@7.2.5",
       "prosemirror-model": "1.25.1",
+      "prosemirror-transform": "1.10.4",
       "prosemirror-view": "1.40.0",
-      "prosemirror-transform": "1.10.4"
+      "vite": "npm:rolldown-vite@7.2.5"
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
