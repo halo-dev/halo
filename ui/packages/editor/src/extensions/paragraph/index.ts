@@ -12,7 +12,6 @@ import {
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { deleteNodeByPos } from "@/utils";
 import { isListActive } from "@/utils/is-list-active";
-import { isEmpty } from "@/utils/is-node-empty";
 import TiptapParagraph from "@tiptap/extension-paragraph";
 import { markRaw } from "vue";
 import TablerLineHeight from "~icons/tabler/line-height";
@@ -98,17 +97,8 @@ const Paragraph = TiptapParagraph.extend<ExtensionOptions>({
         }
 
         const beforePos = $from.before($from.depth);
-        if (isEmpty($from.parent)) {
-          return deleteCurrentNodeAndSetSelection(
-            $from,
-            beforePos,
-            state,
-            view.dispatch
-          );
-        }
-
         if (beforePos === 0) {
-          return false;
+          return true;
         }
 
         return handleDeletePreviousNode($from, beforePos, state, view.dispatch);

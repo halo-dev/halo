@@ -20,6 +20,7 @@ export * from "./types";
 export {
   deleteNode,
   deleteNodeByPos,
+  filterDuplicateExtensions,
   generateAnchor,
   generateAnchorId,
   isAllowedUri,

@@ -13,28 +13,22 @@ const props = defineProps<{
   action?: ({ editor }: { editor: Editor }) => void;
 }>();
 
-const width = computed({
+const size = computed({
   get: () => {
-    return props.editor.getAttributes(Video.name).width;
+    return {
+      width: props.editor.getAttributes(Video.name).width,
+      height: props.editor.getAttributes(Video.name).height,
+    };
   },
-  set: (value: string) => {
-    handleSetSize(value, height.value);
+  set: (size: { width?: string; height?: string }) => {
+    handleSetSize(size);
   },
 });
 
-const height = computed({
-  get: () => {
-    return props.editor.getAttributes(Video.name).height;
-  },
-  set: (value: string) => {
-    handleSetSize(width.value, value);
-  },
-});
-
-function handleSetSize(width: string, height: string) {
+function handleSetSize(size: { width?: string; height?: string }) {
   props.editor
     .chain()
-    .updateAttributes(Video.name, { width, height })
+    .updateAttributes(Video.name, size)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();
@@ -43,12 +37,14 @@ function handleSetSize(width: string, height: string) {
 
 <template>
   <BlockActionInput
-    v-model.lazy.trim="width"
+    v-model.lazy.trim="size.width"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
   />
 
   <BlockActionInput
-    v-model.lazy.trim="height"
+    v-model.lazy.trim="size.height"
+    :visible="visible?.({ editor: props.editor })"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
   />
 </template>

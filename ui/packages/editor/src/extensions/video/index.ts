@@ -4,22 +4,27 @@ import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
-  Node,
-  PluginKey,
-  VueNodeViewRenderer,
+  findChildren,
+  findParentNode,
   isActive,
   mergeAttributes,
+  Node,
   nodeInputRule,
+  Plugin,
+  PluginKey,
+  TextSelection,
+  VueNodeViewRenderer,
+  type EditorState,
   type Range,
 } from "@/tiptap";
-import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import { isEmpty } from "lodash-es";
 import { markRaw } from "vue";
+import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
 import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
 import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
 import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
@@ -32,6 +37,9 @@ import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
 import MdiShare from "~icons/mdi/share";
 import MdiVideo from "~icons/mdi/video";
+import Figure from "../figure";
+import FigureCaption from "../figure/figure-caption";
+import Paragraph from "../paragraph";
 import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
 import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
 import VideoView from "./VideoView.vue";
@@ -49,13 +57,9 @@ const Video = Node.create<ExtensionOptions>({
   name: "video",
   fakeSelection: true,
 
-  inline() {
-    return true;
-  },
+  inline: false,
 
-  group() {
-    return "inline";
-  },
+  group: "block",
 
   addAttributes() {
     return {
@@ -67,9 +71,9 @@ const Video = Node.create<ExtensionOptions>({
         },
       },
       width: {
-        default: "100%",
+        default: undefined,
         parseHTML: (element) => {
-          return element.getAttribute("width");
+          return element.getAttribute("width") || element.style.width || null;
         },
         renderHTML(attributes) {
           return {
@@ -78,9 +82,9 @@ const Video = Node.create<ExtensionOptions>({
         },
       },
       height: {
-        default: "auto",
+        default: undefined,
         parseHTML: (element) => {
-          return element.getAttribute("height");
+          return element.getAttribute("height") || element.style.height || null;
         },
         renderHTML: (attributes) => {
           return {
@@ -121,14 +125,17 @@ const Video = Node.create<ExtensionOptions>({
           };
         },
       },
-      textAlign: {
-        default: null,
+      position: {
+        default: "left",
         parseHTML: (element) => {
-          return element.getAttribute("text-align");
+          return (
+            element.getAttribute("data-position") ||
+            element.getAttribute("text-align")
+          );
         },
         renderHTML: (attributes) => {
           return {
-            "text-align": attributes.textAlign,
+            "data-position": attributes.position,
           };
         },
       },
@@ -165,15 +172,86 @@ const Video = Node.create<ExtensionOptions>({
       nodeInputRule({
         find: /^\$video\$$/,
         type: this.type,
-        getAttributes: () => {
-          return { width: "100%" };
-        },
       }),
     ];
   },
 
   addNodeView() {
     return VueNodeViewRenderer(VideoView);
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("videoLegacyFormat"),
+        appendTransaction: (transactions, _oldState, newState) => {
+          const docChanged = transactions.some((tr) => tr.docChanged);
+          if (!docChanged) {
+            return null;
+          }
+
+          const tr = newState.tr;
+          let modified = false;
+
+          newState.doc.descendants((node, pos) => {
+            if (node.type.name !== Video.name) {
+              return;
+            }
+
+            const $pos = newState.doc.resolve(pos);
+            if ($pos.parent.type.name === Figure.name) {
+              return;
+            }
+
+            let position = "left";
+            let deletePreviousNode = false;
+            let previousNodePos = -1;
+            let previousNodeSize = 0;
+
+            const previousNode = $pos.nodeBefore;
+            if (previousNode && previousNode.type.name === Paragraph.name) {
+              if (previousNode.attrs.textAlign) {
+                const positionMap: Record<string, string> = {
+                  left: "left",
+                  center: "center",
+                  right: "right",
+                  justify: "center",
+                };
+                position = positionMap[previousNode.attrs.textAlign] || "left";
+              }
+              if (previousNode.textContent?.trim().length === 0) {
+                deletePreviousNode = true;
+                previousNodePos = pos - previousNode.nodeSize;
+                previousNodeSize = previousNode.nodeSize;
+              }
+            }
+
+            const figureNode = newState.schema.nodes.figure.create(
+              {
+                contentType: "video",
+                position,
+              },
+              [node]
+            );
+
+            if (deletePreviousNode) {
+              tr.delete(previousNodePos, previousNodePos + previousNodeSize);
+              tr.replaceRangeWith(
+                pos - previousNodeSize,
+                pos - previousNodeSize + node.nodeSize,
+                figureNode
+              );
+            } else {
+              tr.replaceRangeWith(pos, pos + node.nodeSize, figureNode);
+            }
+
+            modified = true;
+          });
+
+          return modified ? tr : null;
+        },
+      }),
+    ];
   },
 
   addOptions() {
@@ -191,7 +269,11 @@ const Video = Node.create<ExtensionOptions>({
               .focus()
               .deleteRange(range)
               .insertContent([
-                { type: "video", attrs: { src: "" } },
+                {
+                  type: "figure",
+                  attrs: { contentType: "video" },
+                  content: [{ type: "video", attrs: { src: "" } }],
+                },
                 { type: "paragraph", content: "" },
               ])
               .run();
@@ -211,7 +293,13 @@ const Video = Node.create<ExtensionOptions>({
                 editor
                   .chain()
                   .focus()
-                  .insertContent([{ type: "video", attrs: { src: "" } }])
+                  .insertContent([
+                    {
+                      type: "figure",
+                      attrs: { contentType: "video" },
+                      content: [{ type: "video", attrs: { src: "" } }],
+                    },
+                  ])
                   .run();
               },
             },
@@ -224,6 +312,9 @@ const Video = Node.create<ExtensionOptions>({
           shouldShow: ({ state }: { state: EditorState }) => {
             return isActive(state, Video.name);
           },
+          options: {
+            placement: "top-start",
+          },
           items: [
             {
               priority: 10,
@@ -234,6 +325,9 @@ const Video = Node.create<ExtensionOptions>({
                     ? MdiCogPlay
                     : MdiCogPlayOutline
                 ),
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
                 action: () => {
                   return editor
                     .chain()
@@ -256,6 +350,9 @@ const Video = Node.create<ExtensionOptions>({
               props: {
                 isActive: () => {
                   return editor.getAttributes(Video.name).autoplay;
+                },
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
                 },
                 icon: markRaw(
                   editor.getAttributes(Video.name).autoplay
@@ -285,6 +382,9 @@ const Video = Node.create<ExtensionOptions>({
                 isActive: () => {
                   return editor.getAttributes(Video.name).loop;
                 },
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
                 icon: markRaw(
                   editor.getAttributes(Video.name).loop
                     ? MdiMotionPlay
@@ -308,84 +408,143 @@ const Video = Node.create<ExtensionOptions>({
             {
               priority: 40,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+              },
             },
             {
               priority: 50,
               component: markRaw(BubbleItemVideoSize),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+              },
             },
             {
               priority: 60,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+              },
             },
             {
               priority: 70,
               props: {
-                isActive: () =>
-                  editor.getAttributes(Video.name).width === "25%",
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: () => {
+                  const size = getVideoSizePercentage(editor, 25);
+                  return (
+                    editor.getAttributes(Video.name).width ===
+                    `${size?.width}px`
+                  );
+                },
                 icon: markRaw(MdiImageSizeSelectSmall),
-                action: () => handleSetSize(editor, "25%", "auto"),
+                action: () =>
+                  handleSetSize(editor, { width: "25%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.small_size"),
               },
             },
             {
               priority: 80,
               props: {
-                isActive: () =>
-                  editor.getAttributes(Video.name).width === "50%",
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: ({ editor }: { editor: Editor }) => {
+                  const size = getVideoSizePercentage(editor, 50);
+                  return (
+                    editor.getAttributes(Video.name).width ===
+                    `${size?.width}px`
+                  );
+                },
                 icon: markRaw(MdiImageSizeSelectLarge),
-                action: () => handleSetSize(editor, "50%", "auto"),
+                action: () =>
+                  handleSetSize(editor, { width: "50%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.medium_size"),
               },
             },
             {
               priority: 90,
               props: {
-                isActive: () =>
-                  editor.getAttributes(Video.name).width === "100%",
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: () => {
+                  const size = getVideoSizePercentage(editor, 100);
+                  return (
+                    editor.getAttributes(Video.name).width ===
+                    `${size?.width}px`
+                  );
+                },
                 icon: markRaw(MdiImageSizeSelectActual),
-                action: () => handleSetSize(editor, "100%", "auto"),
+                action: () =>
+                  handleSetSize(editor, { width: "100%", height: "auto" }),
                 title: i18n.global.t("editor.extensions.video.large_size"),
               },
             },
             {
               priority: 100,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+              },
             },
             {
               priority: 110,
               props: {
-                isActive: () => editor.isActive({ textAlign: "left" }),
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: () => {
+                  return editor.isActive({ position: "left" });
+                },
                 icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetTextAlign(editor, "left"),
+                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
               priority: 120,
               props: {
-                isActive: () => editor.isActive({ textAlign: "center" }),
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: () => {
+                  return editor.isActive({ position: "center" });
+                },
                 icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetTextAlign(editor, "center"),
+                action: () => handleSetPosition(editor, "center"),
               },
             },
             {
               priority: 130,
               props: {
-                isActive: () => editor.isActive({ textAlign: "right" }),
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                isActive: () => {
+                  return editor.isActive({ position: "right" });
+                },
                 icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetTextAlign(editor, "right"),
-              },
-            },
-            {
-              priority: 140,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
-                action: () => handleSetTextAlign(editor, "justify"),
+                action: () => handleSetPosition(editor, "right"),
               },
             },
             {
               priority: 150,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+              },
             },
             {
               priority: 160,
@@ -400,6 +559,9 @@ const Video = Node.create<ExtensionOptions>({
             {
               priority: 170,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
@@ -409,15 +571,72 @@ const Video = Node.create<ExtensionOptions>({
             },
             {
               priority: 180,
-              component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Video.name).src);
+                },
+                icon: markRaw(LucideCaptions),
+                title: i18n.global.t("editor.extensions.video.edit_caption"),
+                action: ({ editor }) => {
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === Figure.name
+                  )(editor.state.selection);
+
+                  if (!figureParent) {
+                    return;
+                  }
+
+                  const { node, pos } = figureParent;
+                  let captionPos = -1;
+
+                  node.forEach((child, offset) => {
+                    if (child.type.name === FigureCaption.name) {
+                      captionPos = pos + offset + 1;
+                    }
+                  });
+
+                  if (captionPos !== -1) {
+                    editor.chain().focus().setTextSelection(captionPos).run();
+                    return;
+                  }
+                  const imageNodePos = findChildren(
+                    editor.state.selection.$from.node(),
+                    (node) => node.type.name === Video.name
+                  )[0];
+                  const figureCaptionNode =
+                    editor.schema.nodes.figureCaption.create({
+                      width: imageNodePos.node.attrs.width,
+                    });
+                  editor
+                    .chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      const insertPos = pos + node.nodeSize - 1;
+                      tr.insert(insertPos, figureCaptionNode);
+                      tr.setSelection(
+                        TextSelection.near(tr.doc.resolve(insertPos + 1))
+                      );
+                      return true;
+                    })
+                    .run();
+                },
+              },
             },
             {
               priority: 190,
+              component: markRaw(BlockActionSeparator),
+            },
+            {
+              priority: 200,
               props: {
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Video.name, editor);
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === "figure"
+                  )(editor.state.selection);
+
+                  deleteNode(figureParent ? "figure" : Video.name, editor);
                 },
               },
             },
@@ -428,20 +647,79 @@ const Video = Node.create<ExtensionOptions>({
   },
 });
 
-const handleSetSize = (editor: Editor, width: string, height: string) => {
+export const getVideoElement = (editor: Editor): HTMLVideoElement | null => {
+  const { view, state } = editor;
+  const { from } = state.selection;
+
+  let domNode = view.nodeDOM(from);
+  if (!domNode && from > 0) {
+    const $pos = state.doc.resolve(from);
+    if ($pos.parent) {
+      domNode = view.domAtPos(from).node as HTMLElement;
+    }
+  }
+
+  if (domNode instanceof HTMLElement) {
+    let video = domNode.querySelector("video");
+    if (video) {
+      return video;
+    }
+
+    if (domNode.tagName === "VIDEO") {
+      return domNode as HTMLVideoElement;
+    }
+
+    const parent = domNode.parentElement;
+    if (parent) {
+      video = parent.querySelector("video");
+      if (video) {
+        return video;
+      }
+    }
+  }
+
+  return null;
+};
+
+export const getVideoSizePercentage = (
+  editor: Editor,
+  percentage: number,
+  videoElement?: HTMLVideoElement | null
+): { width: number; height: number } | undefined => {
+  const element = videoElement || getVideoElement(editor);
+  if (!element || element.readyState < 1) {
+    return undefined;
+  }
+  const videoWidth = element.videoWidth;
+  const videoHeight = element.videoHeight;
+  const aspectRatio = videoWidth / videoHeight;
+  const newWidth = Math.round(videoWidth * (percentage / 100));
+  const newHeight = Math.round(newWidth / aspectRatio);
+  return { width: newWidth, height: newHeight };
+};
+
+export const handleSetSize = (
+  editor: Editor,
+  size: { width?: string; height?: string }
+) => {
   editor
     .chain()
-    .updateAttributes(Video.name, { width, height })
+    .updateAttributes(Video.name, size)
     .setNodeSelection(editor.state.selection.from)
     .focus()
     .run();
 };
 
-const handleSetTextAlign = (
+const handleSetPosition = (
   editor: Editor,
-  align: "left" | "center" | "right" | "justify"
+  position: "left" | "center" | "right"
 ) => {
-  editor.chain().focus().setTextAlign(align).run();
+  return editor
+    .chain()
+    .focus()
+    .updateAttributes(Video.name, { position })
+    .updateAttributes(Figure.name, { position })
+    .run();
 };
 
 export default Video;

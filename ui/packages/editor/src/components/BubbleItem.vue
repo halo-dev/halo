@@ -37,6 +37,7 @@ const handleBubbleItemClick = (editor: Editor) => {
 
 <template>
   <VDropdown
+    v-if="visible({ editor })"
     class="inline-flex"
     :triggers="[]"
     :auto-hide="true"
@@ -45,7 +46,6 @@ const handleBubbleItemClick = (editor: Editor) => {
     @hide="componentRef = undefined"
   >
     <button
-      v-if="visible({ editor })"
       v-tooltip="{
         content: title,
         distance: 8,

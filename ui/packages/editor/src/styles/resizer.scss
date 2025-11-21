@@ -1,0 +1,51 @@
+.resize-container {
+  position: relative;
+  overflow: visible !important;
+}
+
+.resizer-handler {
+  position: absolute;
+  z-index: 3;
+  width: 12px;
+  height: 12px;
+  border: none;
+  background-color: rgba(59, 130, 246, 0.8);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: rgba(37, 99, 235, 1);
+    transform: scale(1.3);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.5);
+  }
+
+  &:active {
+    background-color: rgba(29, 78, 216, 1);
+    transform: scale(1.1);
+  }
+}
+
+.resizer-br {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.resizer-bl {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.resizer-tr {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.resizer-tl {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}

@@ -15,6 +15,10 @@ const src = computed({
   },
 });
 
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
+});
+
 const controls = computed(() => {
   return props.node.attrs.controls;
 });
@@ -38,21 +42,37 @@ onMounted(() => {
     inputRef.value.focus();
   }
 });
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <node-view-wrapper as="div" class="inline-block w-full">
+  <node-view-wrapper
+    as="div"
+    class="flex"
+    :class="{
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
+    }"
+  >
     <div
-      class="relative inline-block h-full max-w-full overflow-hidden text-center transition-all"
+      class="relative inline-block h-full w-full overflow-hidden text-center transition-all"
+      :class="{
+        'rounded ring-2': selected,
+      }"
       :style="{
-        width: node.attrs.width,
+        width: !src ? '100%' : node.attrs.width,
+        height: !src ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="!src" class="p-1.5">
         <input
           ref="inputRef"
           v-model.lazy="src"
-          class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+          class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
           :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
           tabindex="-1"
           @focus="handleSetFocus"
@@ -66,8 +86,8 @@ onMounted(() => {
         class="m-0 rounded-md"
         :src="node!.attrs.src"
         :style="{
-          width: node.attrs.width,
-          height: node.attrs.height,
+          width: isPercentageWidth ? '100%' : node.attrs.width,
+          height: isPercentageWidth ? '100%' : node.attrs.height,
         }"
         @mouseenter="handleSetFocus"
       ></video>
