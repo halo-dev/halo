@@ -1,16 +1,16 @@
 import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
+import { setupCoreModules, setupPluginModules } from "@/setup/setupModules";
 import "@/setup/setupStyles";
+import { setupUserPermissions } from "@/setup/setupUserPermissions";
 import { setupVueQuery } from "@/setup/setupVueQuery";
-import { useRoleStore } from "@/stores/role";
-import { consoleApiClient } from "@halo-dev/api-client";
-import { stores, utils } from "@halo-dev/ui-shared";
+import { stores } from "@halo-dev/ui-shared";
+import modules from "@uc/modules";
 import router from "@uc/router";
-import { setupCoreModules, setupPluginModules } from "@uc/setup/setupModules";
 import "core-js/es/object/has-own";
 import { createPinia } from "pinia";
-import { createApp, type DirectiveBinding } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 
 const app = createApp(App);
@@ -22,41 +22,11 @@ setupApiClient();
 
 app.use(createPinia());
 
-async function loadUserPermissions() {
-  const { data: currentPermissions } =
-    await consoleApiClient.user.getPermissions({
-      name: "-",
-    });
-  const roleStore = useRoleStore();
-  roleStore.$patch({
-    permissions: currentPermissions,
-  });
-
-  // Set permissions in shared utils
-  utils.permission.setUserPermissions(currentPermissions.uiPermissions);
-
-  app.directive(
-    "permission",
-    (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
-      const { value } = binding;
-      const { any } = binding.modifiers;
-
-      if (utils.permission.has(value, any ?? false)) {
-        return;
-      }
-
-      el?.remove?.();
-    }
-  );
-}
-
-(async function () {
-  await initApp();
-})();
+await initApp();
 
 async function initApp() {
   try {
-    setupCoreModules(app);
+    setupCoreModules({ app, router, platform: "uc", modules });
 
     const currentUserStore = stores.currentUser();
     await currentUserStore.fetchCurrentUser();
@@ -70,10 +40,10 @@ async function initApp() {
       return;
     }
 
-    await loadUserPermissions();
+    await setupUserPermissions(app);
 
     try {
-      await setupPluginModules(app);
+      await setupPluginModules({ app, router, platform: "uc" });
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
