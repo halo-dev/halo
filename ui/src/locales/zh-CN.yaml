@@ -1231,8 +1231,8 @@ core:
       detail: 详情
       notification-preferences: 通知配置
       pat: 个人令牌
-      2fa: 两步验证
       devices: 登录设备
+      authentication: 身份认证
     actions:
       update_profile:
         title: 修改资料
@@ -1247,12 +1247,6 @@ core:
         bio: 描述
         creation_time: 注册时间
         identity_authentication: 登录方式
-      operations:
-        bind:
-          button: 绑定
-        unbind:
-          button: 解绑
-          title: 取消绑定 {display_name} 登录方式
       email_not_set:
         title: 设置电子邮箱
         description: 电子邮箱地址还未设置，点击下方按钮进行设置
@@ -1261,6 +1255,14 @@ core:
         description: 电子邮箱地址还未验证，点击下方按钮进行验证
       email_verified:
         tooltip: 已验证
+    auth_providers:
+      title: 登录方式
+      operations:
+        bind:
+          button: 绑定
+        unbind:
+          button: 解绑
+          title: 取消绑定 {display_name} 登录方式
     2fa:
       operations:
         enable:
@@ -1276,7 +1278,7 @@ core:
             label: 验证密码
             help: 当前账号的登录密码
       methods:
-        title: 验证方式
+        title: 两步验证
         totp:
           title: TOTP
           description: 使用 TOTP 应用程序配置两步验证
