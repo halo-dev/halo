@@ -34,7 +34,7 @@ const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    selected: AttachmentLike[];
+    selected?: AttachmentLike[];
     accepts?: string[];
     min?: number;
     max?: number;

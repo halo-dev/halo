@@ -42,7 +42,6 @@ const props = withDefaults(
     max?: number;
   }>(),
   {
-    selected: () => [],
     accepts: () => ["*/*"],
     min: undefined,
     max: undefined,

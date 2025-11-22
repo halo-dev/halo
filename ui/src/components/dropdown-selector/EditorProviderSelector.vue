@@ -11,7 +11,7 @@ import type { EditorProvider } from "@halo-dev/ui-shared";
 withDefaults(
   defineProps<{
     provider?: EditorProvider;
-    allowForcedSelect: boolean;
+    allowForcedSelect?: boolean;
   }>(),
   {
     provider: undefined,

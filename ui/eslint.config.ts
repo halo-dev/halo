@@ -17,6 +17,7 @@ export default defineConfigWithVueTs(
       "packages/api-client/src/",
       // TODO: Remove this in the future, only for compatibility.
       "packages/console-shared/**",
+      "packages/components/storybook-static/**",
       "**/build/**",
     ],
   },
