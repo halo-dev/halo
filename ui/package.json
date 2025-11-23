@@ -49,6 +49,7 @@
     "@codemirror/lang-html": "^6.4.11",
     "@codemirror/lang-javascript": "^6.2.4",
     "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/lang-yaml": "^6.1.2",
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",

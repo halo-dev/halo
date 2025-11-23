@@ -25,6 +25,13 @@ export const presetLanguages = {
     const { json } = await import("@codemirror/lang-json");
     return json();
   },
+  markdown: async (): Promise<LanguageSupport> => {
+    const { markdown } = await import("@codemirror/lang-markdown");
+    return markdown({
+      addKeymap: true,
+      completeHTMLTags: true,
+    });
+  },
 } satisfies Record<string, () => Promise<LanguageSupport>>;
 
 export interface CodemirrorProps {
