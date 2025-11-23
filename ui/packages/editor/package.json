@@ -32,7 +32,6 @@
   "scripts": {
     "build": "vite build --config ./vite.lib.config.ts",
     "dev": "vite",
-    "release": "release-it",
     "test:unit:coverage": "vitest run --environment jsdom --coverage",
     "test:unit:ui": "vitest --environment jsdom --watch --ui",
     "test:unit:watch": "vitest --environment jsdom --watch",
@@ -78,8 +77,7 @@
     "scroll-into-view-if-needed": "^3.1.0"
   },
   "devDependencies": {
-    "@types/linkifyjs": "^2.1.7",
-    "release-it": "^16.1.5"
+    "@types/linkifyjs": "^2.1.7"
   },
   "peerDependencies": {
     "vue": "^3.5.x"

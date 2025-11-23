@@ -22,10 +22,11 @@ import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
-const { initialPolicyName, initialGroupName } = defineProps<{
-  initialPolicyName?: string;
-  initialGroupName?: string;
-}>();
+const { initialPolicyName = undefined, initialGroupName = undefined } =
+  defineProps<{
+    initialPolicyName?: string;
+    initialGroupName?: string;
+  }>();
 
 const emit = defineEmits<{
   (event: "close"): void;

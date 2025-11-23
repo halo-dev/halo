@@ -76,7 +76,7 @@ const FileTypeIconsMap = {
 
 const props = withDefaults(
   defineProps<{
-    fileName: string | undefined;
+    fileName?: string;
     displayExt?: boolean;
     width?: number;
     height?: number;

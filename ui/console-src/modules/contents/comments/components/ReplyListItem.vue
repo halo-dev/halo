@@ -34,7 +34,6 @@ const props = withDefaults(
     replies?: ListedReply[];
   }>(),
   {
-    reply: undefined,
     replies: undefined,
   }
 );
