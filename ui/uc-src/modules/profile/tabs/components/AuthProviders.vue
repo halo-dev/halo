@@ -66,11 +66,13 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
           <template #start>
             <VEntityField v-if="authProvider.logo">
               <template #description>
-                <img
-                  class="size-8 rounded-lg"
-                  :src="authProvider.logo"
-                  :alt="authProvider.displayName"
-                />
+                <div class="size-8 overflow-hidden rounded-lg">
+                  <img
+                    class="size-full object-cover"
+                    :src="authProvider.logo"
+                    :alt="authProvider.displayName"
+                  />
+                </div>
               </template>
             </VEntityField>
             <VEntityField
