@@ -1216,8 +1216,8 @@ core:
       detail: 詳情
       notification-preferences: 通知配置
       pat: 個人令牌
-      2fa: 两步验证
       devices: 登錄設備
+      authentication: 身份認證
     actions:
       update_profile:
         title: 修改資料
@@ -1232,12 +1232,6 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
-      operations:
-        bind:
-          button: 綁定
-        unbind:
-          button: 解綁
-          title: 取消綁定 {display_name} 登入方式
       email_not_set:
         description: 電子郵件地址尚未設置，點擊下方按鈕進行設置
         title: 設定電子郵件信箱
@@ -1246,6 +1240,14 @@ core:
         title: 驗證電子郵件信箱
       email_verified:
         tooltip: 已驗證
+    auth_providers:
+      title: 登入方式
+      operations:
+        bind:
+          button: 綁定
+        unbind:
+          button: 解綁
+          title: 取消綁定 {display_name} 登入方式
     2fa:
       operations:
         enable:
@@ -1261,7 +1263,7 @@ core:
             label: 验证密碼
             help: 目前帳號的登入密碼
       methods:
-        title: 驗證方法
+        title: 兩步驗證
         totp:
           title: TOTP
           description: 使用 TOTP 應用程式設定兩步驟驗證

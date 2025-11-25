@@ -33,8 +33,5 @@ export default defineConfig({
     ],
     reporters: "html",
     outputFile: "build/test-result/index.html",
-    transformMode: {
-      web: [/\.[jt]sx$/],
-    },
   },
 });

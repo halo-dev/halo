@@ -16,8 +16,8 @@ import { uploadFile } from "../utils/upload";
 const props = withDefaults(
   defineProps<{
     editor: Editor;
-    accept: string;
-    uploadedFile: File;
+    accept?: string;
+    uploadedFile?: File;
     uploadToAttachmentFile: (
       file: File,
       options?: AxiosRequestConfig

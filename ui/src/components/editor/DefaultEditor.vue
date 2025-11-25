@@ -118,7 +118,7 @@ const props = withDefaults(
   defineProps<{
     title?: string;
     raw?: string;
-    content: string;
+    content?: string;
     cover?: string;
     uploadImage?: (
       file: File,

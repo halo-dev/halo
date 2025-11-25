@@ -1233,7 +1233,6 @@ core:
         roles: Roles
         bio: Bio
         creation_time: Creation time
-        identity_authentication: Identity authentication
         email_verified:
           tooltip: Verified
         email_not_verified:
@@ -1322,7 +1321,7 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
-      2fa: 2FA
+      authentication: Authentication
       devices: Devices
     actions:
       update_profile:
@@ -1337,13 +1336,6 @@ core:
         roles: Roles
         bio: Bio
         creation_time: Creation time
-        identity_authentication: Identity authentication
-      operations:
-        bind:
-          button: Bind
-        unbind:
-          button: Unbind
-          title: Unbind the login method for {display_name}
       email_not_set:
         description: >-
           Your email address has not been set yet. Click the button below to set
@@ -1356,6 +1348,14 @@ core:
         title: Verify email
       email_verified:
         tooltip: Verified
+    auth_providers:
+      title: Auth providers
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: Unbind the login method for {display_name}
     2fa:
       operations:
         enable:

@@ -28,7 +28,7 @@ export const SUPPORTED_LOCALES: LocaleConfig[] = [
 ];
 
 const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
-  "./*.yaml",
+  ["./*.yaml", "!**/_missing_translations_*.yaml"],
   { eager: false }
 );
 

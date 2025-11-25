@@ -13,9 +13,7 @@ const props = withDefaults(
     getPos: () => number;
     deleteNode: () => void;
   }>(),
-  {
-    selected: false,
-  }
+  {}
 );
 
 function handleInsertNewLine() {

@@ -1,6 +1,7 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
+import type { FormKitInputs } from "@formkit/inputs";
 import { coreApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
 
@@ -33,3 +34,12 @@ export const roleSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    roleSelect: {
+      type: "roleSelect";
+      value?: string;
+    };
+  }
+}
