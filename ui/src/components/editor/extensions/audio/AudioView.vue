@@ -5,7 +5,6 @@ import type { AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import RiFileMusicLine from "~icons/ri/file-music-line";
 import { EditorLinkObtain } from "../../components";
-import InlineBlockBox from "../../components/InlineBlockBox.vue";
 import { useExternalAssetsTransfer } from "../../composables/use-attachment";
 
 const props = defineProps<NodeViewProps>();
@@ -29,6 +28,10 @@ const loop = computed(() => {
 
 const initialization = computed(() => {
   return !src.value;
+});
+
+const position = computed(() => {
+  return props.node?.attrs.position || "left";
 });
 
 const editorLinkObtain = ref();
@@ -69,10 +72,22 @@ const handleResetInit = () => {
 
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
+
+const isPercentageWidth = computed(() => {
+  return props.node?.attrs.width?.includes("%");
+});
 </script>
 
 <template>
-  <InlineBlockBox>
+  <node-view-wrapper
+    as="div"
+    class="flex w-full"
+    :class="{
+      'justify-start': position === 'left',
+      'justify-center': position === 'center',
+      'justify-end': position === 'right',
+    }"
+  >
     <div
       class="relative inline-block h-full max-w-full overflow-hidden rounded-md text-center transition-all"
       :class="{
@@ -80,6 +95,7 @@ const { isExternalAsset, transferring, handleTransfer } =
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
+        height: initialization ? '100%' : node.attrs.height,
       }"
     >
       <div v-if="src" class="group relative">
@@ -91,13 +107,13 @@ const { isExternalAsset, transferring, handleTransfer } =
           :loop="loop"
           preload="metadata"
           :style="{
-            width: node.attrs.width,
-            height: node.attrs.height,
+            width: isPercentageWidth ? '100%' : node.attrs.width,
+            height: isPercentageWidth ? '100%' : node.attrs.height,
           }"
         ></audio>
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <HasPermission :permissions="['uc:attachments:manage']">
             <VButton
@@ -218,5 +234,5 @@ const { isExternalAsset, transferring, handleTransfer } =
         </EditorLinkObtain>
       </div>
     </div>
-  </InlineBlockBox>
+  </node-view-wrapper>
 </template>
