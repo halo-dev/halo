@@ -2,7 +2,7 @@
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
-import Image from "./index";
+import { ExtensionImage } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -15,12 +15,12 @@ const props = defineProps<{
 
 const src = computed({
   get: () => {
-    return props.editor.getAttributes(Image.name).src;
+    return props.editor.getAttributes(ExtensionImage.name).src;
   },
   set: (src: string) => {
     props.editor
       .chain()
-      .updateAttributes(Image.name, { src: src })
+      .updateAttributes(ExtensionImage.name, { src: src })
       .setNodeSelection(props.editor.state.selection.from)
       .focus()
       .run();

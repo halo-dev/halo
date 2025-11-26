@@ -212,7 +212,9 @@ class TableView implements NodeView {
 
 export const TABLE_BUBBLE_MENU_KEY = new PluginKey("tableBubbleMenu");
 
-const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
+export type ExtensionTableOptions = ExtensionOptions & Partial<TableOptions>;
+
+export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
   allowGapCursor: true,
 
   addExtensions() {
@@ -265,7 +267,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
         return {
           pluginKey: TABLE_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Table.name);
+            return isActive(state, ExtensionTable.name);
           },
           options: {
             placement: "bottom-start",
@@ -276,7 +278,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
               return null;
             }
             const parentNode = findParentNode(
-              (node) => node.type.name === Table.name
+              (node) => node.type.name === ExtensionTable.name
             )(editor.state.selection);
             if (parentNode) {
               const domRect = posToDOMRect(
@@ -434,7 +436,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
       // the node in the current active state is not a table
       // and the previous node is a table
       if (
-        !isNodeActive(editor.state, Table.name) &&
+        !isNodeActive(editor.state, ExtensionTable.name) &&
         hasTableBefore(editor.state) &&
         selection.empty
       ) {
@@ -442,7 +444,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
         return true;
       }
 
-      if (!isNodeActive(editor.state, Table.name)) {
+      if (!isNodeActive(editor.state, ExtensionTable.name)) {
         return false;
       }
 
@@ -462,7 +464,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
       "Mod-Backspace": () => handleBackspace(),
 
       "Mod-a": ({ editor }) => {
-        if (!isNodeActive(editor.state, Table.name)) {
+        if (!isNodeActive(editor.state, ExtensionTable.name)) {
           return false;
         }
 
@@ -494,7 +496,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
       },
       Tab: ({ editor }) => {
         const { state } = editor;
-        if (!isActive(editor.state, Table.name)) {
+        if (!isActive(editor.state, ExtensionTable.name)) {
           return false;
         }
         let nextView = editor.view;
@@ -530,7 +532,7 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
       },
       "Shift-Tab": ({ editor }) => {
         const { tr } = editor.state;
-        if (!isActive(editor.state, Table.name)) {
+        if (!isActive(editor.state, ExtensionTable.name)) {
           return false;
         }
         const previousCell = findPreviousCell(editor.state);
@@ -583,5 +585,3 @@ const Table = TiptapTable.extend<ExtensionOptions & Partial<TableOptions>>({
     editor = this.editor;
   },
 }).configure({ resizable: true });
-
-export default Table;

@@ -32,9 +32,9 @@ import MdiLink from "~icons/mdi/link";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiShare from "~icons/mdi/share";
 import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
-import Figure from "../figure";
-import FigureCaption from "../figure/figure-caption";
-import Paragraph from "../paragraph";
+import { ExtensionFigure } from "../figure";
+import { ExtensionFigureCaption } from "../figure/figure-caption";
+import { ExtensionParagraph } from "../paragraph";
 import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
 import BubbleItemImageHref from "./BubbleItemImageHref.vue";
 import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
@@ -43,15 +43,15 @@ import ImageView from "./ImageView.vue";
 
 export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
 
-const Image = TiptapImage.extend<
-  ExtensionOptions &
-    Partial<ImageOptions> & {
-      uploadImage?: (
-        file: File,
-        options?: AxiosRequestConfig
-      ) => Promise<Attachment>;
-    }
->({
+export type ExtensionImageOptions = ExtensionOptions &
+  Partial<ImageOptions> & {
+    uploadImage?: (
+      file: File,
+      options?: AxiosRequestConfig
+    ) => Promise<Attachment>;
+  };
+
+export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
   fakeSelection: true,
 
   inline: false,
@@ -159,12 +159,12 @@ const Image = TiptapImage.extend<
           let modified = false;
 
           newState.doc.descendants((node, pos) => {
-            if (node.type.name !== Image.name) {
+            if (node.type.name !== ExtensionImage.name) {
               return;
             }
 
             const $pos = newState.doc.resolve(pos);
-            if ($pos.parent.type.name === Figure.name) {
+            if ($pos.parent.type.name === ExtensionFigure.name) {
               return;
             }
 
@@ -174,7 +174,10 @@ const Image = TiptapImage.extend<
             let previousNodeSize = 0;
 
             const previousNode = $pos.nodeBefore;
-            if (previousNode && previousNode.type.name === Paragraph.name) {
+            if (
+              previousNode &&
+              previousNode.type.name === ExtensionParagraph.name
+            ) {
               if (previousNode.attrs.textAlign) {
                 const positionMap: Record<string, string> = {
                   left: "left",
@@ -275,7 +278,7 @@ const Image = TiptapImage.extend<
         return {
           pluginKey: IMAGE_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Image.name);
+            return isActive(state, ExtensionImage.name);
           },
           options: {
             placement: "top-start",
@@ -286,7 +289,9 @@ const Image = TiptapImage.extend<
               component: markRaw(BubbleItemImageSize),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
               },
             },
@@ -294,7 +299,9 @@ const Image = TiptapImage.extend<
               priority: 20,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "left" });
@@ -307,7 +314,9 @@ const Image = TiptapImage.extend<
               priority: 30,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "center" });
@@ -320,7 +329,9 @@ const Image = TiptapImage.extend<
               priority: 40,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "right" });
@@ -334,7 +345,9 @@ const Image = TiptapImage.extend<
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
               },
             },
@@ -352,12 +365,17 @@ const Image = TiptapImage.extend<
               priority: 80,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
-                  window.open(editor.getAttributes(Image.name).src, "_blank");
+                  window.open(
+                    editor.getAttributes(ExtensionImage.name).src,
+                    "_blank"
+                  );
                 },
               },
             },
@@ -365,7 +383,9 @@ const Image = TiptapImage.extend<
               priority: 90,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 icon: markRaw(MdiTextBoxEditOutline),
                 title: i18n.global.t("editor.extensions.image.edit_alt"),
@@ -378,7 +398,9 @@ const Image = TiptapImage.extend<
               priority: 100,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 icon: markRaw(MdiLink),
                 title: i18n.global.t("editor.extensions.image.edit_href"),
@@ -392,13 +414,15 @@ const Image = TiptapImage.extend<
               priority: 110,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Image.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
                 icon: markRaw(LucideCaptions),
                 title: i18n.global.t("editor.extensions.image.edit_caption"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
+                    (node) => node.type.name === ExtensionFigure.name
                   )(editor.state.selection);
 
                   if (!figureParent) {
@@ -408,7 +432,7 @@ const Image = TiptapImage.extend<
                   const { node, pos } = figureParent;
                   let captionPos = -1;
                   node.forEach((child, offset) => {
-                    if (child.type.name === FigureCaption.name) {
+                    if (child.type.name === ExtensionFigureCaption.name) {
                       captionPos = pos + offset + 1;
                     }
                   });
@@ -418,7 +442,7 @@ const Image = TiptapImage.extend<
                   }
                   const imageNodePos = findChildren(
                     editor.state.selection.$from.node(),
-                    (node) => node.type.name === Image.name
+                    (node) => node.type.name === ExtensionImage.name
                   )[0];
                   const figureCaptionNode =
                     editor.schema.nodes.figureCaption.create({
@@ -450,10 +474,13 @@ const Image = TiptapImage.extend<
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
+                    (node) => node.type.name === ExtensionFigure.name
                   )(editor.state.selection);
 
-                  deleteNode(figureParent ? Figure.name : Image.name, editor);
+                  deleteNode(
+                    figureParent ? ExtensionFigure.name : ExtensionImage.name,
+                    editor
+                  );
                 },
               },
             },
@@ -472,6 +499,12 @@ const Image = TiptapImage.extend<
     }
     return ["img", mergeAttributes(HTMLAttributes)];
   },
+}).configure({
+  inline: true,
+  allowBase64: false,
+  HTMLAttributes: {
+    loading: "lazy",
+  },
 });
 
 const handleSetPosition = (
@@ -481,9 +514,7 @@ const handleSetPosition = (
   return editor
     .chain()
     .focus()
-    .updateAttributes(Image.name, { position })
-    .updateAttributes(Figure.name, { position })
+    .updateAttributes(ExtensionImage.name, { position })
+    .updateAttributes(ExtensionFigure.name, { position })
     .run();
 };
-
-export default Image;

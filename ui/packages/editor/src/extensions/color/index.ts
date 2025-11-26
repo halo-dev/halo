@@ -1,4 +1,4 @@
-import TextStyle from "@/extensions/text-style";
+import { ExtensionTextStyle } from "@/extensions/text-style";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -8,7 +8,9 @@ import { markRaw } from "vue";
 import MdiFormatColor from "~icons/mdi/format-color";
 import ColorToolbarItem from "./ColorToolbarItem.vue";
 
-const Color = TiptapColor.extend<ExtensionOptions & Partial<ColorOptions>>({
+export type ExtensionColorOptions = Partial<ColorOptions> & ExtensionOptions;
+
+export const ExtensionColor = TiptapColor.extend<ExtensionColorOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -27,8 +29,6 @@ const Color = TiptapColor.extend<ExtensionOptions & Partial<ColorOptions>>({
     };
   },
   addExtensions() {
-    return [TextStyle];
+    return [ExtensionTextStyle];
   },
 });
-
-export default Color;

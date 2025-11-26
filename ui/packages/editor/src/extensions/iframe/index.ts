@@ -45,7 +45,7 @@ declare module "@/tiptap" {
 
 export const IFRAME_BUBBLE_MENU_KEY = new PluginKey("iframeBubbleMenu");
 
-const Iframe = Node.create<ExtensionOptions>({
+export const ExtensionIframe = Node.create<ExtensionOptions>({
   name: "iframe",
   fakeSelection: true,
 
@@ -267,25 +267,27 @@ const Iframe = Node.create<ExtensionOptions>({
         return {
           pluginKey: IFRAME_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
-            return isActive(state, Iframe.name);
+            return isActive(state, ExtensionIframe.name);
           },
           items: [
             {
               priority: 10,
               props: {
                 isActive: () =>
-                  editor.getAttributes(Iframe.name).frameborder === "1",
+                  editor.getAttributes(ExtensionIframe.name).frameborder ===
+                  "1",
                 icon: markRaw(
-                  editor.getAttributes(Iframe.name).frameborder === "1"
+                  editor.getAttributes(ExtensionIframe.name).frameborder === "1"
                     ? MdiBorderAllVariant
                     : MdiBorderNoneVariant
                 ),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Iframe.name, {
+                    .updateAttributes(ExtensionIframe.name, {
                       frameborder:
-                        editor.getAttributes(Iframe.name).frameborder === "1"
+                        editor.getAttributes(ExtensionIframe.name)
+                          .frameborder === "1"
                           ? "0"
                           : "1",
                     })
@@ -294,7 +296,7 @@ const Iframe = Node.create<ExtensionOptions>({
                     .run();
                 },
                 title:
-                  editor.getAttributes(Iframe.name).frameborder === "1"
+                  editor.getAttributes(ExtensionIframe.name).frameborder === "1"
                     ? i18n.global.t(
                         "editor.extensions.iframe.disable_frameborder"
                       )
@@ -407,8 +409,8 @@ const Iframe = Node.create<ExtensionOptions>({
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Iframe.name, {
-                      src: editor.getAttributes(Iframe.name).src,
+                    .updateAttributes(ExtensionIframe.name, {
+                      src: editor.getAttributes(ExtensionIframe.name).src,
                     })
                     .run();
                 },
@@ -430,7 +432,10 @@ const Iframe = Node.create<ExtensionOptions>({
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
-                  window.open(editor.getAttributes(Iframe.name).src, "_blank");
+                  window.open(
+                    editor.getAttributes(ExtensionIframe.name).src,
+                    "_blank"
+                  );
                 },
               },
             },
@@ -440,7 +445,7 @@ const Iframe = Node.create<ExtensionOptions>({
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Iframe.name, editor);
+                  deleteNode(ExtensionIframe.name, editor);
                 },
               },
             },
@@ -452,14 +457,14 @@ const Iframe = Node.create<ExtensionOptions>({
 });
 
 const sizeMatch = (editor: Editor, width: string, height: string) => {
-  const attr = editor.getAttributes(Iframe.name);
+  const attr = editor.getAttributes(ExtensionIframe.name);
   return width === attr.width && height === attr.height;
 };
 
 const handleSetSize = (editor: Editor, width: string, height: string) => {
   editor
     .chain()
-    .updateAttributes(Iframe.name, { width, height })
+    .updateAttributes(ExtensionIframe.name, { width, height })
     .focus()
     .setNodeSelection(editor.state.selection.from)
     .run();
@@ -471,5 +476,3 @@ const handleSetTextAlign = (
 ) => {
   editor.chain().focus().setTextAlign(align).run();
 };
-
-export default Iframe;

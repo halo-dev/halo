@@ -6,7 +6,7 @@ import { fileToBase64 } from "@/utils/upload";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
 import type { AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import Image from "./index";
+import { ExtensionImage } from "./index";
 
 const props = defineProps<NodeViewProps>();
 
@@ -180,7 +180,7 @@ function setupResizeListener() {
 
       props.editor
         .chain()
-        .updateAttributes(Image.name, { width, height })
+        .updateAttributes(ExtensionImage.name, { width, height })
         .setNodeSelection(props.getPos() || 0)
         .focus()
         .run();
@@ -301,7 +301,6 @@ const isPercentageWidth = computed(() => {
           v-if="selected"
           ref="resizeHandleRef"
           class="resizer-handler resizer-br"
-          title="拖拽调整大小"
         ></div>
 
         <div

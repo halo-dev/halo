@@ -30,7 +30,9 @@ const OTHER_BUBBLE_MENU_TYPES = [
 
 export const TEXT_BUBBLE_MENU_KEY = new PluginKey("textBubbleMenu");
 
-const Text = TiptapText.extend<ExtensionOptions>({
+export type ExtensionTextOptions = ExtensionOptions;
+
+export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -197,5 +199,3 @@ const Text = TiptapText.extend<ExtensionOptions>({
     };
   },
 });
-
-export default Text;

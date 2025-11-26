@@ -24,7 +24,7 @@ import MdiCollage from "~icons/mdi/collage";
 import RiDeleteColumn from "~icons/ri/delete-column";
 import RiInsertColumnLeft from "~icons/ri/insert-column-left";
 import RiInsertColumnRight from "~icons/ri/insert-column-right";
-import Column from "./column";
+import { ExtensionColumn } from "./column";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -81,11 +81,11 @@ const addOrDeleteCol = (
   type: ColOperateType
 ) => {
   const maybeColumns = findParentNode(
-    (node) => node.type.name === Columns.name
+    (node) => node.type.name === ExtensionColumns.name
   )(state.selection);
-  const maybeColumn = findParentNode((node) => node.type.name === Column.name)(
-    state.selection
-  );
+  const maybeColumn = findParentNode(
+    (node) => node.type.name === ExtensionColumn.name
+  )(state.selection);
   if (dispatch && maybeColumns && maybeColumn) {
     const cols = maybeColumns.node;
     const colIndex = maybeColumn.node.attrs.index;
@@ -144,11 +144,11 @@ type GotoColType = "before" | "after";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const gotoCol = (state: EditorState, dispatch: any, type: GotoColType) => {
   const maybeColumns = findParentNode(
-    (node) => node.type.name === Columns.name
+    (node) => node.type.name === ExtensionColumns.name
   )(state.selection);
-  const maybeColumn = findParentNode((node) => node.type.name === Column.name)(
-    state.selection
-  );
+  const maybeColumn = findParentNode(
+    (node) => node.type.name === ExtensionColumn.name
+  )(state.selection);
 
   if (dispatch && maybeColumns && maybeColumn) {
     const cols = maybeColumns.node;
@@ -179,13 +179,13 @@ const gotoCol = (state: EditorState, dispatch: any, type: GotoColType) => {
   return false;
 };
 
-export interface ColumnsOptions {
+export interface ExtensionColumnsOptions extends ExtensionOptions {
   HTMLAttributes: {
     class: string;
   };
 }
 
-const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
+export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
   name: "columns",
   group: "block",
   priority: 10,
@@ -244,7 +244,7 @@ const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
         return {
           pluginKey: COLUMNS_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Columns.name);
+            return isActive(state, ExtensionColumns.name);
           },
           options: {
             placement: "bottom-start",
@@ -255,7 +255,7 @@ const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
               return null;
             }
             const parentNode = findParentNode(
-              (node) => node.type.name === Column.name
+              (node) => node.type.name === ExtensionColumn.name
             )(editor.state.selection);
             if (parentNode) {
               const domRect = posToDOMRect(
@@ -315,7 +315,7 @@ const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }) => {
-                  deleteNode(Columns.name, editor);
+                  deleteNode(ExtensionColumns.name, editor);
                 },
               },
             },
@@ -392,6 +392,7 @@ const Columns = Node.create<ExtensionOptions & ColumnsOptions>({
       },
     };
   },
+  addExtensions() {
+    return [ExtensionColumn];
+  },
 });
-
-export default Columns;

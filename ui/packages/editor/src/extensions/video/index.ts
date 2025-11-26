@@ -39,9 +39,9 @@ import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
 import MdiShare from "~icons/mdi/share";
 import MdiVideo from "~icons/mdi/video";
-import Figure from "../figure";
-import FigureCaption from "../figure/figure-caption";
-import Paragraph from "../paragraph";
+import { ExtensionFigure } from "../figure";
+import { ExtensionFigureCaption } from "../figure/figure-caption";
+import { ExtensionParagraph } from "../paragraph";
 import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
 import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
 import VideoView from "./VideoView.vue";
@@ -55,14 +55,14 @@ declare module "@/tiptap" {
 
 export const VIDEO_BUBBLE_MENU_KEY = new PluginKey("videoBubbleMenu");
 
-const Video = Node.create<
-  ExtensionOptions & {
-    uploadVideo?: (
-      file: File,
-      options?: AxiosRequestConfig
-    ) => Promise<Attachment>;
-  }
->({
+export type ExtensionVideoOptions = ExtensionOptions & {
+  uploadVideo?: (
+    file: File,
+    options?: AxiosRequestConfig
+  ) => Promise<Attachment>;
+};
+
+export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
   name: "video",
   fakeSelection: true,
 
@@ -212,12 +212,12 @@ const Video = Node.create<
           let modified = false;
 
           newState.doc.descendants((node, pos) => {
-            if (node.type.name !== Video.name) {
+            if (node.type.name !== ExtensionVideo.name) {
               return;
             }
 
             const $pos = newState.doc.resolve(pos);
-            if ($pos.parent.type.name === Figure.name) {
+            if ($pos.parent.type.name === ExtensionFigure.name) {
               return;
             }
 
@@ -227,7 +227,10 @@ const Video = Node.create<
             let previousNodeSize = 0;
 
             const previousNode = $pos.nodeBefore;
-            if (previousNode && previousNode.type.name === Paragraph.name) {
+            if (
+              previousNode &&
+              previousNode.type.name === ExtensionParagraph.name
+            ) {
               if (previousNode.attrs.textAlign) {
                 const positionMap: Record<string, string> = {
                   left: "left",
@@ -329,7 +332,7 @@ const Video = Node.create<
         return {
           pluginKey: VIDEO_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
-            return isActive(state, Video.name);
+            return isActive(state, ExtensionVideo.name);
           },
           options: {
             placement: "top-start",
@@ -338,20 +341,24 @@ const Video = Node.create<
             {
               priority: 10,
               props: {
-                isActive: () => editor.getAttributes(Video.name).controls,
+                isActive: () =>
+                  editor.getAttributes(ExtensionVideo.name).controls,
                 icon: markRaw(
-                  editor.getAttributes(Video.name).controls
+                  editor.getAttributes(ExtensionVideo.name).controls
                     ? MdiCogPlay
                     : MdiCogPlayOutline
                 ),
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 action: () => {
                   return editor
                     .chain()
-                    .updateAttributes(Video.name, {
-                      controls: editor.getAttributes(Video.name).controls
+                    .updateAttributes(ExtensionVideo.name, {
+                      controls: editor.getAttributes(ExtensionVideo.name)
+                        .controls
                         ? null
                         : true,
                     })
@@ -359,7 +366,7 @@ const Video = Node.create<
                     .focus()
                     .run();
                 },
-                title: editor.getAttributes(Video.name).controls
+                title: editor.getAttributes(ExtensionVideo.name).controls
                   ? i18n.global.t("editor.extensions.video.disable_controls")
                   : i18n.global.t("editor.extensions.video.enable_controls"),
               },
@@ -368,21 +375,24 @@ const Video = Node.create<
               priority: 20,
               props: {
                 isActive: () => {
-                  return editor.getAttributes(Video.name).autoplay;
+                  return editor.getAttributes(ExtensionVideo.name).autoplay;
                 },
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 icon: markRaw(
-                  editor.getAttributes(Video.name).autoplay
+                  editor.getAttributes(ExtensionVideo.name).autoplay
                     ? MdiPlayCircle
                     : MdiPlayCircleOutline
                 ),
                 action: () => {
                   return editor
                     .chain()
-                    .updateAttributes(Video.name, {
-                      autoplay: editor.getAttributes(Video.name).autoplay
+                    .updateAttributes(ExtensionVideo.name, {
+                      autoplay: editor.getAttributes(ExtensionVideo.name)
+                        .autoplay
                         ? null
                         : true,
                     })
@@ -390,7 +400,7 @@ const Video = Node.create<
                     .focus()
                     .run();
                 },
-                title: editor.getAttributes(Video.name).autoplay
+                title: editor.getAttributes(ExtensionVideo.name).autoplay
                   ? i18n.global.t("editor.extensions.video.disable_autoplay")
                   : i18n.global.t("editor.extensions.video.enable_autoplay"),
               },
@@ -399,27 +409,31 @@ const Video = Node.create<
               priority: 30,
               props: {
                 isActive: () => {
-                  return editor.getAttributes(Video.name).loop;
+                  return editor.getAttributes(ExtensionVideo.name).loop;
                 },
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 icon: markRaw(
-                  editor.getAttributes(Video.name).loop
+                  editor.getAttributes(ExtensionVideo.name).loop
                     ? MdiMotionPlay
                     : MdiMotionPlayOutline
                 ),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Video.name, {
-                      loop: editor.getAttributes(Video.name).loop ? null : true,
+                    .updateAttributes(ExtensionVideo.name, {
+                      loop: editor.getAttributes(ExtensionVideo.name).loop
+                        ? null
+                        : true,
                     })
                     .setNodeSelection(editor.state.selection.from)
                     .focus()
                     .run();
                 },
-                title: editor.getAttributes(Video.name).loop
+                title: editor.getAttributes(ExtensionVideo.name).loop
                   ? i18n.global.t("editor.extensions.video.disable_loop")
                   : i18n.global.t("editor.extensions.video.enable_loop"),
               },
@@ -429,7 +443,9 @@ const Video = Node.create<
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
               },
             },
@@ -438,7 +454,9 @@ const Video = Node.create<
               component: markRaw(BubbleItemVideoSize),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
               },
             },
@@ -447,7 +465,9 @@ const Video = Node.create<
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
               },
             },
@@ -455,12 +475,14 @@ const Video = Node.create<
               priority: 70,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: () => {
                   const size = getVideoSizePercentage(editor, 25);
                   return (
-                    editor.getAttributes(Video.name).width ===
+                    editor.getAttributes(ExtensionVideo.name).width ===
                     `${size?.width}px`
                   );
                 },
@@ -474,12 +496,14 @@ const Video = Node.create<
               priority: 80,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: ({ editor }: { editor: Editor }) => {
                   const size = getVideoSizePercentage(editor, 50);
                   return (
-                    editor.getAttributes(Video.name).width ===
+                    editor.getAttributes(ExtensionVideo.name).width ===
                     `${size?.width}px`
                   );
                 },
@@ -493,12 +517,14 @@ const Video = Node.create<
               priority: 90,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: () => {
                   const size = getVideoSizePercentage(editor, 100);
                   return (
-                    editor.getAttributes(Video.name).width ===
+                    editor.getAttributes(ExtensionVideo.name).width ===
                     `${size?.width}px`
                   );
                 },
@@ -513,7 +539,9 @@ const Video = Node.create<
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
               },
             },
@@ -521,7 +549,9 @@ const Video = Node.create<
               priority: 110,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "left" });
@@ -534,7 +564,9 @@ const Video = Node.create<
               priority: 120,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "center" });
@@ -547,7 +579,9 @@ const Video = Node.create<
               priority: 130,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 isActive: () => {
                   return editor.isActive({ position: "right" });
@@ -561,7 +595,9 @@ const Video = Node.create<
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
               },
             },
@@ -579,12 +615,17 @@ const Video = Node.create<
               priority: 170,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
-                  window.open(editor.getAttributes(Video.name).src, "_blank");
+                  window.open(
+                    editor.getAttributes(ExtensionVideo.name).src,
+                    "_blank"
+                  );
                 },
               },
             },
@@ -592,13 +633,15 @@ const Video = Node.create<
               priority: 180,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Video.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionVideo.name).src
+                  );
                 },
                 icon: markRaw(LucideCaptions),
                 title: i18n.global.t("editor.extensions.video.edit_caption"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
-                    (node) => node.type.name === Figure.name
+                    (node) => node.type.name === ExtensionFigure.name
                   )(editor.state.selection);
 
                   if (!figureParent) {
@@ -609,7 +652,7 @@ const Video = Node.create<
                   let captionPos = -1;
 
                   node.forEach((child, offset) => {
-                    if (child.type.name === FigureCaption.name) {
+                    if (child.type.name === ExtensionFigureCaption.name) {
                       captionPos = pos + offset + 1;
                     }
                   });
@@ -620,7 +663,7 @@ const Video = Node.create<
                   }
                   const imageNodePos = findChildren(
                     editor.state.selection.$from.node(),
-                    (node) => node.type.name === Video.name
+                    (node) => node.type.name === ExtensionVideo.name
                   )[0];
                   const figureCaptionNode =
                     editor.schema.nodes.figureCaption.create({
@@ -655,7 +698,10 @@ const Video = Node.create<
                     (node) => node.type.name === "figure"
                   )(editor.state.selection);
 
-                  deleteNode(figureParent ? "figure" : Video.name, editor);
+                  deleteNode(
+                    figureParent ? "figure" : ExtensionVideo.name,
+                    editor
+                  );
                 },
               },
             },
@@ -723,7 +769,7 @@ export const handleSetSize = (
 ) => {
   editor
     .chain()
-    .updateAttributes(Video.name, size)
+    .updateAttributes(ExtensionVideo.name, size)
     .setNodeSelection(editor.state.selection.from)
     .focus()
     .run();
@@ -736,9 +782,7 @@ const handleSetPosition = (
   return editor
     .chain()
     .focus()
-    .updateAttributes(Video.name, { position })
-    .updateAttributes(Figure.name, { position })
+    .updateAttributes(ExtensionVideo.name, { position })
+    .updateAttributes(ExtensionFigure.name, { position })
     .run();
 };
-
-export default Video;

@@ -40,14 +40,14 @@ declare module "@/tiptap" {
 
 export const AUDIO_BUBBLE_MENU_KEY = new PluginKey("audioBubbleMenu");
 
-const Audio = Node.create<
-  ExtensionOptions & {
-    uploadAudio?: (
-      file: File,
-      options?: AxiosRequestConfig
-    ) => Promise<Attachment>;
-  }
->({
+export interface ExtensionAudioOptions extends ExtensionOptions {
+  uploadAudio?: (
+    file: File,
+    options?: AxiosRequestConfig
+  ) => Promise<Attachment>;
+}
+
+export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
   name: "audio",
   fakeSelection: true,
 
@@ -324,5 +324,3 @@ const Audio = Node.create<
     };
   },
 });
-
-export default Audio;

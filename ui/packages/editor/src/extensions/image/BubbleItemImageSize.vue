@@ -11,7 +11,7 @@ import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
-import Image from "./index";
+import { ExtensionImage } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -25,8 +25,8 @@ const props = defineProps<{
 const size = computed({
   get: () => {
     return {
-      width: props.editor.getAttributes(Image.name).width,
-      height: props.editor.getAttributes(Image.name).height,
+      width: props.editor.getAttributes(ExtensionImage.name).width,
+      height: props.editor.getAttributes(ExtensionImage.name).height,
     };
   },
   set: (size: { width?: string; height?: string }) => {
@@ -37,7 +37,7 @@ const size = computed({
 function handleSetSize(size: { width?: string; height?: string }) {
   props.editor
     .chain()
-    .updateAttributes(Image.name, size)
+    .updateAttributes(ExtensionImage.name, size)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();

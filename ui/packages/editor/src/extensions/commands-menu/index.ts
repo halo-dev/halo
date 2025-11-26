@@ -1,1 +1,1 @@
-export { commands as ExtensionCommands } from "./commands";
+export * from "./commands";

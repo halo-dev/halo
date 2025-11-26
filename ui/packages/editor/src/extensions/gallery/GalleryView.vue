@@ -4,7 +4,7 @@ import { VButton, VSpace } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import ProiconsDelete from "~icons/proicons/delete";
-import type { GalleryImage } from "./index";
+import type { ExtensionGalleryImageItem } from "./index";
 import {
   useAttachmentSelector,
   useUploadGalleryImage,
@@ -16,7 +16,7 @@ const images = computed({
   get: () => {
     return props.node?.attrs.images || [];
   },
-  set: (images: GalleryImage[]) => {
+  set: (images: ExtensionGalleryImageItem[]) => {
     props.updateAttributes({
       images: images,
     });
@@ -65,7 +65,11 @@ const layout = computed(() => {
 
 const groups = computed(() => {
   return images.value.reduce(
-    (acc: GalleryImage[][], image: GalleryImage, index: number) => {
+    (
+      acc: ExtensionGalleryImageItem[][],
+      image: ExtensionGalleryImageItem,
+      index: number
+    ) => {
       const groupIndex = Math.floor(index / groupSize.value);
       acc[groupIndex] = acc[groupIndex] || [];
       acc[groupIndex].push(image);

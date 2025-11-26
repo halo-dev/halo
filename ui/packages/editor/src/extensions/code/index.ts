@@ -7,7 +7,9 @@ import TiptapCode from "@tiptap/extension-code";
 import { markRaw } from "vue";
 import MdiCodeTags from "~icons/mdi/code-tags";
 
-const Code = TiptapCode.extend<ExtensionOptions & Partial<CodeOptions>>({
+export type ExtensionCodeOptions = Partial<CodeOptions> & ExtensionOptions;
+
+export const ExtensionCode = TiptapCode.extend<ExtensionCodeOptions>({
   exitable: true,
   addOptions() {
     return {
@@ -28,5 +30,3 @@ const Code = TiptapCode.extend<ExtensionOptions & Partial<CodeOptions>>({
     };
   },
 });
-
-export default Code;

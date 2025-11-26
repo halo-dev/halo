@@ -22,9 +22,10 @@ import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
 
 export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 
-const Details = TiptapDetails.extend<
-  ExtensionOptions & Partial<DetailsOptions>
->({
+export type ExtensionDetailsOptions = Partial<DetailsOptions> &
+  ExtensionOptions;
+
+export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -76,7 +77,7 @@ const Details = TiptapDetails.extend<
         return {
           pluginKey: DETAILS_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Details.name);
+            return isActive(state, ExtensionDetails.name);
           },
           options: {
             placement: "top-start",
@@ -87,7 +88,7 @@ const Details = TiptapDetails.extend<
               return null;
             }
             const parentNode = findParentNode(
-              (node) => node.type.name === Details.name
+              (node) => node.type.name === ExtensionDetails.name
             )(editor.state.selection);
             if (parentNode) {
               const domRect = posToDOMRect(
@@ -109,7 +110,7 @@ const Details = TiptapDetails.extend<
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }): boolean =>
-                  deleteNode(Details.name, editor),
+                  deleteNode(ExtensionDetails.name, editor),
               },
             },
           ],
@@ -120,6 +121,6 @@ const Details = TiptapDetails.extend<
   addExtensions() {
     return [DetailsSummary, DetailsContent];
   },
+}).configure({
+  persist: true,
 });
-
-export default Details;

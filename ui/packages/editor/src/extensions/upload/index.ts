@@ -7,11 +7,11 @@ import {
   isExternalAsset,
 } from "@/utils/upload";
 import { Dialog, Toast } from "@halo-dev/components";
-import ExtensionAudio from "../audio";
-import ExtensionImage from "../image";
-import ExtensionVideo from "../video";
+import { ExtensionAudio } from "../audio";
+import { ExtensionImage } from "../image";
+import { ExtensionVideo } from "../video";
 
-export const Upload = Extension.create({
+export const ExtensionUpload = Extension.create({
   name: "upload",
 
   addProseMirrorPlugins() {
@@ -135,5 +135,3 @@ export function getAllExternalNodes(
   });
   return externalNodes;
 }
-
-export default Upload;

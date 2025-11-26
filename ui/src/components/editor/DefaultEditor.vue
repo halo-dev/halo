@@ -22,58 +22,12 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import {
+  AllExtensions,
   convertToMediaContents,
   DecorationSet,
   Editor,
   Extension,
-  ExtensionAudio,
-  ExtensionBlockquote,
-  ExtensionBold,
-  ExtensionBulletList,
-  ExtensionCharacterCount,
-  ExtensionClearFormat,
-  ExtensionCode,
-  ExtensionCodeBlock,
-  ExtensionColor,
-  ExtensionColumn,
-  ExtensionColumns,
-  ExtensionCommands,
-  ExtensionDetails,
-  ExtensionDocument,
-  ExtensionDropcursor,
-  ExtensionFigure,
-  ExtensionFontSize,
-  ExtensionFormatBrush,
-  ExtensionGallery,
-  ExtensionGapcursor,
-  ExtensionHardBreak,
   ExtensionHeading,
-  ExtensionHighlight,
-  ExtensionHistory,
-  ExtensionHorizontalRule,
-  ExtensionIframe,
-  ExtensionImage,
-  ExtensionIndent,
-  ExtensionItalic,
-  ExtensionLink,
-  ExtensionListKeymap,
-  ExtensionNodeSelected,
-  ExtensionOrderedList,
-  ExtensionParagraph,
-  ExtensionPlaceholder,
-  ExtensionRangeSelection,
-  ExtensionSearchAndReplace,
-  ExtensionStrike,
-  ExtensionSubscript,
-  ExtensionSuperscript,
-  ExtensionTable,
-  ExtensionTaskList,
-  ExtensionText,
-  ExtensionTextAlign,
-  ExtensionTrailingNode,
-  ExtensionUnderline,
-  ExtensionUpload,
-  ExtensionVideo,
   filterDuplicateExtensions,
   Plugin,
   PluginKey,
@@ -218,73 +172,7 @@ const onAttachmentSelectorModalClose = () => {
   attachmentSelectorModalVisible.value = false;
 };
 
-const presetExtensions = [
-  ExtensionParagraph,
-  ExtensionBlockquote,
-  ExtensionBold,
-  ExtensionBulletList,
-  ExtensionCode,
-  ExtensionDocument,
-  ExtensionDropcursor.configure({
-    width: 2,
-    class: "dropcursor",
-    color: "skyblue",
-  }),
-  ExtensionGapcursor,
-  ExtensionHardBreak,
-  ExtensionHeading,
-  ExtensionHistory,
-  ExtensionHorizontalRule,
-  ExtensionItalic,
-  ExtensionOrderedList,
-  ExtensionStrike,
-  ExtensionText,
-  ExtensionImage.configure({
-    inline: true,
-    allowBase64: false,
-    HTMLAttributes: {
-      loading: "lazy",
-    },
-    uploadImage: props.uploadImage,
-  }),
-  ExtensionGallery.configure({
-    allowBase64: false,
-    uploadImage: props.uploadImage,
-  }),
-  ExtensionTaskList,
-  ExtensionLink.configure({
-    autolink: false,
-    openOnClick: false,
-  }),
-  ExtensionTextAlign.configure({
-    types: ["heading", "paragraph"],
-  }),
-  ExtensionUnderline,
-  ExtensionTable.configure({
-    resizable: true,
-  }),
-  ExtensionSubscript,
-  ExtensionSuperscript,
-  ExtensionPlaceholder.configure({
-    placeholder: t(
-      "core.components.default_editor.extensions.placeholder.options.placeholder"
-    ),
-  }),
-  ExtensionHighlight,
-  ExtensionCommands,
-  ExtensionCodeBlock,
-  ExtensionIframe,
-  ExtensionVideo.configure({
-    uploadVideo: props.uploadImage,
-  }),
-  ExtensionAudio.configure({
-    uploadAudio: props.uploadImage,
-  }),
-  ExtensionCharacterCount,
-  ExtensionFontSize,
-  ExtensionColor,
-  ExtensionIndent,
-  ExtensionFigure,
+const customExtensions = [
   Extension.create({
     name: "custom-heading-extension",
     addGlobalAttributes() {
@@ -382,10 +270,6 @@ const presetExtensions = [
       };
     },
   }),
-  ExtensionColumns,
-  ExtensionColumn,
-  ExtensionNodeSelected,
-  ExtensionTrailingNode,
   Extension.create({
     name: "get-heading-id-extension",
     addProseMirrorPlugins() {
@@ -416,15 +300,6 @@ const presetExtensions = [
       ];
     },
   }),
-  ExtensionListKeymap,
-  ExtensionUpload,
-  ExtensionSearchAndReplace,
-  ExtensionClearFormat,
-  ExtensionFormatBrush,
-  ExtensionRangeSelection,
-  ExtensionDetails.configure({
-    persist: true,
-  }),
 ];
 
 const isInitialized = ref(false);
@@ -454,7 +329,26 @@ onMounted(async () => {
   }, 250);
 
   const extensions = filterDuplicateExtensions([
-    ...presetExtensions,
+    AllExtensions.configure({
+      image: {
+        uploadImage: props.uploadImage,
+      },
+      gallery: {
+        uploadImage: props.uploadImage,
+      },
+      video: {
+        uploadVideo: props.uploadImage,
+      },
+      audio: {
+        uploadAudio: props.uploadImage,
+      },
+      placeholder: {
+        placeholder: t(
+          "core.components.default_editor.extensions.placeholder.options.placeholder"
+        ),
+      },
+    }),
+    ...customExtensions,
     ...extensionsFromPlugins,
   ]);
 
