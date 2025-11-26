@@ -1,8 +1,13 @@
 <script lang="ts" setup>
-import type { Editor } from "@/tiptap";
-import { useFileDialog } from "@vueuse/core";
-import { onMounted, type Component } from "vue";
-import Gallery from "./index";
+import { type Editor } from "@/tiptap";
+import { Dropdown as VDropdown } from "floating-vue";
+import { ref, type Component } from "vue";
+import {
+  getCurrentGalleryImages,
+  updateGalleryImages,
+  useAttachmentSelector,
+  useUploadGalleryImage,
+} from "./useGalleryImages";
 
 const props = defineProps<{
   editor: Editor;
@@ -15,47 +20,59 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(["close"]);
 
-const { open: openFileDialog, onChange } = useFileDialog({
-  accept: "image/*",
-  multiple: true,
-  reset: true,
-});
+const dropdownShown = ref(false);
+const { openFileDialog } = useUploadGalleryImage(props.editor);
 
-onChange((files) => {
-  if (files && files.length > 0) {
-    const currentImages = props.editor.getAttributes(Gallery.name).images || [];
-    const imageFiles = Array.from(files).filter((file) =>
-      file.type.startsWith("image/")
-    );
-    const newBlobUrls = imageFiles.map((file) => URL.createObjectURL(file));
-
-    props.editor
-      .chain()
-      .updateAttributes(Gallery.name, {
-        images: [
-          ...currentImages,
-          ...newBlobUrls.map((url) => ({ src: url, aspectRatio: 1 })),
-        ],
-      })
-      .setNodeSelection(props.editor.state.selection.from)
-      .focus()
-      .run();
-
+const openAttachmentSelector = useAttachmentSelector(
+  props.editor,
+  (newImages) => {
+    const currentImages = getCurrentGalleryImages(props.editor);
+    updateGalleryImages(props.editor, [...currentImages, ...newImages]);
     emit("close");
   }
-});
+);
 
-onMounted(() => {
+const handleAttachmentSelector = () => {
+  dropdownShown.value = false;
+  openAttachmentSelector();
+};
+
+const handleUploadClick = () => {
+  dropdownShown.value = false;
   openFileDialog();
-});
+};
 </script>
 
 <template>
-  <button
-    :title="title"
-    class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
-    @click="() => openFileDialog()"
-  >
-    <component :is="icon" :style="iconStyle" class="h-5 w-5" />
-  </button>
+  <VDropdown v-model:shown="dropdownShown" :triggers="['click']" :distance="10">
+    <button
+      :title="title"
+      class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
+      :class="{ 'bg-gray-200': dropdownShown }"
+    >
+      <component :is="icon" :style="iconStyle" class="h-5 w-5" />
+    </button>
+    <template #popper>
+      <div
+        class="w-24 space-y-1 overflow-hidden rounded-md bg-white p-1 shadow-lg"
+      >
+        <button
+          class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+          @click="handleUploadClick"
+        >
+          {{ $t("core.common.buttons.upload") }}
+        </button>
+        <button
+          class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+          @click="handleAttachmentSelector"
+        >
+          {{
+            $t(
+              "core.components.default_editor.extensions.upload.attachment.title"
+            )
+          }}
+        </button>
+      </div>
+    </template>
+  </VDropdown>
 </template>

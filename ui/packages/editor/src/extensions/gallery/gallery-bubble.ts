@@ -1,22 +1,27 @@
 import { i18n } from "@/locales";
-import {
-  Extension,
-  type ExtensionOptions,
-  GALLERY_BUBBLE_MENU_KEY,
-} from "@halo-dev/richtext-editor";
+import { Extension } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImagePlus from "~icons/mdi/image-plus";
-import type { UiGalleryOptions } from ".";
+import { GALLERY_BUBBLE_MENU_KEY } from ".";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 
 export const GalleryBubble = Extension.create<
-  ExtensionOptions & UiGalleryOptions
+  ExtensionOptions & {
+    uploadImage?: (
+      file: File,
+      options?: AxiosRequestConfig
+    ) => Promise<Attachment>;
+  }
 >({
   name: "gallery-bubble",
   addOptions() {
     const { parent } = this;
     return {
       ...parent?.(),
+      uploadImage: undefined,
       getBubbleMenu: () => {
         return {
           extendsKey: GALLERY_BUBBLE_MENU_KEY,

@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
-import type { NodeViewProps } from "@/tiptap/vue-3";
-import { NodeViewWrapper } from "@/tiptap/vue-3";
-import { useFileDialog } from "@vueuse/core";
+import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
+import { VButton, VSpace } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
-import ClarityImageGalleryLine from "~icons/clarity/image-gallery-line";
 import ProiconsDelete from "~icons/proicons/delete";
-import type { GalleryImage } from ".";
+import type { GalleryImage } from "./index";
+import {
+  useAttachmentSelector,
+  useUploadGalleryImage,
+} from "./useGalleryImages";
 
 const props = defineProps<NodeViewProps>();
 
@@ -21,70 +23,23 @@ const images = computed({
   },
 });
 
-const isDragging = ref(false);
+const { openFileDialog } = useUploadGalleryImage(props.editor);
 
-const { open: openFileDialog, onChange } = useFileDialog({
-  accept: "image/*",
-  multiple: true,
-  reset: true,
-});
-
-onChange((selectedFiles) => {
-  if (selectedFiles) {
-    handleFiles(Array.from(selectedFiles));
+const openAttachmentSelector = useAttachmentSelector(
+  props.editor,
+  (newImages) => {
+    images.value = [...images.value, ...newImages];
   }
-});
+);
 
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos() || 0);
 }
 
-function handleFiles(files: File[]) {
-  const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-  const newBlobUrls = imageFiles.map((file) => URL.createObjectURL(file));
-  const newImages = newBlobUrls.map((url) => {
-    return {
-      src: url,
-      aspectRatio: 0,
-    };
-  });
-  images.value = [...images.value, ...newImages];
-}
-
 function removeImage(index: number) {
   const newImages = [...images.value];
-  const image = newImages[index];
-  const removedUrl = image.src;
-
-  if (removedUrl.startsWith("blob:")) {
-    URL.revokeObjectURL(removedUrl);
-  }
-
   newImages.splice(index, 1);
   images.value = newImages;
-}
-
-function handleDragUploadOver(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = true;
-}
-
-function handleDragUploadLeave(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = false;
-}
-
-function handleDragUploadDrop(event: DragEvent) {
-  event.preventDefault();
-  event.stopPropagation();
-  isDragging.value = false;
-
-  const files = event.dataTransfer?.files;
-  if (files && files.length > 0) {
-    handleFiles(Array.from(files));
-  }
 }
 
 function handleImageLoad(event: Event, index: number) {
@@ -160,15 +115,19 @@ function handleDragLeave(event: DragEvent) {
 function handleDrop(targetIndex: number, event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
+
   const target = event.currentTarget as HTMLElement;
   target.classList.remove("ring-2", "ring-blue-500");
+
   if (draggedIndex.value === null || draggedIndex.value === targetIndex) {
     return;
   }
+
   const newImages = [...images.value];
   const [movedImage] = newImages.splice(draggedIndex.value, 1);
   newImages.splice(targetIndex, 0, movedImage);
   images.value = newImages;
+
   draggedIndex.value = null;
   dragOverIndex.value = null;
 }
@@ -177,6 +136,7 @@ function handleDrop(targetIndex: number, event: DragEvent) {
 <template>
   <node-view-wrapper
     as="div"
+    class="p-0.5"
     :class="{
       'rounded ring-2': selected,
     }"
@@ -186,28 +146,37 @@ function handleDrop(targetIndex: number, event: DragEvent) {
       v-if="images.length === 0"
       class="relative flex h-full items-center justify-center rounded-md border border-gray-200 bg-gray-50 before:pb-[62.5%]"
     >
-      <div
-        class="group flex cursor-pointer select-none flex-col items-center justify-center p-20"
-        @click.stop="openFileDialog()"
-        @dragover="handleDragUploadOver"
-        @dragleave="handleDragUploadLeave"
-        @drop="handleDragUploadDrop"
-      >
-        <ClarityImageGalleryLine class="h-16 w-16 text-gray-400" />
-        <p
-          class="mt-4 flex font-sans text-sm font-normal text-gray-600 opacity-80 transition-all group-hover:opacity-100"
+      <VSpace>
+        <VButton
+          v-if="
+            utils.permission.has(
+              ['uc:attachments:manage', 'system:attachments:manage'],
+              true
+            )
+          "
+          @click="openFileDialog()"
         >
-          {{ i18n.global.t("editor.extensions.gallery.empty_prompt") }}
-        </p>
-      </div>
+          {{ $t("core.common.buttons.upload") }}
+        </VButton>
+
+        <VButton
+          v-if="
+            utils.permission.has(
+              ['system:attachments:view', 'uc:attachments:manage'],
+              true
+            )
+          "
+          @click="openAttachmentSelector"
+        >
+          {{
+            $t(
+              "core.components.default_editor.extensions.upload.attachment.title"
+            )
+          }}
+        </VButton>
+      </VSpace>
     </div>
-    <div
-      v-else
-      class="relative grid gap-2"
-      @dragover="handleDragUploadOver"
-      @dragleave="handleDragUploadLeave"
-      @drop="handleDragUploadDrop"
-    >
+    <div v-else class="relative grid gap-2">
       <div
         v-for="(group, groupIndex) in groups"
         :key="groupIndex"
@@ -256,8 +225,12 @@ function handleDrop(targetIndex: number, event: DragEvent) {
                   class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
                 >
                   <span>
-                    {{ i18n.global.t("editor.common.button.delete") }}
-                  </span>
+                    {{
+                      $t(
+                        "core.components.default_editor.extensions.upload.operations.remove.button"
+                      )
+                    }}</span
+                  >
                 </div>
               </button>
             </div>

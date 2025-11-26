@@ -19,7 +19,9 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
-import { isEmpty } from "lodash-es";
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
+import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
@@ -53,7 +55,14 @@ declare module "@/tiptap" {
 
 export const VIDEO_BUBBLE_MENU_KEY = new PluginKey("videoBubbleMenu");
 
-const Video = Node.create<ExtensionOptions>({
+const Video = Node.create<
+  ExtensionOptions & {
+    uploadVideo?: (
+      file: File,
+      options?: AxiosRequestConfig
+    ) => Promise<Attachment>;
+  }
+>({
   name: "video",
   fakeSelection: true,
 
@@ -137,6 +146,15 @@ const Video = Node.create<ExtensionOptions>({
           return {
             "data-position": attributes.position,
           };
+        },
+      },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
         },
       },
     };
@@ -257,6 +275,7 @@ const Video = Node.create<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
+      uploadVideo: undefined,
       getCommandMenuItems() {
         return {
           priority: 100,

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import { uploadFile } from "@/utils/upload";
 import type { Attachment } from "@halo-dev/api-client";
 import { VButton, VDropdown, VSpace } from "@halo-dev/components";
-import type { Editor } from "@halo-dev/richtext-editor";
 import {
   utils,
   type AttachmentLike,
@@ -11,7 +12,6 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
-import { uploadFile } from "../utils/upload";
 
 const props = withDefaults(
   defineProps<{
@@ -55,6 +55,7 @@ const { open, reset, onChange } = useFileDialog({
 });
 
 const openAttachmentSelector = () => {
+  // @ts-ignore TODO: fix this
   props.editor.commands.openAttachmentSelector(
     (attachments: AttachmentLike[]) => {
       if (attachments.length > 0) {

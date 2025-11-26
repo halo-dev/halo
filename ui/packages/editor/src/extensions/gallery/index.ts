@@ -13,6 +13,8 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
@@ -20,6 +22,7 @@ import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
 import GalleryView from "./GalleryView.vue";
+import { GalleryBubble } from "./gallery-bubble";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -31,6 +34,8 @@ declare module "@/tiptap" {
 
 export type GalleryOptions = {
   groupSize?: number;
+  allowBase64: boolean;
+  HTMLAttributes: Record<string, unknown>;
 };
 
 export type GalleryImage = {
@@ -41,7 +46,13 @@ export type GalleryImage = {
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
 
 const Gallery = Node.create<
-  ExtensionOptions & GalleryOptions,
+  ExtensionOptions &
+    GalleryOptions & {
+      uploadImage?: (
+        file: File,
+        options?: AxiosRequestConfig
+      ) => Promise<Attachment>;
+    },
   {
     images: GalleryImage[];
   }
@@ -81,6 +92,15 @@ const Gallery = Node.create<
         default: "auto",
         parseHTML: (element) => {
           return element.getAttribute("data-layout") || "auto";
+        },
+      },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
         },
       },
     };
@@ -166,6 +186,9 @@ const Gallery = Node.create<
   addOptions() {
     return {
       ...this.parent?.(),
+      allowBase64: false,
+      HTMLAttributes: {},
+      uploadImage: undefined,
       getToolboxItems({ editor }: { editor: Editor }) {
         return {
           priority: 15,
@@ -241,6 +264,15 @@ const Gallery = Node.create<
         };
       },
     };
+  },
+
+  addExtensions() {
+    return [
+      ...(this.parent?.() || []),
+      GalleryBubble.configure({
+        uploadImage: this.options.uploadImage,
+      }),
+    ];
   },
 });
 

@@ -1,61 +1,4 @@
 <script lang="ts" setup>
-import {
-  DecorationSet,
-  Editor,
-  Extension,
-  ExtensionBlockquote,
-  ExtensionBold,
-  ExtensionBulletList,
-  ExtensionCharacterCount,
-  ExtensionClearFormat,
-  ExtensionCode,
-  ExtensionCodeBlock,
-  ExtensionColor,
-  ExtensionColumn,
-  ExtensionColumns,
-  ExtensionCommands,
-  ExtensionDetails,
-  ExtensionDocument,
-  ExtensionDropcursor,
-  ExtensionFigure,
-  ExtensionFontSize,
-  ExtensionFormatBrush,
-  ExtensionGapcursor,
-  ExtensionHardBreak,
-  ExtensionHeading,
-  ExtensionHighlight,
-  ExtensionHistory,
-  ExtensionHorizontalRule,
-  ExtensionIframe,
-  ExtensionIndent,
-  ExtensionItalic,
-  ExtensionLink,
-  ExtensionListKeymap,
-  ExtensionNodeSelected,
-  ExtensionOrderedList,
-  ExtensionParagraph,
-  ExtensionPlaceholder,
-  ExtensionRangeSelection,
-  ExtensionSearchAndReplace,
-  ExtensionStrike,
-  ExtensionSubscript,
-  ExtensionSuperscript,
-  ExtensionTable,
-  ExtensionTaskList,
-  ExtensionText,
-  ExtensionTextAlign,
-  ExtensionTrailingNode,
-  ExtensionUnderline,
-  filterDuplicateExtensions,
-  Plugin,
-  PluginKey,
-  RichTextEditor,
-  ToolbarItem,
-  ToolboxItem,
-  VueEditor,
-  type Extensions,
-} from "@halo-dev/richtext-editor";
-// ui custom extension
 import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
@@ -78,6 +21,68 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
+import {
+  convertToMediaContents,
+  DecorationSet,
+  Editor,
+  Extension,
+  ExtensionAudio,
+  ExtensionBlockquote,
+  ExtensionBold,
+  ExtensionBulletList,
+  ExtensionCharacterCount,
+  ExtensionClearFormat,
+  ExtensionCode,
+  ExtensionCodeBlock,
+  ExtensionColor,
+  ExtensionColumn,
+  ExtensionColumns,
+  ExtensionCommands,
+  ExtensionDetails,
+  ExtensionDocument,
+  ExtensionDropcursor,
+  ExtensionFigure,
+  ExtensionFontSize,
+  ExtensionFormatBrush,
+  ExtensionGallery,
+  ExtensionGapcursor,
+  ExtensionHardBreak,
+  ExtensionHeading,
+  ExtensionHighlight,
+  ExtensionHistory,
+  ExtensionHorizontalRule,
+  ExtensionIframe,
+  ExtensionImage,
+  ExtensionIndent,
+  ExtensionItalic,
+  ExtensionLink,
+  ExtensionListKeymap,
+  ExtensionNodeSelected,
+  ExtensionOrderedList,
+  ExtensionParagraph,
+  ExtensionPlaceholder,
+  ExtensionRangeSelection,
+  ExtensionSearchAndReplace,
+  ExtensionStrike,
+  ExtensionSubscript,
+  ExtensionSuperscript,
+  ExtensionTable,
+  ExtensionTaskList,
+  ExtensionText,
+  ExtensionTextAlign,
+  ExtensionTrailingNode,
+  ExtensionUnderline,
+  ExtensionUpload,
+  ExtensionVideo,
+  filterDuplicateExtensions,
+  Plugin,
+  PluginKey,
+  RichTextEditor,
+  ToolbarItem,
+  ToolboxItem,
+  VueEditor,
+  type Extensions,
+} from "@halo-dev/richtext-editor";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
@@ -103,14 +108,6 @@ import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import { useAttachmentSelect } from "./composables/use-attachment";
-import {
-  UiExtensionAudio,
-  UiExtensionGallery,
-  UiExtensionImage,
-  UiExtensionUpload,
-  UiExtensionVideo,
-} from "./extensions";
-import { convertToMediaContents } from "./utils/attachment";
 
 const { t } = useI18n();
 
@@ -242,7 +239,7 @@ const presetExtensions = [
   ExtensionOrderedList,
   ExtensionStrike,
   ExtensionText,
-  UiExtensionImage.configure({
+  ExtensionImage.configure({
     inline: true,
     allowBase64: false,
     HTMLAttributes: {
@@ -250,7 +247,7 @@ const presetExtensions = [
     },
     uploadImage: props.uploadImage,
   }),
-  UiExtensionGallery.configure({
+  ExtensionGallery.configure({
     allowBase64: false,
     uploadImage: props.uploadImage,
   }),
@@ -277,10 +274,10 @@ const presetExtensions = [
   ExtensionCommands,
   ExtensionCodeBlock,
   ExtensionIframe,
-  UiExtensionVideo.configure({
+  ExtensionVideo.configure({
     uploadVideo: props.uploadImage,
   }),
-  UiExtensionAudio.configure({
+  ExtensionAudio.configure({
     uploadAudio: props.uploadImage,
   }),
   ExtensionCharacterCount,
@@ -420,7 +417,7 @@ const presetExtensions = [
     },
   }),
   ExtensionListKeymap,
-  UiExtensionUpload,
+  ExtensionUpload,
   ExtensionSearchAndReplace,
   ExtensionClearFormat,
   ExtensionFormatBrush,

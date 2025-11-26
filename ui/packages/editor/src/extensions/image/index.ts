@@ -17,9 +17,11 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { Attachment } from "@halo-dev/api-client";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
-import { isEmpty } from "lodash-es";
+import type { AxiosRequestConfig } from "axios";
+import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiFileImageBox from "~icons/mdi/file-image-box";
@@ -41,7 +43,15 @@ import ImageView from "./ImageView.vue";
 
 export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
 
-const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
+const Image = TiptapImage.extend<
+  ExtensionOptions &
+    Partial<ImageOptions> & {
+      uploadImage?: (
+        file: File,
+        options?: AxiosRequestConfig
+      ) => Promise<Attachment>;
+    }
+>({
   fakeSelection: true,
 
   inline: false,
@@ -109,6 +119,15 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
           return {
             "data-position": attributes.position,
           };
+        },
+      },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
         },
       },
     };
@@ -203,6 +222,7 @@ const Image = TiptapImage.extend<ExtensionOptions & Partial<ImageOptions>>({
   addOptions() {
     return {
       ...this.parent?.(),
+      uploadImage: undefined,
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {

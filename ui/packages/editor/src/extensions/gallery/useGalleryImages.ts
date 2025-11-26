@@ -1,5 +1,5 @@
+import type { Editor } from "@/tiptap";
 import type { Attachment } from "@halo-dev/api-client";
-import type { Editor } from "@halo-dev/richtext-editor";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 import { computed, ref } from "vue";
@@ -27,6 +27,7 @@ export function useAttachmentSelector(
   onImagesAdded: (images: GalleryImage[]) => void
 ) {
   return () => {
+    // @ts-ignore TODO: fix this
     editor.commands.openAttachmentSelector(
       (attachments: AttachmentLike[]) => {
         if (attachments.length === 0) {

@@ -1,20 +1,15 @@
 import { i18n } from "@/locales";
-import { Dialog, Toast } from "@halo-dev/components";
-import {
-  Editor,
-  Extension,
-  Plugin,
-  PluginKey,
-  PMNode,
-  Slice,
-} from "@halo-dev/richtext-editor";
-import { UiExtensionAudio, UiExtensionImage, UiExtensionVideo } from "..";
+import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
   batchUploadExternalLink,
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
-} from "../../utils/upload";
+} from "@/utils/upload";
+import { Dialog, Toast } from "@halo-dev/components";
+import ExtensionAudio from "../audio";
+import ExtensionImage from "../image";
+import ExtensionVideo from "../video";
 
 export const Upload = Extension.create({
   name: "upload",
@@ -113,11 +108,6 @@ export const Upload = Extension.create({
   },
 });
 
-const checkExternalLinkNodeTypes = [
-  UiExtensionAudio.name,
-  UiExtensionVideo.name,
-  UiExtensionImage.name,
-];
 export function getAllExternalNodes(
   slice: Slice
 ): { node: PMNode; pos: number; index: number; parent: PMNode | null }[] {
@@ -128,7 +118,11 @@ export function getAllExternalNodes(
     parent: PMNode | null;
   }[] = [];
   slice.content.descendants((node, pos, parent, index) => {
-    if (checkExternalLinkNodeTypes.includes(node.type.name)) {
+    if (
+      [ExtensionAudio.name, ExtensionVideo.name, ExtensionImage.name].includes(
+        node.type.name
+      )
+    ) {
       if (isExternalAsset(node.attrs.src)) {
         externalNodes.push({
           node,
