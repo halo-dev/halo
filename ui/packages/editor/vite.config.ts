@@ -51,7 +51,6 @@ export default ({ mode }: { mode: string }) => {
       rollupOptions: {
         external: [
           "vue",
-          "vue-demi",
           "@halo-dev/ui-shared",
           "@halo-dev/api-client",
           "@halo-dev/components",
@@ -59,7 +58,6 @@ export default ({ mode }: { mode: string }) => {
         output: {
           globals: {
             vue: "Vue",
-            "vue-demi": "VueDemi",
             "@halo-dev/ui-shared": "HaloUiShared",
             "@halo-dev/api-client": "HaloApiClient",
             "@halo-dev/components": "HaloComponents",
