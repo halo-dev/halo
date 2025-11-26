@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { type Editor } from "@/tiptap";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { Dropdown as VDropdown } from "floating-vue";
 import { ref, type Component } from "vue";
+import type { ExtensionGalleryImageItem } from ".";
 import {
   getCurrentGalleryImages,
   updateGalleryImages,
-  useAttachmentSelector,
   useUploadGalleryImage,
 } from "./useGalleryImages";
 
@@ -23,24 +24,36 @@ const emit = defineEmits(["close"]);
 const dropdownShown = ref(false);
 const { openFileDialog } = useUploadGalleryImage(props.editor);
 
-const openAttachmentSelector = useAttachmentSelector(
-  props.editor,
-  (newImages) => {
-    const currentImages = getCurrentGalleryImages(props.editor);
-    updateGalleryImages(props.editor, [...currentImages, ...newImages]);
-    emit("close");
-  }
-);
-
-const handleAttachmentSelector = () => {
-  dropdownShown.value = false;
-  openAttachmentSelector();
-};
-
 const handleUploadClick = () => {
   dropdownShown.value = false;
   openFileDialog();
 };
+
+// Attachment Selector Modal
+const attachmentSelectorModalVisible = ref(false);
+
+const handleOpenAttachmentSelector = () => {
+  dropdownShown.value = false;
+  attachmentSelectorModalVisible.value = true;
+};
+
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  const currentImages = getCurrentGalleryImages(props.editor);
+  const newImages = attachments
+    .map((attachment) => {
+      const url = utils.attachment.getUrl(attachment);
+      if (!url) {
+        return;
+      }
+      return {
+        src: url,
+        aspectRatio: 0,
+      };
+    })
+    .filter(Boolean) as ExtensionGalleryImageItem[];
+  updateGalleryImages(props.editor, [...currentImages, ...newImages]);
+  emit("close");
+}
 </script>
 
 <template>
@@ -57,14 +70,26 @@ const handleUploadClick = () => {
         class="w-24 space-y-1 overflow-hidden rounded-md bg-white p-1 shadow-lg"
       >
         <button
+          v-if="
+            utils.permission.has([
+              'uc:attachments:manage',
+              'system:attachments:manage',
+            ])
+          "
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleUploadClick"
         >
           {{ $t("core.common.buttons.upload") }}
         </button>
         <button
+          v-if="
+            utils.permission.has([
+              'system:attachments:view',
+              'uc:attachments:manage',
+            ])
+          "
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-          @click="handleAttachmentSelector"
+          @click="handleOpenAttachmentSelector"
         >
           {{
             $t(
@@ -75,4 +100,10 @@ const handleUploadClick = () => {
       </div>
     </template>
   </VDropdown>
+  <AttachmentSelectorModal
+    v-if="attachmentSelectorModalVisible"
+    :accepts="['image/*']"
+    @select="onAttachmentSelect"
+    @close="attachmentSelectorModalVisible = false"
+  />
 </template>

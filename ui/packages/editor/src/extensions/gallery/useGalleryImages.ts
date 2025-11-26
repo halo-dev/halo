@@ -1,48 +1,9 @@
 import type { Editor } from "@/tiptap";
 import type { Attachment } from "@halo-dev/api-client";
-import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { uploadFile } from "../../utils/upload";
 import { ExtensionGallery, type ExtensionGalleryImageItem } from "./index";
-
-export function convertAttachmentsToImages(
-  attachments: AttachmentLike[]
-): ExtensionGalleryImageItem[] {
-  const newImages: ExtensionGalleryImageItem[] = [];
-  for (const attachment of attachments) {
-    const attachmentUrl = utils.attachment.getUrl(attachment);
-    if (attachmentUrl) {
-      newImages.push({
-        src: attachmentUrl,
-        aspectRatio: 0,
-      });
-    }
-  }
-  return newImages;
-}
-
-export function useAttachmentSelector(
-  editor: Editor,
-  onImagesAdded: (images: ExtensionGalleryImageItem[]) => void
-) {
-  return () => {
-    // @ts-ignore TODO: fix this
-    editor.commands.openAttachmentSelector(
-      (attachments: AttachmentLike[]) => {
-        if (attachments.length === 0) {
-          return;
-        }
-        const newImages = convertAttachmentsToImages(attachments);
-        onImagesAdded(newImages);
-      },
-      {
-        accepts: ["image/*"],
-        min: 1,
-      }
-    );
-  };
-}
 
 export function getCurrentGalleryImages(
   editor: Editor

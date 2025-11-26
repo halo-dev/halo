@@ -1,14 +1,11 @@
 <script lang="ts" setup>
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
-import { utils } from "@halo-dev/ui-shared";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import ProiconsDelete from "~icons/proicons/delete";
 import type { ExtensionGalleryImageItem } from "./index";
-import {
-  useAttachmentSelector,
-  useUploadGalleryImage,
-} from "./useGalleryImages";
+import { useUploadGalleryImage } from "./useGalleryImages";
 
 const props = defineProps<NodeViewProps>();
 
@@ -24,13 +21,6 @@ const images = computed({
 });
 
 const { openFileDialog } = useUploadGalleryImage(props.editor);
-
-const openAttachmentSelector = useAttachmentSelector(
-  props.editor,
-  (newImages) => {
-    images.value = [...images.value, ...newImages];
-  }
-);
 
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos() || 0);
@@ -135,6 +125,25 @@ function handleDrop(targetIndex: number, event: DragEvent) {
   draggedIndex.value = null;
   dragOverIndex.value = null;
 }
+
+// Attachment Selector Modal
+const attachmentSelectorModalVisible = ref(false);
+
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  const newImages = attachments
+    .map((attachment) => {
+      const url = utils.attachment.getUrl(attachment);
+      if (!url) {
+        return;
+      }
+      return {
+        src: url,
+        aspectRatio: 0,
+      };
+    })
+    .filter(Boolean) as ExtensionGalleryImageItem[];
+  images.value = [...images.value, ...newImages];
+}
 </script>
 
 <template>
@@ -153,10 +162,10 @@ function handleDrop(targetIndex: number, event: DragEvent) {
       <VSpace>
         <VButton
           v-if="
-            utils.permission.has(
-              ['uc:attachments:manage', 'system:attachments:manage'],
-              true
-            )
+            utils.permission.has([
+              'uc:attachments:manage',
+              'system:attachments:manage',
+            ])
           "
           @click="openFileDialog()"
         >
@@ -170,7 +179,7 @@ function handleDrop(targetIndex: number, event: DragEvent) {
               true
             )
           "
-          @click="openAttachmentSelector"
+          @click="attachmentSelectorModalVisible = true"
         >
           {{
             $t(
@@ -242,5 +251,11 @@ function handleDrop(targetIndex: number, event: DragEvent) {
         </div>
       </div>
     </div>
+    <AttachmentSelectorModal
+      v-if="attachmentSelectorModalVisible"
+      :accepts="['image/*']"
+      @select="onAttachmentSelect"
+      @close="attachmentSelectorModalVisible = false"
+    />
   </node-view-wrapper>
 </template>

@@ -54,23 +54,6 @@ const { open, reset, onChange } = useFileDialog({
   multiple: false,
 });
 
-const openAttachmentSelector = () => {
-  // @ts-ignore TODO: fix this
-  props.editor.commands.openAttachmentSelector(
-    (attachments: AttachmentLike[]) => {
-      if (attachments.length > 0) {
-        const attachment = attachments[0];
-        const attachmentSimple = utils.attachment.convertToSimple(attachment);
-        emit("setExternalLink", attachmentSimple);
-      }
-    },
-    {
-      accepts: [props.accept],
-      min: 1,
-      max: 1,
-    }
-  );
-};
 const controller = ref<AbortController>();
 const originalFile = ref<File>();
 const uploadState = ref<"init" | "uploading" | "error">("init");
@@ -170,8 +153,29 @@ defineExpose({
   retry: handleUploadRetry,
   reset: handleResetUpload,
 });
+
+// Attachment Selector Modal
+const attachmentSelectorModalVisible = ref(false);
+
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  if (!attachments.length) {
+    return;
+  }
+  const attachment = attachments[0];
+  const attachmentSimple = utils.attachment.convertToSimple(attachment);
+  emit("setExternalLink", attachmentSimple);
+  attachmentSelectorModalVisible.value = false;
+}
 </script>
 <template>
+  <AttachmentSelectorModal
+    v-if="attachmentSelectorModalVisible"
+    :accepts="[props.accept]"
+    :min="1"
+    :max="1"
+    @select="onAttachmentSelect"
+    @close="attachmentSelectorModalVisible = false"
+  />
   <div class="flex h-64 w-full items-center justify-center">
     <slot
       v-if="$slots.uploading && uploadState === 'uploading'"
@@ -191,23 +195,28 @@ defineExpose({
       >
         <slot v-if="$slots.icon" name="icon"></slot>
         <VSpace>
-          <HasPermission :permissions="['uc:attachments:manage']">
-            <VButton @click="open()">
-              {{ $t("core.common.buttons.upload") }}
-            </VButton>
-          </HasPermission>
-
-          <HasPermission
-            :permissions="['system:attachments:view', 'uc:attachments:manage']"
+          <VButton
+            v-if="utils.permission.has(['uc:attachments:manage'])"
+            @click="open()"
           >
-            <VButton @click="openAttachmentSelector">
-              {{
-                $t(
-                  "core.components.default_editor.extensions.upload.attachment.title"
-                )
-              }}
-            </VButton>
-          </HasPermission>
+            {{ $t("core.common.buttons.upload") }}
+          </VButton>
+
+          <VButton
+            v-if="
+              utils.permission.has([
+                'system:attachments:view',
+                'uc:attachments:manage',
+              ])
+            "
+            @click="attachmentSelectorModalVisible = true"
+          >
+            {{
+              $t(
+                "core.components.default_editor.extensions.upload.attachment.title"
+              )
+            }}
+          </VButton>
 
           <VDropdown>
             <VButton>

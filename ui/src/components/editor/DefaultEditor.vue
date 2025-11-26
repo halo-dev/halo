@@ -42,7 +42,6 @@ import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
-  defineAsyncComponent,
   inject,
   markRaw,
   nextTick,
@@ -61,7 +60,6 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
-import { useAttachmentSelect } from "./composables/use-attachment";
 
 const { t } = useI18n();
 
@@ -97,21 +95,6 @@ const owner = inject<ComputedRef<string | undefined>>("owner");
 const publishTime = inject<ComputedRef<string | undefined>>("publishTime");
 const permalink = inject<ComputedRef<string | undefined>>("permalink");
 
-declare module "@halo-dev/richtext-editor" {
-  interface Commands<ReturnType> {
-    global: {
-      openAttachmentSelector: (
-        callback: (attachments: AttachmentLike[]) => void,
-        options?: {
-          accepts?: string[];
-          min?: number;
-          max?: number;
-        }
-      ) => ReturnType;
-    };
-  }
-}
-
 interface HeadingNode {
   id: string;
   level: number;
@@ -138,39 +121,12 @@ const { pluginModules } = usePluginModuleStore();
 
 const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 
-// Attachments
-const AttachmentSelectorModal = defineAsyncComponent({
-  loader: () => {
-    if (utils.permission.has(["system:attachments:manage"])) {
-      return import(
-        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-      );
-    }
-    return import(
-      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-    );
-  },
-});
-
+// Attachment Selector Modal
 const attachmentSelectorModalVisible = ref(false);
-const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
-
-const initAttachmentOptions = {
-  accepts: ["*/*"],
-  min: undefined,
-  max: undefined,
-};
-
-const attachmentOptions = ref<{
-  accepts?: string[];
-  min?: number;
-  max?: number;
-}>(initAttachmentOptions);
-
-const onAttachmentSelectorModalClose = () => {
-  attachmentOptions.value = initAttachmentOptions;
-  attachmentSelectorModalVisible.value = false;
-};
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  const contents = convertToMediaContents(attachments);
+  editor.value?.chain().focus().insertContent(contents).run();
+}
 
 const customExtensions = [
   Extension.create({
@@ -214,34 +170,12 @@ const customExtensions = [
                   "core.components.default_editor.toolbox.attachment"
                 ),
                 action: () => {
-                  editor.commands.openAttachmentSelector((attachment) => {
-                    editor
-                      .chain()
-                      .focus()
-                      .insertContent(convertToMediaContents(attachment))
-                      .run();
-                  });
+                  attachmentSelectorModalVisible.value = true;
                   return true;
                 },
               },
             },
           ];
-        },
-      };
-    },
-    addCommands() {
-      return {
-        openAttachmentSelector: (callback, options) => () => {
-          if (options) {
-            attachmentOptions.value = options;
-          }
-          attachmentSelectorModalVisible.value = true;
-          attachmentResult.updateAttachment = (
-            attachments: AttachmentLike[]
-          ) => {
-            callback(attachments);
-          };
-          return true;
         },
       };
     },
@@ -466,9 +400,8 @@ onCoverInputChange((files) => {
   <div v-else>
     <AttachmentSelectorModal
       v-if="attachmentSelectorModalVisible"
-      v-bind="attachmentOptions"
       @select="onAttachmentSelect"
-      @close="onAttachmentSelectorModalClose"
+      @close="attachmentSelectorModalVisible = false"
     />
     <!-- For cover image -->
     <AttachmentSelectorModal

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { EditorLinkObtain } from "@/components";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
-import { VButton } from "@halo-dev/components";
 import type { NodeViewProps } from "@/tiptap";
-import type { AttachmentSimple } from "@halo-dev/ui-shared";
+import { VButton } from "@halo-dev/components";
+import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import RiVideoAddLine from "~icons/ri/video-add-line";
 
@@ -120,26 +120,29 @@ const isPercentageWidth = computed(() => {
           v-if="src"
           class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
-          <HasPermission :permissions="['uc:attachments:manage']">
-            <VButton
-              v-if="isExternalAsset"
-              v-tooltip="
-                $t(
-                  'core.components.default_editor.extensions.upload.operations.transfer.tooltip'
-                )
-              "
-              :loading="transferring"
-              size="sm"
-              ghost
-              @click="handleTransfer"
-            >
-              {{
-                $t(
-                  "core.components.default_editor.extensions.upload.operations.transfer.button"
-                )
-              }}
-            </VButton>
-          </HasPermission>
+          <VButton
+            v-if="
+              utils.permission.has([
+                'uc:attachments:manage',
+                'system:attachments:manage',
+              ]) && isExternalAsset
+            "
+            v-tooltip="
+              $t(
+                'core.components.default_editor.extensions.upload.operations.transfer.tooltip'
+              )
+            "
+            :loading="transferring"
+            size="sm"
+            ghost
+            @click="handleTransfer"
+          >
+            {{
+              $t(
+                "core.components.default_editor.extensions.upload.operations.transfer.button"
+              )
+            }}
+          </VButton>
           <VButton size="sm" type="secondary" @click="handleResetInit">
             {{
               $t(
