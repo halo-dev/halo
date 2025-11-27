@@ -21,7 +21,6 @@ export interface ExtensionFormatBrushStore {
   formatBrushMarks: any[];
 }
 
- 
 export const ExtensionFormatBrush = Extension.create<
   ExtensionOptions,
   ExtensionFormatBrushStore

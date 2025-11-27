@@ -45,7 +45,7 @@ export function useExternalAssetsTransfer(
       alt: data.spec.displayName,
     });
 
-    Toast.success(t("core.common.toast.save_success"));
+    Toast.success(t("editor.common.toast.save_success"));
 
     transferring.value = false;
   }

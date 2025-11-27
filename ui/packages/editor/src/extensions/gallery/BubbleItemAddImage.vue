@@ -79,7 +79,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleUploadClick"
         >
-          {{ $t("core.common.buttons.upload") }}
+          {{ $t("editor.common.button.upload") }}
         </button>
         <button
           v-if="
@@ -91,11 +91,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleOpenAttachmentSelector"
         >
-          {{
-            $t(
-              "core.components.default_editor.extensions.upload.attachment.title"
-            )
-          }}
+          {{ $t("editor.extensions.upload.attachment.title") }}
         </button>
       </div>
     </template>

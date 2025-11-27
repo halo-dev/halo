@@ -124,27 +124,17 @@ const isPercentageWidth = computed(() => {
               ]) && isExternalAsset
             "
             v-tooltip="
-              $t(
-                'core.components.default_editor.extensions.upload.operations.transfer.tooltip'
-              )
+              $t('editor.extensions.upload.operations.transfer.tooltip')
             "
             :loading="transferring"
             size="sm"
             ghost
             @click="handleTransfer"
           >
-            {{
-              $t(
-                "core.components.default_editor.extensions.upload.operations.transfer.button"
-              )
-            }}
+            {{ $t("editor.extensions.upload.operations.transfer.button") }}
           </VButton>
           <VButton size="xs" type="secondary" @click="handleResetInit">
-            {{
-              $t(
-                "core.components.default_editor.extensions.upload.operations.replace.button"
-              )
-            }}
+            {{ $t("editor.extensions.upload.operations.replace.button") }}
           </VButton>
         </div>
       </div>
@@ -186,9 +176,7 @@ const isPercentageWidth = computed(() => {
                       {{
                         progress
                           ? `${progress}%`
-                          : `${$t(
-                              "core.components.default_editor.extensions.upload.loading"
-                            )}...`
+                          : `${$t("editor.extensions.upload.loading")}...`
                       }}
                     </div>
                   </div>
@@ -198,7 +186,7 @@ const isPercentageWidth = computed(() => {
                   class="inline-block cursor-pointer text-sm hover:opacity-70"
                   @click="handleUploadAbort"
                 >
-                  {{ $t("core.common.buttons.cancel") }}
+                  {{ $t("editor.common.button.cancel") }}
                 </div>
               </div>
             </div>
@@ -214,11 +202,7 @@ const isPercentageWidth = computed(() => {
                     <div
                       class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
                     >
-                      {{
-                        $t(
-                          "core.components.default_editor.extensions.upload.error"
-                        )
-                      }}
+                      {{ $t("editor.extensions.upload.error") }}
                     </div>
                   </div>
                 </div>
@@ -226,11 +210,7 @@ const isPercentageWidth = computed(() => {
                   class="inline-block cursor-pointer text-sm hover:opacity-70"
                   @click="handleUploadRetry"
                 >
-                  {{
-                    $t(
-                      "core.components.default_editor.extensions.upload.click_retry"
-                    )
-                  }}
+                  {{ $t("editor.extensions.upload.click_retry") }}
                 </div>
               </div>
             </div>

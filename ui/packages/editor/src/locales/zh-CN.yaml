@@ -114,6 +114,25 @@ editor:
         title: 布局
         auto: 自适应
         square: 等比矩形
+    upload:
+      error: 上传失败
+      click_retry: 点击重试
+      loading: 等待中
+      attachment:
+        title: 附件库
+      permalink:
+        title: 输入链接
+        placeholder: 输入链接，按回车确定
+      operations:
+        remove:
+          button: 删除
+        replace:
+          button: 替换
+        transfer:
+          button: 转存
+          tooltip: 检测到此资源为外部资源，点击此按钮以转存到附件库
+        transfer_in_batch:
+          description: 检测到具有外部链接，是否需要自动上传到附件库？
   components:
     color_picker:
       more_color: 更多颜色
@@ -166,7 +185,12 @@ editor:
       restore_default: 恢复为默认
       add: 添加
       cancel: 取消
+      upload: 上传
+      confirm: 确定
     text:
       default: 默认
+      tip: 提示
+    toast:
+      save_success: 保存成功
     line_height: 行高
     clear_format: 清除格式

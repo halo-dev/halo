@@ -1131,7 +1131,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 註冊時間
-        identity_authentication: 登入方式
         email_verified:
           tooltip: 已驗證
         email_not_verified:
@@ -1231,7 +1230,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 註冊時間
-        identity_authentication: 登入方式
       email_not_set:
         description: 電子郵件地址尚未設置，點擊下方按鈕進行設置
         title: 設定電子郵件信箱
@@ -1637,25 +1635,6 @@ core:
         placeholder:
           options:
             placeholder: 輸入 / 以選擇輸入類型
-        upload:
-          error: 上傳失敗
-          click_retry: 點擊重試
-          loading: 等待中
-          attachment:
-            title: 附件庫
-          permalink:
-            title: 輸入連結
-            placeholder: 輸入連結，按回車確定
-          operations:
-            remove:
-              button: 刪除
-            replace:
-              button: 替換
-            transfer:
-              button: 轉存
-              tooltip: 偵測到此資源為外部資源，點擊此按鈕以轉存到附件庫
-            transfer_in_batch:
-              description: 檢測到具有外部連結，是否需要自動上傳到附件庫？
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄

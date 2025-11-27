@@ -169,7 +169,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           "
           @click="openFileDialog()"
         >
-          {{ $t("core.common.buttons.upload") }}
+          {{ $t("editor.common.button.upload") }}
         </VButton>
 
         <VButton
@@ -181,11 +181,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           "
           @click="attachmentSelectorModalVisible = true"
         >
-          {{
-            $t(
-              "core.components.default_editor.extensions.upload.attachment.title"
-            )
-          }}
+          {{ $t("editor.extensions.upload.attachment.title") }}
         </VButton>
       </VSpace>
     </div>
@@ -239,9 +235,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 >
                   <span>
                     {{
-                      $t(
-                        "core.components.default_editor.extensions.upload.operations.remove.button"
-                      )
+                      $t("editor.extensions.upload.operations.remove.button")
                     }}</span
                   >
                 </div>

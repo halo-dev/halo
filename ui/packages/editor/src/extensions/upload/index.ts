@@ -33,17 +33,17 @@ export const ExtensionUpload = Extension.create({
             const externalNodes = getAllExternalNodes(slice);
             if (externalNodes.length > 0) {
               Dialog.info({
-                title: i18n.global.t("core.common.text.tip"),
+                title: i18n.global.t("editor.common.text.tip"),
                 description: i18n.global.t(
-                  "core.components.default_editor.extensions.upload.operations.transfer_in_batch.description"
+                  "editor.extensions.upload.operations.transfer_in_batch.description"
                 ),
-                confirmText: i18n.global.t("core.common.buttons.confirm"),
-                cancelText: i18n.global.t("core.common.buttons.cancel"),
+                confirmText: i18n.global.t("editor.common.button.confirm"),
+                cancelText: i18n.global.t("editor.common.button.cancel"),
                 async onConfirm() {
                   await batchUploadExternalLink(editor, externalNodes);
 
                   Toast.success(
-                    i18n.global.t("core.common.toast.save_success")
+                    i18n.global.t("editor.common.toast.save_success")
                   );
                 },
               });

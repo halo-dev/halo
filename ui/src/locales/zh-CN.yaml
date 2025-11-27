@@ -1146,7 +1146,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 注册时间
-        identity_authentication: 登录方式
         email_verified:
           tooltip: 已验证
         email_not_verified:
@@ -1246,7 +1245,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 注册时间
-        identity_authentication: 登录方式
       email_not_set:
         title: 设置电子邮箱
         description: 电子邮箱地址还未设置，点击下方按钮进行设置
@@ -1652,25 +1650,6 @@ core:
         placeholder:
           options:
             placeholder: 输入 / 以选择输入类型
-        upload:
-          error: 上传失败
-          click_retry: 点击重试
-          loading: 等待中
-          attachment:
-            title: 附件库
-          permalink:
-            title: 输入链接
-            placeholder: 输入链接，按回车确定
-          operations:
-            remove:
-              button: 删除
-            replace:
-              button: 替换
-            transfer:
-              button: 转存
-              tooltip: 检测到此资源为外部资源，点击此按钮以转存到附件库
-            transfer_in_batch:
-              description: 检测到具有外部链接，是否需要自动上传到附件库？
       toolbox:
         attachment: 选择附件
         show_hide_sidebar: 显示 / 隐藏侧边栏
