@@ -22,13 +22,12 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import {
-  AllExtensions,
   convertToMediaContents,
   DecorationSet,
   Editor,
   Extension,
   ExtensionHeading,
-  filterDuplicateExtensions,
+  ExtensionsKit,
   Plugin,
   PluginKey,
   RichTextEditor,
@@ -262,33 +261,30 @@ onMounted(async () => {
     emit("update", html);
   }, 250);
 
-  const extensions = filterDuplicateExtensions([
-    AllExtensions.configure({
-      image: {
-        uploadImage: props.uploadImage,
-      },
-      gallery: {
-        uploadImage: props.uploadImage,
-      },
-      video: {
-        uploadVideo: props.uploadImage,
-      },
-      audio: {
-        uploadAudio: props.uploadImage,
-      },
-      placeholder: {
-        placeholder: t(
-          "core.components.default_editor.extensions.placeholder.options.placeholder"
-        ),
-      },
-    }),
-    ...customExtensions,
-    ...extensionsFromPlugins,
-  ]);
-
   editor.value = new VueEditor({
     content: props.raw,
-    extensions,
+    extensions: [
+      ExtensionsKit.configure({
+        image: {
+          uploadImage: props.uploadImage,
+        },
+        gallery: {
+          uploadImage: props.uploadImage,
+        },
+        video: {
+          uploadVideo: props.uploadImage,
+        },
+        audio: {
+          uploadAudio: props.uploadImage,
+        },
+        placeholder: {
+          placeholder: t(
+            "core.components.default_editor.extensions.placeholder.options.placeholder"
+          ),
+        },
+        customExtensions: [...customExtensions, ...extensionsFromPlugins],
+      }),
+    ],
     parseOptions: {
       preserveWhitespace: true,
     },

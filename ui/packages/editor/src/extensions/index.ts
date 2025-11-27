@@ -1,4 +1,4 @@
-export * from "./all-extensions";
+export * from "./extensions-kit";
 
 export * from "./audio";
 export * from "./blockquote";

@@ -7,6 +7,7 @@ import type {
   DropcursorOptions,
   PlaceholderOptions,
 } from "@tiptap/extensions";
+import { filterDuplicateExtensions } from "../utils";
 import type { ExtensionAudioOptions } from "./audio";
 import { ExtensionAudio } from "./audio";
 import {
@@ -99,7 +100,7 @@ import {
 import { ExtensionUpload } from "./upload";
 import { ExtensionVideo, type ExtensionVideoOptions } from "./video";
 
-export interface AllExtensionOptions {
+export interface ExtensionsKitOptions {
   audio: Partial<ExtensionAudioOptions> | false;
   blockquote: Partial<ExtensionBlockquoteOptions> | false;
   bold: Partial<ExtensionBoldOptions> | false;
@@ -148,210 +149,255 @@ export interface AllExtensionOptions {
   underline: Partial<ExtensionUnderlineOptions> | false;
   upload?: boolean;
   video: Partial<ExtensionVideoOptions> | false;
+  customExtensions?: Extensions;
 }
 
-export const AllExtensions = Extension.create<AllExtensionOptions>({
-  name: "halo-all-extensions",
+export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
+  name: "halo-extensions-kit",
   addExtensions() {
-    const extensions: Extensions = [];
+    const internalExtensions: Extensions = [];
 
     if (this.options.audio !== false) {
-      extensions.push(ExtensionAudio.configure(this.options.audio));
+      internalExtensions.push(ExtensionAudio.configure(this.options.audio));
     }
 
     if (this.options.blockquote !== false) {
-      extensions.push(ExtensionBlockquote.configure(this.options.blockquote));
+      internalExtensions.push(
+        ExtensionBlockquote.configure(this.options.blockquote)
+      );
     }
 
     if (this.options.bold !== false) {
-      extensions.push(ExtensionBold.configure(this.options.bold));
+      internalExtensions.push(ExtensionBold.configure(this.options.bold));
     }
 
     if (this.options.bulletList !== false) {
-      extensions.push(ExtensionBulletList.configure(this.options.bulletList));
+      internalExtensions.push(
+        ExtensionBulletList.configure(this.options.bulletList)
+      );
     }
 
     if (this.options.characterCount !== false) {
-      extensions.push(
+      internalExtensions.push(
         ExtensionCharacterCount.configure(this.options.characterCount)
       );
     }
 
     if (this.options.clearFormat !== false) {
-      extensions.push(ExtensionClearFormat.configure(this.options.clearFormat));
+      internalExtensions.push(
+        ExtensionClearFormat.configure(this.options.clearFormat)
+      );
     }
 
     if (this.options.code !== false) {
-      extensions.push(ExtensionCode.configure(this.options.code));
+      internalExtensions.push(ExtensionCode.configure(this.options.code));
     }
 
     if (this.options.codeBlock !== false) {
-      extensions.push(ExtensionCodeBlock.configure(this.options.codeBlock));
+      internalExtensions.push(
+        ExtensionCodeBlock.configure(this.options.codeBlock)
+      );
     }
 
     if (this.options.color !== false) {
-      extensions.push(ExtensionColor.configure(this.options.color));
+      internalExtensions.push(ExtensionColor.configure(this.options.color));
     }
 
     if (this.options.columns !== false) {
-      extensions.push(ExtensionColumns.configure(this.options.columns));
+      internalExtensions.push(ExtensionColumns.configure(this.options.columns));
     }
 
     if (this.options.commandsMenu !== false) {
-      extensions.push(ExtensionCommandsMenu);
+      internalExtensions.push(ExtensionCommandsMenu);
     }
 
     if (this.options.details !== false) {
-      extensions.push(ExtensionDetails.configure(this.options.details));
+      internalExtensions.push(ExtensionDetails.configure(this.options.details));
     }
 
     if (this.options.document !== false) {
-      extensions.push(ExtensionDocument);
+      internalExtensions.push(ExtensionDocument);
     }
 
     if (this.options.dropCursor !== false) {
-      extensions.push(ExtensionDropcursor.configure(this.options.dropCursor));
+      internalExtensions.push(
+        ExtensionDropcursor.configure(this.options.dropCursor)
+      );
     }
 
     if (this.options.figure !== false) {
-      extensions.push(ExtensionFigure.configure(this.options.figure));
+      internalExtensions.push(ExtensionFigure.configure(this.options.figure));
     }
 
     if (this.options.fontSize !== false) {
-      extensions.push(ExtensionFontSize.configure(this.options.fontSize));
+      internalExtensions.push(
+        ExtensionFontSize.configure(this.options.fontSize)
+      );
     }
 
     if (this.options.formatBrush !== false) {
-      extensions.push(ExtensionFormatBrush.configure(this.options.formatBrush));
+      internalExtensions.push(
+        ExtensionFormatBrush.configure(this.options.formatBrush)
+      );
     }
 
     if (this.options.gallery !== false) {
-      extensions.push(ExtensionGallery.configure(this.options.gallery));
+      internalExtensions.push(ExtensionGallery.configure(this.options.gallery));
     }
 
     if (this.options.gapCursor !== false) {
-      extensions.push(ExtensionGapCursor);
+      internalExtensions.push(ExtensionGapCursor);
     }
 
     if (this.options.hardBreak !== false) {
-      extensions.push(ExtensionHardBreak.configure(this.options.hardBreak));
+      internalExtensions.push(
+        ExtensionHardBreak.configure(this.options.hardBreak)
+      );
     }
 
     if (this.options.heading !== false) {
-      extensions.push(ExtensionHeading.configure(this.options.heading));
+      internalExtensions.push(ExtensionHeading.configure(this.options.heading));
     }
 
     if (this.options.highlight !== false) {
-      extensions.push(ExtensionHighlight.configure(this.options.highlight));
+      internalExtensions.push(
+        ExtensionHighlight.configure(this.options.highlight)
+      );
     }
 
     if (this.options.history !== false) {
-      extensions.push(ExtensionHistory.configure(this.options.history));
+      internalExtensions.push(ExtensionHistory.configure(this.options.history));
     }
 
     if (this.options.horizontalRule !== false) {
-      extensions.push(
+      internalExtensions.push(
         ExtensionHorizontalRule.configure(this.options.horizontalRule)
       );
     }
 
     if (this.options.iframe !== false) {
-      extensions.push(ExtensionIframe.configure(this.options.iframe));
+      internalExtensions.push(ExtensionIframe.configure(this.options.iframe));
     }
 
     if (this.options.image !== false) {
-      extensions.push(ExtensionImage.configure(this.options.image));
+      internalExtensions.push(ExtensionImage.configure(this.options.image));
     }
 
     if (this.options.indent !== false) {
-      extensions.push(ExtensionIndent.configure(this.options.indent));
+      internalExtensions.push(ExtensionIndent.configure(this.options.indent));
     }
 
     if (this.options.italic !== false) {
-      extensions.push(ExtensionItalic.configure(this.options.italic));
+      internalExtensions.push(ExtensionItalic.configure(this.options.italic));
     }
 
     if (this.options.link !== false) {
-      extensions.push(ExtensionLink.configure(this.options.link));
+      internalExtensions.push(ExtensionLink.configure(this.options.link));
     }
 
     if (this.options.listKeymap !== false) {
-      extensions.push(ExtensionListKeymap.configure(this.options.listKeymap));
+      internalExtensions.push(
+        ExtensionListKeymap.configure(this.options.listKeymap)
+      );
     }
 
     if (this.options.nodeSelected !== false) {
-      extensions.push(
+      internalExtensions.push(
         ExtensionNodeSelected.configure(this.options.nodeSelected)
       );
     }
 
     if (this.options.orderedList !== false) {
-      extensions.push(ExtensionOrderedList.configure(this.options.orderedList));
+      internalExtensions.push(
+        ExtensionOrderedList.configure(this.options.orderedList)
+      );
     }
 
     if (this.options.paragraph !== false) {
-      extensions.push(ExtensionParagraph.configure(this.options.paragraph));
+      internalExtensions.push(
+        ExtensionParagraph.configure(this.options.paragraph)
+      );
     }
 
     if (this.options.placeholder !== false) {
-      extensions.push(ExtensionPlaceholder.configure(this.options.placeholder));
+      internalExtensions.push(
+        ExtensionPlaceholder.configure(this.options.placeholder)
+      );
     }
 
     if (this.options.rangeSelection !== false) {
-      extensions.push(ExtensionRangeSelection);
+      internalExtensions.push(ExtensionRangeSelection);
     }
 
     if (this.options.searchAndReplace !== false) {
-      extensions.push(ExtensionSearchAndReplace);
+      internalExtensions.push(ExtensionSearchAndReplace);
     }
 
     if (this.options.strike !== false) {
-      extensions.push(ExtensionStrike.configure(this.options.strike));
+      internalExtensions.push(ExtensionStrike.configure(this.options.strike));
     }
 
     if (this.options.subscript !== false) {
-      extensions.push(ExtensionSubscript.configure(this.options.subscript));
+      internalExtensions.push(
+        ExtensionSubscript.configure(this.options.subscript)
+      );
     }
 
     if (this.options.superscript !== false) {
-      extensions.push(ExtensionSuperscript.configure(this.options.superscript));
+      internalExtensions.push(
+        ExtensionSuperscript.configure(this.options.superscript)
+      );
     }
 
     if (this.options.table !== false) {
-      extensions.push(ExtensionTable.configure(this.options.table));
+      internalExtensions.push(ExtensionTable.configure(this.options.table));
     }
 
     if (this.options.taskList !== false) {
-      extensions.push(ExtensionTaskList.configure(this.options.taskList));
+      internalExtensions.push(
+        ExtensionTaskList.configure(this.options.taskList)
+      );
     }
 
     if (this.options.text !== false) {
-      extensions.push(ExtensionText.configure(this.options.text));
+      internalExtensions.push(ExtensionText.configure(this.options.text));
     }
 
     if (this.options.textAlign !== false) {
-      extensions.push(ExtensionTextAlign.configure(this.options.textAlign));
+      internalExtensions.push(
+        ExtensionTextAlign.configure(this.options.textAlign)
+      );
     }
 
     if (this.options.textStyle !== false) {
-      extensions.push(ExtensionTextStyle.configure(this.options.textStyle));
+      internalExtensions.push(
+        ExtensionTextStyle.configure(this.options.textStyle)
+      );
     }
 
     if (this.options.trailingNode !== false) {
-      extensions.push(ExtensionTrailingNode);
+      internalExtensions.push(ExtensionTrailingNode);
     }
 
     if (this.options.underline !== false) {
-      extensions.push(ExtensionUnderline.configure(this.options.underline));
+      internalExtensions.push(
+        ExtensionUnderline.configure(this.options.underline)
+      );
     }
 
     if (this.options.upload !== false) {
-      extensions.push(ExtensionUpload);
+      internalExtensions.push(ExtensionUpload);
     }
 
     if (this.options.video !== false) {
-      extensions.push(ExtensionVideo.configure(this.options.video));
+      internalExtensions.push(ExtensionVideo.configure(this.options.video));
     }
+
+    const extensions =
+      filterDuplicateExtensions([
+        ...internalExtensions,
+        ...(this.options.customExtensions || []),
+      ]) || [];
 
     return extensions;
   },
