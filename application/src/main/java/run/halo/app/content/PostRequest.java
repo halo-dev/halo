@@ -14,7 +14,7 @@ import run.halo.app.extension.Ref;
  * @since 2.0.0
  */
 public record PostRequest(@Schema(requiredMode = REQUIRED) @NonNull Post post,
-                          ContentUpdateParam content) {
+                          @Schema(requiredMode = REQUIRED) @NonNull ContentUpdateParam content) {
 
     public ContentRequest contentRequest() {
         Ref subjectRef = Ref.of(post);

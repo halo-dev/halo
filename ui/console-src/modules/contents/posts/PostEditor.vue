@@ -78,17 +78,8 @@ const handleChangeEditorProvider = async (provider: EditorProvider) => {
   }
 };
 
-// fixme: PostRequest type may be wrong
-interface PostRequestWithContent extends PostRequest {
-  content: {
-    raw: string;
-    content: string;
-    rawType: string;
-  };
-}
-
 // Post form
-const formState = ref<PostRequestWithContent>({
+const formState = ref<PostRequest>({
   post: {
     spec: {
       title: "",

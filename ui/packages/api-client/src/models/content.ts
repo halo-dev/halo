@@ -15,8 +15,8 @@
 
 
 export interface Content {
-    'content'?: string;
-    'raw'?: string;
-    'rawType'?: string;
+    'content': string;
+    'raw': string;
+    'rawType': string;
 }
 
