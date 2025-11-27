@@ -1,4 +1,3 @@
-// image drag and paste upload
 import { ExtensionAudio } from "@/extensions/audio";
 import { ExtensionImage } from "@/extensions/image";
 import { ExtensionVideo } from "@/extensions/video";
@@ -24,7 +23,12 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
     return false;
   }
 
-  if (!utils.permission.has(["uc:attachments:manage"])) {
+  if (
+    !utils.permission.has([
+      "uc:attachments:manage",
+      "system:attachments:manage",
+    ])
+  ) {
     return false;
   }
 
