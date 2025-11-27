@@ -199,7 +199,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             v-if="utils.permission.has(['uc:attachments:manage'])"
             @click="open()"
           >
-            {{ $t("editor.common.button.upload") }}
+            {{ i18n.global.t("editor.common.button.upload") }}
           </VButton>
 
           <VButton
@@ -211,12 +211,12 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             "
             @click="attachmentSelectorModalVisible = true"
           >
-            {{ $t("editor.extensions.upload.attachment.title") }}
+            {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
           </VButton>
 
           <VDropdown>
             <VButton>
-              {{ $t("editor.extensions.upload.permalink.title") }}
+              {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
             <template #popper>
               <input

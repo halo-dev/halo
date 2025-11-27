@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
@@ -169,7 +170,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           "
           @click="openFileDialog()"
         >
-          {{ $t("editor.common.button.upload") }}
+          {{ i18n.global.t("editor.common.button.upload") }}
         </VButton>
 
         <VButton
@@ -181,7 +182,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           "
           @click="attachmentSelectorModalVisible = true"
         >
-          {{ $t("editor.extensions.upload.attachment.title") }}
+          {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
         </VButton>
       </VSpace>
     </div>
@@ -235,7 +236,9 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 >
                   <span>
                     {{
-                      $t("editor.extensions.upload.operations.remove.button")
+                      i18n.global.t(
+                        "editor.extensions.upload.operations.remove.button"
+                      )
                     }}</span
                   >
                 </div>

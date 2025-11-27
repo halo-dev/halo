@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { EditorLinkObtain } from "@/components";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
+import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { fileToBase64 } from "@/utils/upload";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
@@ -315,18 +316,28 @@ const isPercentageWidth = computed(() => {
               ]) && isExternalAsset
             "
             v-tooltip="
-              $t('editor.extensions.upload.operations.transfer.tooltip')
+              i18n.global.t(
+                'editor.extensions.upload.operations.transfer.tooltip'
+              )
             "
             :loading="transferring"
             size="sm"
             ghost
             @click="handleTransfer"
           >
-            {{ $t("editor.extensions.upload.operations.transfer.button") }}
+            {{
+              i18n.global.t(
+                "editor.extensions.upload.operations.transfer.button"
+              )
+            }}
           </VButton>
 
           <VButton size="sm" type="secondary" @click="handleResetInit">
-            {{ $t("editor.extensions.upload.operations.replace.button") }}
+            {{
+              i18n.global.t(
+                "editor.extensions.upload.operations.replace.button"
+              )
+            }}
           </VButton>
         </div>
 
@@ -344,7 +355,7 @@ const isPercentageWidth = computed(() => {
                   <div
                     class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
                   >
-                    {{ $t("editor.extensions.upload.error") }}
+                    {{ i18n.global.t("editor.extensions.upload.error") }}
                   </div>
                 </div>
               </div>
@@ -352,7 +363,7 @@ const isPercentageWidth = computed(() => {
                 class="inline-block cursor-pointer text-sm hover:opacity-70"
                 @click="handleUploadRetry"
               >
-                {{ $t("editor.extensions.upload.click_retry") }}
+                {{ i18n.global.t("editor.extensions.upload.click_retry") }}
               </div>
             </template>
             <template v-else>
@@ -372,7 +383,7 @@ const isPercentageWidth = computed(() => {
                     {{
                       uploadProgress
                         ? `${uploadProgress}%`
-                        : `${$t("editor.extensions.upload.loading")}...`
+                        : `${i18n.global.t("editor.extensions.upload.loading")}...`
                     }}
                   </div>
                 </div>
@@ -382,7 +393,7 @@ const isPercentageWidth = computed(() => {
                 class="inline-block cursor-pointer text-sm hover:opacity-70"
                 @click="handleUploadAbort"
               >
-                {{ $t("editor.common.button.cancel") }}
+                {{ i18n.global.t("editor.common.button.cancel") }}
               </div>
             </template>
           </div>

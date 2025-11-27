@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { Dropdown as VDropdown } from "floating-vue";
@@ -79,7 +80,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleUploadClick"
         >
-          {{ $t("editor.common.button.upload") }}
+          {{ i18n.global.t("editor.common.button.upload") }}
         </button>
         <button
           v-if="
@@ -91,7 +92,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
           @click="handleOpenAttachmentSelector"
         >
-          {{ $t("editor.extensions.upload.attachment.title") }}
+          {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
         </button>
       </div>
     </template>
