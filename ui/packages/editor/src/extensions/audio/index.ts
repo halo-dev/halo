@@ -4,17 +4,19 @@ import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
-  Node,
-  PluginKey,
-  VueNodeViewRenderer,
+  findParentNode,
   isActive,
   mergeAttributes,
+  Node,
   nodeInputRule,
+  PluginKey,
+  VueNodeViewRenderer,
   type Range,
 } from "@/tiptap";
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import { isEmpty } from "lodash-es";
 import { markRaw } from "vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
@@ -40,13 +42,9 @@ const Audio = Node.create<ExtensionOptions>({
   name: "audio",
   fakeSelection: true,
 
-  inline() {
-    return true;
-  },
+  inline: false,
 
-  group() {
-    return "inline";
-  },
+  group: "block",
 
   addAttributes() {
     return {
@@ -149,7 +147,11 @@ const Audio = Node.create<ExtensionOptions>({
               .focus()
               .deleteRange(range)
               .insertContent([
-                { type: "audio", attrs: { src: "" } },
+                {
+                  type: "figure",
+                  attrs: { contentType: "audio" },
+                  content: [{ type: "audio", attrs: { src: "" } }],
+                },
                 { type: "paragraph", content: "" },
               ])
               .run();
@@ -168,7 +170,13 @@ const Audio = Node.create<ExtensionOptions>({
               editor
                 .chain()
                 .focus()
-                .insertContent([{ type: "audio", attrs: { src: "" } }])
+                .insertContent([
+                  {
+                    type: "figure",
+                    attrs: { contentType: "audio" },
+                    content: [{ type: "audio", attrs: { src: "" } }],
+                  },
+                ])
                 .run();
             },
           },
@@ -184,6 +192,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 10,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 isActive: () => {
                   return editor.getAttributes(Audio.name).autoplay;
                 },
@@ -212,6 +223,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 20,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 isActive: () => {
                   return editor.getAttributes(Audio.name).loop;
                 },
@@ -238,6 +252,11 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 30,
               component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
+              },
             },
             {
               priority: 40,
@@ -252,6 +271,9 @@ const Audio = Node.create<ExtensionOptions>({
             {
               priority: 50,
               props: {
+                visible({ editor }) {
+                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                },
                 icon: markRaw(MdiShare),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
@@ -269,7 +291,10 @@ const Audio = Node.create<ExtensionOptions>({
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Audio.name, editor);
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === "figure"
+                  )(editor.state.selection);
+                  deleteNode(figureParent ? "figure" : Audio.name, editor);
                 },
               },
             },

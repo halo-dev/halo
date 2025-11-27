@@ -11,9 +11,9 @@ import {
   mergeAttributes,
   nodeInputRule,
   nodePasteRule,
+  type EditorState,
   type Range,
 } from "@/tiptap";
-import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
