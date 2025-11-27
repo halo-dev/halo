@@ -18,8 +18,7 @@ pnpm install @halo-dev/richtext-editor
 ```vue
 <script setup lang="ts">
 import {
-  AllExtensions,
-  filterDuplicateExtensions,
+  ExtensionsKit,
   RichTextEditor,
   VueEditor,
 } from "@halo-dev/richtext-editor";
@@ -29,11 +28,9 @@ const editor = shallowRef<VueEditor>();
 const content = ref("Hello World");
 
 onMounted(() => {
-  const extensions = filterDuplicateExtensions([AllExtensions]);
-
   editor.value = new VueEditor({
     content: content.value,
-    extensions,
+    extensions: [ExtensionsKit],
     parseOptions: {
       preserveWhitespace: true,
     },
