@@ -129,21 +129,6 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
 
 const customExtensions = [
   Extension.create({
-    name: "custom-heading-extension",
-    addGlobalAttributes() {
-      return [
-        {
-          types: ["heading"],
-          attributes: {
-            id: {
-              default: null,
-            },
-          },
-        },
-      ];
-    },
-  }),
-  Extension.create({
     name: "custom-attachment-extension",
     addOptions() {
       // If user has no permission to view attachments, return

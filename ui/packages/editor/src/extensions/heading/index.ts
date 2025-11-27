@@ -37,6 +37,15 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
     ];
   },
 
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      id: {
+        default: null,
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent!(),
