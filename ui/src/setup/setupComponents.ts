@@ -1,7 +1,6 @@
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import AttachmentFileTypeIcon from "@/components/icon/AttachmentFileTypeIcon.vue";
 import SearchInput from "@/components/input/SearchInput.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
 import FormKitConfig from "@/formkit/formkit.config";
@@ -36,7 +35,12 @@ export function setupComponents(app: App) {
   app.component("FilterCleanButton", FilterCleanButton);
   app.component("SearchInput", SearchInput);
   app.component("AnnotationsForm", AnnotationsForm);
-  app.component("AttachmentFileTypeIcon", AttachmentFileTypeIcon);
+  app.component(
+    "AttachmentFileTypeIcon",
+    defineAsyncComponent(
+      () => import("@/components/icon/AttachmentFileTypeIcon.vue")
+    )
+  );
   app.component("HasPermission", HasPermission);
   app.component(
     "UppyUpload",
