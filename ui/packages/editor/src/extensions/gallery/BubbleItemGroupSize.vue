@@ -5,7 +5,7 @@ import type { Editor } from "@/tiptap";
 import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { computed, ref, type Component } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
-import Gallery from "./index";
+import { ExtensionGallery } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -19,17 +19,18 @@ const props = defineProps<{
 const dropdownRef = ref();
 
 const groupSize = computed(() => {
-  return props.editor.getAttributes(Gallery.name).groupSize || 3;
+  return props.editor.getAttributes(ExtensionGallery.name).groupSize || 3;
 });
 
 const options = [1, 2, 3, 4, 5, 6];
 
 function handleSetGroupSize(size: number) {
-  const currentImages = props.editor.getAttributes(Gallery.name).images || [];
+  const currentImages =
+    props.editor.getAttributes(ExtensionGallery.name).images || [];
 
   props.editor
     .chain()
-    .updateAttributes(Gallery.name, {
+    .updateAttributes(ExtensionGallery.name, {
       images: currentImages,
       groupSize: size,
     })

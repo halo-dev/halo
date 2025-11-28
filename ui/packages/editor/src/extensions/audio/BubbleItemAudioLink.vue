@@ -2,7 +2,7 @@
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
-import Audio from "./index";
+import { ExtensionAudio } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -15,12 +15,12 @@ const props = defineProps<{
 
 const src = computed({
   get: () => {
-    return props.editor.getAttributes(Audio.name)?.src;
+    return props.editor.getAttributes(ExtensionAudio.name)?.src;
   },
   set: (src: string) => {
     props.editor
       .chain()
-      .updateAttributes(Audio.name, { src: src })
+      .updateAttributes(ExtensionAudio.name, { src: src })
       .setNodeSelection(props.editor.state.selection.from)
       .focus()
       .run();

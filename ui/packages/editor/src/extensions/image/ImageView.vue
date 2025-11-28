@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+import { EditorLinkObtain } from "@/components";
+import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
-import type { NodeViewProps } from "@/tiptap/vue-3";
-import { NodeViewWrapper } from "@/tiptap/vue-3";
+import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
+import { fileToBase64 } from "@/utils/upload";
+import { IconImageAddLine, VButton } from "@halo-dev/components";
+import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import Image from "./index";
+import { ExtensionImage } from "./index";
 
 const props = defineProps<NodeViewProps>();
 
@@ -40,25 +44,75 @@ const position = computed(() => {
   return props.node?.attrs.position || "left";
 });
 
-function handleSetFocus() {
-  props.editor.commands.setNodeSelection(props.getPos() || 0);
-}
+const fileBase64 = ref<string>();
+const uploadProgress = ref<number | undefined>(undefined);
+const retryFlag = ref<boolean>(false);
+const editorLinkObtain = ref();
+
+const handleUploadAbort = () => {
+  editorLinkObtain.value?.abort();
+};
+
+const initialization = computed(() => {
+  return !src.value && !fileBase64.value;
+});
+
+const handleUploadReady = async (file: File) => {
+  fileBase64.value = await fileToBase64(file);
+  retryFlag.value = false;
+};
+
+const handleSetExternalLink = (attachment?: AttachmentSimple) => {
+  if (!attachment) return;
+  props.updateAttributes({
+    src: attachment.url,
+    alt: attachment.alt,
+  });
+};
+
+const handleUploadRetry = () => {
+  editorLinkObtain.value?.retry();
+};
+
+const handleUploadProgress = (progress: number) => {
+  uploadProgress.value = progress;
+};
+
+const handleUploadError = () => {
+  retryFlag.value = true;
+};
+
+const resetUpload = () => {
+  fileBase64.value = undefined;
+  uploadProgress.value = undefined;
+
+  const { file } = props.node.attrs;
+  if (file) {
+    props.updateAttributes({
+      width: undefined,
+      height: undefined,
+      file: undefined,
+    });
+  }
+};
+
+const handleResetInit = () => {
+  editorLinkObtain.value?.reset();
+  props.updateAttributes({
+    src: "",
+    file: undefined,
+  });
+};
 
 const aspectRatio = ref<number>(0);
-const inputRef = ref<HTMLInputElement>();
 const resizeRef = ref<HTMLDivElement>();
-const imageLoadError = ref<boolean>(false);
+const inputRef = ref<HTMLInputElement>();
 
 function onImageLoaded() {
   if (!resizeRef.value) return;
 
   aspectRatio.value =
     resizeRef.value.clientWidth / resizeRef.value.clientHeight;
-  imageLoadError.value = false;
-}
-
-function onImageError() {
-  imageLoadError.value = true;
 }
 
 let cleanupResize: (() => void) | null = null;
@@ -127,7 +181,7 @@ function setupResizeListener() {
 
       props.editor
         .chain()
-        .updateAttributes(Image.name, { width, height })
+        .updateAttributes(ExtensionImage.name, { width, height })
         .setNodeSelection(props.getPos() || 0)
         .focus()
         .run();
@@ -195,13 +249,26 @@ watch([src, resizeHandleRef], () => {
   }
 });
 
+watch(
+  () => props.node?.attrs.width,
+  (newWidth) => {
+    if (newWidth) {
+      props.editor.commands.updateFigureContainerWidth(newWidth);
+    }
+  },
+  { immediate: false }
+);
+
+const { isExternalAsset, transferring, handleTransfer } =
+  useExternalAssetsTransfer(src, handleSetExternalLink);
+
 const isPercentageWidth = computed(() => {
   return props.node?.attrs.width?.includes("%");
 });
 </script>
 
 <template>
-  <node-view-wrapper
+  <NodeViewWrapper
     as="div"
     class="flex w-full"
     :class="{
@@ -211,64 +278,150 @@ const isPercentageWidth = computed(() => {
     }"
   >
     <div
-      v-if="!src"
-      class="w-full p-0.5"
-      :class="{
-        'rounded ring-2': selected,
-      }"
-    >
-      <input
-        ref="inputRef"
-        v-model.lazy="src"
-        class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-        :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
-        tabindex="-1"
-        @focus="handleSetFocus"
-      />
-    </div>
-    <div
-      v-else
       ref="resizeRef"
-      class="resize-container relative inline-block max-w-full overflow-hidden rounded-md text-center"
+      class="resize-container group relative inline-block max-w-full overflow-hidden rounded-md text-center"
       :class="{
         'rounded ring-2': selected,
-        'ring-red-500': imageLoadError,
       }"
       :style="{
-        width: !src ? '100%' : node.attrs.width,
-        height: !src ? '100%' : node.attrs.height,
+        width: initialization ? '100%' : node.attrs.width,
       }"
     >
-      <img
-        v-if="!imageLoadError"
-        :src="src"
-        :title="node.attrs.title"
-        :alt="alt"
-        :href="href"
-        :width="isPercentageWidth ? '100%' : node.attrs.width"
-        :height="isPercentageWidth ? '100%' : node.attrs.height"
-        class="max-w-full rounded-md"
-        :style="{
-          width: isPercentageWidth ? '100%' : node.attrs.width,
-          height: isPercentageWidth ? '100%' : node.attrs.height,
-        }"
-        @load="onImageLoaded"
-        @error="onImageError"
-      />
-      <div
-        v-else
-        class="flex h-full w-full items-center justify-center overflow-hidden rounded-md bg-gray-100 p-1.5 text-gray-400"
-      >
-        <span>{{
-          i18n.global.t("editor.extensions.image.image_load_error")
-        }}</span>
+      <div v-if="src || fileBase64" class="relative">
+        <img
+          :src="src || fileBase64"
+          :title="node.attrs.title"
+          :alt="alt"
+          :href="href"
+          :width="isPercentageWidth ? '100%' : node.attrs.width"
+          class="max-w-full rounded-md"
+          @load="onImageLoaded"
+        />
+
+        <div
+          v-if="selected"
+          ref="resizeHandleRef"
+          class="resizer-handler resizer-br"
+        ></div>
+
+        <div
+          v-if="src"
+          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+        >
+          <VButton
+            v-if="
+              utils.permission.has([
+                'uc:attachments:manage',
+                'system:attachments:manage',
+              ]) && isExternalAsset
+            "
+            v-tooltip="
+              i18n.global.t(
+                'editor.extensions.upload.operations.transfer.tooltip'
+              )
+            "
+            :loading="transferring"
+            size="sm"
+            ghost
+            @click="handleTransfer"
+          >
+            {{
+              i18n.global.t(
+                "editor.extensions.upload.operations.transfer.button"
+              )
+            }}
+          </VButton>
+
+          <VButton size="sm" type="secondary" @click="handleResetInit">
+            {{
+              i18n.global.t(
+                "editor.extensions.upload.operations.replace.button"
+              )
+            }}
+          </VButton>
+        </div>
+
+        <div
+          v-if="fileBase64"
+          class="absolute top-0 h-full w-full bg-black bg-opacity-20"
+        >
+          <div class="absolute top-[50%] w-full space-y-2 text-white">
+            <template v-if="retryFlag">
+              <div class="px-10">
+                <div
+                  class="relative h-4 w-full overflow-hidden rounded-full bg-gray-200"
+                >
+                  <div class="h-full w-full bg-red-600"></div>
+                  <div
+                    class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
+                  >
+                    {{ i18n.global.t("editor.extensions.upload.error") }}
+                  </div>
+                </div>
+              </div>
+              <div
+                class="inline-block cursor-pointer text-sm hover:opacity-70"
+                @click="handleUploadRetry"
+              >
+                {{ i18n.global.t("editor.extensions.upload.click_retry") }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="px-10">
+                <div
+                  class="relative h-4 w-full overflow-hidden rounded-full bg-gray-200"
+                >
+                  <div
+                    class="h-full bg-primary"
+                    :style="{
+                      width: `${uploadProgress || 0}%`,
+                    }"
+                  ></div>
+                  <div
+                    class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
+                  >
+                    {{
+                      uploadProgress
+                        ? `${uploadProgress}%`
+                        : `${i18n.global.t("editor.extensions.upload.loading")}...`
+                    }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="inline-block cursor-pointer text-sm hover:opacity-70"
+                @click="handleUploadAbort"
+              >
+                {{ i18n.global.t("editor.common.button.cancel") }}
+              </div>
+            </template>
+          </div>
+        </div>
       </div>
-      <div
-        v-if="selected && !imageLoadError"
-        ref="resizeHandleRef"
-        class="resizer-handler resizer-br"
-        title="拖拽调整大小"
-      ></div>
+      <div v-show="!src && !fileBase64">
+        <EditorLinkObtain
+          ref="editorLinkObtain"
+          :accept="'image/*'"
+          :editor="editor"
+          :upload-to-attachment-file="extension.options.uploadImage"
+          :uploaded-file="node?.attrs.file"
+          @set-external-link="handleSetExternalLink"
+          @on-upload-ready="handleUploadReady"
+          @on-upload-progress="handleUploadProgress"
+          @on-upload-finish="resetUpload"
+          @on-upload-error="handleUploadError"
+          @on-upload-abort="resetUpload"
+        >
+          <template #icon>
+            <div
+              class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
+            >
+              <IconImageAddLine class="text-xl text-primary" />
+            </div>
+          </template>
+        </EditorLinkObtain>
+      </div>
     </div>
-  </node-view-wrapper>
+  </NodeViewWrapper>
 </template>

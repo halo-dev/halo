@@ -3,7 +3,7 @@ import { BlockActionInput, BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { computed } from "vue";
-import Iframe from "./index";
+import { ExtensionIframe } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const width = computed({
   get: () => {
-    return props.editor.getAttributes(Iframe.name).width;
+    return props.editor.getAttributes(ExtensionIframe.name).width;
   },
   set: (value: string) => {
     handleSetSize(value, height.value);
@@ -20,7 +20,7 @@ const width = computed({
 
 const height = computed({
   get: () => {
-    return props.editor.getAttributes(Iframe.name).height;
+    return props.editor.getAttributes(ExtensionIframe.name).height;
   },
   set: (value: string) => {
     handleSetSize(width.value, value);
@@ -30,7 +30,7 @@ const height = computed({
 const handleSetSize = (width: string, height: string) => {
   props.editor
     .chain()
-    .updateAttributes(Iframe.name, { width, height })
+    .updateAttributes(ExtensionIframe.name, { width, height })
     .focus()
     .setNodeSelection(props.editor.state.selection.from)
     .run();

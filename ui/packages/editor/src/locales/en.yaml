@@ -114,6 +114,29 @@ editor:
         title: Layout
         auto: Auto
         square: Square
+    upload:
+      error: Upload failed
+      click_retry: Click to retry
+      loading: Loading
+      attachment:
+        title: Attachment Library
+      permalink:
+        title: Input Link
+        placeholder: Input link and press Enter to confirm
+      operations:
+        remove:
+          button: Delete
+        replace:
+          button: Replace
+        transfer:
+          button: Save locally
+          tooltip: >-
+            This resource is detected as an external resource. Click this
+            button to save it to the attachment library.
+        transfer_in_batch:
+          description: >-
+            External link detected. Would you like to automatically upload
+            it to the attachment library?
   components:
     color_picker:
       more_color: More
@@ -166,7 +189,12 @@ editor:
       restore_default: Restore default
       add: Add
       cancel: Cancel
+      upload: Upload
+      confirm: Confirm
     text:
       default: Default
+      tip: Tip
+    toast:
+      save_success: Saved successfully
     line_height: Line height
     clear_format: Clear format

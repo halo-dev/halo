@@ -5,43 +5,44 @@ import {
   type ListKeymapOptions,
 } from "@tiptap/extension-list";
 
+export type ExtensionListKeymapOptions = Partial<ListKeymapOptions>;
+
 /**
  *  Optimize the listKeymap extension until the issue with @tiptap/extension-list is resolved.
  *  https://github.com/ueberdosis/tiptap/issues/4395
  */
-const ExtensionListKeymap = ListKeymap.extend<ListKeymapOptions>({
-  addKeyboardShortcuts() {
-    const backspaceHandle = (editor: Editor) => {
-      let handled = false;
+export const ExtensionListKeymap =
+  ListKeymap.extend<ExtensionListKeymapOptions>({
+    addKeyboardShortcuts() {
+      const backspaceHandle = (editor: Editor) => {
+        let handled = false;
 
-      if (!editor.state.selection.empty) {
-        return false;
-      }
-
-      this.options.listTypes.forEach(
-        ({
-          itemName,
-          wrapperNames,
-        }: {
-          itemName: string;
-          wrapperNames: string[];
-        }) => {
-          if (listHelpers.handleBackspace(editor, itemName, wrapperNames)) {
-            handled = true;
-          }
+        if (!editor.state.selection.empty) {
+          return false;
         }
-      );
 
-      return handled;
-    };
+        this.options.listTypes?.forEach(
+          ({
+            itemName,
+            wrapperNames,
+          }: {
+            itemName: string;
+            wrapperNames: string[];
+          }) => {
+            if (listHelpers.handleBackspace(editor, itemName, wrapperNames)) {
+              handled = true;
+            }
+          }
+        );
 
-    return {
-      Backspace: ({ editor }: { editor: Editor }) => backspaceHandle(editor),
+        return handled;
+      };
 
-      "Mod-Backspace": ({ editor }: { editor: Editor }) =>
-        backspaceHandle(editor),
-    };
-  },
-});
+      return {
+        Backspace: ({ editor }: { editor: Editor }) => backspaceHandle(editor),
 
-export default ExtensionListKeymap;
+        "Mod-Backspace": ({ editor }: { editor: Editor }) =>
+          backspaceHandle(editor),
+      };
+    },
+  });

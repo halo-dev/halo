@@ -7,9 +7,9 @@ import {
   type CommandProps,
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import Paragraph from "../paragraph";
+import { ExtensionParagraph } from "../paragraph";
 import { RangeSelection } from "../range-selection";
-import FigureCaption from "./figure-caption";
+import { ExtensionFigureCaption } from "./figure-caption";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -21,11 +21,11 @@ declare module "@/tiptap" {
   }
 }
 
-export interface FigureOptions {
+export interface ExtensionFigureOptions extends ExtensionOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
-const Figure = Node.create<ExtensionOptions & FigureOptions>({
+export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
   name: "figure",
   group: "block",
   content: "(image|video|audio)? figureCaption?",
@@ -91,7 +91,7 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
   },
 
   addExtensions() {
-    return [FigureCaption];
+    return [ExtensionFigureCaption];
   },
 
   addKeyboardShortcuts() {
@@ -104,7 +104,7 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
           return false;
         }
 
-        if ($from.parent.type.name !== Paragraph.name) {
+        if ($from.parent.type.name !== ExtensionParagraph.name) {
           return false;
         }
 
@@ -116,7 +116,10 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
         const beforeResolve = doc.resolve(beforePos - 1);
         const nodeBefore = beforeResolve.nodeBefore;
 
-        if (!nodeBefore || nodeBefore.type.name !== FigureCaption.name) {
+        if (
+          !nodeBefore ||
+          nodeBefore.type.name !== ExtensionFigureCaption.name
+        ) {
           return false;
         }
         let depth = beforeResolve.depth;
@@ -161,7 +164,7 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
 
             node.forEach((child) => {
               if (
-                child.type.name !== Paragraph.name ||
+                child.type.name !== ExtensionParagraph.name ||
                 child.childCount > 0 ||
                 child.textContent.trim().length > 0
               ) {
@@ -213,7 +216,7 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
 
           const figureCaptionNodes = findChildren(
             $from.node(),
-            (node) => node.type.name === FigureCaption.name
+            (node) => node.type.name === ExtensionFigureCaption.name
           );
 
           if (figureCaptionNodes.length === 0) {
@@ -230,5 +233,3 @@ const Figure = Node.create<ExtensionOptions & FigureOptions>({
     };
   },
 });
-
-export default Figure;

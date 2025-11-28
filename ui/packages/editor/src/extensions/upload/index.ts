@@ -1,22 +1,17 @@
 import { i18n } from "@/locales";
-import { Dialog, Toast } from "@halo-dev/components";
-import {
-  Editor,
-  Extension,
-  Plugin,
-  PluginKey,
-  PMNode,
-  Slice,
-} from "@halo-dev/richtext-editor";
-import { UiExtensionAudio, UiExtensionImage, UiExtensionVideo } from "..";
+import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
   batchUploadExternalLink,
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
-} from "../../utils/upload";
+} from "@/utils/upload";
+import { Dialog, Toast } from "@halo-dev/components";
+import { ExtensionAudio } from "../audio";
+import { ExtensionImage } from "../image";
+import { ExtensionVideo } from "../video";
 
-export const Upload = Extension.create({
+export const ExtensionUpload = Extension.create({
   name: "upload",
 
   addProseMirrorPlugins() {
@@ -38,17 +33,17 @@ export const Upload = Extension.create({
             const externalNodes = getAllExternalNodes(slice);
             if (externalNodes.length > 0) {
               Dialog.info({
-                title: i18n.global.t("core.common.text.tip"),
+                title: i18n.global.t("editor.common.text.tip"),
                 description: i18n.global.t(
-                  "core.components.default_editor.extensions.upload.operations.transfer_in_batch.description"
+                  "editor.extensions.upload.operations.transfer_in_batch.description"
                 ),
-                confirmText: i18n.global.t("core.common.buttons.confirm"),
-                cancelText: i18n.global.t("core.common.buttons.cancel"),
+                confirmText: i18n.global.t("editor.common.button.confirm"),
+                cancelText: i18n.global.t("editor.common.button.cancel"),
                 async onConfirm() {
                   await batchUploadExternalLink(editor, externalNodes);
 
                   Toast.success(
-                    i18n.global.t("core.common.toast.save_success")
+                    i18n.global.t("editor.common.toast.save_success")
                   );
                 },
               });
@@ -113,11 +108,6 @@ export const Upload = Extension.create({
   },
 });
 
-const checkExternalLinkNodeTypes = [
-  UiExtensionAudio.name,
-  UiExtensionVideo.name,
-  UiExtensionImage.name,
-];
 export function getAllExternalNodes(
   slice: Slice
 ): { node: PMNode; pos: number; index: number; parent: PMNode | null }[] {
@@ -128,7 +118,11 @@ export function getAllExternalNodes(
     parent: PMNode | null;
   }[] = [];
   slice.content.descendants((node, pos, parent, index) => {
-    if (checkExternalLinkNodeTypes.includes(node.type.name)) {
+    if (
+      [ExtensionAudio.name, ExtensionVideo.name, ExtensionImage.name].includes(
+        node.type.name
+      )
+    ) {
       if (isExternalAsset(node.attrs.src)) {
         externalNodes.push({
           node,
@@ -141,5 +135,3 @@ export function getAllExternalNodes(
   });
   return externalNodes;
 }
-
-export default Upload;

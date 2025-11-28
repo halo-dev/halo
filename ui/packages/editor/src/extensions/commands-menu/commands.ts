@@ -12,7 +12,7 @@ import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import CommandsView from "./CommandsView.vue";
 
-export default Extension.create({
+export const ExtensionCommandsMenu = Extension.create({
   name: "commands-menu",
 
   addProseMirrorPlugins() {

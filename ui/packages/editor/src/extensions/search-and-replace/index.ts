@@ -51,7 +51,8 @@ function isShowSearch() {
   }
   return false;
 }
-const SearchAndReplace = Extension.create<ExtensionOptions>({
+
+export const ExtensionSearchAndReplace = Extension.create<ExtensionOptions>({
   name: "searchAndReplace",
 
   // @ts-ignore
@@ -298,5 +299,3 @@ const SearchAndReplace = Extension.create<ExtensionOptions>({
     };
   },
 });
-
-export default SearchAndReplace;

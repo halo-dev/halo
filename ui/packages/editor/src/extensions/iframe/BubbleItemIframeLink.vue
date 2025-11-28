@@ -3,7 +3,7 @@ import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { computed, type Component } from "vue";
-import Iframe from "./index";
+import { ExtensionIframe } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -16,13 +16,16 @@ const props = defineProps<{
 
 const src = computed({
   get: () => {
-    return props.editor.getAttributes(Iframe.name).src;
+    return props.editor.getAttributes(ExtensionIframe.name).src;
   },
   set: (src: string) => {
     if (!src || !isAllowedUri(src)) {
       return;
     }
-    props.editor.chain().updateAttributes(Iframe.name, { src: src }).run();
+    props.editor
+      .chain()
+      .updateAttributes(ExtensionIframe.name, { src: src })
+      .run();
   },
 });
 </script>

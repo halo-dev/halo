@@ -7,7 +7,7 @@ import { markRaw } from "vue";
 import MdiRedoVariant from "~icons/mdi/redo-variant";
 import MdiUndoVariant from "~icons/mdi/undo-variant";
 
-const History = TiptapHistory.extend<ExtensionOptions>({
+export const ExtensionHistory = TiptapHistory.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -40,5 +40,3 @@ const History = TiptapHistory.extend<ExtensionOptions>({
     };
   },
 });
-
-export default History;

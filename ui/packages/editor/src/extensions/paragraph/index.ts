@@ -12,100 +12,115 @@ import {
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { deleteNodeByPos } from "@/utils";
 import { isListActive } from "@/utils/is-list-active";
-import TiptapParagraph from "@tiptap/extension-paragraph";
+import TiptapParagraph, {
+  type ParagraphOptions,
+} from "@tiptap/extension-paragraph";
 import { markRaw } from "vue";
 import TablerLineHeight from "~icons/tabler/line-height";
 
-const Paragraph = TiptapParagraph.extend<ExtensionOptions>({
-  addAttributes() {
-    return {
-      lineHeight: {
-        default: null,
-        parseHTML: (element) => {
-          return element.style.lineHeight;
+export type ExtensionParagraphOptions = ExtensionOptions &
+  Partial<ParagraphOptions>;
+
+export const ExtensionParagraph =
+  TiptapParagraph.extend<ExtensionParagraphOptions>({
+    addAttributes() {
+      return {
+        lineHeight: {
+          default: null,
+          parseHTML: (element) => {
+            return element.style.lineHeight;
+          },
+          renderHTML: (attributes) => {
+            const lineHeight = attributes.lineHeight;
+            if (!lineHeight) {
+              return {};
+            }
+            return {
+              style: `line-height: ${lineHeight}`,
+            };
+          },
         },
-        renderHTML: (attributes) => {
-          const lineHeight = attributes.lineHeight;
-          if (!lineHeight) {
-            return {};
-          }
+      };
+    },
+    addOptions() {
+      return {
+        ...this.parent?.(),
+        getToolbarItems({ editor }: { editor: Editor }): ToolbarItemType {
           return {
-            style: `line-height: ${lineHeight}`,
+            priority: 220,
+            component: markRaw(ToolbarItem),
+            props: {
+              editor,
+              isActive: !!editor.getAttributes(ExtensionParagraph.name)
+                ?.lineHeight,
+              icon: markRaw(TablerLineHeight),
+              title: i18n.global.t("editor.common.line_height"),
+            },
+            children: [0, 1, 1.5, 2, 2.5, 3].map((lineHeight) => {
+              return {
+                priority: lineHeight,
+                component: markRaw(ToolbarSubItem),
+                props: {
+                  editor,
+                  isActive:
+                    editor.getAttributes(ExtensionParagraph.name)
+                      ?.lineHeight === lineHeight,
+                  title: !lineHeight
+                    ? i18n.global.t("editor.common.text.default")
+                    : String(lineHeight),
+                  action: () =>
+                    editor
+                      .chain()
+                      .focus()
+                      .updateAttributes(ExtensionParagraph.name, {
+                        lineHeight,
+                      })
+                      .run(),
+                },
+              };
+            }),
           };
         },
-      },
-    };
-  },
-  addOptions() {
-    return {
-      ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: Editor }): ToolbarItemType {
-        return {
-          priority: 220,
-          component: markRaw(ToolbarItem),
-          props: {
-            editor,
-            isActive: !!editor.getAttributes(Paragraph.name)?.lineHeight,
-            icon: markRaw(TablerLineHeight),
-            title: i18n.global.t("editor.common.line_height"),
-          },
-          children: [0, 1, 1.5, 2, 2.5, 3].map((lineHeight) => {
-            return {
-              priority: lineHeight,
-              component: markRaw(ToolbarSubItem),
-              props: {
-                editor,
-                isActive:
-                  editor.getAttributes(Paragraph.name)?.lineHeight ===
-                  lineHeight,
-                title: !lineHeight
-                  ? i18n.global.t("editor.common.text.default")
-                  : String(lineHeight),
-                action: () =>
-                  editor
-                    .chain()
-                    .focus()
-                    .updateAttributes(Paragraph.name, {
-                      lineHeight,
-                    })
-                    .run(),
-              },
-            };
-          }),
-        };
-      },
-    };
-  },
+      };
+    },
 
-  addKeyboardShortcuts() {
-    return {
-      Backspace: ({ editor }: { editor: Editor }) => {
-        const { state, view } = editor;
-        const { selection } = state;
-        if (isListActive(editor) || !isActive(state, Paragraph.name)) {
-          return false;
-        }
+    addKeyboardShortcuts() {
+      return {
+        Backspace: ({ editor }: { editor: Editor }) => {
+          const { state, view } = editor;
+          const { selection } = state;
+          if (
+            isListActive(editor) ||
+            !isActive(state, ExtensionParagraph.name)
+          ) {
+            return false;
+          }
 
-        if (!(selection instanceof TextSelection) || !selection.empty) {
-          return false;
-        }
+          if (!(selection instanceof TextSelection) || !selection.empty) {
+            return false;
+          }
 
-        const { $from } = selection;
+          const { $from } = selection;
 
-        if ($from.parentOffset !== 0) {
-          return false;
-        }
+          if ($from.parentOffset !== 0) {
+            return false;
+          }
 
-        const beforePos = $from.before($from.depth);
-        if (beforePos === 0) {
-          return true;
-        }
+          const beforePos = $from.before($from.depth);
+          if (beforePos === 0) {
+            return true;
+          }
 
-        return handleDeletePreviousNode($from, beforePos, state, view.dispatch);
-      },
-    };
-  },
-});
+          return handleDeletePreviousNode(
+            $from,
+            beforePos,
+            state,
+            view.dispatch
+          );
+        },
+      };
+    },
+  });
 
 export function deleteCurrentNodeAndSetSelection(
   $from: ResolvedPos,
@@ -142,7 +157,7 @@ export function handleDeletePreviousNode(
     !nodeBefore ||
     !nodeBefore.type.isBlock ||
     nodeBefore.type.isText ||
-    nodeBefore.type.name === Paragraph.name
+    nodeBefore.type.name === ExtensionParagraph.name
   ) {
     return false;
   }
@@ -158,5 +173,3 @@ export function handleDeletePreviousNode(
   }
   return false;
 }
-
-export default Paragraph;

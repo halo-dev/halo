@@ -1,4 +1,4 @@
-import type { Content } from "@halo-dev/richtext-editor";
+import type { Content } from "@/tiptap";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 
 export function convertToMediaContents(

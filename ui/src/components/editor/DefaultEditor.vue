@@ -1,61 +1,4 @@
 <script lang="ts" setup>
-import {
-  DecorationSet,
-  Editor,
-  Extension,
-  ExtensionBlockquote,
-  ExtensionBold,
-  ExtensionBulletList,
-  ExtensionCharacterCount,
-  ExtensionClearFormat,
-  ExtensionCode,
-  ExtensionCodeBlock,
-  ExtensionColor,
-  ExtensionColumn,
-  ExtensionColumns,
-  ExtensionCommands,
-  ExtensionDetails,
-  ExtensionDocument,
-  ExtensionDropcursor,
-  ExtensionFigure,
-  ExtensionFontSize,
-  ExtensionFormatBrush,
-  ExtensionGapcursor,
-  ExtensionHardBreak,
-  ExtensionHeading,
-  ExtensionHighlight,
-  ExtensionHistory,
-  ExtensionHorizontalRule,
-  ExtensionIframe,
-  ExtensionIndent,
-  ExtensionItalic,
-  ExtensionLink,
-  ExtensionListKeymap,
-  ExtensionNodeSelected,
-  ExtensionOrderedList,
-  ExtensionParagraph,
-  ExtensionPlaceholder,
-  ExtensionRangeSelection,
-  ExtensionSearchAndReplace,
-  ExtensionStrike,
-  ExtensionSubscript,
-  ExtensionSuperscript,
-  ExtensionTable,
-  ExtensionTaskList,
-  ExtensionText,
-  ExtensionTextAlign,
-  ExtensionTrailingNode,
-  ExtensionUnderline,
-  filterDuplicateExtensions,
-  Plugin,
-  PluginKey,
-  RichTextEditor,
-  ToolbarItem,
-  ToolboxItem,
-  VueEditor,
-  type Extensions,
-} from "@halo-dev/richtext-editor";
-// ui custom extension
 import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
@@ -78,12 +21,26 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
+import {
+  convertToMediaContents,
+  DecorationSet,
+  Editor,
+  Extension,
+  ExtensionHeading,
+  ExtensionsKit,
+  Plugin,
+  PluginKey,
+  RichTextEditor,
+  ToolbarItem,
+  ToolboxItem,
+  VueEditor,
+  type Extensions,
+} from "@halo-dev/richtext-editor";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import {
-  defineAsyncComponent,
   inject,
   markRaw,
   nextTick,
@@ -102,15 +59,6 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import RiLayoutRightLine from "~icons/ri/layout-right-line";
-import { useAttachmentSelect } from "./composables/use-attachment";
-import {
-  UiExtensionAudio,
-  UiExtensionGallery,
-  UiExtensionImage,
-  UiExtensionUpload,
-  UiExtensionVideo,
-} from "./extensions";
-import { convertToMediaContents } from "./utils/attachment";
 
 const { t } = useI18n();
 
@@ -146,21 +94,6 @@ const owner = inject<ComputedRef<string | undefined>>("owner");
 const publishTime = inject<ComputedRef<string | undefined>>("publishTime");
 const permalink = inject<ComputedRef<string | undefined>>("permalink");
 
-declare module "@halo-dev/richtext-editor" {
-  interface Commands<ReturnType> {
-    global: {
-      openAttachmentSelector: (
-        callback: (attachments: AttachmentLike[]) => void,
-        options?: {
-          accepts?: string[];
-          min?: number;
-          max?: number;
-        }
-      ) => ReturnType;
-    };
-  }
-}
-
 interface HeadingNode {
   id: string;
   level: number;
@@ -187,122 +120,14 @@ const { pluginModules } = usePluginModuleStore();
 
 const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 
-// Attachments
-const AttachmentSelectorModal = defineAsyncComponent({
-  loader: () => {
-    if (utils.permission.has(["system:attachments:manage"])) {
-      return import(
-        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-      );
-    }
-    return import(
-      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-    );
-  },
-});
-
+// Attachment Selector Modal
 const attachmentSelectorModalVisible = ref(false);
-const { onAttachmentSelect, attachmentResult } = useAttachmentSelect();
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  const contents = convertToMediaContents(attachments);
+  editor.value?.chain().focus().insertContent(contents).run();
+}
 
-const initAttachmentOptions = {
-  accepts: ["*/*"],
-  min: undefined,
-  max: undefined,
-};
-
-const attachmentOptions = ref<{
-  accepts?: string[];
-  min?: number;
-  max?: number;
-}>(initAttachmentOptions);
-
-const onAttachmentSelectorModalClose = () => {
-  attachmentOptions.value = initAttachmentOptions;
-  attachmentSelectorModalVisible.value = false;
-};
-
-const presetExtensions = [
-  ExtensionParagraph,
-  ExtensionBlockquote,
-  ExtensionBold,
-  ExtensionBulletList,
-  ExtensionCode,
-  ExtensionDocument,
-  ExtensionDropcursor.configure({
-    width: 2,
-    class: "dropcursor",
-    color: "skyblue",
-  }),
-  ExtensionGapcursor,
-  ExtensionHardBreak,
-  ExtensionHeading,
-  ExtensionHistory,
-  ExtensionHorizontalRule,
-  ExtensionItalic,
-  ExtensionOrderedList,
-  ExtensionStrike,
-  ExtensionText,
-  UiExtensionImage.configure({
-    inline: true,
-    allowBase64: false,
-    HTMLAttributes: {
-      loading: "lazy",
-    },
-    uploadImage: props.uploadImage,
-  }),
-  UiExtensionGallery.configure({
-    allowBase64: false,
-    uploadImage: props.uploadImage,
-  }),
-  ExtensionTaskList,
-  ExtensionLink.configure({
-    autolink: false,
-    openOnClick: false,
-  }),
-  ExtensionTextAlign.configure({
-    types: ["heading", "paragraph"],
-  }),
-  ExtensionUnderline,
-  ExtensionTable.configure({
-    resizable: true,
-  }),
-  ExtensionSubscript,
-  ExtensionSuperscript,
-  ExtensionPlaceholder.configure({
-    placeholder: t(
-      "core.components.default_editor.extensions.placeholder.options.placeholder"
-    ),
-  }),
-  ExtensionHighlight,
-  ExtensionCommands,
-  ExtensionCodeBlock,
-  ExtensionIframe,
-  UiExtensionVideo.configure({
-    uploadVideo: props.uploadImage,
-  }),
-  UiExtensionAudio.configure({
-    uploadAudio: props.uploadImage,
-  }),
-  ExtensionCharacterCount,
-  ExtensionFontSize,
-  ExtensionColor,
-  ExtensionIndent,
-  ExtensionFigure,
-  Extension.create({
-    name: "custom-heading-extension",
-    addGlobalAttributes() {
-      return [
-        {
-          types: ["heading"],
-          attributes: {
-            id: {
-              default: null,
-            },
-          },
-        },
-      ];
-    },
-  }),
+const customExtensions = [
   Extension.create({
     name: "custom-attachment-extension",
     addOptions() {
@@ -329,34 +154,12 @@ const presetExtensions = [
                   "core.components.default_editor.toolbox.attachment"
                 ),
                 action: () => {
-                  editor.commands.openAttachmentSelector((attachment) => {
-                    editor
-                      .chain()
-                      .focus()
-                      .insertContent(convertToMediaContents(attachment))
-                      .run();
-                  });
+                  attachmentSelectorModalVisible.value = true;
                   return true;
                 },
               },
             },
           ];
-        },
-      };
-    },
-    addCommands() {
-      return {
-        openAttachmentSelector: (callback, options) => () => {
-          if (options) {
-            attachmentOptions.value = options;
-          }
-          attachmentSelectorModalVisible.value = true;
-          attachmentResult.updateAttachment = (
-            attachments: AttachmentLike[]
-          ) => {
-            callback(attachments);
-          };
-          return true;
         },
       };
     },
@@ -385,10 +188,6 @@ const presetExtensions = [
       };
     },
   }),
-  ExtensionColumns,
-  ExtensionColumn,
-  ExtensionNodeSelected,
-  ExtensionTrailingNode,
   Extension.create({
     name: "get-heading-id-extension",
     addProseMirrorPlugins() {
@@ -419,15 +218,6 @@ const presetExtensions = [
       ];
     },
   }),
-  ExtensionListKeymap,
-  UiExtensionUpload,
-  ExtensionSearchAndReplace,
-  ExtensionClearFormat,
-  ExtensionFormatBrush,
-  ExtensionRangeSelection,
-  ExtensionDetails.configure({
-    persist: true,
-  }),
 ];
 
 const isInitialized = ref(false);
@@ -456,14 +246,30 @@ onMounted(async () => {
     emit("update", html);
   }, 250);
 
-  const extensions = filterDuplicateExtensions([
-    ...presetExtensions,
-    ...extensionsFromPlugins,
-  ]);
-
   editor.value = new VueEditor({
     content: props.raw,
-    extensions,
+    extensions: [
+      ExtensionsKit.configure({
+        image: {
+          uploadImage: props.uploadImage,
+        },
+        gallery: {
+          uploadImage: props.uploadImage,
+        },
+        video: {
+          uploadVideo: props.uploadImage,
+        },
+        audio: {
+          uploadAudio: props.uploadImage,
+        },
+        placeholder: {
+          placeholder: t(
+            "core.components.default_editor.extensions.placeholder.options.placeholder"
+          ),
+        },
+        customExtensions: [...customExtensions, ...extensionsFromPlugins],
+      }),
+    ],
     parseOptions: {
       preserveWhitespace: true,
     },
@@ -575,9 +381,8 @@ onCoverInputChange((files) => {
   <div v-else>
     <AttachmentSelectorModal
       v-if="attachmentSelectorModalVisible"
-      v-bind="attachmentOptions"
       @select="onAttachmentSelect"
-      @close="onAttachmentSelectorModalClose"
+      @close="attachmentSelectorModalVisible = false"
     />
     <!-- For cover image -->
     <AttachmentSelectorModal

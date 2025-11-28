@@ -7,29 +7,29 @@ import TiptapBlockquote from "@tiptap/extension-blockquote";
 import { markRaw } from "vue";
 import MdiFormatQuoteOpen from "~icons/mdi/format-quote-open";
 
-const Blockquote = TiptapBlockquote.extend<
-  ExtensionOptions & Partial<BlockquoteOptions>
->({
-  addOptions() {
-    return {
-      ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: Editor }) {
-        return {
-          priority: 90,
-          component: markRaw(ToolbarItemVue),
-          props: {
-            editor,
-            isActive: editor.isActive("blockquote"),
-            icon: markRaw(MdiFormatQuoteOpen),
-            title: i18n.global.t("editor.common.quote"),
-            action: () => {
-              editor.commands.toggleBlockquote();
-            },
-          },
-        };
-      },
-    };
-  },
-});
+export type ExtensionBlockquoteOptions = Partial<BlockquoteOptions> &
+  ExtensionOptions;
 
-export default Blockquote;
+export const ExtensionBlockquote =
+  TiptapBlockquote.extend<ExtensionBlockquoteOptions>({
+    addOptions() {
+      return {
+        ...this.parent?.(),
+        getToolbarItems({ editor }: { editor: Editor }) {
+          return {
+            priority: 90,
+            component: markRaw(ToolbarItemVue),
+            props: {
+              editor,
+              isActive: editor.isActive("blockquote"),
+              icon: markRaw(MdiFormatQuoteOpen),
+              title: i18n.global.t("editor.common.quote"),
+              action: () => {
+                editor.commands.toggleBlockquote();
+              },
+            },
+          };
+        },
+      };
+    },
+  });

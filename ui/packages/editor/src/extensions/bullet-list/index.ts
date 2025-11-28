@@ -5,11 +5,15 @@ import type { ExtensionOptions } from "@/types";
 import {
   ListItem,
   BulletList as TiptapBulletList,
+  type BulletListOptions,
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MdiFormatListBulleted from "~icons/mdi/format-list-bulleted";
 
-const BulletList = TiptapBulletList.extend<ExtensionOptions>({
+export type ExtensionBulletListOptions = Partial<BulletListOptions> &
+  ExtensionOptions;
+
+export const ExtensionBulletList = TiptapBulletList.extend<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -43,5 +47,3 @@ const BulletList = TiptapBulletList.extend<ExtensionOptions>({
     return [ListItem];
   },
 });
-
-export default BulletList;

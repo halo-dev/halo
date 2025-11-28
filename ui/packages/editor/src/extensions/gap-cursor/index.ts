@@ -53,7 +53,7 @@ declare module "@tiptap/core" {
  *  - Backspace on an empty line
  *  - Tab key
  */
-const GapCursor = Extension.create({
+export const ExtensionGapCursor = Extension.create({
   priority: 900,
   name: "gapCursor",
 
@@ -220,7 +220,7 @@ const GapCursor = Extension.create({
   },
 });
 
-export function handleBackspaceAtStart(
+function handleBackspaceAtStart(
   pos: number,
   state: EditorState,
   dispatch: Dispatch
@@ -249,7 +249,7 @@ export function handleBackspaceAtStart(
   return false;
 }
 
-export function handleInlineContent(
+function handleInlineContent(
   $beforePos: ResolvedPos,
   state: EditorState,
   dispatch: Dispatch
@@ -276,7 +276,7 @@ export function handleInlineContent(
  * @param {("vert" | "horiz")} axis - The axis of movement, either vertical ("vert") or horizontal ("horiz").
  * @param {number} dir - The direction of movement, positive (1) or negative (-1).
  */
-export function arrow(axis: "vert" | "horiz", dir: number): Command {
+function arrow(axis: "vert" | "horiz", dir: number): Command {
   const dirStr =
     axis == "vert" ? (dir > 0 ? "down" : "up") : dir > 0 ? "right" : "left";
   return (state, dispatch, view) => {
@@ -289,7 +289,7 @@ export function arrow(axis: "vert" | "horiz", dir: number): Command {
   };
 }
 
-export const arrowGapCursor = (
+const arrowGapCursor = (
   dir: number,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dirStr: any,
@@ -400,5 +400,3 @@ function drawGapCursor(state: EditorState) {
     }),
   ]);
 }
-
-export default GapCursor;

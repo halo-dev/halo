@@ -36,6 +36,7 @@ declare module "@/tiptap" {
 }
 
 type IndentType = "indent" | "outdent";
+
 const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   const { doc, selection } = tr;
   if (!doc || !selection) return tr;
@@ -76,7 +77,7 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   return tr;
 };
 
-export interface Option {
+interface Option {
   label: string;
   value: string;
 }
@@ -144,10 +145,8 @@ export interface ExtensionCodeBlockOptions extends CodeBlockOptions {
 
 export const CODE_BLOCK_BUBBLE_MENU_KEY = new PluginKey("codeBlockBubbleMenu");
 
-export const CodeBlockExtension = TiptapCodeBlock.extend<
-  ExtensionOptions &
-    Partial<ExtensionCodeBlockOptions> &
-    Partial<CodeBlockOptions>
+export const ExtensionCodeBlock = TiptapCodeBlock.extend<
+  ExtensionOptions & Partial<ExtensionCodeBlockOptions>
 >({
   allowGapCursor: true,
   // It needs to have a higher priority than range-selection (100),
@@ -344,7 +343,7 @@ export const CodeBlockExtension = TiptapCodeBlock.extend<
               return null;
             }
             const parentNode = findParentNode(
-              (node) => node.type.name === CodeBlockExtension.name
+              (node) => node.type.name === ExtensionCodeBlock.name
             )(editor.state.selection);
             if (parentNode) {
               const domRect = posToDOMRect(
@@ -441,5 +440,3 @@ export const CodeBlockExtension = TiptapCodeBlock.extend<
     ];
   },
 });
-
-export default CodeBlockExtension;
