@@ -41,7 +41,7 @@ defineExpose({
 </script>
 
 <template>
-  <!-- @vue-skip -->
+  <!-- @vue-ignore -->
   <FloatingDropdown
     ref="dropdownRef"
     :placement="placement"
