@@ -1,8 +1,7 @@
-import { defineConfig } from "tsdown";
+import { defineConfig, type UserConfig } from "tsdown";
 
-export default defineConfig({
+const sharedConfig: UserConfig = {
   entry: ["./entry/index.ts"],
-  format: ["esm", "iife"],
   external: ["axios"],
   noExternal: ["qs"],
   outputOptions: {
@@ -13,9 +12,20 @@ export default defineConfig({
   platform: "browser",
   globalName: "HaloApiClient",
   tsconfig: "./tsconfig.json",
-  minify: true,
   exports: true,
   dts: {
     tsgo: true,
   },
-});
+};
+
+export default defineConfig([
+  {
+    ...sharedConfig,
+    format: "esm",
+  },
+  {
+    ...sharedConfig,
+    format: "iife",
+    minify: true,
+  },
+]);
