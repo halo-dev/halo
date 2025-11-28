@@ -5,7 +5,7 @@ import type { Editor } from "@/tiptap";
 import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { computed, ref, type Component } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
-import Gallery from "./index";
+import { ExtensionGallery } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -19,7 +19,7 @@ const props = defineProps<{
 const dropdownRef = ref();
 
 const layout = computed(() => {
-  return props.editor.getAttributes(Gallery.name).layout || "auto";
+  return props.editor.getAttributes(ExtensionGallery.name).layout || "auto";
 });
 
 const options = [
@@ -34,7 +34,10 @@ const options = [
 ];
 
 function handleSetLayout(layout: string) {
-  props.editor.chain().updateAttributes(Gallery.name, { layout }).run();
+  props.editor
+    .chain()
+    .updateAttributes(ExtensionGallery.name, { layout })
+    .run();
   dropdownRef.value?.hide();
 }
 </script>
@@ -50,9 +53,9 @@ function handleSetLayout(layout: string) {
       v-tooltip="i18n.global.t('editor.extensions.gallery.layout.title')"
       class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
     >
-      <span>{{
-        options.find((option) => option.value === layout)?.label
-      }}</span>
+      <span>
+        {{ options.find((option) => option.value === layout)?.label }}
+      </span>
       <IconArrowDownLine class="h-4 w-4" />
     </button>
 

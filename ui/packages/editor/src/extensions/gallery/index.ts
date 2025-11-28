@@ -13,6 +13,8 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
@@ -20,6 +22,7 @@ import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
 import GalleryView from "./GalleryView.vue";
+import { ExtensionGalleryBubble } from "./gallery-bubble";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -29,21 +32,27 @@ declare module "@/tiptap" {
   }
 }
 
-export type GalleryOptions = {
-  groupSize?: number;
-};
-
-export type GalleryImage = {
+export type ExtensionGalleryImageItem = {
   src: string;
   aspectRatio: number;
 };
 
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
 
-const Gallery = Node.create<
-  ExtensionOptions & GalleryOptions,
+export type ExtensionGalleryOptions = ExtensionOptions & {
+  groupSize?: number;
+  allowBase64: boolean;
+  HTMLAttributes: Record<string, unknown>;
+  uploadImage?: (
+    file: File,
+    options?: AxiosRequestConfig
+  ) => Promise<Attachment>;
+};
+
+export const ExtensionGallery = Node.create<
+  ExtensionGalleryOptions,
   {
-    images: GalleryImage[];
+    images: ExtensionGalleryImageItem[];
   }
 >({
   name: "gallery",
@@ -83,6 +92,15 @@ const Gallery = Node.create<
           return element.getAttribute("data-layout") || "auto";
         },
       },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
+        },
+      },
     };
   },
 
@@ -95,11 +113,15 @@ const Gallery = Node.create<
   },
 
   renderHTML({ node }) {
-    const images: GalleryImage[] = node.attrs.images || [];
+    const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
     const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
     const layout = node.attrs.layout || "auto";
-    const imageGroups: GalleryImage[][] = images.reduce(
-      (acc: GalleryImage[][], image: GalleryImage, index: number) => {
+    const imageGroups: ExtensionGalleryImageItem[][] = images.reduce(
+      (
+        acc: ExtensionGalleryImageItem[][],
+        image: ExtensionGalleryImageItem,
+        index: number
+      ) => {
         const groupIndex = Math.floor(index / groupSize);
         acc[groupIndex] = acc[groupIndex] || [];
         acc[groupIndex].push(image);
@@ -107,31 +129,34 @@ const Gallery = Node.create<
       },
       []
     );
-    const imageGroupElements = imageGroups.map((items: GalleryImage[]) => [
-      "div",
-      {
-        "data-type": "gallery-group",
-        style:
-          "display: flex; flex-direction: row; justify-content: center; gap: 0.5rem;",
-      },
-      ...items.map((image: GalleryImage) => {
-        return [
-          "div",
-          {
-            style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
-            "data-aspect-ratio": image.aspectRatio.toString(),
-          },
-          [
-            "img",
+    const imageGroupElements = imageGroups.map(
+      (items: ExtensionGalleryImageItem[]) => [
+        "div",
+        {
+          "data-type": "gallery-group",
+          style:
+            "display: flex; flex-direction: row; justify-content: center; gap: 0.5rem;",
+        },
+        ...items.map((image: ExtensionGalleryImageItem) => {
+          return [
+            "div",
             {
-              src: image.src,
-              "data-type": "gallery-image",
-              style: "width: 100%; height: 100%; margin: 0; object-fit: cover;",
+              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
+              "data-aspect-ratio": image.aspectRatio.toString(),
             },
-          ],
-        ];
-      }),
-    ]);
+            [
+              "img",
+              {
+                src: image.src,
+                "data-type": "gallery-image",
+                style:
+                  "width: 100%; height: 100%; margin: 0; object-fit: cover;",
+              },
+            ],
+          ];
+        }),
+      ]
+    );
 
     return [
       "div",
@@ -166,6 +191,9 @@ const Gallery = Node.create<
   addOptions() {
     return {
       ...this.parent?.(),
+      allowBase64: false,
+      HTMLAttributes: {},
+      uploadImage: undefined,
       getToolboxItems({ editor }: { editor: Editor }) {
         return {
           priority: 15,
@@ -200,7 +228,7 @@ const Gallery = Node.create<
         return {
           pluginKey: GALLERY_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Gallery.name);
+            return isActive(state, ExtensionGallery.name);
           },
           options: {
             placement: "top-start",
@@ -233,7 +261,7 @@ const Gallery = Node.create<
                 icon: markRaw(MdiDeleteForeverOutline),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Gallery.name, editor);
+                  deleteNode(ExtensionGallery.name, editor);
                 },
               },
             },
@@ -242,6 +270,13 @@ const Gallery = Node.create<
       },
     };
   },
-});
 
-export default Gallery;
+  addExtensions() {
+    return [
+      ...(this.parent?.() || []),
+      ExtensionGalleryBubble.configure({
+        uploadImage: this.options.uploadImage,
+      }),
+    ];
+  },
+});

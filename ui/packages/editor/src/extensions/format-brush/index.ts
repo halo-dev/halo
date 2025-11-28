@@ -1,6 +1,7 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
 import MdiBrushVariant from "~icons/mdi/brush-variant";
 import { getMarksByFirstTextNode, setMarks } from "./util";
@@ -14,14 +15,16 @@ declare module "@/tiptap" {
   }
 }
 
-export interface FormatBrushStore {
+export interface ExtensionFormatBrushStore {
   formatBrush: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatBrushMarks: any[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const formatBrush = Extension.create<any, FormatBrushStore>({
+export const ExtensionFormatBrush = Extension.create<
+  ExtensionOptions,
+  ExtensionFormatBrushStore
+>({
   name: "formatBrush",
 
   addOptions() {
@@ -120,5 +123,3 @@ const formatBrush = Extension.create<any, FormatBrushStore>({
     };
   },
 });
-
-export default formatBrush;

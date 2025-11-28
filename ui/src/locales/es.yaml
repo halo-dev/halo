@@ -796,7 +796,6 @@ core:
         roles: Roles
         bio: Biografía
         creation_time: Fecha de creación
-        identity_authentication: Autenticación de identidad
   role:
     title: Roles
     common:

@@ -1787,29 +1787,6 @@ core:
         placeholder:
           options:
             placeholder: Enter / to select input type.
-        upload:
-          error: Upload failed
-          click_retry: Click to retry
-          loading: Loading
-          attachment:
-            title: Attachment Library
-          permalink:
-            title: Input Link
-            placeholder: Input link and press Enter to confirm
-          operations:
-            remove:
-              button: Delete
-            replace:
-              button: Replace
-            transfer:
-              button: Save locally
-              tooltip: >-
-                This resource is detected as an external resource. Click this
-                button to save it to the attachment library.
-            transfer_in_batch:
-              description: >-
-                External link detected. Would you like to automatically upload
-                it to the attachment library?
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar

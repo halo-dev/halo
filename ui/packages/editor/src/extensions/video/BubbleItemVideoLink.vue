@@ -2,7 +2,7 @@
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
-import Video from "./index";
+import { ExtensionVideo } from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -15,10 +15,13 @@ const props = defineProps<{
 
 const src = computed({
   get: () => {
-    return props.editor.getAttributes(Video.name).src;
+    return props.editor.getAttributes(ExtensionVideo.name).src;
   },
   set: (src: string) => {
-    props.editor.chain().updateAttributes(Video.name, { src: src }).run();
+    props.editor
+      .chain()
+      .updateAttributes(ExtensionVideo.name, { src: src })
+      .run();
   },
 });
 </script>

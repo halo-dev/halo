@@ -1,12 +1,11 @@
-// image drag and paste upload
+import { ExtensionAudio } from "@/extensions/audio";
+import { ExtensionImage } from "@/extensions/image";
+import { ExtensionVideo } from "@/extensions/video";
+import { Editor, PMNode } from "@/tiptap";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
-import { Editor, PMNode } from "@halo-dev/richtext-editor";
 import { utils } from "@halo-dev/ui-shared";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "es-toolkit";
-import ExtensionAudio from "../extensions/audio";
-import Image from "../extensions/image";
-import ExtensionVideo from "../extensions/video";
 
 export interface FileProps {
   file: File;
@@ -24,7 +23,12 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
     return false;
   }
 
-  if (!utils.permission.has(["uc:attachments:manage"])) {
+  if (
+    !utils.permission.has([
+      "uc:attachments:manage",
+      "system:attachments:manage",
+    ])
+  ) {
     return false;
   }
 
@@ -53,7 +57,7 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
  */
 export const uploadImage = ({ file, editor }: FileProps) => {
   const { view } = editor;
-  const node = view.props.state.schema.nodes[Image.name].create({
+  const node = view.props.state.schema.nodes[ExtensionImage.name].create({
     file: file,
   });
   editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));

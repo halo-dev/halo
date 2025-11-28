@@ -462,6 +462,15 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.7.4
         version: 1.7.4
+      '@halo-dev/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@halo-dev/components':
+        specifier: workspace:*
+        version: link:../components
+      '@halo-dev/ui-shared':
+        specifier: workspace:*
+        version: link:../shared
       '@tiptap/core':
         specifier: ^3.11.0
         version: 3.11.0(@tiptap/pm@3.11.0)
@@ -564,9 +573,6 @@ importers:
       scroll-into-view-if-needed:
         specifier: ^3.1.0
         version: 3.1.0
-      uuid:
-        specifier: ^13.0.0
-        version: 13.0.0
       vue:
         specifier: ^3.5.x
         version: 3.5.24(typescript@5.9.3)

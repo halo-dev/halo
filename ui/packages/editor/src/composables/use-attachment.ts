@@ -1,37 +1,8 @@
 import { ucApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
-import {
-  stores,
-  type AttachmentLike,
-  type AttachmentSimple,
-} from "@halo-dev/ui-shared";
+import { stores, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
-
-interface useAttachmentSelectReturn {
-  onAttachmentSelect: (attachments: AttachmentLike[]) => void;
-  attachmentResult: AttachmentResult;
-}
-
-export interface AttachmentResult {
-  updateAttachment: (attachments: AttachmentLike[]) => void;
-}
-
-export function useAttachmentSelect(): useAttachmentSelectReturn {
-  const attachmentResult = {
-    updateAttachment: (attachments: AttachmentLike[]) => {
-      return attachments;
-    },
-  };
-  const onAttachmentSelect = (attachmentLikes: AttachmentLike[]) => {
-    attachmentResult.updateAttachment(attachmentLikes);
-  };
-
-  return {
-    onAttachmentSelect,
-    attachmentResult,
-  };
-}
 
 export function useExternalAssetsTransfer(
   src: Ref<string | undefined>,
@@ -74,7 +45,7 @@ export function useExternalAssetsTransfer(
       alt: data.spec.displayName,
     });
 
-    Toast.success(t("core.common.toast.save_success"));
+    Toast.success(t("editor.common.toast.save_success"));
 
     transferring.value = false;
   }

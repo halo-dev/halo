@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import { uploadFile } from "@/utils/upload";
 import type { Attachment } from "@halo-dev/api-client";
 import { VButton, VDropdown, VSpace } from "@halo-dev/components";
-import type { Editor } from "@halo-dev/richtext-editor";
 import {
   utils,
   type AttachmentLike,
@@ -11,7 +12,6 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
-import { uploadFile } from "../utils/upload";
 
 const props = withDefaults(
   defineProps<{
@@ -54,22 +54,6 @@ const { open, reset, onChange } = useFileDialog({
   multiple: false,
 });
 
-const openAttachmentSelector = () => {
-  props.editor.commands.openAttachmentSelector(
-    (attachments: AttachmentLike[]) => {
-      if (attachments.length > 0) {
-        const attachment = attachments[0];
-        const attachmentSimple = utils.attachment.convertToSimple(attachment);
-        emit("setExternalLink", attachmentSimple);
-      }
-    },
-    {
-      accepts: [props.accept],
-      min: 1,
-      max: 1,
-    }
-  );
-};
 const controller = ref<AbortController>();
 const originalFile = ref<File>();
 const uploadState = ref<"init" | "uploading" | "error">("init");
@@ -169,8 +153,29 @@ defineExpose({
   retry: handleUploadRetry,
   reset: handleResetUpload,
 });
+
+// Attachment Selector Modal
+const attachmentSelectorModalVisible = ref(false);
+
+function onAttachmentSelect(attachments: AttachmentLike[]) {
+  if (!attachments.length) {
+    return;
+  }
+  const attachment = attachments[0];
+  const attachmentSimple = utils.attachment.convertToSimple(attachment);
+  emit("setExternalLink", attachmentSimple);
+  attachmentSelectorModalVisible.value = false;
+}
 </script>
 <template>
+  <AttachmentSelectorModal
+    v-if="attachmentSelectorModalVisible"
+    :accepts="[props.accept]"
+    :min="1"
+    :max="1"
+    @select="onAttachmentSelect"
+    @close="attachmentSelectorModalVisible = false"
+  />
   <div class="flex h-64 w-full items-center justify-center">
     <slot
       v-if="$slots.uploading && uploadState === 'uploading'"
@@ -190,31 +195,28 @@ defineExpose({
       >
         <slot v-if="$slots.icon" name="icon"></slot>
         <VSpace>
-          <HasPermission :permissions="['uc:attachments:manage']">
-            <VButton @click="open()">
-              {{ $t("core.common.buttons.upload") }}
-            </VButton>
-          </HasPermission>
-
-          <HasPermission
-            :permissions="['system:attachments:view', 'uc:attachments:manage']"
+          <VButton
+            v-if="utils.permission.has(['uc:attachments:manage'])"
+            @click="open()"
           >
-            <VButton @click="openAttachmentSelector">
-              {{
-                $t(
-                  "core.components.default_editor.extensions.upload.attachment.title"
-                )
-              }}
-            </VButton>
-          </HasPermission>
+            {{ i18n.global.t("editor.common.button.upload") }}
+          </VButton>
+
+          <VButton
+            v-if="
+              utils.permission.has([
+                'system:attachments:view',
+                'uc:attachments:manage',
+              ])
+            "
+            @click="attachmentSelectorModalVisible = true"
+          >
+            {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
+          </VButton>
 
           <VDropdown>
             <VButton>
-              {{
-                $t(
-                  "core.components.default_editor.extensions.upload.permalink.title"
-                )
-              }}
+              {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
             <template #popper>
               <input
@@ -222,7 +224,7 @@ defineExpose({
                 class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
                 :placeholder="
                   i18n.global.t(
-                    'core.components.default_editor.extensions.upload.permalink.placeholder'
+                    'editor.extensions.upload.permalink.placeholder'
                   )
                 "
                 @keydown.enter="handleEnterSetExternalLink"

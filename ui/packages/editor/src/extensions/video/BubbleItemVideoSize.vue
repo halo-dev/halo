@@ -3,7 +3,7 @@ import { BlockActionInput } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
-import Video from "./index";
+import { ExtensionVideo } from "./index";
 const props = defineProps<{
   editor: Editor;
   isActive?: ({ editor }: { editor: Editor }) => boolean;
@@ -16,8 +16,8 @@ const props = defineProps<{
 const size = computed({
   get: () => {
     return {
-      width: props.editor.getAttributes(Video.name).width,
-      height: props.editor.getAttributes(Video.name).height,
+      width: props.editor.getAttributes(ExtensionVideo.name).width,
+      height: props.editor.getAttributes(ExtensionVideo.name).height,
     };
   },
   set: (size: { width?: string; height?: string }) => {
@@ -28,7 +28,7 @@ const size = computed({
 function handleSetSize(size: { width?: string; height?: string }) {
   props.editor
     .chain()
-    .updateAttributes(Video.name, size)
+    .updateAttributes(ExtensionVideo.name, size)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();

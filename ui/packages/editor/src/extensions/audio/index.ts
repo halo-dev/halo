@@ -16,7 +16,9 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
-import { isEmpty } from "lodash-es";
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
+import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
@@ -38,7 +40,14 @@ declare module "@/tiptap" {
 
 export const AUDIO_BUBBLE_MENU_KEY = new PluginKey("audioBubbleMenu");
 
-const Audio = Node.create<ExtensionOptions>({
+export interface ExtensionAudioOptions extends ExtensionOptions {
+  uploadAudio?: (
+    file: File,
+    options?: AxiosRequestConfig
+  ) => Promise<Attachment>;
+}
+
+export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
   name: "audio",
   fakeSelection: true,
 
@@ -88,6 +97,16 @@ const Audio = Node.create<ExtensionOptions>({
           };
         },
       },
+
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
+        },
+      },
     };
   },
 
@@ -135,6 +154,7 @@ const Audio = Node.create<ExtensionOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
+      uploadAudio: undefined,
       getCommandMenuItems() {
         return {
           priority: 110,
@@ -304,5 +324,3 @@ const Audio = Node.create<ExtensionOptions>({
     };
   },
 });
-
-export default Audio;

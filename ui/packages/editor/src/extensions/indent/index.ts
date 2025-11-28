@@ -19,7 +19,7 @@ declare module "@/tiptap" {
   }
 }
 
-type IndentOptions = {
+export interface ExtensionIndentOptions extends ExtensionOptions {
   names: Array<string>;
   indentRange: number;
   minIndentLevel: number;
@@ -28,8 +28,9 @@ type IndentOptions = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
   firstLineIndent: boolean;
-};
-const Indent = Extension.create<IndentOptions & ExtensionOptions>({
+}
+
+export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
   name: "indent",
   priority: 800,
 
@@ -166,7 +167,7 @@ function setNodeIndentMarkup(
   tr: Transaction,
   pos: number,
   dir: number,
-  options: IndentOptions
+  options: ExtensionIndentOptions
 ): Transaction {
   if (!tr.doc) {
     return tr;
@@ -210,7 +211,7 @@ const isLineIndent = (tr: Transaction) => {
 type IndentType = "indent" | "outdent";
 const updateIndentLevel = (
   tr: Transaction,
-  options: IndentOptions,
+  options: ExtensionIndentOptions,
   extensions: Extensions,
   type: IndentType
 ): Transaction => {
@@ -286,5 +287,3 @@ export const getOutdent: (
     }
     return editor.chain().focus().outdent().run();
   };
-
-export default Indent;

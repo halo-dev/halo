@@ -1,7 +1,7 @@
 import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
-import TiptapParagraph from "@/extensions/paragraph";
+import { ExtensionParagraph } from "@/extensions/paragraph";
 import { i18n } from "@/locales";
 import {
   AttrStep,
@@ -24,7 +24,9 @@ import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import MdiFormatHeaderPound from "~icons/mdi/format-header-pound";
 import MdiFormatParagraph from "~icons/mdi/format-paragraph";
 
-const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
+export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
+
+export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
   renderHTML({ node, HTMLAttributes }) {
     const hasLevel = this.options.levels.includes(node.attrs.level);
     const level = hasLevel ? node.attrs.level : this.options.levels[0];
@@ -33,6 +35,15 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       0,
     ];
+  },
+
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      id: {
+        default: null,
+      },
+    };
   },
 
   addOptions() {
@@ -293,7 +304,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
     };
   },
   addExtensions() {
-    return [TiptapParagraph];
+    return [ExtensionParagraph];
   },
   addProseMirrorPlugins() {
     let beforeComposition: boolean | undefined = undefined;
@@ -315,7 +326,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
               const selection = transaction.selection;
               const { $from } = selection;
               const node = $from.parent;
-              return node.type.name === Blockquote.name && !composition;
+              return node.type.name === ExtensionHeading.name && !composition;
             }
             return false;
           });
@@ -323,7 +334,7 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
             const tr = newState.tr;
             const headingIds: string[] = [];
             newState.doc.descendants((node, pos) => {
-              if (node.type.name === Blockquote.name) {
+              if (node.type.name === ExtensionHeading.name) {
                 const id = generateAnchorId(node.textContent, headingIds);
                 tr.step(new AttrStep(pos, "id", id));
                 headingIds.push(id);
@@ -337,5 +348,3 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
     ];
   },
 });
-
-export default Blockquote;

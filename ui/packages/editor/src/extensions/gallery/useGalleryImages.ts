@@ -1,60 +1,24 @@
+import type { Editor } from "@/tiptap";
 import type { Attachment } from "@halo-dev/api-client";
-import type { Editor } from "@halo-dev/richtext-editor";
-import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { uploadFile } from "../../utils/upload";
-import Gallery, { type GalleryImage } from "./index";
+import { ExtensionGallery, type ExtensionGalleryImageItem } from "./index";
 
-export function convertAttachmentsToImages(
-  attachments: AttachmentLike[]
-): GalleryImage[] {
-  const newImages: GalleryImage[] = [];
-  for (const attachment of attachments) {
-    const attachmentUrl = utils.attachment.getUrl(attachment);
-    if (attachmentUrl) {
-      newImages.push({
-        src: attachmentUrl,
-        aspectRatio: 0,
-      });
-    }
-  }
-  return newImages;
-}
-
-export function useAttachmentSelector(
-  editor: Editor,
-  onImagesAdded: (images: GalleryImage[]) => void
-) {
-  return () => {
-    editor.commands.openAttachmentSelector(
-      (attachments: AttachmentLike[]) => {
-        if (attachments.length === 0) {
-          return;
-        }
-        const newImages = convertAttachmentsToImages(attachments);
-        onImagesAdded(newImages);
-      },
-      {
-        accepts: ["image/*"],
-        min: 1,
-      }
-    );
-  };
-}
-
-export function getCurrentGalleryImages(editor: Editor): GalleryImage[] {
-  return editor.getAttributes(Gallery.name).images || [];
+export function getCurrentGalleryImages(
+  editor: Editor
+): ExtensionGalleryImageItem[] {
+  return editor.getAttributes(ExtensionGallery.name).images || [];
 }
 
 export function updateGalleryImages(
   editor: Editor,
-  images: GalleryImage[],
+  images: ExtensionGalleryImageItem[],
   focus = true
 ) {
   const chain = editor
     .chain()
-    .updateAttributes(Gallery.name, { images })
+    .updateAttributes(ExtensionGallery.name, { images })
     .setNodeSelection(editor.state.selection.from);
 
   if (focus) {
@@ -90,7 +54,7 @@ export function useUploadGalleryImage(editor: Editor) {
 
   const uploadImage = computed(() => {
     return editor.extensionManager.extensions.find(
-      (extension) => extension.name === Gallery.name
+      (extension) => extension.name === ExtensionGallery.name
     )?.options.uploadImage;
   });
 
@@ -111,7 +75,7 @@ export function useUploadGalleryImage(editor: Editor) {
 
       onFinish: (attachment?: Attachment) => {
         if (attachment) {
-          editor.commands.updateAttributes(Gallery.name, {
+          editor.commands.updateAttributes(ExtensionGallery.name, {
             images: [
               ...getCurrentGalleryImages(editor),
               {

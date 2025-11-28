@@ -1,7 +1,9 @@
 import type { ExtensionOptions } from "@/types";
 import TiptapLink, { type LinkOptions } from "@tiptap/extension-link";
 
-const Link = TiptapLink.extend<ExtensionOptions & Partial<LinkOptions>>({
+export type ExtensionLinkOptions = ExtensionOptions & Partial<LinkOptions>;
+
+export const ExtensionLink = TiptapLink.extend<ExtensionLinkOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -21,6 +23,7 @@ const Link = TiptapLink.extend<ExtensionOptions & Partial<LinkOptions>>({
     // Remove the function of pasted text parsing as a link
     return [];
   },
+}).configure({
+  autolink: false,
+  openOnClick: false,
 });
-
-export default Link;

@@ -20,7 +20,7 @@ function nodeEqualsType({ types, node }: { types: any; node: any }) {
  * - https://github.com/remirror/remirror/blob/e0f1bec4a1e8073ce8f5500d62193e52321155b9/packages/prosemirror-trailing-node/src/trailing-node-plugin.ts
  */
 
-const TrailingNode = Extension.create({
+export const ExtensionTrailingNode = Extension.create({
   name: "trailingNode",
 
   addOptions() {
@@ -76,5 +76,3 @@ const TrailingNode = Extension.create({
     ];
   },
 });
-
-export default TrailingNode;

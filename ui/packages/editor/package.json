@@ -30,17 +30,17 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build --config ./vite.lib.config.ts",
-    "dev": "vite",
-    "test:unit:coverage": "vitest run --environment jsdom --coverage",
-    "test:unit:ui": "vitest --environment jsdom --watch --ui",
-    "test:unit:watch": "vitest --environment jsdom --watch",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "prepublishOnly": "pnpm run build"
+    "build": "vite build",
+    "dev": "vite build --watch --mode development",
+    "prepublishOnly": "pnpm run build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.5.0",
     "@floating-ui/dom": "^1.7.4",
+    "@halo-dev/ui-shared": "workspace:*",
+    "@halo-dev/api-client": "workspace:*",
+    "@halo-dev/components": "workspace:*",
     "@tiptap/core": "^3.11.0",
     "@tiptap/extension-blockquote": "^3.11.0",
     "@tiptap/extension-bold": "^3.11.0",
@@ -74,8 +74,7 @@
     "floating-vue": "^5.2.2",
     "github-markdown-css": "^5.2.0",
     "linkifyjs": "^4.1.3",
-    "scroll-into-view-if-needed": "^3.1.0",
-    "uuid": "^13.0.0"
+    "scroll-into-view-if-needed": "^3.1.0"
   },
   "devDependencies": {
     "@types/linkifyjs": "^2.1.7"

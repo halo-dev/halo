@@ -10,7 +10,7 @@ import {
 } from "@/tiptap";
 import FigureCaptionView from "./FigureCaptionView.vue";
 
-const FigureCaption = Node.create({
+export const ExtensionFigureCaption = Node.create({
   name: "figureCaption",
   content: "text*",
   inline: false,
@@ -126,7 +126,7 @@ const FigureCaption = Node.create({
             let currentCaptionPos: number | null = null;
             for (let depth = $from.depth; depth > 0; depth--) {
               const node = $from.node(depth);
-              if (node.type.name === FigureCaption.name) {
+              if (node.type.name === ExtensionFigureCaption.name) {
                 currentCaptionPos = $from.before(depth);
                 break;
               }
@@ -148,7 +148,7 @@ const FigureCaption = Node.create({
           let currentInCaption = false;
           for (let depth = $from.depth; depth > 0; depth--) {
             const node = $from.node(depth);
-            if (node.type.name === FigureCaption.name) {
+            if (node.type.name === ExtensionFigureCaption.name) {
               currentInCaption = true;
               break;
             }
@@ -164,7 +164,10 @@ const FigureCaption = Node.create({
           ) {
             const captionNode = oldState.doc.nodeAt(previousCaptionPos);
 
-            if (captionNode && captionNode.type.name === FigureCaption.name) {
+            if (
+              captionNode &&
+              captionNode.type.name === ExtensionFigureCaption.name
+            ) {
               const isEmpty =
                 captionNode.textContent.trim().length === 0 ||
                 captionNode.childCount === 0;
@@ -206,5 +209,3 @@ const FigureCaption = Node.create({
     return VueNodeViewRenderer(FigureCaptionView);
   },
 });
-
-export default FigureCaption;
