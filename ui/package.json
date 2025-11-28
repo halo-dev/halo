@@ -188,6 +188,9 @@
       "core-js",
       "esbuild",
       "vue-demi"
-    ]
+    ],
+    "patchedDependencies": {
+      "@tiptap/extension-drag-handle@3.11.0": "patches/@tiptap__extension-drag-handle@3.11.0.patch"
+    }
   }
 }
