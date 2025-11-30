@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { inject } from "vue";
-import { DropdownContextInjectionKey } from "./symbols";
-
 const props = withDefaults(
   defineProps<{
     selected?: boolean;
@@ -19,14 +17,16 @@ const emit = defineEmits<{
   (event: "click", e: MouseEvent): void;
 }>();
 
-const { hide } = inject(DropdownContextInjectionKey) || {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dropdown = inject<{ parentPopper: any }>("__floating-vue__popper");
 
 function onClick(e: MouseEvent) {
   if (props.disabled) {
     return;
   }
 
-  hide?.();
+  dropdown?.parentPopper?.hide?.();
+
   emit("click", e);
 }
 </script>
@@ -54,7 +54,7 @@ function onClick(e: MouseEvent) {
 
 <style lang="scss">
 .dropdown-item-wrapper {
-  @apply flex w-full cursor-pointer items-center justify-between gap-1 rounded px-4 py-2 text-sm;
+  @apply flex w-full min-w-52 cursor-pointer items-center justify-between gap-1 rounded px-4 py-2 text-sm;
 
   &--default {
     @apply text-gray-700 hover:bg-gray-100 hover:text-gray-900;

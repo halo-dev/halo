@@ -133,8 +133,8 @@ const activeTab = ref("upload");
           </AttachmentPolicyBadge>
           <template #popper>
             <VDropdownItem
-              v-for="(policyTemplate, index) in policyTemplates"
-              :key="index"
+              v-for="policyTemplate in policyTemplates"
+              :key="policyTemplate.metadata.name"
               @click="handleOpenCreateNewPolicyModal(policyTemplate)"
             >
               {{ policyTemplate.spec?.displayName }}
