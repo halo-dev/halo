@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap";
+import { VDropdown } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { Dropdown as VDropdown } from "floating-vue";
 import { ref, type Component } from "vue";
 import type { ExtensionGalleryImageItem } from ".";
 import {
@@ -67,9 +67,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       <component :is="icon" :style="iconStyle" class="h-5 w-5" />
     </button>
     <template #popper>
-      <div
-        class="w-24 space-y-1 overflow-hidden rounded-md bg-white p-1 shadow-lg"
-      >
+      <div class="w-24 space-y-1 overflow-hidden bg-white">
         <button
           v-if="
             utils.permission.has([

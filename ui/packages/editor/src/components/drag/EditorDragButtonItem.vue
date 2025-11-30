@@ -2,7 +2,7 @@
 import type { PMNode, VueEditor } from "@/tiptap";
 import type { DragButtonType } from "@/types";
 import { formatShortcut } from "@/utils";
-import { Dropdown as VDropdown } from "floating-vue";
+import { VDropdown } from "@halo-dev/components";
 import { computed, ref, type Component } from "vue";
 import MaterialSymbolsArrowForwardIosRounded from "~icons/material-symbols/arrow-forward-ios-rounded";
 import EditorDragHandleMenu from "./EditorDragMenu.vue";
@@ -131,9 +131,9 @@ defineExpose({
               :style="props.iconStyle"
               class="h-4 w-4"
             />
-            <span class="flex flex-grow justify-start px-0.5">{{
-              displayTitle
-            }}</span>
+            <span class="flex flex-grow justify-start px-0.5">
+              {{ displayTitle }}
+            </span>
           </div>
         </button>
         <div v-if="isChildrenComponent" class="flex items-center gap-2">
@@ -171,13 +171,3 @@ defineExpose({
     </template>
   </VDropdown>
 </template>
-<style>
-.v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
-  transform: scale(0.9);
-}
-
-.v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
-  transform: none;
-  transition: transform 0.1s;
-}
-</style>

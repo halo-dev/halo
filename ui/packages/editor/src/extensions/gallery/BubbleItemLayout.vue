@@ -2,7 +2,7 @@
 import { BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
+import { VDropdown, vTooltip } from "@halo-dev/components";
 import { computed, ref, type Component } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 import { ExtensionGallery } from "./index";
@@ -60,7 +60,7 @@ function handleSetLayout(layout: string) {
     </button>
 
     <template #popper>
-      <div class="rounded-md bg-white p-1 shadow">
+      <div class="bg-white">
         <div
           v-for="option in options"
           :key="option.value"

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap/vue-3";
+import { VDropdown, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { test } from "linkifyjs";
 import { computed, type Component } from "vue";
 import MdiLinkVariant from "~icons/mdi/link-variant";
@@ -110,7 +110,7 @@ const handleLinkBubbleButton = () => {
 
     <template #popper>
       <div
-        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
+        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto bg-white"
       >
         <input
           v-model.lazy="href"

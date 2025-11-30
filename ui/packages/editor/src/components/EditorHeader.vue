@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { type AnyExtension, VueEditor } from "@/tiptap";
 import type { ToolbarItemType, ToolboxItemType } from "@/types";
-import { Dropdown as VDropdown } from "floating-vue";
+import { VDropdown } from "@halo-dev/components";
 import MdiPlusCircle from "~icons/mdi/plus-circle";
 
 const props = defineProps({
@@ -74,7 +74,7 @@ function getToolboxItemsFromExtensions() {
         </template>
         <template #popper>
           <div
-            class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
+            class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white"
           >
             <component
               :is="toolboxItem.component"
@@ -115,7 +115,7 @@ function getToolboxItemsFromExtensions() {
             </template>
             <template #popper>
               <div
-                class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
+                class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white"
               >
                 <component
                   v-bind="child.props"

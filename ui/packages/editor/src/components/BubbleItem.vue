@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Editor } from "@/tiptap";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
+import { VDropdown, vTooltip } from "@halo-dev/components";
 import { ref, type Component } from "vue";
 
 const props = withDefaults(
@@ -38,6 +38,7 @@ const handleBubbleItemClick = (editor: Editor) => {
 <template>
   <VDropdown
     v-if="visible({ editor })"
+    popper-class="editor-bubble-item-popper"
     class="inline-flex"
     :triggers="[]"
     :auto-hide="true"
@@ -62,7 +63,7 @@ const handleBubbleItemClick = (editor: Editor) => {
     </button>
     <template #popper>
       <div
-        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
+        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto bg-white"
       >
         <KeepAlive>
           <component :is="componentRef" v-bind="props"></component>
@@ -71,13 +72,19 @@ const handleBubbleItemClick = (editor: Editor) => {
     </template>
   </VDropdown>
 </template>
-<style>
-.v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
-  transform: scale(0.9);
-}
+<style lang="scss">
+.editor-bubble-item-popper {
+  &.v-popper__popper--show-from {
+    .v-popper__wrapper {
+      transform: scale(0.9);
+    }
+  }
 
-.v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
-  transform: none;
-  transition: transform 0.1s;
+  &.v-popper__popper--show-to {
+    .v-popper__wrapper {
+      transform: none;
+      transition: transform 0.1s;
+    }
+  }
 }
 </style>
