@@ -38,7 +38,6 @@ const handleBubbleItemClick = (editor: Editor) => {
 <template>
   <VDropdown
     v-if="visible({ editor })"
-    popper-class="editor-bubble-item-popper"
     class="inline-flex"
     :triggers="[]"
     :auto-hide="true"
@@ -72,19 +71,3 @@ const handleBubbleItemClick = (editor: Editor) => {
     </template>
   </VDropdown>
 </template>
-<style lang="scss">
-.editor-bubble-item-popper {
-  &.v-popper__popper--show-from {
-    .v-popper__wrapper {
-      transform: scale(0.9);
-    }
-  }
-
-  &.v-popper__popper--show-to {
-    .v-popper__wrapper {
-      transform: none;
-      transition: transform 0.1s;
-    }
-  }
-}
-</style>
