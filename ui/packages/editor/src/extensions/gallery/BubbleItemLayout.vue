@@ -2,7 +2,12 @@
 import { BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
+import {
+  IconCheckboxCircle,
+  VDropdown,
+  VDropdownItem,
+  vTooltip,
+} from "@halo-dev/components";
 import { computed, ref, type Component } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 import { ExtensionGallery } from "./index";
@@ -56,23 +61,22 @@ function handleSetLayout(layout: string) {
       <span>
         {{ options.find((option) => option.value === layout)?.label }}
       </span>
-      <IconArrowDownLine class="h-4 w-4" />
+      <IconArrowDownLine class="size-4" />
     </button>
 
     <template #popper>
-      <div class="rounded-md bg-white p-1 shadow">
-        <div
-          v-for="option in options"
-          :key="option.value"
-          class="flex cursor-pointer items-center justify-center rounded-md px-3 py-2 text-sm hover:bg-gray-100"
-          :class="{
-            '!bg-gray-200 font-medium': option.value === layout,
-          }"
-          @click="handleSetLayout(option.value)"
-        >
-          {{ option.label }}
-        </div>
-      </div>
+      <VDropdownItem
+        v-for="option in options"
+        :key="option.value"
+        class="!min-w-36"
+        @click="handleSetLayout(option.value)"
+      >
+        {{ option.label }}
+
+        <template v-if="option.value === layout" #suffix-icon>
+          <IconCheckboxCircle class="size-4" />
+        </template>
+      </VDropdownItem>
     </template>
   </VDropdown>
 

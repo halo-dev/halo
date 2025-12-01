@@ -80,7 +80,6 @@ export function createViteConfig(options: Options) {
               "colorjs.io",
               "overlayscrollbars",
               "overlayscrollbars-vue",
-              "floating-vue",
               "@he-tree/vue",
             ].map((name) => ({
               name: "vendor",

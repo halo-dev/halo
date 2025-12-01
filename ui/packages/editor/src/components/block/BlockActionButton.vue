@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { vTooltip } from "floating-vue";
+import { vTooltip } from "@halo-dev/components";
 
 withDefaults(
   defineProps<{

@@ -72,7 +72,10 @@ watch(
     value=""
   ></FormKit>
   <div class="flex w-full justify-end sm:max-w-lg">
-    <VDropdown :classes="['!p-0']" @show="handleCreateEmojiPicker">
+    <VDropdown
+      popper-class="[&_.v-popper\_\_inner]:!p-0"
+      @show="handleCreateEmojiPicker"
+    >
       <IconMotionLine
         class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
       />

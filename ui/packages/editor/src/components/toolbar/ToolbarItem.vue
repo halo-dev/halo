@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { ToolbarItemType } from "@/types";
-import { vTooltip } from "floating-vue";
+import { vTooltip } from "@halo-dev/components";
 import type { Component } from "vue";
 import MdiMenuDown from "~icons/mdi/menu-down";
 

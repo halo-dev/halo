@@ -2,7 +2,7 @@
 import { i18n } from "@/locales";
 import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
-import { Dropdown as VDropdown } from "floating-vue";
+import { VDropdown } from "@halo-dev/components";
 import tailwindcssColors from "tailwindcss/colors";
 import MdiChevronRight from "~icons/mdi/chevron-right";
 import MdiPalette from "~icons/mdi/palette";
@@ -93,7 +93,7 @@ function onColorChange(color: Payload) {
         ></div>
       </div>
 
-      <VDropdown placement="right">
+      <VDropdown popper-class="[&_.v-popper\_\_inner]:!p-0" placement="right">
         <div class="p-1">
           <div
             class="flex cursor-pointer items-center justify-between rounded p-1 hover:bg-gray-100"

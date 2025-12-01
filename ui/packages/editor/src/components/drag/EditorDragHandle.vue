@@ -14,9 +14,9 @@ import type {
 } from "@/types";
 import { isBlockEmpty } from "@/utils";
 import { offset } from "@floating-ui/dom";
+import { VDropdown, vTooltip } from "@halo-dev/components";
 import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
 import { sortBy } from "es-toolkit";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { computed, ref, shallowRef, type PropType } from "vue";
 import MaterialSymbolsAddRounded from "~icons/material-symbols/add-rounded";
 import MaterialSymbolsDragIndicator from "~icons/material-symbols/drag-indicator";

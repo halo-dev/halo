@@ -13,10 +13,7 @@ const props = withDefaults(
 );
 
 function action(dropdownItem: OperationItem<T>) {
-  if (!dropdownItem.action) {
-    return;
-  }
-  dropdownItem.action(props.item);
+  dropdownItem.action?.(props.item);
 }
 </script>
 

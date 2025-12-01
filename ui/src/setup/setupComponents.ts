@@ -6,8 +6,6 @@ import HasPermission from "@/components/permission/HasPermission.vue";
 import FormKitConfig from "@/formkit/formkit.config";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
 import { vClosePopper, VLoading, vTooltip } from "@halo-dev/components";
-import { Dropdown } from "floating-vue";
-import "floating-vue/dist/style.css";
 import { defineAsyncComponent, type App } from "vue";
 import VueGridLayout from "vue-grid-layout";
 
@@ -22,9 +20,6 @@ export function setupComponents(app: App) {
 
   app.directive("tooltip", vTooltip);
   app.directive("close-popper", vClosePopper);
-  // @deprecated
-  // Will be removed in the future, please use the VDropdown component from @halo-dev/components.
-  app.component("FloatingDropdown", Dropdown);
   app.component(
     "VCodemirror",
     defineAsyncComponent(() => import("@/components/codemirror/Codemirror.vue"))

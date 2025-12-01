@@ -81,7 +81,11 @@ const selectedCategory = computed(() => {
 </script>
 
 <template>
-  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
+  <VDropdown
+    ref="dropdown"
+    popper-class="[&_.v-popper\_\_inner]:!p-0"
+    @show="onDropdownShow"
+  >
     <div
       class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
       :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"

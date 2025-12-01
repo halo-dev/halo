@@ -38,9 +38,9 @@
   "dependencies": {
     "@ckpack/vue-color": "^1.5.0",
     "@floating-ui/dom": "^1.7.4",
-    "@halo-dev/ui-shared": "workspace:*",
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
+    "@halo-dev/ui-shared": "workspace:*",
     "@tiptap/core": "^3.11.0",
     "@tiptap/extension-blockquote": "^3.11.0",
     "@tiptap/extension-bold": "^3.11.0",
@@ -72,7 +72,6 @@
     "@tiptap/pm": "^3.11.0",
     "@tiptap/suggestion": "^3.11.0",
     "@tiptap/vue-3": "^3.11.0",
-    "floating-vue": "^5.2.2",
     "github-markdown-css": "^5.2.0",
     "linkifyjs": "^4.1.3",
     "scroll-into-view-if-needed": "^3.1.0"

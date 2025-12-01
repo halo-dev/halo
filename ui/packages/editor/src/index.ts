@@ -1,4 +1,3 @@
-import "floating-vue/dist/style.css";
 import "github-markdown-css/github-markdown-light.css";
 import "./styles/index.scss";
 import "./styles/tailwind.css";

@@ -322,8 +322,8 @@ watch(
                       </VButton>
                       <template #popper>
                         <VDropdownItem
-                          v-for="(group, index) in groups"
-                          :key="index"
+                          v-for="group in groups"
+                          :key="group.metadata.name"
                           @click="handleMove(group)"
                         >
                           {{ group.spec.displayName }}
