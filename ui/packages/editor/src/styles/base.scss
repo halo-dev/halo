@@ -94,13 +94,3 @@
     pointer-events: all;
   }
 }
-
-.v-popper--theme-editor-block-dropdown {
-  .v-popper__inner {
-    @apply rounded-md bg-white shadow-md;
-  }
-
-  .v-popper__arrow-container {
-    display: none;
-  }
-}
