@@ -93,7 +93,7 @@ defineExpose({
         :key="index"
         type="button"
         :class="{ 'bg-gray-100': index === selectedIndex }"
-        class="group flex w-full items-center gap-3 rounded p-1.5 hover:bg-gray-100"
+        class="group flex w-full items-center gap-3 rounded p-1.5 transition-colors hover:bg-gray-100"
         @click="handleSelectItem(index)"
       >
         <div

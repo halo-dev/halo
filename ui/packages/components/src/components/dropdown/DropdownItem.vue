@@ -54,7 +54,7 @@ function onClick(e: MouseEvent) {
 
 <style lang="scss">
 .dropdown-item-wrapper {
-  @apply flex w-full min-w-52 cursor-pointer items-center justify-between gap-1 rounded px-4 py-2 text-sm;
+  @apply flex w-full min-w-52 cursor-pointer items-center justify-between gap-1 rounded px-4 py-2 text-sm transition-colors;
 
   &--default {
     @apply text-gray-700 hover:bg-gray-100 hover:text-gray-900;

@@ -104,7 +104,7 @@ defineExpose({
     <template v-else>
       <div
         :class="[
-          'flex w-full rounded px-2 py-2 text-sm text-gray-600',
+          'flex w-full rounded px-2 py-2 text-sm text-gray-600 transition-colors',
           {
             'bg-gray-200 !text-black': props.isActive?.({
               editor: props.editor,

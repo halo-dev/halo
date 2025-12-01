@@ -31,7 +31,7 @@ const action = () => {
       { 'cursor-not-allowed opacity-70': disabled },
       { 'hover:bg-gray-100': !disabled },
     ]"
-    class="group flex min-h-9 cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1"
+    class="group flex min-h-9 cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 transition-colors"
     @click="action"
   >
     <div
