@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
@@ -230,7 +230,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                 type="button"
                 @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
               >
-                <MdiDeleteForeverOutline class="size-4" />
+                <MingcuteDelete2Line class="size-4" />
                 <div
                   class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
                 >

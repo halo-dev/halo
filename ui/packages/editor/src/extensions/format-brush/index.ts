@@ -3,7 +3,7 @@ import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
-import MdiBrushVariant from "~icons/mdi/brush-variant";
+import MingcuteBrush3Line from "~icons/mingcute/brush-3-line";
 import { getMarksByFirstTextNode, setMarks } from "./util";
 
 declare module "@/tiptap" {
@@ -39,7 +39,7 @@ export const ExtensionFormatBrush = Extension.create<
           props: {
             editor,
             isActive: formatBrush,
-            icon: markRaw(MdiBrushVariant),
+            icon: markRaw(MingcuteBrush3Line),
             title: formatBrush
               ? i18n.global.t(
                   "editor.extensions.format_brush.toolbar_item.cancel"

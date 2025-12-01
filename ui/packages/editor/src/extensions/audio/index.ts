@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -20,13 +20,13 @@ import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
 import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
-import MdiMusicCircleOutline from "~icons/mdi/music-circle-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MdiShare from "~icons/mdi/share";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteMusic2Line from "~icons/mingcute/music-2-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import AudioView from "./AudioView.vue";
 import BubbleItemAudioLink from "./BubbleItemAudioLink.vue";
 
@@ -158,7 +158,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
       getCommandMenuItems() {
         return {
           priority: 110,
-          icon: markRaw(MdiMusicCircleOutline),
+          icon: markRaw(MingcuteMusic2Line),
           title: "editor.extensions.commands_menu.audio",
           keywords: ["audio", "yinpin"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -184,7 +184,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
           component: markRaw(ToolboxItemVue),
           props: {
             editor,
-            icon: markRaw(MdiMusicCircleOutline),
+            icon: markRaw(MingcuteMusic2Line),
             title: i18n.global.t("editor.extensions.commands_menu.audio"),
             action: () => {
               editor
@@ -281,7 +281,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
             {
               priority: 40,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
                   return markRaw(BubbleItemAudioLink);
@@ -294,7 +294,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
                 visible({ editor }) {
                   return !isEmpty(editor.getAttributes(Audio.name).src);
                 },
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
                   window.open(editor.getAttributes(Audio.name).src, "_blank");
@@ -308,7 +308,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
             {
               priority: 70,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(

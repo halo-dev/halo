@@ -5,7 +5,7 @@ import { VDropdown, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
 import { test } from "linkifyjs";
 import { computed, type Component } from "vue";
-import MdiLinkVariant from "~icons/mdi/link-variant";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
 
 const props = defineProps<{
   editor: Editor;
@@ -105,7 +105,7 @@ const handleLinkBubbleButton = () => {
       class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
       :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
     >
-      <MdiLinkVariant />
+      <MingcuteLinkLine />
     </button>
 
     <template #popper>

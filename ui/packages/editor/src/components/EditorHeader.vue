@@ -69,7 +69,7 @@ function getToolboxItemsFromExtensions() {
       >
         <template #default="{ shown }">
           <button
-            class="inline-flex size-8 items-center justify-center rounded-md p-1 hover:bg-gray-100 active:!bg-gray-200"
+            class="inline-flex size-8 items-center justify-center rounded-md p-1 transition-colors hover:bg-gray-100 active:!bg-gray-200"
             :class="{ 'bg-gray-200': shown }"
             tabindex="-1"
           >

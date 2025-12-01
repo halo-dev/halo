@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import MdiArrowULeftBottom from "~icons/mdi/arrow-u-left-bottom";
+import MingcuteDelete2Line from "../icon/MingcuteDelete2Line.vue";
 import BlockActionButton from "./BlockActionButton.vue";
 import BlockActionSeparator from "./BlockActionSeparator.vue";
 
@@ -62,7 +62,7 @@ function handleInsertNewLine() {
           @click="deleteNode"
         >
           <template #icon>
-            <MdiDeleteForeverOutline />
+            <MingcuteDelete2Line />
           </template>
         </BlockActionButton>
       </div>

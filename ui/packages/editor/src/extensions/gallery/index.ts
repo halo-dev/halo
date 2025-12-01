@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -16,8 +16,8 @@ import { deleteNode } from "@/utils";
 import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
-import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
+import MingcutePhotoAlbumLine from "~icons/mingcute/photo-album-line";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
@@ -200,7 +200,7 @@ export const ExtensionGallery = Node.create<
           component: markRaw(ToolboxItem),
           props: {
             editor,
-            icon: markRaw(MdiImageMultiple),
+            icon: markRaw(MingcutePhotoAlbumLine),
             title: i18n.global.t("editor.extensions.gallery.title"),
             action: () => {
               editor.chain().focus().setGallery({ images: [] }).run();
@@ -211,7 +211,7 @@ export const ExtensionGallery = Node.create<
       getCommandMenuItems() {
         return {
           priority: 96,
-          icon: markRaw(MdiImageMultiple),
+          icon: markRaw(MingcutePhotoAlbumLine),
           title: "editor.extensions.commands_menu.gallery",
           keywords: ["gallery", "hualang", "tupian", "images"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -258,7 +258,7 @@ export const ExtensionGallery = Node.create<
             {
               priority: 50,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   deleteNode(ExtensionGallery.name, editor);

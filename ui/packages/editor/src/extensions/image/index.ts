@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -24,14 +24,14 @@ import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiLink from "~icons/mdi/link";
-import MdiLinkVariant from "~icons/mdi/link-variant";
-import MdiShare from "~icons/mdi/share";
 import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
+import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
+import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
+import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcutePicLine from "~icons/mingcute/pic-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
@@ -233,7 +233,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiFileImageBox),
+              icon: markRaw(MingcutePicLine),
               title: i18n.global.t("editor.common.image"),
               action: () => {
                 editor
@@ -255,7 +255,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
       getCommandMenuItems() {
         return {
           priority: 95,
-          icon: markRaw(MdiFileImageBox),
+          icon: markRaw(MingcutePicLine),
           title: "editor.extensions.commands_menu.image",
           keywords: ["image", "tupian"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -306,7 +306,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "left" });
                 },
-                icon: markRaw(MdiFormatAlignLeft),
+                icon: markRaw(MingcuteAlignLeftLine),
                 action: () => handleSetPosition(editor, "left"),
               },
             },
@@ -321,7 +321,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "center" });
                 },
-                icon: markRaw(MdiFormatAlignCenter),
+                icon: markRaw(MingcuteAlignCenterLine),
                 action: () => handleSetPosition(editor, "center"),
               },
             },
@@ -336,7 +336,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "right" });
                 },
-                icon: markRaw(MdiFormatAlignRight),
+                icon: markRaw(MingcuteAlignRightLine),
                 action: () => handleSetPosition(editor, "right"),
               },
             },
@@ -354,7 +354,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             {
               priority: 70,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
                   return markRaw(BubbleItemVideoLink);
@@ -369,7 +369,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
                   window.open(
@@ -470,7 +470,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             {
               priority: 130,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(

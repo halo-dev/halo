@@ -5,7 +5,7 @@ import type { ExtensionOptions } from "@/types";
 import type { BlockquoteOptions } from "@tiptap/extension-blockquote";
 import TiptapBlockquote from "@tiptap/extension-blockquote";
 import { markRaw } from "vue";
-import MdiFormatQuoteOpen from "~icons/mdi/format-quote-open";
+import MingcuteBlockquoteLine from "~icons/mingcute/blockquote-line";
 
 export type ExtensionBlockquoteOptions = Partial<BlockquoteOptions> &
   ExtensionOptions;
@@ -22,7 +22,7 @@ export const ExtensionBlockquote =
             props: {
               editor,
               isActive: editor.isActive("blockquote"),
-              icon: markRaw(MdiFormatQuoteOpen),
+              icon: markRaw(MingcuteBlockquoteLine),
               title: i18n.global.t("editor.common.quote"),
               action: () => {
                 editor.commands.toggleBlockquote();

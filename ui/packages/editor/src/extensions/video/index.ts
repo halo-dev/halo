@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -26,19 +26,19 @@ import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
 import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MdiShare from "~icons/mdi/share";
-import MdiVideo from "~icons/mdi/video";
+import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
+import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
+import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import MingcuteVideoLine from "~icons/mingcute/video-line";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
@@ -282,7 +282,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
       getCommandMenuItems() {
         return {
           priority: 100,
-          icon: markRaw(MdiVideo),
+          icon: markRaw(MingcuteVideoLine),
           title: "editor.extensions.commands_menu.video",
           keywords: ["video", "shipin"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -309,7 +309,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiVideo),
+              icon: markRaw(MingcuteVideoLine),
               title: i18n.global.t("editor.extensions.commands_menu.video"),
               action: () => {
                 editor
@@ -556,7 +556,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "left" });
                 },
-                icon: markRaw(MdiFormatAlignLeft),
+                icon: markRaw(MingcuteAlignLeftLine),
                 action: () => handleSetPosition(editor, "left"),
               },
             },
@@ -571,7 +571,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "center" });
                 },
-                icon: markRaw(MdiFormatAlignCenter),
+                icon: markRaw(MingcuteAlignCenterLine),
                 action: () => handleSetPosition(editor, "center"),
               },
             },
@@ -586,7 +586,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
                 isActive: () => {
                   return editor.isActive({ position: "right" });
                 },
-                icon: markRaw(MdiFormatAlignRight),
+                icon: markRaw(MingcuteAlignRightLine),
                 action: () => handleSetPosition(editor, "right"),
               },
             },
@@ -604,7 +604,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             {
               priority: 160,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
                   return markRaw(BubbleItemVideoLink);
@@ -619,7 +619,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
                     editor.getAttributes(ExtensionVideo.name).src
                   );
                 },
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
                   window.open(
@@ -691,7 +691,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             {
               priority: 200,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(

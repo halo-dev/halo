@@ -22,7 +22,7 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import MdiFormatHeaderPound from "~icons/mdi/format-header-pound";
-import MdiFormatParagraph from "~icons/mdi/format-paragraph";
+import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
 
 export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
 
@@ -66,7 +66,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               props: {
                 editor,
                 isActive: editor.isActive("paragraph"),
-                icon: markRaw(MdiFormatParagraph),
+                icon: markRaw(MingcuteParagraphLine),
                 title: i18n.global.t("editor.common.heading.paragraph"),
                 action: () => editor.chain().focus().setParagraph().run(),
               },
@@ -150,7 +150,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
         return [
           {
             priority: 10,
-            icon: markRaw(MdiFormatParagraph),
+            icon: markRaw(MingcuteParagraphLine),
             title: "editor.common.heading.paragraph",
             keywords: ["paragraph", "text", "putongwenben"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -250,7 +250,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             items: [
               {
                 priority: 10,
-                icon: markRaw(MdiFormatParagraph),
+                icon: markRaw(MingcuteParagraphLine),
                 title: i18n.global.t("editor.common.heading.paragraph"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setParagraph().run(),

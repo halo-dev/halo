@@ -6,7 +6,7 @@ import TiptapSuperscript, {
   type SuperscriptExtensionOptions,
 } from "@tiptap/extension-superscript";
 import { markRaw } from "vue";
-import MdiFormatSuperscript from "~icons/mdi/format-superscript";
+import PhTextSuperscriptBold from "~icons/ph/text-superscript-bold";
 
 export type ExtensionSuperscriptOptions = Partial<SuperscriptExtensionOptions> &
   ExtensionOptions;
@@ -23,7 +23,7 @@ export const ExtensionSuperscript =
             props: {
               editor,
               isActive: editor.isActive("superscript"),
-              icon: markRaw(MdiFormatSuperscript),
+              icon: markRaw(PhTextSuperscriptBold),
               title: i18n.global.t("editor.common.superscript"),
               action: () => editor.chain().focus().toggleSuperscript().run(),
             },

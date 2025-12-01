@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -22,15 +22,15 @@ import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
 import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
 import MdiCellphoneIphone from "~icons/mdi/cellphone-iphone";
 import MdiDesktopMac from "~icons/mdi/desktop-mac";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiLinkVariant from "~icons/mdi/link-variant";
-import MdiShare from "~icons/mdi/share";
 import MdiTabletIpad from "~icons/mdi/tablet-ipad";
 import MdiWeb from "~icons/mdi/web";
 import MdiWebSync from "~icons/mdi/web-sync";
+import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
+import MingcuteAlignJustifyLine from "~icons/mingcute/align-justify-line";
+import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
+import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import BubbleIframeLink from "./BubbleItemIframeLink.vue";
 import BubbleIframeSize from "./BubbleItemIframeSize.vue";
 import IframeView from "./IframeView.vue";
@@ -370,7 +370,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               priority: 90,
               props: {
                 isActive: () => editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MdiFormatAlignLeft),
+                icon: markRaw(MingcuteAlignLeftLine),
                 action: () => handleSetTextAlign(editor, "left"),
               },
             },
@@ -378,7 +378,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               priority: 100,
               props: {
                 isActive: () => editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MdiFormatAlignCenter),
+                icon: markRaw(MingcuteAlignCenterLine),
                 action: () => handleSetTextAlign(editor, "center"),
               },
             },
@@ -386,7 +386,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               priority: 110,
               props: {
                 isActive: () => editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MdiFormatAlignRight),
+                icon: markRaw(MingcuteAlignRightLine),
                 action: () => handleSetTextAlign(editor, "right"),
               },
             },
@@ -394,7 +394,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               priority: 120,
               props: {
                 isActive: () => editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
+                icon: markRaw(MingcuteAlignJustifyLine),
                 action: () => handleSetTextAlign(editor, "justify"),
               },
             },
@@ -419,7 +419,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
             {
               priority: 150,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
                   return markRaw(BubbleIframeLink);
@@ -429,7 +429,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
             {
               priority: 160,
               props: {
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
                   window.open(
@@ -442,7 +442,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
             {
               priority: 190,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   deleteNode(ExtensionIframe.name, editor);

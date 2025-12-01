@@ -7,7 +7,7 @@ import {
   type FontSizeOptions,
 } from "@tiptap/extension-text-style";
 import { markRaw } from "vue";
-import MdiFormatSize from "~icons/mdi/format-size";
+import MingcuteFontSizeLine from "~icons/mingcute/font-size-line";
 
 export type ExtensionFontSizeOptions = Partial<FontSizeOptions> &
   ExtensionOptions;
@@ -27,7 +27,7 @@ export const ExtensionFontSize =
             props: {
               editor,
               isActive: false,
-              icon: markRaw(MdiFormatSize),
+              icon: markRaw(MingcuteFontSizeLine),
             },
             children: [
               {

@@ -4,7 +4,7 @@ import type { ExtensionOptions } from "@/types";
 import type { HighlightOptions } from "@tiptap/extension-highlight";
 import TiptapHighlight from "@tiptap/extension-highlight";
 import { markRaw } from "vue";
-import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
+import MingcuteMarkPenLine from "~icons/mingcute/mark-pen-line";
 import HighlightToolbarItem from "./HighlightToolbarItem.vue";
 
 export type ExtensionHighlightOptions = ExtensionOptions &
@@ -22,7 +22,7 @@ export const ExtensionHighlight =
             props: {
               editor,
               isActive: editor.isActive("highlight"),
-              icon: markRaw(MdiFormatColorHighlight),
+              icon: markRaw(MingcuteMarkPenLine),
               title: i18n.global.t("editor.common.highlight"),
             },
           };

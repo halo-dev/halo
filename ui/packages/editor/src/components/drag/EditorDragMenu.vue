@@ -72,13 +72,8 @@ const setItemRef = (key: string, ref: unknown) => {
 </script>
 
 <template>
-  <div
-    :class="[
-      'min-w-60 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5',
-      props.class,
-    ]"
-  >
-    <div class="flex flex-col gap-0.5 px-2 py-1">
+  <div :class="['min-w-60 bg-white', props.class]">
+    <div class="flex flex-col gap-0.5">
       <EditorDragButtonItem
         v-for="(item, index) in items"
         :key="item.key || String(index)"

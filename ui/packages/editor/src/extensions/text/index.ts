@@ -8,17 +8,17 @@ import { isActive, isTextSelection } from "@/tiptap/vue-3";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { Text as TiptapText } from "@tiptap/extension-text";
 import { markRaw } from "vue";
-import MdiCodeTags from "~icons/mdi/code-tags";
-import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
-import MdiFormatSubscript from "~icons/mdi/format-subscript";
-import MdiFormatSuperscript from "~icons/mdi/format-superscript";
-import MdiLinkVariantOff from "~icons/mdi/link-variant-off";
-import MdiShare from "~icons/mdi/share";
 import MingcuteBoldLine from "~icons/mingcute/bold-line";
+import MingcuteCodeLine from "~icons/mingcute/code-line";
 import MingcuteItalicLine from "~icons/mingcute/italic-line";
+import MingcuteMarkPenLine from "~icons/mingcute/mark-pen-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
 import MingcuteUnderlineLine from "~icons/mingcute/underline-line";
+import MingcuteUnlinkLine from "~icons/mingcute/unlink-line";
+import PhTextSubscriptBold from "~icons/ph/text-subscript-bold";
+import PhTextSuperscriptBold from "~icons/ph/text-superscript-bold";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",
@@ -118,7 +118,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               component: markRaw(HighlightBubbleItem),
               props: {
                 isActive: ({ editor }) => editor.isActive("highlight"),
-                icon: markRaw(MdiFormatColorHighlight),
+                icon: markRaw(MingcuteMarkPenLine),
                 title: i18n.global.t("editor.common.highlight"),
               },
             },
@@ -135,7 +135,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 70,
               props: {
                 isActive: ({ editor }) => editor.isActive("code"),
-                icon: markRaw(MdiCodeTags),
+                icon: markRaw(MingcuteCodeLine),
                 title: i18n.global.t("editor.common.code"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleCode().run(),
@@ -145,7 +145,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 80,
               props: {
                 isActive: ({ editor }) => editor.isActive("superscript"),
-                icon: markRaw(MdiFormatSuperscript),
+                icon: markRaw(PhTextSuperscriptBold),
                 title: i18n.global.t("editor.common.superscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSuperscript().run(),
@@ -155,7 +155,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 90,
               props: {
                 isActive: ({ editor }) => editor.isActive("subscript"),
-                icon: markRaw(MdiFormatSubscript),
+                icon: markRaw(PhTextSubscriptBold),
                 title: i18n.global.t("editor.common.subscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSubscript().run(),
@@ -173,7 +173,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive("link"),
-                icon: markRaw(MdiLinkVariantOff),
+                icon: markRaw(MingcuteUnlinkLine),
                 title: i18n.global.t("editor.extensions.link.cancel_link"),
                 action: ({ editor }) => editor.commands.unsetLink(),
               },
@@ -183,7 +183,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive("link"),
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: ({ editor }) => {
                   const attrs = editor.getAttributes("link");

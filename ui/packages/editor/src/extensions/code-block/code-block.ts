@@ -1,4 +1,4 @@
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
@@ -23,7 +23,7 @@ import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
 import TiptapCodeBlock from "@tiptap/extension-code-block";
 import { markRaw } from "vue";
-import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
+import MingcuteBracesLine from "~icons/mingcute/braces-line";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
 
 declare module "@/tiptap" {
@@ -295,7 +295,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
           props: {
             editor,
             isActive: editor.isActive("codeBlock"),
-            icon: markRaw(MdiCodeBracesBox),
+            icon: markRaw(MingcuteBracesLine),
             title: i18n.global.t("editor.common.codeblock.title"),
             action: () => editor.chain().focus().toggleCodeBlock().run(),
           },
@@ -304,7 +304,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
       getCommandMenuItems() {
         return {
           priority: 80,
-          icon: markRaw(MdiCodeBracesBox),
+          icon: markRaw(MingcuteBracesLine),
           title: "editor.common.codeblock.title",
           keywords: ["codeblock", "daimakuai"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -319,7 +319,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiCodeBracesBox),
+              icon: markRaw(MingcuteBracesLine),
               title: i18n.global.t("editor.common.codeblock.title"),
               action: () => {
                 editor.chain().focus().setCodeBlock().run();
@@ -362,7 +362,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
             {
               priority: 10,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }) =>
                   deleteNode(TiptapCodeBlock.name, editor),
