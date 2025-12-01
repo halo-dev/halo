@@ -51,7 +51,7 @@ function handleInsertNewLine() {
           @click="handleInsertNewLine"
         >
           <template #icon>
-            <MdiArrowULeftBottom />
+            <MdiArrowULeftBottom class="size-5" />
           </template>
         </BlockActionButton>
 
@@ -62,7 +62,7 @@ function handleInsertNewLine() {
           @click="deleteNode"
         >
           <template #icon>
-            <MingcuteDelete2Line />
+            <MingcuteDelete2Line class="size-5" />
           </template>
         </BlockActionButton>
       </div>

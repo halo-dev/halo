@@ -102,7 +102,7 @@ const handleLinkBubbleButton = () => {
           ? i18n.global.t('editor.extensions.link.edit_link')
           : i18n.global.t('editor.extensions.link.add_link')
       "
-      class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
+      class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
       :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
     >
       <MingcuteLinkLine />

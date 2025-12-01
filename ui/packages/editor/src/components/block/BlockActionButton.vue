@@ -36,7 +36,7 @@ withDefaults(
 
 <style lang="scss">
 .editor-block__actions-button {
-  @apply cursor-pointer rounded-md bg-gray-50 p-1.5 hover:bg-gray-200;
+  @apply inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200;
 
   &--selected {
     @apply bg-gray-200;

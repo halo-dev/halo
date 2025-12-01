@@ -69,7 +69,7 @@ function handleSetSize(size: { width?: string; height?: string }) {
     @click="handleSetSize({ width: '25%', height: 'auto' })"
   >
     <template #icon>
-      <MdiImageSizeSelectSmall />
+      <MdiImageSizeSelectSmall class="size-5" />
     </template>
   </BlockActionButton>
 
@@ -80,7 +80,7 @@ function handleSetSize(size: { width?: string; height?: string }) {
     @click="handleSetSize({ width: '50%', height: 'auto' })"
   >
     <template #icon>
-      <MdiImageSizeSelectLarge />
+      <MdiImageSizeSelectLarge class="size-5" />
     </template>
   </BlockActionButton>
 
@@ -91,7 +91,7 @@ function handleSetSize(size: { width?: string; height?: string }) {
     @click="handleSetSize({ width: '100%', height: 'auto' })"
   >
     <template #icon>
-      <MdiImageSizeSelectActual />
+      <MdiImageSizeSelectActual class="size-5" />
     </template>
   </BlockActionButton>
 
@@ -101,7 +101,7 @@ function handleSetSize(size: { width?: string; height?: string }) {
     @click="handleSetSize({ width: undefined, height: undefined })"
   >
     <template #icon>
-      <MdiBackupRestore />
+      <MdiBackupRestore class="size-5" />
     </template>
   </BlockActionButton>
 
