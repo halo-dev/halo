@@ -38,7 +38,7 @@ watch(
     <editor-bubble-menu :editor="editor" />
     <editor-drag-handle :editor="editor" />
     <editor-header :editor="editor" />
-    <div class="flex h-full w-full flex-row overflow-hidden">
+    <div class="flex size-full flex-row overflow-hidden">
       <div class="relative flex-1 overflow-y-auto bg-white">
         <div v-if="$slots.content" class="editor-header-extra">
           <slot name="content" />

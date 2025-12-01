@@ -129,7 +129,7 @@ defineExpose({
             <component
               :is="props.icon"
               :style="props.iconStyle"
-              class="h-4 w-4"
+              class="size-4"
             />
             <span class="flex flex-grow justify-start px-0.5">
               {{ displayTitle }}
@@ -137,7 +137,7 @@ defineExpose({
           </div>
         </button>
         <div v-if="isChildrenComponent" class="flex items-center gap-2">
-          <MaterialSymbolsArrowForwardIosRounded class="h-3 w-3" />
+          <MaterialSymbolsArrowForwardIosRounded class="size-3" />
         </div>
         <div
           v-else-if="props.keyboard"

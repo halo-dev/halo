@@ -61,11 +61,15 @@ function getToolboxItemsFromExtensions() {
   <div
     class="editor-header space-x-1 overflow-auto border-b bg-white px-1 py-1 text-center shadow-sm"
   >
-    <div class="inline-flex h-full items-center">
-      <VDropdown :triggers="['click']" :popper-triggers="['click']">
+    <div class="inline-flex h-full items-center gap-1">
+      <VDropdown
+        :triggers="['click']"
+        :popper-triggers="['click']"
+        popper-class="[&_.v-popper\_\_inner]:!p-0"
+      >
         <template #default="{ shown }">
           <button
-            class="rounded-md p-1.5 hover:bg-gray-100 active:bg-gray-200"
+            class="inline-flex size-8 items-center justify-center rounded-md p-1 hover:bg-gray-100 active:!bg-gray-200"
             :class="{ 'bg-gray-200': shown }"
             tabindex="-1"
           >
@@ -74,7 +78,7 @@ function getToolboxItemsFromExtensions() {
         </template>
         <template #popper>
           <div
-            class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white"
+            class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white p-1.5"
           >
             <component
               :is="toolboxItem.component"
@@ -86,7 +90,7 @@ function getToolboxItemsFromExtensions() {
           </div>
         </template>
       </VDropdown>
-      <div class="!mx-1 h-5 w-[1px] bg-gray-100"></div>
+      <div class="mx-1 h-5 w-[1px] bg-gray-100"></div>
       <div
         v-for="(item, index) in getToolbarItemsFromExtensions()"
         :key="index"
@@ -103,6 +107,7 @@ function getToolboxItemsFromExtensions() {
             tabindex="-1"
             :triggers="['click']"
             :popper-triggers="['click']"
+            popper-class="[&_.v-popper\_\_inner]:!p-0"
           >
             <template #default="{ shown }">
               <component
@@ -115,7 +120,7 @@ function getToolboxItemsFromExtensions() {
             </template>
             <template #popper>
               <div
-                class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white"
+                class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white p-1.5"
               >
                 <component
                   v-bind="child.props"

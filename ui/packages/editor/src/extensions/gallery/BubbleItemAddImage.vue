@@ -64,7 +64,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
       :class="{ 'bg-gray-200': dropdownShown }"
     >
-      <component :is="icon" :style="iconStyle" class="h-5 w-5" />
+      <component :is="icon" :style="iconStyle" class="size-5" />
     </button>
     <template #popper>
       <VDropdownItem

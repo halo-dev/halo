@@ -128,7 +128,7 @@ defineExpose({
     }
 
     .command-icon {
-      @apply h-6 w-6 rounded bg-gray-100 p-1;
+      @apply size-6 rounded bg-gray-100 p-1;
     }
 
     .command-title {

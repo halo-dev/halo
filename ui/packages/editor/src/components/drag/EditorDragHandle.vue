@@ -424,7 +424,7 @@ const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
         class="flex p-0.5 hover:bg-gray-100"
         @click="handleInsertBlock"
       >
-        <MaterialSymbolsAddRounded class="h-5 w-5" />
+        <MaterialSymbolsAddRounded class="size-5" />
       </button>
 
       <VDropdown
@@ -446,7 +446,7 @@ const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
           }"
           @click="showMenu = true"
         >
-          <MaterialSymbolsDragIndicator class="h-5 w-5" />
+          <MaterialSymbolsDragIndicator class="size-5" />
         </button>
 
         <template #popper>

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
-import ProiconsDelete from "~icons/proicons/delete";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -226,11 +226,11 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
             <div class="flex flex-row-reverse">
               <button
                 aria-label="Delete"
-                class="text-grey-900 group pointer-events-auto relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black"
+                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black"
                 type="button"
                 @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
               >
-                <ProiconsDelete class="h-4 w-4" />
+                <MdiDeleteForeverOutline class="size-4" />
                 <div
                   class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
                 >
@@ -239,8 +239,8 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
                       i18n.global.t(
                         "editor.extensions.upload.operations.remove.button"
                       )
-                    }}</span
-                  >
+                    }}
+                  </span>
                 </div>
               </button>
             </div>

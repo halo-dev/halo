@@ -87,7 +87,7 @@ function onColorChange(color: Payload) {
           v-for="item in getColors()"
           :key="item.color"
           :style="{ backgroundColor: item.color }"
-          class="h-5 w-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
+          class="size-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
           :title="item.name"
           @click="handleSetColor(item.color)"
         ></div>

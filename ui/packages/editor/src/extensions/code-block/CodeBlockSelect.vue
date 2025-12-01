@@ -151,7 +151,7 @@ const handleScrollIntoView = () => {
     <div class="relative inline-block w-full" @keydown="handleOptionKeydown">
       <div class="h-8">
         <div
-          class="select-input box-border grid h-full w-full cursor-pointer items-center rounded-md px-3 text-sm"
+          class="select-input box-border grid size-full cursor-pointer items-center rounded-md px-3 text-sm"
           :class="{
             'bg-white': isFocus,
             'border-[1px]': isFocus,

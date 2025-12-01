@@ -109,7 +109,7 @@ const handleCopyCode = () => {
       >
         <div class="flex items-center pr-3">
           <div
-            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded hover:bg-zinc-200"
+            class="flex size-8 cursor-pointer items-center justify-center rounded hover:bg-zinc-200"
             @click.stop="collapsed = !collapsed"
           >
             <RiArrowRightSFill v-if="collapsed" />
@@ -140,12 +140,12 @@ const handleCopyCode = () => {
               ? i18n.global.t('editor.common.codeblock.copy_code')
               : i18n.global.t('editor.common.codeblock.copy_code_success')
           "
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded"
+          class="flex size-8 cursor-pointer items-center justify-center rounded"
           :class="{ 'hover:bg-zinc-200': ready }"
           @click="handleCopyCode"
         >
-          <IconCheckboxCircle v-if="!ready" class="h-4 w-4 text-green-500" />
-          <BxBxsCopy v-else class="h-4 w-4 text-gray-500" />
+          <IconCheckboxCircle v-if="!ready" class="size-4 text-green-500" />
+          <BxBxsCopy v-else class="size-4 text-gray-500" />
         </div>
       </div>
     </div>

@@ -188,7 +188,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
     ></slot>
     <div
       v-else
-      class="flex h-full w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50"
+      class="flex size-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50"
     >
       <div
         class="flex flex-col items-center justify-center space-y-7 pb-6 pt-5"

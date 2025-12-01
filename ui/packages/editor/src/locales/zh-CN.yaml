@@ -164,6 +164,7 @@ editor:
       header4: 四级标题
       header5: 五级标题
       header6: 六级标题
+    list: 列表
     bullet_list: 无序列表
     ordered_list: 有序列表
     task_list: 任务列表

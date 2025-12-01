@@ -50,7 +50,7 @@ function handleUnsetColor() {
           @click="handleSetColor()"
         >
           <div
-            class="h-5 w-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
+            class="size-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
             :style="{ 'background-color': '#fff8c5' }"
           ></div>
           <span class="text-xs text-gray-600">

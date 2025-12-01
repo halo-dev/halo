@@ -168,6 +168,7 @@ editor:
       header4: Header 4
       header5: Header 5
       header6: Header 6
+    list: List
     bullet_list: Bullet list
     ordered_list: Ordered list
     task_list: Task list

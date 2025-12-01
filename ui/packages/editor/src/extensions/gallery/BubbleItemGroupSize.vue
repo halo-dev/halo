@@ -59,7 +59,7 @@ function handleSetGroupSize(size: number) {
       class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
     >
       <span>{{ groupSize }}</span>
-      <IconArrowDownLine class="h-4 w-4" />
+      <IconArrowDownLine class="size-4" />
     </button>
 
     <template #popper>

@@ -1,5 +1,3 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
 import type { Editor, Range } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import {
@@ -18,19 +16,6 @@ export const ExtensionOrderedList =
     addOptions() {
       return {
         ...this.parent?.(),
-        getToolbarItems({ editor }: { editor: Editor }) {
-          return {
-            priority: 140,
-            component: markRaw(ToolbarItem),
-            props: {
-              editor,
-              isActive: editor.isActive("orderedList"),
-              icon: markRaw(MdiFormatListNumbered),
-              title: i18n.global.t("editor.common.ordered_list"),
-              action: () => editor.chain().focus().toggleOrderedList().run(),
-            },
-          };
-        },
         getCommandMenuItems() {
           return {
             priority: 140,

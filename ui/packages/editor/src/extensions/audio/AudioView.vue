@@ -169,7 +169,7 @@ const isPercentageWidth = computed(() => {
             </div>
           </template>
           <template #uploading="{ progress }">
-            <div class="absolute top-0 h-full w-full bg-black bg-opacity-20">
+            <div class="absolute top-0 size-full bg-black bg-opacity-20">
               <div class="absolute top-[50%] w-full space-y-2 text-white">
                 <div class="px-10">
                   <div
@@ -203,13 +203,13 @@ const isPercentageWidth = computed(() => {
             </div>
           </template>
           <template #error>
-            <div class="absolute top-0 h-full w-full bg-black bg-opacity-20">
+            <div class="absolute top-0 size-full bg-black bg-opacity-20">
               <div class="absolute top-[50%] w-full space-y-2 text-white">
                 <div class="px-10">
                   <div
                     class="relative h-4 w-full overflow-hidden rounded-full bg-gray-200"
                   >
-                    <div class="h-full w-full bg-red-600"></div>
+                    <div class="size-full bg-red-600"></div>
                     <div
                       class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
                     >

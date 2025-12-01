@@ -36,7 +36,7 @@ function handleUnsetColor() {
           @click="handleUnsetColor"
         >
           <div
-            class="h-5 w-5 cursor-pointer rounded-sm bg-black ring-gray-300 ring-offset-1 hover:ring-1"
+            class="size-5 cursor-pointer rounded-sm bg-black ring-gray-300 ring-offset-1 hover:ring-1"
           ></div>
           <span class="text-xs text-gray-600">
             {{ i18n.global.t("editor.common.button.restore_default") }}

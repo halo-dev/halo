@@ -53,6 +53,7 @@ import { ExtensionImage, type ExtensionImageOptions } from "./image";
 import { ExtensionIndent, type ExtensionIndentOptions } from "./indent";
 import { ExtensionItalic, type ExtensionItalicOptions } from "./italic";
 import { ExtensionLink, type ExtensionLinkOptions } from "./link";
+import { ExtensionListExtra } from "./list-extra";
 import {
   ExtensionListKeymap,
   type ExtensionListKeymapOptions,
@@ -149,6 +150,7 @@ export interface ExtensionsKitOptions {
   underline: Partial<ExtensionUnderlineOptions> | false;
   upload?: boolean;
   video: Partial<ExtensionVideoOptions> | false;
+  listExtra: Partial<ExtensionOptions> | false;
   customExtensions?: Extensions;
 }
 
@@ -391,6 +393,12 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
 
     if (this.options.video !== false) {
       internalExtensions.push(ExtensionVideo.configure(this.options.video));
+    }
+
+    if (this.options.listExtra !== false) {
+      internalExtensions.push(
+        ExtensionListExtra.configure(this.options.listExtra)
+      );
     }
 
     const extensions =
