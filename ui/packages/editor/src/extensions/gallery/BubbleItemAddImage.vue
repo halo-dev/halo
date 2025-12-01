@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap";
-import { VDropdown } from "@halo-dev/components";
+import { VDropdown, VDropdownItem } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { ref, type Component } from "vue";
 import type { ExtensionGalleryImageItem } from ".";
@@ -67,32 +67,30 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       <component :is="icon" :style="iconStyle" class="h-5 w-5" />
     </button>
     <template #popper>
-      <div class="w-24 space-y-1 overflow-hidden bg-white">
-        <button
-          v-if="
-            utils.permission.has([
-              'uc:attachments:manage',
-              'system:attachments:manage',
-            ])
-          "
-          class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-          @click="handleUploadClick"
-        >
-          {{ i18n.global.t("editor.common.button.upload") }}
-        </button>
-        <button
-          v-if="
-            utils.permission.has([
-              'system:attachments:view',
-              'uc:attachments:manage',
-            ])
-          "
-          class="flex w-full items-center rounded px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-          @click="handleOpenAttachmentSelector"
-        >
-          {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
-        </button>
-      </div>
+      <VDropdownItem
+        v-if="
+          utils.permission.has([
+            'uc:attachments:manage',
+            'system:attachments:manage',
+          ])
+        "
+        class="!min-w-36"
+        @click="handleUploadClick"
+      >
+        {{ i18n.global.t("editor.common.button.upload") }}
+      </VDropdownItem>
+      <VDropdownItem
+        v-if="
+          utils.permission.has([
+            'system:attachments:view',
+            'uc:attachments:manage',
+          ])
+        "
+        class="!min-w-36"
+        @click="handleOpenAttachmentSelector"
+      >
+        {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
+      </VDropdownItem>
     </template>
   </VDropdown>
   <AttachmentSelectorModal

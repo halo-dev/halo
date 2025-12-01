@@ -2,7 +2,12 @@
 import { BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { VDropdown, vTooltip } from "@halo-dev/components";
+import {
+  IconCheckboxCircle,
+  VDropdown,
+  VDropdownItem,
+  vTooltip,
+} from "@halo-dev/components";
 import { computed, ref, type Component } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 import { ExtensionGallery } from "./index";
@@ -58,19 +63,18 @@ function handleSetGroupSize(size: number) {
     </button>
 
     <template #popper>
-      <div class="w-16 bg-white">
-        <div
-          v-for="option in options"
-          :key="option"
-          class="flex cursor-pointer items-center justify-center rounded-md px-3 py-2 text-sm hover:bg-gray-100"
-          :class="{
-            '!bg-gray-200 font-medium': option === groupSize,
-          }"
-          @click="handleSetGroupSize(option)"
-        >
-          {{ option }}
-        </div>
-      </div>
+      <VDropdownItem
+        v-for="option in options"
+        :key="option"
+        class="!min-w-36"
+        @click="handleSetGroupSize(option)"
+      >
+        {{ option }}
+
+        <template v-if="option === groupSize" #suffix-icon>
+          <IconCheckboxCircle class="size-4" />
+        </template>
+      </VDropdownItem>
     </template>
   </VDropdown>
 
