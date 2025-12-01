@@ -16932,6 +16932,11 @@
         }
       },
       "Content": {
+        "required": [
+          "content",
+          "raw",
+          "rawType"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -16946,6 +16951,11 @@
         }
       },
       "ContentUpdateParam": {
+        "required": [
+          "content",
+          "raw",
+          "rawType"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -17473,6 +17483,7 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string"
           }
         }
@@ -20475,6 +20486,7 @@
       },
       "PostRequest": {
         "required": [
+          "content",
           "post"
         ],
         "type": "object",
@@ -20580,12 +20592,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },
@@ -22356,12 +22368,12 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ]
+            ],
+            "default": "PUBLIC"
           }
         }
       },

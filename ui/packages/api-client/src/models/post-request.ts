@@ -24,7 +24,7 @@ import type { Post } from './post';
  * Post and content data for creating and updating post.
  */
 export interface PostRequest {
-    'content'?: ContentUpdateParam;
+    'content': ContentUpdateParam;
     'post': Post;
 }
 

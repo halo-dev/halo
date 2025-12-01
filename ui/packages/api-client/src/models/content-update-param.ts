@@ -15,9 +15,9 @@
 
 
 export interface ContentUpdateParam {
-    'content'?: string;
-    'raw'?: string;
-    'rawType'?: string;
+    'content': string;
+    'raw': string;
+    'rawType': string;
     'version'?: number;
 }
 
