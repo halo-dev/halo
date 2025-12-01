@@ -4,7 +4,7 @@ import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import TiptapStrike, { type StrikeOptions } from "@tiptap/extension-strike";
 import { markRaw } from "vue";
-import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
+import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 
 export type ExtensionStrikeOptions = ExtensionOptions & Partial<StrikeOptions>;
 
@@ -19,7 +19,7 @@ export const ExtensionStrike = TiptapStrike.extend<ExtensionStrikeOptions>({
           props: {
             editor,
             isActive: editor.isActive("strike"),
-            icon: markRaw(MdiFormatStrikethrough),
+            icon: markRaw(MingcuteStrikethroughLine),
             title: i18n.global.t("editor.common.strike"),
             action: () => editor.chain().focus().toggleStrike().run(),
           },

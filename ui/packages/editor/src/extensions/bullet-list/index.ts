@@ -6,7 +6,7 @@ import {
   type BulletListOptions,
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
-import MdiFormatListBulleted from "~icons/mdi/format-list-bulleted";
+import MingcuteListCheckLine from "~icons/mingcute/list-check-line";
 
 export type ExtensionBulletListOptions = Partial<BulletListOptions> &
   ExtensionOptions;
@@ -18,7 +18,7 @@ export const ExtensionBulletList = TiptapBulletList.extend<ExtensionOptions>({
       getCommandMenuItems() {
         return {
           priority: 130,
-          icon: markRaw(MdiFormatListBulleted),
+          icon: markRaw(MingcuteListCheckLine),
           title: "editor.common.bullet_list",
           keywords: ["bulletlist", "wuxuliebiao"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {

@@ -6,7 +6,7 @@ import {
   type TaskListOptions,
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
-import MdiFormatListCheckbox from "~icons/mdi/format-list-checkbox";
+import MingcuteListCheck3Line from "~icons/mingcute/list-check-3-line";
 
 export type ExtensionTaskListOptions = Partial<TaskListOptions> &
   ExtensionOptions;
@@ -19,7 +19,7 @@ export const ExtensionTaskList =
         getCommandMenuItems() {
           return {
             priority: 150,
-            icon: markRaw(MdiFormatListCheckbox),
+            icon: markRaw(MingcuteListCheck3Line),
             title: "editor.common.task_list",
             keywords: ["tasklist", "renwuliebiao"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {

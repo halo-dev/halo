@@ -4,7 +4,7 @@ import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import TiptapItalic, { type ItalicOptions } from "@tiptap/extension-italic";
 import { markRaw } from "vue";
-import MdiFormatItalic from "~icons/mdi/format-italic";
+import MingcuteItalicLine from "~icons/mingcute/italic-line";
 
 export type ExtensionItalicOptions = ExtensionOptions & Partial<ItalicOptions>;
 
@@ -19,7 +19,7 @@ export const ExtensionItalic = TiptapItalic.extend<ExtensionItalicOptions>({
           props: {
             editor,
             isActive: editor.isActive("italic"),
-            icon: markRaw(MdiFormatItalic),
+            icon: markRaw(MingcuteItalicLine),
             title: i18n.global.t("editor.common.italic"),
             action: () => editor.chain().focus().toggleItalic().run(),
           },

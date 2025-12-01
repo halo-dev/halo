@@ -4,9 +4,10 @@ import { i18n } from "@/locales";
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { Editor, Extension } from "@tiptap/core";
 import { markRaw } from "vue";
-import MdiFormatListBulleted from "~icons/mdi/format-list-bulleted";
-import MdiFormatListCheckbox from "~icons/mdi/format-list-checkbox";
-import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
+import MingcuteListCheck3Line from "~icons/mingcute/list-check-3-line";
+import MingcuteListCheckLine from "~icons/mingcute/list-check-line";
+import MingcuteListOrderedLine from "~icons/mingcute/list-ordered-line";
+
 import { ExtensionBulletList } from "../bullet-list";
 import { ExtensionOrderedList } from "../ordered-list";
 import { ExtensionTaskList } from "../task-list";
@@ -64,15 +65,15 @@ function isListActive(editor: Editor) {
 
 function getListIcon(editor: Editor) {
   if (editor.isActive(ExtensionBulletList.name)) {
-    return MdiFormatListBulleted;
+    return MingcuteListCheckLine;
   }
   if (editor.isActive(ExtensionOrderedList.name)) {
-    return MdiFormatListNumbered;
+    return MingcuteListOrderedLine;
   }
   if (editor.isActive(ExtensionTaskList.name)) {
-    return MdiFormatListCheckbox;
+    return MingcuteListCheck3Line;
   }
-  return MdiFormatListBulleted;
+  return MingcuteListCheckLine;
 }
 
 function isListExtensionLoaded(editor: Editor, extensionName: string) {
@@ -90,7 +91,7 @@ function getListItems(editor: Editor) {
       props: {
         editor,
         isActive: editor.isActive(ExtensionBulletList.name),
-        icon: markRaw(MdiFormatListBulleted),
+        icon: markRaw(MingcuteListCheckLine),
         title: i18n.global.t("editor.common.bullet_list"),
         action: () => editor.chain().focus().toggleBulletList().run(),
       },
@@ -104,7 +105,7 @@ function getListItems(editor: Editor) {
       props: {
         editor,
         isActive: editor.isActive(ExtensionOrderedList.name),
-        icon: markRaw(MdiFormatListNumbered),
+        icon: markRaw(MingcuteListOrderedLine),
         title: i18n.global.t("editor.common.ordered_list"),
         action: () => editor.chain().focus().toggleOrderedList().run(),
       },
@@ -118,7 +119,7 @@ function getListItems(editor: Editor) {
       props: {
         editor,
         isActive: editor.isActive(ExtensionTaskList.name),
-        icon: markRaw(MdiFormatListCheckbox),
+        icon: markRaw(MingcuteListCheck3Line),
         title: i18n.global.t("editor.common.task_list"),
         action: () => editor.chain().focus().toggleTaskList().run(),
       },

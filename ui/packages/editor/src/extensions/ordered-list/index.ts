@@ -6,7 +6,7 @@ import {
   type OrderedListOptions,
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
-import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
+import MingcuteListOrderedLine from "~icons/mingcute/list-ordered-line";
 
 export type ExtensionOrderedListOptions = Partial<OrderedListOptions> &
   ExtensionOptions;
@@ -19,7 +19,7 @@ export const ExtensionOrderedList =
         getCommandMenuItems() {
           return {
             priority: 140,
-            icon: markRaw(MdiFormatListNumbered),
+            icon: markRaw(MingcuteListOrderedLine),
             title: "editor.common.ordered_list",
             keywords: ["orderedlist", "youxuliebiao"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
