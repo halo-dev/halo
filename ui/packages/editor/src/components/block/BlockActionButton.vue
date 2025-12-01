@@ -20,9 +20,10 @@ withDefaults(
 </script>
 
 <template>
-  <div
+  <button
     v-if="visible"
     v-tooltip="tooltip"
+    type="button"
     class="editor-block__actions-button"
     :class="{
       'editor-block__actions-button--selected': selected,
@@ -31,7 +32,7 @@ withDefaults(
     :disabled="disabled"
   >
     <slot name="icon" />
-  </div>
+  </button>
 </template>
 
 <style lang="scss">

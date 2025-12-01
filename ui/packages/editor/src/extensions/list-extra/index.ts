@@ -41,12 +41,6 @@ export const ExtensionListExtra = Extension.create<ExtensionOptions>({
             isActive: isListActive(editor),
             icon: markRaw(getListIcon(editor)),
             title: i18n.global.t("editor.common.list"),
-            action() {
-              if (isListActive(editor)) {
-                return;
-              }
-              editor.chain().focus().toggleBulletList().run();
-            },
           },
           children: getListItems(editor),
         };

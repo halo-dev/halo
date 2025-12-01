@@ -104,7 +104,7 @@ defineExpose({
     <template v-else>
       <div
         :class="[
-          'flex w-full rounded-lg p-1.5 text-sm text-gray-600',
+          'flex w-full rounded px-2 py-2 text-sm text-gray-600',
           {
             'bg-gray-200 !text-black': props.isActive?.({
               editor: props.editor,
@@ -113,7 +113,7 @@ defineExpose({
             }),
           },
           {
-            'cursor-pointer hover:bg-gray-200/80 hover:text-gray-900':
+            'cursor-pointer hover:bg-gray-100 hover:text-gray-900 active:!bg-gray-200':
               !props.isActive?.({
                 editor: props.editor,
                 node: props.node,

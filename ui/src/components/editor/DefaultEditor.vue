@@ -52,13 +52,13 @@ import {
   type ComputedRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import MdiFormatHeader1 from "~icons/mdi/format-header-1";
-import MdiFormatHeader2 from "~icons/mdi/format-header-2";
-import MdiFormatHeader3 from "~icons/mdi/format-header-3";
-import MdiFormatHeader4 from "~icons/mdi/format-header-4";
-import MdiFormatHeader5 from "~icons/mdi/format-header-5";
-import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import RiLayoutRightLine from "~icons/ri/layout-right-line";
+import LucideHeading1 from "~icons/lucide/heading-1";
+import LucideHeading2 from "~icons/lucide/heading-2";
+import LucideHeading3 from "~icons/lucide/heading-3";
+import LucideHeading4 from "~icons/lucide/heading-4";
+import LucideHeading5 from "~icons/lucide/heading-5";
+import LucideHeading6 from "~icons/lucide/heading-6";
+import MingcuteLayoutRightLine from "~icons/mingcute/layout-right-line";
 
 const { t } = useI18n();
 
@@ -101,12 +101,12 @@ interface HeadingNode {
 }
 
 const headingIcons = {
-  1: markRaw(MdiFormatHeader1),
-  2: markRaw(MdiFormatHeader2),
-  3: markRaw(MdiFormatHeader3),
-  4: markRaw(MdiFormatHeader4),
-  5: markRaw(MdiFormatHeader5),
-  6: markRaw(MdiFormatHeader6),
+  1: markRaw(LucideHeading1),
+  2: markRaw(LucideHeading2),
+  3: markRaw(LucideHeading3),
+  4: markRaw(LucideHeading4),
+  5: markRaw(LucideHeading5),
+  6: markRaw(LucideHeading6),
 };
 
 const headingNodes = ref<HeadingNode[]>();
@@ -175,7 +175,7 @@ const customExtensions = [
             props: {
               editor,
               isActive: showSidebar.value,
-              icon: markRaw(RiLayoutRightLine),
+              icon: markRaw(MingcuteLayoutRightLine),
               title: i18n.global.t(
                 "core.components.default_editor.toolbox.show_hide_sidebar"
               ),

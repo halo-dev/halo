@@ -4,7 +4,8 @@ import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { Component } from "vue";
-import MdiFormatColorMarkerCancel from "~icons/mdi/format-color-marker-cancel";
+import MingcuteCloseLine from "~icons/mingcute/close-line";
+import { ExtensionHighlight } from ".";
 
 const props = defineProps<{
   editor: Editor;
@@ -16,10 +17,15 @@ const props = defineProps<{
 }>();
 
 function handleSetColor(color?: string) {
-  if (!color) {
-    return;
+  if (props.editor.isActive(ExtensionHighlight.name)) {
+    props.editor.chain().focus().unsetHighlight().run();
   }
-  props.editor?.chain().focus().toggleHighlight({ color }).run();
+
+  props.editor
+    ?.chain()
+    .focus()
+    .setHighlight(color ? { color } : undefined)
+    .run();
 }
 
 function handleUnsetColor() {
@@ -37,7 +43,7 @@ function handleUnsetColor() {
           @click="handleUnsetColor"
         >
           <div class="inline-flex items-center gap-2">
-            <MdiFormatColorMarkerCancel />
+            <MingcuteCloseLine />
             <span class="text-xs text-gray-600">
               {{ i18n.global.t("editor.extensions.highlight.unset") }}
             </span>

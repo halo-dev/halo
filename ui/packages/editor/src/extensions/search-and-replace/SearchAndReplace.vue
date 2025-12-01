@@ -228,9 +228,13 @@ watch(
           </div>
           <div class="mx-2 min-w-[130px] text-sm">
             <div v-if="findState.findCount === 0">
-              <span :class="{ 'text-red-600': searchTerm.length > 0 }">{{
-                i18n.global.t("editor.extensions.search_and_replace.not_found")
-              }}</span>
+              <span :class="{ 'text-red-600': searchTerm.length > 0 }">
+                {{
+                  i18n.global.t(
+                    "editor.extensions.search_and_replace.not_found"
+                  )
+                }}
+              </span>
             </div>
             <div v-else>
               <span>

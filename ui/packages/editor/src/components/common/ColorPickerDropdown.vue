@@ -5,7 +5,7 @@ import { Sketch } from "@ckpack/vue-color";
 import { VDropdown } from "@halo-dev/components";
 import tailwindcssColors from "tailwindcss/colors";
 import MdiChevronRight from "~icons/mdi/chevron-right";
-import MdiPalette from "~icons/mdi/palette";
+import MingcutePaletteLine from "~icons/mingcute/palette-line";
 
 interface Color {
   color: string;
@@ -99,7 +99,7 @@ function onColorChange(color: Payload) {
             class="flex cursor-pointer items-center justify-between rounded p-1 hover:bg-gray-100"
           >
             <div class="inline-flex items-center gap-2">
-              <MdiPalette />
+              <MingcutePaletteLine />
               <span class="text-xs text-gray-600">
                 {{ i18n.global.t("editor.components.color_picker.more_color") }}
               </span>

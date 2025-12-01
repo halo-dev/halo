@@ -17,8 +17,8 @@ import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
 import MingcuteUnderlineLine from "~icons/mingcute/underline-line";
 import MingcuteUnlinkLine from "~icons/mingcute/unlink-line";
-import PhTextSubscriptBold from "~icons/ph/text-subscript-bold";
-import PhTextSuperscriptBold from "~icons/ph/text-superscript-bold";
+import PhTextSubscript from "~icons/ph/text-subscript";
+import PhTextSuperscript from "~icons/ph/text-superscript";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",
@@ -145,7 +145,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 80,
               props: {
                 isActive: ({ editor }) => editor.isActive("superscript"),
-                icon: markRaw(PhTextSuperscriptBold),
+                icon: markRaw(PhTextSuperscript),
                 title: i18n.global.t("editor.common.superscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSuperscript().run(),
@@ -155,7 +155,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 90,
               props: {
                 isActive: ({ editor }) => editor.isActive("subscript"),
-                icon: markRaw(PhTextSubscriptBold),
+                icon: markRaw(PhTextSubscript),
                 title: i18n.global.t("editor.common.subscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSubscript().run(),
