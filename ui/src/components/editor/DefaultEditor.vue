@@ -516,7 +516,7 @@ onCoverInputChange((files) => {
         <OverlayScrollbarsComponent
           element="div"
           :options="{ scrollbars: { autoHide: 'scroll' } }"
-          class="h-full border-l bg-white"
+          class="h-full border-l bg-white p-2"
           defer
         >
           <VTabs v-model:active-id="extraActiveId" type="outline">
@@ -524,48 +524,46 @@ onCoverInputChange((files) => {
               id="toc"
               :label="$t('core.components.default_editor.tabs.toc.title')"
             >
-              <div class="p-1 pt-0">
-                <ul v-if="headingNodes?.length" class="space-y-1">
-                  <li
-                    v-for="(node, index) in headingNodes"
-                    :key="index"
-                    :class="[
-                      { 'bg-gray-100': node.id === selectedHeadingNode?.id },
-                    ]"
-                    class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                    @click="handleSelectHeadingNode(node)"
+              <ul v-if="headingNodes?.length" class="space-y-1">
+                <li
+                  v-for="(node, index) in headingNodes"
+                  :key="index"
+                  :class="[
+                    { 'bg-gray-100': node.id === selectedHeadingNode?.id },
+                  ]"
+                  class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  @click="handleSelectHeadingNode(node)"
+                >
+                  <div
+                    :style="{
+                      paddingLeft: `${(node.level - 1) * 0.8}rem`,
+                    }"
+                    class="flex items-center gap-2"
                   >
-                    <div
-                      :style="{
-                        paddingLeft: `${(node.level - 1) * 0.8}rem`,
-                      }"
-                      class="flex items-center gap-2"
-                    >
-                      <component
-                        :is="headingIcons[node.level]"
-                        class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
-                        :class="[
-                          {
-                            '!bg-white': node.id === selectedHeadingNode?.id,
-                          },
-                        ]"
-                      />
-                      <span class="flex-1 truncate">{{ node.text }}</span>
-                    </div>
-                  </li>
-                </ul>
-                <div v-else class="flex flex-col items-center py-10">
-                  <span class="text-sm text-gray-600">
-                    {{ $t("core.components.default_editor.tabs.toc.empty") }}
-                  </span>
-                </div>
+                    <component
+                      :is="headingIcons[node.level]"
+                      class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
+                      :class="[
+                        {
+                          '!bg-white': node.id === selectedHeadingNode?.id,
+                        },
+                      ]"
+                    />
+                    <span class="flex-1 truncate">{{ node.text }}</span>
+                  </div>
+                </li>
+              </ul>
+              <div v-else class="flex flex-col items-center py-10">
+                <span class="text-sm text-gray-600">
+                  {{ $t("core.components.default_editor.tabs.toc.empty") }}
+                </span>
               </div>
             </VTabItem>
             <VTabItem
               id="information"
               :label="$t('core.components.default_editor.tabs.detail.title')"
             >
-              <div class="flex flex-col gap-2 p-1 pt-0">
+              <div class="flex flex-col gap-2">
                 <div class="grid grid-cols-2 gap-2">
                   <div
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"

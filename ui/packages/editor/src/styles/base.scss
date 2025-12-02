@@ -3,8 +3,10 @@
   $editorContentMaxWidth: 64rem;
 
   box-sizing: border-box;
-  height: calc(100% - 48px);
+  height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 
   .editor-header {
     height: 48px;

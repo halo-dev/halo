@@ -37,9 +37,9 @@ watch(
   <div v-if="editor" class="halo-rich-text-editor">
     <editor-bubble-menu :editor="editor" />
     <editor-drag-handle :editor="editor" />
-    <editor-header :editor="editor" />
-    <div class="flex size-full flex-row overflow-hidden">
-      <div class="relative flex-1 overflow-y-auto bg-white">
+    <editor-header :editor="editor" class="flex-none" />
+    <div class="flex size-full min-h-0 flex-1 shrink overflow-hidden">
+      <div class="relative min-w-0 flex-1 shrink overflow-y-auto bg-white">
         <div v-if="$slots.content" class="editor-header-extra">
           <slot name="content" />
         </div>
@@ -52,7 +52,7 @@ watch(
       </div>
       <div
         v-if="$slots.extra"
-        class="hidden h-full w-72 flex-none flex-shrink-0 sm:!block"
+        class="hidden h-full w-72 flex-none flex-shrink-0 sm:block"
       >
         <slot name="extra"></slot>
       </div>
