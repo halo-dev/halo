@@ -55,7 +55,7 @@ const rel = computed({
  * Convert the currently selected text when clicking the link
  */
 const handleLinkBubbleButton = () => {
-  if (props.isActive({ editor: props.editor })) {
+  if (props.isActive?.({ editor: props.editor })) {
     return;
   }
   const { state } = props.editor;
