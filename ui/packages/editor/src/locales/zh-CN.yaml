@@ -64,9 +64,9 @@ editor:
       large_size: 大尺寸
       restore_size: 恢复原始尺寸
       edit_link: 修改链接
-      edit_alt: 修改图片 alt 属性
+      edit_alt: 修改图片的替代文本（alt 属性）
       edit_href: 修改图片跳转链接
-      edit_caption: 图片描述
+      edit_caption: 图片描述文本
       image_load_error: 图片加载失败
     video:
       disable_controls: 隐藏控制面板

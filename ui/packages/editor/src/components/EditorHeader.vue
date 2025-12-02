@@ -2,7 +2,7 @@
 import { type AnyExtension, VueEditor } from "@/tiptap";
 import type { ToolbarItemType, ToolboxItemType } from "@/types";
 import { VDropdown } from "@halo-dev/components";
-import MdiPlusCircle from "~icons/mdi/plus-circle";
+import MingcuteAddCircleFill from "~icons/mingcute/add-circle-fill";
 
 const props = defineProps({
   editor: {
@@ -73,7 +73,7 @@ function getToolboxItemsFromExtensions() {
             :class="{ 'bg-gray-200': shown }"
             tabindex="-1"
           >
-            <MdiPlusCircle class="text-[#4CCBA0]" />
+            <MingcuteAddCircleFill class="text-primary" />
           </button>
         </template>
         <template #popper>

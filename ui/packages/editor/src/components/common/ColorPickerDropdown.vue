@@ -4,8 +4,8 @@ import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
 import { VDropdown } from "@halo-dev/components";
 import tailwindcssColors from "tailwindcss/colors";
-import MdiChevronRight from "~icons/mdi/chevron-right";
 import MingcutePaletteLine from "~icons/mingcute/palette-line";
+import MingcuteRightLine from "~icons/mingcute/right-line";
 
 interface Color {
   color: string;
@@ -96,16 +96,16 @@ function onColorChange(color: Payload) {
       <VDropdown popper-class="[&_.v-popper\_\_inner]:!p-0" placement="right">
         <div class="p-1">
           <div
-            class="flex cursor-pointer items-center justify-between rounded p-1 hover:bg-gray-100"
+            class="flex cursor-pointer items-center justify-between rounded p-1 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900"
           >
             <div class="inline-flex items-center gap-2">
               <MingcutePaletteLine />
-              <span class="text-xs text-gray-600">
+              <span>
                 {{ i18n.global.t("editor.components.color_picker.more_color") }}
               </span>
             </div>
             <div>
-              <MdiChevronRight />
+              <MingcuteRightLine />
             </div>
           </div>
         </div>

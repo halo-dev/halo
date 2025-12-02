@@ -23,12 +23,12 @@ import TiptapImage from "@tiptap/extension-image";
 import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
-import LucideCaptions from "~icons/lucide/captions";
-import MdiLink from "~icons/mdi/link";
-import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
 import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
+import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
+import MingcuteLink2Line from "~icons/mingcute/link-2-line";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
 import MingcutePicLine from "~icons/mingcute/pic-line";
 import MingcuteShare3Line from "~icons/mingcute/share-3-line";
@@ -387,7 +387,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                icon: markRaw(MdiTextBoxEditOutline),
+                icon: markRaw(MingcuteEdit4Line),
                 title: i18n.global.t("editor.extensions.image.edit_alt"),
                 action: () => {
                   return markRaw(BubbleItemImageAlt);
@@ -402,7 +402,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                icon: markRaw(MdiLink),
+                icon: markRaw(MingcuteLink2Line),
                 title: i18n.global.t("editor.extensions.image.edit_href"),
                 action: () => {
                   return markRaw(BubbleItemImageHref);
@@ -418,7 +418,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                icon: markRaw(LucideCaptions),
+                icon: markRaw(MingcuteBookmarkEditLine),
                 title: i18n.global.t("editor.extensions.image.edit_caption"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(

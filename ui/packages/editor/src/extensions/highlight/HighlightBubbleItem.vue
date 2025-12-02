@@ -31,12 +31,12 @@ function handleUnsetColor() {
     <template #prefix>
       <div class="p-1">
         <div
-          class="flex cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
+          class="flex cursor-pointer items-center gap-2 rounded p-1 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900"
           @click="handleUnsetColor"
         >
           <div class="inline-flex items-center gap-2">
             <MingcuteCloseLine />
-            <span class="text-xs text-gray-600">
+            <span>
               {{ i18n.global.t("editor.extensions.highlight.unset") }}
             </span>
           </div>
