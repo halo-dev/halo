@@ -161,18 +161,22 @@ export interface NodeBubbleMenuType extends BubbleMenuProps {
   items?: BubbleItemType[];
   extendsKey?: string | PluginKey;
 }
+
 export interface BubbleItemType {
   priority: number;
   component?: Component;
   key?: string;
-  props?: {
-    isActive?: ({ editor }: { editor: Editor }) => boolean;
-    visible?: ({ editor }: { editor: Editor }) => boolean;
-    icon?: Component;
-    iconStyle?: string;
-    title?: string;
-    action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
-  } & Record<string, unknown>;
+  props?: Omit<BubbleItemComponentProps, "editor">;
+}
+
+export interface BubbleItemComponentProps {
+  editor: Editor;
+  isActive?: ({ editor }: { editor: Editor }) => boolean;
+  visible?: ({ editor }: { editor: Editor }) => boolean;
+  icon?: Component;
+  iconStyle?: string;
+  title?: string;
+  action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
 }
 
 export interface ToolboxItemType {

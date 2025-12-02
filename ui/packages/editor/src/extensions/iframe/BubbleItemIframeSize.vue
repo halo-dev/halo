@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { BlockActionInput, BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import { computed } from "vue";
 import { ExtensionIframe } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const width = computed({
   get: () => {
@@ -47,5 +45,5 @@ const handleSetSize = (width: string, height: string) => {
     :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
   />
 
-  <BlockActionSeparator />
+  <BlockActionSeparator :editor="editor" />
 </template>

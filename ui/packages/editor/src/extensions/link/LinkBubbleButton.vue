@@ -1,20 +1,13 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import { type Editor } from "@/tiptap/vue-3";
+import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
 import { test } from "linkifyjs";
-import { computed, type Component } from "vue";
+import { computed } from "vue";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const href = computed({
   get() {
@@ -98,12 +91,12 @@ const handleLinkBubbleButton = () => {
   >
     <button
       v-tooltip="
-        isActive({ editor })
+        isActive?.({ editor })
           ? i18n.global.t('editor.extensions.link.edit_link')
           : i18n.global.t('editor.extensions.link.add_link')
       "
       class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
-      :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
+      :class="{ 'bg-gray-200 !text-black': isActive?.({ editor }) }"
     >
       <MingcuteLinkLine />
     </button>

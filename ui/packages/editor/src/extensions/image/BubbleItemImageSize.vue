@@ -5,22 +5,15 @@ import {
   BlockActionSeparator,
 } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { computed, type Component } from "vue";
+import type { BubbleItemComponentProps } from "@/types";
+import { computed } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
 import { ExtensionImage } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const size = computed({
   get: () => {
@@ -105,5 +98,8 @@ function handleSetSize(size: { width?: string; height?: string }) {
     </template>
   </BlockActionButton>
 
-  <BlockActionSeparator v-if="visible?.({ editor: props.editor })" />
+  <BlockActionSeparator
+    v-if="visible?.({ editor: props.editor })"
+    :editor="editor"
+  />
 </template>

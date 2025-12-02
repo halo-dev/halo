@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
-import { computed, type Component } from "vue";
+import { computed } from "vue";
 import { ExtensionIframe } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const src = computed({
   get: () => {

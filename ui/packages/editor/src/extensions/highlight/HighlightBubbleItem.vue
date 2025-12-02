@@ -2,19 +2,11 @@
 import { BubbleItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { Component } from "vue";
+import type { BubbleItemComponentProps } from "@/types";
 import MingcuteCloseLine from "~icons/mingcute/close-line";
 import { ExtensionHighlight } from ".";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 function handleSetColor(color?: string) {
   if (props.editor.isActive(ExtensionHighlight.name)) {

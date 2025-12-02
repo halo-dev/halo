@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { i18n } from "@/locales";
-import { type Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown, VDropdownItem } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { ref, type Component } from "vue";
+import { ref } from "vue";
 import type { ExtensionGalleryImageItem } from ".";
 import {
   getCurrentGalleryImages,
@@ -11,15 +11,8 @@ import {
   useUploadGalleryImage,
 } from "./useGalleryImages";
 
-const props = defineProps<{
-  editor: Editor;
-  visible: ({ editor }: { editor: Editor }) => boolean;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  title: string;
-  icon: Component;
-  iconStyle: string;
-  action: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
+
 const emit = defineEmits(["close"]);
 
 const dropdownShown = ref(false);

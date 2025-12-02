@@ -1,25 +1,18 @@
 <script setup lang="ts">
 import { BlockActionSeparator } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import {
   IconCheckboxCircle,
   VDropdown,
   VDropdownItem,
   vTooltip,
 } from "@halo-dev/components";
-import { computed, ref, type Component } from "vue";
+import { computed, ref } from "vue";
 import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
 import { ExtensionGallery } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const dropdownRef = ref();
 
@@ -78,5 +71,5 @@ function handleSetGroupSize(size: number) {
     </template>
   </VDropdown>
 
-  <BlockActionSeparator />
+  <BlockActionSeparator :editor="editor" />
 </template>

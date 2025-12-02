@@ -1,27 +1,13 @@
 <script lang="ts" setup>
 import type { Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown, vTooltip } from "@halo-dev/components";
 import { ref, type Component } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    editor: Editor;
-    isActive?: ({ editor }: { editor: Editor }) => boolean;
-    visible?: ({ editor }: { editor: Editor }) => boolean;
-    icon?: Component;
-    iconStyle?: string;
-    title?: string;
-    action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
-  }>(),
-  {
-    isActive: () => false,
-    visible: () => true,
-    title: undefined,
-    action: undefined,
-    icon: undefined,
-    iconStyle: undefined,
-  }
-);
+const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
+  isActive: () => false,
+  visible: () => true,
+});
 
 const componentRef = ref<Component | void>();
 const handleBubbleItemClick = (editor: Editor) => {
