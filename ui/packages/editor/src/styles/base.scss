@@ -1,6 +1,7 @@
 .halo-rich-text-editor {
   $editorVerticalPadding: 15px;
-  $editorContentMaxWidth: 64rem;
+  $editorHorizontalPadding: 1rem;
+  $editorContentMaxWidth: 70rem;
 
   box-sizing: border-box;
   height: 100%;
@@ -10,21 +11,61 @@
 
   .editor-header {
     height: 48px;
+    flex: none;
   }
 
-  .editor-header-extra {
-    padding: $editorVerticalPadding 1rem;
-    max-width: $editorContentMaxWidth;
-    margin: 0 auto;
+  .editor-entry {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex-shrink: 1;
+    flex: 1 1 0%;
+    overflow: hidden;
+
+    .editor-main {
+      position: relative;
+      min-width: 0;
+      flex: 1 1 0%;
+      flex-shrink: 1;
+      overflow-y: auto;
+      background-color: theme("colors.white");
+
+      &-extra {
+        padding: $editorVerticalPadding $editorHorizontalPadding;
+        max-width: $editorContentMaxWidth;
+        margin: 0 auto;
+
+        @media (min-width: theme("screens.sm")) {
+          padding-left: 3.5rem;
+          padding-right: 3.5rem;
+        }
+      }
+    }
+
+    &-extra {
+      display: none;
+      height: 100%;
+      width: theme("width.72");
+      flex: none;
+      flex-shrink: 0;
+
+      @media (min-width: theme("screens.sm")) {
+        display: block;
+      }
+    }
   }
 
-  .editor-content {
+  .editor-main-content {
     width: 100%;
     position: relative;
 
     .ProseMirror {
       outline: none !important;
-      padding: $editorVerticalPadding 1rem;
+      padding-left: $editorHorizontalPadding;
+      padding-right: $editorHorizontalPadding;
+      padding-top: $editorVerticalPadding;
+      padding-bottom: 30vh;
       max-width: $editorContentMaxWidth;
       margin: 0 auto;
 
@@ -84,6 +125,11 @@
 
       code br {
         display: initial;
+      }
+
+      @media (min-width: theme("screens.sm")) {
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
       }
     }
 

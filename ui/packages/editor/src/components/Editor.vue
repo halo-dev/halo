@@ -37,23 +37,20 @@ watch(
   <div v-if="editor" class="halo-rich-text-editor">
     <editor-bubble-menu :editor="editor" />
     <editor-drag-handle :editor="editor" />
-    <editor-header :editor="editor" class="flex-none" />
-    <div class="flex size-full min-h-0 flex-1 shrink overflow-hidden">
-      <div class="relative min-w-0 flex-1 shrink overflow-y-auto bg-white">
-        <div v-if="$slots.content" class="editor-header-extra">
+    <editor-header :editor="editor" />
+    <div class="editor-entry">
+      <div class="editor-main">
+        <div v-if="$slots.content" class="editor-main-extra">
           <slot name="content" />
         </div>
 
         <editor-content
           :editor="editor"
           :style="contentStyles"
-          class="editor-content markdown-body relative"
+          class="editor-main-content markdown-body"
         />
       </div>
-      <div
-        v-if="$slots.extra"
-        class="hidden h-full w-72 flex-none flex-shrink-0 sm:block"
-      >
+      <div v-if="$slots.extra" class="editor-entry-extra">
         <slot name="extra"></slot>
       </div>
     </div>
