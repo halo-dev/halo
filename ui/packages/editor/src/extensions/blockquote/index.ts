@@ -1,4 +1,4 @@
-import ToolbarItemVue from "@/components/toolbar/ToolbarItem.vue";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -18,7 +18,7 @@ export const ExtensionBlockquote =
         getToolbarItems({ editor }: { editor: Editor }) {
           return {
             priority: 90,
-            component: markRaw(ToolbarItemVue),
+            component: markRaw(ToolbarItem),
             props: {
               editor,
               isActive: editor.isActive("blockquote"),

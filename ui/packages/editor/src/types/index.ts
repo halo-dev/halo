@@ -19,17 +19,21 @@ import type {
   VirtualElement,
 } from "@floating-ui/dom";
 import type { Component } from "vue";
+
 export interface ToolbarItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    isActive: boolean;
-    disabled?: boolean;
-    icon?: Component;
-    title?: string;
-    action?: () => void;
-  };
+  props: Omit<ToolbarItemComponentProps, "children">;
+  children?: ToolbarItemType[];
+}
+
+export interface ToolbarItemComponentProps {
+  editor: Editor;
+  isActive: boolean;
+  disabled?: boolean;
+  icon?: Component;
+  title?: string;
+  action?: () => void;
   children?: ToolbarItemType[];
 }
 
@@ -174,13 +178,15 @@ export interface BubbleItemType {
 export interface ToolboxItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    icon?: Component;
-    title?: string;
-    description?: string;
-    action?: () => void;
-  };
+  props: ToolboxItemComponentProps;
+}
+
+export interface ToolboxItemComponentProps {
+  editor: Editor;
+  icon?: Component;
+  title?: string;
+  description?: string;
+  action?: () => void;
 }
 
 export interface ExtensionOptions {

@@ -1,27 +1,9 @@
 <script lang="ts" setup>
-import type { ToolbarItemType } from "@/types";
+import type { ToolbarItemComponentProps } from "@/types";
 import { vTooltip } from "@halo-dev/components";
-import type { Component } from "vue";
 import MdiMenuDown from "~icons/mdi/menu-down";
 
-withDefaults(
-  defineProps<{
-    isActive?: boolean;
-    disabled?: boolean;
-    title?: string;
-    action?: () => void;
-    icon?: Component;
-    children?: ToolbarItemType[];
-  }>(),
-  {
-    isActive: false,
-    disabled: false,
-    title: undefined,
-    action: undefined,
-    icon: undefined,
-    children: undefined,
-  }
-);
+defineProps<ToolbarItemComponentProps>();
 </script>
 
 <template>

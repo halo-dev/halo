@@ -2,27 +2,9 @@
 import { ToolbarItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { Component } from "vue";
+import type { ToolbarItemComponentProps } from "@/types";
 
-const props = withDefaults(
-  defineProps<{
-    editor?: Editor;
-    isActive?: boolean;
-    disabled?: boolean;
-    title?: string;
-    action?: () => void;
-    icon?: Component;
-  }>(),
-  {
-    editor: undefined,
-    isActive: false,
-    disabled: false,
-    title: undefined,
-    action: undefined,
-    icon: undefined,
-  }
-);
+const props = defineProps<ToolbarItemComponentProps>();
 
 function handleSetColor(color?: string) {
   if (!color) {

@@ -1,33 +1,13 @@
 <script lang="ts" setup>
-import type { Editor } from "@/tiptap";
-import type { Component } from "vue";
+import type { ToolboxItemComponentProps } from "@/types";
 
-const props = withDefaults(
-  defineProps<{
-    editor?: Editor;
-    title?: string;
-    description?: string;
-    action?: () => void;
-    icon?: Component;
-  }>(),
-  {
-    editor: undefined,
-    title: undefined,
-    description: undefined,
-    action: undefined,
-    icon: undefined,
-  }
-);
-
-const action = () => {
-  props.action?.();
-};
+defineProps<ToolboxItemComponentProps>();
 </script>
 
 <template>
   <div
     class="group flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 hover:bg-gray-100"
-    @click="action"
+    @click="action?.()"
   >
     <div
       class="size-7 flex-none rounded bg-gray-100 p-1.5 group-hover:bg-white"

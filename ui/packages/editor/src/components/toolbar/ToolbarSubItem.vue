@@ -1,23 +1,8 @@
 <script lang="ts" setup>
+import type { ToolbarItemComponentProps } from "@/types";
 import { IconCheckboxCircle } from "@halo-dev/components";
-import type { Component } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    isActive?: boolean;
-    disabled?: boolean;
-    title?: string;
-    action?: () => void;
-    icon?: Component;
-  }>(),
-  {
-    isActive: false,
-    disabled: false,
-    title: undefined,
-    action: undefined,
-    icon: undefined,
-  }
-);
+const props = defineProps<ToolbarItemComponentProps>();
 
 const action = () => {
   if (props.disabled) return;

@@ -1,6 +1,6 @@
 import { BlockActionSeparator } from "@/components";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
-import ToolboxItemVue from "@/components/toolbox/ToolboxItem.vue";
+import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -181,7 +181,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
       getToolboxItems({ editor }: { editor: Editor }) {
         return {
           priority: 30,
-          component: markRaw(ToolboxItemVue),
+          component: markRaw(ToolboxItem),
           props: {
             editor,
             icon: markRaw(MingcuteMusic2Line),
