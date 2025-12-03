@@ -23,7 +23,7 @@ import type { Component } from "vue";
 export interface ToolbarItemType {
   priority: number;
   component: Component;
-  props: Omit<ToolbarItemComponentProps, "children">;
+  props: Omit<ToolbarItemComponentProps, "children"> & Record<string, unknown>;
   children?: ToolbarItemType[];
 }
 
@@ -166,7 +166,7 @@ export interface BubbleItemType {
   priority: number;
   component?: Component;
   key?: string;
-  props?: Omit<BubbleItemComponentProps, "editor">;
+  props?: Omit<BubbleItemComponentProps, "editor"> & Record<string, unknown>;
 }
 
 export interface BubbleItemComponentProps {
@@ -182,7 +182,7 @@ export interface BubbleItemComponentProps {
 export interface ToolboxItemType {
   priority: number;
   component: Component;
-  props: ToolboxItemComponentProps;
+  props: ToolboxItemComponentProps & Record<string, unknown>;
 }
 
 export interface ToolboxItemComponentProps {
