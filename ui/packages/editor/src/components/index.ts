@@ -13,7 +13,8 @@ export * from "./toolbox";
 // upload
 export * from "./upload";
 
-export { default as BubbleItem } from "./BubbleItem.vue";
+// bubble
+export * from "./bubble";
+
 export { default as RichTextEditor } from "./Editor.vue";
-export { default as EditorBubbleMenu } from "./EditorBubbleMenu.vue";
 export { default as EditorHeader } from "./EditorHeader.vue";
