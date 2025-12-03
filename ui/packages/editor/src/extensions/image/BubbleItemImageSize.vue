@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import {
-  BlockActionButton,
-  BlockActionInput,
-  BlockActionSeparator,
-} from "@/components";
+import { BlockActionInput, BlockActionSeparator } from "@/components";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { computed } from "vue";
@@ -55,48 +52,48 @@ function handleSetSize(size: { width?: string; height?: string }) {
     :editor="props.editor"
   />
 
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.small_size')"
+  <BubbleButton
+    v-if="visible?.({ editor: props.editor })"
+    :title="i18n.global.t('editor.extensions.image.small_size')"
     :is-active="size.width === `25%`"
-    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSize({ width: '25%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectSmall class="size-5" />
     </template>
-  </BlockActionButton>
+  </BubbleButton>
 
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.medium_size')"
+  <BubbleButton
+    v-if="visible?.({ editor: props.editor })"
+    :title="i18n.global.t('editor.extensions.image.medium_size')"
     :is-active="size.width === `50%`"
-    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSize({ width: '50%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectLarge class="size-5" />
     </template>
-  </BlockActionButton>
+  </BubbleButton>
 
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.large_size')"
+  <BubbleButton
+    v-if="visible?.({ editor: props.editor })"
+    :title="i18n.global.t('editor.extensions.image.large_size')"
     :is-active="size.width === `100%`"
-    :visible="visible?.({ editor: props.editor })"
     @click="handleSetSize({ width: '100%', height: 'auto' })"
   >
     <template #icon>
       <MdiImageSizeSelectActual class="size-5" />
     </template>
-  </BlockActionButton>
+  </BubbleButton>
 
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.restore_size')"
-    :visible="visible?.({ editor: props.editor })"
+  <BubbleButton
+    v-if="visible?.({ editor: props.editor })"
+    :title="i18n.global.t('editor.extensions.image.restore_size')"
     @click="handleSetSize({ width: undefined, height: undefined })"
   >
     <template #icon>
       <MdiBackupRestore class="size-5" />
     </template>
-  </BlockActionButton>
+  </BubbleButton>
 
   <BlockActionSeparator
     v-if="visible?.({ editor: props.editor })"

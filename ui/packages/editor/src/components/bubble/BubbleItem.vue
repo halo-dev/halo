@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { Editor } from "@/tiptap";
 import type { BubbleItemComponentProps } from "@/types";
-import { VDropdown, vTooltip } from "@halo-dev/components";
+import { VDropdown } from "@halo-dev/components";
 import { ref, type Component } from "vue";
+import BubbleButton from "./BubbleButton.vue";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
   isActive: () => false,
@@ -31,21 +32,15 @@ const handleBubbleItemClick = (editor: Editor) => {
     :distance="10"
     @hide="componentRef = undefined"
   >
-    <button
-      v-tooltip="{
-        content: title,
-        distance: 8,
-        delay: {
-          show: 0,
-        },
-      }"
-      :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
+    <BubbleButton
       :title="title"
-      class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
+      :is-active="isActive({ editor })"
       @click="handleBubbleItemClick(editor)"
     >
-      <component :is="icon" :style="iconStyle" class="size-5" />
-    </button>
+      <template #icon>
+        <component :is="icon" :style="iconStyle" class="size-5" />
+      </template>
+    </BubbleButton>
     <template #popper>
       <div
         class="relative max-h-72 w-96 overflow-hidden overflow-y-auto bg-white"

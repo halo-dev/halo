@@ -28,6 +28,7 @@ export const ExtensionFontSize =
               editor,
               isActive: false,
               icon: markRaw(MingcuteFontSizeLine),
+              title: i18n.global.t("editor.extensions.font_size.title"),
             },
             children: [
               {

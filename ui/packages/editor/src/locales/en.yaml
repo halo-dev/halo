@@ -137,6 +137,8 @@ editor:
           description: >-
             External link detected. Would you like to automatically upload
             it to the attachment library?
+    font_size:
+      title: Font size
   components:
     color_picker:
       more_color: More

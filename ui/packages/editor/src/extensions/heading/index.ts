@@ -57,6 +57,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             isActive:
               editor.isActive("paragraph") || editor.isActive("heading"),
             icon: markRaw(getIcon(editor)),
+            title: i18n.global.t("editor.common.heading.title"),
           },
           children: [
             {
