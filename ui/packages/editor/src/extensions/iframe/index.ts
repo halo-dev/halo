@@ -25,12 +25,9 @@ import MdiDesktopMac from "~icons/mdi/desktop-mac";
 import MdiTabletIpad from "~icons/mdi/tablet-ipad";
 import MdiWeb from "~icons/mdi/web";
 import MdiWebSync from "~icons/mdi/web-sync";
-import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
-import MingcuteAlignJustifyLine from "~icons/mingcute/align-justify-line";
-import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
-import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
 import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import BubbleItemIframeAlign from "./BubbleItemIframeAlign.vue";
 import BubbleIframeLink from "./BubbleItemIframeLink.vue";
 import BubbleIframeSize from "./BubbleItemIframeSize.vue";
 import IframeView from "./IframeView.vue";
@@ -368,42 +365,14 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
             },
             {
               priority: 90,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MingcuteAlignLeftLine),
-                action: () => handleSetTextAlign(editor, "left"),
-              },
+              component: markRaw(BubbleItemIframeAlign),
             },
             {
               priority: 100,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MingcuteAlignCenterLine),
-                action: () => handleSetTextAlign(editor, "center"),
-              },
-            },
-            {
-              priority: 110,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MingcuteAlignRightLine),
-                action: () => handleSetTextAlign(editor, "right"),
-              },
-            },
-            {
-              priority: 120,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MingcuteAlignJustifyLine),
-                action: () => handleSetTextAlign(editor, "justify"),
-              },
-            },
-            {
-              priority: 130,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 140,
+              priority: 110,
               props: {
                 icon: markRaw(MdiWebSync),
                 action: () => {
@@ -417,7 +386,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 150,
+              priority: 120,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
@@ -427,7 +396,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 160,
+              priority: 130,
               props: {
                 icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
@@ -440,7 +409,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 190,
+              priority: 140,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
@@ -468,11 +437,4 @@ const handleSetSize = (editor: Editor, width: string, height: string) => {
     .focus()
     .setNodeSelection(editor.state.selection.from)
     .run();
-};
-
-const handleSetTextAlign = (
-  editor: Editor,
-  align: "left" | "center" | "right" | "justify"
-) => {
-  editor.chain().focus().setTextAlign(align).run();
 };
