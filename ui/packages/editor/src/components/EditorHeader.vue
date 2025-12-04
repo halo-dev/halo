@@ -62,11 +62,7 @@ function getToolboxItemsFromExtensions() {
     class="editor-header space-x-1 overflow-auto border-b bg-white px-1 py-1 text-center shadow-sm"
   >
     <div class="inline-flex h-full items-center gap-1">
-      <VDropdown
-        :triggers="['click']"
-        :popper-triggers="['click']"
-        popper-class="[&_.v-popper\_\_inner]:!p-0"
-      >
+      <VDropdown :triggers="['click']" :popper-triggers="['click']">
         <template #default="{ shown }">
           <button
             class="inline-flex size-8 items-center justify-center rounded-md p-1 transition-colors hover:bg-gray-100 active:!bg-gray-200"
@@ -77,9 +73,7 @@ function getToolboxItemsFromExtensions() {
           </button>
         </template>
         <template #popper>
-          <div
-            class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white p-1.5"
-          >
+          <div class="relative max-h-96 w-56 overflow-hidden overflow-y-auto">
             <component
               :is="toolboxItem.component"
               v-for="(toolboxItem, index) in getToolboxItemsFromExtensions()"
@@ -107,7 +101,6 @@ function getToolboxItemsFromExtensions() {
             tabindex="-1"
             :triggers="['click']"
             :popper-triggers="['click']"
-            popper-class="[&_.v-popper\_\_inner]:!p-0"
           >
             <template #default="{ shown }">
               <component
@@ -120,7 +113,7 @@ function getToolboxItemsFromExtensions() {
             </template>
             <template #popper>
               <div
-                class="relative max-h-96 w-56 space-y-1.5 overflow-hidden overflow-y-auto bg-white p-1.5"
+                class="relative max-h-96 w-56 overflow-hidden overflow-y-auto"
               >
                 <component
                   v-bind="child.props"

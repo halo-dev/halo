@@ -6,7 +6,9 @@ defineProps<ToolboxItemComponentProps>();
 
 <template>
   <div
-    class="group flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 hover:bg-gray-100"
+    role="menuitem"
+    tabindex="-1"
+    class="group my-1.5 flex cursor-pointer flex-row items-center gap-3 rounded px-1.5 py-1 transition-colors first:mt-0 last:mb-0 hover:bg-gray-100"
     @click="action?.()"
   >
     <div
