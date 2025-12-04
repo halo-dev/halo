@@ -29,6 +29,7 @@ import MingcuteMusic2Line from "~icons/mingcute/music-2-line";
 import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import AudioView from "./AudioView.vue";
 import BubbleItemAudioLink from "./BubbleItemAudioLink.vue";
+import BubbleItemAudioPosition from "./BubbleItemAudioPosition.vue";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -97,7 +98,20 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
           };
         },
       },
-
+      position: {
+        default: "left",
+        parseHTML: (element) => {
+          return (
+            element.getAttribute("data-position") ||
+            element.getAttribute("text-align")
+          );
+        },
+        renderHTML: (attributes) => {
+          return {
+            "data-position": attributes.position,
+          };
+        },
+      },
       file: {
         default: null,
         renderHTML() {
@@ -206,28 +220,31 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
         return {
           pluginKey: AUDIO_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
-            return isActive(state, Audio.name);
+            return isActive(state, ExtensionAudio.name);
           },
           items: [
             {
               priority: 10,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
                 },
                 isActive: () => {
-                  return editor.getAttributes(Audio.name).autoplay;
+                  return editor.getAttributes(ExtensionAudio.name).autoplay;
                 },
                 icon: markRaw(
-                  editor.getAttributes(Audio.name).autoplay
+                  editor.getAttributes(ExtensionAudio.name).autoplay
                     ? MdiPlayCircle
                     : MdiPlayCircleOutline
                 ),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Audio.name, {
-                      autoplay: editor.getAttributes(Audio.name).autoplay
+                    .updateAttributes(ExtensionAudio.name, {
+                      autoplay: editor.getAttributes(ExtensionAudio.name)
+                        .autoplay
                         ? null
                         : true,
                     })
@@ -235,7 +252,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
                     .focus()
                     .run();
                 },
-                title: editor.getAttributes(Audio.name).autoplay
+                title: editor.getAttributes(ExtensionAudio.name).autoplay
                   ? i18n.global.t("editor.extensions.audio.disable_autoplay")
                   : i18n.global.t("editor.extensions.audio.enable_autoplay"),
               },
@@ -244,27 +261,31 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
               priority: 20,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
                 },
                 isActive: () => {
-                  return editor.getAttributes(Audio.name).loop;
+                  return editor.getAttributes(ExtensionAudio.name).loop;
                 },
                 icon: markRaw(
-                  editor.getAttributes(Audio.name).loop
+                  editor.getAttributes(ExtensionAudio.name).loop
                     ? MdiMotionPlay
                     : MdiMotionPlayOutline
                 ),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Audio.name, {
-                      loop: editor.getAttributes(Audio.name).loop ? null : true,
+                    .updateAttributes(ExtensionAudio.name, {
+                      loop: editor.getAttributes(ExtensionAudio.name).loop
+                        ? null
+                        : true,
                     })
                     .setNodeSelection(editor.state.selection.from)
                     .focus()
                     .run();
                 },
-                title: editor.getAttributes(Audio.name).loop
+                title: editor.getAttributes(ExtensionAudio.name).loop
                   ? i18n.global.t("editor.extensions.audio.disable_loop")
                   : i18n.global.t("editor.extensions.audio.enable_loop"),
               },
@@ -274,12 +295,36 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
                 },
               },
             },
             {
               priority: 40,
+              component: markRaw(BubbleItemAudioPosition),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
+                },
+              },
+            },
+            {
+              priority: 50,
+              component: markRaw(BlockActionSeparator),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
+                },
+              },
+            },
+            {
+              priority: 60,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
@@ -289,24 +334,29 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
               },
             },
             {
-              priority: 50,
+              priority: 70,
               props: {
                 visible({ editor }) {
-                  return !isEmpty(editor.getAttributes(Audio.name).src);
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionAudio.name).src
+                  );
                 },
                 icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
-                  window.open(editor.getAttributes(Audio.name).src, "_blank");
+                  window.open(
+                    editor.getAttributes(ExtensionAudio.name).src,
+                    "_blank"
+                  );
                 },
               },
             },
             {
-              priority: 60,
+              priority: 80,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 70,
+              priority: 90,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
@@ -314,7 +364,10 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
                   const figureParent = findParentNode(
                     (node) => node.type.name === "figure"
                   )(editor.state.selection);
-                  deleteNode(figureParent ? "figure" : Audio.name, editor);
+                  deleteNode(
+                    figureParent ? "figure" : ExtensionAudio.name,
+                    editor
+                  );
                 },
               },
             },
