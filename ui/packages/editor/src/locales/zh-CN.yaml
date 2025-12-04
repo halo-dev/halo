@@ -110,6 +110,7 @@ editor:
       add_image: 添加图片
       empty_prompt: 点击选择图片或拖拽图片到这里
       group_size: 每行图片数
+      group_size_label: 每行 {count} 张图片
       layout:
         title: 布局
         auto: 自适应

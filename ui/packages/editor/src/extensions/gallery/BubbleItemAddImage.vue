@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import { VDropdown, VDropdownItem } from "@halo-dev/components";
+import { VDropdown } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { ref } from "vue";
 import type { ExtensionGalleryImageItem } from ".";
@@ -52,15 +54,13 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
 
 <template>
   <VDropdown v-model:shown="dropdownShown" :triggers="['click']" :distance="10">
-    <button
-      :title="title"
-      class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
-      :class="{ 'bg-gray-200': dropdownShown }"
-    >
-      <component :is="icon" :style="iconStyle" class="size-5" />
-    </button>
+    <BubbleButton :title="title" :is-active="dropdownShown">
+      <template #icon>
+        <component :is="icon" :style="iconStyle" class="size-5" />
+      </template>
+    </BubbleButton>
     <template #popper>
-      <VDropdownItem
+      <DropdownItem
         v-if="
           utils.permission.has([
             'uc:attachments:manage',
@@ -71,8 +71,8 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
         @click="handleUploadClick"
       >
         {{ i18n.global.t("editor.common.button.upload") }}
-      </VDropdownItem>
-      <VDropdownItem
+      </DropdownItem>
+      <DropdownItem
         v-if="
           utils.permission.has([
             'system:attachments:view',
@@ -83,7 +83,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
         @click="handleOpenAttachmentSelector"
       >
         {{ i18n.global.t("editor.extensions.upload.attachment.title") }}
-      </VDropdownItem>
+      </DropdownItem>
     </template>
   </VDropdown>
   <AttachmentSelectorModal

@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { BlockActionSeparator } from "@/components";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import {
-  IconCheckboxCircle,
-  VDropdown,
-  VDropdownItem,
-  vTooltip,
-} from "@halo-dev/components";
+import { VDropdown } from "@halo-dev/components";
 import { computed, ref } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+import MingcuteDotGridLine from "~icons/mingcute/dot-grid-line";
 import { ExtensionGallery } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();
@@ -47,27 +44,30 @@ function handleSetGroupSize(size: number) {
     :triggers="['click']"
     :distance="10"
   >
-    <button
-      v-tooltip="i18n.global.t('editor.extensions.gallery.group_size')"
-      class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.gallery.group_size')"
+      :text="
+        i18n.global.t('editor.extensions.gallery.group_size_label', {
+          count: groupSize,
+        })
+      "
+      show-more-indicator
     >
-      <span>{{ groupSize }}</span>
-      <IconArrowDownLine class="size-4" />
-    </button>
+      <template #icon>
+        <MingcuteDotGridLine class="size-5" />
+      </template>
+    </BubbleButton>
 
     <template #popper>
-      <VDropdownItem
+      <DropdownItem
         v-for="option in options"
         :key="option"
         class="!min-w-36"
+        :is-active="option === groupSize"
         @click="handleSetGroupSize(option)"
       >
         {{ option }}
-
-        <template v-if="option === groupSize" #suffix-icon>
-          <IconCheckboxCircle class="size-4" />
-        </template>
-      </VDropdownItem>
+      </DropdownItem>
     </template>
   </VDropdown>
 

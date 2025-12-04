@@ -110,6 +110,7 @@ editor:
       add_image: Add image
       empty_prompt: Click to select images or drag images here
       group_size: Images per row
+      group_size_label: "{count} images per row"
       layout:
         title: Layout
         auto: Auto
