@@ -2,7 +2,7 @@
 import { EditorLinkObtain } from "@/components";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
-import type { NodeViewProps } from "@/tiptap";
+import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton } from "@halo-dev/components";
 import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";

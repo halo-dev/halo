@@ -162,7 +162,7 @@
     "tsdown": "^0.16.6",
     "typescript": "~5.9.3",
     "unplugin-icons": "^22.5.0",
-    "vite": "npm:rolldown-vite@7.2.7",
+    "vite": "^8.0.0-beta.0",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.2",
@@ -176,8 +176,7 @@
       "@lezer/javascript": "1.5.4",
       "prosemirror-model": "1.25.1",
       "prosemirror-transform": "1.10.4",
-      "prosemirror-view": "1.40.0",
-      "vite": "npm:rolldown-vite@7.2.7"
+      "prosemirror-view": "1.40.0"
     },
     "onlyBuiltDependencies": [
       "@nestjs/core",
