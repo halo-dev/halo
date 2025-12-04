@@ -23,9 +23,6 @@ import TiptapImage from "@tiptap/extension-image";
 import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
-import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
-import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
-import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
 import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
 import MingcuteLink2Line from "~icons/mingcute/link-2-line";
@@ -37,7 +34,8 @@ import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
 import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
 import BubbleItemImageHref from "./BubbleItemImageHref.vue";
-import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
+import BubbleItemImageLink from "./BubbleItemImageLink.vue";
+import BubbleItemImagePosition from "./BubbleItemImagePosition.vue";
 import BubbleItemImageSize from "./BubbleItemImageSize.vue";
 import ImageView from "./ImageView.vue";
 
@@ -297,51 +295,17 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             },
             {
               priority: 20,
+              component: markRaw(BubbleItemImagePosition),
               props: {
                 visible({ editor }) {
                   return !isEmpty(
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                isActive: () => {
-                  return editor.isActive({ position: "left" });
-                },
-                icon: markRaw(MingcuteAlignLeftLine),
-                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
               priority: 30,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "center" });
-                },
-                icon: markRaw(MingcuteAlignCenterLine),
-                action: () => handleSetPosition(editor, "center"),
-              },
-            },
-            {
-              priority: 40,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "right" });
-                },
-                icon: markRaw(MingcuteAlignRightLine),
-                action: () => handleSetPosition(editor, "right"),
-              },
-            },
-            {
-              priority: 60,
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
@@ -352,17 +316,17 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 70,
+              priority: 40,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
-                  return markRaw(BubbleItemVideoLink);
+                  return markRaw(BubbleItemImageLink);
                 },
               },
             },
             {
-              priority: 80,
+              priority: 50,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -380,7 +344,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 90,
+              priority: 60,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -395,7 +359,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 100,
+              priority: 70,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -409,9 +373,8 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 },
               },
             },
-
             {
-              priority: 110,
+              priority: 80,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -464,11 +427,11 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 120,
+              priority: 90,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 130,
+              priority: 100,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
@@ -506,15 +469,3 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
     loading: "lazy",
   },
 });
-
-const handleSetPosition = (
-  editor: Editor,
-  position: "left" | "center" | "right"
-) => {
-  return editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionImage.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
-    .run();
-};
