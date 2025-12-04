@@ -1,13 +1,8 @@
 export * from "./core";
-export {
-  Editor,
-  Fragment,
-  MarkView,
-  type MarkType,
-  type NodeType,
-} from "./core";
+export { Editor, MarkView, type MarkType, type NodeType } from "./core";
 export * from "./pm";
 export {
+  Fragment,
   InputRule as PMInputRule,
   Mark as PMMark,
   Node as PMNode,
