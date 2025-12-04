@@ -70,7 +70,7 @@ const handleSetAlign = (align: string) => {
       show-more-indicator
     >
       <template #icon>
-        <component :is="currentAlign.icon" class="size-5" />
+        <component :is="currentAlign.icon" />
       </template>
     </BubbleButton>
 

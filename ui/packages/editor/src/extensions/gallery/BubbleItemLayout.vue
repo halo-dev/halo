@@ -57,7 +57,7 @@ function handleSetLayout(layout: string) {
       show-more-indicator
     >
       <template #icon>
-        <component :is="currentLayout.icon" class="size-5" />
+        <component :is="currentLayout.icon" />
       </template>
     </BubbleButton>
 

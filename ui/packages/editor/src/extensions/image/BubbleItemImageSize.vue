@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { BlockActionInput, BlockActionSeparator } from "@/components";
+import Input from "@/components/base/Input.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown } from "@halo-dev/components";
 import { computed } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
@@ -12,15 +13,21 @@ import { ExtensionImage } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();
 
-const size = computed({
+const width = computed({
   get: () => {
-    return {
-      width: props.editor.getAttributes(ExtensionImage.name).width,
-      height: props.editor.getAttributes(ExtensionImage.name).height,
-    };
+    return props.editor.getAttributes(ExtensionImage.name).width;
   },
-  set: (size: { width?: string; height?: string }) => {
-    handleSetSize(size);
+  set: (width: string) => {
+    handleSetSize({ width, height: height.value });
+  },
+});
+
+const height = computed({
+  get: () => {
+    return props.editor.getAttributes(ExtensionImage.name).height;
+  },
+  set: (height: string) => {
+    handleSetSize({ width: width.value, height });
   },
 });
 
@@ -32,71 +39,83 @@ function handleSetSize(size: { width?: string; height?: string }) {
     .focus()
     .run();
 }
+
+const presetSizes = [
+  {
+    width: "25%",
+    height: "auto",
+    icon: MdiImageSizeSelectSmall,
+    title: i18n.global.t("editor.extensions.image.small_size"),
+  },
+  {
+    width: "50%",
+    height: "auto",
+    icon: MdiImageSizeSelectLarge,
+    title: i18n.global.t("editor.extensions.image.medium_size"),
+  },
+  {
+    width: "100%",
+    height: "auto",
+    icon: MdiImageSizeSelectActual,
+    title: i18n.global.t("editor.extensions.image.large_size"),
+  },
+  {
+    width: undefined,
+    height: undefined,
+    icon: MdiBackupRestore,
+    title: i18n.global.t("editor.extensions.image.restore_size"),
+  },
+];
 </script>
 
 <template>
-  <BlockActionInput
-    v-model.lazy.trim="size.width"
-    :visible="visible?.({ editor: props.editor })"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
-  />
-
-  <BlockActionInput
-    v-model.lazy.trim="size.height"
-    :visible="visible?.({ editor: props.editor })"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
-  />
-
-  <BlockActionSeparator
-    v-if="visible?.({ editor: props.editor })"
-    :editor="props.editor"
-  />
-
-  <BubbleButton
-    v-if="visible?.({ editor: props.editor })"
-    :title="i18n.global.t('editor.extensions.image.small_size')"
-    :is-active="size.width === `25%`"
-    @click="handleSetSize({ width: '25%', height: 'auto' })"
+  <VDropdown
+    v-if="visible?.({ editor })"
+    class="inline-flex"
+    :auto-hide="true"
+    :distance="10"
   >
-    <template #icon>
-      <MdiImageSizeSelectSmall class="size-5" />
-    </template>
-  </BubbleButton>
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.image.resize')"
+      show-more-indicator
+    >
+      <template #icon>
+        <MdiImageSizeSelectSmall />
+      </template>
+    </BubbleButton>
+    <template #popper>
+      <div class="flex w-56 flex-col gap-3">
+        <div class="flex flex-col items-center gap-3">
+          <Input
+            v-model="width"
+            :label="i18n.global.t('editor.common.width')"
+            :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
+          />
+          <Input
+            v-model="height"
+            :label="i18n.global.t('editor.common.height')"
+            :tooltip="
+              i18n.global.t('editor.common.tooltip.custom_height_input')
+            "
+          />
+        </div>
 
-  <BubbleButton
-    v-if="visible?.({ editor: props.editor })"
-    :title="i18n.global.t('editor.extensions.image.medium_size')"
-    :is-active="size.width === `50%`"
-    @click="handleSetSize({ width: '50%', height: 'auto' })"
-  >
-    <template #icon>
-      <MdiImageSizeSelectLarge class="size-5" />
+        <div class="flex items-center gap-1 rounded-md bg-gray-100 p-1">
+          <button
+            v-for="item in presetSizes"
+            :key="item.width"
+            v-tooltip="item.title"
+            class="inline-flex flex-1 items-center justify-center rounded px-2 py-1.5 text-gray-600 transition-all hover:text-gray-900"
+            :class="{
+              'bg-white text-gray-900':
+                item.width === width && item.height === height,
+            }"
+            @click="handleSetSize({ width: item.width, height: item.height })"
+          >
+            <component :is="item.icon" />
+          </button>
+        </div>
+      </div>
     </template>
-  </BubbleButton>
-
-  <BubbleButton
-    v-if="visible?.({ editor: props.editor })"
-    :title="i18n.global.t('editor.extensions.image.large_size')"
-    :is-active="size.width === `100%`"
-    @click="handleSetSize({ width: '100%', height: 'auto' })"
-  >
-    <template #icon>
-      <MdiImageSizeSelectActual class="size-5" />
-    </template>
-  </BubbleButton>
-
-  <BubbleButton
-    v-if="visible?.({ editor: props.editor })"
-    :title="i18n.global.t('editor.extensions.image.restore_size')"
-    @click="handleSetSize({ width: undefined, height: undefined })"
-  >
-    <template #icon>
-      <MdiBackupRestore class="size-5" />
-    </template>
-  </BubbleButton>
-
-  <BlockActionSeparator
-    v-if="visible?.({ editor: props.editor })"
-    :editor="editor"
-  />
+  </VDropdown>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { BlockActionInput, BlockActionSeparator } from "@/components";
+import { BlockActionSeparator } from "@/components";
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { computed } from "vue";
@@ -35,12 +36,12 @@ const handleSetSize = (width: string, height: string) => {
 };
 </script>
 <template>
-  <BlockActionInput
+  <Input
     v-model.lazy.trim="width"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
   />
 
-  <BlockActionInput
+  <Input
     v-model.lazy.trim="height"
     :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
   />

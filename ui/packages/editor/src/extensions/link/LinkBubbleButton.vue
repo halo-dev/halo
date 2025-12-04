@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown, vTooltip } from "@halo-dev/components";
@@ -103,31 +104,20 @@ const handleLinkBubbleButton = () => {
     </button>
 
     <template #popper>
-      <div
-        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto bg-white"
-      >
-        <input
+      <div class="relative w-96">
+        <Input
           v-model.lazy="href"
           :placeholder="i18n.global.t('editor.extensions.link.placeholder')"
-          class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
         />
         <label class="mr-2 mt-2 inline-flex items-center">
-          <input
-            v-model="target"
-            type="checkbox"
-            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
+          <input v-model="target" type="checkbox" />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
           </span>
         </label>
         <label class="mt-2 inline-flex items-center">
           <!-- nofollow -->
-          <input
-            v-model="rel"
-            type="checkbox"
-            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
+          <input v-model="rel" type="checkbox" />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.nofollow") }}
           </span>

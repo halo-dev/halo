@@ -12,6 +12,7 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
+import Input from "../base/Input.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -219,16 +220,17 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
               {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
             <template #popper>
-              <input
-                v-model="externalLink"
-                class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
-                :placeholder="
-                  i18n.global.t(
-                    'editor.extensions.upload.permalink.placeholder'
-                  )
-                "
-                @keydown.enter="handleEnterSetExternalLink"
-              />
+              <div class="w-60">
+                <Input
+                  v-model="externalLink"
+                  :placeholder="
+                    i18n.global.t(
+                      'editor.extensions.upload.permalink.placeholder'
+                    )
+                  "
+                  @keydown.enter="handleEnterSetExternalLink"
+                />
+              </div>
             </template>
           </VDropdown>
         </VSpace>

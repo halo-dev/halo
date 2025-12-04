@@ -42,13 +42,9 @@ const handleBubbleItemClick = (editor: Editor) => {
       </template>
     </BubbleButton>
     <template #popper>
-      <div
-        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto bg-white"
-      >
-        <KeepAlive>
-          <component :is="componentRef" v-bind="props"></component>
-        </KeepAlive>
-      </div>
+      <KeepAlive>
+        <component :is="componentRef" v-bind="props"></component>
+      </KeepAlive>
     </template>
   </VDropdown>
 </template>

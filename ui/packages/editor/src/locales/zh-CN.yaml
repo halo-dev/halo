@@ -47,11 +47,13 @@ editor:
       cancel_link: 取消链接
       nofollow: 搜索引擎忽略链接关系
     audio:
+      src_input_label: 音频链接
       disable_autoplay: 关闭自动播放
       enable_autoplay: 开启自动播放
       disable_loop: 关闭循环播放
       enable_loop: 开启循环播放
     iframe:
+      src_input_label: 网页链接
       disable_frameborder: 取消边框
       enable_frameborder: 设置边框
       phone_size: 手机尺寸
@@ -59,6 +61,9 @@ editor:
       tablet_horizontal_size: 平板电脑横向尺寸
       desktop_size: 桌面电脑尺寸
     image:
+      src_input_label: 图片链接
+      href_input_label: 图片跳转链接
+      resize: 调整尺寸
       small_size: 小尺寸
       medium_size: 中尺寸
       large_size: 大尺寸
@@ -69,6 +74,7 @@ editor:
       edit_caption: 图片描述文本
       image_load_error: 图片加载失败
     video:
+      src_input_label: 视频链接
       disable_controls: 隐藏控制面板
       enable_controls: 显示控制面板
       disable_autoplay: 关闭自动播放
@@ -140,6 +146,9 @@ editor:
     color_picker:
       more_color: 更多颜色
   common:
+    alt: 替代文本
+    width: 宽度
+    height: 高度
     align_method: 对齐方式
     align_left: 左对齐
     align_center: 居中

@@ -54,7 +54,7 @@ function handleSetGroupSize(size: number) {
       show-more-indicator
     >
       <template #icon>
-        <MingcuteDotGridLine class="size-5" />
+        <MingcuteDotGridLine />
       </template>
     </BubbleButton>
 

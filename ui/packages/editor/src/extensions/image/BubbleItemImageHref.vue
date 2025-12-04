@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Input from "@/components/base/Input.vue";
 import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
@@ -31,20 +32,18 @@ const target = computed({
 </script>
 
 <template>
-  <input
-    v-if="visible?.({ editor: props.editor })"
-    v-model.lazy="href"
-    :placeholder="i18n.global.t('editor.common.placeholder.alt_href')"
-    class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
-  />
-  <label class="mt-2 inline-flex items-center">
-    <input
-      v-model="target"
-      type="checkbox"
-      class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+  <div class="w-60">
+    <Input
+      v-if="visible?.({ editor: props.editor })"
+      v-model="href"
+      :placeholder="i18n.global.t('editor.common.placeholder.alt_href')"
+      :label="i18n.global.t('editor.extensions.image.href_input_label')"
     />
-    <span class="ml-2 text-sm text-gray-500">
-      {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
-    </span>
-  </label>
+    <label class="mt-3 inline-flex items-center">
+      <input v-model="target" type="checkbox" />
+      <span class="ml-2 text-sm text-gray-500">
+        {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
+      </span>
+    </label>
+  </div>
 </template>

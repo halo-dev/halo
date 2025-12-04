@@ -36,7 +36,7 @@ const onlyIcon = computed(() => {
       { 'h-8 gap-1 px-1': !onlyIcon },
     ]"
     :title="title"
-    class="text inline-flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
+    class="text inline-flex items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 active:!bg-gray-200 [&>svg]:size-5"
   >
     <slot name="icon" />
     <span v-if="text">{{ text }}</span>

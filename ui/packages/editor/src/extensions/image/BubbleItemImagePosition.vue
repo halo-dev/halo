@@ -69,7 +69,7 @@ const handleSetPosition = (position: string) => {
       show-more-indicator
     >
       <template #icon>
-        <component :is="currentPosition.icon" class="size-5" />
+        <component :is="currentPosition.icon" />
       </template>
     </BubbleButton>
 

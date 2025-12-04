@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { computed } from "vue";
@@ -22,10 +23,11 @@ const alt = computed({
 </script>
 
 <template>
-  <input
-    v-if="visible?.({ editor: props.editor })"
-    v-model.lazy="alt"
-    :placeholder="i18n.global.t('editor.common.placeholder.alt_input')"
-    class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
-  />
+  <div v-if="visible?.({ editor: props.editor })" class="w-56">
+    <Input
+      v-model="alt"
+      :label="i18n.global.t('editor.common.alt')"
+      :placeholder="i18n.global.t('editor.common.placeholder.alt_input')"
+    />
+  </div>
 </template>

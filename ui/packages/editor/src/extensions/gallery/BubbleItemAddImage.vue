@@ -56,7 +56,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
   <VDropdown v-model:shown="dropdownShown" :triggers="['click']" :distance="10">
     <BubbleButton :title="title" :is-active="dropdownShown">
       <template #icon>
-        <component :is="icon" :style="iconStyle" class="size-5" />
+        <component :is="icon" :style="iconStyle" />
       </template>
     </BubbleButton>
     <template #popper>
