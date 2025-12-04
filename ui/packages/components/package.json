@@ -61,8 +61,7 @@
     "eslint-plugin-storybook": "10.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^10.0.8",
-    "vite": "npm:rolldown-vite@7.2.0"
+    "storybook": "^10.0.8"
   },
   "peerDependencies": {
     "vue": "^3.5.x",

@@ -70,7 +70,7 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
           advancedChunks: {
             groups: [
