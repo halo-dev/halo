@@ -6,12 +6,13 @@ import { TextSelection } from "@tiptap/pm/state";
 import { test } from "linkifyjs";
 import { computed } from "vue";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
+import { ExtensionLink } from ".";
 
 const props = defineProps<BubbleItemComponentProps>();
 
 const href = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.href;
   },
   set(value) {
@@ -25,7 +26,7 @@ const href = computed({
 
 const target = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.target === "_blank";
   },
   set(value) {
@@ -39,7 +40,7 @@ const target = computed({
 
 const rel = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.rel === "nofollow";
   },
   set(value) {

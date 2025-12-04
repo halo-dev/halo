@@ -44,7 +44,7 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
               .focus()
               .deleteRange(range)
               .setDetails()
-              .updateAttributes("details", { open: true })
+              .updateAttributes(TiptapDetails.name, { open: true })
               .run();
           },
         };
@@ -55,18 +55,18 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("details"),
+            isActive: editor.isActive(TiptapDetails.name),
             icon: markRaw(MingcuteFoldVerticalLine),
             title: i18n.global.t("editor.extensions.details.command_item"),
             action: () => {
-              if (editor.isActive("details")) {
+              if (editor.isActive(TiptapDetails.name)) {
                 editor.chain().focus().unsetDetails().run();
               } else {
                 editor
                   .chain()
                   .focus()
                   .setDetails()
-                  .updateAttributes("details", { open: true })
+                  .updateAttributes(TiptapDetails.name, { open: true })
                   .run();
               }
             },

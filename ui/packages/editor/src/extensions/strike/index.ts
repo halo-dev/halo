@@ -18,7 +18,7 @@ export const ExtensionStrike = TiptapStrike.extend<ExtensionStrikeOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("strike"),
+            isActive: editor.isActive(TiptapStrike.name),
             icon: markRaw(MingcuteStrikethroughLine),
             title: i18n.global.t("editor.common.strike"),
             action: () => editor.chain().focus().toggleStrike().run(),

@@ -21,7 +21,7 @@ export const ExtensionBlockquote =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("blockquote"),
+              isActive: editor.isActive(TiptapBlockquote.name),
               icon: markRaw(MingcuteBlockquoteLine),
               title: i18n.global.t("editor.common.quote"),
               action: () => {

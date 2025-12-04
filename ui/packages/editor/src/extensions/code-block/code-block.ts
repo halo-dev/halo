@@ -244,19 +244,19 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
         return false;
       },
       Tab: () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           return this.editor.chain().focus().codeIndent().run();
         }
         return false;
       },
       "Shift-Tab": () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           return this.editor.chain().focus().codeOutdent().run();
         }
         return false;
       },
       "Mod-a": () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           const { tr, selection } = this.editor.state;
           const codeBlack = findParentNode(
             (node) => node.type.name === TiptapCodeBlock.name
@@ -294,7 +294,7 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("codeBlock"),
+            isActive: editor.isActive(TiptapCodeBlock.name),
             icon: markRaw(MingcuteBracesLine),
             title: i18n.global.t("editor.common.codeblock.title"),
             action: () => editor.chain().focus().toggleCodeBlock().run(),

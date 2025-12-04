@@ -22,7 +22,7 @@ export const ExtensionSubscript =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("subscript"),
+              isActive: editor.isActive(TiptapSubscript.name),
               icon: markRaw(PhTextSubscript),
               title: i18n.global.t("editor.common.subscript"),
               action: () => editor.chain().focus().toggleSubscript().run(),

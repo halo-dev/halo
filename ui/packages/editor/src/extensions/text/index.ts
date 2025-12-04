@@ -19,6 +19,16 @@ import MingcuteUnderlineLine from "~icons/mingcute/underline-line";
 import MingcuteUnlinkLine from "~icons/mingcute/unlink-line";
 import PhTextSubscript from "~icons/ph/text-subscript";
 import PhTextSuperscript from "~icons/ph/text-superscript";
+import { ExtensionBold } from "../bold";
+import { ExtensionCode } from "../code";
+import { ExtensionColor } from "../color";
+import { ExtensionHighlight } from "../highlight";
+import { ExtensionItalic } from "../italic";
+import { ExtensionLink } from "../link";
+import { ExtensionStrike } from "../strike";
+import { ExtensionSubscript } from "../subscript";
+import { ExtensionSuperscript } from "../superscript";
+import { ExtensionUnderline } from "../underline";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",
@@ -74,7 +84,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 10,
               props: {
-                isActive: ({ editor }) => editor.isActive("bold"),
+                isActive: ({ editor }) => editor.isActive(ExtensionBold.name),
                 icon: markRaw(MingcuteBoldLine),
                 title: i18n.global.t("editor.common.bold"),
                 action: ({ editor }) => {
@@ -85,7 +95,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 20,
               props: {
-                isActive: ({ editor }) => editor.isActive("italic"),
+                isActive: ({ editor }) => editor.isActive(ExtensionItalic.name),
                 icon: markRaw(MingcuteItalicLine),
                 title: i18n.global.t("editor.common.italic"),
                 action: ({ editor }) => {
@@ -96,7 +106,8 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 30,
               props: {
-                isActive: ({ editor }) => editor.isActive("underline"),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionUnderline.name),
                 icon: markRaw(MingcuteUnderlineLine),
                 title: i18n.global.t("editor.common.underline"),
                 action: ({ editor }) =>
@@ -106,7 +117,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 40,
               props: {
-                isActive: ({ editor }) => editor.isActive("strike"),
+                isActive: ({ editor }) => editor.isActive(ExtensionStrike.name),
                 icon: markRaw(MingcuteStrikethroughLine),
                 title: i18n.global.t("editor.common.strike"),
                 action: ({ editor }) =>
@@ -117,7 +128,8 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 50,
               component: markRaw(HighlightBubbleItem),
               props: {
-                isActive: ({ editor }) => editor.isActive("highlight"),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionHighlight.name),
                 icon: markRaw(MingcuteMarkPenLine),
                 title: i18n.global.t("editor.common.highlight"),
               },
@@ -126,7 +138,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 60,
               component: markRaw(ColorBubbleItem),
               props: {
-                isActive: ({ editor }) => editor.isActive("color"),
+                isActive: ({ editor }) => editor.isActive(ExtensionColor.name),
                 icon: markRaw(MingcuteTextColorLine),
                 title: i18n.global.t("editor.common.color"),
               },
@@ -134,7 +146,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 70,
               props: {
-                isActive: ({ editor }) => editor.isActive("code"),
+                isActive: ({ editor }) => editor.isActive(ExtensionCode.name),
                 icon: markRaw(MingcuteCodeLine),
                 title: i18n.global.t("editor.common.code"),
                 action: ({ editor }) =>
@@ -144,7 +156,8 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 80,
               props: {
-                isActive: ({ editor }) => editor.isActive("superscript"),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionSuperscript.name),
                 icon: markRaw(PhTextSuperscript),
                 title: i18n.global.t("editor.common.superscript"),
                 action: ({ editor }) =>
@@ -154,7 +167,8 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
             {
               priority: 90,
               props: {
-                isActive: ({ editor }) => editor.isActive("subscript"),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionSubscript.name),
                 icon: markRaw(PhTextSubscript),
                 title: i18n.global.t("editor.common.subscript"),
                 action: ({ editor }) =>
@@ -165,14 +179,14 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 100,
               component: markRaw(LinkBubbleButton),
               props: {
-                isActive: ({ editor }) => editor.isActive("link"),
+                isActive: ({ editor }) => editor.isActive(ExtensionLink.name),
               },
             },
             {
               priority: 110,
               props: {
                 isActive: () => false,
-                visible: ({ editor }) => editor.isActive("link"),
+                visible: ({ editor }) => editor.isActive(ExtensionLink.name),
                 icon: markRaw(MingcuteUnlinkLine),
                 title: i18n.global.t("editor.extensions.link.cancel_link"),
                 action: ({ editor }) => editor.commands.unsetLink(),
@@ -182,11 +196,11 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               priority: 120,
               props: {
                 isActive: () => false,
-                visible: ({ editor }) => editor.isActive("link"),
+                visible: ({ editor }) => editor.isActive(ExtensionLink.name),
                 icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: ({ editor }) => {
-                  const attrs = editor.getAttributes("link");
+                  const attrs = editor.getAttributes(ExtensionLink.name);
                   if (attrs?.href) {
                     window.open(attrs.href, "_blank");
                   }

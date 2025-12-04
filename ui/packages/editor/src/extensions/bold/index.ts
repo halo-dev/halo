@@ -18,7 +18,7 @@ export const ExtensionBold = TiptapBold.extend<ExtensionBoldOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("bold"),
+            isActive: editor.isActive(TiptapBold.name),
             icon: markRaw(MingcuteBoldLine),
             title: i18n.global.t("editor.common.bold"),
             action: () => {

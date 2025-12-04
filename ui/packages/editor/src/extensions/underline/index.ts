@@ -22,7 +22,7 @@ export const ExtensionUnderline =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("underline"),
+              isActive: editor.isActive(TiptapUnderline.name),
               icon: markRaw(MingcuteUnderlineLine),
               title: i18n.global.t("editor.common.underline"),
               action: () => editor.chain().focus().toggleUnderline().run(),

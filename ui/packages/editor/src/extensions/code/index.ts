@@ -20,7 +20,7 @@ export const ExtensionCode = TiptapCode.extend<ExtensionCodeOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("code"),
+            isActive: editor.isActive(TiptapCode.name),
             icon: markRaw(MingcuteCodeLine),
             title: i18n.global.t("editor.common.code"),
             action: () => editor.chain().focus().toggleCode().run(),

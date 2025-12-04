@@ -18,7 +18,7 @@ export const ExtensionItalic = TiptapItalic.extend<ExtensionItalicOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("italic"),
+            isActive: editor.isActive(TiptapItalic.name),
             icon: markRaw(MingcuteItalicLine),
             title: i18n.global.t("editor.common.italic"),
             action: () => editor.chain().focus().toggleItalic().run(),

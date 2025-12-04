@@ -22,7 +22,7 @@ export const ExtensionSuperscript =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("superscript"),
+              isActive: editor.isActive(TiptapSuperscript.name),
               icon: markRaw(PhTextSuperscript),
               title: i18n.global.t("editor.common.superscript"),
               action: () => editor.chain().focus().toggleSuperscript().run(),

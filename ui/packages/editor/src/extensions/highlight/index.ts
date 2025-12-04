@@ -21,7 +21,7 @@ export const ExtensionHighlight =
             component: markRaw(HighlightToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("highlight"),
+              isActive: editor.isActive(TiptapHighlight.name),
               icon: markRaw(MingcuteMarkPenLine),
               title: i18n.global.t("editor.common.highlight"),
             },
