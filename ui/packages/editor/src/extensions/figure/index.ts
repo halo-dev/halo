@@ -4,6 +4,7 @@ import {
   Node,
   Plugin,
   PluginKey,
+  TextSelection,
   type CommandProps,
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
@@ -16,7 +17,7 @@ declare module "@/tiptap" {
     figure: {
       setFigure: (attrs?: Record<string, unknown>) => ReturnType;
       unsetFigure: () => ReturnType;
-      updateFigureContainerWidth: (width: string) => ReturnType;
+      updateFigureContainerWidth: (width?: string) => ReturnType;
     };
   }
 }
@@ -96,6 +97,51 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
 
   addKeyboardShortcuts() {
     return {
+      Enter: ({ editor }) => {
+        const { state } = editor;
+        const { selection } = state;
+        const { $from } = selection;
+
+        let inFigure = false;
+        let figureDepth = -1;
+        for (let depth = $from.depth; depth > 0; depth--) {
+          const node = $from.node(depth);
+          if (node.type.name === this.name) {
+            inFigure = true;
+            figureDepth = depth;
+            break;
+          }
+        }
+
+        if (!inFigure) {
+          return false;
+        }
+
+        for (let depth = $from.depth; depth > 0; depth--) {
+          const node = $from.node(depth);
+          if (node.type.name === ExtensionFigureCaption.name) {
+            return false;
+          }
+        }
+
+        const figureNode = $from.node(figureDepth);
+        const figurePos = $from.before(figureDepth);
+        const afterFigurePos = figurePos + figureNode.nodeSize;
+
+        editor
+          .chain()
+          .command(({ tr }) => {
+            const paragraph = tr.doc.type.schema.nodes.paragraph.create();
+            tr.insert(afterFigurePos, paragraph);
+            tr.setSelection(
+              TextSelection.near(tr.doc.resolve(afterFigurePos + 1))
+            );
+            return true;
+          })
+          .run();
+
+        return true;
+      },
       Backspace: ({ editor }) => {
         const { state } = editor;
         const { selection, doc } = state;
@@ -205,17 +251,26 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
           return commands.lift(this.name);
         },
       updateFigureContainerWidth:
-        (width: string) =>
-        ({ state }: CommandProps) => {
-          // Here we need to use this.editor instead of the dispatch and tr obtained from CommandProps
-          // Because the dispatch and tr in CommandProps are outdated
-          const { dispatch } = this.editor.view;
-          const { tr } = this.editor.state;
+        (width?: string) =>
+        ({ state, dispatch }: CommandProps) => {
           const { selection } = state;
           const { $from } = selection;
 
+          let figureDepth = -1;
+          for (let d = $from.depth; d > 0; d--) {
+            if ($from.node(d).type.name === this.name) {
+              figureDepth = d;
+              break;
+            }
+          }
+
+          if (figureDepth === -1) {
+            return false;
+          }
+
+          const figureNode = $from.node(figureDepth);
           const figureCaptionNodes = findChildren(
-            $from.node(),
+            figureNode,
             (node) => node.type.name === ExtensionFigureCaption.name
           );
 
@@ -224,7 +279,10 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
           }
 
           const figureCaptionNode = figureCaptionNodes[0];
-          tr.setNodeMarkup(figureCaptionNode.pos + 1, undefined, {
+          const figurePos = $from.start(figureDepth);
+          const captionPos = figurePos + figureCaptionNode.pos;
+
+          const tr = state.tr.setNodeMarkup(captionPos, undefined, {
             width: width,
           });
           dispatch?.(tr);
