@@ -23,7 +23,7 @@ const src = computed({
 </script>
 
 <template>
-  <div v-if="visible?.({ editor: props.editor })" class="w-60">
+  <div v-if="visible?.({ editor: props.editor })" class="w-64">
     <Input
       v-model="src"
       :label="i18n.global.t('editor.extensions.image.src_input_label')"

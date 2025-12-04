@@ -21,7 +21,7 @@ const src = computed({
 </script>
 
 <template>
-  <div class="w-60">
+  <div class="w-64">
     <Input
       v-model="src"
       :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
