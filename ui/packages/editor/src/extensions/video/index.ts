@@ -33,9 +33,6 @@ import MdiMotionPlay from "~icons/mdi/motion-play";
 import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
-import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
-import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
 import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import MingcuteVideoLine from "~icons/mingcute/video-line";
@@ -43,6 +40,7 @@ import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
 import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
+import BubbleItemVideoPosition from "./BubbleItemVideoPosition.vue";
 import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
 import VideoView from "./VideoView.vue";
 declare module "@/tiptap" {
@@ -547,51 +545,17 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             },
             {
               priority: 110,
+              component: markRaw(BubbleItemVideoPosition),
               props: {
                 visible({ editor }) {
                   return !isEmpty(
                     editor.getAttributes(ExtensionVideo.name).src
                   );
                 },
-                isActive: () => {
-                  return editor.isActive({ position: "left" });
-                },
-                icon: markRaw(MingcuteAlignLeftLine),
-                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
               priority: 120,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "center" });
-                },
-                icon: markRaw(MingcuteAlignCenterLine),
-                action: () => handleSetPosition(editor, "center"),
-              },
-            },
-            {
-              priority: 130,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "right" });
-                },
-                icon: markRaw(MingcuteAlignRightLine),
-                action: () => handleSetPosition(editor, "right"),
-              },
-            },
-            {
-              priority: 150,
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
@@ -602,7 +566,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 160,
+              priority: 130,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
@@ -612,7 +576,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 170,
+              priority: 140,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -630,7 +594,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 180,
+              priority: 150,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -685,11 +649,11 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 190,
+              priority: 160,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 200,
+              priority: 170,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
@@ -772,17 +736,5 @@ export const handleSetSize = (
     .updateAttributes(ExtensionVideo.name, size)
     .setNodeSelection(editor.state.selection.from)
     .focus()
-    .run();
-};
-
-const handleSetPosition = (
-  editor: Editor,
-  position: "left" | "center" | "right"
-) => {
-  return editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionVideo.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
     .run();
 };
