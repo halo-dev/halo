@@ -75,6 +75,7 @@ editor:
       image_load_error: 图片加载失败
     video:
       src_input_label: 视频链接
+      resize: 调整尺寸
       disable_controls: 隐藏控制面板
       enable_controls: 显示控制面板
       disable_autoplay: 关闭自动播放

@@ -220,7 +220,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
               {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
             <template #popper>
-              <div class="w-64">
+              <div class="w-80">
                 <Input
                   v-model="externalLink"
                   :placeholder="

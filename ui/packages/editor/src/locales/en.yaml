@@ -75,6 +75,7 @@ editor:
       image_load_error: Image load failed
     video:
       src_input_label: Video link
+      resize: Resize
       disable_controls: Hide controls
       enable_controls: Show controls
       disable_autoplay: Disable auto play

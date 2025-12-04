@@ -32,7 +32,7 @@ const target = computed({
 </script>
 
 <template>
-  <div class="w-64">
+  <div class="w-80">
     <Input
       v-if="visible?.({ editor: props.editor })"
       v-model="href"

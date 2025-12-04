@@ -26,9 +26,6 @@ import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
-import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
-import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
-import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
 import MdiMotionPlay from "~icons/mdi/motion-play";
 import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
@@ -460,91 +457,6 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             },
             {
               priority: 60,
-              component: markRaw(BlockActionSeparator),
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-              },
-            },
-            {
-              priority: 70,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  const size = getVideoSizePercentage(editor, 25);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectSmall),
-                action: () =>
-                  handleSetSize(editor, { width: "25%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.small_size"),
-              },
-            },
-            {
-              priority: 80,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: ({ editor }: { editor: Editor }) => {
-                  const size = getVideoSizePercentage(editor, 50);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectLarge),
-                action: () =>
-                  handleSetSize(editor, { width: "50%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.medium_size"),
-              },
-            },
-            {
-              priority: 90,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  const size = getVideoSizePercentage(editor, 100);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectActual),
-                action: () =>
-                  handleSetSize(editor, { width: "100%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.large_size"),
-              },
-            },
-            {
-              priority: 100,
-              component: markRaw(BlockActionSeparator),
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-              },
-            },
-            {
-              priority: 110,
               component: markRaw(BubbleItemVideoPosition),
               props: {
                 visible({ editor }) {
@@ -555,7 +467,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 120,
+              priority: 70,
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
@@ -566,7 +478,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 130,
+              priority: 80,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
@@ -576,7 +488,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 140,
+              priority: 90,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -594,7 +506,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 150,
+              priority: 100,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -649,11 +561,11 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 160,
+              priority: 110,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 170,
+              priority: 120,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
