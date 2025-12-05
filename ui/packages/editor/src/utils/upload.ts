@@ -1,7 +1,7 @@
 import { ExtensionAudio } from "@/extensions/audio";
 import { ExtensionImage } from "@/extensions/image";
 import { ExtensionVideo } from "@/extensions/video";
-import { Editor, PMNode } from "@/tiptap";
+import { Editor, NodePos } from "@/tiptap";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import type { AxiosRequestConfig } from "axios";
@@ -153,7 +153,7 @@ export function containsFileClipboardIdentifier(types: readonly string[]) {
 
 export async function batchUploadExternalLink(
   editor: Editor,
-  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+  nodes: NodePos[]
 ) {
   const chunks = chunk(nodes, 5);
 
@@ -164,15 +164,7 @@ export async function batchUploadExternalLink(
   }
 }
 
-export async function uploadExternalLink(
-  editor: Editor,
-  nodeWithPos: {
-    node: PMNode;
-    pos: number;
-    index: number;
-    parent: PMNode | null;
-  }
-) {
+export async function uploadExternalLink(editor: Editor, nodeWithPos: NodePos) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
 
