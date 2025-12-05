@@ -1,5 +1,13 @@
 import { i18n } from "@/locales";
-import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
+import {
+  Editor,
+  Extension,
+  NodePos,
+  Plugin,
+  PluginKey,
+  PMNode,
+  Slice,
+} from "@/tiptap";
 import {
   batchUploadExternalLink,
   containsFileClipboardIdentifier,
@@ -30,6 +38,7 @@ export const ExtensionUpload = Extension.create({
               return false;
             }
 
+            const editor = this.editor;
             const externalNodes = getAllExternalNodes(slice);
             if (externalNodes.length > 0) {
               Dialog.info({
@@ -40,7 +49,11 @@ export const ExtensionUpload = Extension.create({
                 confirmText: i18n.global.t("editor.common.button.confirm"),
                 cancelText: i18n.global.t("editor.common.button.cancel"),
                 async onConfirm() {
-                  await batchUploadExternalLink(editor, externalNodes);
+                  const latestNodes = getLatestNodePos(editor, externalNodes);
+                  if (latestNodes.length === 0) {
+                    return;
+                  }
+                  await batchUploadExternalLink(editor, latestNodes);
 
                   Toast.success(
                     i18n.global.t("editor.common.toast.save_success")
@@ -107,6 +120,22 @@ export const ExtensionUpload = Extension.create({
     ];
   },
 });
+
+/**
+ * Get the latest node positions of the nodes in the slice.
+ *
+ * @param editor - The editor instance.
+ * @param nodes - The nodes to get the latest positions of.
+ * @returns The latest node positions.
+ */
+export function getLatestNodePos(
+  editor: Editor,
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+): NodePos[] {
+  return nodes
+    .map((node) => editor.$node(node.node.type.name, node.node.attrs))
+    .filter((node) => node !== null);
+}
 
 export function getAllExternalNodes(
   slice: Slice
