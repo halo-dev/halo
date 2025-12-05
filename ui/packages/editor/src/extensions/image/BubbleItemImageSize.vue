@@ -2,6 +2,7 @@
 import Input from "@/components/base/Input.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
+import { findChildren } from "@/tiptap";
 import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { computed } from "vue";
@@ -32,9 +33,31 @@ const height = computed({
 });
 
 function handleSetSize(size: { width?: string; height?: string }) {
+  let figureWidth = size.width;
+  if (!size.width) {
+    const { state } = props.editor;
+    const { selection } = state;
+    const imageNodePosList = findChildren(
+      selection.$from.node(),
+      (node) => node.type.name === ExtensionImage.name
+    );
+    if (imageNodePosList.length === 0) {
+      return;
+    }
+    const imageNodePos = imageNodePosList[0];
+    if (imageNodePos && imageNodePos.node.type.name === ExtensionImage.name) {
+      const pos = selection.$from.pos + imageNodePos.pos;
+      const nodeDOM = props.editor.view.nodeDOM(pos) as HTMLElement;
+      const imageNodeDOM = nodeDOM.querySelector("img");
+      if (imageNodeDOM && imageNodeDOM.naturalWidth) {
+        figureWidth = `${imageNodeDOM.naturalWidth}px`;
+      }
+    }
+  }
   props.editor
     .chain()
     .updateAttributes(ExtensionImage.name, size)
+    .updateFigureContainerWidth(figureWidth)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();

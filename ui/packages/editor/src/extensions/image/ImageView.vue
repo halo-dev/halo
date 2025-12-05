@@ -108,11 +108,28 @@ const aspectRatio = ref<number>(0);
 const resizeRef = ref<HTMLDivElement>();
 const inputRef = ref<HTMLInputElement>();
 
-function onImageLoaded() {
+function onImageLoaded(event: Event) {
   if (!resizeRef.value) return;
 
   aspectRatio.value =
     resizeRef.value.clientWidth / resizeRef.value.clientHeight;
+  const target = event.target;
+
+  if (props.node?.attrs.width) {
+    return;
+  }
+  if (target instanceof HTMLImageElement) {
+    props.editor
+      .chain()
+      .updateAttributes(ExtensionImage.name, {
+        width: `${target.naturalWidth}px`,
+        height: `${target.naturalHeight}px`,
+      })
+      .updateFigureContainerWidth(`${target.naturalWidth}px`)
+      .setNodeSelection(props.getPos() || 0)
+      .focus()
+      .run();
+  }
 }
 
 let cleanupResize: (() => void) | null = null;
@@ -182,6 +199,7 @@ function setupResizeListener() {
       props.editor
         .chain()
         .updateAttributes(ExtensionImage.name, { width, height })
+        .updateFigureContainerWidth(width)
         .setNodeSelection(props.getPos() || 0)
         .focus()
         .run();
@@ -248,16 +266,6 @@ watch([src, resizeHandleRef], () => {
     setupResizeListener();
   }
 });
-
-watch(
-  () => props.node?.attrs.width,
-  (newWidth) => {
-    if (newWidth) {
-      props.editor.commands.updateFigureContainerWidth(newWidth);
-    }
-  },
-  { immediate: false }
-);
 
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
