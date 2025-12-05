@@ -118,6 +118,8 @@ core:
             title: No pending comments
         views_stats:
           title: Visits
+        upvote_stats:
+          title: Likes
         iframe:
           title: Iframe
           empty:
