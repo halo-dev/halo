@@ -106,6 +106,8 @@ core:
           title: 留言
         views_stats:
           title: 瀏覽量
+        upvote_stats:
+          title: 按讚數
         pending_comments:
           title: 新評論
           empty:

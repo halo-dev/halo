@@ -77,6 +77,8 @@ core:
           title: Comentarios
         views_stats:
           title: Visitas
+        upvote_stats:
+          title: Me gusta
   post:
     title: Publicaciones
     actions:
