@@ -83,61 +83,40 @@ defineExpose({
 });
 </script>
 <template>
-  <div class="command-items">
+  <div
+    class="relative flex max-h-72 w-60 flex-col gap-1 overflow-y-auto overflow-x-hidden rounded-lg border bg-white p-1.5 shadow-md"
+  >
     <template v-if="items.length">
-      <div
+      <button
         v-for="(item, index) in items"
         :id="`command-item-${index}`"
         :key="index"
-        :class="{ 'is-selected': index === selectedIndex }"
-        class="command-item group hover:bg-gray-100"
+        type="button"
+        :class="{ 'bg-gray-100': index === selectedIndex }"
+        class="group flex w-full items-center gap-3 rounded p-1.5 transition-colors hover:bg-gray-100"
         @click="handleSelectItem(index)"
       >
-        <component :is="item.icon" class="command-icon group-hover:!bg-white" />
-        <span
-          class="command-title group-hover:font-medium group-hover:text-gray-900"
+        <div
+          class="size-6 flex-none rounded bg-gray-100 p-1 group-hover:bg-white"
+          :class="{ '!bg-white': index === selectedIndex }"
+        >
+          <component :is="item.icon" class="size-full" />
+        </div>
+        <div
+          class="min-w-0 flex-1 shrink text-left text-sm text-gray-600 group-hover:font-medium group-hover:text-gray-900"
+          :class="{ 'font-medium text-gray-900': index === selectedIndex }"
         >
           {{ i18n.global.t(item.title) }}
-        </span>
-      </div>
+        </div>
+      </button>
     </template>
-    <div v-else class="command-empty">
+    <div
+      v-else
+      class="flex items-center justify-center p-1 text-sm text-gray-600"
+    >
       <span>
         {{ i18n.global.t("editor.extensions.commands_menu.no_results") }}
       </span>
     </div>
   </div>
 </template>
-<style lang="scss">
-.command-items {
-  @apply relative max-h-72 w-52 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow;
-
-  .command-item {
-    @apply flex flex-row items-center gap-4 rounded p-1;
-
-    &.is-selected {
-      @apply bg-gray-100;
-
-      .command-icon {
-        @apply bg-white;
-      }
-
-      .command-title {
-        @apply font-medium text-gray-900;
-      }
-    }
-
-    .command-icon {
-      @apply h-6 w-6 rounded bg-gray-100 p-1;
-    }
-
-    .command-title {
-      @apply text-xs text-gray-600;
-    }
-  }
-
-  .command-empty {
-    @apply flex items-center justify-center p-1 text-xs text-gray-600;
-  }
-}
-</style>

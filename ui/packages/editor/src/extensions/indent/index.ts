@@ -9,6 +9,9 @@ import {
 import { TextSelection, Transaction } from "@/tiptap/pm";
 import type { ExtensionOptions } from "@/types";
 import { isListActive } from "@/utils/is-list-active";
+import { ListItem } from "@tiptap/extension-list";
+import { ExtensionColumns } from "../columns";
+import { ExtensionTable } from "../table";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -144,7 +147,7 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
 
   onUpdate() {
     const { editor } = this;
-    if (editor.isActive("listItem")) {
+    if (editor.isActive(ListItem.name)) {
       const node = editor.state.selection.$head.node();
       if (node.attrs.indent) {
         editor.commands.updateAttributes(node.type.name, { indent: 0 });
@@ -249,7 +252,10 @@ const isTextIndent = (tr: Transaction, currNodePos: number) => {
 };
 
 const isFilterActive = (editor: Editor) => {
-  return editor.isActive("table") || editor.isActive("columns");
+  return (
+    editor.isActive(ExtensionTable.name) ||
+    editor.isActive(ExtensionColumns.name)
+  );
 };
 
 export const getIndent: () => KeyboardShortcutCommand =

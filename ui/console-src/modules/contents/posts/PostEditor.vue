@@ -564,7 +564,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-model:title="formState.post.spec.title"
       v-model:cover="formState.post.spec.cover"
       :upload-image="handleUploadImage"
-      class="h-full"
+      class="size-full"
       @update="handleSetContentCache"
     />
   </div>

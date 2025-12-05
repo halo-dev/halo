@@ -5,12 +5,12 @@ import { PluginKey } from "@/tiptap/pm";
 import { computed, nextTick, ref, watch, type PropType } from "vue";
 import LucideReplace from "~icons/lucide/replace";
 import LucideReplaceAll from "~icons/lucide/replace-all";
-import MdiArrowDown from "~icons/mdi/arrow-down";
-import MdiArrowUp from "~icons/mdi/arrow-up";
-import MdiClose from "~icons/mdi/close";
 import MdiFormatLetterCase from "~icons/mdi/format-letter-case";
 import MdiFormatLetterMatches from "~icons/mdi/format-letter-matches";
 import MdiRegex from "~icons/mdi/regex";
+import MingcuteArrowDownLine from "~icons/mingcute/arrow-down-line";
+import MingcuteArrowUpLine from "~icons/mingcute/arrow-up-line";
+import MingcuteCloseLine from "~icons/mingcute/close-line";
 import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";
 
 const props = defineProps({
@@ -228,9 +228,13 @@ watch(
           </div>
           <div class="mx-2 min-w-[130px] text-sm">
             <div v-if="findState.findCount === 0">
-              <span :class="{ 'text-red-600': searchTerm.length > 0 }">{{
-                i18n.global.t("editor.extensions.search_and_replace.not_found")
-              }}</span>
+              <span :class="{ 'text-red-600': searchTerm.length > 0 }">
+                {{
+                  i18n.global.t(
+                    "editor.extensions.search_and_replace.not_found"
+                  )
+                }}
+              </span>
             </div>
             <div v-else>
               <span>
@@ -261,7 +265,7 @@ watch(
               :disabled="findState.findCount === 0"
               @click="findPreviousSearchResult"
             >
-              <MdiArrowUp></MdiArrowUp>
+              <MingcuteArrowUpLine />
             </button>
             <button
               :title="
@@ -275,7 +279,7 @@ watch(
               :disabled="findState.findCount === 0"
               @click="findNextSearchResult"
             >
-              <MdiArrowDown></MdiArrowDown>
+              <MingcuteArrowDownLine />
             </button>
             <button
               :title="
@@ -285,7 +289,7 @@ watch(
               class="rounded-sm p-0.5 hover:bg-gray-200"
               @click="handleCloseSearch"
             >
-              <MdiClose></MdiClose>
+              <MingcuteCloseLine />
             </button>
           </div>
         </div>

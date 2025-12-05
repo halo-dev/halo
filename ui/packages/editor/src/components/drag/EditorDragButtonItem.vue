@@ -104,7 +104,7 @@ defineExpose({
     <template v-else>
       <div
         :class="[
-          'flex w-full rounded-lg p-1.5 text-sm text-gray-600',
+          'flex w-full rounded px-2 py-2 text-sm text-gray-600 transition-colors',
           {
             'bg-gray-200 !text-black': props.isActive?.({
               editor: props.editor,
@@ -113,7 +113,7 @@ defineExpose({
             }),
           },
           {
-            'cursor-pointer hover:bg-gray-200/80 hover:text-gray-900':
+            'cursor-pointer hover:bg-gray-100 hover:text-gray-900 active:!bg-gray-200':
               !props.isActive?.({
                 editor: props.editor,
                 node: props.node,
@@ -129,7 +129,7 @@ defineExpose({
             <component
               :is="props.icon"
               :style="props.iconStyle"
-              class="h-4 w-4"
+              class="size-4"
             />
             <span class="flex flex-grow justify-start px-0.5">
               {{ displayTitle }}
@@ -137,7 +137,7 @@ defineExpose({
           </div>
         </button>
         <div v-if="isChildrenComponent" class="flex items-center gap-2">
-          <MaterialSymbolsArrowForwardIosRounded class="h-3 w-3" />
+          <MaterialSymbolsArrowForwardIosRounded class="size-3" />
         </div>
         <div
           v-else-if="props.keyboard"

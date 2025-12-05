@@ -26,6 +26,10 @@
       width: 1.25rem;
 
       &:hover {
+        background-color: theme("colors.gray.100");
+      }
+
+      &:active {
         background-color: theme("colors.gray.200");
       }
 

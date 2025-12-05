@@ -5,7 +5,7 @@ import type { ExtensionOptions } from "@/types";
 import type { ColorOptions } from "@tiptap/extension-color";
 import TiptapColor from "@tiptap/extension-color";
 import { markRaw } from "vue";
-import MdiFormatColor from "~icons/mdi/format-color";
+import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
 import ColorToolbarItem from "./ColorToolbarItem.vue";
 
 export type ExtensionColorOptions = Partial<ColorOptions> & ExtensionOptions;
@@ -21,7 +21,7 @@ export const ExtensionColor = TiptapColor.extend<ExtensionColorOptions>({
           props: {
             editor,
             isActive: false,
-            icon: markRaw(MdiFormatColor),
+            icon: markRaw(MingcuteTextColorLine),
             title: i18n.global.t("editor.common.color"),
           },
         };

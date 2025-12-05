@@ -7,20 +7,20 @@ import TiptapTextAlign, {
   type TextAlignOptions,
 } from "@tiptap/extension-text-align";
 import { markRaw } from "vue";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
+import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
+import MingcuteAlignJustifyLine from "~icons/mingcute/align-justify-line";
+import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
+import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 
 const iconComponent = {
-  left: MdiFormatAlignLeft,
-  center: MdiFormatAlignCenter,
-  right: MdiFormatAlignRight,
-  justify: MdiFormatAlignJustify,
+  left: MingcuteAlignLeftLine,
+  center: MingcuteAlignCenterLine,
+  right: MingcuteAlignRightLine,
+  justify: MingcuteAlignJustifyLine,
 };
 
 const getIcon = (editor: Editor) => {
-  let icon = MdiFormatAlignLeft;
+  let icon = MingcuteAlignLeftLine;
   Object.entries(iconComponent).forEach(([key, value]) => {
     if (editor.isActive({ textAlign: key })) {
       icon = value;
@@ -55,7 +55,7 @@ export const ExtensionTextAlign =
                 props: {
                   editor,
                   isActive: editor.isActive({ textAlign: "left" }),
-                  icon: markRaw(MdiFormatAlignLeft),
+                  icon: markRaw(MingcuteAlignLeftLine),
                   title: i18n.global.t("editor.common.align_left"),
                   action: () =>
                     editor.chain().focus().setTextAlign("left").run(),
@@ -67,7 +67,7 @@ export const ExtensionTextAlign =
                 props: {
                   editor,
                   isActive: editor.isActive({ textAlign: "center" }),
-                  icon: markRaw(MdiFormatAlignCenter),
+                  icon: markRaw(MingcuteAlignCenterLine),
                   title: i18n.global.t("editor.common.align_center"),
                   action: () =>
                     editor.chain().focus().setTextAlign("center").run(),
@@ -79,7 +79,7 @@ export const ExtensionTextAlign =
                 props: {
                   editor,
                   isActive: editor.isActive({ textAlign: "right" }),
-                  icon: markRaw(MdiFormatAlignRight),
+                  icon: markRaw(MingcuteAlignRightLine),
                   title: i18n.global.t("editor.common.align_right"),
                   action: () =>
                     editor.chain().focus().setTextAlign("right").run(),
@@ -91,7 +91,7 @@ export const ExtensionTextAlign =
                 props: {
                   editor,
                   isActive: editor.isActive({ textAlign: "justify" }),
-                  icon: markRaw(MdiFormatAlignJustify),
+                  icon: markRaw(MingcuteAlignJustifyLine),
                   title: i18n.global.t("editor.common.align_justify"),
                   action: () =>
                     editor.chain().focus().setTextAlign("justify").run(),

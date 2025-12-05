@@ -1,25 +1,16 @@
 <script setup lang="ts">
 import { BlockActionSeparator } from "@/components";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import {
-  IconCheckboxCircle,
-  VDropdown,
-  VDropdownItem,
-  vTooltip,
-} from "@halo-dev/components";
-import { computed, ref, type Component } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown } from "@halo-dev/components";
+import { computed, ref } from "vue";
+import MingcuteLayout10Line from "~icons/mingcute/layout-10-line";
+import MingcuteLayoutGridLine from "~icons/mingcute/layout-grid-line";
 import { ExtensionGallery } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const dropdownRef = ref();
 
@@ -31,12 +22,18 @@ const options = [
   {
     label: i18n.global.t("editor.extensions.gallery.layout.auto"),
     value: "auto",
+    icon: MingcuteLayout10Line,
   },
   {
     label: i18n.global.t("editor.extensions.gallery.layout.square"),
     value: "square",
+    icon: MingcuteLayoutGridLine,
   },
 ];
+
+const currentLayout = computed(() => {
+  return options.find((option) => option.value === layout.value) || options[0];
+});
 
 function handleSetLayout(layout: string) {
   props.editor
@@ -54,31 +51,31 @@ function handleSetLayout(layout: string) {
     :triggers="['click']"
     :distance="10"
   >
-    <button
-      v-tooltip="i18n.global.t('editor.extensions.gallery.layout.title')"
-      class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.gallery.layout.title')"
+      :text="currentLayout.label"
+      show-more-indicator
     >
-      <span>
-        {{ options.find((option) => option.value === layout)?.label }}
-      </span>
-      <IconArrowDownLine class="size-4" />
-    </button>
+      <template #icon>
+        <component :is="currentLayout.icon" />
+      </template>
+    </BubbleButton>
 
     <template #popper>
-      <VDropdownItem
+      <DropdownItem
         v-for="option in options"
         :key="option.value"
         class="!min-w-36"
+        :is-active="option.value === layout"
         @click="handleSetLayout(option.value)"
       >
-        {{ option.label }}
-
-        <template v-if="option.value === layout" #suffix-icon>
-          <IconCheckboxCircle class="size-4" />
+        <template #icon>
+          <component :is="option.icon" />
         </template>
-      </VDropdownItem>
+        {{ option.label }}
+      </DropdownItem>
     </template>
   </VDropdown>
 
-  <BlockActionSeparator />
+  <BlockActionSeparator :editor="editor" />
 </template>

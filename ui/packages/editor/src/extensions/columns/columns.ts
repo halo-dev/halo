@@ -1,5 +1,5 @@
 import { BlockActionSeparator, ToolboxItem } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -20,7 +20,7 @@ import {
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
 import { markRaw } from "vue";
-import MdiCollage from "~icons/mdi/collage";
+import MingcuteColumns2Line from "~icons/mingcute/columns-2-line";
 import RiDeleteColumn from "~icons/ri/delete-column";
 import RiInsertColumnLeft from "~icons/ri/insert-column-left";
 import RiInsertColumnRight from "~icons/ri/insert-column-right";
@@ -207,7 +207,7 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiCollage),
+              icon: markRaw(MingcuteColumns2Line),
               title: i18n.global.t("editor.extensions.commands_menu.columns"),
               action: () => {
                 editor
@@ -225,7 +225,7 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
       getCommandMenuItems() {
         return {
           priority: 70,
-          icon: markRaw(MdiCollage),
+          icon: markRaw(MingcuteColumns2Line),
           title: "editor.extensions.commands_menu.columns",
           keywords: ["fenlan", "columns"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -312,7 +312,7 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
             {
               priority: 50,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }) => {
                   deleteNode(ExtensionColumns.name, editor);

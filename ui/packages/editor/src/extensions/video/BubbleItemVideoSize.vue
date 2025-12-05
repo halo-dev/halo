@@ -1,27 +1,32 @@
-<script lang="ts" setup>
-import { BlockActionInput } from "@/components";
+<script setup lang="ts">
+import Input from "@/components/base/Input.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { computed, type Component } from "vue";
+import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown } from "@halo-dev/components";
+import { computed } from "vue";
+import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
+import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
+import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
 import { ExtensionVideo } from "./index";
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
 
-const size = computed({
+const props = defineProps<BubbleItemComponentProps>();
+
+const width = computed({
   get: () => {
-    return {
-      width: props.editor.getAttributes(ExtensionVideo.name).width,
-      height: props.editor.getAttributes(ExtensionVideo.name).height,
-    };
+    return props.editor.getAttributes(ExtensionVideo.name).width;
   },
-  set: (size: { width?: string; height?: string }) => {
-    handleSetSize(size);
+  set: (width: string) => {
+    handleSetSize({ width, height: height.value });
+  },
+});
+
+const height = computed({
+  get: () => {
+    return props.editor.getAttributes(ExtensionVideo.name).height;
+  },
+  set: (height: string) => {
+    handleSetSize({ width: width.value, height });
   },
 });
 
@@ -33,23 +38,77 @@ function handleSetSize(size: { width?: string; height?: string }) {
     .focus()
     .run();
 }
+
+const presetSizes = [
+  {
+    width: "25%",
+    height: "auto",
+    icon: MdiImageSizeSelectSmall,
+    title: i18n.global.t("editor.extensions.video.small_size"),
+  },
+  {
+    width: "50%",
+    height: "auto",
+    icon: MdiImageSizeSelectLarge,
+    title: i18n.global.t("editor.extensions.video.medium_size"),
+  },
+  {
+    width: "100%",
+    height: "auto",
+    icon: MdiImageSizeSelectActual,
+    title: i18n.global.t("editor.extensions.video.large_size"),
+  },
+];
 </script>
 
 <template>
-  <BlockActionInput
-    v-model.lazy.trim="size.width"
-    :visible="visible?.({ editor: props.editor })"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
-  />
+  <VDropdown
+    v-if="visible?.({ editor })"
+    class="inline-flex"
+    :auto-hide="true"
+    :distance="10"
+  >
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.video.resize')"
+      show-more-indicator
+    >
+      <template #icon>
+        <MdiImageSizeSelectSmall />
+      </template>
+    </BubbleButton>
+    <template #popper>
+      <div class="flex w-56 flex-col gap-3">
+        <div class="flex flex-col items-center gap-3">
+          <Input
+            v-model="width"
+            :label="i18n.global.t('editor.common.width')"
+            :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
+          />
+          <Input
+            v-model="height"
+            :label="i18n.global.t('editor.common.height')"
+            :tooltip="
+              i18n.global.t('editor.common.tooltip.custom_height_input')
+            "
+          />
+        </div>
 
-  <BlockActionInput
-    v-model.lazy.trim="size.height"
-    :visible="visible?.({ editor: props.editor })"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
-  />
+        <div class="flex items-center gap-1 rounded-md bg-gray-100 p-1">
+          <button
+            v-for="item in presetSizes"
+            :key="item.width"
+            v-tooltip="item.title"
+            class="inline-flex flex-1 items-center justify-center rounded px-2 py-1.5 text-gray-600 transition-all hover:text-gray-900"
+            :class="{
+              'bg-white text-gray-900':
+                item.width === width && item.height === height,
+            }"
+            @click="handleSetSize({ width: item.width, height: item.height })"
+          >
+            <component :is="item.icon" />
+          </button>
+        </div>
+      </div>
+    </template>
+  </VDropdown>
 </template>
-<style lang="scss">
-.editor-block__actions-input {
-  @apply block w-32 rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500;
-}
-</style>
