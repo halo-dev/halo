@@ -5,7 +5,7 @@ import {
   BlockActionSeparator,
 } from "@/components";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
+import { findChildren, type Editor } from "@/tiptap";
 import { computed, type Component } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
@@ -35,9 +35,31 @@ const size = computed({
 });
 
 function handleSetSize(size: { width?: string; height?: string }) {
+  let figureWidth = size.width;
+  if (!size.width) {
+    const { state } = props.editor;
+    const { selection } = state;
+    const imageNodePosList = findChildren(
+      selection.$from.node(),
+      (node) => node.type.name === ExtensionImage.name
+    );
+    if (imageNodePosList.length === 0) {
+      return;
+    }
+    const imageNodePos = imageNodePosList[0];
+    if (imageNodePos && imageNodePos.node.type.name === ExtensionImage.name) {
+      const pos = selection.$from.pos + imageNodePos.pos;
+      const nodeDOM = props.editor.view.nodeDOM(pos) as HTMLElement;
+      const imageNodeDOM = nodeDOM.querySelector("img");
+      if (imageNodeDOM && imageNodeDOM.naturalWidth) {
+        figureWidth = `${imageNodeDOM.naturalWidth}px`;
+      }
+    }
+  }
   props.editor
     .chain()
     .updateAttributes(ExtensionImage.name, size)
+    .updateFigureContainerWidth(figureWidth)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();
