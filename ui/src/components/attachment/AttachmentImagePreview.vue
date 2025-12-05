@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import LazyImage from "@/components/image/LazyImage.vue";
 import {
   GetThumbnailByUriSizeEnum,
   type Attachment,
 } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
 import { THUMBNAIL_WIDTH_MAP } from "@halo-dev/ui-shared";
+import { UseImage } from "@vueuse/components";
 import { computed, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -73,14 +73,16 @@ const activeId = ref(items.value?.[0]?.id);
       target="_blank"
       :href="item.permalink"
     >
-      <LazyImage
-        v-if="item.id === activeId"
+      <span v-if="!item.permalink" class="text-red-400">
+        {{ $t("core.common.status.loading_error") }}
+      </span>
+      <UseImage
+        v-else-if="item.id === activeId"
         v-tooltip="{
           content: item.permalink,
           placement: 'bottom',
         }"
         :src="item.permalink"
-        classes="max-w-full rounded"
       >
         <template #loading>
           <span class="text-gray-400">
@@ -92,7 +94,12 @@ const activeId = ref(items.value?.[0]?.id);
             {{ $t("core.common.status.loading_error") }}
           </span>
         </template>
-      </LazyImage>
+        <template #default>
+          <Transition appear name="fade">
+            <img :src="item.permalink" class="max-w-full rounded" />
+          </Transition>
+        </template>
+      </UseImage>
     </a>
   </div>
 </template>
