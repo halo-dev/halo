@@ -20,9 +20,6 @@ import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { markRaw } from "vue";
 import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
 import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
-import MdiCellphoneIphone from "~icons/mdi/cellphone-iphone";
-import MdiDesktopMac from "~icons/mdi/desktop-mac";
-import MdiTabletIpad from "~icons/mdi/tablet-ipad";
 import MdiWeb from "~icons/mdi/web";
 import MdiWebSync from "~icons/mdi/web-sync";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
@@ -312,67 +309,14 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
             },
             {
               priority: 40,
-              props: {
-                isActive: () => sizeMatch(editor, "390px", "844px"),
-                icon: markRaw(MdiCellphoneIphone),
-                action: () => {
-                  handleSetSize(editor, "390px", "844px");
-                },
-                title: i18n.global.t("editor.extensions.iframe.phone_size"),
-              },
-            },
-            {
-              priority: 50,
-              props: {
-                isActive: () => sizeMatch(editor, "834px", "1194px"),
-                icon: markRaw(MdiTabletIpad),
-                action: () => {
-                  handleSetSize(editor, "834px", "1194px");
-                },
-                title: i18n.global.t(
-                  "editor.extensions.iframe.tablet_vertical_size"
-                ),
-              },
-            },
-            {
-              priority: 60,
-              props: {
-                isActive: () => sizeMatch(editor, "1194px", "834px"),
-                icon: markRaw(MdiTabletIpad),
-                iconStyle: "transform: rotate(90deg)",
-                action: () => {
-                  handleSetSize(editor, "1194px", "834px");
-                },
-                title: i18n.global.t(
-                  "editor.extensions.iframe.tablet_horizontal_size"
-                ),
-              },
-            },
-            {
-              priority: 70,
-              props: {
-                isActive: () => sizeMatch(editor, "100%", "834px"),
-                icon: markRaw(MdiDesktopMac),
-                action: () => {
-                  handleSetSize(editor, "100%", "834px");
-                },
-                title: i18n.global.t("editor.extensions.iframe.desktop_size"),
-              },
-            },
-            {
-              priority: 80,
-              component: markRaw(BlockActionSeparator),
-            },
-            {
-              priority: 90,
               component: markRaw(BubbleItemIframeAlign),
             },
             {
-              priority: 100,
+              priority: 50,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 110,
+              priority: 60,
               props: {
                 icon: markRaw(MdiWebSync),
                 action: () => {
@@ -386,7 +330,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 120,
+              priority: 70,
               props: {
                 icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
@@ -396,7 +340,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 130,
+              priority: 80,
               props: {
                 icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
@@ -409,7 +353,7 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 140,
+              priority: 90,
               props: {
                 icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
@@ -424,17 +368,3 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
     };
   },
 });
-
-const sizeMatch = (editor: Editor, width: string, height: string) => {
-  const attr = editor.getAttributes(ExtensionIframe.name);
-  return width === attr.width && height === attr.height;
-};
-
-const handleSetSize = (editor: Editor, width: string, height: string) => {
-  editor
-    .chain()
-    .updateAttributes(ExtensionIframe.name, { width, height })
-    .focus()
-    .setNodeSelection(editor.state.selection.from)
-    .run();
-};

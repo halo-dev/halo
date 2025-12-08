@@ -6,7 +6,7 @@ import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton } from "@halo-dev/components";
 import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
-import RiVideoAddLine from "~icons/ri/video-add-line";
+import MingcuteVideoLine from "~icons/mingcute/video-line";
 
 const props = defineProps<NodeViewProps>();
 
@@ -168,7 +168,7 @@ const isPercentageWidth = computed(() => {
             <div
               class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
             >
-              <RiVideoAddLine class="text-xl text-primary" />
+              <MingcuteVideoLine class="text-xl text-primary" />
             </div>
           </template>
           <template #uploading="{ progress }">

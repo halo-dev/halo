@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VDropdown } from "@halo-dev/components";
 import { computed, ref, watch } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+import MingcuteDownLine from "~icons/mingcute/down-line";
 
 export interface Option {
   label: string;
@@ -171,7 +171,7 @@ const handleScrollIntoView = () => {
             {{ displayLabel }}
           </span>
           <span class="justify-self-end" @click="inputRef?.focus()">
-            <IconArrowDownLine />
+            <MingcuteDownLine />
           </span>
         </div>
       </div>

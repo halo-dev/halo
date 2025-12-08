@@ -75,7 +75,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
         },
       },
       width: {
-        default: undefined,
+        default: "100%",
         parseHTML: (element) => {
           return element.getAttribute("width") || element.style.width || null;
         },
@@ -86,7 +86,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
         },
       },
       height: {
-        default: undefined,
+        default: "auto",
         parseHTML: (element) => {
           return element.getAttribute("height") || element.style.height || null;
         },

@@ -1,24 +1,41 @@
 <script lang="ts" setup>
+import { nextTick, onMounted, ref } from "vue";
 import MingcuteInformationLine from "~icons/mingcute/information-line";
 
 const modelValue = defineModel<string | number | undefined>({
   default: "",
 });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label?: string;
     help?: boolean;
     placeholder?: string;
     tooltip?: string;
+    autoFocus?: boolean;
   }>(),
   {
     label: undefined,
     help: undefined,
     placeholder: undefined,
     tooltip: undefined,
+    autoFocus: false,
   }
 );
+
+const emit = defineEmits<{
+  (event: "focus"): void;
+}>();
+
+const inputRef = ref<HTMLInputElement>();
+
+onMounted(() => {
+  if (props.autoFocus) {
+    nextTick(() => {
+      inputRef.value?.focus();
+    });
+  }
+});
 </script>
 
 <template>
@@ -30,10 +47,12 @@ withDefaults(
       {{ label }}
     </label>
     <input
+      ref="inputRef"
       v-model.lazy.trim="modelValue"
       type="text"
       class="block size-full rounded-md bg-white px-3 text-sm text-gray-900 ring-1 ring-gray-100 transition-all placeholder:text-gray-400 focus:!ring-1 focus:!ring-primary"
       :placeholder="placeholder"
+      @focus="emit('focus')"
     />
     <MingcuteInformationLine
       v-if="tooltip"

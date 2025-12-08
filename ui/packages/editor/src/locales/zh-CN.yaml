@@ -54,6 +54,7 @@ editor:
       enable_loop: 开启循环播放
     iframe:
       src_input_label: 网页链接
+      resize: 调整尺寸
       disable_frameborder: 取消边框
       enable_frameborder: 设置边框
       phone_size: 手机尺寸

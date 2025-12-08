@@ -54,6 +54,7 @@ editor:
       enable_loop: Disable loop
     iframe:
       src_input_label: Web link
+      resize: Resize
       disable_frameborder: Hide frameborder
       enable_frameborder: Show frameborder
       phone_size: Mobile phone size
