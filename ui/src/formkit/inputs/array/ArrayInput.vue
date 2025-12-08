@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
-import { VButton } from "@halo-dev/components";
+import { IconClose, VButton } from "@halo-dev/components";
 import { cloneDeepWith } from "lodash-es";
 import objectHash from "object-hash";
 import { onMounted, ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
-import MdiRemove from "~icons/mdi/remove";
-import RadixIconsDragHandleDots2 from "~icons/radix-icons/drag-handle-dots-2";
+import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import ArrayFormModal from "./ArrayFormModal.vue";
 
 export type ArrayProps = {
@@ -126,43 +125,57 @@ const handleRemoveItem = (index: number) => {
   arrayValue.value.splice(index, 1);
   props.node.input(arrayValue.value, false);
 };
+
+function getItemImage(item: Record<string, unknown>) {
+  // TODO: @LIlGG
+  return "https://www.halo.run/logo";
+}
 </script>
 <template>
-  <div class="flex flex-col gap-2">
-    <div>
-      <div v-if="arrayValue.length > 0">
-        <VueDraggable
-          v-model="arrayValue"
-          :animation="150"
-          class="flex flex-col gap-1"
-          handle=".drag-handle"
-          @update="handleDragUpdate"
+  <div class="mt-4 w-full space-y-2 sm:max-w-lg">
+    <VueDraggable
+      v-if="arrayValue.length > 0"
+      v-model="arrayValue"
+      :animation="150"
+      class="flex flex-col gap-1"
+      handle=".drag-handle"
+      @update="handleDragUpdate"
+    >
+      <div
+        v-for="(item, index) in arrayValue"
+        :key="generateKey(item, index)"
+        class="group/item flex h-12 items-center gap-2.5 rounded-md border bg-gray-50 px-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        @click="handleOpenArrayModal(item, index)"
+      >
+        <MingcuteDotsLine class="drag-handle size-4.5 flex-none cursor-move" />
+        <a
+          v-if="getItemImage(item)"
+          :href="getItemImage(item)"
+          target="_blank"
+          class="block aspect-1 size-8 flex-none"
+          @click.stop
         >
-          <li
-            v-for="(item, index) in arrayValue"
-            :key="generateKey(item, index)"
-            class="text-ellipsis text-nowrap rounded-md border bg-gray-100 p-2 hover:bg-gray-200"
-          >
-            <div class="flex items-center gap-2">
-              <RadixIconsDragHandleDots2
-                class="drag-handle size-4 cursor-move"
-              />
-              <span
-                class="cursor-pointer"
-                @click="handleOpenArrayModal(item, index)"
-                >{{ formatItemLabel(item) }}</span
-              >
-              <MdiRemove
-                class="size-4 cursor-pointer"
-                @click="handleRemoveItem(index)"
-              />
-            </div>
-          </li>
-        </VueDraggable>
+          <img
+            v-tooltip="`查看图片：${getItemImage(item)}`"
+            :src="getItemImage(item)"
+            class="size-full object-cover"
+          />
+        </a>
+        <div
+          class="line-clamp-1 min-w-0 flex-1 shrink cursor-pointer text-sm text-gray-900"
+        >
+          {{ formatItemLabel(item) }}
+        </div>
+        <IconClose
+          class="size-4.5 flex-none cursor-pointer text-gray-500 opacity-0 transition-opacity hover:text-gray-900 group-hover/item:opacity-100"
+          @click.stop="handleRemoveItem(index)"
+        />
       </div>
-      <div v-else>No Items</div>
-    </div>
-    <VButton type="primary" @click="handleOpenArrayModal()">Add Item</VButton>
+    </VueDraggable>
+    <div v-else class="text-sm text-gray-500">没有条目</div>
+    <VButton size="sm" type="default" @click="handleOpenArrayModal()">
+      {{ $t("core.common.buttons.add") }}
+    </VButton>
   </div>
 
   <ArrayFormModal

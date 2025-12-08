@@ -51,31 +51,28 @@ const handleSave = (data: Record<string, unknown>) => {
 <template>
   <VModal
     ref="modal"
-    title="编辑项目"
-    :width="640"
+    title="编辑条目"
+    :width="700"
     mount-to-body
-    :layer-closable="true"
-    height="calc(90vh - 40px)"
-    :body-class="['!p-0']"
+    layer-closable
+    :centered="false"
     @close="emit('close')"
   >
-    <div class="p-4">
-      <FormKit
-        :id="formId"
-        type="form"
-        :ignore="true"
-        :actions="false"
-        :model-value="itemValue"
-        @submit="handleSave"
-      >
-        <component
-          :is="node.context?.slots.default"
-          v-bind="{
-            value: itemValue,
-          }"
-        />
-      </FormKit>
-    </div>
+    <FormKit
+      :id="formId"
+      type="form"
+      :ignore="true"
+      :actions="false"
+      :model-value="itemValue"
+      @submit="handleSave"
+    >
+      <component
+        :is="node.context?.slots.default"
+        v-bind="{
+          value: itemValue,
+        }"
+      />
+    </FormKit>
 
     <template #footer>
       <VSpace>
