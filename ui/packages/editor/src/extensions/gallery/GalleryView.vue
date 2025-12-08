@@ -154,7 +154,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
 <template>
   <node-view-wrapper
     as="div"
-    class="p-0.5"
+    class="mt-2 p-0.5"
     :class="{
       'rounded ring-2': selected,
     }"
