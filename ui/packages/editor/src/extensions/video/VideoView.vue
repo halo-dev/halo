@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { EditorLinkObtain } from "@/components";
+import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
@@ -67,14 +68,6 @@ const handleUploadAbort = () => {
   editorLinkObtain.value?.abort();
 };
 
-const handleResetInit = () => {
-  editorLinkObtain.value?.reset();
-  props.updateAttributes({
-    src: "",
-    file: undefined,
-  });
-};
-
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
 
@@ -119,7 +112,7 @@ const isPercentageWidth = computed(() => {
         ></video>
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <VButton
             v-if="
@@ -144,13 +137,12 @@ const isPercentageWidth = computed(() => {
               )
             }}
           </VButton>
-          <VButton size="sm" type="secondary" @click="handleResetInit">
-            {{
-              i18n.global.t(
-                "editor.extensions.upload.operations.replace.button"
-              )
-            }}
-          </VButton>
+          <ResourceReplaceButton
+            accept="video/*"
+            :original-link="src"
+            :upload="extension.options.uploadVideo"
+            @change="handleSetExternalLink"
+          />
         </div>
       </div>
       <div v-show="!src" class="relative">
@@ -165,11 +157,7 @@ const isPercentageWidth = computed(() => {
           @on-upload-abort="resetUpload"
         >
           <template #icon>
-            <div
-              class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
-            >
-              <MingcuteVideoLine class="text-xl text-primary" />
-            </div>
+            <MingcuteVideoLine class="text-xl text-primary" />
           </template>
           <template #uploading="{ progress }">
             <div class="absolute top-0 size-full bg-black bg-opacity-20">

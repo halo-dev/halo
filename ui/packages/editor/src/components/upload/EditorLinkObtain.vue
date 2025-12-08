@@ -194,7 +194,12 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       <div
         class="flex flex-col items-center justify-center space-y-7 pb-6 pt-5"
       >
-        <slot v-if="$slots.icon" name="icon"></slot>
+        <div
+          v-if="$slots.icon"
+          class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
+        >
+          <slot name="icon"></slot>
+        </div>
         <VSpace>
           <VButton
             v-if="utils.permission.has(['uc:attachments:manage'])"
