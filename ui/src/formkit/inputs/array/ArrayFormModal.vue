@@ -35,7 +35,7 @@ const handleSave = (data: Record<string, unknown>) => {
   const oldNodeValue = (node._value as ArrayValue) || [];
   if (currentEditIndex === -1) {
     node.input(oldNodeValue.concat(data), false);
-    emit("close");
+    modal.value?.close();
     return;
   }
 
@@ -45,7 +45,7 @@ const handleSave = (data: Record<string, unknown>) => {
 
   oldNodeValue[currentEditIndex] = data;
   node.input(oldNodeValue, false);
-  emit("close");
+  modal.value?.close();
 };
 </script>
 <template>
