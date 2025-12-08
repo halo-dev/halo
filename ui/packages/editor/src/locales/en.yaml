@@ -123,6 +123,7 @@ editor:
         title: Layout
         auto: Auto
         square: Square
+      gap: Gap
     upload:
       error: Upload failed
       click_retry: Click to retry

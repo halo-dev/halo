@@ -8,6 +8,7 @@ const modelValue = defineModel<string | number | undefined>({
 
 const props = withDefaults(
   defineProps<{
+    type?: string;
     label?: string;
     help?: boolean;
     placeholder?: string;
@@ -15,6 +16,7 @@ const props = withDefaults(
     autoFocus?: boolean;
   }>(),
   {
+    type: "text",
     label: undefined,
     help: undefined,
     placeholder: undefined,
@@ -49,7 +51,7 @@ onMounted(() => {
     <input
       ref="inputRef"
       v-model.lazy.trim="modelValue"
-      type="text"
+      :type="type"
       class="block size-full rounded-md bg-white px-3 text-sm text-gray-900 ring-1 ring-gray-100 transition-all placeholder:text-gray-400 focus:!ring-1 focus:!ring-primary"
       :placeholder="placeholder"
       @focus="emit('focus')"

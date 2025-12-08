@@ -54,6 +54,10 @@ const layout = computed(() => {
   return props.node?.attrs.layout || "auto";
 });
 
+const gap = computed(() => {
+  return props.node?.attrs.gap;
+});
+
 const groups = computed(() => {
   return images.value.reduce(
     (
@@ -186,11 +190,12 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
         </VButton>
       </VSpace>
     </div>
-    <div v-else class="relative grid gap-2">
+    <div v-else class="relative grid" :style="{ gap: `${gap}px` }">
       <div
         v-for="(group, groupIndex) in groups"
         :key="groupIndex"
-        class="flex flex-row justify-center gap-2"
+        class="flex flex-row justify-center"
+        :style="{ gap: `${gap}px` }"
       >
         <div
           v-for="(image, imgIndex) in group"
@@ -225,23 +230,17 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           >
             <div class="flex flex-row-reverse">
               <button
+                v-tooltip="
+                  i18n.global.t(
+                    'editor.extensions.upload.operations.remove.button'
+                  )
+                "
                 aria-label="Delete"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black"
+                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
                 type="button"
                 @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
               >
                 <MingcuteDelete2Line class="size-4" />
-                <div
-                  class="text-2xs dark:bg-grey-900 invisible absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md bg-black px-4 py-1 font-sans font-medium text-white group-hover:visible"
-                >
-                  <span>
-                    {{
-                      i18n.global.t(
-                        "editor.extensions.upload.operations.remove.button"
-                      )
-                    }}
-                  </span>
-                </div>
               </button>
             </div>
           </div>

@@ -123,6 +123,7 @@ editor:
         title: 布局
         auto: 自适应
         square: 等比矩形
+      gap: 间距
     upload:
       error: 上传失败
       click_retry: 点击重试
