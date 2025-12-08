@@ -94,6 +94,7 @@ function onExternalLinkChange(value?: string | number) {
         <template #popper>
           <div class="w-80">
             <Input
+              auto-focus
               :model-value="originalLink"
               :placeholder="
                 i18n.global.t('editor.extensions.upload.permalink.placeholder')

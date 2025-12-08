@@ -43,6 +43,7 @@ function onGapChange(value: string | number | undefined) {
     <template #popper>
       <div class="w-80">
         <Input
+          auto-focus
           :label="i18n.global.t('editor.extensions.gallery.gap')"
           type="number"
           :model-value="gap"

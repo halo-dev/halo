@@ -26,6 +26,7 @@ const alt = computed({
   <div v-if="visible?.({ editor: props.editor })" class="w-56">
     <Input
       v-model="alt"
+      auto-focus
       :label="i18n.global.t('editor.common.alt')"
       :placeholder="i18n.global.t('editor.common.placeholder.alt_input')"
     />

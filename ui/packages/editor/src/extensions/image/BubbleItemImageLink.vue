@@ -26,6 +26,7 @@ const src = computed({
   <div v-if="visible?.({ editor: props.editor })" class="w-80">
     <Input
       v-model="src"
+      auto-focus
       :label="i18n.global.t('editor.extensions.image.src_input_label')"
       :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
     />

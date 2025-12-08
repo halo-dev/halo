@@ -107,6 +107,7 @@ const handleLinkBubbleButton = () => {
       <div class="relative w-96">
         <Input
           v-model.lazy="href"
+          auto-focus
           :placeholder="i18n.global.t('editor.extensions.link.placeholder')"
         />
         <label class="mr-2 mt-2 inline-flex items-center">

@@ -36,6 +36,7 @@ const target = computed({
     <Input
       v-if="visible?.({ editor: props.editor })"
       v-model="href"
+      auto-focus
       :placeholder="i18n.global.t('editor.common.placeholder.alt_href')"
       :label="i18n.global.t('editor.extensions.image.href_input_label')"
     />

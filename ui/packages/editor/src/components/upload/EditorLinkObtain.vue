@@ -228,6 +228,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
               <div class="w-80">
                 <Input
                   v-model="externalLink"
+                  auto-focus
                   :placeholder="
                     i18n.global.t(
                       'editor.extensions.upload.permalink.placeholder'

@@ -28,6 +28,7 @@ const src = computed({
   <div class="w-80">
     <Input
       v-model="src"
+      auto-focus
       :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
       :label="i18n.global.t('editor.extensions.iframe.src_input_label')"
     />

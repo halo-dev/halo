@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from "vue";
+import { ref, watchEffect } from "vue";
 import MingcuteInformationLine from "~icons/mingcute/information-line";
 
 const modelValue = defineModel<string | number | undefined>({
@@ -31,11 +31,13 @@ const emit = defineEmits<{
 
 const inputRef = ref<HTMLInputElement>();
 
-onMounted(() => {
-  if (props.autoFocus) {
-    nextTick(() => {
-      inputRef.value?.focus();
-    });
+watchEffect(() => {
+  if (inputRef.value) {
+    if (props.autoFocus) {
+      setTimeout(() => {
+        inputRef.value?.focus();
+      }, 100);
+    }
   }
 });
 </script>
