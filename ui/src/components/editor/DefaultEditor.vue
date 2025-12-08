@@ -452,7 +452,10 @@ onCoverInputChange((files) => {
                         )
                       }}
                     </VDropdownItem>
-                    <VDropdownItem @click="emit('update:cover', undefined)">
+                    <VDropdownItem
+                      type="danger"
+                      @click="emit('update:cover', undefined)"
+                    >
                       {{ $t("core.common.buttons.delete") }}
                     </VDropdownItem>
                   </template>
