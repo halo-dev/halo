@@ -17,8 +17,6 @@ const groupSize = computed(() => {
   return props.editor.getAttributes(ExtensionGallery.name).groupSize || 3;
 });
 
-const options = [1, 2, 3, 4, 5, 6];
-
 function handleSetGroupSize(size: number) {
   const currentImages =
     props.editor.getAttributes(ExtensionGallery.name).images || [];
@@ -60,13 +58,13 @@ function handleSetGroupSize(size: number) {
 
     <template #popper>
       <DropdownItem
-        v-for="option in options"
-        :key="option"
+        v-for="i in 10"
+        :key="i"
         class="!min-w-36"
-        :is-active="option === groupSize"
-        @click="handleSetGroupSize(option)"
+        :is-active="i === groupSize"
+        @click="handleSetGroupSize(i)"
       >
-        {{ option }}
+        {{ i }}
       </DropdownItem>
     </template>
   </VDropdown>
