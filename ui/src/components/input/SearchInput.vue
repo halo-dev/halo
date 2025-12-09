@@ -3,13 +3,15 @@ import { getNode, reset } from "@formkit/core";
 import { IconCloseCircle } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     placeholder?: string;
     modelValue: string;
+    sync?: boolean;
   }>(),
   {
     placeholder: undefined,
+    sync: false,
   }
 );
 
@@ -30,6 +32,12 @@ function onKeywordChange() {
     emit("update:modelValue", keywordNode._value as string);
   }
 }
+
+function onInput(value?: string) {
+  if (props.sync) {
+    emit("update:modelValue", value || "");
+  }
+}
 </script>
 
 <template>
@@ -40,6 +48,7 @@ function onKeywordChange() {
     type="text"
     name="keyword"
     :model-value="modelValue"
+    @update:model-value="onInput"
     @keyup.enter="onKeywordChange"
   >
     <template v-if="modelValue" #suffix>
