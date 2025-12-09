@@ -20,6 +20,9 @@ importers:
 
   .:
     dependencies:
+      '@ckpack/vue-color':
+        specifier: ^1.6.0
+        version: 1.6.0(vue@3.5.24(typescript@5.9.3))
       '@codemirror/commands':
         specifier: ^6.10.0
         version: 6.10.0
@@ -454,9 +457,6 @@ importers:
 
   packages/editor:
     dependencies:
-      '@ckpack/vue-color':
-        specifier: ^1.5.0
-        version: 1.5.0(vue@3.5.24(typescript@5.9.3))
       '@floating-ui/dom':
         specifier: ^1.7.4
         version: 1.7.4
@@ -780,8 +780,8 @@ packages:
   '@bufbuild/protobuf@2.10.1':
     resolution: {integrity: sha512-ckS3+vyJb5qGpEYv/s1OebUHDi/xSNtfgw1wqKZo7MR9F2z+qXr0q5XagafAG/9O0QPVIUfST0smluYSTpYFkg==}
 
-  '@ckpack/vue-color@1.5.0':
-    resolution: {integrity: sha512-dj1zXVyay2m4LdlLJCQSdIS2FYwUl77BZqyKmUXiehyqjCP0bGYnPcL38lrShzYUc2FdkYQX8ANZZjRahd4PQw==}
+  '@ckpack/vue-color@1.6.0':
+    resolution: {integrity: sha512-b9kFTKhYbNArfgP1lmnaVm0VNsWdZjqIbyHUYry7mZ+E7JeTQclbjq1+2xWn0SE3wzqRYlXmAVjECPOgteWmMQ==}
     engines: {node: '>=12'}
     peerDependencies:
       vue: ^3.2.0
@@ -6630,8 +6630,8 @@ packages:
   vue-component-type-helpers@2.2.12:
     resolution: {integrity: sha512-YbGqHZ5/eW4SnkPNR44mKVc6ZKQoRs/Rux1sxC6rdwXb4qpbOSYfDr9DsTHolOTGmIKgM9j141mZbBeg05R1pw==}
 
-  vue-component-type-helpers@3.1.5:
-    resolution: {integrity: sha512-7V3yJuNWW7/1jxCcI1CswnpDsvs02Qcx/N43LkV+ZqhLj2PKj50slUflHAroNkN4UWiYfzMUUUXiNuv9khmSpQ==}
+  vue-component-type-helpers@3.1.8:
+    resolution: {integrity: sha512-oaowlmEM6BaYY+8o+9D9cuzxpWQWHqHTMKakMxXu0E+UCIOMTljyIPO15jcnaCwJtZu/zWDotK7mOIHvWD9mcw==}
 
   vue-demi@0.13.11:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
@@ -7125,7 +7125,7 @@ snapshots:
 
   '@bufbuild/protobuf@2.10.1': {}
 
-  '@ckpack/vue-color@1.5.0(vue@3.5.24(typescript@5.9.3))':
+  '@ckpack/vue-color@1.6.0(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       material-colors: 1.2.6
@@ -8468,7 +8468,7 @@ snapshots:
       storybook: 10.0.8(@testing-library/dom@8.20.1)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite@8.0.0-beta.0(@types/node@22.19.1)(esbuild@0.25.5)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.1))
       type-fest: 2.19.0
       vue: 3.5.24(typescript@5.9.3)
-      vue-component-type-helpers: 3.1.5
+      vue-component-type-helpers: 3.1.8
 
   '@swc/helpers@0.5.17':
     dependencies:
@@ -13287,7 +13287,7 @@ snapshots:
 
   vue-component-type-helpers@2.2.12: {}
 
-  vue-component-type-helpers@3.1.5: {}
+  vue-component-type-helpers@3.1.8: {}
 
   vue-demi@0.13.11(vue@3.5.24(typescript@5.9.3)):
     dependencies:

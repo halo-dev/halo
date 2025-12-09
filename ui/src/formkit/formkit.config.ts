@@ -27,6 +27,7 @@ import { tagSelect } from "./inputs/tag-select";
 import { verificationForm } from "./inputs/verify-form";
 import theme from "./theme";
 
+import { color } from "./inputs/color";
 import { menuSelect } from "./inputs/menu-select";
 import { userSelect } from "./inputs/user-select";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
@@ -74,6 +75,7 @@ const config: DefaultConfigOptions = {
     userSelect,
     nativeSelect,
     select,
+    color,
   },
   locales: { zh, en },
   locale: "zh",
