@@ -15,7 +15,10 @@ import reactor.core.publisher.Mono;
 public enum ReactiveUtils {
     ;
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(1);
+    /**
+     * Default timeout for blocking operation.
+     */
+    public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
     /**
      * Resolve reactive value by blocking operation.

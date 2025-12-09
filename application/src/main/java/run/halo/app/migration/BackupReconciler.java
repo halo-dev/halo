@@ -18,6 +18,7 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.migration.Backup.Phase;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class BackupReconciler implements Reconciler<Request> {
                 var spec = backup.getSpec();
                 if (isDeleted(backup)) {
                     if (removeFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER))) {
-                        migrationService.cleanup(backup).block();
+                        migrationService.cleanup(backup).block(ReactiveUtils.DEFAULT_TIMEOUT);
                         client.update(backup);
                     }
                     return doNotRetry();
@@ -70,7 +71,7 @@ public class BackupReconciler implements Reconciler<Request> {
                         status.setStartTimestamp(Instant.now(clock));
                         updateStatus(request.name(), status);
                         // Long period execution when backing up
-                        migrationService.backup(backup).block();
+                        migrationService.backup(backup).block(Duration.ofMinutes(30));
                         status.setPhase(Phase.SUCCEEDED);
                         status.setCompletionTimestamp(Instant.now(clock));
                         updateStatus(request.name(), status);
