@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import IconifyInput from "@/formkit/inputs/iconify/IconifyInput.vue";
 import {
   IconToolsFill,
   VButton,
@@ -116,7 +115,5 @@ onMounted(() => {
         </VEntity>
       </VEntityContainer>
     </VCard>
-
-    <IconifyInput />
   </div>
 </template>
