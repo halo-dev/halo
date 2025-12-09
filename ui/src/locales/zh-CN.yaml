@@ -1757,6 +1757,17 @@ core:
       fullscreen:
         exit: 退出全屏
         enter: 全屏编辑
+    iconify:
+      placeholder: 选择图标
+      tabs:
+        collections: 图标集
+        search: 全局搜索
+      collection_search_placeholder: 搜索图标集合
+      search_placeholder: 搜索图标
+      no_results: 没有找到结果，请尝试其他关键词
+      option_size: 大小
+      option_color: 颜色
+      copyright: 图标数据来自 {url}
   common:
     buttons:
       save: 保存

@@ -91,12 +91,12 @@ async function handleConfirm() {
               v-model="width"
               type="select"
               name="size"
-              label="大小"
+              :label="$t('core.formkit.iconify.option_size')"
               allow-create
               searchable
               :options="[
                 {
-                  label: '无',
+                  label: $t('core.common.text.none'),
                   value: 'none',
                 },
                 {
@@ -130,7 +130,12 @@ async function handleConfirm() {
               ]"
               clearable
             ></FormKit>
-            <FormKit v-model="color" type="color" name="color" label="颜色">
+            <FormKit
+              v-model="color"
+              type="color"
+              name="color"
+              :label="$t('core.formkit.iconify.option_color')"
+            >
               <template v-if="color !== ''" #suffixIcon>
                 <IconClose @click="color = ''" />
               </template>

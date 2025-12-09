@@ -31,7 +31,9 @@ const onSelect = (icon: string) => {
         type="button"
         class="inline-flex h-9 items-center justify-center rounded-lg border bg-white px-2 transition-all hover:bg-gray-50 hover:shadow active:bg-gray-100"
       >
-        <div v-if="!context._value" class="text-sm text-gray-600">选择图标</div>
+        <div v-if="!context._value" class="text-sm text-gray-600">
+          {{ $t("core.formkit.iconify.placeholder") }}
+        </div>
         <div
           v-else
           class="inline-flex size-full items-center justify-center [&>*]:size-5"

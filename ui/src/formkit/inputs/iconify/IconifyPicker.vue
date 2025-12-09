@@ -27,23 +27,30 @@ const onSelect = (icon: string) => {
 <template>
   <div class="w-full">
     <VTabs v-model:active-id="activeTab" type="outline">
-      <VTabItem id="collections" label="图标集">
+      <VTabItem
+        id="collections"
+        :label="$t('core.formkit.iconify.tabs.collections')"
+      >
         <CollectionsView @select="onSelect" />
       </VTabItem>
-      <VTabItem id="search" label="全局搜索">
+      <VTabItem id="search" :label="$t('core.formkit.iconify.tabs.search')">
         <SearchView @select="onSelect" />
       </VTabItem>
     </VTabs>
 
     <div class="mt-2 flex justify-end text-xs text-gray-500">
-      图标数据来自
-      <a
-        href="https://iconify.design"
-        class="text-gray-900 hover:underline"
-        rel="noopener noreferrer"
-        target="_blank"
-        >Iconify</a
-      >
+      <i18n-t keypath="core.formkit.iconify.copyright" tag="span">
+        <template #url>
+          <a
+            href="https://iconify.design"
+            class="text-gray-900 hover:underline"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Iconify
+          </a>
+        </template>
+      </i18n-t>
     </div>
   </div>
 </template>

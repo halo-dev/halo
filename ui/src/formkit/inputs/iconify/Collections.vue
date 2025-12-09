@@ -71,7 +71,11 @@ watch(
 </script>
 <template>
   <div class="flex-none">
-    <SearchInput v-model="keyword" placeholder="搜索图标集合" sync />
+    <SearchInput
+      v-model="keyword"
+      :placeholder="$t('core.formkit.iconify.collection_search_placeholder')"
+      sync
+    />
   </div>
   <VLoading v-if="isLoading" />
   <div

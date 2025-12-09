@@ -49,7 +49,11 @@ const onSelect = (icon: string) => {
       <Collections v-model="selectedCollection" />
     </div>
     <div class="flex h-full flex-1 flex-col gap-2 p-1.5">
-      <SearchInput v-model="keyword" placeholder="搜索图标" sync />
+      <SearchInput
+        v-model="keyword"
+        :placeholder="$t('core.formkit.iconify.search_placeholder')"
+        sync
+      />
       <Icons :icons="results.map((result) => result.item)" @select="onSelect" />
     </div>
   </div>

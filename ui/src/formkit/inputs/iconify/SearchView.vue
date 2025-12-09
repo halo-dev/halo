@@ -38,14 +38,14 @@ const onSelect = (icon: string) => {
       v-if="!keyword"
       class="flex items-center justify-center py-2 text-sm text-gray-600"
     >
-      请输入关键词进行搜索
+      {{ $t("core.common.placeholder.search") }}
     </div>
     <VLoading v-else-if="isLoading" />
     <div
       v-else-if="!data?.length"
       class="flex items-center justify-center py-2 text-sm text-gray-600"
     >
-      没有找到结果，请尝试其他关键词
+      {{ $t("core.formkit.iconify.no_results") }}
     </div>
     <div
       v-else
