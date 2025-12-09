@@ -2,8 +2,8 @@
 import { VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
-import iconifyClient from "./api";
 import Icons from "./Icons.vue";
+import { iconifyClient } from "./api";
 
 const emit = defineEmits<{
   (e: "select", iconName: string): void;
@@ -30,7 +30,7 @@ const onSelect = (icon: string) => {
 };
 </script>
 <template>
-  <div class="flex h-[500px] w-[500px] flex-col gap-2 bg-white">
+  <div class="flex h-[500px] flex-col gap-2 bg-white sm:w-[500px]">
     <div class="flex-none">
       <SearchInput v-model="keyword" />
     </div>

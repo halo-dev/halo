@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { Icon } from "@iconify/vue";
 import { useVirtualizer } from "@tanstack/vue-virtual";
 import { chunk } from "es-toolkit";
 import { computed, useTemplateRef, watch } from "vue";
+import Icon from "./Icon.vue";
 
 const COLUMNS = 12;
 const ROW_HEIGHT = 36;
@@ -37,6 +37,10 @@ watch(
     rowVirtualizer.value.scrollToIndex(0);
   }
 );
+
+function onSelect(icon: string) {
+  emit("select", icon);
+}
 </script>
 <template>
   <div ref="container" class="size-full flex-1 overflow-auto">
@@ -56,14 +60,13 @@ watch(
           transform: `translateY(${virtualRow.start}px)`,
         }"
       >
-        <div
-          v-for="icon in iconRows[virtualRow.index]"
-          :key="icon"
-          class="aspect-square inline-flex cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200"
-          @click="emit('select', icon)"
+        <Icon
+          v-for="iconName in iconRows[virtualRow.index]"
+          :key="iconName"
+          :icon-name="iconName"
+          @select="onSelect"
         >
-          <Icon :icon="icon" class="text-2xl" />
-        </div>
+        </Icon>
       </div>
     </div>
   </div>

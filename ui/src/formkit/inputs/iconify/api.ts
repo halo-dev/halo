@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const iconifyClient = axios.create({
-  baseURL: "https://api.iconify.design",
-});
+export const ICONIFY_BASE_URL = "https://api.iconify.design";
 
-export default iconifyClient;
+export const iconifyClient = axios.create({
+  baseURL: ICONIFY_BASE_URL,
+});
