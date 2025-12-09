@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useFuse } from "@vueuse/integrations/useFuse.mjs";
 import { flatten } from "es-toolkit";
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 const selectedCollection = ref<string>();
 const keyword = ref<string>("");
 
-const { data } = useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ["iconify:icons", selectedCollection],
   queryFn: () =>
     iconifyClient
@@ -54,7 +55,12 @@ const onSelect = (icon: string) => {
         :placeholder="$t('core.formkit.iconify.search_placeholder')"
         sync
       />
-      <Icons :icons="results.map((result) => result.item)" @select="onSelect" />
+      <VLoading v-if="isLoading" />
+      <Icons
+        v-else
+        :icons="results.map((result) => result.item)"
+        @select="onSelect"
+      />
     </div>
   </div>
 </template>
