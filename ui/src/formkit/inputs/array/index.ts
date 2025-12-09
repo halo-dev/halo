@@ -34,13 +34,11 @@ export const array: FormKitTypeDefinition = {
   props: [
     "min",
     "max",
-    "upControl",
-    "downControl",
     "removeControl",
-    "insertControl",
     "addLabel",
     "addButton",
-    "itemLabel",
+    "itemLabels",
+    "emptyText",
   ],
   /**
    * Additional features that make this input work.
@@ -55,6 +53,10 @@ declare module "@formkit/inputs" {
     array: {
       type: "array";
       value?: Record<string, unknown>[];
+      itemLabels?: {
+        type: "image" | "text";
+        label: string;
+      }[];
     };
   }
 }

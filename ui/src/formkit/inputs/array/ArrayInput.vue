@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type FormKitNode, type FormKitProps } from "@formkit/core";
+import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
-import { cloneDeepWith } from "lodash-es";
+import { cloneDeepWith, get } from "lodash-es";
 import objectHash from "object-hash";
 import { onMounted, ref } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
@@ -11,15 +11,11 @@ import ArrayFormModal from "./ArrayFormModal.vue";
 
 export type ArrayProps = {
   removeControl?: boolean;
-  upControl?: boolean;
-  downControl?: boolean;
-  insertControl?: boolean;
   addButton?: boolean;
   addLabel?: boolean;
   addAttrs?: Record<string, unknown>;
   min?: number;
   max?: number;
-  // item 需要展示的文本项， 支持表达式方式，如：$label.xxx  $value.title - $value.description
   itemLabel: string;
 };
 
@@ -29,7 +25,9 @@ const props = defineProps<{
   node: FormKitNode<ArrayValue>;
 }>();
 
+const hiddenChildrenFormKit = ref<FormKitNode<unknown>>();
 const arrayModal = ref<boolean>(false);
+const nodeProps = ref<Partial<FormKitProps<ArrayProps>>>(props.node.props);
 
 type FnType = (index: number) => Record<string, unknown>;
 
@@ -38,23 +36,23 @@ function createValue(num: number, fn: FnType): ArrayValue {
 }
 
 function arrayFeature(node: FormKitNode<ArrayValue>) {
-  const nodeProps = node.props as Partial<FormKitProps<ArrayProps>>;
-  node.props.removeControl = nodeProps.removeControl ?? true;
-  node.props.upControl = nodeProps.upControl ?? true;
-  node.props.downControl = nodeProps.downControl ?? true;
-  node.props.insertControl = nodeProps.insertControl ?? true;
-  node.props.addButton = nodeProps.addButton ?? true;
-  node.props.addLabel = nodeProps.addLabel ?? false;
-  node.props.addAttrs = nodeProps.addAttrs ?? {};
-  node.props.min = nodeProps.min ? Number(nodeProps.min) : 0;
-  node.props.max = nodeProps.max ? Number(nodeProps.max) : 1 / 0;
-  if (node.props.min > nodeProps.max) {
+  const initProps = node.props as Partial<FormKitProps<ArrayProps>>;
+  node.props.removeControl = initProps.removeControl ?? true;
+  node.props.addButton = initProps.addButton ?? true;
+  node.props.addAttrs = initProps.addAttrs ?? {};
+  node.props.min = initProps.min ? Number(initProps.min) : 0;
+  node.props.max = initProps.max ? Number(initProps.max) : 1 / 0;
+  if (node.props.min > initProps.max) {
     throw Error("Repeater: min must be less than max");
   }
 
-  if ("disabled" in nodeProps) {
-    node.props.disabled = undefine(nodeProps.disabled);
+  if ("disabled" in initProps) {
+    node.props.disabled = undefine(initProps.disabled);
   }
+
+  nodeProps.value = {
+    ...initProps,
+  };
 
   if (Array.isArray(node.value)) {
     if (node.value.length < node.props.min) {
@@ -73,25 +71,80 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   }
 }
 
-// 根据 itemLabel 表达式，计算出 item 需要展示的文本项
-const formatItemLabel = (item: Record<string, unknown>) => {
-  if (item === null || item === undefined) {
-    return "";
-  }
-
-  if (props.node.props.itemLabel) {
-    // TODO: 计算出 item 需要展示的文本项
-    return "";
-  }
-  // 所有 item 的 value 集合，使用 - 连接
-  return Object.values(item).join("-");
-};
-
 onMounted(() => {
   const node = props.node;
   node._c.sync = true;
   arrayFeature(node);
+  hiddenChildrenFormKit.value = getNode("hidden-children-formkit");
 });
+
+const renderItemLabelValue = (
+  node: FormKitNode<unknown>,
+  value: unknown
+): unknown => {
+  switch (node.props.type) {
+    case "select": {
+      let renderValue = value;
+      const options = node.context?.attrs.options;
+      if (options && options.length > 0) {
+        renderValue =
+          options.find(
+            (option: { label: string; value: unknown }) =>
+              option.value === value
+          )?.label ?? value;
+      }
+      return renderValue;
+    }
+    default: {
+      return value;
+    }
+  }
+};
+
+const parseItemLabel = (
+  itemLabel: { type: "image" | "text"; label: string },
+  item: Record<string, unknown>
+) => {
+  if (!itemLabel.label) {
+    return;
+  }
+
+  if (itemLabel.label.startsWith("$value.")) {
+    const [_, path] = itemLabel.label.split("$value.");
+    const value = get(item, path);
+    const node = hiddenChildrenFormKit.value?.at(path);
+    console.log(hiddenChildrenFormKit.value, path, node);
+    if (!node) {
+      return {
+        type: itemLabel.type,
+        value: value,
+      };
+    }
+    return {
+      type: itemLabel.type,
+      value: renderItemLabelValue(node, value),
+    };
+  }
+};
+
+const formatItemLabel = (item: Record<string, unknown>) => {
+  const defaultItemLabel = Object.keys(item).map((key) => {
+    return {
+      type: "text",
+      label: `$value.${key}`,
+    };
+  });
+  const itemLabels = props.node.props.itemLabels ?? defaultItemLabel;
+  if (itemLabels.length > 0) {
+    const result = itemLabels
+      .map((itemLabel: { type: "image" | "text"; label: string }) => {
+        return parseItemLabel(itemLabel, item);
+      })
+      .filter(Boolean);
+    return result;
+  }
+  return [];
+};
 
 const itemValue = ref<Record<string, unknown>>({});
 const currentEditIndex = ref<number>(-1);
@@ -122,14 +175,12 @@ const handleDragUpdate = () => {
 };
 
 const handleRemoveItem = (index: number) => {
+  if (arrayValue.value.length <= nodeProps.value.min) {
+    return;
+  }
   arrayValue.value.splice(index, 1);
   props.node.input(arrayValue.value, false);
 };
-
-function getItemImage(item: Record<string, unknown>) {
-  // TODO: @LIlGG
-  return "https://www.halo.run/logo";
-}
 </script>
 <template>
   <div class="mt-4 w-full space-y-2 sm:max-w-lg">
@@ -148,35 +199,67 @@ function getItemImage(item: Record<string, unknown>) {
         @click="handleOpenArrayModal(item, index)"
       >
         <MingcuteDotsLine class="drag-handle size-4.5 flex-none cursor-move" />
-        <a
-          v-if="getItemImage(item)"
-          :href="getItemImage(item)"
-          target="_blank"
-          class="block aspect-1 size-8 flex-none"
-          @click.stop
-        >
-          <img
-            v-tooltip="`查看图片：${getItemImage(item)}`"
-            :src="getItemImage(item)"
-            class="size-full object-cover"
-          />
-        </a>
         <div
-          class="line-clamp-1 min-w-0 flex-1 shrink cursor-pointer text-sm text-gray-900"
+          class="line-clamp-1 inline-flex min-w-0 flex-1 shrink cursor-pointer gap-1 whitespace-nowrap text-sm text-gray-900"
         >
-          {{ formatItemLabel(item) }}
+          <template
+            v-for="itemLabel in formatItemLabel(item)"
+            :key="itemLabel.label"
+          >
+            <template v-if="itemLabel.type === 'image'">
+              <a
+                :href="itemLabel.value"
+                target="_blank"
+                class="block aspect-1 size-8 flex-none"
+                @click.stop
+              >
+                <img
+                  v-tooltip="`查看图片：${itemLabel.value}`"
+                  :src="itemLabel.value"
+                  class="size-full object-cover"
+                />
+              </a>
+            </template>
+            <template v-if="itemLabel.type === 'text'">
+              <span class="flex items-center">{{ itemLabel.value }}</span>
+            </template>
+          </template>
         </div>
         <IconClose
+          v-if="nodeProps.removeControl"
+          :disabled="arrayValue.length <= nodeProps.min"
           class="size-4.5 flex-none cursor-pointer text-gray-500 opacity-0 transition-opacity hover:text-gray-900 group-hover/item:opacity-100"
+          :class="{
+            'event-none cursor-not-allowed opacity-50 hover:text-gray-500 group-hover/item:opacity-50':
+              arrayValue.length <= nodeProps.min,
+          }"
           @click.stop="handleRemoveItem(index)"
         />
       </div>
     </VueDraggable>
-    <div v-else class="text-sm text-gray-500">没有条目</div>
-    <VButton size="sm" type="default" @click="handleOpenArrayModal()">
-      {{ $t("core.common.buttons.add") }}
+    <div v-else class="text-sm text-gray-500">
+      {{ nodeProps.emptyText ?? "没有条目" }}
+    </div>
+    <VButton
+      v-if="nodeProps.addButton"
+      v-bind="nodeProps.addAttrs"
+      :disabled="arrayValue.length >= nodeProps.max"
+      size="sm"
+      type="default"
+      @click="handleOpenArrayModal()"
+    >
+      {{ nodeProps.addLabel ?? $t("core.common.buttons.add") }}
     </VButton>
   </div>
+
+  <FormKit
+    v-show="false"
+    id="hidden-children-formkit"
+    type="group"
+    ignore="true"
+  >
+    <component :is="node.context?.slots.default" />
+  </FormKit>
 
   <ArrayFormModal
     v-if="arrayModal"
