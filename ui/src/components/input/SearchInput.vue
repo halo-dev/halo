@@ -48,6 +48,7 @@ function onInput(value?: string) {
     type="text"
     name="keyword"
     :model-value="modelValue"
+    ignore
     @update:model-value="onInput"
     @keyup.enter="onKeywordChange"
   >
