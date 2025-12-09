@@ -24,10 +24,12 @@ const { data, isLoading } = useQuery({
 });
 
 const collections = computed(() => {
-  return Object.entries(data.value || {}).map(([key, value]) => ({
-    key,
-    value,
-  }));
+  return Object.entries(data.value || {})
+    .map(([key, value]) => ({
+      key,
+      value,
+    }))
+    .filter(({ value }) => value.hidden !== true);
 });
 
 const keyword = ref<string>("");
