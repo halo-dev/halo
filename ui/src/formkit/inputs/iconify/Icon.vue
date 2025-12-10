@@ -65,7 +65,8 @@ async function handleConfirm() {
       v-tooltip="iconName"
       type="button"
       class="inline-flex size-full items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200"
-    >
+      :aria-label="`Select icon: ${iconName}`"
+      >
       <IconifyIcon :icon="iconName" class="text-2xl" />
     </button>
     <template #popper>
