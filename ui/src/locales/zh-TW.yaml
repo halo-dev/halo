@@ -1753,6 +1753,8 @@ core:
       option_size: 大小
       option_color: 顏色
       copyright: 圖標數據來自 {url}
+    color:
+      placeholder: 選擇顏色
   common:
     buttons:
       save: 保存

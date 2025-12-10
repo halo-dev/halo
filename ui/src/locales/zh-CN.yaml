@@ -1768,6 +1768,8 @@ core:
       option_size: 大小
       option_color: 颜色
       copyright: 图标数据来自 {url}
+    color:
+      placeholder: 选择颜色
   common:
     buttons:
       save: 保存
