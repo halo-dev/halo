@@ -1742,6 +1742,17 @@ core:
       fullscreen:
         exit: 退出全屏
         enter: 全屏编辑
+    iconify:
+      placeholder: 選擇圖標
+      tabs:
+        collections: 圖標集
+        search: 全局搜索
+      collection_search_placeholder: 搜索圖標集合
+      search_placeholder: 搜索圖標
+      no_results: 沒有找到結果，請嘗試其他關鍵詞
+      option_size: 大小
+      option_color: 顏色
+      copyright: 圖標數據來自 {url}
   common:
     buttons:
       save: 保存
