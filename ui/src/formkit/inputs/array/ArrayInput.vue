@@ -43,7 +43,7 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   node.props.min = initProps.min ? Number(initProps.min) : 0;
   node.props.max = initProps.max ? Number(initProps.max) : 1 / 0;
   if (node.props.min > initProps.max) {
-    throw Error("Repeater: min must be less than max");
+    throw Error("Array: min must be less than max");
   }
 
   if ("disabled" in initProps) {
