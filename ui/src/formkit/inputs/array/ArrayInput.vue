@@ -200,29 +200,28 @@ const handleRemoveItem = (index: number) => {
       >
         <MingcuteDotsLine class="drag-handle size-4.5 flex-none cursor-move" />
         <div
-          class="line-clamp-1 inline-flex min-w-0 flex-1 shrink cursor-pointer gap-1 whitespace-nowrap text-sm text-gray-900"
+          class="line-clamp-1 flex min-w-0 flex-1 shrink cursor-pointer items-center gap-2 whitespace-nowrap text-sm text-gray-900"
         >
           <template
             v-for="itemLabel in formatItemLabel(item)"
             :key="itemLabel.label"
           >
-            <template v-if="itemLabel.type === 'image'">
-              <a
-                :href="itemLabel.value"
-                target="_blank"
-                class="block aspect-1 size-8 flex-none"
-                @click.stop
-              >
-                <img
-                  v-tooltip="`查看图片：${itemLabel.value}`"
-                  :src="itemLabel.value"
-                  class="size-full object-cover"
-                />
-              </a>
-            </template>
-            <template v-if="itemLabel.type === 'text'">
-              <span class="flex items-center">{{ itemLabel.value }}</span>
-            </template>
+            <a
+              v-if="itemLabel.type === 'image'"
+              :href="itemLabel.value"
+              target="_blank"
+              class="block aspect-1 size-8 flex-none"
+              @click.stop
+            >
+              <img
+                v-tooltip="`查看图片：${itemLabel.value}`"
+                :src="itemLabel.value"
+                class="size-full object-cover"
+              />
+            </a>
+            <span v-if="itemLabel.type === 'text'">
+              {{ itemLabel.value }}
+            </span>
           </template>
         </div>
         <IconClose
