@@ -30,6 +30,7 @@ const onSelect = (icon: string) => {
       <button
         type="button"
         class="inline-flex h-9 items-center justify-center rounded-lg border bg-white px-2 transition-all hover:bg-gray-50 hover:shadow active:bg-gray-100"
+        aria-label="Select icon"
       >
         <div v-if="!context._value" class="text-sm text-gray-600">
           {{ $t("core.formkit.iconify.placeholder") }}
