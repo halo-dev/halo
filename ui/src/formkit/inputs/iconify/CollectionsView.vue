@@ -20,7 +20,12 @@ const { data, isLoading } = useQuery({
   queryKey: ["iconify:icons", selectedCollection],
   queryFn: () =>
     iconifyClient
-      .get(`/collection?prefix=${selectedCollection.value}&chars=true`)
+      .get(`/collection`, {
+        params: {
+          prefix: selectedCollection.value,
+          chars: true,
+        },
+      })
       .then((res) => res.data),
   enabled: computed(() => !!selectedCollection.value),
 });

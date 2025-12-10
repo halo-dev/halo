@@ -18,7 +18,12 @@ const { data, isLoading } = useQuery({
       return [];
     }
     const response = await iconifyClient
-      .get<{ icons: string[] }>(`/search?query=${keyword.value}&limit=999`)
+      .get<{ icons: string[] }>(`/search`, {
+        params: {
+          query: keyword.value,
+          limit: 999,
+        },
+      })
       .then((res) => res.data);
 
     return response.icons;

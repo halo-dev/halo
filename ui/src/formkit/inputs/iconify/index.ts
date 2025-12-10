@@ -1,6 +1,7 @@
 import { initialValue, type FormKitInputs } from "@formkit/inputs";
 import { createInput } from "@formkit/vue";
 import { defineAsyncComponent } from "vue";
+import type { IconifyFormat } from "./types";
 
 export const iconify = createInput(
   defineAsyncComponent(() => import("./IconifyInput.vue")),
@@ -16,6 +17,7 @@ declare module "@formkit/inputs" {
     iconify: {
       type: "iconify";
       value?: string;
+      format?: IconifyFormat;
     };
   }
 }
