@@ -42,6 +42,7 @@ const onSelect = (icon: string) => {
           <img
             v-if="['url', 'dataurl'].includes(format)"
             :src="context._value"
+            alt="Selected icon"
           />
           <Icon v-else-if="format === 'name'" :icon="context._value" />
           <div
