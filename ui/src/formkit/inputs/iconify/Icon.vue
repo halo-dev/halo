@@ -66,7 +66,7 @@ async function handleConfirm() {
       type="button"
       class="inline-flex size-full items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200"
       :aria-label="`Select icon: ${iconName}`"
-      >
+    >
       <IconifyIcon :icon="iconName" class="text-2xl" />
     </button>
     <template #popper>
@@ -138,7 +138,7 @@ async function handleConfirm() {
               :label="$t('core.formkit.iconify.option_color')"
             >
               <template v-if="color !== ''" #suffixIcon>
-                <IconClose @click="color = ''" aria-label="Clear color" />
+                <IconClose aria-label="Clear color" @click="color = ''" />
               </template>
             </FormKit>
           </FormKit>
