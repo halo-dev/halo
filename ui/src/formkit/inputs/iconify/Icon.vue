@@ -138,7 +138,7 @@ async function handleConfirm() {
               :label="$t('core.formkit.iconify.option_color')"
             >
               <template v-if="color !== ''" #suffixIcon>
-                <IconClose @click="color = ''" />
+                <IconClose @click="color = ''" aria-label="Clear color" />
               </template>
             </FormKit>
           </FormKit>
