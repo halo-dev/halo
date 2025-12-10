@@ -2,6 +2,7 @@ package run.halo.app.theme.dialect;
 
 import static org.thymeleaf.spring6.context.SpringContextUtils.getApplicationContext;
 
+import java.time.Duration;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -13,6 +14,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import reactor.core.publisher.Flux;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
@@ -24,6 +26,8 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  * @since 2.0.0
  */
 public class TemplateFooterElementTagProcessor extends AbstractElementTagProcessor {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private static final String TAG_NAME = "footer";
     private static final int PRECEDENCE = 1000;
@@ -66,7 +70,7 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
                 SecureTemplateContextWrapper.wrap(context), tag, structureHandler, modelToInsert)
             )
             .then()
-            .block();
+            .block(BLOCKING_TIMEOUT);
         structureHandler.replaceWith(modelToInsert, false);
     }
 
@@ -75,7 +79,7 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
             appCtx.getBean(SystemConfigurableEnvironmentFetcher.class);
         return fetcher.fetch(SystemSetting.CodeInjection.GROUP, SystemSetting.CodeInjection.class)
             .map(SystemSetting.CodeInjection::getFooter)
-            .block();
+            .block(BLOCKING_TIMEOUT);
     }
 
     private Flux<TemplateFooterProcessor> getTemplateFooterProcessors(ITemplateContext context) {

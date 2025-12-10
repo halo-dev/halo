@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * @author guqing
@@ -23,6 +24,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @Slf4j
 @Component
 public class PluginDevelopmentInitializer implements ApplicationListener<ApplicationReadyEvent> {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private final PluginManager pluginManager;
 
@@ -60,7 +63,7 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
                 }))
                 .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
                     .filter(t -> t instanceof OptimisticLockingFailureException))
-                .block();
+                .block(BLOCKING_TIMEOUT);
         }
     }
 }

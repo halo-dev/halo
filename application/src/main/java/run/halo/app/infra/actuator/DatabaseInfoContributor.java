@@ -3,6 +3,7 @@ package run.halo.app.infra.actuator;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionMetadata;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,9 +11,11 @@ import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 @Component
 public class DatabaseInfoContributor implements InfoContributor {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String DATABASE_INFO_KEY = "database";
 
     private final ConnectionFactory connectionFactory;
@@ -28,7 +31,7 @@ public class DatabaseInfoContributor implements InfoContributor {
 
     public Map<String, Object> contributorMap() {
         var map = new HashMap<String, Object>();
-        var connectionMetadata = getConnectionMetadata().block();
+        var connectionMetadata = getConnectionMetadata().block(BLOCKING_TIMEOUT);
         if (Objects.isNull(connectionMetadata)) {
             return map;
         }
