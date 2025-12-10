@@ -9,6 +9,7 @@ import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { categorySelect } from "./inputs/category-select";
 import { code } from "./inputs/code";
+import { color } from "./inputs/color";
 import { form } from "./inputs/form";
 import { group } from "./inputs/group";
 import { iconify } from "./inputs/iconify";
@@ -74,6 +75,7 @@ const config: DefaultConfigOptions = {
     userSelect,
     nativeSelect,
     select,
+    color,
     iconify,
   },
   locales: { zh, en },

@@ -20,6 +20,9 @@ importers:
 
   .:
     dependencies:
+      '@ckpack/vue-color':
+        specifier: ^1.6.0
+        version: 1.6.0(vue@3.5.24(typescript@5.9.3))
       '@codemirror/commands':
         specifier: ^6.10.0
         version: 6.10.0
@@ -463,9 +466,6 @@ importers:
 
   packages/editor:
     dependencies:
-      '@ckpack/vue-color':
-        specifier: ^1.5.0
-        version: 1.5.0(vue@3.5.24(typescript@5.9.3))
       '@floating-ui/dom':
         specifier: ^1.7.4
         version: 1.7.4
@@ -789,8 +789,8 @@ packages:
   '@bufbuild/protobuf@2.10.1':
     resolution: {integrity: sha512-ckS3+vyJb5qGpEYv/s1OebUHDi/xSNtfgw1wqKZo7MR9F2z+qXr0q5XagafAG/9O0QPVIUfST0smluYSTpYFkg==}
 
-  '@ckpack/vue-color@1.5.0':
-    resolution: {integrity: sha512-dj1zXVyay2m4LdlLJCQSdIS2FYwUl77BZqyKmUXiehyqjCP0bGYnPcL38lrShzYUc2FdkYQX8ANZZjRahd4PQw==}
+  '@ckpack/vue-color@1.6.0':
+    resolution: {integrity: sha512-b9kFTKhYbNArfgP1lmnaVm0VNsWdZjqIbyHUYry7mZ+E7JeTQclbjq1+2xWn0SE3wzqRYlXmAVjECPOgteWmMQ==}
     engines: {node: '>=12'}
     peerDependencies:
       vue: ^3.2.0
@@ -7147,7 +7147,7 @@ snapshots:
 
   '@bufbuild/protobuf@2.10.1': {}
 
-  '@ckpack/vue-color@1.5.0(vue@3.5.24(typescript@5.9.3))':
+  '@ckpack/vue-color@1.6.0(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       material-colors: 1.2.6

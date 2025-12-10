@@ -36,7 +36,6 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "@ckpack/vue-color": "^1.5.0",
     "@floating-ui/dom": "^1.7.4",
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
