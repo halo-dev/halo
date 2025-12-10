@@ -59,7 +59,8 @@ const onSelect = (icon: string) => {
       v-if="context._value"
       type="button"
       @click="context.node.input(undefined)"
-    >
+      aria-label="Clear selected icon"
+      >
       <IconClose class="text-gray-500 hover:text-gray-900" />
     </button>
   </div>
