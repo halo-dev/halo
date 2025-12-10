@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { EditorLinkObtain } from "@/components";
+import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
@@ -94,14 +95,6 @@ const resetUpload = () => {
       file: undefined,
     });
   }
-};
-
-const handleResetInit = () => {
-  editorLinkObtain.value?.reset();
-  props.updateAttributes({
-    src: "",
-    file: undefined,
-  });
 };
 
 const aspectRatio = ref<number>(0);
@@ -287,9 +280,10 @@ const isPercentageWidth = computed(() => {
   >
     <div
       ref="resizeRef"
-      class="resize-container group relative inline-block max-w-full overflow-hidden rounded-md text-center"
+      class="group relative inline-block max-w-full overflow-hidden rounded-md text-center"
       :class="{
         'rounded ring-2': selected,
+        'resize-container': !!src || !!fileBase64,
       }"
       :style="{
         width: initialization ? '100%' : node.attrs.width,
@@ -314,7 +308,7 @@ const isPercentageWidth = computed(() => {
 
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden w-full cursor-pointer justify-end gap-2 rounded-md bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <VButton
             v-if="
@@ -339,19 +333,17 @@ const isPercentageWidth = computed(() => {
               )
             }}
           </VButton>
-
-          <VButton size="sm" type="secondary" @click="handleResetInit">
-            {{
-              i18n.global.t(
-                "editor.extensions.upload.operations.replace.button"
-              )
-            }}
-          </VButton>
+          <ResourceReplaceButton
+            accept="image/*"
+            :original-link="src"
+            :upload="extension.options.uploadImage"
+            @change="handleSetExternalLink"
+          />
         </div>
 
         <div
           v-if="fileBase64"
-          class="absolute top-0 h-full w-full bg-black bg-opacity-20"
+          class="absolute top-0 size-full bg-black bg-opacity-20"
         >
           <div class="absolute top-[50%] w-full space-y-2 text-white">
             <template v-if="retryFlag">
@@ -359,7 +351,7 @@ const isPercentageWidth = computed(() => {
                 <div
                   class="relative h-4 w-full overflow-hidden rounded-full bg-gray-200"
                 >
-                  <div class="h-full w-full bg-red-600"></div>
+                  <div class="size-full bg-red-600"></div>
                   <div
                     class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
                   >
@@ -422,11 +414,7 @@ const isPercentageWidth = computed(() => {
           @on-upload-abort="resetUpload"
         >
           <template #icon>
-            <div
-              class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
-            >
-              <IconImageAddLine class="text-xl text-primary" />
-            </div>
+            <IconImageAddLine class="text-xl text-primary" />
           </template>
         </EditorLinkObtain>
       </div>

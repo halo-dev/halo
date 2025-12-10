@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { EditorLinkObtain } from "@/components";
+import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton } from "@halo-dev/components";
 import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
-import RiVideoAddLine from "~icons/ri/video-add-line";
+import MingcuteVideoLine from "~icons/mingcute/video-line";
 
 const props = defineProps<NodeViewProps>();
 
@@ -67,14 +68,6 @@ const handleUploadAbort = () => {
   editorLinkObtain.value?.abort();
 };
 
-const handleResetInit = () => {
-  editorLinkObtain.value?.reset();
-  props.updateAttributes({
-    src: "",
-    file: undefined,
-  });
-};
-
 const { isExternalAsset, transferring, handleTransfer } =
   useExternalAssetsTransfer(src, handleSetExternalLink);
 
@@ -119,7 +112,7 @@ const isPercentageWidth = computed(() => {
         ></video>
         <div
           v-if="src"
-          class="absolute left-0 top-0 hidden h-1/4 w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden w-full cursor-pointer justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent p-2 ease-in-out group-hover:flex"
         >
           <VButton
             v-if="
@@ -144,13 +137,12 @@ const isPercentageWidth = computed(() => {
               )
             }}
           </VButton>
-          <VButton size="sm" type="secondary" @click="handleResetInit">
-            {{
-              i18n.global.t(
-                "editor.extensions.upload.operations.replace.button"
-              )
-            }}
-          </VButton>
+          <ResourceReplaceButton
+            accept="video/*"
+            :original-link="src"
+            :upload="extension.options.uploadVideo"
+            @change="handleSetExternalLink"
+          />
         </div>
       </div>
       <div v-show="!src" class="relative">
@@ -165,14 +157,10 @@ const isPercentageWidth = computed(() => {
           @on-upload-abort="resetUpload"
         >
           <template #icon>
-            <div
-              class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
-            >
-              <RiVideoAddLine class="text-xl text-primary" />
-            </div>
+            <MingcuteVideoLine class="text-xl text-primary" />
           </template>
           <template #uploading="{ progress }">
-            <div class="absolute top-0 h-full w-full bg-black bg-opacity-20">
+            <div class="absolute top-0 size-full bg-black bg-opacity-20">
               <div class="absolute top-[50%] w-full space-y-2 text-white">
                 <div class="px-10">
                   <div
@@ -206,13 +194,13 @@ const isPercentageWidth = computed(() => {
             </div>
           </template>
           <template #error>
-            <div class="absolute top-0 h-full w-full bg-black bg-opacity-20">
+            <div class="absolute top-0 size-full bg-black bg-opacity-20">
               <div class="absolute top-[50%] w-full space-y-2 text-white">
                 <div class="px-10">
                   <div
                     class="relative h-4 w-full overflow-hidden rounded-full bg-gray-200"
                   >
-                    <div class="h-full w-full bg-red-600"></div>
+                    <div class="size-full bg-red-600"></div>
                     <div
                       class="absolute left-[50%] top-0 -translate-x-[50%] text-xs leading-4 text-white"
                     >

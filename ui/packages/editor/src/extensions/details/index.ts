@@ -1,4 +1,4 @@
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -18,7 +18,7 @@ import TiptapDetails, {
   type DetailsOptions,
 } from "@tiptap/extension-details";
 import { markRaw } from "vue";
-import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
+import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 
 export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 
@@ -35,7 +35,7 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
       getCommandMenuItems() {
         return {
           priority: 160,
-          icon: markRaw(MdiExpandHorizontal),
+          icon: markRaw(MingcuteFoldVerticalLine),
           title: "editor.extensions.details.command_item",
           keywords: ["details"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -44,7 +44,7 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
               .focus()
               .deleteRange(range)
               .setDetails()
-              .updateAttributes("details", { open: true })
+              .updateAttributes(TiptapDetails.name, { open: true })
               .run();
           },
         };
@@ -55,18 +55,18 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("details"),
-            icon: markRaw(MdiExpandHorizontal),
+            isActive: editor.isActive(TiptapDetails.name),
+            icon: markRaw(MingcuteFoldVerticalLine),
             title: i18n.global.t("editor.extensions.details.command_item"),
             action: () => {
-              if (editor.isActive("details")) {
+              if (editor.isActive(TiptapDetails.name)) {
                 editor.chain().focus().unsetDetails().run();
               } else {
                 editor
                   .chain()
                   .focus()
                   .setDetails()
-                  .updateAttributes("details", { open: true })
+                  .updateAttributes(TiptapDetails.name, { open: true })
                   .run();
               }
             },
@@ -107,7 +107,7 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
             {
               priority: 10,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }): boolean =>
                   deleteNode(ExtensionDetails.name, editor),

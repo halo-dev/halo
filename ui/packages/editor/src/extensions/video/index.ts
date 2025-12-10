@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -26,23 +26,18 @@ import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
 import MdiCogPlay from "~icons/mdi/cog-play";
 import MdiCogPlayOutline from "~icons/mdi/cog-play-outline";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
-import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
-import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
-import MdiLinkVariant from "~icons/mdi/link-variant";
 import MdiMotionPlay from "~icons/mdi/motion-play";
 import MdiMotionPlayOutline from "~icons/mdi/motion-play-outline";
 import MdiPlayCircle from "~icons/mdi/play-circle";
 import MdiPlayCircleOutline from "~icons/mdi/play-circle-outline";
-import MdiShare from "~icons/mdi/share";
-import MdiVideo from "~icons/mdi/video";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import MingcuteVideoLine from "~icons/mingcute/video-line";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
 import BubbleItemVideoLink from "./BubbleItemVideoLink.vue";
+import BubbleItemVideoPosition from "./BubbleItemVideoPosition.vue";
 import BubbleItemVideoSize from "./BubbleItemVideoSize.vue";
 import VideoView from "./VideoView.vue";
 declare module "@/tiptap" {
@@ -80,7 +75,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
         },
       },
       width: {
-        default: undefined,
+        default: "100%",
         parseHTML: (element) => {
           return element.getAttribute("width") || element.style.width || null;
         },
@@ -91,7 +86,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
         },
       },
       height: {
-        default: undefined,
+        default: "auto",
         parseHTML: (element) => {
           return element.getAttribute("height") || element.style.height || null;
         },
@@ -282,7 +277,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
       getCommandMenuItems() {
         return {
           priority: 100,
-          icon: markRaw(MdiVideo),
+          icon: markRaw(MingcuteVideoLine),
           title: "editor.extensions.commands_menu.video",
           keywords: ["video", "shipin"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -309,7 +304,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiVideo),
+              icon: markRaw(MingcuteVideoLine),
               title: i18n.global.t("editor.extensions.commands_menu.video"),
               action: () => {
                 editor
@@ -462,7 +457,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             },
             {
               priority: 60,
-              component: markRaw(BlockActionSeparator),
+              component: markRaw(BubbleItemVideoPosition),
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -473,44 +468,23 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
             },
             {
               priority: 70,
+              component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
                   return !isEmpty(
                     editor.getAttributes(ExtensionVideo.name).src
                   );
                 },
-                isActive: () => {
-                  const size = getVideoSizePercentage(editor, 25);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectSmall),
-                action: () =>
-                  handleSetSize(editor, { width: "25%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.small_size"),
               },
             },
             {
               priority: 80,
               props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
+                icon: markRaw(MingcuteLinkLine),
+                title: i18n.global.t("editor.common.button.edit_link"),
+                action: () => {
+                  return markRaw(BubbleItemVideoLink);
                 },
-                isActive: ({ editor }: { editor: Editor }) => {
-                  const size = getVideoSizePercentage(editor, 50);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectLarge),
-                action: () =>
-                  handleSetSize(editor, { width: "50%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.medium_size"),
               },
             },
             {
@@ -521,105 +495,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
                     editor.getAttributes(ExtensionVideo.name).src
                   );
                 },
-                isActive: () => {
-                  const size = getVideoSizePercentage(editor, 100);
-                  return (
-                    editor.getAttributes(ExtensionVideo.name).width ===
-                    `${size?.width}px`
-                  );
-                },
-                icon: markRaw(MdiImageSizeSelectActual),
-                action: () =>
-                  handleSetSize(editor, { width: "100%", height: "auto" }),
-                title: i18n.global.t("editor.extensions.video.large_size"),
-              },
-            },
-            {
-              priority: 100,
-              component: markRaw(BlockActionSeparator),
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-              },
-            },
-            {
-              priority: 110,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "left" });
-                },
-                icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetPosition(editor, "left"),
-              },
-            },
-            {
-              priority: 120,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "center" });
-                },
-                icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetPosition(editor, "center"),
-              },
-            },
-            {
-              priority: 130,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "right" });
-                },
-                icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetPosition(editor, "right"),
-              },
-            },
-            {
-              priority: 150,
-              component: markRaw(BlockActionSeparator),
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-              },
-            },
-            {
-              priority: 160,
-              props: {
-                icon: markRaw(MdiLinkVariant),
-                title: i18n.global.t("editor.common.button.edit_link"),
-                action: () => {
-                  return markRaw(BubbleItemVideoLink);
-                },
-              },
-            },
-            {
-              priority: 170,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionVideo.name).src
-                  );
-                },
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
                   window.open(
@@ -630,7 +506,7 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 180,
+              priority: 100,
               props: {
                 visible({ editor }) {
                   return !isEmpty(
@@ -685,13 +561,13 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
               },
             },
             {
-              priority: 190,
+              priority: 110,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 200,
+              priority: 120,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
@@ -772,17 +648,5 @@ export const handleSetSize = (
     .updateAttributes(ExtensionVideo.name, size)
     .setNodeSelection(editor.state.selection.from)
     .focus()
-    .run();
-};
-
-const handleSetPosition = (
-  editor: Editor,
-  position: "left" | "center" | "right"
-) => {
-  return editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionVideo.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
     .run();
 };

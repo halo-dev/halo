@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -23,21 +23,19 @@ import TiptapImage from "@tiptap/extension-image";
 import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
-import LucideCaptions from "~icons/lucide/captions";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiLink from "~icons/mdi/link";
-import MdiLinkVariant from "~icons/mdi/link-variant";
-import MdiShare from "~icons/mdi/share";
-import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
+import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
+import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
+import MingcuteLink2Line from "~icons/mingcute/link-2-line";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcutePicLine from "~icons/mingcute/pic-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
 import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
 import BubbleItemImageHref from "./BubbleItemImageHref.vue";
-import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
+import BubbleItemImageLink from "./BubbleItemImageLink.vue";
+import BubbleItemImagePosition from "./BubbleItemImagePosition.vue";
 import BubbleItemImageSize from "./BubbleItemImageSize.vue";
 import ImageView from "./ImageView.vue";
 
@@ -233,7 +231,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiFileImageBox),
+              icon: markRaw(MingcutePicLine),
               title: i18n.global.t("editor.common.image"),
               action: () => {
                 editor
@@ -255,7 +253,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
       getCommandMenuItems() {
         return {
           priority: 95,
-          icon: markRaw(MdiFileImageBox),
+          icon: markRaw(MingcutePicLine),
           title: "editor.extensions.commands_menu.image",
           keywords: ["image", "tupian"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -297,51 +295,17 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             },
             {
               priority: 20,
+              component: markRaw(BubbleItemImagePosition),
               props: {
                 visible({ editor }) {
                   return !isEmpty(
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                isActive: () => {
-                  return editor.isActive({ position: "left" });
-                },
-                icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetPosition(editor, "left"),
               },
             },
             {
               priority: 30,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "center" });
-                },
-                icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetPosition(editor, "center"),
-              },
-            },
-            {
-              priority: 40,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                isActive: () => {
-                  return editor.isActive({ position: "right" });
-                },
-                icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetPosition(editor, "right"),
-              },
-            },
-            {
-              priority: 60,
               component: markRaw(BlockActionSeparator),
               props: {
                 visible({ editor }) {
@@ -352,12 +316,60 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 70,
+              priority: 40,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
-                  return markRaw(BubbleItemVideoLink);
+                  return markRaw(BubbleItemImageLink);
+                },
+              },
+            },
+            {
+              priority: 50,
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteShare3Line),
+                title: i18n.global.t("editor.common.tooltip.open_link"),
+                action: () => {
+                  window.open(
+                    editor.getAttributes(ExtensionImage.name).src,
+                    "_blank"
+                  );
+                },
+              },
+            },
+            {
+              priority: 60,
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteEdit4Line),
+                title: i18n.global.t("editor.extensions.image.edit_alt"),
+                action: () => {
+                  return markRaw(BubbleItemImageAlt);
+                },
+              },
+            },
+            {
+              priority: 70,
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteLink2Line),
+                title: i18n.global.t("editor.extensions.image.edit_href"),
+                action: () => {
+                  return markRaw(BubbleItemImageHref);
                 },
               },
             },
@@ -369,56 +381,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                     editor.getAttributes(ExtensionImage.name).src
                   );
                 },
-                icon: markRaw(MdiShare),
-                title: i18n.global.t("editor.common.tooltip.open_link"),
-                action: () => {
-                  window.open(
-                    editor.getAttributes(ExtensionImage.name).src,
-                    "_blank"
-                  );
-                },
-              },
-            },
-            {
-              priority: 90,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                icon: markRaw(MdiTextBoxEditOutline),
-                title: i18n.global.t("editor.extensions.image.edit_alt"),
-                action: () => {
-                  return markRaw(BubbleItemImageAlt);
-                },
-              },
-            },
-            {
-              priority: 100,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                icon: markRaw(MdiLink),
-                title: i18n.global.t("editor.extensions.image.edit_href"),
-                action: () => {
-                  return markRaw(BubbleItemImageHref);
-                },
-              },
-            },
-
-            {
-              priority: 110,
-              props: {
-                visible({ editor }) {
-                  return !isEmpty(
-                    editor.getAttributes(ExtensionImage.name).src
-                  );
-                },
-                icon: markRaw(LucideCaptions),
+                icon: markRaw(MingcuteBookmarkEditLine),
                 title: i18n.global.t("editor.extensions.image.edit_caption"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
@@ -464,13 +427,13 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               },
             },
             {
-              priority: 120,
+              priority: 90,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 130,
+              priority: 100,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   const figureParent = findParentNode(
@@ -506,15 +469,3 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
     loading: "lazy",
   },
 });
-
-const handleSetPosition = (
-  editor: Editor,
-  position: "left" | "center" | "right"
-) => {
-  return editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionImage.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
-    .run();
-};

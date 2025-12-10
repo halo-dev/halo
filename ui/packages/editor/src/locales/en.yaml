@@ -47,11 +47,14 @@ editor:
       cancel_link: Cancel link
       nofollow: No follow
     audio:
+      src_input_label: Audio link
       disable_autoplay: Disable auto play
       enable_autoplay: Enable auto play
       disable_loop: Disable loop
       enable_loop: Disable loop
     iframe:
+      src_input_label: Web link
+      resize: Resize
       disable_frameborder: Hide frameborder
       enable_frameborder: Show frameborder
       phone_size: Mobile phone size
@@ -59,6 +62,9 @@ editor:
       tablet_horizontal_size: Tablet landscape size
       desktop_size: Desktop size
     image:
+      src_input_label: Image link
+      href_input_label: Image hyperlink
+      resize: Resize
       small_size: Small size
       medium_size: Medium size
       large_size: Large size
@@ -69,6 +75,8 @@ editor:
       edit_caption: Image description
       image_load_error: Image load failed
     video:
+      src_input_label: Video link
+      resize: Resize
       disable_controls: Hide controls
       enable_controls: Show controls
       disable_autoplay: Disable auto play
@@ -110,10 +118,12 @@ editor:
       add_image: Add image
       empty_prompt: Click to select images or drag images here
       group_size: Images per row
+      group_size_label: "{count} images per row"
       layout:
         title: Layout
         auto: Auto
         square: Square
+      gap: Gap
     upload:
       error: Upload failed
       click_retry: Click to retry
@@ -137,10 +147,15 @@ editor:
           description: >-
             External link detected. Would you like to automatically upload
             it to the attachment library?
+    font_size:
+      title: Font size
   components:
     color_picker:
       more_color: More
   common:
+    alt: Alternative text
+    width: Width
+    height: Height
     align_method: Align method
     align_left: Align left
     align_center: Align center
@@ -168,6 +183,7 @@ editor:
       header4: Header 4
       header5: Header 5
       header6: Header 6
+    list: List
     bullet_list: Bullet list
     ordered_list: Ordered list
     task_list: Task list
