@@ -49,6 +49,7 @@ const isHighContrast = computed(() => {
   <VDropdown class="inline-flex" popper-class="[&_.v-popper\_\_inner]:!p-0">
     <button
       type="button"
+      aria-label="Choose color"
       class="inline-flex h-8 items-center justify-center rounded-lg bg-white px-2 transition-all hover:opacity-80 hover:shadow active:opacity-70"
       :style="{
         backgroundColor: context._value,
