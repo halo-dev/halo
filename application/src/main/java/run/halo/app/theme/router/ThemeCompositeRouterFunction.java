@@ -1,5 +1,6 @@
 package run.halo.app.theme.router;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.factories.ArchiveRouteFactory;
 import run.halo.app.theme.router.factories.AuthorPostsRouteFactory;
@@ -39,6 +41,9 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
 @RequiredArgsConstructor
 public class ThemeCompositeRouterFunction
     implements RouterFunction<ServerResponse>, SmartLifecycle {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private final ArchiveRouteFactory archiveRouteFactory;
@@ -130,7 +135,7 @@ public class ThemeCompositeRouterFunction
         SystemSetting.ThemeRouteRules rules =
             environmentFetcher.fetch(SystemSetting.ThemeRouteRules.GROUP,
                     SystemSetting.ThemeRouteRules.class)
-                .blockOptional()
+                .blockOptional(BLOCKING_TIMEOUT)
                 .orElse(SystemSetting.ThemeRouteRules.empty());
         String post = rules.getPost();
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.POST, post));

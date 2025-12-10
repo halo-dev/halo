@@ -1,5 +1,6 @@
 package run.halo.app.core.reconciler;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.security.AuthProviderService;
 
 /**
@@ -20,6 +22,7 @@ import run.halo.app.security.AuthProviderService;
 @Component
 @RequiredArgsConstructor
 public class AuthProviderReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private final ExtensionClient client;
     private final AuthProviderService authProviderService;
 
@@ -39,7 +42,8 @@ public class AuthProviderReconciler implements Reconciler<Reconciler.Request> {
 
     private void handlePrivileged(AuthProvider authProvider) {
         if (privileged(authProvider)) {
-            authProviderService.enable(authProvider.getMetadata().getName()).block();
+            authProviderService.enable(authProvider.getMetadata().getName())
+                .block(BLOCKING_TIMEOUT);
         }
     }
 

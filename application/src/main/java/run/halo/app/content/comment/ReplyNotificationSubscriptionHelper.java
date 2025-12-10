@@ -1,6 +1,7 @@
 package run.halo.app.content.comment;
 
 import io.micrometer.common.util.StringUtils;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.notification.Subscription;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.UserIdentity;
 
@@ -20,6 +22,8 @@ import run.halo.app.notification.UserIdentity;
 @Component
 @RequiredArgsConstructor
 public class ReplyNotificationSubscriptionHelper {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private final NotificationCenter notificationCenter;
 
@@ -50,7 +54,7 @@ public class ReplyNotificationSubscriptionHelper {
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU);
         interestReason.setExpression("props.repliedOwner == '%s'".formatted(identity.name()));
-        notificationCenter.subscribe(subscriber, interestReason).block();
+        notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
     @Nullable

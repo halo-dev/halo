@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static run.halo.app.content.comment.ReplyNotificationSubscriptionHelper.identityFrom;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Builder;
@@ -29,6 +30,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -41,6 +43,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @Component
 @RequiredArgsConstructor
 public class CommentNotificationReasonPublisher {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final GroupVersionKind POST_GVK = GroupVersionKind.fromExtension(Post.class);
     private static final GroupVersionKind PAGE_GVK =
         GroupVersionKind.fromExtension(SinglePage.class);
@@ -123,7 +126,7 @@ public class CommentNotificationReasonPublisher {
                     builder.attributes(ReasonDataConverter.toAttributeMap(attributes))
                         .author(identityFrom(owner))
                         .subject(reasonSubject);
-                }).block();
+                }).block(BLOCKING_TIMEOUT);
         }
 
         boolean doNotEmitReason(Comment comment, Post post) {
@@ -191,7 +194,7 @@ public class CommentNotificationReasonPublisher {
                     builder.attributes(ReasonDataConverter.toAttributeMap(attributes))
                         .author(identityFrom(owner))
                         .subject(reasonSubject);
-                }).block();
+                }).block(BLOCKING_TIMEOUT);
         }
 
         public boolean doNotEmitReason(Comment comment, SinglePage page) {
@@ -300,7 +303,7 @@ public class CommentNotificationReasonPublisher {
                             .name(reasonSubject.getName())
                             .title(reasonSubjectTitle)
                             .build());
-                }).block();
+                }).block(BLOCKING_TIMEOUT);
         }
 
         /**
@@ -312,7 +315,7 @@ public class CommentNotificationReasonPublisher {
                 .filter(commentSubject -> commentSubject.supports(ref))
                 .next()
                 .flatMap(subject -> subject.getSubjectDisplay(ref.getName()))
-                .blockOptional();
+                .blockOptional(BLOCKING_TIMEOUT);
         }
 
         boolean doNotEmitReason(Reply currentReply, Reply quoteReply, Comment comment) {

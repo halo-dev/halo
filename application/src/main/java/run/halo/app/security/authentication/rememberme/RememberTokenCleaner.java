@@ -14,6 +14,7 @@ import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * A cleaner for remember me tokens that cleans up expired tokens periodically.
@@ -25,6 +26,7 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 @Component
 @RequiredArgsConstructor
 public class RememberTokenCleaner {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
     private final RememberMeCookieResolver rememberMeCookieResolver;
 
@@ -34,7 +36,7 @@ public class RememberTokenCleaner {
     @Scheduled(cron = "0 0 3 * * ?")
     public void cleanUpExpiredTokens() {
         paginatedOperator.deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
-            .then().block();
+            .then().block(BLOCKING_TIMEOUT);
         log.info("Expired remember me tokens have been cleaned up.");
     }
 

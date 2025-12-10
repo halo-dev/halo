@@ -4,6 +4,7 @@ import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.index.query.Queries;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * Reconciler for {@link Category}.
@@ -34,6 +36,9 @@ import run.halo.app.extension.index.query.Queries;
 @Component
 @AllArgsConstructor
 public class CategoryReconciler implements Reconciler<Reconciler.Request> {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
     static final String FINALIZER_NAME = "category-protection";
     private final ExtensionClient client;
     private final CategoryPermalinkPolicy categoryPermalinkPolicy;
@@ -65,7 +70,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
     private void checkHiddenState(Category category) {
         final boolean hidden = categoryService.isCategoryHidden(category.getMetadata().getName())
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(false);
         refreshHiddenState(category, hidden);
     }
