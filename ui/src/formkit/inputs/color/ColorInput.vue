@@ -33,11 +33,15 @@ function formatColor(color: Payload) {
 const isHighContrast = computed(() => {
   const color = props.context._value;
   if (!color) {
-    return "inherit";
+    return false;
   }
-  const onWhite = Math.abs(Color.contrast(color, "white", "APCA"));
-  const onBlack = Math.abs(Color.contrast(color, "black", "APCA"));
-  return onWhite > onBlack;
+  try {
+    const onWhite = Math.abs(Color.contrast(color, "white", "APCA"));
+    const onBlack = Math.abs(Color.contrast(color, "black", "APCA"));
+    return onWhite > onBlack;
+  } catch {
+    return false; // Default to low contrast on error
+  }
 });
 </script>
 
