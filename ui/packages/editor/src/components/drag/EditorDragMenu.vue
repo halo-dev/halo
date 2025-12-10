@@ -22,11 +22,6 @@ const props = defineProps({
     type: Array as PropType<DragButtonType[]>,
     required: true,
   },
-  class: {
-    type: String,
-    required: false,
-    default: "",
-  },
 });
 
 const emit = defineEmits<{
@@ -72,23 +67,16 @@ const setItemRef = (key: string, ref: unknown) => {
 </script>
 
 <template>
-  <div
-    :class="[
-      'min-w-60 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5',
-      props.class,
-    ]"
-  >
-    <div class="flex flex-col gap-0.5 px-2 py-1">
-      <EditorDragButtonItem
-        v-for="(item, index) in items"
-        :key="item.key || String(index)"
-        :ref="(el) => setItemRef(item.key || String(index), el)"
-        :editor="editor"
-        :node="node"
-        :pos="pos"
-        v-bind="item"
-        @close="emit('close')"
-      />
-    </div>
+  <div class="flex min-w-60 flex-col gap-0.5 bg-white">
+    <EditorDragButtonItem
+      v-for="(item, index) in items"
+      :key="item.key || String(index)"
+      :ref="(el) => setItemRef(item.key || String(index), el)"
+      :editor="editor"
+      :node="node"
+      :pos="pos"
+      v-bind="item"
+      @close="emit('close')"
+    />
   </div>
 </template>

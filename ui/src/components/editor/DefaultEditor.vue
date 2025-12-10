@@ -52,13 +52,13 @@ import {
   type ComputedRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import MdiFormatHeader1 from "~icons/mdi/format-header-1";
-import MdiFormatHeader2 from "~icons/mdi/format-header-2";
-import MdiFormatHeader3 from "~icons/mdi/format-header-3";
-import MdiFormatHeader4 from "~icons/mdi/format-header-4";
-import MdiFormatHeader5 from "~icons/mdi/format-header-5";
-import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import RiLayoutRightLine from "~icons/ri/layout-right-line";
+import LucideHeading1 from "~icons/lucide/heading-1";
+import LucideHeading2 from "~icons/lucide/heading-2";
+import LucideHeading3 from "~icons/lucide/heading-3";
+import LucideHeading4 from "~icons/lucide/heading-4";
+import LucideHeading5 from "~icons/lucide/heading-5";
+import LucideHeading6 from "~icons/lucide/heading-6";
+import MingcuteLayoutRightLine from "~icons/mingcute/layout-right-line";
 
 const { t } = useI18n();
 
@@ -101,12 +101,12 @@ interface HeadingNode {
 }
 
 const headingIcons = {
-  1: markRaw(MdiFormatHeader1),
-  2: markRaw(MdiFormatHeader2),
-  3: markRaw(MdiFormatHeader3),
-  4: markRaw(MdiFormatHeader4),
-  5: markRaw(MdiFormatHeader5),
-  6: markRaw(MdiFormatHeader6),
+  1: markRaw(LucideHeading1),
+  2: markRaw(LucideHeading2),
+  3: markRaw(LucideHeading3),
+  4: markRaw(LucideHeading4),
+  5: markRaw(LucideHeading5),
+  6: markRaw(LucideHeading6),
 };
 
 const headingNodes = ref<HeadingNode[]>();
@@ -175,7 +175,7 @@ const customExtensions = [
             props: {
               editor,
               isActive: showSidebar.value,
-              icon: markRaw(RiLayoutRightLine),
+              icon: markRaw(MingcuteLayoutRightLine),
               title: i18n.global.t(
                 "core.components.default_editor.toolbox.show_hide_sidebar"
               ),
@@ -452,7 +452,10 @@ onCoverInputChange((files) => {
                         )
                       }}
                     </VDropdownItem>
-                    <VDropdownItem @click="emit('update:cover', undefined)">
+                    <VDropdownItem
+                      type="danger"
+                      @click="emit('update:cover', undefined)"
+                    >
                       {{ $t("core.common.buttons.delete") }}
                     </VDropdownItem>
                   </template>
@@ -516,7 +519,7 @@ onCoverInputChange((files) => {
         <OverlayScrollbarsComponent
           element="div"
           :options="{ scrollbars: { autoHide: 'scroll' } }"
-          class="h-full border-l bg-white"
+          class="h-full border-l bg-white p-2"
           defer
         >
           <VTabs v-model:active-id="extraActiveId" type="outline">
@@ -524,48 +527,46 @@ onCoverInputChange((files) => {
               id="toc"
               :label="$t('core.components.default_editor.tabs.toc.title')"
             >
-              <div class="p-1 pt-0">
-                <ul v-if="headingNodes?.length" class="space-y-1">
-                  <li
-                    v-for="(node, index) in headingNodes"
-                    :key="index"
-                    :class="[
-                      { 'bg-gray-100': node.id === selectedHeadingNode?.id },
-                    ]"
-                    class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                    @click="handleSelectHeadingNode(node)"
+              <ul v-if="headingNodes?.length" class="space-y-1">
+                <li
+                  v-for="(node, index) in headingNodes"
+                  :key="index"
+                  :class="[
+                    { 'bg-gray-100': node.id === selectedHeadingNode?.id },
+                  ]"
+                  class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  @click="handleSelectHeadingNode(node)"
+                >
+                  <div
+                    :style="{
+                      paddingLeft: `${(node.level - 1) * 0.8}rem`,
+                    }"
+                    class="flex items-center gap-2"
                   >
-                    <div
-                      :style="{
-                        paddingLeft: `${(node.level - 1) * 0.8}rem`,
-                      }"
-                      class="flex items-center gap-2"
-                    >
-                      <component
-                        :is="headingIcons[node.level]"
-                        class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
-                        :class="[
-                          {
-                            '!bg-white': node.id === selectedHeadingNode?.id,
-                          },
-                        ]"
-                      />
-                      <span class="flex-1 truncate">{{ node.text }}</span>
-                    </div>
-                  </li>
-                </ul>
-                <div v-else class="flex flex-col items-center py-10">
-                  <span class="text-sm text-gray-600">
-                    {{ $t("core.components.default_editor.tabs.toc.empty") }}
-                  </span>
-                </div>
+                    <component
+                      :is="headingIcons[node.level]"
+                      class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
+                      :class="[
+                        {
+                          '!bg-white': node.id === selectedHeadingNode?.id,
+                        },
+                      ]"
+                    />
+                    <span class="flex-1 truncate">{{ node.text }}</span>
+                  </div>
+                </li>
+              </ul>
+              <div v-else class="flex flex-col items-center py-10">
+                <span class="text-sm text-gray-600">
+                  {{ $t("core.components.default_editor.tabs.toc.empty") }}
+                </span>
               </div>
             </VTabItem>
             <VTabItem
               id="information"
               :label="$t('core.components.default_editor.tabs.detail.title')"
             >
-              <div class="flex flex-col gap-2 p-1 pt-0">
+              <div class="flex flex-col gap-2">
                 <div class="grid grid-cols-2 gap-2">
                   <div
                     class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"

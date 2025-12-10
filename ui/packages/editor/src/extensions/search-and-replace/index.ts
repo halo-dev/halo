@@ -4,7 +4,7 @@ import { EditorState } from "@/tiptap/pm";
 import { Editor, Extension } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
 import { h, markRaw, render } from "vue";
-import MdiTextBoxSearchOutline from "~icons/mdi/text-box-search-outline";
+import MingcuteListSearchLine from "~icons/mingcute/list-search-line";
 import SearchAndReplaceVue from "./SearchAndReplace.vue";
 import {
   SearchAndReplacePlugin,
@@ -66,7 +66,7 @@ export const ExtensionSearchAndReplace = Extension.create<ExtensionOptions>({
             props: {
               editor,
               isActive: isShowSearch(),
-              icon: markRaw(MdiTextBoxSearchOutline),
+              icon: markRaw(MingcuteListSearchLine),
               title: i18n.global.t(
                 "editor.extensions.search_and_replace.title"
               ),

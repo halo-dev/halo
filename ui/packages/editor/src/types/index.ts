@@ -19,17 +19,21 @@ import type {
   VirtualElement,
 } from "@floating-ui/dom";
 import type { Component } from "vue";
+
 export interface ToolbarItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    isActive: boolean;
-    disabled?: boolean;
-    icon?: Component;
-    title?: string;
-    action?: () => void;
-  };
+  props: Omit<ToolbarItemComponentProps, "children"> & Record<string, unknown>;
+  children?: ToolbarItemType[];
+}
+
+export interface ToolbarItemComponentProps {
+  editor: Editor;
+  isActive: boolean;
+  disabled?: boolean;
+  icon?: Component;
+  title?: string;
+  action?: () => void;
   children?: ToolbarItemType[];
 }
 
@@ -157,30 +161,36 @@ export interface NodeBubbleMenuType extends BubbleMenuProps {
   items?: BubbleItemType[];
   extendsKey?: string | PluginKey;
 }
+
 export interface BubbleItemType {
   priority: number;
   component?: Component;
   key?: string;
-  props?: {
-    isActive?: ({ editor }: { editor: Editor }) => boolean;
-    visible?: ({ editor }: { editor: Editor }) => boolean;
-    icon?: Component;
-    iconStyle?: string;
-    title?: string;
-    action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
-  } & Record<string, unknown>;
+  props?: Omit<BubbleItemComponentProps, "editor"> & Record<string, unknown>;
+}
+
+export interface BubbleItemComponentProps {
+  editor: Editor;
+  isActive?: ({ editor }: { editor: Editor }) => boolean;
+  visible?: ({ editor }: { editor: Editor }) => boolean;
+  icon?: Component;
+  iconStyle?: string;
+  title?: string;
+  action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
 }
 
 export interface ToolboxItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    icon?: Component;
-    title?: string;
-    description?: string;
-    action?: () => void;
-  };
+  props: ToolboxItemComponentProps & Record<string, unknown>;
+}
+
+export interface ToolboxItemComponentProps {
+  editor: Editor;
+  icon?: Component;
+  title?: string;
+  description?: string;
+  action?: () => void;
 }
 
 export interface ExtensionOptions {

@@ -4,7 +4,7 @@ import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
-import MdiEraser from "~icons/mdi/eraser";
+import MingcuteEraserLine from "~icons/mingcute/eraser-line";
 
 export type ExtensionClearFormatOptions = ExtensionOptions;
 
@@ -21,7 +21,7 @@ export const ExtensionClearFormat =
             props: {
               editor,
               isActive: false,
-              icon: markRaw(MdiEraser),
+              icon: markRaw(MingcuteEraserLine),
               title: i18n.global.t("editor.common.clear_format"),
               action: () => editor.chain().focus().unsetAllMarks().run(),
             },

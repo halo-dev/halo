@@ -1,17 +1,11 @@
 <script lang="ts" setup>
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { computed, type Component } from "vue";
+import type { BubbleItemComponentProps } from "@/types";
+import { computed } from "vue";
 import { ExtensionAudio } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const src = computed({
   get: () => {
@@ -29,9 +23,12 @@ const src = computed({
 </script>
 
 <template>
-  <input
-    v-model.lazy="src"
-    :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
-    class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
-  />
+  <div class="w-80">
+    <Input
+      v-model="src"
+      auto-focus
+      :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
+      :label="i18n.global.t('editor.extensions.audio.src_input_label')"
+    />
+  </div>
 </template>

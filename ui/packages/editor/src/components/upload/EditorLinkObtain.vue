@@ -12,6 +12,7 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
+import Input from "../base/Input.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -188,12 +189,17 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
     ></slot>
     <div
       v-else
-      class="flex h-full w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50"
+      class="flex size-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50"
     >
       <div
         class="flex flex-col items-center justify-center space-y-7 pb-6 pt-5"
       >
-        <slot v-if="$slots.icon" name="icon"></slot>
+        <div
+          v-if="$slots.icon"
+          class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20"
+        >
+          <slot name="icon"></slot>
+        </div>
         <VSpace>
           <VButton
             v-if="utils.permission.has(['uc:attachments:manage'])"
@@ -219,16 +225,18 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
               {{ i18n.global.t("editor.extensions.upload.permalink.title") }}
             </VButton>
             <template #popper>
-              <input
-                v-model="externalLink"
-                class="block w-full rounded-md border !border-solid border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100"
-                :placeholder="
-                  i18n.global.t(
-                    'editor.extensions.upload.permalink.placeholder'
-                  )
-                "
-                @keydown.enter="handleEnterSetExternalLink"
-              />
+              <div class="w-80">
+                <Input
+                  v-model="externalLink"
+                  auto-focus
+                  :placeholder="
+                    i18n.global.t(
+                      'editor.extensions.upload.permalink.placeholder'
+                    )
+                  "
+                  @keydown.enter="handleEnterSetExternalLink"
+                />
+              </div>
             </template>
           </VDropdown>
         </VSpace>

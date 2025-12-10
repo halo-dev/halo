@@ -16,7 +16,7 @@ import TiptapParagraph, {
   type ParagraphOptions,
 } from "@tiptap/extension-paragraph";
 import { markRaw } from "vue";
-import TablerLineHeight from "~icons/tabler/line-height";
+import MingcuteLineHeightLine from "~icons/mingcute/line-height-line";
 
 export type ExtensionParagraphOptions = ExtensionOptions &
   Partial<ParagraphOptions>;
@@ -53,7 +53,7 @@ export const ExtensionParagraph =
               editor,
               isActive: !!editor.getAttributes(ExtensionParagraph.name)
                 ?.lineHeight,
-              icon: markRaw(TablerLineHeight),
+              icon: markRaw(MingcuteLineHeightLine),
               title: i18n.global.t("editor.common.line_height"),
             },
             children: [0, 1, 1.5, 2, 2.5, 3].map((lineHeight) => {
