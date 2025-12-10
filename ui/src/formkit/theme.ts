@@ -44,9 +44,13 @@ const theme: Record<string, Record<string, string>> = {
   button: buttonClassification,
   color: {
     ...textClassification,
-    inner: "",
+    inner: "inline-flex items-center gap-1",
     input:
-      "w-16 h-8 appearance-none cursor-pointer border border-gray-300 rounded-md mb-2 p-1",
+      "w-16 h-8 appearance-none cursor-pointer border border-gray-300 rounded-md p-1",
+  },
+  iconify: {
+    ...textClassification,
+    inner: "inline-flex items-center gap-1",
   },
   file: {
     ...textClassification,
