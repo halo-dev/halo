@@ -16,7 +16,7 @@ export type ArrayProps = {
   addAttrs?: Record<string, unknown>;
   min?: number;
   max?: number;
-  itemLabel: string;
+  itemLabels: { type: "image" | "text"; label: string }[];
 };
 
 export type ArrayValue = Record<string, unknown>[];
@@ -42,7 +42,7 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   node.props.addAttrs = initProps.addAttrs ?? {};
   node.props.min = initProps.min ? Number(initProps.min) : 0;
   node.props.max = initProps.max ? Number(initProps.max) : 1 / 0;
-  if (node.props.min > initProps.max) {
+  if (node.props.min > node.props.max) {
     throw Error("Array: min must be less than max");
   }
 
@@ -110,10 +110,10 @@ const parseItemLabel = (
   }
 
   if (itemLabel.label.startsWith("$value.")) {
-    const [_, path] = itemLabel.label.split("$value.");
+    const path = itemLabel.label.split("$value.")[1];
     const value = get(item, path);
     const node = hiddenChildrenFormKit.value?.at(path);
-    console.log(hiddenChildrenFormKit.value, path, node);
+
     if (!node) {
       return {
         type: itemLabel.type,
@@ -160,7 +160,7 @@ const handleOpenArrayModal = (
 
 const arrayValue = ref<ArrayValue>(props.node.value);
 
-const handleCloseArrayModel = () => {
+const handleCloseArrayModal = () => {
   currentEditIndex.value = -1;
   arrayModal.value = false;
   arrayValue.value = [...props.node.value];
@@ -214,7 +214,11 @@ const handleRemoveItem = (index: number) => {
               @click.stop
             >
               <img
-                v-tooltip="`查看图片：${itemLabel.value}`"
+                v-tooltip="
+                  $t('core.formkit.array.image_tooltip', {
+                    value: itemLabel.value,
+                  })
+                "
                 :src="itemLabel.value"
                 class="size-full object-cover"
               />
@@ -229,7 +233,7 @@ const handleRemoveItem = (index: number) => {
           :disabled="arrayValue.length <= nodeProps.min"
           class="size-4.5 flex-none cursor-pointer text-gray-500 opacity-0 transition-opacity hover:text-gray-900 group-hover/item:opacity-100"
           :class="{
-            'event-none cursor-not-allowed opacity-50 hover:text-gray-500 group-hover/item:opacity-50':
+            'pointer-events-none cursor-not-allowed opacity-50 hover:text-gray-500 group-hover/item:opacity-50':
               arrayValue.length <= nodeProps.min,
           }"
           @click.stop="handleRemoveItem(index)"
@@ -237,7 +241,7 @@ const handleRemoveItem = (index: number) => {
       </div>
     </VueDraggable>
     <div v-else class="text-sm text-gray-500">
-      {{ nodeProps.emptyText ?? "没有条目" }}
+      {{ nodeProps.emptyText ?? $t("core.formkit.array.empty_text") }}
     </div>
     <VButton
       v-if="nodeProps.addButton"
@@ -265,6 +269,6 @@ const handleRemoveItem = (index: number) => {
     :node="node"
     :item-value="itemValue"
     :current-edit-index="currentEditIndex"
-    @close="handleCloseArrayModel"
+    @close="handleCloseArrayModal"
   />
 </template>

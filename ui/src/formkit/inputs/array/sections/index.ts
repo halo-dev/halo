@@ -1,4 +1,4 @@
-import { createRepeaterSection } from "../repeaterSection";
+import { createRepeaterSection } from "../../repeater/repeaterSection";
 
 const repeaterSection = createRepeaterSection();
 

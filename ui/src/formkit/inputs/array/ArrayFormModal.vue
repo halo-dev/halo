@@ -51,7 +51,7 @@ const handleSave = (data: Record<string, unknown>) => {
 <template>
   <VModal
     ref="modal"
-    title="编辑条目"
+    :title="$t('core.formkit.array.item_modal.title')"
     :width="700"
     mount-to-body
     layer-closable
