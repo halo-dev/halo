@@ -1865,6 +1865,8 @@ core:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
   formkit:
+    color:
+      placeholder: Select color
     select:
       no_data: No data
     category_select:

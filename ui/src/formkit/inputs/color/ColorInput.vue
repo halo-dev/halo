@@ -59,7 +59,9 @@ const isHighContrast = computed(() => {
         { 'text-gray-900 ring-1 ring-gray-200': !isHighContrast },
       ]"
     >
-      <span class="text-sm">{{ context._value }}</span>
+      <span class="text-sm">{{
+        context._value || $t("core.formkit.color.placeholder")
+      }}</span>
     </button>
     <template #popper>
       <Sketch

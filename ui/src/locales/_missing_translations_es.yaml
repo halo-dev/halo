@@ -739,6 +739,8 @@ core:
       title: "Warning: H2 database in use"
       description: The H2 database is only suitable for development and testing environments and is not recommended for use in production environments. H2 is very easy to cause data file corruption due to improper operation. If you must use it, please back up the data on time.
   formkit:
+    color:
+      placeholder: Select color
     select:
       no_data: No data
     validation:

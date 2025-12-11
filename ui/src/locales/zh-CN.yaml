@@ -1773,6 +1773,8 @@ core:
       image_tooltip: 查看图片：{value}
       item_modal:
         title: 编辑条目
+    color:
+      placeholder: 选择颜色
   common:
     buttons:
       save: 保存
