@@ -10,10 +10,10 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
-import static run.halo.app.extension.index.query.QueryFactory.contains;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
-import static run.halo.app.extension.index.query.QueryFactory.or;
+import static run.halo.app.extension.index.query.Queries.contains;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.in;
+import static run.halo.app.extension.index.query.Queries.or;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
@@ -25,6 +25,7 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.time.Duration;
 import java.util.Collection;
@@ -282,9 +283,11 @@ public class UserEndpoint implements CustomEndpoint {
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED)
-                                     @Email
-                                     String email) {
+    public record EmailVerifyRequest(
+        @Schema(requiredMode = REQUIRED)
+        @Email
+        @NotBlank
+        String email) {
     }
 
     public record VerifyCodeRequest(
@@ -305,7 +308,8 @@ public class UserEndpoint implements CustomEndpoint {
                     throw new ServerWebInputException("validation.error.email.pattern");
                 }
             })
-            .map(EmailVerifyRequest::email);
+            .map(EmailVerifyRequest::email)
+            .map(String::toLowerCase);
         return Mono.zip(emailMono, getAuthenticatedUserName())
             .flatMap(tuple -> {
                 var email = tuple.getT1();
@@ -689,8 +693,10 @@ public class UserEndpoint implements CustomEndpoint {
     public static class UserPermission {
         @Schema(requiredMode = REQUIRED)
         private List<Role> roles;
+
         @Schema(requiredMode = REQUIRED)
         private List<Role> permissions;
+
         @Schema(requiredMode = REQUIRED)
         private List<String> uiPermissions;
 

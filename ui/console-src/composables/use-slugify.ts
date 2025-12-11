@@ -1,6 +1,4 @@
-import { useGlobalInfoStore } from "@/stores/global-info";
-import { FormType } from "@/types/slug";
-import { randomUUID } from "@/utils/id";
+import { FormType, stores, utils } from "@halo-dev/ui-shared";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
 import { computed, watch, type Ref } from "vue";
@@ -12,7 +10,7 @@ type SlugStrategy = (value?: string) => string;
 const strategies: Record<string, SlugStrategy> = {
   generateByTitle: (value?: string) => slugify(value || "", { trim: true }),
   shortUUID: () => uid.randomUUID(8),
-  UUID: () => randomUUID(),
+  UUID: () => utils.id.uuid(),
   timestamp: () => new Date().getTime().toString(),
 };
 
@@ -24,7 +22,7 @@ export default function useSlugify(
   auto: Ref<boolean>,
   formType: FormType
 ) {
-  const globalInfoStore = useGlobalInfoStore();
+  const globalInfoStore = stores.globalInfo();
 
   const currentStrategy = computed(
     () =>

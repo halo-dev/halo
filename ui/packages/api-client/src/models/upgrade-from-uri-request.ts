@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface UpgradeFromUriRequest
- */
 export interface UpgradeFromUriRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpgradeFromUriRequest
-     */
     'uri': string;
 }
 

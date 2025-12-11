@@ -15,31 +15,11 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonProperty } from './reason-property';
+import type { ReasonProperty } from './reason-property';
 
-/**
- * 
- * @export
- * @interface ReasonTypeSpec
- */
 export interface ReasonTypeSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeSpec
-     */
     'description': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonTypeSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {Array<ReasonProperty>}
-     * @memberof ReasonTypeSpec
-     */
     'properties'?: Array<ReasonProperty>;
 }
 

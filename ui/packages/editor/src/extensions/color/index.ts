@@ -1,14 +1,16 @@
-import TextStyle from "@/extensions/text-style";
+import { ExtensionTextStyle } from "@/extensions/text-style";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { ColorOptions } from "@tiptap/extension-color";
 import TiptapColor from "@tiptap/extension-color";
 import { markRaw } from "vue";
-import MdiFormatColor from "~icons/mdi/format-color";
+import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
 import ColorToolbarItem from "./ColorToolbarItem.vue";
 
-const Color = TiptapColor.extend<ColorOptions & ExtensionOptions>({
+export type ExtensionColorOptions = Partial<ColorOptions> & ExtensionOptions;
+
+export const ExtensionColor = TiptapColor.extend<ExtensionColorOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -19,7 +21,7 @@ const Color = TiptapColor.extend<ColorOptions & ExtensionOptions>({
           props: {
             editor,
             isActive: false,
-            icon: markRaw(MdiFormatColor),
+            icon: markRaw(MingcuteTextColorLine),
             title: i18n.global.t("editor.common.color"),
           },
         };
@@ -27,8 +29,6 @@ const Color = TiptapColor.extend<ColorOptions & ExtensionOptions>({
     };
   },
   addExtensions() {
-    return [TextStyle];
+    return [ExtensionTextStyle];
   },
 });
-
-export default Color;

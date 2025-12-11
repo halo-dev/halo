@@ -1,4 +1,13 @@
 editor:
+  drag:
+    button:
+      insert_block: 插入块
+      drag_handle: 按住拖动
+    menu:
+      convert_to: 转化为
+      copy: 复制
+      cut: 剪切
+      delete: 删除
   menus:
     undo: 撤销
     redo: 恢复
@@ -25,8 +34,11 @@ editor:
       video: 视频
       audio: 音频
       table: 表格
+      gallery: 画廊
       no_results: 没有搜索结果
       placeholder: 输入 / 以选择输入类型
+    figure_caption:
+      empty_placeholder: 添加描述
     link:
       add_link: 添加链接
       edit_link: 修改链接
@@ -35,11 +47,14 @@ editor:
       cancel_link: 取消链接
       nofollow: 搜索引擎忽略链接关系
     audio:
+      src_input_label: 音频链接
       disable_autoplay: 关闭自动播放
       enable_autoplay: 开启自动播放
       disable_loop: 关闭循环播放
       enable_loop: 开启循环播放
     iframe:
+      src_input_label: 网页链接
+      resize: 调整尺寸
       disable_frameborder: 取消边框
       enable_frameborder: 设置边框
       phone_size: 手机尺寸
@@ -47,14 +62,21 @@ editor:
       tablet_horizontal_size: 平板电脑横向尺寸
       desktop_size: 桌面电脑尺寸
     image:
+      src_input_label: 图片链接
+      href_input_label: 图片跳转链接
+      resize: 调整尺寸
       small_size: 小尺寸
       medium_size: 中尺寸
       large_size: 大尺寸
       restore_size: 恢复原始尺寸
       edit_link: 修改链接
-      edit_alt: 修改图片 alt 属性
+      edit_alt: 修改图片的替代文本（alt 属性）
       edit_href: 修改图片跳转链接
+      edit_caption: 图片描述文本
+      image_load_error: 图片加载失败
     video:
+      src_input_label: 视频链接
+      resize: 调整尺寸
       disable_controls: 隐藏控制面板
       enable_controls: 显示控制面板
       disable_autoplay: 关闭自动播放
@@ -64,6 +86,7 @@ editor:
       small_size: 小尺寸
       medium_size: 中尺寸
       large_size: 大尺寸
+      edit_caption: 视频描述
     highlight:
       unset: 移除高亮颜色
     columns:
@@ -90,10 +113,45 @@ editor:
         cancel: 取消格式刷
     details:
       command_item: 折叠内容
+    gallery:
+      title: 画廊
+      add_image: 添加图片
+      empty_prompt: 点击选择图片或拖拽图片到这里
+      group_size: 每行图片数
+      group_size_label: 每行 {count} 张图片
+      layout:
+        title: 布局
+        auto: 自适应
+        square: 等比矩形
+      gap: 间距
+    upload:
+      error: 上传失败
+      click_retry: 点击重试
+      loading: 等待中
+      attachment:
+        title: 附件库
+      permalink:
+        title: 输入链接
+        placeholder: 输入链接，按回车确定
+      operations:
+        remove:
+          button: 删除
+        replace:
+          button: 替换
+        transfer:
+          button: 转存
+          tooltip: 检测到此资源为外部资源，点击此按钮以转存到附件库
+        transfer_in_batch:
+          description: 检测到具有外部链接，是否需要自动上传到附件库？
+    font_size:
+      title: 字体大小
   components:
     color_picker:
       more_color: 更多颜色
   common:
+    alt: 替代文本
+    width: 宽度
+    height: 高度
     align_method: 对齐方式
     align_left: 左对齐
     align_center: 居中
@@ -121,6 +179,7 @@ editor:
       header4: 四级标题
       header5: 五级标题
       header6: 六级标题
+    list: 列表
     bullet_list: 无序列表
     ordered_list: 有序列表
     task_list: 任务列表
@@ -140,7 +199,14 @@ editor:
       edit_link: 修改链接
       refresh: 刷新
       restore_default: 恢复为默认
+      add: 添加
+      cancel: 取消
+      upload: 上传
+      confirm: 确定
     text:
       default: 默认
+      tip: 提示
+    toast:
+      save_success: 保存成功
     line_height: 行高
     clear_format: 清除格式

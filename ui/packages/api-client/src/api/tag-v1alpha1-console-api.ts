@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { TagList } from '../models';
+import type { TagList } from '../models';
 /**
  * TagV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const TagV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -101,7 +100,6 @@ export const TagV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: 
 
 /**
  * TagV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const TagV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TagV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -128,7 +126,6 @@ export const TagV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
 
 /**
  * TagV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const TagV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TagV1alpha1ConsoleApiFp(configuration)
@@ -147,58 +144,41 @@ export const TagV1alpha1ConsoleApiFactory = function (configuration?: Configurat
 
 /**
  * Request parameters for listPostTags operation in TagV1alpha1ConsoleApi.
- * @export
- * @interface TagV1alpha1ConsoleApiListPostTagsRequest
  */
 export interface TagV1alpha1ConsoleApiListPostTagsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly sort?: Array<string>
 
     /**
      * Post tags filtered by keyword.
-     * @type {string}
-     * @memberof TagV1alpha1ConsoleApiListPostTags
      */
     readonly keyword?: string
 }
 
 /**
  * TagV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class TagV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class TagV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -206,7 +186,6 @@ export class TagV1alpha1ConsoleApi extends BaseAPI {
      * @param {TagV1alpha1ConsoleApiListPostTagsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1ConsoleApi
      */
     public listPostTags(requestParameters: TagV1alpha1ConsoleApiListPostTagsRequest = {}, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ConsoleApiFp(this.configuration).listPostTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));

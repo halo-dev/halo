@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonSpec } from './reason-spec';
+import type { ReasonSpec } from './reason-spec';
 
 /**
  * <p>{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents  an instance of a {@link ReasonType ReasonType}.</p>  <p>It can be understood as an event that triggers a notification.</p>
- * @export
- * @interface Reason
  */
 export interface Reason {
-    /**
-     * 
-     * @type {string}
-     * @memberof Reason
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Reason
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Reason
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ReasonSpec}
-     * @memberof Reason
-     */
     'spec'?: ReasonSpec;
 }
 

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
 import { coreApiClient, type Category } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -12,6 +10,7 @@ import {
   VDropdownItem,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import "@he-tree/vue/style/default.css";
 import { useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
@@ -20,7 +19,6 @@ import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTreeNode } from "../utils";
 import CategoryEditingModal from "./CategoryEditingModal.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
@@ -137,9 +135,9 @@ const handleOpenCreateByParentModal = () => {
         }}
       </span>
       <span class="truncate text-xs tabular-nums text-gray-500">
-        {{ formatDatetime(categoryTreeNode.metadata.creationTimestamp) }}
+        {{ utils.date.format(categoryTreeNode.metadata.creationTimestamp) }}
       </span>
-      <VDropdown v-if="currentUserHasPermission(['system:posts:manage'])">
+      <VDropdown v-if="utils.permission.has(['system:posts:manage'])">
         <div
           class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"
           @click.stop

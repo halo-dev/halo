@@ -20,22 +20,21 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ConfigMap } from '../models';
+import type { ConfigMap } from '../models';
 // @ts-ignore
-import { InstallFromUriRequest } from '../models';
+import type { InstallFromUriRequest } from '../models';
 // @ts-ignore
-import { Setting } from '../models';
+import type { Setting } from '../models';
 // @ts-ignore
-import { Theme } from '../models';
+import type { Theme } from '../models';
 // @ts-ignore
-import { ThemeList } from '../models';
+import type { ThemeList } from '../models';
 // @ts-ignore
-import { UpgradeFromUriRequest } from '../models';
+import type { UpgradeFromUriRequest } from '../models';
 /**
  * ThemeV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -615,7 +614,6 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
 
 /**
  * ThemeV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ThemeV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -786,7 +784,6 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
 
 /**
  * ThemeV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ThemeV1alpha1ConsoleApiFp(configuration)
@@ -911,212 +908,112 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for activateTheme operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiActivateThemeRequest
  */
 export interface ThemeV1alpha1ConsoleApiActivateThemeRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiActivateTheme
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for fetchThemeJsonConfig operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest
  */
 export interface ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiFetchThemeJsonConfig
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for fetchThemeSetting operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiFetchThemeSettingRequest
  */
 export interface ThemeV1alpha1ConsoleApiFetchThemeSettingRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiFetchThemeSetting
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for installThemeFromUri operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiInstallThemeFromUriRequest
  */
 export interface ThemeV1alpha1ConsoleApiInstallThemeFromUriRequest {
-    /**
-     * 
-     * @type {InstallFromUriRequest}
-     * @memberof ThemeV1alpha1ConsoleApiInstallThemeFromUri
-     */
     readonly installFromUriRequest: InstallFromUriRequest
 }
 
 /**
  * Request parameters for invalidateCache operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiInvalidateCacheRequest
  */
 export interface ThemeV1alpha1ConsoleApiInvalidateCacheRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiInvalidateCache
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for listThemes operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiListThemesRequest
  */
 export interface ThemeV1alpha1ConsoleApiListThemesRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ThemeV1alpha1ConsoleApiListThemes
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ThemeV1alpha1ConsoleApiListThemes
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ThemeV1alpha1ConsoleApiListThemes
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ThemeV1alpha1ConsoleApiListThemes
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Whether to list uninstalled themes.
-     * @type {boolean}
-     * @memberof ThemeV1alpha1ConsoleApiListThemes
      */
     readonly uninstalled?: boolean
 }
 
 /**
  * Request parameters for reload operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiReloadRequest
  */
 export interface ThemeV1alpha1ConsoleApiReloadRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiReload
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for resetThemeConfig operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiResetThemeConfigRequest
  */
 export interface ThemeV1alpha1ConsoleApiResetThemeConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiResetThemeConfig
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for updateThemeJsonConfig operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest
  */
 export interface ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiUpdateThemeJsonConfig
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof ThemeV1alpha1ConsoleApiUpdateThemeJsonConfig
-     */
     readonly body: object
 }
 
 /**
  * Request parameters for upgradeTheme operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiUpgradeThemeRequest
  */
 export interface ThemeV1alpha1ConsoleApiUpgradeThemeRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiUpgradeTheme
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {File}
-     * @memberof ThemeV1alpha1ConsoleApiUpgradeTheme
-     */
     readonly file: File
 }
 
 /**
  * Request parameters for upgradeThemeFromUri operation in ThemeV1alpha1ConsoleApi.
- * @export
- * @interface ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest
  */
 export interface ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeV1alpha1ConsoleApiUpgradeThemeFromUri
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {UpgradeFromUriRequest}
-     * @memberof ThemeV1alpha1ConsoleApiUpgradeThemeFromUri
-     */
     readonly upgradeFromUriRequest: UpgradeFromUriRequest
 }
 
 /**
  * ThemeV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class ThemeV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class ThemeV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -1124,7 +1021,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiActivateThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public activateTheme(requestParameters: ThemeV1alpha1ConsoleApiActivateThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).activateTheme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1134,7 +1030,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * Fetch the activated theme.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public fetchActivatedTheme(options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchActivatedTheme(options).then((request) => request(this.axios, this.basePath));
@@ -1145,7 +1040,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public fetchThemeJsonConfig(requestParameters: ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchThemeJsonConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1156,7 +1050,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiFetchThemeSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public fetchThemeSetting(requestParameters: ThemeV1alpha1ConsoleApiFetchThemeSettingRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchThemeSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1166,7 +1059,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * Install a theme by uploading a zip file.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public installTheme(options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).installTheme(options).then((request) => request(this.axios, this.basePath));
@@ -1177,7 +1069,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiInstallThemeFromUriRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public installThemeFromUri(requestParameters: ThemeV1alpha1ConsoleApiInstallThemeFromUriRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).installThemeFromUri(requestParameters.installFromUriRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1188,7 +1079,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiInvalidateCacheRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public invalidateCache(requestParameters: ThemeV1alpha1ConsoleApiInvalidateCacheRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).invalidateCache(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1199,7 +1089,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiListThemesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public listThemes(requestParameters: ThemeV1alpha1ConsoleApiListThemesRequest = {}, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).listThemes(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.uninstalled, options).then((request) => request(this.axios, this.basePath));
@@ -1210,7 +1099,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiReloadRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public reload(requestParameters: ThemeV1alpha1ConsoleApiReloadRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).reload(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1221,7 +1109,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiResetThemeConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public resetThemeConfig(requestParameters: ThemeV1alpha1ConsoleApiResetThemeConfigRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).resetThemeConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1232,7 +1119,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public updateThemeJsonConfig(requestParameters: ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).updateThemeJsonConfig(requestParameters.name, requestParameters.body, options).then((request) => request(this.axios, this.basePath));
@@ -1243,7 +1129,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiUpgradeThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public upgradeTheme(requestParameters: ThemeV1alpha1ConsoleApiUpgradeThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).upgradeTheme(requestParameters.name, requestParameters.file, options).then((request) => request(this.axios, this.basePath));
@@ -1254,7 +1139,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      * @param {ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ThemeV1alpha1ConsoleApi
      */
     public upgradeThemeFromUri(requestParameters: ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).upgradeThemeFromUri(requestParameters.name, requestParameters.upgradeFromUriRequest, options).then((request) => request(this.axios, this.basePath));

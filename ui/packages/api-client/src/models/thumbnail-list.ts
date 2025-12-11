@@ -15,66 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Thumbnail } from './thumbnail';
+import type { Thumbnail } from './thumbnail';
 
-/**
- * 
- * @export
- * @interface ThumbnailList
- */
 export interface ThumbnailList {
     /**
      * Indicates whether current page is the first page.
-     * @type {boolean}
-     * @memberof ThumbnailList
      */
     'first': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof ThumbnailList
      */
     'hasNext': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof ThumbnailList
      */
     'hasPrevious': boolean;
     /**
      * A chunk of items.
-     * @type {Array<Thumbnail>}
-     * @memberof ThumbnailList
      */
     'items': Array<Thumbnail>;
     /**
      * Indicates whether current page is the last page.
-     * @type {boolean}
-     * @memberof ThumbnailList
      */
     'last': boolean;
     /**
      * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof ThumbnailList
      */
     'page': number;
     /**
      * Size of each page. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof ThumbnailList
      */
     'size': number;
     /**
      * Total elements.
-     * @type {number}
-     * @memberof ThumbnailList
      */
     'total': number;
     /**
      * Indicates total pages.
-     * @type {number}
-     * @memberof ThumbnailList
      */
     'totalPages': number;
 }

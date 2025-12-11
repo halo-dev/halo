@@ -1,5 +1,5 @@
 import {
-  CoreEditor,
+  Editor,
   Extension,
   isList,
   type CommandProps,
@@ -7,7 +7,11 @@ import {
   type KeyboardShortcutCommand,
 } from "@/tiptap";
 import { TextSelection, Transaction } from "@/tiptap/pm";
-import { isListActive } from "@/utils/isListActive";
+import type { ExtensionOptions } from "@/types";
+import { isListActive } from "@/utils/is-list-active";
+import { ListItem } from "@tiptap/extension-list";
+import { ExtensionColumns } from "../columns";
+import { ExtensionTable } from "../table";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
@@ -18,7 +22,7 @@ declare module "@/tiptap" {
   }
 }
 
-type IndentOptions = {
+export interface ExtensionIndentOptions extends ExtensionOptions {
   names: Array<string>;
   indentRange: number;
   minIndentLevel: number;
@@ -27,10 +31,11 @@ type IndentOptions = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: Record<string, any>;
   firstLineIndent: boolean;
-};
-const Indent = Extension.create<IndentOptions, never>({
+}
+
+export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
   name: "indent",
-  priority: 10000,
+  priority: 800,
 
   addOptions() {
     return {
@@ -135,7 +140,6 @@ const Indent = Extension.create<IndentOptions, never>({
             return getOutdent(false)({ editor });
           }
         }
-
         return false;
       },
     };
@@ -143,7 +147,7 @@ const Indent = Extension.create<IndentOptions, never>({
 
   onUpdate() {
     const { editor } = this;
-    if (editor.isActive("listItem")) {
+    if (editor.isActive(ListItem.name)) {
       const node = editor.state.selection.$head.node();
       if (node.attrs.indent) {
         editor.commands.updateAttributes(node.type.name, { indent: 0 });
@@ -166,7 +170,7 @@ function setNodeIndentMarkup(
   tr: Transaction,
   pos: number,
   dir: number,
-  options: IndentOptions
+  options: ExtensionIndentOptions
 ): Transaction {
   if (!tr.doc) {
     return tr;
@@ -210,7 +214,7 @@ const isLineIndent = (tr: Transaction) => {
 type IndentType = "indent" | "outdent";
 const updateIndentLevel = (
   tr: Transaction,
-  options: IndentOptions,
+  options: ExtensionIndentOptions,
   extensions: Extensions,
   type: IndentType
 ): Transaction => {
@@ -247,8 +251,11 @@ const isTextIndent = (tr: Transaction, currNodePos: number) => {
   return false;
 };
 
-const isFilterActive = (editor: CoreEditor) => {
-  return editor.isActive("table") || editor.isActive("columns");
+const isFilterActive = (editor: Editor) => {
+  return (
+    editor.isActive(ExtensionTable.name) ||
+    editor.isActive(ExtensionColumns.name)
+  );
 };
 
 export const getIndent: () => KeyboardShortcutCommand =
@@ -286,5 +293,3 @@ export const getOutdent: (
     }
     return editor.chain().focus().outdent().run();
   };
-
-export default Indent;

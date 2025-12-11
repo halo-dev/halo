@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
 import type { Attachment } from "@halo-dev/api-client";
 import {
   VEntity,
@@ -8,11 +6,10 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import prettyBytes from "pretty-bytes";
 import { computed, toRefs } from "vue";
 import { useFetchAttachmentPolicy } from "../../../composables/use-attachment-policy";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -42,7 +39,7 @@ const policyDisplayName = computed(() => {
 <template>
   <VEntity :is-selected="isSelected">
     <template
-      v-if="currentUserHasPermission(['system:attachments:manage'])"
+      v-if="utils.permission.has(['system:attachments:manage'])"
       #checkbox
     >
       <slot name="checkbox" />
@@ -91,7 +88,7 @@ const policyDisplayName = computed(() => {
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(attachment.metadata.creationTimestamp) }}
+            {{ utils.date.format(attachment.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>

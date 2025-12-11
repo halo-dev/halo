@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import { randomUUID } from "@/utils/id";
 import { getNode, reset } from "@formkit/core";
 import { IconCloseCircle } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     placeholder?: string;
     modelValue: string;
+    sync?: boolean;
   }>(),
   {
     placeholder: undefined,
+    sync: false,
   }
 );
 
@@ -17,7 +19,7 @@ const emit = defineEmits<{
   (event: "update:modelValue", modelValue: string): void;
 }>();
 
-const id = `search-input-${randomUUID()}`;
+const id = `search-input-${utils.id.uuid()}`;
 
 function handleReset() {
   emit("update:modelValue", "");
@@ -30,6 +32,12 @@ function onKeywordChange() {
     emit("update:modelValue", keywordNode._value as string);
   }
 }
+
+function onInput(value?: string) {
+  if (props.sync) {
+    emit("update:modelValue", value || "");
+  }
+}
 </script>
 
 <template>
@@ -40,6 +48,8 @@ function onKeywordChange() {
     type="text"
     name="keyword"
     :model-value="modelValue"
+    ignore
+    @update:model-value="onInput"
     @keyup.enter="onKeywordChange"
   >
     <template v-if="modelValue" #suffix>

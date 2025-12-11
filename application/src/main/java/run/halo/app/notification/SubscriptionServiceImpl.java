@@ -1,9 +1,9 @@
 package run.halo.app.notification;
 
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
-import static run.halo.app.extension.index.query.QueryFactory.startsWith;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
+import static run.halo.app.extension.index.query.Queries.startsWith;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 
@@ -90,7 +90,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
-    Query reasonSubjectMatch(Subscription.ReasonSubject reasonSubject) {
+    Condition reasonSubjectMatch(Subscription.ReasonSubject reasonSubject) {
         Assert.notNull(reasonSubject, "The reasonSubject must not be null");
         if (StringUtils.isNotBlank(reasonSubject.getName())) {
             return equal("spec.reason.subject", reasonSubject.toString());

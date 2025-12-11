@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface MarkSpecifiedRequest
- */
 export interface MarkSpecifiedRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof MarkSpecifiedRequest
-     */
     'names'?: Array<string>;
 }
 

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.json.JSONException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.JsonUtils;
@@ -273,8 +275,10 @@ class ThemeReconcilerTest {
         themeSpec.setSettingName("theme-test-setting");
         assertThat(theme.getSpec().getConfigMapName()).isNull();
         ArgumentCaptor<Theme> captor = ArgumentCaptor.forClass(Theme.class);
-        themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
-        verify(extensionClient, times(6))
+        Assertions.assertThrows(RequeueException.class,
+            () -> themeReconciler.reconcile(new Reconciler.Request(metadata.getName()))
+        );
+        verify(extensionClient, times(5))
             .fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(3))
             .update(captor.capture());

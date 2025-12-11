@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * SystemConfigV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const SystemConfigV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -118,7 +117,6 @@ export const SystemConfigV1alpha1ConsoleApiAxiosParamCreator = function (configu
 
 /**
  * SystemConfigV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const SystemConfigV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SystemConfigV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -153,7 +151,6 @@ export const SystemConfigV1alpha1ConsoleApiFp = function(configuration?: Configu
 
 /**
  * SystemConfigV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const SystemConfigV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SystemConfigV1alpha1ConsoleApiFp(configuration)
@@ -181,44 +178,28 @@ export const SystemConfigV1alpha1ConsoleApiFactory = function (configuration?: C
 
 /**
  * Request parameters for getSystemConfigByGroup operation in SystemConfigV1alpha1ConsoleApi.
- * @export
- * @interface SystemConfigV1alpha1ConsoleApiGetSystemConfigByGroupRequest
  */
 export interface SystemConfigV1alpha1ConsoleApiGetSystemConfigByGroupRequest {
     /**
      * Group of the system config
-     * @type {string}
-     * @memberof SystemConfigV1alpha1ConsoleApiGetSystemConfigByGroup
      */
     readonly group: string
 }
 
 /**
  * Request parameters for updateSystemConfigByGroup operation in SystemConfigV1alpha1ConsoleApi.
- * @export
- * @interface SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroupRequest
  */
 export interface SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroupRequest {
     /**
      * Group of the system config
-     * @type {string}
-     * @memberof SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroup
      */
     readonly group: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroup
-     */
     readonly body?: object
 }
 
 /**
  * SystemConfigV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class SystemConfigV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class SystemConfigV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -226,7 +207,6 @@ export class SystemConfigV1alpha1ConsoleApi extends BaseAPI {
      * @param {SystemConfigV1alpha1ConsoleApiGetSystemConfigByGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemConfigV1alpha1ConsoleApi
      */
     public getSystemConfigByGroup(requestParameters: SystemConfigV1alpha1ConsoleApiGetSystemConfigByGroupRequest, options?: RawAxiosRequestConfig) {
         return SystemConfigV1alpha1ConsoleApiFp(this.configuration).getSystemConfigByGroup(requestParameters.group, options).then((request) => request(this.axios, this.basePath));
@@ -237,7 +217,6 @@ export class SystemConfigV1alpha1ConsoleApi extends BaseAPI {
      * @param {SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemConfigV1alpha1ConsoleApi
      */
     public updateSystemConfigByGroup(requestParameters: SystemConfigV1alpha1ConsoleApiUpdateSystemConfigByGroupRequest, options?: RawAxiosRequestConfig) {
         return SystemConfigV1alpha1ConsoleApiFp(this.configuration).updateSystemConfigByGroup(requestParameters.group, requestParameters.body, options).then((request) => request(this.axios, this.basePath));

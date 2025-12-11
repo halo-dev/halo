@@ -15,55 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentSpec } from './comment-spec';
+import type { CommentSpec } from './comment-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStatsVo } from './comment-stats-vo';
+import type { CommentStatsVo } from './comment-stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStatus } from './comment-status';
+import type { CommentStatus } from './comment-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info';
+import type { OwnerInfo } from './owner-info';
 
 /**
  * A chunk of items.
- * @export
- * @interface CommentVo
  */
 export interface CommentVo {
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof CommentVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {OwnerInfo}
-     * @memberof CommentVo
-     */
     'owner': OwnerInfo;
-    /**
-     * 
-     * @type {CommentSpec}
-     * @memberof CommentVo
-     */
     'spec': CommentSpec;
-    /**
-     * 
-     * @type {CommentStatsVo}
-     * @memberof CommentVo
-     */
     'stats': CommentStatsVo;
-    /**
-     * 
-     * @type {CommentStatus}
-     * @memberof CommentVo
-     */
     'status'?: CommentStatus;
 }
 

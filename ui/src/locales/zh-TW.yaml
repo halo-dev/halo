@@ -583,6 +583,7 @@ core:
     common:
       text:
         ungrouped: 未分組
+        original: 原始
     actions:
       storage_policies: 存儲策略
     empty:
@@ -632,19 +633,18 @@ core:
         preview: 預覽
         storage_policy: 存儲策略
         group: 所在分組
-        display_name: 文件名稱
+        display_name: 附件名稱
         media_type: 文件類型
         size: 文件大小
         owner: 上傳者
         creation_time: 上傳時間
         permalink: 連結
-        thumbnails: 縮略圖
+      display_name_form:
+        help: 自定義附件名稱，僅用於管理介面顯示，不會影響文件本身名稱以及訪問連結
       preview:
-        click_to_exit: 點擊離開預覽
         video_not_support: 當前瀏覽器不支援該影片播放
         audio_not_support: 當前瀏覽器不支援該音頻播放
         not_support: 此文件不支援預覽
-        not_support_thumbnail: 此圖片不支持生成縮略圖
     group_editing_modal:
       titles:
         create: 新增附件分組
@@ -694,6 +694,9 @@ core:
         hidden:
           label: 在上傳介面隱藏
           help: 開啟後，會在上傳介面隱藏該儲存策略
+        priority:
+          label: 上傳介面顯示優先權
+          help: 設置在上傳界面的顯示優先權，數字越大，排序越靠前
       toast:
         policy_name_exists: 儲存策略名稱已存在
     upload_modal:
@@ -1029,6 +1032,9 @@ core:
             button: 使用
     actions:
       extension-point-settings: 擴展配置
+    list:
+      fields:
+        system_reserved: 系統保留
   user:
     title: 用戶
     actions:
@@ -1125,7 +1131,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 註冊時間
-        identity_authentication: 登入方式
         email_verified:
           tooltip: 已驗證
         email_not_verified:
@@ -1210,8 +1215,8 @@ core:
       detail: 詳情
       notification-preferences: 通知配置
       pat: 個人令牌
-      2fa: 两步验证
       devices: 登錄設備
+      authentication: 身份認證
     actions:
       update_profile:
         title: 修改資料
@@ -1225,13 +1230,6 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 註冊時間
-        identity_authentication: 登入方式
-      operations:
-        bind:
-          button: 綁定
-        unbind:
-          button: 解綁
-          title: 取消綁定 {display_name} 登入方式
       email_not_set:
         description: 電子郵件地址尚未設置，點擊下方按鈕進行設置
         title: 設定電子郵件信箱
@@ -1240,6 +1238,14 @@ core:
         title: 驗證電子郵件信箱
       email_verified:
         tooltip: 已驗證
+    auth_providers:
+      title: 登入方式
+      operations:
+        bind:
+          button: 綁定
+        unbind:
+          button: 解綁
+          title: 取消綁定 {display_name} 登入方式
     2fa:
       operations:
         enable:
@@ -1255,7 +1261,7 @@ core:
             label: 验证密碼
             help: 目前帳號的登入密碼
       methods:
-        title: 驗證方法
+        title: 兩步驗證
         totp:
           title: TOTP
           description: 使用 TOTP 應用程式設定兩步驟驗證
@@ -1433,8 +1439,8 @@ core:
     fields:
       external_url: 外部訪問地址
       start_time: 啟動時間
-      timezone: 系統時區
-      locale: 系統語言
+      timezone: 操作系統時區
+      locale: 操作系統語言
       version: 版本
       build_time: 構建時間
       database: 資料庫
@@ -1629,27 +1635,18 @@ core:
         placeholder:
           options:
             placeholder: 輸入 / 以選擇輸入類型
-        upload:
-          error: 上傳失敗
-          click_retry: 點擊重試
-          loading: 等待中
-          attachment:
-            title: 附件庫
-          permalink:
-            title: 輸入連結
-            placeholder: 輸入連結，按回車確定
-          operations:
-            replace:
-              button: 替換
-            transfer:
-              button: 轉存
-              tooltip: 偵測到此資源為外部資源，點擊此按鈕以轉存到附件庫
-            transfer_in_batch:
-              description: 檢測到具有外部連結，是否需要自動上傳到附件庫？
       toolbox:
         attachment: 選擇附件
         show_hide_sidebar: 顯示 / 隱藏側邊欄
       title_placeholder: 請輸入標題
+      cover:
+        options:
+          add: 添加封面圖
+          change: 更換
+          upload: 上傳
+          attachment: 從附件庫選擇
+        toast:
+          upload_failed: "上傳封面圖失敗: {message}"
     global_search:
       placeholder: 輸入關鍵字以搜尋
       no_results: 沒有搜尋結果
@@ -1745,6 +1742,19 @@ core:
       fullscreen:
         exit: 退出全屏
         enter: 全屏编辑
+    iconify:
+      placeholder: 選擇圖標
+      tabs:
+        collections: 圖標集
+        search: 全局搜索
+      collection_search_placeholder: 搜索圖標集合
+      search_placeholder: 搜索圖標
+      no_results: 沒有找到結果，請嘗試其他關鍵詞
+      option_size: 大小
+      option_color: 顏色
+      copyright: 圖標數據來自 {url}
+    color:
+      placeholder: 選擇顏色
   common:
     buttons:
       save: 保存

@@ -1,8 +1,9 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import { CoreEditor, Extension, Plugin, PluginKey } from "@/tiptap";
+import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
-import MdiBrushVariant from "~icons/mdi/brush-variant";
+import MingcuteBrush3Line from "~icons/mingcute/brush-3-line";
 import { getMarksByFirstTextNode, setMarks } from "./util";
 
 declare module "@/tiptap" {
@@ -14,20 +15,22 @@ declare module "@/tiptap" {
   }
 }
 
-export interface FormatBrushStore {
+export interface ExtensionFormatBrushStore {
   formatBrush: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatBrushMarks: any[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const formatBrush = Extension.create<any, FormatBrushStore>({
+export const ExtensionFormatBrush = Extension.create<
+  ExtensionOptions,
+  ExtensionFormatBrushStore
+>({
   name: "formatBrush",
 
   addOptions() {
     return {
       ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: CoreEditor }) {
+      getToolbarItems({ editor }: { editor: Editor }) {
         const formatBrush =
           editor.view.dom.classList.contains("format-brush-mode");
         return {
@@ -36,7 +39,7 @@ const formatBrush = Extension.create<any, FormatBrushStore>({
           props: {
             editor,
             isActive: formatBrush,
-            icon: markRaw(MdiBrushVariant),
+            icon: markRaw(MingcuteBrush3Line),
             title: formatBrush
               ? i18n.global.t(
                   "editor.extensions.format_brush.toolbar_item.cancel"
@@ -120,5 +123,3 @@ const formatBrush = Extension.create<any, FormatBrushStore>({
     };
   },
 });
-
-export default formatBrush;

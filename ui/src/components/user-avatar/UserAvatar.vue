@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
-import { usePermission } from "@/utils/permission";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -15,6 +14,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useFileDialog } from "@vueuse/core";
 import { computed, defineAsyncComponent, ref, toRefs, type Ref } from "vue";
@@ -32,9 +32,9 @@ const props = withDefaults(
 );
 
 const { isCurrentUser, name } = toRefs(props);
+const { fetchCurrentUser } = stores.currentUser();
 
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const { data: avatar, isFetching } = useQuery({
@@ -103,6 +103,9 @@ const handleUploadAvatar = () => {
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
         queryClient.invalidateQueries({ queryKey: ["user-detail"] });
+        if (props.isCurrentUser) {
+          fetchCurrentUser();
+        }
         handleCloseCropperModal();
       })
       .catch(() => {
@@ -129,6 +132,9 @@ const handleRemoveCurrentAvatar = () => {
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["user-avatar"] });
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });
+          if (props.isCurrentUser) {
+            fetchCurrentUser();
+          }
         })
         .catch(() => {
           Toast.error(t("core.components.user_avatar.toast_remove_failed"));
@@ -164,7 +170,7 @@ const hasAvatar = computed(() => {
       class="shadow-xl ring-4 ring-white"
     />
     <VDropdown
-      v-if="currentUserHasPermission(['system:users:manage']) || isCurrentUser"
+      v-if="utils.permission.has(['system:users:manage']) || isCurrentUser"
     >
       <div
         class="absolute left-0 right-0 top-0 hidden h-full w-full cursor-pointer items-center rounded-full border-0 bg-black/60 text-center transition-all duration-300 group-hover:flex"

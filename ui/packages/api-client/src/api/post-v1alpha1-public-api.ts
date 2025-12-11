@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ListedPostVoList } from '../models';
+import type { ListedPostVoList } from '../models';
 // @ts-ignore
-import { NavigationPostVo } from '../models';
+import type { NavigationPostVo } from '../models';
 // @ts-ignore
-import { PostVo } from '../models';
+import type { PostVo } from '../models';
 /**
  * PostV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -182,7 +181,6 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
 
 /**
  * PostV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -232,7 +230,6 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
 
 /**
  * PostV1alpha1PublicApi - factory interface
- * @export
  */
 export const PostV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PostV1alpha1PublicApiFp(configuration)
@@ -269,79 +266,56 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
 
 /**
  * Request parameters for queryPostByName operation in PostV1alpha1PublicApi.
- * @export
- * @interface PostV1alpha1PublicApiQueryPostByNameRequest
  */
 export interface PostV1alpha1PublicApiQueryPostByNameRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1PublicApiQueryPostByName
      */
     readonly name: string
 }
 
 /**
  * Request parameters for queryPostNavigationByName operation in PostV1alpha1PublicApi.
- * @export
- * @interface PostV1alpha1PublicApiQueryPostNavigationByNameRequest
  */
 export interface PostV1alpha1PublicApiQueryPostNavigationByNameRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1PublicApiQueryPostNavigationByName
      */
     readonly name: string
 }
 
 /**
  * Request parameters for queryPosts operation in PostV1alpha1PublicApi.
- * @export
- * @interface PostV1alpha1PublicApiQueryPostsRequest
  */
 export interface PostV1alpha1PublicApiQueryPostsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1PublicApiQueryPosts
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1PublicApiQueryPosts
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PostV1alpha1PublicApiQueryPosts
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PostV1alpha1PublicApiQueryPosts
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PostV1alpha1PublicApiQueryPosts
      */
     readonly sort?: Array<string>
 }
 
 /**
  * PostV1alpha1PublicApi - object-oriented interface
- * @export
- * @class PostV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class PostV1alpha1PublicApi extends BaseAPI {
     /**
@@ -349,7 +323,6 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @param {PostV1alpha1PublicApiQueryPostByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1PublicApi
      */
     public queryPostByName(requestParameters: PostV1alpha1PublicApiQueryPostByNameRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1PublicApiFp(this.configuration).queryPostByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -360,7 +333,6 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @param {PostV1alpha1PublicApiQueryPostNavigationByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1PublicApi
      */
     public queryPostNavigationByName(requestParameters: PostV1alpha1PublicApiQueryPostNavigationByNameRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1PublicApiFp(this.configuration).queryPostNavigationByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -371,7 +343,6 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @param {PostV1alpha1PublicApiQueryPostsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1PublicApi
      */
     public queryPosts(requestParameters: PostV1alpha1PublicApiQueryPostsRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1PublicApiFp(this.configuration).queryPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));

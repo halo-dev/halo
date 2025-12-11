@@ -1,26 +1,23 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import type { Plugin } from "@halo-dev/api-client";
-import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import type { PluginInstallationTab } from "@halo-dev/console-shared";
+import { VButton, VLoading, VModal, VTabbar } from "@halo-dev/components";
+import { utils, type PluginInstallationTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
-  markRaw,
+  defineAsyncComponent,
   nextTick,
   onMounted,
   provide,
   ref,
+  shallowRef,
   toRefs,
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import LocalUpload from "./installation-tabs/LocalUpload.vue";
-import RemoteDownload from "./installation-tabs/RemoteDownload.vue";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -40,17 +37,23 @@ provide<Ref<Plugin | undefined>>("pluginToUpgrade", pluginToUpgrade);
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const tabs = ref<PluginInstallationTab[]>([
+const tabs = shallowRef<PluginInstallationTab[]>([
   {
     id: "local",
     label: t("core.plugin.upload_modal.tabs.local"),
-    component: markRaw(LocalUpload),
+    component: defineAsyncComponent({
+      loader: () => import("./installation-tabs/LocalUpload.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 10,
   },
   {
     id: "remote",
     label: t("core.plugin.upload_modal.tabs.remote.title"),
-    component: markRaw(RemoteDownload),
+    component: defineAsyncComponent({
+      loader: () => import("./installation-tabs/RemoteDownload.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 20,
   },
 ]);
@@ -94,7 +97,7 @@ onMounted(async () => {
 
       tabs.value.push(
         ...items.filter((item) => {
-          return currentUserHasPermission(item.permissions);
+          return utils.permission.has(item.permissions || []);
         })
       );
     } catch (error) {

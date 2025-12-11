@@ -4,7 +4,7 @@ import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.net.URI;
 import java.time.Duration;
@@ -35,11 +35,15 @@ import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserReconciler implements Reconciler<Request> {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
     private static final String FINALIZER_NAME = "user-protection";
     private final ExtensionClient client;
     private final ExternalUrlSupplier externalUrlSupplier;
@@ -85,7 +89,7 @@ public class UserReconciler implements Reconciler<Request> {
             .filter(existUser -> existUser.getSpec().isEmailVerified())
             .filter(existUser -> !existUser.getMetadata().getName().equals(username))
             .hasElements()
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(false);
     }
 
@@ -115,7 +119,7 @@ public class UserReconciler implements Reconciler<Request> {
         }
         client.fetch(Attachment.class, avatarAttachmentName)
             .flatMap(attachment -> attachmentService.getPermalink(attachment)
-                .blockOptional(Duration.ofMinutes(1))
+                .blockOptional(BLOCKING_TIMEOUT)
             )
             .map(URI::toString)
             .ifPresentOrElse(avatar -> {
@@ -150,7 +154,7 @@ public class UserReconciler implements Reconciler<Request> {
                 user.getMetadata().setAnnotations(annotations);
                 annotations.put(User.ROLE_NAMES_ANNO, roleNamesJson);
             })
-            .block(Duration.ofMinutes(1));
+            .block(BLOCKING_TIMEOUT);
     }
 
     private void updatePermalink(User user) {

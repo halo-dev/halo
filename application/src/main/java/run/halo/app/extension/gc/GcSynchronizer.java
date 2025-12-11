@@ -1,5 +1,8 @@
 package run.halo.app.extension.gc;
 
+import static run.halo.app.extension.index.query.Queries.isNull;
+import static run.halo.app.extension.index.query.Queries.not;
+
 import java.util.List;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Sort;
@@ -12,7 +15,6 @@ import run.halo.app.extension.Watcher;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.controller.Synchronizer;
 import run.halo.app.extension.event.SchemeAddedEvent;
-import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 
 class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<SchemeAddedEvent> {
@@ -72,7 +74,7 @@ class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<Sch
     <E extends Extension> List<E> listDeleted(Class<E> type) {
         var options = new ListOptions()
             .setFieldSelector(
-                FieldSelector.of(QueryFactory.isNotNull("metadata.deletionTimestamp"))
+                FieldSelector.of(not(isNull("metadata.deletionTimestamp")))
             );
         // TODO Refine with scrolling query
         return client.listAll(type, options, Sort.by(Sort.Order.asc("metadata.creationTimestamp")));

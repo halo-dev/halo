@@ -1,27 +1,18 @@
-import { consoleApiClient } from "@halo-dev/api-client";
+import { setLanguage, setupI18n } from "@/locales";
+import { setupApiClient } from "@/setup/setupApiClient";
+import { setupComponents } from "@/setup/setupComponents";
+import { setupCoreModules, setupPluginModules } from "@/setup/setupModules";
+import "@/setup/setupStyles";
+import { setupUserPermissions } from "@/setup/setupUserPermissions";
+import { setupVueQuery } from "@/setup/setupVueQuery";
+import modules from "@console/modules";
+import { useThemeStore } from "@console/stores/theme";
+import { stores } from "@halo-dev/ui-shared";
+import "core-js/es/object/has-own";
 import { createPinia } from "pinia";
-import type { DirectiveBinding } from "vue";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-// setup
-import { getBrowserLanguage, i18n, setupI18n } from "@/locales";
-import { setupComponents } from "@/setup/setupComponents";
-import "@/setup/setupStyles";
-// core modules
-import { setupApiClient } from "@/setup/setupApiClient";
-import { setupVueQuery } from "@/setup/setupVueQuery";
-import { useGlobalInfoStore } from "@/stores/global-info";
-import { useRoleStore } from "@/stores/role";
-import { useUserStore } from "@/stores/user";
-import { getCookie } from "@/utils/cookie";
-import { hasPermission } from "@/utils/permission";
-import {
-  setupCoreModules,
-  setupPluginModules,
-} from "@console/setup/setupModules";
-import { useThemeStore } from "@console/stores/theme";
-import "core-js/es/object/has-own";
 
 const app = createApp(App);
 
@@ -32,74 +23,38 @@ setupApiClient();
 
 app.use(createPinia());
 
-async function loadUserPermissions() {
-  const { data: currentPermissions } =
-    await consoleApiClient.user.getPermissions({
-      name: "-",
-    });
-  const roleStore = useRoleStore();
-  roleStore.$patch({
-    permissions: currentPermissions,
-  });
-  app.directive(
-    "permission",
-    (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
-      const uiPermissions = Array.from<string>(
-        currentPermissions.uiPermissions
-      );
-      const { value } = binding;
-      const { any, enable } = binding.modifiers;
-
-      if (hasPermission(uiPermissions, value, any ?? false)) {
-        return;
-      }
-
-      if (enable) {
-        //TODO
-        return;
-      }
-      el?.remove?.();
-    }
-  );
-}
-
 async function loadActivatedTheme() {
   const themeStore = useThemeStore();
   await themeStore.fetchActivatedTheme();
 }
 
-(async function () {
-  await initApp();
-})();
+await initApp();
 
 async function initApp() {
   try {
-    setupCoreModules(app);
+    setupCoreModules({ app, router, platform: "console", modules });
 
-    const userStore = useUserStore();
-    await userStore.fetchCurrentUser();
+    const currentUserStore = stores.currentUser();
+    await currentUserStore.fetchCurrentUser();
 
-    // set locale
-    i18n.global.locale.value = getCookie("language") || getBrowserLanguage();
-
-    const globalInfoStore = useGlobalInfoStore();
+    const globalInfoStore = stores.globalInfo();
     await globalInfoStore.fetchGlobalInfo();
 
-    if (userStore.isAnonymous) {
+    await setLanguage();
+
+    if (currentUserStore.isAnonymous) {
       return;
     }
 
-    await loadUserPermissions();
+    await setupUserPermissions(app);
 
     try {
-      await setupPluginModules(app);
+      await setupPluginModules({ app, router, platform: "console" });
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
 
-    if (globalInfoStore.globalInfo?.userInitialized) {
-      await loadActivatedTheme();
-    }
+    await loadActivatedTheme();
   } catch (e) {
     console.error(e);
   } finally {

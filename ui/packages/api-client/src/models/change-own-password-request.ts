@@ -14,22 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface ChangeOwnPasswordRequest
- */
 export interface ChangeOwnPasswordRequest {
     /**
      * Old password.
-     * @type {string}
-     * @memberof ChangeOwnPasswordRequest
      */
     'oldPassword': string;
     /**
      * New password.
-     * @type {string}
-     * @memberof ChangeOwnPasswordRequest
      */
     'password': string;
 }

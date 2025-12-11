@@ -4,10 +4,10 @@ package run.halo.app.theme.finders.impl;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.core.extension.content.Comment.CommentOwner.ownerIdentity;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
-import static run.halo.app.extension.index.query.QueryFactory.or;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
+import static run.halo.app.extension.index.query.Queries.or;
 
 import com.google.common.hash.Hashing;
 import java.util.HashMap;
@@ -83,7 +83,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentVo>> list(Ref ref, PageRequest pageParam) {
         var pageRequest = Optional.ofNullable(pageParam)
             .map(page -> page.withSort(page.getSort().and(defaultCommentSort())))
-            .orElse(PageRequestImpl.ofSize(0));
+            .orElseGet(() -> PageRequestImpl.ofSize(10));
         return populateCommentListOptions(ref)
             .flatMap(listOptions -> client.listBy(Comment.class, listOptions, pageRequest))
             .flatMap(listResult -> Flux.fromStream(listResult.get())

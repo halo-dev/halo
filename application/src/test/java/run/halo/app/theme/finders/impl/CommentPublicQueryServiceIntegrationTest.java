@@ -32,7 +32,6 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.DuplicateNameException;
@@ -51,15 +50,9 @@ class CommentPublicQueryServiceIntegrationTest {
     @Autowired
     private ReactiveExtensionStoreClient storeClient;
 
-    @Autowired
-    private IndexerFactory indexerFactory;
-
     Mono<Extension> deleteImmediately(Extension extension) {
         var name = extension.getMetadata().getName();
         var scheme = schemeManager.get(extension.getClass());
-        // un-index
-        var indexer = indexerFactory.getIndexer(extension.groupVersionKind());
-        indexer.unIndexRecord(extension.getMetadata().getName());
 
         // delete from db
         var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);
@@ -228,17 +221,16 @@ class CommentPublicQueryServiceIntegrationTest {
 
         @Test
         void sortTest() {
-            var comments =
-                client.listAll(Comment.class, new ListOptions(),
-                        CommentPublicQueryServiceImpl.defaultCommentSort())
-                    .collectList()
-                    .block();
+            var comments = client.listAll(Comment.class, new ListOptions(),
+                    CommentPublicQueryServiceImpl.defaultCommentSort())
+                .collectList()
+                .block();
             assertThat(comments).isNotNull();
 
             var result = comments.stream()
                 .map(comment -> comment.getMetadata().getName())
                 .collect(Collectors.joining(", "));
-            assertThat(result).isEqualTo("1, 2, 4, 3, 5, 6, 9, 10, 14, 8, 7, 11, 12, 13");
+            assertThat(result).isEqualTo("1, 2, 4, 3, 5, 6, 10, 14, 9, 8, 7, 11, 12, 13");
         }
 
         List<Comment> createCommentList() {
@@ -247,9 +239,9 @@ class CommentPublicQueryServiceIntegrationTest {
             // 3, now + 3s, top, 2
             // 4, now + 4s, top, 2
             // 5, now + 4s, top, 3
-            // 6, now + 1s, no, 0
-            // 7, now + 2s, no, 0
-            // 8, now + 3s, no, 0
+            // 6, now + 4s, no, 0
+            // 7, now + 1s, no, 0
+            // 8, now + 2s, no, 0
             // 9, now + 3s, no, 0
             // 10, null, no, 0
             // 11, null, no, 1

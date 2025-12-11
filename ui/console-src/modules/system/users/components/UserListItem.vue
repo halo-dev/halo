@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { rbacAnnotations } from "@/constants/annotations";
-import { useUserStore } from "@/stores/user";
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
 import { coreApiClient, type ListedUser } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -16,6 +13,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -34,9 +32,8 @@ const props = withDefaults(
 );
 
 const queryClient = useQueryClient();
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
-const { currentUser } = storeToRefs(useUserStore());
+const { currentUser } = storeToRefs(stores.currentUser());
 
 const handleDelete = async () => {
   Dialog.warning({
@@ -166,13 +163,13 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(user.user.metadata.creationTimestamp) }}
+            {{ utils.date.format(user.user.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>
     </template>
     <template
-      v-if="currentUserHasPermission(['system:users:manage'])"
+      v-if="utils.permission.has(['system:users:manage'])"
       #dropdownItems
     >
       <VDropdownItem @click="editingModal = true">
@@ -182,16 +179,16 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
         {{ $t("core.user.operations.change_password.title") }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.metadata.name !== user.user.metadata.name"
+        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
         @click="grantPermissionModal = true"
       >
         {{ $t("core.user.operations.grant_permission.title") }}
       </VDropdownItem>
       <VDropdownDivider
-        v-if="currentUser?.metadata.name !== user.user.metadata.name"
+        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
       />
       <VDropdownItem
-        v-if="currentUser?.metadata.name !== user.user.metadata.name"
+        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
         type="danger"
         @click="
           handleEnableOrDisableUser({
@@ -212,7 +209,7 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
         }}
       </VDropdownItem>
       <VDropdownItem
-        v-if="currentUser?.metadata.name !== user.user.metadata.name"
+        v-if="currentUser?.user.metadata.name !== user.user.metadata.name"
         type="danger"
         @click="handleDelete"
       >

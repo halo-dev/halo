@@ -7,10 +7,9 @@ import {
 } from "@/tiptap/vue-3";
 import { useTimeout } from "@vueuse/core";
 import { computed } from "vue";
-import BxBxsCopy from "~icons/bx/bxs-copy";
-import RiArrowDownSFill from "~icons/ri/arrow-down-s-fill";
-import RiArrowRightSFill from "~icons/ri/arrow-right-s-fill";
-import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
+import MingcuteCheckCircleLine from "~icons/mingcute/check-circle-line";
+import MingcuteCopyLine from "~icons/mingcute/copy-line";
+import MingcuteRightSmallFill from "~icons/mingcute/right-small-fill";
 import CodeBlockSelect from "./CodeBlockSelect.vue";
 
 const props = defineProps<NodeViewProps>();
@@ -108,20 +107,22 @@ const handleCopyCode = () => {
         @click.self="collapsed ? (collapsed = false) : null"
       >
         <div class="flex items-center pr-3">
-          <div
-            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded hover:bg-zinc-200"
+          <button
+            type="button"
+            class="flex size-8 cursor-pointer items-center justify-center rounded transition-colors hover:bg-gray-200 active:!bg-gray-300"
             @click.stop="collapsed = !collapsed"
           >
-            <RiArrowRightSFill v-if="collapsed" />
-            <RiArrowDownSFill v-else />
-          </div>
+            <MingcuteRightSmallFill
+              class="size-6 transition-all"
+              :class="{ 'rotate-90': !collapsed }"
+            />
+          </button>
         </div>
         <CodeBlockSelect
           v-model="selectedLanguage"
           class="w-48"
           :container="editor.options.element"
           :options="languageOptions"
-          @select="editor.commands.focus()"
         >
         </CodeBlockSelect>
         <CodeBlockSelect
@@ -135,19 +136,23 @@ const handleCopyCode = () => {
         </CodeBlockSelect>
       </div>
       <div class="flex items-center pr-3">
-        <div
+        <button
           v-tooltip="
             ready
               ? i18n.global.t('editor.common.codeblock.copy_code')
               : i18n.global.t('editor.common.codeblock.copy_code_success')
           "
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded"
-          :class="{ 'hover:bg-zinc-200': ready }"
+          type="button"
+          class="flex size-8 cursor-pointer items-center justify-center rounded"
+          :class="{ 'hover:bg-gray-200 active:!bg-gray-300': ready }"
           @click="handleCopyCode"
         >
-          <IconCheckboxCircle v-if="!ready" class="h-4 w-4 text-green-500" />
-          <BxBxsCopy v-else class="h-4 w-4 text-gray-500" />
-        </div>
+          <MingcuteCheckCircleLine
+            v-if="!ready"
+            class="size-4 text-green-500"
+          />
+          <MingcuteCopyLine v-else class="size-4 text-gray-500" />
+        </button>
       </div>
     </div>
     <pre v-show="!collapsed"><node-view-content as="code" class="hljs" /></pre>

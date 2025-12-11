@@ -19,7 +19,7 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
@@ -104,7 +104,7 @@ public class TagQueryEndpoint implements CustomEndpoint {
         final var query = new PostPublicQuery(request.exchange());
         var listOptions = query.toListOptions();
         var newFieldSelector = listOptions.getFieldSelector()
-            .andQuery(QueryFactory.equal("spec.tags", name));
+            .andQuery(Queries.equal("spec.tags", name));
         listOptions.setFieldSelector(newFieldSelector);
         return postPublicQueryService.list(listOptions, query.toPageRequest())
             .flatMap(result -> ServerResponse.ok()

@@ -1,4 +1,5 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
+import type { FormKitInputs } from "@formkit/inputs";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { select } from "./select";
 
@@ -16,7 +17,7 @@ const search = async ({ page, size, keyword }) => {
     options: data.items?.map((user) => {
       return {
         value: user.user.metadata.name,
-        label: user.user.spec.displayName,
+        label: `${user.user.spec.displayName}(${user.user.metadata.name})`,
       };
     }),
     total: data.total,
@@ -61,3 +62,12 @@ export const userSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    userSelect: {
+      type: "userSelect";
+      value?: string;
+    };
+  }
+}

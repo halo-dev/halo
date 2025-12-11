@@ -102,7 +102,6 @@ export * from './local-thumbnail';
 export * from './local-thumbnail-list';
 export * from './local-thumbnail-spec';
 export * from './local-thumbnail-status';
-export * from './login-history';
 export * from './mark-specified-request';
 export * from './menu';
 export * from './menu-item';

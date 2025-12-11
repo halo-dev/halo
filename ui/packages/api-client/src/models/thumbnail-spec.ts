@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface ThumbnailSpec
- */
 export interface ThumbnailSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof ThumbnailSpec
-     */
     'imageSignature': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThumbnailSpec
-     */
     'imageUri': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThumbnailSpec
-     */
     'size': ThumbnailSpecSizeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThumbnailSpec
-     */
     'thumbnailUri': string;
 }
 

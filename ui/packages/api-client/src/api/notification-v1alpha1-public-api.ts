@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * NotificationV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const NotificationV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -80,7 +79,6 @@ export const NotificationV1alpha1PublicApiAxiosParamCreator = function (configur
 
 /**
  * NotificationV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const NotificationV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotificationV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -103,7 +101,6 @@ export const NotificationV1alpha1PublicApiFp = function(configuration?: Configur
 
 /**
  * NotificationV1alpha1PublicApi - factory interface
- * @export
  */
 export const NotificationV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotificationV1alpha1PublicApiFp(configuration)
@@ -122,30 +119,21 @@ export const NotificationV1alpha1PublicApiFactory = function (configuration?: Co
 
 /**
  * Request parameters for unsubscribe operation in NotificationV1alpha1PublicApi.
- * @export
- * @interface NotificationV1alpha1PublicApiUnsubscribeRequest
  */
 export interface NotificationV1alpha1PublicApiUnsubscribeRequest {
     /**
      * Subscription name
-     * @type {string}
-     * @memberof NotificationV1alpha1PublicApiUnsubscribe
      */
     readonly name: string
 
     /**
      * Unsubscribe token
-     * @type {string}
-     * @memberof NotificationV1alpha1PublicApiUnsubscribe
      */
     readonly token: string
 }
 
 /**
  * NotificationV1alpha1PublicApi - object-oriented interface
- * @export
- * @class NotificationV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class NotificationV1alpha1PublicApi extends BaseAPI {
     /**
@@ -153,7 +141,6 @@ export class NotificationV1alpha1PublicApi extends BaseAPI {
      * @param {NotificationV1alpha1PublicApiUnsubscribeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationV1alpha1PublicApi
      */
     public unsubscribe(requestParameters: NotificationV1alpha1PublicApiUnsubscribeRequest, options?: RawAxiosRequestConfig) {
         return NotificationV1alpha1PublicApiFp(this.configuration).unsubscribe(requestParameters.name, requestParameters.token, options).then((request) => request(this.axios, this.basePath));

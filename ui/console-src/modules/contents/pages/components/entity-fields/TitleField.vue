@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { singlePageLabels } from "@/constants/labels";
-import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedSinglePage } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,

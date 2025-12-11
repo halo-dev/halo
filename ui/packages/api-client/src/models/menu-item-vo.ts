@@ -15,49 +15,25 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuItemSpec } from './menu-item-spec';
+import type { MenuItemSpec } from './menu-item-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuItemStatus } from './menu-item-status';
+import type { MenuItemStatus } from './menu-item-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link MenuItem MenuItem}.
- * @export
- * @interface MenuItemVo
  */
 export interface MenuItemVo {
     /**
      * Gets menu item\'s display name.
-     * @type {string}
-     * @memberof MenuItemVo
      */
     'displayName'?: string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof MenuItemVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {string}
-     * @memberof MenuItemVo
-     */
     'parentName'?: string;
-    /**
-     * 
-     * @type {MenuItemSpec}
-     * @memberof MenuItemVo
-     */
     'spec'?: MenuItemSpec;
-    /**
-     * 
-     * @type {MenuItemStatus}
-     * @memberof MenuItemVo
-     */
     'status'?: MenuItemStatus;
 }
 

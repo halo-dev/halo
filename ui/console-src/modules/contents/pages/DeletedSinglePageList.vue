@@ -1,8 +1,5 @@
 <script lang="ts" setup>
 import PostContributorList from "@/components/user/PostContributorList.vue";
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
-import { generateThumbnailUrl } from "@/utils/thumbnail";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -28,11 +25,11 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const selectedPageNames = ref<string[]>([]);
@@ -301,7 +298,7 @@ watch(
             :is-selected="checkSelection(singlePage.page)"
           >
             <template
-              v-if="currentUserHasPermission(['system:singlepages:manage'])"
+              v-if="utils.permission.has(['system:singlepages:manage'])"
               #checkbox
             >
               <input
@@ -319,7 +316,7 @@ watch(
                     <img
                       class="h-full w-full object-cover"
                       :src="
-                        generateThumbnailUrl(
+                        utils.attachment.getThumbnailUrl(
                           singlePage.page.spec.cover,
                           GetThumbnailByUriSizeEnum.S
                         )
@@ -381,13 +378,15 @@ watch(
               </VEntityField>
               <VEntityField
                 v-if="singlePage.page.spec.publishTime"
-                v-tooltip="formatDatetime(singlePage.page.spec.publishTime)"
-                :description="relativeTimeTo(singlePage.page.spec.publishTime)"
+                v-tooltip="utils.date.format(singlePage.page.spec.publishTime)"
+                :description="
+                  utils.date.timeAgo(singlePage.page.spec.publishTime)
+                "
               >
               </VEntityField>
             </template>
             <template
-              v-if="currentUserHasPermission(['system:singlepages:manage'])"
+              v-if="utils.permission.has(['system:singlepages:manage'])"
               #dropdownItems
             >
               <VDropdownItem

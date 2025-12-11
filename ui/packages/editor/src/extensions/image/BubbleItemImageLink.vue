@@ -1,26 +1,20 @@
 <script setup lang="ts">
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
-import { computed, type Component } from "vue";
-import Image from "./index";
+import type { BubbleItemComponentProps } from "@/types";
+import { computed } from "vue";
+import { ExtensionImage } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const src = computed({
   get: () => {
-    return props.editor.getAttributes(Image.name).src;
+    return props.editor.getAttributes(ExtensionImage.name).src;
   },
   set: (src: string) => {
     props.editor
       .chain()
-      .updateAttributes(Image.name, { src: src })
+      .updateAttributes(ExtensionImage.name, { src: src })
       .setNodeSelection(props.editor.state.selection.from)
       .focus()
       .run();
@@ -29,9 +23,12 @@ const src = computed({
 </script>
 
 <template>
-  <input
-    v-model.lazy="src"
-    :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
-    class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
-  />
+  <div v-if="visible?.({ editor: props.editor })" class="w-80">
+    <Input
+      v-model="src"
+      auto-focus
+      :label="i18n.global.t('editor.extensions.image.src_input_label')"
+      :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
+    />
+  </div>
 </template>

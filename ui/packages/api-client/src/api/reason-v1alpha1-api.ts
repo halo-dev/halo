@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Reason } from '../models';
+import type { Reason } from '../models';
 // @ts-ignore
-import { ReasonList } from '../models';
+import type { ReasonList } from '../models';
 /**
  * ReasonV1alpha1Api - axios parameter creator
- * @export
  */
 export const ReasonV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ReasonV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * ReasonV1alpha1Api - functional programming interface
- * @export
  */
 export const ReasonV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ReasonV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ReasonV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * ReasonV1alpha1Api - factory interface
- * @export
  */
 export const ReasonV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ReasonV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ReasonV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiCreateReasonRequest
  */
 export interface ReasonV1alpha1ApiCreateReasonRequest {
     /**
      * Fresh reason
-     * @type {Reason}
-     * @memberof ReasonV1alpha1ApiCreateReason
      */
     readonly reason?: Reason
 }
 
 /**
  * Request parameters for deleteReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiDeleteReasonRequest
  */
 export interface ReasonV1alpha1ApiDeleteReasonRequest {
     /**
      * Name of reason
-     * @type {string}
-     * @memberof ReasonV1alpha1ApiDeleteReason
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiGetReasonRequest
  */
 export interface ReasonV1alpha1ApiGetReasonRequest {
     /**
      * Name of reason
-     * @type {string}
-     * @memberof ReasonV1alpha1ApiGetReason
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiListReasonRequest
  */
 export interface ReasonV1alpha1ApiListReasonRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ReasonV1alpha1ApiListReason
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ReasonV1alpha1ApiListReason
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ReasonV1alpha1ApiListReason
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ReasonV1alpha1ApiListReason
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ReasonV1alpha1ApiListReason
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiPatchReasonRequest
  */
 export interface ReasonV1alpha1ApiPatchReasonRequest {
     /**
      * Name of reason
-     * @type {string}
-     * @memberof ReasonV1alpha1ApiPatchReason
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ReasonV1alpha1ApiPatchReason
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateReason operation in ReasonV1alpha1Api.
- * @export
- * @interface ReasonV1alpha1ApiUpdateReasonRequest
  */
 export interface ReasonV1alpha1ApiUpdateReasonRequest {
     /**
      * Name of reason
-     * @type {string}
-     * @memberof ReasonV1alpha1ApiUpdateReason
      */
     readonly name: string
 
     /**
      * Updated reason
-     * @type {Reason}
-     * @memberof ReasonV1alpha1ApiUpdateReason
      */
     readonly reason?: Reason
 }
 
 /**
  * ReasonV1alpha1Api - object-oriented interface
- * @export
- * @class ReasonV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ReasonV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiCreateReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public createReason(requestParameters: ReasonV1alpha1ApiCreateReasonRequest = {}, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).createReason(requestParameters.reason, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiDeleteReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public deleteReason(requestParameters: ReasonV1alpha1ApiDeleteReasonRequest, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).deleteReason(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiGetReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public getReason(requestParameters: ReasonV1alpha1ApiGetReasonRequest, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).getReason(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiListReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public listReason(requestParameters: ReasonV1alpha1ApiListReasonRequest = {}, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).listReason(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiPatchReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public patchReason(requestParameters: ReasonV1alpha1ApiPatchReasonRequest, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).patchReason(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ReasonV1alpha1Api extends BaseAPI {
      * @param {ReasonV1alpha1ApiUpdateReasonRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReasonV1alpha1Api
      */
     public updateReason(requestParameters: ReasonV1alpha1ApiUpdateReasonRequest, options?: RawAxiosRequestConfig) {
         return ReasonV1alpha1ApiFp(this.configuration).updateReason(requestParameters.name, requestParameters.reason, options).then((request) => request(this.axios, this.basePath));

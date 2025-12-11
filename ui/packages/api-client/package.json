@@ -19,13 +19,14 @@
       "url": "https://github.com/ruibaby"
     }
   ],
+  "type": "module",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
@@ -34,23 +35,24 @@
       ]
     }
   },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsdown",
-    "gen": "rimraf --glob './src/**' && openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array'",
+    "gen": "rimraf --glob './src/**' && openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array' --global-property apiDocs=false,modelDocs=false",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "qs": "^6.13.0"
+    "qs": "^6.14.0"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.13.4",
-    "@types/qs": "^6.9.15",
-    "rimraf": "^5.0.7"
+    "@openapitools/openapi-generator-cli": "^2.25.0",
+    "@types/qs": "^6.14.0",
+    "rimraf": "^5.0.10"
   },
   "peerDependencies": {
-    "axios": "^1.7.x"
+    "axios": "^1.12.*"
   }
 }

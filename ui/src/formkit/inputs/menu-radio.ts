@@ -1,5 +1,10 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { defaultIcon, radio, radios } from "@formkit/inputs";
+import {
+  defaultIcon,
+  radio,
+  radios,
+  type FormKitInputs,
+} from "@formkit/inputs";
 import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
@@ -25,3 +30,12 @@ export const menuRadio: FormKitTypeDefinition = {
     defaultIcon("decorator", "radioDecorator"),
   ],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    menuRadio: {
+      type: "menuRadio";
+      value?: string;
+    };
+  }
+}

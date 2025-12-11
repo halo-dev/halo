@@ -1,48 +1,72 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
-import type { EditorState } from "@/tiptap/pm";
 import {
+  findChildren,
+  findParentNode,
   isActive,
   mergeAttributes,
+  Plugin,
+  PluginKey,
+  TextSelection,
   VueNodeViewRenderer,
   type Editor,
-} from "@/tiptap/vue-3";
+  type EditorState,
+  type Range,
+} from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { Attachment } from "@halo-dev/api-client";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
+import type { AxiosRequestConfig } from "axios";
+import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiLink from "~icons/mdi/link";
-import MdiLinkVariant from "~icons/mdi/link-variant";
-import MdiShare from "~icons/mdi/share";
-import MdiTextBoxEditOutline from "~icons/mdi/text-box-edit-outline";
+import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
+import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
+import MingcuteLink2Line from "~icons/mingcute/link-2-line";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcutePicLine from "~icons/mingcute/pic-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import { ExtensionFigure } from "../figure";
+import { ExtensionFigureCaption } from "../figure/figure-caption";
+import { ExtensionParagraph } from "../paragraph";
 import BubbleItemImageAlt from "./BubbleItemImageAlt.vue";
 import BubbleItemImageHref from "./BubbleItemImageHref.vue";
-import BubbleItemVideoLink from "./BubbleItemImageLink.vue";
+import BubbleItemImageLink from "./BubbleItemImageLink.vue";
+import BubbleItemImagePosition from "./BubbleItemImagePosition.vue";
 import BubbleItemImageSize from "./BubbleItemImageSize.vue";
 import ImageView from "./ImageView.vue";
 
-const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
+export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
+
+export type ExtensionImageOptions = ExtensionOptions &
+  Partial<ImageOptions> & {
+    uploadImage?: (
+      file: File,
+      options?: AxiosRequestConfig
+    ) => Promise<Attachment>;
+  };
+
+export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
   fakeSelection: true,
 
-  inline() {
-    return true;
-  },
+  inline: false,
 
-  group() {
-    return "inline";
-  },
+  group: "block",
+
+  defining: false,
 
   addAttributes() {
     return {
       ...this.parent?.(),
+      src: {
+        default: null,
+        parseHTML: (element) => {
+          return element.getAttribute("src");
+        },
+      },
       width: {
         default: undefined,
         parseHTML: (element) => {
@@ -81,11 +105,27 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
           };
         },
       },
-      style: {
-        renderHTML() {
+      position: {
+        default: "left",
+        parseHTML: (element) => {
+          return (
+            element.getAttribute("data-position") ||
+            element.getAttribute("text-align")
+          );
+        },
+        renderHTML: (attributes) => {
           return {
-            style: "display: inline-block",
+            "data-position": attributes.position,
           };
+        },
+      },
+      file: {
+        default: null,
+        renderHTML() {
+          return {};
+        },
+        parseHTML() {
+          return null;
         },
       },
     };
@@ -98,15 +138,92 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
   parseHTML() {
     return [
       {
-        tag: this.options.allowBase64
-          ? "img[src]"
-          : 'img[src]:not([src^="data:"])',
+        tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])',
       },
     ];
   },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("imageLegacyFormat"),
+        appendTransaction: (transactions, _oldState, newState) => {
+          const docChanged = transactions.some((tr) => tr.docChanged);
+          if (!docChanged) {
+            return null;
+          }
+
+          const tr = newState.tr;
+          let modified = false;
+
+          newState.doc.descendants((node, pos) => {
+            if (node.type.name !== ExtensionImage.name) {
+              return;
+            }
+
+            const $pos = newState.doc.resolve(pos);
+            if ($pos.parent.type.name === ExtensionFigure.name) {
+              return;
+            }
+
+            let position = "left";
+            let deletePreviousNode = false;
+            let previousNodePos = -1;
+            let previousNodeSize = 0;
+
+            const previousNode = $pos.nodeBefore;
+            if (
+              previousNode &&
+              previousNode.type.name === ExtensionParagraph.name
+            ) {
+              if (previousNode.attrs.textAlign) {
+                const positionMap: Record<string, string> = {
+                  left: "left",
+                  center: "center",
+                  right: "right",
+                  justify: "center",
+                };
+                position = positionMap[previousNode.attrs.textAlign] || "left";
+              }
+              if (previousNode.textContent?.trim().length === 0) {
+                deletePreviousNode = true;
+                previousNodePos = pos - previousNode.nodeSize;
+                previousNodeSize = previousNode.nodeSize;
+              }
+            }
+
+            const figureNode = newState.schema.nodes.figure.create(
+              {
+                contentType: "image",
+                position,
+              },
+              [node]
+            );
+
+            if (deletePreviousNode) {
+              tr.delete(previousNodePos, previousNodePos + previousNodeSize);
+              tr.replaceRangeWith(
+                pos - previousNodeSize,
+                pos - previousNodeSize + node.nodeSize,
+                figureNode
+              );
+            } else {
+              tr.replaceRangeWith(pos, pos + node.nodeSize, figureNode);
+            }
+
+            modified = true;
+          });
+
+          return modified ? tr : null;
+        },
+      }),
+    ];
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),
+      uploadImage: undefined,
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
@@ -114,91 +231,127 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiFileImageBox),
+              icon: markRaw(MingcutePicLine),
               title: i18n.global.t("editor.common.image"),
               action: () => {
                 editor
                   .chain()
                   .focus()
-                  .insertContent([{ type: "image", attrs: { src: "" } }])
+                  .insertContent([
+                    {
+                      type: "figure",
+                      attrs: { contentType: "image" },
+                      content: [{ type: "image" }],
+                    },
+                  ])
                   .run();
               },
             },
           },
         ];
       },
+      getCommandMenuItems() {
+        return {
+          priority: 95,
+          icon: markRaw(MingcutePicLine),
+          title: "editor.extensions.commands_menu.image",
+          keywords: ["image", "tupian"],
+          command: ({ editor, range }: { editor: Editor; range: Range }) => {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertContent([
+                {
+                  type: "figure",
+                  attrs: { contentType: "image" },
+                  content: [{ type: "image" }],
+                },
+              ])
+              .run();
+          },
+        };
+      },
       getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
-          pluginKey: "imageBubbleMenu",
+          pluginKey: IMAGE_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Image.name);
+            return isActive(state, ExtensionImage.name);
           },
-          defaultAnimation: false,
+          options: {
+            placement: "top-start",
+          },
           items: [
             {
               priority: 10,
               component: markRaw(BubbleItemImageSize),
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+              },
             },
             {
               priority: 20,
+              component: markRaw(BubbleItemImagePosition),
               props: {
-                isActive: () => editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetTextAlign(editor, "left"),
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
               },
             },
             {
               priority: 30,
+              component: markRaw(BlockActionSeparator),
               props: {
-                isActive: () => editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetTextAlign(editor, "center"),
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
               },
             },
             {
               priority: 40,
               props: {
-                isActive: () => editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetTextAlign(editor, "right"),
+                icon: markRaw(MingcuteLinkLine),
+                title: i18n.global.t("editor.common.button.edit_link"),
+                action: () => {
+                  return markRaw(BubbleItemImageLink);
+                },
               },
             },
             {
               priority: 50,
               props: {
-                isActive: () => editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
-                action: () => handleSetTextAlign(editor, "justify"),
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteShare3Line),
+                title: i18n.global.t("editor.common.tooltip.open_link"),
+                action: () => {
+                  window.open(
+                    editor.getAttributes(ExtensionImage.name).src,
+                    "_blank"
+                  );
+                },
               },
             },
             {
               priority: 60,
-              component: markRaw(BlockActionSeparator),
-            },
-            {
-              priority: 70,
               props: {
-                icon: markRaw(MdiLinkVariant),
-                title: i18n.global.t("editor.common.button.edit_link"),
-                action: () => {
-                  return markRaw(BubbleItemVideoLink);
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
                 },
-              },
-            },
-            {
-              priority: 80,
-              props: {
-                icon: markRaw(MdiShare),
-                title: i18n.global.t("editor.common.tooltip.open_link"),
-                action: () => {
-                  window.open(editor.getAttributes(Image.name).src, "_blank");
-                },
-              },
-            },
-            {
-              priority: 90,
-              props: {
-                icon: markRaw(MdiTextBoxEditOutline),
+                icon: markRaw(MingcuteEdit4Line),
                 title: i18n.global.t("editor.extensions.image.edit_alt"),
                 action: () => {
                   return markRaw(BubbleItemImageAlt);
@@ -206,9 +359,14 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
               },
             },
             {
-              priority: 100,
+              priority: 70,
               props: {
-                icon: markRaw(MdiLink),
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteLink2Line),
                 title: i18n.global.t("editor.extensions.image.edit_href"),
                 action: () => {
                   return markRaw(BubbleItemImageHref);
@@ -216,48 +374,80 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
               },
             },
             {
-              priority: 110,
+              priority: 80,
+              props: {
+                visible({ editor }) {
+                  return !isEmpty(
+                    editor.getAttributes(ExtensionImage.name).src
+                  );
+                },
+                icon: markRaw(MingcuteBookmarkEditLine),
+                title: i18n.global.t("editor.extensions.image.edit_caption"),
+                action: ({ editor }) => {
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === ExtensionFigure.name
+                  )(editor.state.selection);
+
+                  if (!figureParent) {
+                    return;
+                  }
+
+                  const { node, pos } = figureParent;
+                  let captionPos = -1;
+                  node.forEach((child, offset) => {
+                    if (child.type.name === ExtensionFigureCaption.name) {
+                      captionPos = pos + offset + 1;
+                    }
+                  });
+                  if (captionPos !== -1) {
+                    editor.chain().focus().setTextSelection(captionPos).run();
+                    return;
+                  }
+                  const imageNodePos = findChildren(
+                    editor.state.selection.$from.node(),
+                    (node) => node.type.name === ExtensionImage.name
+                  )[0];
+                  const figureCaptionNode =
+                    editor.schema.nodes.figureCaption.create({
+                      width: imageNodePos.node.attrs.width,
+                    });
+                  editor
+                    .chain()
+                    .focus()
+                    .command(({ tr }) => {
+                      const insertPos = pos + node.nodeSize - 1;
+                      tr.insert(insertPos, figureCaptionNode);
+                      tr.setSelection(
+                        TextSelection.near(tr.doc.resolve(insertPos + 1))
+                      );
+                      return true;
+                    })
+                    .run();
+                },
+              },
+            },
+            {
+              priority: 90,
               component: markRaw(BlockActionSeparator),
             },
             {
-              priority: 120,
+              priority: 100,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Image.name, editor);
+                  const figureParent = findParentNode(
+                    (node) => node.type.name === ExtensionFigure.name
+                  )(editor.state.selection);
+
+                  deleteNode(
+                    figureParent ? ExtensionFigure.name : ExtensionImage.name,
+                    editor
+                  );
                 },
               },
             },
           ],
-        };
-      },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom, view }) {
-            let container = dom;
-            while (container && container.tagName !== "P") {
-              container = container.parentElement as HTMLElement;
-            }
-            if (container) {
-              container = container.firstElementChild
-                ?.firstElementChild as HTMLElement;
-            }
-            let node;
-            if (container.firstElementChild) {
-              const pos = view.posAtDOM(container.firstElementChild, 0);
-              const $pos = view.state.doc.resolve(pos);
-              node = $pos.node();
-            }
-
-            return {
-              node: node,
-              el: container as HTMLElement,
-              dragDomOffset: {
-                y: -5,
-              },
-            };
-          },
         };
       },
     };
@@ -272,13 +462,10 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
     }
     return ["img", mergeAttributes(HTMLAttributes)];
   },
+}).configure({
+  inline: true,
+  allowBase64: false,
+  HTMLAttributes: {
+    loading: "lazy",
+  },
 });
-
-const handleSetTextAlign = (
-  editor: Editor,
-  align: "left" | "center" | "right" | "justify"
-) => {
-  editor.chain().focus().setTextAlign(align).run();
-};
-
-export default Image;

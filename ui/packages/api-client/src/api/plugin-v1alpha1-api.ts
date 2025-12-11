@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Plugin } from '../models';
+import type { Plugin } from '../models';
 // @ts-ignore
-import { PluginList } from '../models';
+import type { PluginList } from '../models';
 /**
  * PluginV1alpha1Api - axios parameter creator
- * @export
  */
 export const PluginV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const PluginV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * PluginV1alpha1Api - functional programming interface
- * @export
  */
 export const PluginV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PluginV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const PluginV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * PluginV1alpha1Api - factory interface
- * @export
  */
 export const PluginV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PluginV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const PluginV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createPlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiCreatePluginRequest
  */
 export interface PluginV1alpha1ApiCreatePluginRequest {
     /**
      * Fresh plugin
-     * @type {Plugin}
-     * @memberof PluginV1alpha1ApiCreatePlugin
      */
     readonly plugin?: Plugin
 }
 
 /**
  * Request parameters for deletePlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiDeletePluginRequest
  */
 export interface PluginV1alpha1ApiDeletePluginRequest {
     /**
      * Name of plugin
-     * @type {string}
-     * @memberof PluginV1alpha1ApiDeletePlugin
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getPlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiGetPluginRequest
  */
 export interface PluginV1alpha1ApiGetPluginRequest {
     /**
      * Name of plugin
-     * @type {string}
-     * @memberof PluginV1alpha1ApiGetPlugin
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listPlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiListPluginRequest
  */
 export interface PluginV1alpha1ApiListPluginRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PluginV1alpha1ApiListPlugin
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PluginV1alpha1ApiListPlugin
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ApiListPlugin
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ApiListPlugin
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ApiListPlugin
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchPlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiPatchPluginRequest
  */
 export interface PluginV1alpha1ApiPatchPluginRequest {
     /**
      * Name of plugin
-     * @type {string}
-     * @memberof PluginV1alpha1ApiPatchPlugin
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof PluginV1alpha1ApiPatchPlugin
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updatePlugin operation in PluginV1alpha1Api.
- * @export
- * @interface PluginV1alpha1ApiUpdatePluginRequest
  */
 export interface PluginV1alpha1ApiUpdatePluginRequest {
     /**
      * Name of plugin
-     * @type {string}
-     * @memberof PluginV1alpha1ApiUpdatePlugin
      */
     readonly name: string
 
     /**
      * Updated plugin
-     * @type {Plugin}
-     * @memberof PluginV1alpha1ApiUpdatePlugin
      */
     readonly plugin?: Plugin
 }
 
 /**
  * PluginV1alpha1Api - object-oriented interface
- * @export
- * @class PluginV1alpha1Api
- * @extends {BaseAPI}
  */
 export class PluginV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiCreatePluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public createPlugin(requestParameters: PluginV1alpha1ApiCreatePluginRequest = {}, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).createPlugin(requestParameters.plugin, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiDeletePluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public deletePlugin(requestParameters: PluginV1alpha1ApiDeletePluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).deletePlugin(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiGetPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public getPlugin(requestParameters: PluginV1alpha1ApiGetPluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).getPlugin(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiListPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public listPlugin(requestParameters: PluginV1alpha1ApiListPluginRequest = {}, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).listPlugin(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiPatchPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public patchPlugin(requestParameters: PluginV1alpha1ApiPatchPluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).patchPlugin(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class PluginV1alpha1Api extends BaseAPI {
      * @param {PluginV1alpha1ApiUpdatePluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1Api
      */
     public updatePlugin(requestParameters: PluginV1alpha1ApiUpdatePluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ApiFp(this.configuration).updatePlugin(requestParameters.name, requestParameters.plugin, options).then((request) => request(this.axios, this.basePath));

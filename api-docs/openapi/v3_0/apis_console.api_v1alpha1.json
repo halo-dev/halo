@@ -4074,6 +4074,11 @@
         }
       },
       "Content": {
+        "required": [
+          "content",
+          "raw",
+          "rawType"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -4088,6 +4093,11 @@
         }
       },
       "ContentUpdateParam": {
+        "required": [
+          "content",
+          "raw",
+          "rawType"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -4236,27 +4246,27 @@
         "properties": {
           "approvedComments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "comments": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "posts": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "upvotes": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "users": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           },
           "visits": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64"
           }
         }
       },
@@ -4317,6 +4327,7 @@
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string"
           }
         }
@@ -4912,33 +4923,6 @@
         },
         "description": "A chunk of items."
       },
-      "LoginHistory": {
-        "required": [
-          "loginAt",
-          "sourceIp",
-          "successful",
-          "userAgent"
-        ],
-        "type": "object",
-        "properties": {
-          "loginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "sourceIp": {
-            "type": "string"
-          },
-          "successful": {
-            "type": "boolean"
-          },
-          "userAgent": {
-            "type": "string"
-          }
-        }
-      },
       "Metadata": {
         "required": [
           "name"
@@ -5370,6 +5354,7 @@
       },
       "PostRequest": {
         "required": [
+          "content",
           "post"
         ],
         "type": "object",
@@ -6657,16 +6642,6 @@
       "UserStatus": {
         "type": "object",
         "properties": {
-          "lastLoginAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "loginHistories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LoginHistory"
-            }
-          },
           "permalink": {
             "type": "string"
           }

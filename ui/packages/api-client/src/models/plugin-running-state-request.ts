@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface PluginRunningStateRequest
- */
 export interface PluginRunningStateRequest {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PluginRunningStateRequest
-     */
     'async'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PluginRunningStateRequest
-     */
     'enable'?: boolean;
 }
 

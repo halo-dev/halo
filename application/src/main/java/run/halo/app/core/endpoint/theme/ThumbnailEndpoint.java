@@ -4,7 +4,6 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import java.net.URI;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +21,7 @@ import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * Thumbnail endpoint for thumbnail resource access.
@@ -82,7 +82,7 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
         var uri = request.queryParam("uri")
             .filter(StringUtils::isNotBlank)
-            .map(URI::create);
+            .map(HaloUtils::safeToUri);
         if (uri.isEmpty()) {
             return Mono.error(
                 new ServerWebInputException("Required parameter 'uri' is missing or invalid")

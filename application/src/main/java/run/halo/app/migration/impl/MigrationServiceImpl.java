@@ -29,6 +29,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
@@ -58,6 +60,8 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
 
     private final ObjectMapper objectMapper;
 
+    private final ReactiveTransactionManager txManager;
+
     private final Set<String> excludes = Set.of(
         "**/.git/**",
         "**/node_modules/**",
@@ -79,10 +83,12 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
     public MigrationServiceImpl(ExtensionStoreRepository repository,
-        HaloProperties haloProperties, BackupRootGetter backupRoot) {
+        HaloProperties haloProperties, BackupRootGetter backupRoot,
+        ReactiveTransactionManager txManager) {
         this.repository = repository;
         this.haloProperties = haloProperties;
         this.backupRoot = backupRoot;
+        this.txManager = txManager;
         this.objectMapper = JsonMapper.builder()
             .defaultPrettyPrinter(new MinimalPrettyPrinter())
             .build();
@@ -138,6 +144,7 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
 
     @Override
     public Mono<Void> restore(Publisher<DataBuffer> content) {
+        var tx = TransactionalOperator.create(txManager);
         return Mono.usingWhen(
             createTempDir("halo-restore-", scheduler),
             tempDir -> unpackBackup(content, tempDir)
@@ -145,10 +152,12 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
                     // This step skips index verification such as unique index.
                     // In order to avoid index conflicts after recovery or
                     // OptimisticLockingFailureException when updating the same record,
-                    // so we need to truncate all extension stores before saving(create or update).
+                    // so we need to truncate all extension stores before saving(create or
+                    // update).
                     repository.deleteAll()
-                        .then(restoreExtensions(tempDir)))
-                )
+                        .then(restoreExtensions(tempDir))
+                        .as(tx::transactional)
+                ))
                 .then(Mono.defer(() -> restoreWorkdir(tempDir))),
             tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
         );
@@ -235,7 +244,7 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
     private Mono<Void> restoreExtensions(Path backupRoot) {
         var extensionsPath = backupRoot.resolve("extensions.data");
         if (Files.notExists(extensionsPath)) {
-            return Mono.empty();
+            return Mono.error(new ServerWebInputException("Extensions data file not found."));
         }
         var reader = objectMapper.readerFor(ExtensionStore.class);
         return Mono.<Void, MappingIterator<ExtensionStore>>using(

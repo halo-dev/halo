@@ -9,8 +9,7 @@ import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.in;
+import static run.halo.app.extension.index.query.Queries.in;
 
 import com.google.common.hash.Hashing;
 import java.time.Duration;
@@ -53,7 +52,6 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
-import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ListOptions;
@@ -63,11 +61,12 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequeueException;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -87,6 +86,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @AllArgsConstructor
 @Component
 public class PostReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
     private final PostService postService;
@@ -211,7 +211,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var hidden = categories.stream()
             .anyMatch(categoryName -> categoryService.isCategoryHidden(categoryName)
-                .blockOptional().orElse(false)
+                .blockOptional(BLOCKING_TIMEOUT).orElse(false)
             );
         post.getStatusOrDefault().setHideFromList(hidden);
     }
@@ -253,12 +253,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Post())
-            .onAddMatcher(DefaultExtensionMatcher.builder(client, Post.GVK)
-                .fieldSelector(FieldSelector.of(
-                    equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, TRUE))
-                )
-                .build()
-            )
+            .syncAllListOptions(ListOptions.builder()
+                .andQuery(Queries.equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                .build())
             .build();
     }
 
@@ -292,7 +289,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
         interestReason.setExpression(
             "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
-        notificationCenter.subscribe(subscriber, interestReason).block();
+        notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
     private void publishPost(Post post, Set<ApplicationEvent> events) {
@@ -371,18 +368,18 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        commentService.removeBySubject(ref).block();
+        commentService.removeBySubject(ref).block(BLOCKING_TIMEOUT);
 
         // delete counter
         counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
-            .block();
+            .block(BLOCKING_TIMEOUT);
     }
 
     private String getExcerpt(Post post) {
         Optional<ContentWrapper> contentWrapper =
             postService.getContent(post.getSpec().getReleaseSnapshot(),
                     post.getSpec().getBaseSnapshot())
-                .blockOptional();
+                .blockOptional(BLOCKING_TIMEOUT);
         if (contentWrapper.isEmpty()) {
             return StringUtils.EMPTY;
         }
@@ -420,7 +417,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     post.getMetadata().getName(), e);
                 return Mono.empty();
             })
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(StringUtils.EMPTY);
     }
 
@@ -448,7 +445,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     List<Snapshot> listSnapshots(Ref ref) {
         var snapshotListOptions = new ListOptions();
         snapshotListOptions.setFieldSelector(FieldSelector.of(
-            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+            Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
         return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

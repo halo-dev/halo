@@ -2,7 +2,6 @@ package run.halo.app.core.attachment.thumbnail;
 
 import static org.thymeleaf.templatemode.TemplateMode.HTML;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -16,6 +15,7 @@ import org.thymeleaf.model.IAttribute;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.MatchingElementName;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.theme.dialect.ElementTagPostProcessor;
 
 @Slf4j
@@ -52,7 +52,8 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
         var srcValue = Optional.ofNullable(tag.getAttribute("src"))
             .map(IAttribute::getValue)
             .filter(StringUtils::hasText)
-            .map(URI::create);
+            .map(String::trim)
+            .map(HaloUtils::safeToUri);
         if (srcValue.isEmpty()) {
             log.debug("Skip processing img tag without src attribute");
             return Mono.empty();

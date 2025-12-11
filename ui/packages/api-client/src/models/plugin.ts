@@ -15,49 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PluginSpec } from './plugin-spec';
+import type { PluginSpec } from './plugin-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PluginStatus } from './plugin-status';
+import type { PluginStatus } from './plugin-status';
 
 /**
  * A custom resource for Plugin.
- * @export
- * @interface Plugin
  */
 export interface Plugin {
-    /**
-     * 
-     * @type {string}
-     * @memberof Plugin
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Plugin
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Plugin
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {PluginSpec}
-     * @memberof Plugin
-     */
     'spec': PluginSpec;
-    /**
-     * 
-     * @type {PluginStatus}
-     * @memberof Plugin
-     */
     'status'?: PluginStatus;
 }
 

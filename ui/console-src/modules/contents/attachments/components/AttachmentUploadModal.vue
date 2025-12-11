@@ -22,10 +22,11 @@ import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
-const { initialPolicyName, initialGroupName } = defineProps<{
-  initialPolicyName?: string;
-  initialGroupName?: string;
-}>();
+const { initialPolicyName = undefined, initialGroupName = undefined } =
+  defineProps<{
+    initialPolicyName?: string;
+    initialGroupName?: string;
+  }>();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -44,9 +45,21 @@ const { policies: allPolicies, handleFetchPolicies } =
   useFetchAttachmentPolicy();
 
 const policies = computed(() => {
-  return allPolicies.value?.filter((policy) => {
-    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
-  });
+  return allPolicies.value
+    ?.filter((policy) => {
+      return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+    })
+    .sort((a, b) => {
+      const priorityA = parseInt(
+        a.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+        10
+      );
+      const priorityB = parseInt(
+        b.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+        10
+      );
+      return priorityB - priorityA;
+    });
 });
 
 onMounted(() => {
@@ -120,8 +133,8 @@ const activeTab = ref("upload");
           </AttachmentPolicyBadge>
           <template #popper>
             <VDropdownItem
-              v-for="(policyTemplate, index) in policyTemplates"
-              :key="index"
+              v-for="policyTemplate in policyTemplates"
+              :key="policyTemplate.metadata.name"
               @click="handleOpenCreateNewPolicyModal(policyTemplate)"
             >
               {{ policyTemplate.spec?.displayName }}

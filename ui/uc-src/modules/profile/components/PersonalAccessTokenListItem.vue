@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
@@ -10,7 +9,9 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  type StatusDotState,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -29,6 +30,9 @@ function handleDelete() {
   Dialog.warning({
     title: t("core.uc_profile.pat.operations.delete.title"),
     description: t("core.uc_profile.pat.operations.delete.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.deletePat({
         name: props.token.metadata.name,
@@ -44,6 +48,9 @@ function handleRevoke() {
   Dialog.warning({
     title: t("core.uc_profile.pat.operations.revoke.title"),
     description: t("core.uc_profile.pat.operations.revoke.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await ucApiClient.security.personalAccessToken.revokePat({
         name: props.token.metadata.name,
@@ -76,7 +83,7 @@ const statusText = computed(() => {
   );
 });
 
-const statusTheme = computed(() => {
+const statusTheme = computed<StatusDotState>(() => {
   const { expiresAt } = props.token.spec || {};
   if (expiresAt && new Date(expiresAt) < new Date()) {
     return "warning";
@@ -108,11 +115,11 @@ const statusTheme = computed(() => {
           <div class="truncate text-xs tabular-nums text-gray-500">
             <span
               v-if="token.spec?.expiresAt"
-              v-tooltip="formatDatetime(token.spec.expiresAt)"
+              v-tooltip="utils.date.format(token.spec.expiresAt)"
             >
               {{
                 $t("core.uc_profile.pat.list.fields.expiresAt.dynamic", {
-                  expiresAt: relativeTimeTo(token.spec?.expiresAt),
+                  expiresAt: utils.date.timeAgo(token.spec?.expiresAt),
                 })
               }}
             </span>
@@ -128,7 +135,7 @@ const statusTheme = computed(() => {
         </template>
       </VEntityField>
       <VEntityField
-        :description="formatDatetime(token.metadata.creationTimestamp)"
+        :description="utils.date.format(token.metadata.creationTimestamp)"
       ></VEntityField>
     </template>
     <template #dropdownItems>

@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface InstallFromUriRequest
- */
 export interface InstallFromUriRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof InstallFromUriRequest
-     */
     'uri': string;
 }
 

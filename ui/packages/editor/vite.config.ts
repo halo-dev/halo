@@ -5,18 +5,67 @@ import Vue from "@vitejs/plugin-vue";
 import path from "node:path";
 import Icons from "unplugin-icons/vite";
 import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
 
-export default defineConfig({
-  plugins: [
-    Vue(),
-    Icons({ compiler: "vue3" }),
-    VueI18nPlugin({
-      include: [path.resolve(__dirname, "./src/locales/*.yaml")],
-    }),
-  ],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+export default ({ mode }: { mode: string }) => {
+  const isProduction = mode === "production";
+
+  return defineConfig({
+    experimental: {
+      enableNativePlugin: true,
     },
-  },
-});
+    plugins: [
+      Vue(),
+      Icons({
+        compiler: "vue3",
+      }),
+      isProduction &&
+        dts({
+          tsconfigPath: "./tsconfig.app.json",
+          entryRoot: "./src",
+          outDir: "./dist",
+          insertTypesEntry: true,
+        }),
+      VueI18nPlugin({
+        include: [path.resolve(__dirname, "./src/locales/*.yaml")],
+      }),
+    ],
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    },
+    build: {
+      outDir: path.resolve(__dirname, "dist"),
+      lib: {
+        entry: path.resolve(__dirname, "src/index.ts"),
+        name: "RichTextEditor",
+        formats: ["es", "iife"],
+        fileName: (format) => `index.${format}.js`,
+        cssFileName: "style",
+      },
+      minify: isProduction,
+      rollupOptions: {
+        external: [
+          "vue",
+          "@halo-dev/ui-shared",
+          "@halo-dev/api-client",
+          "@halo-dev/components",
+        ],
+        output: {
+          globals: {
+            vue: "Vue",
+            "@halo-dev/ui-shared": "HaloUiShared",
+            "@halo-dev/api-client": "HaloApiClient",
+            "@halo-dev/components": "HaloComponents",
+          },
+          exports: "named",
+        },
+      },
+      sourcemap: false,
+    },
+  });
+};

@@ -3,8 +3,7 @@
 
 export {};
 
-import type { FormKitInputs } from "@formkit/inputs";
-import type { CoreMenuGroupId } from "@halo-dev/console-shared";
+import type { CoreMenuGroupId } from "@halo-dev/ui-shared";
 
 import "vue-router";
 
@@ -42,94 +41,5 @@ declare module "vue-router" {
 declare module "axios" {
   export interface AxiosRequestConfig {
     mute?: boolean;
-  }
-}
-
-declare module "@formkit/inputs" {
-  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
-    "datetime-local": {
-      type: "datetime-local";
-      value?: string;
-    };
-
-    attachmentGroupSelect: {
-      type: "attachmentGroupSelect";
-      value?: string;
-    };
-
-    attachmentPolicySelect: {
-      type: "attachmentPolicySelect";
-      value?: string;
-    };
-
-    attachment: {
-      type: "attachment";
-      value?: string;
-    };
-
-    categoryCheckbox: {
-      type: "categoryCheckbox";
-      value?: string[];
-    };
-
-    tagSelect: {
-      type: "tagSelect";
-      value?: string | string[];
-    };
-
-    repeater: {
-      type: "repeater";
-      value?: Record<string, unknown>[];
-    };
-
-    categorySelect: {
-      type: "categorySelect";
-      value?: string | string[];
-    };
-
-    tagCheckbox: {
-      type: "tagCheckbox";
-      value?: string[];
-    };
-
-    singlePageSelect: {
-      type: "singlePageSelect";
-      value?: string;
-    };
-
-    roleSelect: {
-      type: "roleSelect";
-      value?: string;
-    };
-
-    postSelect: {
-      type: "postSelect";
-      value?: string;
-    };
-
-    menuRadio: {
-      type: "menuRadio";
-      value?: string;
-    };
-
-    menuItemSelect: {
-      type: "menuItemSelect";
-      value?: string;
-    };
-
-    menuCheckbox: {
-      type: "menuCheckbox";
-      value?: string[];
-    };
-
-    code: {
-      type: "code";
-      value?: string;
-    };
-
-    userSelect: {
-      type: "userSelect";
-      value?: string;
-    };
   }
 }

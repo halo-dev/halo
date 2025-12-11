@@ -15,88 +15,41 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryVo } from './category-vo';
+import type { CategoryVo } from './category-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContentVo } from './content-vo';
+import type { ContentVo } from './content-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContributorVo } from './contributor-vo';
+import type { ContributorVo } from './contributor-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostSpec } from './post-spec';
+import type { PostSpec } from './post-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostStatus } from './post-status';
+import type { PostStatus } from './post-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { StatsVo } from './stats-vo';
+import type { StatsVo } from './stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagVo } from './tag-vo';
+import type { TagVo } from './tag-vo';
 
 /**
  * A value object for {@link Post Post}.
- * @export
- * @interface PostVo
  */
 export interface PostVo {
-    /**
-     * 
-     * @type {Array<CategoryVo>}
-     * @memberof PostVo
-     */
     'categories'?: Array<CategoryVo>;
-    /**
-     * 
-     * @type {ContentVo}
-     * @memberof PostVo
-     */
     'content'?: ContentVo;
-    /**
-     * 
-     * @type {Array<ContributorVo>}
-     * @memberof PostVo
-     */
     'contributors'?: Array<ContributorVo>;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof PostVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ContributorVo}
-     * @memberof PostVo
-     */
     'owner'?: ContributorVo;
-    /**
-     * 
-     * @type {PostSpec}
-     * @memberof PostVo
-     */
     'spec'?: PostSpec;
-    /**
-     * 
-     * @type {StatsVo}
-     * @memberof PostVo
-     */
     'stats'?: StatsVo;
-    /**
-     * 
-     * @type {PostStatus}
-     * @memberof PostVo
-     */
     'status'?: PostStatus;
-    /**
-     * 
-     * @type {Array<TagVo>}
-     * @memberof PostVo
-     */
     'tags'?: Array<TagVo>;
 }
 

@@ -1,8 +1,8 @@
 package run.halo.app.content.comment;
 
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -176,8 +176,10 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
     Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(
-            and(equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
-                isNull("metadata.deletionTimestamp"))
+            and(
+                equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
+                isNull("metadata.deletionTimestamp")
+            )
         ));
         return client.listBy(Comment.class, listOptions, pageRequest);
     }

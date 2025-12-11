@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { relativeTimeTo } from "@/utils/date";
 import type { ListedSnapshotDto, Post } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -49,6 +49,7 @@ function handleDelete() {
     description: t("core.post_snapshots.operations.delete.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     async onConfirm() {
       await consoleApiClient.content.post.deletePostContent({
         name: props.post?.metadata.name as string,
@@ -98,7 +99,7 @@ const isBase = computed(() => {
           'font-semibold': isSelected,
         }"
       >
-        {{ relativeTimeTo(snapshot.metadata.creationTimestamp) }}
+        {{ utils.date.timeAgo(snapshot.metadata.creationTimestamp) }}
       </div>
       <div class="inline-flex flex-none items-center space-x-3">
         <VTag v-if="isReleased" theme="primary">

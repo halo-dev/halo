@@ -1,9 +1,9 @@
 package run.halo.app.content.comment;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
+import static run.halo.app.extension.index.query.Queries.isNull;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -220,8 +220,10 @@ public class ReplyServiceImpl extends AbstractCommentService implements ReplySer
     Mono<ListResult<Reply>> listRepliesByComment(String commentName, PageRequest pageRequest) {
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(
-            and(equal("spec.commentName", commentName),
-                isNull("metadata.deletionTimestamp"))
+            and(
+                equal("spec.commentName", commentName),
+                isNull("metadata.deletionTimestamp")
+            )
         ));
         return client.listBy(Reply.class, listOptions, pageRequest);
     }

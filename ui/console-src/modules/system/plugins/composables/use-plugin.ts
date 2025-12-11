@@ -1,5 +1,4 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -7,15 +6,13 @@ import {
   type Plugin,
   type SettingForm,
 } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
-import type { PluginTab } from "@halo-dev/console-shared";
+import { Dialog, Toast, VLoading } from "@halo-dev/components";
+import { utils, type PluginTab } from "@halo-dev/ui-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
-import { computed, markRaw, ref } from "vue";
+import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
-import DetailTab from "../components/tabs/Detail.vue";
-import SettingTab from "../components/tabs/Setting.vue";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -281,18 +278,20 @@ export function usePluginDetailTabs(
   pluginName: Ref<string | undefined>,
   recordsActiveTab: boolean
 ) {
-  const { currentUserHasPermission } = usePermission();
   const { t } = useI18n();
 
   const initialTabs = [
     {
       id: "detail",
       label: t("core.plugin.tabs.detail"),
-      component: markRaw(DetailTab),
+      component: defineAsyncComponent({
+        loader: () => import("../components/tabs/Detail.vue"),
+        loadingComponent: VLoading,
+      }),
     },
   ];
 
-  const tabs = ref<PluginTab[]>(initialTabs);
+  const tabs = shallowRef<PluginTab[]>(initialTabs);
   const activeTab = recordsActiveTab
     ? useRouteQuery<string>("tab", tabs.value[0].id)
     : ref(tabs.value[0].id);
@@ -308,7 +307,7 @@ export function usePluginDetailTabs(
     async onSuccess(data) {
       if (
         !data.spec.settingName ||
-        !currentUserHasPermission(["system:plugins:manage"])
+        !utils.permission.has(["system:plugins:manage"])
       ) {
         tabs.value = [...initialTabs, ...(await getTabsFromExtensions())];
       }
@@ -327,7 +326,7 @@ export function usePluginDetailTabs(
       return (
         !!plugin.value &&
         !!plugin.value.spec.settingName &&
-        currentUserHasPermission(["system:plugins:manage"])
+        utils.permission.has(["system:plugins:manage"])
       );
     }),
     async onSuccess(data) {
@@ -340,7 +339,10 @@ export function usePluginDetailTabs(
             return {
               id: item.group,
               label: item.label || "",
-              component: markRaw(SettingTab),
+              component: defineAsyncComponent({
+                loader: () => import("../components/tabs/Setting.vue"),
+                loadingComponent: VLoading,
+              }),
             };
           }),
         ] as PluginTab[];
@@ -367,7 +369,7 @@ export function usePluginDetailTabs(
     const pluginTabs = await callbackFunction();
 
     return pluginTabs.filter((tab) => {
-      return currentUserHasPermission(tab.permissions);
+      return utils.permission.has(tab.permissions || []);
     });
   }
 

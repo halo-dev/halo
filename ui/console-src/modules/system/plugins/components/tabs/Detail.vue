@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
@@ -16,13 +14,12 @@ import {
   VDescriptionItem,
   VSwitch,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
 import { usePluginLifeCycle } from "../../composables/use-plugin";
 import PluginConditionsModal from "../PluginConditionsModal.vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
@@ -51,7 +48,7 @@ const { data: pluginRoleTemplates } = useQuery({
   enabled: computed(
     () =>
       !!plugin?.value?.metadata.name &&
-      currentUserHasPermission(["system:roles:view"])
+      utils.permission.has(["system:roles:view"])
   ),
 });
 
@@ -275,11 +272,11 @@ const lastCondition = computed(() => {
         </VDescriptionItem>
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.creation_time')"
-          :content="formatDatetime(plugin?.metadata.creationTimestamp)"
+          :content="utils.date.format(plugin?.metadata.creationTimestamp)"
         />
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.last_starttime')"
-          :content="formatDatetime(plugin?.status?.lastStartTime)"
+          :content="utils.date.format(plugin?.status?.lastStartTime)"
         />
         <VDescriptionItem
           :label="$t('core.plugin.detail.fields.load_location')"

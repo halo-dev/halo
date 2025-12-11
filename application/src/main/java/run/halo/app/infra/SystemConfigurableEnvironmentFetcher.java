@@ -1,11 +1,12 @@
 package run.halo.app.infra;
 
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * A fetcher that fetches the system configuration from the extension client.
@@ -38,6 +40,7 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private final ReactiveExtensionClient extensionClient;
     private final ConversionService conversionService;
     private final ApplicationEventPublisher eventPublisher;
@@ -110,7 +113,7 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
      * @return load configMap from {@link ReactiveExtensionClient}
      */
     public Optional<ConfigMap> loadConfigMapBlocking() {
-        return loadConfigMapInternal().blockOptional();
+        return loadConfigMapInternal().blockOptional(BLOCKING_TIMEOUT);
     }
 
     private Map<String, String> mergeData(Map<String, String> defaultData,
@@ -175,7 +178,7 @@ public class SystemConfigurableEnvironmentFetcher implements Reconciler<Reconcil
             // should never happen
             .switchIfEmpty(Mono.error(new IllegalStateException("System configMap not found.")))
             .doOnNext(configMapCache::set)
-            .block();
+            .block(BLOCKING_TIMEOUT);
         eventPublisher.publishEvent(new SystemConfigChangedEvent(this));
         return Result.doNotRetry();
     }

@@ -1,5 +1,9 @@
 <script lang="ts" setup>
-import { IconArrowDownLine, IconCloseCircle } from "@halo-dev/components";
+import {
+  IconArrowDownLine,
+  IconCloseCircle,
+  VDropdown,
+} from "@halo-dev/components";
 import {
   computed,
   defineEmits,
@@ -9,8 +13,6 @@ import {
   ref,
   type PropType,
 } from "vue";
-
-import { Dropdown } from "floating-vue";
 import MultipleSelectSelector from "./MultipleSelectSelector.vue";
 import SelectDropdownContainer from "./SelectDropdownContainer.vue";
 import SelectSelector from "./SelectSelector.vue";
@@ -238,7 +240,7 @@ const handleSortSelectedOptions = (
 </script>
 
 <template>
-  <Dropdown
+  <VDropdown
     :triggers="[]"
     :shown="isDropdownVisible"
     auto-size
@@ -305,12 +307,15 @@ const handleSortSelectedOptions = (
         @load-more="emit('loadMore')"
       />
     </template>
-  </Dropdown>
+  </VDropdown>
 </template>
 <style lang="scss">
 .select-container-dropdown {
   .v-popper__arrow-container {
     display: none;
+  }
+  .v-popper__inner {
+    padding: 0 !important;
   }
 }
 </style>

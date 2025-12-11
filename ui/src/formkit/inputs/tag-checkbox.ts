@@ -1,5 +1,10 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
+import {
+  checkbox,
+  checkboxes,
+  defaultIcon,
+  type FormKitInputs,
+} from "@formkit/inputs";
 import { coreApiClient } from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
@@ -27,3 +32,12 @@ export const tagCheckbox: FormKitTypeDefinition = {
     defaultIcon("decorator", "checkboxDecorator"),
   ],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    tagCheckbox: {
+      type: "tagCheckbox";
+      value?: string[];
+    };
+  }
+}

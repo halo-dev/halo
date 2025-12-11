@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ConfigMap } from '../models';
+import type { ConfigMap } from '../models';
 // @ts-ignore
-import { ConfigMapList } from '../models';
+import type { ConfigMapList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * ConfigMapV1alpha1Api - axios parameter creator
- * @export
  */
 export const ConfigMapV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ConfigMapV1alpha1ApiAxiosParamCreator = function (configuration?: C
 
 /**
  * ConfigMapV1alpha1Api - functional programming interface
- * @export
  */
 export const ConfigMapV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ConfigMapV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ConfigMapV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * ConfigMapV1alpha1Api - factory interface
- * @export
  */
 export const ConfigMapV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ConfigMapV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ConfigMapV1alpha1ApiFactory = function (configuration?: Configurati
 
 /**
  * Request parameters for createConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiCreateConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiCreateConfigMapRequest {
     /**
      * Fresh configmap
-     * @type {ConfigMap}
-     * @memberof ConfigMapV1alpha1ApiCreateConfigMap
      */
     readonly configMap?: ConfigMap
 }
 
 /**
  * Request parameters for deleteConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiDeleteConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiDeleteConfigMapRequest {
     /**
      * Name of configmap
-     * @type {string}
-     * @memberof ConfigMapV1alpha1ApiDeleteConfigMap
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiGetConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiGetConfigMapRequest {
     /**
      * Name of configmap
-     * @type {string}
-     * @memberof ConfigMapV1alpha1ApiGetConfigMap
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiListConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiListConfigMapRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ConfigMapV1alpha1ApiListConfigMap
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ConfigMapV1alpha1ApiListConfigMap
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ConfigMapV1alpha1ApiListConfigMap
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ConfigMapV1alpha1ApiListConfigMap
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ConfigMapV1alpha1ApiListConfigMap
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiPatchConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiPatchConfigMapRequest {
     /**
      * Name of configmap
-     * @type {string}
-     * @memberof ConfigMapV1alpha1ApiPatchConfigMap
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ConfigMapV1alpha1ApiPatchConfigMap
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateConfigMap operation in ConfigMapV1alpha1Api.
- * @export
- * @interface ConfigMapV1alpha1ApiUpdateConfigMapRequest
  */
 export interface ConfigMapV1alpha1ApiUpdateConfigMapRequest {
     /**
      * Name of configmap
-     * @type {string}
-     * @memberof ConfigMapV1alpha1ApiUpdateConfigMap
      */
     readonly name: string
 
     /**
      * Updated configmap
-     * @type {ConfigMap}
-     * @memberof ConfigMapV1alpha1ApiUpdateConfigMap
      */
     readonly configMap?: ConfigMap
 }
 
 /**
  * ConfigMapV1alpha1Api - object-oriented interface
- * @export
- * @class ConfigMapV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ConfigMapV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiCreateConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public createConfigMap(requestParameters: ConfigMapV1alpha1ApiCreateConfigMapRequest = {}, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).createConfigMap(requestParameters.configMap, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiDeleteConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public deleteConfigMap(requestParameters: ConfigMapV1alpha1ApiDeleteConfigMapRequest, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).deleteConfigMap(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiGetConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public getConfigMap(requestParameters: ConfigMapV1alpha1ApiGetConfigMapRequest, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).getConfigMap(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiListConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public listConfigMap(requestParameters: ConfigMapV1alpha1ApiListConfigMapRequest = {}, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).listConfigMap(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiPatchConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public patchConfigMap(requestParameters: ConfigMapV1alpha1ApiPatchConfigMapRequest, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).patchConfigMap(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ConfigMapV1alpha1Api extends BaseAPI {
      * @param {ConfigMapV1alpha1ApiUpdateConfigMapRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ConfigMapV1alpha1Api
      */
     public updateConfigMap(requestParameters: ConfigMapV1alpha1ApiUpdateConfigMapRequest, options?: RawAxiosRequestConfig) {
         return ConfigMapV1alpha1ApiFp(this.configuration).updateConfigMap(requestParameters.name, requestParameters.configMap, options).then((request) => request(this.axios, this.basePath));

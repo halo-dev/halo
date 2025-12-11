@@ -1,7 +1,17 @@
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
+import {
+  Editor,
+  VueNodeViewRenderer,
+  findParentNode,
+  isActive,
+  isNodeActive,
+  posToDOMRect,
+  type CommandProps,
+  type Range,
+} from "@/tiptap";
 import {
   EditorState,
   Plugin,
@@ -9,19 +19,11 @@ import {
   TextSelection,
   type Transaction,
 } from "@/tiptap/pm";
-import {
-  Editor,
-  VueNodeViewRenderer,
-  findParentNode,
-  isActive,
-  isNodeActive,
-  type CommandProps,
-  type Range,
-} from "@/tiptap/vue-3";
+import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
 import TiptapCodeBlock from "@tiptap/extension-code-block";
 import { markRaw } from "vue";
-import MdiCodeBracesBox from "~icons/mdi/code-braces-box";
+import MingcuteBracesLine from "~icons/mingcute/braces-line";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
 
 declare module "@/tiptap" {
@@ -34,6 +36,7 @@ declare module "@/tiptap" {
 }
 
 type IndentType = "indent" | "outdent";
+
 const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   const { doc, selection } = tr;
   if (!doc || !selection) return tr;
@@ -74,23 +77,7 @@ const updateIndent = (tr: Transaction, type: IndentType): Transaction => {
   return tr;
 };
 
-const getRenderContainer = (node: HTMLElement) => {
-  let container = node;
-  // 文本节点
-  if (container.nodeName === "#text") {
-    container = node.parentElement as HTMLElement;
-  }
-  while (
-    container &&
-    container.classList &&
-    !container.classList.contains("code-node")
-  ) {
-    container = container.parentElement as HTMLElement;
-  }
-  return container;
-};
-
-export interface Option {
+interface Option {
   label: string;
   value: string;
 }
@@ -156,11 +143,16 @@ export interface ExtensionCodeBlockOptions extends CodeBlockOptions {
       }>);
 }
 
-export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
+export const CODE_BLOCK_BUBBLE_MENU_KEY = new PluginKey("codeBlockBubbleMenu");
+
+export const ExtensionCodeBlock = TiptapCodeBlock.extend<
+  ExtensionOptions & Partial<ExtensionCodeBlockOptions>
+>({
   allowGapCursor: true,
-  // It needs to have a higher priority than range-selection,
+  // It needs to have a higher priority than range-selection (100),
   // otherwise the Mod-a shortcut key will be overridden.
-  priority: 110,
+  // But it should be lower than paragraph (1000) to avoid Backspace issues.
+  priority: 101,
 
   fakeSelection: true,
 
@@ -252,19 +244,19 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
         return false;
       },
       Tab: () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           return this.editor.chain().focus().codeIndent().run();
         }
         return false;
       },
       "Shift-Tab": () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           return this.editor.chain().focus().codeOutdent().run();
         }
         return false;
       },
       "Mod-a": () => {
-        if (this.editor.isActive("codeBlock")) {
+        if (this.editor.isActive(TiptapCodeBlock.name)) {
           const { tr, selection } = this.editor.state;
           const codeBlack = findParentNode(
             (node) => node.type.name === TiptapCodeBlock.name
@@ -302,8 +294,8 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("codeBlock"),
-            icon: markRaw(MdiCodeBracesBox),
+            isActive: editor.isActive(TiptapCodeBlock.name),
+            icon: markRaw(MingcuteBracesLine),
             title: i18n.global.t("editor.common.codeblock.title"),
             action: () => editor.chain().focus().toggleCodeBlock().run(),
           },
@@ -312,7 +304,7 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
       getCommandMenuItems() {
         return {
           priority: 80,
-          icon: markRaw(MdiCodeBracesBox),
+          icon: markRaw(MingcuteBracesLine),
           title: "editor.common.codeblock.title",
           keywords: ["codeblock", "daimakuai"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -323,11 +315,11 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 50,
+            priority: 60,
             component: markRaw(ToolboxItem),
             props: {
               editor,
-              icon: markRaw(MdiCodeBracesBox),
+              icon: markRaw(MingcuteBracesLine),
               title: i18n.global.t("editor.common.codeblock.title"),
               action: () => {
                 editor.chain().focus().setCodeBlock().run();
@@ -338,33 +330,45 @@ export default TiptapCodeBlock.extend<ExtensionCodeBlockOptions>({
       },
       getBubbleMenu() {
         return {
-          pluginKey: "codeBlockBubbleMenu",
-          shouldShow: ({ state }: { state: EditorState }) => {
+          pluginKey: CODE_BLOCK_BUBBLE_MENU_KEY,
+          shouldShow: ({ state }: { state: EditorState }): boolean => {
             return isActive(state, TiptapCodeBlock.name);
           },
-          getRenderContainer: (node: HTMLElement) => {
-            return getRenderContainer(node);
+          options: {
+            placement: "top-start",
+          },
+          getReferencedVirtualElement() {
+            const editor = this.editor;
+            if (!editor) {
+              return null;
+            }
+            const parentNode = findParentNode(
+              (node) => node.type.name === ExtensionCodeBlock.name
+            )(editor.state.selection);
+            if (parentNode) {
+              const domRect = posToDOMRect(
+                editor.view,
+                parentNode.pos,
+                parentNode.pos + parentNode.node.nodeSize
+              );
+              return {
+                getBoundingClientRect: () => domRect,
+                getClientRects: () => [domRect],
+              };
+            }
+            return null;
           },
           items: [
             {
               priority: 10,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }) =>
                   deleteNode(TiptapCodeBlock.name, editor),
               },
             },
           ],
-        };
-      },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }: { dom: HTMLElement }) {
-            return {
-              el: getRenderContainer(dom),
-            };
-          },
         };
       },
     };

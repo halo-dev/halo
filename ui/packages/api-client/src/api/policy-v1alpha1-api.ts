@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Policy } from '../models';
+import type { Policy } from '../models';
 // @ts-ignore
-import { PolicyList } from '../models';
+import type { PolicyList } from '../models';
 /**
  * PolicyV1alpha1Api - axios parameter creator
- * @export
  */
 export const PolicyV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const PolicyV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * PolicyV1alpha1Api - functional programming interface
- * @export
  */
 export const PolicyV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PolicyV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const PolicyV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * PolicyV1alpha1Api - factory interface
- * @export
  */
 export const PolicyV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PolicyV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const PolicyV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createPolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiCreatePolicyRequest
  */
 export interface PolicyV1alpha1ApiCreatePolicyRequest {
     /**
      * Fresh policy
-     * @type {Policy}
-     * @memberof PolicyV1alpha1ApiCreatePolicy
      */
     readonly policy?: Policy
 }
 
 /**
  * Request parameters for deletePolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiDeletePolicyRequest
  */
 export interface PolicyV1alpha1ApiDeletePolicyRequest {
     /**
      * Name of policy
-     * @type {string}
-     * @memberof PolicyV1alpha1ApiDeletePolicy
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getPolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiGetPolicyRequest
  */
 export interface PolicyV1alpha1ApiGetPolicyRequest {
     /**
      * Name of policy
-     * @type {string}
-     * @memberof PolicyV1alpha1ApiGetPolicy
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listPolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiListPolicyRequest
  */
 export interface PolicyV1alpha1ApiListPolicyRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PolicyV1alpha1ApiListPolicy
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PolicyV1alpha1ApiListPolicy
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PolicyV1alpha1ApiListPolicy
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PolicyV1alpha1ApiListPolicy
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PolicyV1alpha1ApiListPolicy
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchPolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiPatchPolicyRequest
  */
 export interface PolicyV1alpha1ApiPatchPolicyRequest {
     /**
      * Name of policy
-     * @type {string}
-     * @memberof PolicyV1alpha1ApiPatchPolicy
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof PolicyV1alpha1ApiPatchPolicy
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updatePolicy operation in PolicyV1alpha1Api.
- * @export
- * @interface PolicyV1alpha1ApiUpdatePolicyRequest
  */
 export interface PolicyV1alpha1ApiUpdatePolicyRequest {
     /**
      * Name of policy
-     * @type {string}
-     * @memberof PolicyV1alpha1ApiUpdatePolicy
      */
     readonly name: string
 
     /**
      * Updated policy
-     * @type {Policy}
-     * @memberof PolicyV1alpha1ApiUpdatePolicy
      */
     readonly policy?: Policy
 }
 
 /**
  * PolicyV1alpha1Api - object-oriented interface
- * @export
- * @class PolicyV1alpha1Api
- * @extends {BaseAPI}
  */
 export class PolicyV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiCreatePolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public createPolicy(requestParameters: PolicyV1alpha1ApiCreatePolicyRequest = {}, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).createPolicy(requestParameters.policy, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiDeletePolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public deletePolicy(requestParameters: PolicyV1alpha1ApiDeletePolicyRequest, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).deletePolicy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiGetPolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public getPolicy(requestParameters: PolicyV1alpha1ApiGetPolicyRequest, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).getPolicy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiListPolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public listPolicy(requestParameters: PolicyV1alpha1ApiListPolicyRequest = {}, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).listPolicy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiPatchPolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public patchPolicy(requestParameters: PolicyV1alpha1ApiPatchPolicyRequest, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).patchPolicy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class PolicyV1alpha1Api extends BaseAPI {
      * @param {PolicyV1alpha1ApiUpdatePolicyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PolicyV1alpha1Api
      */
     public updatePolicy(requestParameters: PolicyV1alpha1ApiUpdatePolicyRequest, options?: RawAxiosRequestConfig) {
         return PolicyV1alpha1ApiFp(this.configuration).updatePolicy(requestParameters.name, requestParameters.policy, options).then((request) => request(this.axios, this.basePath));

@@ -1,6 +1,6 @@
 package run.halo.app.infra;
 
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.isNull;
 
 import java.time.Duration;
 import java.time.Instant;

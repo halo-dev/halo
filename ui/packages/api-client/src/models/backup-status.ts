@@ -14,53 +14,19 @@
 
 
 
-/**
- * 
- * @export
- * @interface BackupStatus
- */
 export interface BackupStatus {
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupStatus
-     */
     'completionTimestamp'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupStatus
-     */
     'failureMessage'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupStatus
-     */
     'failureReason'?: string;
     /**
      * Name of backup file.
-     * @type {string}
-     * @memberof BackupStatus
      */
     'filename'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupStatus
-     */
     'phase'?: BackupStatusPhaseEnum;
     /**
      * Size of backup file. Data unit: byte
-     * @type {number}
-     * @memberof BackupStatus
      */
     'size'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof BackupStatus
-     */
     'startTimestamp'?: string;
 }
 

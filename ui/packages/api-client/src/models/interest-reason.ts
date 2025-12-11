@@ -15,31 +15,20 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { InterestReasonSubject } from './interest-reason-subject';
+import type { InterestReasonSubject } from './interest-reason-subject';
 
 /**
  * The reason to be interested in
- * @export
- * @interface InterestReason
  */
 export interface InterestReason {
     /**
      * The expression to be interested in
-     * @type {string}
-     * @memberof InterestReason
      */
     'expression'?: string;
     /**
      * The name of the reason definition to be interested in
-     * @type {string}
-     * @memberof InterestReason
      */
     'reasonType': string;
-    /**
-     * 
-     * @type {InterestReasonSubject}
-     * @memberof InterestReason
-     */
     'subject': InterestReasonSubject;
 }
 

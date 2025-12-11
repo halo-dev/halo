@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { EmailConfigValidationRequest } from '../models';
+import type { EmailConfigValidationRequest } from '../models';
 /**
  * NotifierV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const NotifierV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -165,7 +164,6 @@ export const NotifierV1alpha1ConsoleApiAxiosParamCreator = function (configurati
 
 /**
  * NotifierV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const NotifierV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotifierV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -212,7 +210,6 @@ export const NotifierV1alpha1ConsoleApiFp = function(configuration?: Configurati
 
 /**
  * NotifierV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const NotifierV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotifierV1alpha1ConsoleApiFp(configuration)
@@ -249,58 +246,35 @@ export const NotifierV1alpha1ConsoleApiFactory = function (configuration?: Confi
 
 /**
  * Request parameters for fetchSenderConfig operation in NotifierV1alpha1ConsoleApi.
- * @export
- * @interface NotifierV1alpha1ConsoleApiFetchSenderConfigRequest
  */
 export interface NotifierV1alpha1ConsoleApiFetchSenderConfigRequest {
     /**
      * Notifier name
-     * @type {string}
-     * @memberof NotifierV1alpha1ConsoleApiFetchSenderConfig
      */
     readonly name: string
 }
 
 /**
  * Request parameters for saveSenderConfig operation in NotifierV1alpha1ConsoleApi.
- * @export
- * @interface NotifierV1alpha1ConsoleApiSaveSenderConfigRequest
  */
 export interface NotifierV1alpha1ConsoleApiSaveSenderConfigRequest {
     /**
      * Notifier name
-     * @type {string}
-     * @memberof NotifierV1alpha1ConsoleApiSaveSenderConfig
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof NotifierV1alpha1ConsoleApiSaveSenderConfig
-     */
     readonly body: object
 }
 
 /**
  * Request parameters for verifyEmailSenderConfig operation in NotifierV1alpha1ConsoleApi.
- * @export
- * @interface NotifierV1alpha1ConsoleApiVerifyEmailSenderConfigRequest
  */
 export interface NotifierV1alpha1ConsoleApiVerifyEmailSenderConfigRequest {
-    /**
-     * 
-     * @type {EmailConfigValidationRequest}
-     * @memberof NotifierV1alpha1ConsoleApiVerifyEmailSenderConfig
-     */
     readonly emailConfigValidationRequest: EmailConfigValidationRequest
 }
 
 /**
  * NotifierV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class NotifierV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class NotifierV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -308,7 +282,6 @@ export class NotifierV1alpha1ConsoleApi extends BaseAPI {
      * @param {NotifierV1alpha1ConsoleApiFetchSenderConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierV1alpha1ConsoleApi
      */
     public fetchSenderConfig(requestParameters: NotifierV1alpha1ConsoleApiFetchSenderConfigRequest, options?: RawAxiosRequestConfig) {
         return NotifierV1alpha1ConsoleApiFp(this.configuration).fetchSenderConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -319,7 +292,6 @@ export class NotifierV1alpha1ConsoleApi extends BaseAPI {
      * @param {NotifierV1alpha1ConsoleApiSaveSenderConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierV1alpha1ConsoleApi
      */
     public saveSenderConfig(requestParameters: NotifierV1alpha1ConsoleApiSaveSenderConfigRequest, options?: RawAxiosRequestConfig) {
         return NotifierV1alpha1ConsoleApiFp(this.configuration).saveSenderConfig(requestParameters.name, requestParameters.body, options).then((request) => request(this.axios, this.basePath));
@@ -330,7 +302,6 @@ export class NotifierV1alpha1ConsoleApi extends BaseAPI {
      * @param {NotifierV1alpha1ConsoleApiVerifyEmailSenderConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierV1alpha1ConsoleApi
      */
     public verifyEmailSenderConfig(requestParameters: NotifierV1alpha1ConsoleApiVerifyEmailSenderConfigRequest, options?: RawAxiosRequestConfig) {
         return NotifierV1alpha1ConsoleApiFp(this.configuration).verifyEmailSenderConfig(requestParameters.emailConfigValidationRequest, options).then((request) => request(this.axios, this.basePath));

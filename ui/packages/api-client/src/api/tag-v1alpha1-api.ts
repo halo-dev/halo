@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Tag } from '../models';
+import type { Tag } from '../models';
 // @ts-ignore
-import { TagList } from '../models';
+import type { TagList } from '../models';
 /**
  * TagV1alpha1Api - axios parameter creator
- * @export
  */
 export const TagV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const TagV1alpha1ApiAxiosParamCreator = function (configuration?: Configu
 
 /**
  * TagV1alpha1Api - functional programming interface
- * @export
  */
 export const TagV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TagV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const TagV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * TagV1alpha1Api - factory interface
- * @export
  */
 export const TagV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TagV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const TagV1alpha1ApiFactory = function (configuration?: Configuration, ba
 
 /**
  * Request parameters for createTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiCreateTagRequest
  */
 export interface TagV1alpha1ApiCreateTagRequest {
     /**
      * Fresh tag
-     * @type {Tag}
-     * @memberof TagV1alpha1ApiCreateTag
      */
     readonly tag?: Tag
 }
 
 /**
  * Request parameters for deleteTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiDeleteTagRequest
  */
 export interface TagV1alpha1ApiDeleteTagRequest {
     /**
      * Name of tag
-     * @type {string}
-     * @memberof TagV1alpha1ApiDeleteTag
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiGetTagRequest
  */
 export interface TagV1alpha1ApiGetTagRequest {
     /**
      * Name of tag
-     * @type {string}
-     * @memberof TagV1alpha1ApiGetTag
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiListTagRequest
  */
 export interface TagV1alpha1ApiListTagRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1ApiListTag
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1ApiListTag
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ApiListTag
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ApiListTag
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof TagV1alpha1ApiListTag
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiPatchTagRequest
  */
 export interface TagV1alpha1ApiPatchTagRequest {
     /**
      * Name of tag
-     * @type {string}
-     * @memberof TagV1alpha1ApiPatchTag
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof TagV1alpha1ApiPatchTag
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateTag operation in TagV1alpha1Api.
- * @export
- * @interface TagV1alpha1ApiUpdateTagRequest
  */
 export interface TagV1alpha1ApiUpdateTagRequest {
     /**
      * Name of tag
-     * @type {string}
-     * @memberof TagV1alpha1ApiUpdateTag
      */
     readonly name: string
 
     /**
      * Updated tag
-     * @type {Tag}
-     * @memberof TagV1alpha1ApiUpdateTag
      */
     readonly tag?: Tag
 }
 
 /**
  * TagV1alpha1Api - object-oriented interface
- * @export
- * @class TagV1alpha1Api
- * @extends {BaseAPI}
  */
 export class TagV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiCreateTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public createTag(requestParameters: TagV1alpha1ApiCreateTagRequest = {}, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).createTag(requestParameters.tag, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiDeleteTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public deleteTag(requestParameters: TagV1alpha1ApiDeleteTagRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).deleteTag(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiGetTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public getTag(requestParameters: TagV1alpha1ApiGetTagRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).getTag(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiListTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public listTag(requestParameters: TagV1alpha1ApiListTagRequest = {}, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).listTag(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiPatchTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public patchTag(requestParameters: TagV1alpha1ApiPatchTagRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).patchTag(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class TagV1alpha1Api extends BaseAPI {
      * @param {TagV1alpha1ApiUpdateTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1Api
      */
     public updateTag(requestParameters: TagV1alpha1ApiUpdateTagRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1ApiFp(this.configuration).updateTag(requestParameters.name, requestParameters.tag, options).then((request) => request(this.axios, this.basePath));

@@ -15,49 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link run.halo.app.core.extension.User run.halo.app.core.extension.User}.
- * @export
- * @interface ContributorVo
  */
 export interface ContributorVo {
-    /**
-     * 
-     * @type {string}
-     * @memberof ContributorVo
-     */
     'avatar'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContributorVo
-     */
     'bio'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContributorVo
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ContributorVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContributorVo
-     */
     'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContributorVo
-     */
     'permalink'?: string;
 }
 

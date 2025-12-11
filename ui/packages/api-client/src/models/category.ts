@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategorySpec } from './category-spec';
+import type { CategorySpec } from './category-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryStatus } from './category-status';
+import type { CategoryStatus } from './category-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface Category
- */
 export interface Category {
-    /**
-     * 
-     * @type {string}
-     * @memberof Category
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Category
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Category
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {CategorySpec}
-     * @memberof Category
-     */
     'spec': CategorySpec;
-    /**
-     * 
-     * @type {CategoryStatus}
-     * @memberof Category
-     */
     'status'?: CategoryStatus;
 }
 

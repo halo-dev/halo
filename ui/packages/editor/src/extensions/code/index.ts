@@ -1,13 +1,15 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { CodeOptions } from "@tiptap/extension-code";
 import TiptapCode from "@tiptap/extension-code";
 import { markRaw } from "vue";
-import MdiCodeTags from "~icons/mdi/code-tags";
+import MingcuteCodeLine from "~icons/mingcute/code-line";
 
-const Code = TiptapCode.extend<ExtensionOptions & CodeOptions>({
+export type ExtensionCodeOptions = Partial<CodeOptions> & ExtensionOptions;
+
+export const ExtensionCode = TiptapCode.extend<ExtensionCodeOptions>({
   exitable: true,
   addOptions() {
     return {
@@ -18,8 +20,8 @@ const Code = TiptapCode.extend<ExtensionOptions & CodeOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("code"),
-            icon: markRaw(MdiCodeTags),
+            isActive: editor.isActive(TiptapCode.name),
+            icon: markRaw(MingcuteCodeLine),
             title: i18n.global.t("editor.common.code"),
             action: () => editor.chain().focus().toggleCode().run(),
           },
@@ -28,5 +30,3 @@ const Code = TiptapCode.extend<ExtensionOptions & CodeOptions>({
     };
   },
 });
-
-export default Code;

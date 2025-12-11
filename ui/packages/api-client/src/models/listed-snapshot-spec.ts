@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface ListedSnapshotSpec
- */
 export interface ListedSnapshotSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedSnapshotSpec
-     */
     'modifyTime'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ListedSnapshotSpec
-     */
     'owner': string;
 }
 

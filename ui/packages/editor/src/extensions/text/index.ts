@@ -3,22 +3,32 @@ import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue"
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
 import { RangeSelection } from "@/extensions/range-selection";
 import { i18n } from "@/locales";
-import type { EditorState } from "@/tiptap/pm";
+import { PluginKey, type EditorState } from "@/tiptap/pm";
 import { isActive, isTextSelection } from "@/tiptap/vue-3";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { Text as TiptapText } from "@tiptap/extension-text";
 import { markRaw } from "vue";
-import MdiCodeTags from "~icons/mdi/code-tags";
-import MdiFormatBold from "~icons/mdi/format-bold";
-import MdiFormatColor from "~icons/mdi/format-color";
-import MdiFormatColorHighlight from "~icons/mdi/format-color-highlight";
-import MdiFormatItalic from "~icons/mdi/format-italic";
-import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
-import MdiFormatSubscript from "~icons/mdi/format-subscript";
-import MdiFormatSuperscript from "~icons/mdi/format-superscript";
-import MdiFormatUnderline from "~icons/mdi/format-underline";
-import MdiLinkVariantOff from "~icons/mdi/link-variant-off";
-import MdiShare from "~icons/mdi/share";
+import MingcuteBoldLine from "~icons/mingcute/bold-line";
+import MingcuteCodeLine from "~icons/mingcute/code-line";
+import MingcuteItalicLine from "~icons/mingcute/italic-line";
+import MingcuteMarkPenLine from "~icons/mingcute/mark-pen-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
+import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
+import MingcuteUnderlineLine from "~icons/mingcute/underline-line";
+import MingcuteUnlinkLine from "~icons/mingcute/unlink-line";
+import PhTextSubscript from "~icons/ph/text-subscript";
+import PhTextSuperscript from "~icons/ph/text-superscript";
+import { ExtensionBold } from "../bold";
+import { ExtensionCode } from "../code";
+import { ExtensionColor } from "../color";
+import { ExtensionHighlight } from "../highlight";
+import { ExtensionItalic } from "../italic";
+import { ExtensionLink } from "../link";
+import { ExtensionStrike } from "../strike";
+import { ExtensionSubscript } from "../subscript";
+import { ExtensionSuperscript } from "../superscript";
+import { ExtensionUnderline } from "../underline";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",
@@ -28,13 +38,17 @@ const OTHER_BUBBLE_MENU_TYPES = [
   "codeBlock",
 ];
 
-const Text = TiptapText.extend<ExtensionOptions>({
+export const TEXT_BUBBLE_MENU_KEY = new PluginKey("textBubbleMenu");
+
+export type ExtensionTextOptions = ExtensionOptions;
+
+export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
       getBubbleMenu(): NodeBubbleMenuType {
         return {
-          pluginKey: "textBubbleMenu",
+          pluginKey: TEXT_BUBBLE_MENU_KEY,
           shouldShow: ({ state, from, to }) => {
             const { doc, selection } = state as EditorState;
             const { empty } = selection;
@@ -66,16 +80,12 @@ const Text = TiptapText.extend<ExtensionOptions>({
 
             return true;
           },
-          tippyOptions: {
-            fixed: false,
-          },
-          defaultAnimation: false,
           items: [
             {
               priority: 10,
               props: {
-                isActive: ({ editor }) => editor.isActive("bold"),
-                icon: markRaw(MdiFormatBold),
+                isActive: ({ editor }) => editor.isActive(ExtensionBold.name),
+                icon: markRaw(MingcuteBoldLine),
                 title: i18n.global.t("editor.common.bold"),
                 action: ({ editor }) => {
                   editor.chain().focus().toggleBold().run();
@@ -85,8 +95,8 @@ const Text = TiptapText.extend<ExtensionOptions>({
             {
               priority: 20,
               props: {
-                isActive: ({ editor }) => editor.isActive("italic"),
-                icon: markRaw(MdiFormatItalic),
+                isActive: ({ editor }) => editor.isActive(ExtensionItalic.name),
+                icon: markRaw(MingcuteItalicLine),
                 title: i18n.global.t("editor.common.italic"),
                 action: ({ editor }) => {
                   editor.chain().focus().toggleItalic().run();
@@ -96,8 +106,9 @@ const Text = TiptapText.extend<ExtensionOptions>({
             {
               priority: 30,
               props: {
-                isActive: ({ editor }) => editor.isActive("underline"),
-                icon: markRaw(MdiFormatUnderline),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionUnderline.name),
+                icon: markRaw(MingcuteUnderlineLine),
                 title: i18n.global.t("editor.common.underline"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleUnderline().run(),
@@ -106,8 +117,8 @@ const Text = TiptapText.extend<ExtensionOptions>({
             {
               priority: 40,
               props: {
-                isActive: ({ editor }) => editor.isActive("strike"),
-                icon: markRaw(MdiFormatStrikethrough),
+                isActive: ({ editor }) => editor.isActive(ExtensionStrike.name),
+                icon: markRaw(MingcuteStrikethroughLine),
                 title: i18n.global.t("editor.common.strike"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleStrike().run(),
@@ -117,8 +128,9 @@ const Text = TiptapText.extend<ExtensionOptions>({
               priority: 50,
               component: markRaw(HighlightBubbleItem),
               props: {
-                isActive: ({ editor }) => editor.isActive("highlight"),
-                icon: markRaw(MdiFormatColorHighlight),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionHighlight.name),
+                icon: markRaw(MingcuteMarkPenLine),
                 title: i18n.global.t("editor.common.highlight"),
               },
             },
@@ -126,16 +138,16 @@ const Text = TiptapText.extend<ExtensionOptions>({
               priority: 60,
               component: markRaw(ColorBubbleItem),
               props: {
-                isActive: ({ editor }) => editor.isActive("color"),
-                icon: markRaw(MdiFormatColor),
+                isActive: ({ editor }) => editor.isActive(ExtensionColor.name),
+                icon: markRaw(MingcuteTextColorLine),
                 title: i18n.global.t("editor.common.color"),
               },
             },
             {
               priority: 70,
               props: {
-                isActive: ({ editor }) => editor.isActive("code"),
-                icon: markRaw(MdiCodeTags),
+                isActive: ({ editor }) => editor.isActive(ExtensionCode.name),
+                icon: markRaw(MingcuteCodeLine),
                 title: i18n.global.t("editor.common.code"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleCode().run(),
@@ -144,8 +156,9 @@ const Text = TiptapText.extend<ExtensionOptions>({
             {
               priority: 80,
               props: {
-                isActive: ({ editor }) => editor.isActive("superscript"),
-                icon: markRaw(MdiFormatSuperscript),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionSuperscript.name),
+                icon: markRaw(PhTextSuperscript),
                 title: i18n.global.t("editor.common.superscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSuperscript().run(),
@@ -154,8 +167,9 @@ const Text = TiptapText.extend<ExtensionOptions>({
             {
               priority: 90,
               props: {
-                isActive: ({ editor }) => editor.isActive("subscript"),
-                icon: markRaw(MdiFormatSubscript),
+                isActive: ({ editor }) =>
+                  editor.isActive(ExtensionSubscript.name),
+                icon: markRaw(PhTextSubscript),
                 title: i18n.global.t("editor.common.subscript"),
                 action: ({ editor }) =>
                   editor.chain().focus().toggleSubscript().run(),
@@ -165,15 +179,15 @@ const Text = TiptapText.extend<ExtensionOptions>({
               priority: 100,
               component: markRaw(LinkBubbleButton),
               props: {
-                isActive: ({ editor }) => editor.isActive("link"),
+                isActive: ({ editor }) => editor.isActive(ExtensionLink.name),
               },
             },
             {
               priority: 110,
               props: {
                 isActive: () => false,
-                visible: ({ editor }) => editor.isActive("link"),
-                icon: markRaw(MdiLinkVariantOff),
+                visible: ({ editor }) => editor.isActive(ExtensionLink.name),
+                icon: markRaw(MingcuteUnlinkLine),
                 title: i18n.global.t("editor.extensions.link.cancel_link"),
                 action: ({ editor }) => editor.commands.unsetLink(),
               },
@@ -182,11 +196,11 @@ const Text = TiptapText.extend<ExtensionOptions>({
               priority: 120,
               props: {
                 isActive: () => false,
-                visible: ({ editor }) => editor.isActive("link"),
-                icon: markRaw(MdiShare),
+                visible: ({ editor }) => editor.isActive(ExtensionLink.name),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: ({ editor }) => {
-                  const attrs = editor.getAttributes("link");
+                  const attrs = editor.getAttributes(ExtensionLink.name);
                   if (attrs?.href) {
                     window.open(attrs.href, "_blank");
                   }
@@ -199,5 +213,3 @@ const Text = TiptapText.extend<ExtensionOptions>({
     };
   },
 });
-
-export default Text;

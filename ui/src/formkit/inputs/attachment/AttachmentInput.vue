@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { IconFolder } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { defineAsyncComponent, ref, type PropType } from "vue";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = defineProps({
   context: {
@@ -14,11 +11,11 @@ const props = defineProps({
   },
 });
 
-const attachmentSelectorModal = ref(false);
+const attachmentSelectorModalVisible = ref(false);
 
 const AttachmentSelectorModal = defineAsyncComponent({
   loader: () => {
-    if (currentUserHasPermission(["system:attachments:view"])) {
+    if (utils.permission.has(["system:attachments:view"])) {
       return import(
         "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
       );
@@ -34,21 +31,11 @@ const onInput = (e: Event) => {
 };
 
 const onAttachmentSelect = (attachments: AttachmentLike[]) => {
-  const urls: (string | undefined)[] = attachments.map((attachment) => {
-    if (typeof attachment === "string") {
-      return attachment;
-    }
-    if ("url" in attachment) {
-      return attachment.url;
-    }
-    if ("spec" in attachment) {
-      return attachment.status?.permalink;
-    }
-  });
-
-  if (urls.length) {
-    props.context.node.input(urls[0]);
+  if (!attachments.length) {
+    return;
   }
+  const attachment = attachments[0];
+  props.context.node.input(utils.attachment.getUrl(attachment));
 };
 </script>
 
@@ -69,17 +56,18 @@ const onAttachmentSelect = (attachments: AttachmentLike[]) => {
   >
     <div
       class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-      @click="attachmentSelectorModal = true"
+      @click="attachmentSelectorModalVisible = true"
     >
       <IconFolder class="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
     </div>
   </HasPermission>
 
   <AttachmentSelectorModal
-    v-model:visible="attachmentSelectorModal"
+    v-if="attachmentSelectorModalVisible"
     :accepts="context.accepts as string[]"
     :min="1"
     :max="1"
     @select="onAttachmentSelect"
+    @close="attachmentSelectorModalVisible = false"
   />
 </template>

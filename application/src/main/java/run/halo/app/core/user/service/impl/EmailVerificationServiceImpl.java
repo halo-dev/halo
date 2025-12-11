@@ -26,7 +26,7 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
@@ -124,7 +124,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     Mono<Boolean> isEmailInUse(String username, String emailToVerify) {
         var listOptions = ListOptions.builder()
-            .andQuery(QueryFactory.equal("spec.email", emailToVerify))
+            .andQuery(Queries.equal("spec.email", emailToVerify))
             .build();
         return client.listAll(User.class, listOptions, ExtensionUtil.defaultSort())
             .filter(user -> user.getSpec().isEmailVerified())

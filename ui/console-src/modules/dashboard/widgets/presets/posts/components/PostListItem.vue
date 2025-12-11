@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { postLabels } from "@/constants/labels";
-import { formatDatetime, relativeTimeTo } from "@/utils/date";
-import SubjectQueryCommentListModal from "@console/modules/contents/comments/components/SubjectQueryCommentListModal.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -10,6 +8,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -114,8 +113,8 @@ const commentText = computed(() => {
     </template>
     <template #end>
       <VEntityField
-        v-tooltip="formatDatetime(datetime)"
-        :description="relativeTimeTo(datetime)"
+        v-tooltip="utils.date.format(datetime)"
+        :description="utils.date.timeAgo(datetime)"
       ></VEntityField>
     </template>
   </VEntity>

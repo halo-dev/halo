@@ -31,7 +31,7 @@ import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.security.SuperAdminInitializer;
 
@@ -57,7 +57,7 @@ public class DefaultRoleService implements RoleService {
     public Flux<RoleBinding> listRoleBindings(Subject subject) {
         var listOptions = ListOptions.builder()
             .andQuery(notDeleting())
-            .andQuery(QueryFactory.in("subjects", subject.toString()))
+            .andQuery(Queries.in("subjects", subject.toString()))
             .build();
         return client.listAll(RoleBinding.class, listOptions, defaultSort());
     }
@@ -79,7 +79,7 @@ public class DefaultRoleService implements RoleService {
             .collect(Collectors.toSet());
         var listOptions = ListOptions.builder()
             .andQuery(notDeleting())
-            .andQuery(QueryFactory.in("subjects", subjects))
+            .andQuery(Queries.in("subjects", subjects))
             .build();
 
         return client.listAll(RoleBinding.class, listOptions, defaultSort())
@@ -145,7 +145,7 @@ public class DefaultRoleService implements RoleService {
             .map(ListOptions::builder)
             .orElseGet(ListOptions::builder)
             .andQuery(notDeleting())
-            .andQuery(QueryFactory.in("metadata.name", names))
+            .andQuery(Queries.in("metadata.name", names))
             .build();
 
         return client.listAll(Role.class, listOptions, ExtensionUtil.defaultSort());
@@ -179,7 +179,7 @@ public class DefaultRoleService implements RoleService {
 
                 return Flux.fromIterable(dependencies)
                     .filter(dep -> !visited.contains(dep))
-                    .collect(Collectors.toSet())
+                    .collect(Collectors.<String>toSet())
                     .flatMapMany(deps -> listRoles(deps, additionalListOptions));
             })
             .concatWith(Flux.defer(() -> listAggregatedRoles(visited, additionalListOptions)));
@@ -193,7 +193,7 @@ public class DefaultRoleService implements RoleService {
         var listOptions = Optional.ofNullable(additionalListOptions)
             .map(ListOptions::builder)
             .orElseGet(ListOptions::builder)
-            .andQuery(QueryFactory.in("labels.aggregateToRoles", roleNames))
+            .andQuery(Queries.in("labels.aggregateToRoles", roleNames))
             .build();
         return client.listAll(Role.class, listOptions, ExtensionUtil.defaultSort());
     }
@@ -230,7 +230,7 @@ public class DefaultRoleService implements RoleService {
         }
         var builder = ListOptions.builder()
             .andQuery(notDeleting())
-            .andQuery(QueryFactory.in("metadata.name", roleNames));
+            .andQuery(Queries.in("metadata.name", roleNames));
         if (excludeHidden) {
             builder.labelSelector().notEq(Role.HIDDEN_LABEL_NAME, Boolean.TRUE.toString());
         }

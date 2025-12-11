@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Counter } from '../models';
+import type { Counter } from '../models';
 // @ts-ignore
-import { CounterList } from '../models';
+import type { CounterList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * CounterV1alpha1Api - axios parameter creator
- * @export
  */
 export const CounterV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const CounterV1alpha1ApiAxiosParamCreator = function (configuration?: Con
 
 /**
  * CounterV1alpha1Api - functional programming interface
- * @export
  */
 export const CounterV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CounterV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const CounterV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * CounterV1alpha1Api - factory interface
- * @export
  */
 export const CounterV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CounterV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const CounterV1alpha1ApiFactory = function (configuration?: Configuration
 
 /**
  * Request parameters for createCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiCreateCounterRequest
  */
 export interface CounterV1alpha1ApiCreateCounterRequest {
     /**
      * Fresh counter
-     * @type {Counter}
-     * @memberof CounterV1alpha1ApiCreateCounter
      */
     readonly counter?: Counter
 }
 
 /**
  * Request parameters for deleteCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiDeleteCounterRequest
  */
 export interface CounterV1alpha1ApiDeleteCounterRequest {
     /**
      * Name of counter
-     * @type {string}
-     * @memberof CounterV1alpha1ApiDeleteCounter
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiGetCounterRequest
  */
 export interface CounterV1alpha1ApiGetCounterRequest {
     /**
      * Name of counter
-     * @type {string}
-     * @memberof CounterV1alpha1ApiGetCounter
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiListCounterRequest
  */
 export interface CounterV1alpha1ApiListCounterRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CounterV1alpha1ApiListCounter
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CounterV1alpha1ApiListCounter
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CounterV1alpha1ApiListCounter
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CounterV1alpha1ApiListCounter
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CounterV1alpha1ApiListCounter
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiPatchCounterRequest
  */
 export interface CounterV1alpha1ApiPatchCounterRequest {
     /**
      * Name of counter
-     * @type {string}
-     * @memberof CounterV1alpha1ApiPatchCounter
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof CounterV1alpha1ApiPatchCounter
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateCounter operation in CounterV1alpha1Api.
- * @export
- * @interface CounterV1alpha1ApiUpdateCounterRequest
  */
 export interface CounterV1alpha1ApiUpdateCounterRequest {
     /**
      * Name of counter
-     * @type {string}
-     * @memberof CounterV1alpha1ApiUpdateCounter
      */
     readonly name: string
 
     /**
      * Updated counter
-     * @type {Counter}
-     * @memberof CounterV1alpha1ApiUpdateCounter
      */
     readonly counter?: Counter
 }
 
 /**
  * CounterV1alpha1Api - object-oriented interface
- * @export
- * @class CounterV1alpha1Api
- * @extends {BaseAPI}
  */
 export class CounterV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiCreateCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public createCounter(requestParameters: CounterV1alpha1ApiCreateCounterRequest = {}, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).createCounter(requestParameters.counter, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiDeleteCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public deleteCounter(requestParameters: CounterV1alpha1ApiDeleteCounterRequest, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).deleteCounter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiGetCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public getCounter(requestParameters: CounterV1alpha1ApiGetCounterRequest, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).getCounter(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiListCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public listCounter(requestParameters: CounterV1alpha1ApiListCounterRequest = {}, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).listCounter(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiPatchCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public patchCounter(requestParameters: CounterV1alpha1ApiPatchCounterRequest, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).patchCounter(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class CounterV1alpha1Api extends BaseAPI {
      * @param {CounterV1alpha1ApiUpdateCounterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CounterV1alpha1Api
      */
     public updateCounter(requestParameters: CounterV1alpha1ApiUpdateCounterRequest, options?: RawAxiosRequestConfig) {
         return CounterV1alpha1ApiFp(this.configuration).updateCounter(requestParameters.name, requestParameters.counter, options).then((request) => request(this.axios, this.basePath));

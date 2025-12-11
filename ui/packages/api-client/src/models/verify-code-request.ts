@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface VerifyCodeRequest
- */
 export interface VerifyCodeRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof VerifyCodeRequest
-     */
     'code': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof VerifyCodeRequest
-     */
     'password': string;
 }
 

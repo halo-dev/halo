@@ -1,5 +1,5 @@
 import type { MenuItem } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 
 export interface MenuTreeItem extends MenuItem {
   children: MenuTreeItem[];

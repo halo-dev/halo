@@ -37,6 +37,11 @@ export const setupLibraryExternal = (
       rename: `vue-router.[hash].js`,
     },
     {
+      src: `./node_modules/pinia/dist/pinia.iife.prod.js`,
+      dest: "assets/pinia",
+      rename: `pinia.[hash].js`,
+    },
+    {
       src: "./node_modules/axios/dist/axios.min.js",
       dest: "assets/axios",
       rename: `axios.[hash].js`,
@@ -67,24 +72,30 @@ export const setupLibraryExternal = (
       rename: `vueuse.router.[hash].js`,
     },
     {
-      src: "./node_modules/@halo-dev/components/dist/halo-components.iife.js",
+      src: "./node_modules/@halo-dev/components/dist/index.iife.js",
       dest: "assets/components",
       rename: `components.[hash].js`,
-    },
-    {
-      src: "./node_modules/@halo-dev/console-shared/dist/index.iife.js",
-      dest: "assets/console-shared",
-      rename: `console-shared.[hash].js`,
-    },
-    {
-      src: "./node_modules/@halo-dev/richtext-editor/dist/rich-text-editor.iife.js",
-      dest: "assets/editor",
-      rename: `editor.[hash].js`,
     },
     {
       src: "./node_modules/@halo-dev/api-client/dist/index.iife.js",
       dest: "assets/api-client",
       rename: `api-client.[hash].js`,
+    },
+    {
+      src: "./node_modules/@halo-dev/ui-shared/dist/index.iife.js",
+      dest: "assets/ui-shared",
+      rename: `ui-shared.[hash].js`,
+    },
+    // TODO: Remove this in the future, only for compatibility.
+    {
+      src: "./node_modules/@halo-dev/console-shared/index.js",
+      dest: "assets/console-shared",
+      rename: `console-shared.[hash].js`,
+    },
+    {
+      src: "./node_modules/@halo-dev/richtext-editor/dist/index.iife.js",
+      dest: "assets/editor",
+      rename: `editor.[hash].js`,
     },
   ].map((target) => {
     return {
@@ -114,8 +125,9 @@ export const setupLibraryExternal = (
     ViteExternals({
       vue: "Vue",
       "vue-router": "VueRouter",
+      pinia: "Pinia",
       axios: "axios",
-      "@halo-dev/shared": "HaloConsoleShared",
+      "@halo-dev/ui-shared": "HaloUiShared",
       "@halo-dev/components": "HaloComponents",
       "@vueuse/core": "VueUse",
       "@vueuse/components": "VueUse",

@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Snapshot } from '../models';
+import type { Snapshot } from '../models';
 /**
  * SnapshotV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const SnapshotV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -87,7 +86,6 @@ export const SnapshotV1alpha1UcApiAxiosParamCreator = function (configuration?: 
 
 /**
  * SnapshotV1alpha1UcApi - functional programming interface
- * @export
  */
 export const SnapshotV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SnapshotV1alpha1UcApiAxiosParamCreator(configuration)
@@ -111,7 +109,6 @@ export const SnapshotV1alpha1UcApiFp = function(configuration?: Configuration) {
 
 /**
  * SnapshotV1alpha1UcApi - factory interface
- * @export
  */
 export const SnapshotV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SnapshotV1alpha1UcApiFp(configuration)
@@ -130,37 +127,26 @@ export const SnapshotV1alpha1UcApiFactory = function (configuration?: Configurat
 
 /**
  * Request parameters for getSnapshotForPost operation in SnapshotV1alpha1UcApi.
- * @export
- * @interface SnapshotV1alpha1UcApiGetSnapshotForPostRequest
  */
 export interface SnapshotV1alpha1UcApiGetSnapshotForPostRequest {
     /**
      * Snapshot name.
-     * @type {string}
-     * @memberof SnapshotV1alpha1UcApiGetSnapshotForPost
      */
     readonly name: string
 
     /**
      * Post name.
-     * @type {string}
-     * @memberof SnapshotV1alpha1UcApiGetSnapshotForPost
      */
     readonly postName: string
 
     /**
      * Should include patched content and raw or not.
-     * @type {boolean}
-     * @memberof SnapshotV1alpha1UcApiGetSnapshotForPost
      */
     readonly patched?: boolean
 }
 
 /**
  * SnapshotV1alpha1UcApi - object-oriented interface
- * @export
- * @class SnapshotV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class SnapshotV1alpha1UcApi extends BaseAPI {
     /**
@@ -168,7 +154,6 @@ export class SnapshotV1alpha1UcApi extends BaseAPI {
      * @param {SnapshotV1alpha1UcApiGetSnapshotForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SnapshotV1alpha1UcApi
      */
     public getSnapshotForPost(requestParameters: SnapshotV1alpha1UcApiGetSnapshotForPostRequest, options?: RawAxiosRequestConfig) {
         return SnapshotV1alpha1UcApiFp(this.configuration).getSnapshotForPost(requestParameters.name, requestParameters.postName, requestParameters.patched, options).then((request) => request(this.axios, this.basePath));

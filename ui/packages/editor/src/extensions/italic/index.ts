@@ -1,13 +1,14 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { ItalicOptions } from "@tiptap/extension-italic";
-import TiptapItalic from "@tiptap/extension-italic";
+import TiptapItalic, { type ItalicOptions } from "@tiptap/extension-italic";
 import { markRaw } from "vue";
-import MdiFormatItalic from "~icons/mdi/format-italic";
+import MingcuteItalicLine from "~icons/mingcute/italic-line";
 
-const Italic = TiptapItalic.extend<ExtensionOptions & ItalicOptions>({
+export type ExtensionItalicOptions = ExtensionOptions & Partial<ItalicOptions>;
+
+export const ExtensionItalic = TiptapItalic.extend<ExtensionItalicOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -17,8 +18,8 @@ const Italic = TiptapItalic.extend<ExtensionOptions & ItalicOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("italic"),
-            icon: markRaw(MdiFormatItalic),
+            isActive: editor.isActive(TiptapItalic.name),
+            icon: markRaw(MingcuteItalicLine),
             title: i18n.global.t("editor.common.italic"),
             action: () => editor.chain().focus().toggleItalic().run(),
           },
@@ -27,5 +28,3 @@ const Italic = TiptapItalic.extend<ExtensionOptions & ItalicOptions>({
     };
   },
 });
-
-export default Italic;

@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.util.UriUtils.encodePath;
 
 import com.google.common.hash.Hashing;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -40,13 +41,14 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.index.query.QueryFactory;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -66,6 +68,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @AllArgsConstructor
 @Component
 public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "single-page-protection";
     private final ExtensionClient client;
     private final SinglePageService singlePageService;
@@ -116,7 +119,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
         interestReason.setExpression(
             "props.pageOwner == '%s'".formatted(page.getSpec().getOwner()));
-        notificationCenter.subscribe(subscriber, interestReason).block();
+        notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
     private void reconcileSpec(String name) {
@@ -255,12 +258,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        commentService.removeBySubject(ref).block();
+        commentService.removeBySubject(ref).block(BLOCKING_TIMEOUT);
 
         // delete counter for single page
         counterService.deleteByName(
                 MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName()))
-            .block();
+            .block(BLOCKING_TIMEOUT);
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String pageName) {
@@ -369,7 +372,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         Optional<ContentWrapper> contentWrapper =
             singlePageService.getContent(singlePage.getSpec().getReleaseSnapshot(),
                     singlePage.getSpec().getBaseSnapshot())
-                .blockOptional();
+                .blockOptional(BLOCKING_TIMEOUT);
         if (contentWrapper.isEmpty()) {
             return StringUtils.EMPTY;
         }
@@ -398,7 +401,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                     singlePage.getMetadata().getName(), e);
                 return Mono.empty();
             })
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(StringUtils.EMPTY);
     }
 
@@ -419,7 +422,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     List<Snapshot> listSnapshots(Ref ref) {
         var snapshotListOptions = new ListOptions();
         snapshotListOptions.setFieldSelector(FieldSelector.of(
-            QueryFactory.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+            Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
         return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

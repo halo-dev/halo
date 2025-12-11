@@ -15,43 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { HaloDocument } from './halo-document';
+import type { HaloDocument } from './halo-document';
 
-/**
- * 
- * @export
- * @interface SearchResult
- */
 export interface SearchResult {
-    /**
-     * 
-     * @type {Array<HaloDocument>}
-     * @memberof SearchResult
-     */
     'hits'?: Array<HaloDocument>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SearchResult
-     */
     'keyword'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SearchResult
-     */
     'limit'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SearchResult
-     */
     'processingTimeMillis'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SearchResult
-     */
     'total'?: number;
 }
 

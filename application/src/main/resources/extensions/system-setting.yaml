@@ -125,6 +125,12 @@ spec:
           if: "$get(allowRegistration).value === true"
           help: "需要确保已经正确配置邮件通知器"
           value: false
+        - $formkit: textarea
+          name: protectedUsernames
+          label: "保留用户名"
+          if: "$get(allowRegistration).value === true"
+          help: 保留用户名，限制用户注册时使用，多个用户名请用英文逗号,分隔，留空则不限制
+          value: "admin,administrator,root,system,superuser,guest,test,demo,user,backup,ftp,www,manager,support,service,api"
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"

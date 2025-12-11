@@ -1,4 +1,5 @@
 @use "base.scss";
+@use "resizer.scss";
 @use "table.scss";
 @use "draggable.scss";
 @use "columns.scss";
@@ -8,3 +9,4 @@
 @use "node-select.scss";
 @use "range-selection.scss";
 @use "details.scss";
+@use "figure.scss";

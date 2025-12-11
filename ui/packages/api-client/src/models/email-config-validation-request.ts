@@ -14,59 +14,20 @@
 
 
 
-/**
- * 
- * @export
- * @interface EmailConfigValidationRequest
- */
 export interface EmailConfigValidationRequest {
     /**
      * Gets email display name.
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
      */
     'displayName'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EmailConfigValidationRequest
-     */
     'enable'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
-     */
     'encryption'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
-     */
     'host'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
-     */
     'password'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof EmailConfigValidationRequest
-     */
     'port'?: number;
     /**
      * Gets email sender address.
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
      */
     'sender'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EmailConfigValidationRequest
-     */
     'username'?: string;
 }
 

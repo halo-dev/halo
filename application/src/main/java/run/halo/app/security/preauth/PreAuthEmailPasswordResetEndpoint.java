@@ -159,7 +159,8 @@ class PreAuthEmailPasswordResetEndpoint {
                         if (bindingResult.hasErrors()) {
                             return ServerResponse.badRequest().render(SEND_TEMPLATE, model);
                         }
-                        return emailService.sendPasswordResetEmail(sendForm.getEmail())
+                        var email = sendForm.getEmail().toLowerCase();
+                        return emailService.sendPasswordResetEmail(email)
                             .then(Mono.defer(() -> {
                                 model.put("sent", true);
                                 return ServerResponse.ok().render(SEND_TEMPLATE, model);

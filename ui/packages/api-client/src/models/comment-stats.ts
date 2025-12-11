@@ -16,15 +16,8 @@
 
 /**
  * comment stats value object.
- * @export
- * @interface CommentStats
  */
 export interface CommentStats {
-    /**
-     * 
-     * @type {number}
-     * @memberof CommentStats
-     */
     'upvote'?: number;
 }
 

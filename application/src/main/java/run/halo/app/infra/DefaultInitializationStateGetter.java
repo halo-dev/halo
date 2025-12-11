@@ -1,7 +1,7 @@
 package run.halo.app.infra;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
+import static run.halo.app.extension.index.query.Queries.isNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;

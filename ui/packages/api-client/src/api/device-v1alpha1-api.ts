@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Device } from '../models';
+import type { Device } from '../models';
 // @ts-ignore
-import { DeviceList } from '../models';
+import type { DeviceList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * DeviceV1alpha1Api - axios parameter creator
- * @export
  */
 export const DeviceV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const DeviceV1alpha1ApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * DeviceV1alpha1Api - functional programming interface
- * @export
  */
 export const DeviceV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DeviceV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const DeviceV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * DeviceV1alpha1Api - factory interface
- * @export
  */
 export const DeviceV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DeviceV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const DeviceV1alpha1ApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiCreateDeviceRequest
  */
 export interface DeviceV1alpha1ApiCreateDeviceRequest {
     /**
      * Fresh device
-     * @type {Device}
-     * @memberof DeviceV1alpha1ApiCreateDevice
      */
     readonly device?: Device
 }
 
 /**
  * Request parameters for deleteDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiDeleteDeviceRequest
  */
 export interface DeviceV1alpha1ApiDeleteDeviceRequest {
     /**
      * Name of device
-     * @type {string}
-     * @memberof DeviceV1alpha1ApiDeleteDevice
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiGetDeviceRequest
  */
 export interface DeviceV1alpha1ApiGetDeviceRequest {
     /**
      * Name of device
-     * @type {string}
-     * @memberof DeviceV1alpha1ApiGetDevice
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiListDeviceRequest
  */
 export interface DeviceV1alpha1ApiListDeviceRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof DeviceV1alpha1ApiListDevice
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiPatchDeviceRequest
  */
 export interface DeviceV1alpha1ApiPatchDeviceRequest {
     /**
      * Name of device
-     * @type {string}
-     * @memberof DeviceV1alpha1ApiPatchDevice
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof DeviceV1alpha1ApiPatchDevice
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateDevice operation in DeviceV1alpha1Api.
- * @export
- * @interface DeviceV1alpha1ApiUpdateDeviceRequest
  */
 export interface DeviceV1alpha1ApiUpdateDeviceRequest {
     /**
      * Name of device
-     * @type {string}
-     * @memberof DeviceV1alpha1ApiUpdateDevice
      */
     readonly name: string
 
     /**
      * Updated device
-     * @type {Device}
-     * @memberof DeviceV1alpha1ApiUpdateDevice
      */
     readonly device?: Device
 }
 
 /**
  * DeviceV1alpha1Api - object-oriented interface
- * @export
- * @class DeviceV1alpha1Api
- * @extends {BaseAPI}
  */
 export class DeviceV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiCreateDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public createDevice(requestParameters: DeviceV1alpha1ApiCreateDeviceRequest = {}, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).createDevice(requestParameters.device, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiDeleteDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public deleteDevice(requestParameters: DeviceV1alpha1ApiDeleteDeviceRequest, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).deleteDevice(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiGetDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public getDevice(requestParameters: DeviceV1alpha1ApiGetDeviceRequest, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).getDevice(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiListDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public listDevice(requestParameters: DeviceV1alpha1ApiListDeviceRequest = {}, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).listDevice(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiPatchDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public patchDevice(requestParameters: DeviceV1alpha1ApiPatchDeviceRequest, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).patchDevice(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class DeviceV1alpha1Api extends BaseAPI {
      * @param {DeviceV1alpha1ApiUpdateDeviceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DeviceV1alpha1Api
      */
     public updateDevice(requestParameters: DeviceV1alpha1ApiUpdateDeviceRequest, options?: RawAxiosRequestConfig) {
         return DeviceV1alpha1ApiFp(this.configuration).updateDevice(requestParameters.name, requestParameters.device, options).then((request) => request(this.axios, this.basePath));

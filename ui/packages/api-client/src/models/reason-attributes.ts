@@ -16,15 +16,8 @@
 
 /**
  * Attributes used to transfer data
- * @export
- * @interface ReasonAttributes
  */
 export interface ReasonAttributes {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ReasonAttributes
-     */
     'empty'?: boolean;
 }
 

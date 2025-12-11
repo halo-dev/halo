@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -21,6 +20,7 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
@@ -31,20 +31,12 @@ import PluginListItem from "./components/PluginListItem.vue";
 import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
-const { currentUserHasPermission } = usePermission();
 
 const pluginInstallationModalVisible = ref(false);
 
 const keyword = useRouteQuery<string>("keyword", "");
 
-const selectedEnabledValue = useRouteQuery<
-  string | undefined,
-  boolean | undefined
->("enabled", undefined, {
-  transform: (value) => {
-    return value ? value === "true" : undefined;
-  },
-});
+const selectedEnabledValue = useRouteQuery<string | undefined>("enabled");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 const hasFilters = computed(() => {
@@ -65,7 +57,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
       page: 0,
       size: 0,
       keyword: keyword.value,
-      enabled: selectedEnabledValue.value,
+      enabled: selectedEnabledValue.value
+        ? JSON.parse(selectedEnabledValue.value)
+        : undefined,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
     });
 
@@ -152,7 +146,7 @@ onMounted(() => {
   <PluginInstallationModal
     v-if="
       pluginInstallationModalVisible &&
-      currentUserHasPermission(['system:plugins:manage'])
+      utils.permission.has(['system:plugins:manage'])
     "
     @close="pluginInstallationModalVisible = false"
   />
@@ -252,11 +246,11 @@ onMounted(() => {
                   },
                   {
                     label: t('core.plugin.filters.status.items.active'),
-                    value: true,
+                    value: 'true',
                   },
                   {
                     label: t('core.plugin.filters.status.items.inactive'),
-                    value: false,
+                    value: 'false',
                   },
                 ]"
               />

@@ -14,35 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface TwoFactorAuthSettings
- */
 export interface TwoFactorAuthSettings {
     /**
      * Check if 2FA is available.
-     * @type {boolean}
-     * @memberof TwoFactorAuthSettings
      */
     'available'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TwoFactorAuthSettings
-     */
     'emailVerified'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TwoFactorAuthSettings
-     */
     'enabled'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TwoFactorAuthSettings
-     */
     'totpConfigured'?: boolean;
 }
 

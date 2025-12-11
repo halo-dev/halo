@@ -1,9 +1,9 @@
-import { useUserStore } from "@/stores/user";
+import { stores } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
 
 export function useSessionKeepAlive() {
-  const { isAnonymous } = useUserStore();
+  const { isAnonymous } = stores.currentUser();
 
   useQuery({
     queryKey: ["health", "keep-session-alive"],

@@ -1,6 +1,6 @@
 package run.halo.app.core.attachment;
 
-import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
@@ -46,17 +47,18 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
         client.fetch(ConfigMap.class, request.name())
             .ifPresent(configMap -> {
                 var labels = configMap.getMetadata().getLabels();
-                if (labels == null || !labels.containsKey(Policy.POLICY_OWNER_LABEL)) {
+                if (labels == null) {
                     return;
                 }
                 var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
-                var attachmentNames = client.indexedQueryEngine()
-                    .retrieveAll(attachmentGvk, ListOptions.builder()
-                            .andQuery(equal("spec.policyName", policyName))
-                            .build(),
-                        Sort.unsorted()
-                    );
-                attachmentUpdateTrigger.addAll(attachmentNames);
+                if (StringUtils.hasText(policyName)) {
+                    var options = ListOptions.builder()
+                        .andQuery(equal("spec.policyName", policyName))
+                        .build();
+                    var attachmentNames =
+                        client.listAllNames(Attachment.class, options, Sort.unsorted());
+                    attachmentUpdateTrigger.addAll(attachmentNames);
+                }
             });
         return Result.doNotRetry();
     }

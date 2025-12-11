@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { usePermission } from "@/utils/permission";
 import ActionButton from "@console/modules/dashboard/components/ActionButton.vue";
 import WidgetConfigFormModal from "@console/modules/dashboard/components/WidgetConfigFormModal.vue";
 import { IconCloseCircle, IconSettings } from "@halo-dev/components";
-import type { DashboardWidgetDefinition } from "@halo-dev/console-shared";
+import { utils, type DashboardWidgetDefinition } from "@halo-dev/ui-shared";
 import { computed, inject, ref, type ComputedRef } from "vue";
 import type { SimpleWidget } from "../types";
 
@@ -15,8 +14,6 @@ const emit = defineEmits<{
   (e: "remove"): void;
   (e: "update:config", config: Record<string, unknown>): void;
 }>();
-
-const { currentUserHasPermission } = usePermission();
 
 const availableWidgetDefinitions = inject<
   ComputedRef<DashboardWidgetDefinition[]>
@@ -41,7 +38,7 @@ function handleSaveConfig(config: Record<string, unknown>) {
 </script>
 <template>
   <div
-    v-if="currentUserHasPermission(widgetDefinition?.permissions)"
+    v-if="utils.permission.has(widgetDefinition?.permissions || [])"
     class="group/grid-item relative"
     :style="{
       width: `${defaultSize.w * 100}px`,

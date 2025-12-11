@@ -1,12 +1,15 @@
-import type { PluginModule } from "@halo-dev/console-shared";
+import type { PluginModule } from "@halo-dev/ui-shared";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, shallowRef } from "vue";
 
 export const usePluginModuleStore = defineStore("plugin", () => {
-  const pluginModuleMap = ref<Record<string, PluginModule>>({});
+  const pluginModuleMap = shallowRef<Record<string, PluginModule>>({});
 
   function registerPluginModule(name: string, pluginModule: PluginModule) {
-    pluginModuleMap.value[name] = pluginModule;
+    pluginModuleMap.value = {
+      ...pluginModuleMap.value,
+      [name]: pluginModule,
+    };
   }
 
   const pluginModules = computed(() => {

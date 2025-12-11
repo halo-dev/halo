@@ -12,7 +12,6 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
-import PluginDetailModal from "../PluginDetailModal.vue";
 
 const props = withDefaults(
   defineProps<{ extensionDefinition: ExtensionDefinition }>(),

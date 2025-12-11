@@ -1,7 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.List;
-import org.springframework.lang.Nullable;
+import run.halo.app.extension.Extension;
 
 /**
  * An interface that defines a collection of {@link IndexSpec}, and provides methods to add,
@@ -10,7 +10,7 @@ import org.springframework.lang.Nullable;
  * @author guqing
  * @since 2.12.0
  */
-public interface IndexSpecs {
+public interface IndexSpecs<E extends Extension> {
 
     /**
      * Add a new {@link IndexSpec} to the collection.
@@ -19,36 +19,53 @@ public interface IndexSpecs {
      * @throws IllegalArgumentException if the index spec with the same name already exists or
      *                                  the index spec is invalid
      */
-    void add(IndexSpec indexSpec);
+    default <K extends Comparable<K>> void add(IndexSpec<E, K> indexSpec) {
+        add((ValueIndexSpec<E, K>) indexSpec);
+    }
+
+    <K extends Comparable<K>> void add(ValueIndexSpec<E, K> indexSpec);
+
+    default <K extends Comparable<K>> void add(IndexSpecBuilder<E, K, ?> builder) {
+        add(builder.build());
+    }
 
     /**
      * Get all {@link IndexSpec} in the collection.
      *
      * @return all index specs
      */
-    List<IndexSpec> getIndexSpecs();
+    List<ValueIndexSpec<E, ?>> getIndexSpecs();
+
+    /***
+     * Create a multi-value index spec builder.
+     *
+     * @param name the name of the index spec
+     * @param keyType the type of the keys used in the index spec
+     * @param <E> the type of the extension
+     * @param <K> the type of the key
+     * @return a MultiValueBuilder for the specified index spec
+     */
+    static <E extends Extension, K extends Comparable<K>> MultiValueIndexSpecBuilder<E, K> multi(
+        String name,
+        Class<K> keyType
+    ) {
+        return new MultiValueBuilder<>(name, keyType);
+    }
 
     /**
-     * Get the {@link IndexSpec} with the given name.
+     * Create a single-value index spec builder.
      *
-     * @param indexName the name of the index spec to get.
-     * @return the index spec with the given name, or {@code null} if not found.
+     * @param name the name of the index spec
+     * @param keyType the type of the keys used in the index spec
+     * @param <E> the type of the extension
+     * @param <K> the type of the key
+     * @return a SingleValueBuilder for the specified index spec.
      */
-    @Nullable
-    IndexSpec getIndexSpec(String indexName);
+    static <E extends Extension, K extends Comparable<K>> SingleValueIndexSpecBuilder<E, K> single(
+        String name,
+        Class<K> keyType
+    ) {
+        return new SingleValueBuilder<>(name, keyType);
+    }
 
-    /**
-     * Check if the collection contains the {@link IndexSpec} with the given name.
-     *
-     * @param indexName the name of the index spec to check.
-     * @return {@code true} if the collection contains the index spec with the given name,
-     */
-    boolean contains(String indexName);
-
-    /**
-     * Remove the {@link IndexSpec} with the given name.
-     *
-     * @param name the name of the index spec to remove.
-     */
-    void remove(String name);
 }

@@ -14,22 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface GroupStatus
- */
 export interface GroupStatus {
     /**
      * Total of attachments under the current group
-     * @type {number}
-     * @memberof GroupStatus
      */
     'totalAttachments'?: number;
     /**
      * Update timestamp of the group
-     * @type {string}
-     * @memberof GroupStatus
      */
     'updateTimestamp'?: string;
 }

@@ -1,24 +1,19 @@
 <script lang="ts" setup>
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
-import { type Editor } from "@/tiptap/vue-3";
+import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
-import { Dropdown as VDropdown, vTooltip } from "floating-vue";
 import { test } from "linkifyjs";
-import { computed, type Component } from "vue";
-import MdiLinkVariant from "~icons/mdi/link-variant";
+import { computed } from "vue";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import { ExtensionLink } from ".";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const href = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.href;
   },
   set(value) {
@@ -32,7 +27,7 @@ const href = computed({
 
 const target = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.target === "_blank";
   },
   set(value) {
@@ -46,7 +41,7 @@ const target = computed({
 
 const rel = computed({
   get() {
-    const attrs = props.editor.getAttributes("link");
+    const attrs = props.editor.getAttributes(ExtensionLink.name);
     return attrs?.rel === "nofollow";
   },
   set(value) {
@@ -62,7 +57,7 @@ const rel = computed({
  * Convert the currently selected text when clicking the link
  */
 const handleLinkBubbleButton = () => {
-  if (props.isActive({ editor: props.editor })) {
+  if (props.isActive?.({ editor: props.editor })) {
     return;
   }
   const { state } = props.editor;
@@ -98,42 +93,32 @@ const handleLinkBubbleButton = () => {
   >
     <button
       v-tooltip="
-        isActive({ editor })
+        isActive?.({ editor })
           ? i18n.global.t('editor.extensions.link.edit_link')
           : i18n.global.t('editor.extensions.link.add_link')
       "
-      class="rounded-md p-2 text-lg text-gray-600 hover:bg-gray-100"
-      :class="{ 'bg-gray-200 !text-black': isActive({ editor }) }"
+      class="inline-flex size-8 items-center justify-center rounded-md text-lg text-gray-600 hover:bg-gray-100 active:!bg-gray-200"
+      :class="{ 'bg-gray-200 !text-black': isActive?.({ editor }) }"
     >
-      <MdiLinkVariant />
+      <MingcuteLinkLine />
     </button>
 
     <template #popper>
-      <div
-        class="relative max-h-72 w-96 overflow-hidden overflow-y-auto rounded-md bg-white p-1 shadow"
-      >
-        <input
+      <div class="relative w-96">
+        <Input
           v-model.lazy="href"
+          auto-focus
           :placeholder="i18n.global.t('editor.extensions.link.placeholder')"
-          class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 hover:bg-gray-100 focus:border-blue-500 focus:ring-blue-500"
         />
         <label class="mr-2 mt-2 inline-flex items-center">
-          <input
-            v-model="target"
-            type="checkbox"
-            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
+          <input v-model="target" type="checkbox" />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.open_in_new_window") }}
           </span>
         </label>
         <label class="mt-2 inline-flex items-center">
           <!-- nofollow -->
-          <input
-            v-model="rel"
-            type="checkbox"
-            class="form-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
+          <input v-model="rel" type="checkbox" />
           <span class="ml-2 text-sm text-gray-500">
             {{ i18n.global.t("editor.extensions.link.nofollow") }}
           </span>

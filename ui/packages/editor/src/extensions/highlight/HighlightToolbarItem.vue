@@ -2,30 +2,17 @@
 import { ToolbarItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
-import type { Component } from "vue";
-import MdiFormatColorMarkerCancel from "~icons/mdi/format-color-marker-cancel";
+import type { ToolbarItemComponentProps } from "@/types";
+import MingcuteCloseLine from "~icons/mingcute/close-line";
+import { ExtensionHighlight } from ".";
 
-const props = withDefaults(
-  defineProps<{
-    editor?: Editor;
-    isActive?: boolean;
-    disabled?: boolean;
-    title?: string;
-    action?: () => void;
-    icon?: Component;
-  }>(),
-  {
-    editor: undefined,
-    isActive: false,
-    disabled: false,
-    title: undefined,
-    action: undefined,
-    icon: undefined,
-  }
-);
+const props = defineProps<ToolbarItemComponentProps>();
 
 function handleSetColor(color?: string) {
+  if (props.editor?.isActive(ExtensionHighlight.name)) {
+    props.editor?.chain().focus().unsetHighlight().run();
+  }
+
   props.editor
     ?.chain()
     .focus()
@@ -44,12 +31,12 @@ function handleUnsetColor() {
     <template #prefix>
       <div class="p-1">
         <div
-          class="flex cursor-pointer items-center gap-2 rounded p-1 hover:bg-gray-100"
+          class="flex cursor-pointer items-center gap-2 rounded p-1 text-xs text-gray-600 hover:bg-gray-100 hover:text-gray-900"
           @click="handleUnsetColor"
         >
           <div class="inline-flex items-center gap-2">
-            <MdiFormatColorMarkerCancel />
-            <span class="text-xs text-gray-600">
+            <MingcuteCloseLine />
+            <span>
               {{ i18n.global.t("editor.extensions.highlight.unset") }}
             </span>
           </div>
@@ -61,7 +48,7 @@ function handleUnsetColor() {
           @click="handleSetColor()"
         >
           <div
-            class="h-5 w-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
+            class="size-5 cursor-pointer rounded-sm ring-gray-300 ring-offset-1 hover:ring-1"
             :style="{ 'background-color': '#fff8c5' }"
           ></div>
           <span class="text-xs text-gray-600">

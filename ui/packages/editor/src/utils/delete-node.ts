@@ -1,5 +1,5 @@
+import type { Editor } from "@/tiptap";
 import { NodeSelection, Transaction, type ResolvedPos } from "@/tiptap/pm";
-import type { Editor } from "@/tiptap/vue-3";
 
 export const deleteNodeByPos = ($pos: ResolvedPos) => {
   return (tr: Transaction) => {

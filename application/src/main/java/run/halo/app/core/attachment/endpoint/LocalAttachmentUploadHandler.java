@@ -59,6 +59,7 @@ import run.halo.app.infra.exception.FileSizeExceededException;
 import run.halo.app.infra.exception.FileTypeNotAllowedException;
 import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
@@ -293,21 +294,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             return Optional.empty();
         }
         var uriStr = annotations.get(Constant.URI_ANNO_KEY);
-        URI uri;
-        try {
-            uri = UriComponentsBuilder.fromUri(externalUrl.get())
-                // The URI has been encoded before, so there is no need to encode it again.
-                .path(uriStr)
-                .build(true)
-                .toUri();
-        } catch (IllegalArgumentException e) {
-            // The URI may not be encoded, so we need to build with encoding.
-            uri = UriComponentsBuilder.fromUri(externalUrl.get())
-                .path(uriStr)
-                .build()
-                .toUri();
-        }
-        return Optional.of(uri);
+        return Optional.of(HaloUtils.safeToUri(uriStr));
     }
 
     private Map<ThumbnailSize, URI> doGetThumbnailLinks(Attachment attachment) {

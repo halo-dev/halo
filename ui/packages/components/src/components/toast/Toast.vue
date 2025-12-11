@@ -14,11 +14,11 @@ import {
   type Component,
   type Raw,
 } from "vue";
-import type { Type } from "./interface";
+import type { ToastType } from "./types";
 
 const props = withDefaults(
   defineProps<{
-    type?: Type;
+    type?: ToastType;
     content?: string;
     duration?: number;
     closable?: boolean;
@@ -43,7 +43,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const icons: Record<Type, { icon: Raw<Component>; color: string }> = {
+const icons: Record<ToastType, { icon: Raw<Component>; color: string }> = {
   success: {
     icon: markRaw(IconCheckboxCircle),
     color: "text-green-500",

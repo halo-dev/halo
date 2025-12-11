@@ -14,29 +14,9 @@
 
 
 
-/**
- * 
- * @export
- * @interface TotpRequest
- */
 export interface TotpRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof TotpRequest
-     */
     'code': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TotpRequest
-     */
     'password': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TotpRequest
-     */
     'secret': string;
 }
 

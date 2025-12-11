@@ -33,7 +33,6 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 
 @DirtiesContext
@@ -70,12 +69,8 @@ class ExtensionConfigurationTest {
     }
 
     @AfterEach
-    void cleanUp(@Autowired ExtensionStoreRepository repository,
-        @Autowired IndexerFactory indexerFactory) {
+    void cleanUp(@Autowired ExtensionStoreRepository repository) {
         var gvk = Scheme.buildFromType(FakeExtension.class).groupVersionKind();
-        if (indexerFactory.contains(gvk)) {
-            indexerFactory.getIndexer(gvk).removeIndexRecords(descriptor -> true);
-        }
         repository.deleteAll().block();
         schemeManager.fetch(GroupVersionKind.fromExtension(FakeExtension.class))
             .ifPresent(scheme -> schemeManager.unregister(scheme));

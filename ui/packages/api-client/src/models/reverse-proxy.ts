@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReverseProxyRule } from './reverse-proxy-rule';
+import type { ReverseProxyRule } from './reverse-proxy-rule';
 
 /**
  * <p>The reverse proxy custom resource is used to configure a path to proxy it to a directory or  file.</p>  <p>HTTP proxy may be added in the future.</p>
- * @export
- * @interface ReverseProxy
  */
 export interface ReverseProxy {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReverseProxy
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReverseProxy
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ReverseProxy
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {Array<ReverseProxyRule>}
-     * @memberof ReverseProxy
-     */
     'rules'?: Array<ReverseProxyRule>;
 }
 

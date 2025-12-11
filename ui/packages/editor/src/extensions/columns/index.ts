@@ -1,2 +1,2 @@
-export { default as ExtensionColumn } from "./column";
-export { default as ExtensionColumns } from "./columns";
+export * from "./column";
+export * from "./columns";

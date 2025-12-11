@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuItemSpec } from './menu-item-spec';
+import type { MenuItemSpec } from './menu-item-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuItemStatus } from './menu-item-status';
+import type { MenuItemStatus } from './menu-item-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface MenuItem
- */
 export interface MenuItem {
-    /**
-     * 
-     * @type {string}
-     * @memberof MenuItem
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MenuItem
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof MenuItem
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {MenuItemSpec}
-     * @memberof MenuItem
-     */
     'spec': MenuItemSpec;
-    /**
-     * 
-     * @type {MenuItemStatus}
-     * @memberof MenuItem
-     */
     'status'?: MenuItemStatus;
 }
 

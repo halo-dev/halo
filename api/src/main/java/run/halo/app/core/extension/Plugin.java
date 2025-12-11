@@ -32,6 +32,10 @@ import run.halo.app.infra.ConditionList;
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
 
+    public static final String SYSTEM_RESERVED_LABEL_KEY = "plugin.halo.run/system-reserved";
+
+    public static final String BUILT_IN_KEEPER_FINALIZER = "plugin.halo.run/built-in-keeper";
+
     @Schema(requiredMode = REQUIRED)
     private PluginSpec spec;
 

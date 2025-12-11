@@ -3,7 +3,8 @@ package run.halo.app.extension.index;
 import java.util.Comparator;
 import org.springframework.lang.Nullable;
 
-public class KeyComparator implements Comparator<String> {
+@Deprecated(forRemoval = true, since = "2.22.0")
+class KeyComparator implements Comparator<String> {
     public static final KeyComparator INSTANCE = new KeyComparator();
 
     @Override

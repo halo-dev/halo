@@ -1,9 +1,5 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
-import type { Info, Startup } from "@/types";
-import { formatDatetime } from "@/utils/date";
-import { usePermission } from "@/utils/permission";
-import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { useThemeStore } from "@console/stores/theme";
 import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -19,16 +15,18 @@ import {
   VPageHeader,
   VTag,
 } from "@halo-dev/components";
+import type { Info, Startup } from "@halo-dev/ui-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import axios from "axios";
+import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import ExternalUrlItem from "./components/ExternalUrlItem.vue";
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
-const { currentUserHasPermission } = usePermission();
 
 const { data: info } = useQuery<Info>({
   queryKey: ["system-info"],
@@ -41,7 +39,7 @@ const { data: info } = useQuery<Info>({
   retry: 0,
 });
 
-const { globalInfo } = useGlobalInfoFetch();
+const { globalInfo } = storeToRefs(stores.globalInfo());
 
 const { data: startup } = useQuery<Startup>({
   queryKey: ["system-startup-info"],
@@ -65,7 +63,7 @@ const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
 
     return data.items;
   },
-  enabled: computed(() => currentUserHasPermission(["system:plugins:view"])),
+  enabled: computed(() => utils.permission.has(["system:plugins:view"])),
 });
 
 // copy system information to clipboard
@@ -91,7 +89,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.start_time"),
-      value: formatDatetime(startup.value?.timeline.startTime) || "",
+      value: utils.date.format(startup.value?.timeline.startTime) || "",
     },
     {
       label: t("core.overview.fields.version"),
@@ -99,7 +97,7 @@ const handleCopy = () => {
     },
     {
       label: t("core.overview.fields.build_time"),
-      value: formatDatetime(info.value?.build?.time) || "",
+      value: utils.date.format(info.value?.build?.time) || "",
     },
     {
       label: "Git Commit",
@@ -177,7 +175,7 @@ const handleDownloadLogfile = () => {
       const downloadElement = document.createElement("a");
       const href = window.URL.createObjectURL(blob);
       downloadElement.href = href;
-      downloadElement.download = `halo-log-${formatDatetime(new Date())}.log`;
+      downloadElement.download = `halo-log-${utils.date.format(new Date())}.log`;
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
@@ -225,7 +223,7 @@ const handleDownloadLogfile = () => {
             <VDescriptionItem
               v-if="startup?.timeline.startTime"
               :label="$t('core.overview.fields.start_time')"
-              :content="formatDatetime(startup?.timeline.startTime)"
+              :content="utils.date.format(startup?.timeline.startTime)"
             />
             <VDescriptionItem
               v-if="themeStore.activatedTheme"
@@ -304,7 +302,7 @@ const handleDownloadLogfile = () => {
             <VDescriptionItem
               v-if="info.build"
               :label="$t('core.overview.fields.build_time')"
-              :content="formatDatetime(info.build.time)"
+              :content="utils.date.format(info.build.time)"
             />
             <VDescriptionItem v-if="info.git" label="Git Commit">
               <a

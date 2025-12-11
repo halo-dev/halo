@@ -37,7 +37,8 @@ const classes = computed(() => {
       <div class="entity-end">
         <slot name="end" />
         <div v-if="$slots.dropdownItems" class="entity-dropdown">
-          <VDropdown>
+          <!-- @vue-ignore -->
+          <VDropdown :dispose-timeout="null">
             <div
               class="entity-dropdown-trigger group-hover:bg-gray-200/60"
               :class="{ '!bg-gray-300/60': isSelected }"

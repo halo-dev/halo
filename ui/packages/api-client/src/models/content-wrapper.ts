@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface ContentWrapper
- */
 export interface ContentWrapper {
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentWrapper
-     */
     'content'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentWrapper
-     */
     'raw'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentWrapper
-     */
     'rawType'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentWrapper
-     */
     'snapshotName'?: string;
 }
 

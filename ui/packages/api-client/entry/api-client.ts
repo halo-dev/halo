@@ -456,10 +456,14 @@ function createPublicApiClient(axiosInstance: AxiosInstance) {
   };
 }
 
-const defaultCoreApiClient = createCoreApiClient(defaultAxiosInstance);
-const defaultConsoleApiClient = createConsoleApiClient(defaultAxiosInstance);
-const defaultUcApiClient = createUcApiClient(defaultAxiosInstance);
-const defaultPublicApiClient = createPublicApiClient(defaultAxiosInstance);
+const defaultCoreApiClient =
+  /*#__PURE__*/ createCoreApiClient(defaultAxiosInstance);
+const defaultConsoleApiClient =
+  /*#__PURE__*/ createConsoleApiClient(defaultAxiosInstance);
+const defaultUcApiClient =
+  /*#__PURE__*/ createUcApiClient(defaultAxiosInstance);
+const defaultPublicApiClient =
+  /*#__PURE__*/ createPublicApiClient(defaultAxiosInstance);
 
 export {
   defaultAxiosInstance as axiosInstance,

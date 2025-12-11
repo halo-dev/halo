@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ExtensionDefinition } from '../models';
+import type { ExtensionDefinition } from '../models';
 // @ts-ignore
-import { ExtensionDefinitionList } from '../models';
+import type { ExtensionDefinitionList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * ExtensionDefinitionV1alpha1Api - axios parameter creator
- * @export
  */
 export const ExtensionDefinitionV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ExtensionDefinitionV1alpha1ApiAxiosParamCreator = function (configu
 
 /**
  * ExtensionDefinitionV1alpha1Api - functional programming interface
- * @export
  */
 export const ExtensionDefinitionV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ExtensionDefinitionV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ExtensionDefinitionV1alpha1ApiFp = function(configuration?: Configu
 
 /**
  * ExtensionDefinitionV1alpha1Api - factory interface
- * @export
  */
 export const ExtensionDefinitionV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ExtensionDefinitionV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ExtensionDefinitionV1alpha1ApiFactory = function (configuration?: C
 
 /**
  * Request parameters for createExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiCreateExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiCreateExtensionDefinitionRequest {
     /**
      * Fresh extensiondefinition
-     * @type {ExtensionDefinition}
-     * @memberof ExtensionDefinitionV1alpha1ApiCreateExtensionDefinition
      */
     readonly extensionDefinition?: ExtensionDefinition
 }
 
 /**
  * Request parameters for deleteExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiDeleteExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiDeleteExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
-     * @type {string}
-     * @memberof ExtensionDefinitionV1alpha1ApiDeleteExtensionDefinition
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiGetExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiGetExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
-     * @type {string}
-     * @memberof ExtensionDefinitionV1alpha1ApiGetExtensionDefinition
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ExtensionDefinitionV1alpha1ApiListExtensionDefinition
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ExtensionDefinitionV1alpha1ApiListExtensionDefinition
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ExtensionDefinitionV1alpha1ApiListExtensionDefinition
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ExtensionDefinitionV1alpha1ApiListExtensionDefinition
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ExtensionDefinitionV1alpha1ApiListExtensionDefinition
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiPatchExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiPatchExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
-     * @type {string}
-     * @memberof ExtensionDefinitionV1alpha1ApiPatchExtensionDefinition
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ExtensionDefinitionV1alpha1ApiPatchExtensionDefinition
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateExtensionDefinition operation in ExtensionDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinitionRequest
  */
 export interface ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinitionRequest {
     /**
      * Name of extensiondefinition
-     * @type {string}
-     * @memberof ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinition
      */
     readonly name: string
 
     /**
      * Updated extensiondefinition
-     * @type {ExtensionDefinition}
-     * @memberof ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinition
      */
     readonly extensionDefinition?: ExtensionDefinition
 }
 
 /**
  * ExtensionDefinitionV1alpha1Api - object-oriented interface
- * @export
- * @class ExtensionDefinitionV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiCreateExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public createExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiCreateExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).createExtensionDefinition(requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiDeleteExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public deleteExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiDeleteExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).deleteExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiGetExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public getExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiGetExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).getExtensionDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public listExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).listExtensionDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiPatchExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public patchExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiPatchExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).patchExtensionDefinition(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ExtensionDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionDefinitionV1alpha1Api
      */
     public updateExtensionDefinition(requestParameters: ExtensionDefinitionV1alpha1ApiUpdateExtensionDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionDefinitionV1alpha1ApiFp(this.configuration).updateExtensionDefinition(requestParameters.name, requestParameters.extensionDefinition, options).then((request) => request(this.axios, this.basePath));

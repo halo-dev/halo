@@ -3,7 +3,6 @@ import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { postLabels } from "@/constants/labels";
-import { usePermission } from "@/utils/permission";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedPost, Post } from "@halo-dev/api-client";
@@ -15,7 +14,11 @@ import {
   VDropdownItem,
   VEntity,
 } from "@halo-dev/components";
-import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
+import {
+  utils,
+  type EntityFieldItem,
+  type OperationItem,
+} from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
@@ -28,7 +31,6 @@ import PublishTimeField from "./entity-fields/PublishTimeField.vue";
 import TitleField from "./entity-fields/TitleField.vue";
 import VisibleField from "./entity-fields/VisibleField.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
 const router = useRouter();
@@ -69,7 +71,7 @@ const handleDelete = async () => {
   });
 };
 
-const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
+const { data: operationItems } = useOperationItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
   post,
   computed((): OperationItem<ListedPost>[] => [
@@ -154,7 +156,7 @@ const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
   ])
 );
 
-const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
+const { data: fields } = useEntityFieldItemExtensionPoint<ListedPost>(
   "post:list-item:field:create",
   post,
   computed((): EntityFieldItem[] => [
@@ -226,10 +228,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
 
 <template>
   <VEntity :is-selected="isSelected">
-    <template
-      v-if="currentUserHasPermission(['system:posts:manage'])"
-      #checkbox
-    >
+    <template v-if="utils.permission.has(['system:posts:manage'])" #checkbox>
       <input
         v-model="selectedPostNames"
         :value="post.post.metadata.name"
@@ -238,16 +237,19 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       />
     </template>
     <template #start>
-      <EntityFieldItems :fields="startFields" />
+      <EntityFieldItems :fields="fields?.start || []" />
     </template>
     <template #end>
-      <EntityFieldItems :fields="endFields" />
+      <EntityFieldItems :fields="fields?.end || []" />
     </template>
     <template
-      v-if="currentUserHasPermission(['system:posts:manage'])"
+      v-if="utils.permission.has(['system:posts:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="post" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="post"
+      />
     </template>
   </VEntity>
 </template>

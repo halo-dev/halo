@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface DeviceStatus
- */
 export interface DeviceStatus {
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceStatus
-     */
     'browser'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceStatus
-     */
     'os'?: string;
 }
 

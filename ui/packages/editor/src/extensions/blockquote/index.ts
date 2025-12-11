@@ -1,51 +1,35 @@
-import ToolbarItemVue from "@/components/toolbar/ToolbarItem.vue";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap/vue-3";
+import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import type { BlockquoteOptions } from "@tiptap/extension-blockquote";
 import TiptapBlockquote from "@tiptap/extension-blockquote";
 import { markRaw } from "vue";
-import MdiFormatQuoteOpen from "~icons/mdi/format-quote-open";
+import MingcuteBlockquoteLine from "~icons/mingcute/blockquote-line";
 
-const Blockquote = TiptapBlockquote.extend<
-  ExtensionOptions & BlockquoteOptions
->({
-  addOptions() {
-    return {
-      ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: Editor }) {
-        return {
-          priority: 90,
-          component: markRaw(ToolbarItemVue),
-          props: {
-            editor,
-            isActive: editor.isActive("blockquote"),
-            icon: markRaw(MdiFormatQuoteOpen),
-            title: i18n.global.t("editor.common.quote"),
-            action: () => {
-              editor.commands.toggleBlockquote();
+export type ExtensionBlockquoteOptions = Partial<BlockquoteOptions> &
+  ExtensionOptions;
+
+export const ExtensionBlockquote =
+  TiptapBlockquote.extend<ExtensionBlockquoteOptions>({
+    addOptions() {
+      return {
+        ...this.parent?.(),
+        getToolbarItems({ editor }: { editor: Editor }) {
+          return {
+            priority: 90,
+            component: markRaw(ToolbarItem),
+            props: {
+              editor,
+              isActive: editor.isActive(TiptapBlockquote.name),
+              icon: markRaw(MingcuteBlockquoteLine),
+              title: i18n.global.t("editor.common.quote"),
+              action: () => {
+                editor.commands.toggleBlockquote();
+              },
             },
-          },
-        };
-      },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }) {
-            let element: HTMLElement | null = dom;
-            while (element && element.parentElement) {
-              if (element.tagName === "BLOCKQUOTE") {
-                break;
-              }
-              element = element.parentElement;
-            }
-            return {
-              el: element,
-            };
-          },
-        };
-      },
-    };
-  },
-});
-
-export default Blockquote;
+          };
+        },
+      };
+    },
+  });

@@ -20,18 +20,17 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Attachment } from '../models';
+import type { Attachment } from '../models';
 // @ts-ignore
-import { AttachmentList } from '../models';
+import type { AttachmentList } from '../models';
 // @ts-ignore
-import { UcUploadFromUrlRequest } from '../models';
+import type { UcUploadFromUrlRequest } from '../models';
 // @ts-ignore
-import { UcUploadRequestFormData } from '../models';
+import type { UcUploadRequestFormData } from '../models';
 /**
  * AttachmentV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -281,7 +280,6 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
 
 /**
  * AttachmentV1alpha1UcApi - functional programming interface
- * @export
  */
 export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AttachmentV1alpha1UcApiAxiosParamCreator(configuration)
@@ -351,7 +349,6 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
 
 /**
  * AttachmentV1alpha1UcApi - factory interface
- * @export
  */
 export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AttachmentV1alpha1UcApiFp(configuration)
@@ -397,149 +394,94 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for createAttachmentForPost operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest
  */
 export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
-    /**
-     * 
-     * @type {File}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
-     */
     readonly file: File
 
     /**
      * Wait for permalink.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly waitForPermalink?: boolean
 
     /**
      * Post name.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly postName?: string
 
     /**
      * Single page name.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly singlePageName?: string
 }
 
 /**
  * Request parameters for externalTransferAttachment1 operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request
  */
 export interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request {
-    /**
-     * 
-     * @type {UcUploadFromUrlRequest}
-     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
-     */
     readonly ucUploadFromUrlRequest: UcUploadFromUrlRequest
 
     /**
      * Wait for permalink.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
      */
     readonly waitForPermalink?: boolean
 }
 
 /**
  * Request parameters for listMyAttachments operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiListMyAttachmentsRequest
  */
 export interface AttachmentV1alpha1UcApiListMyAttachmentsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly sort?: Array<string>
 
     /**
      * Filter attachments without group. This parameter will ignore group parameter.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly ungrouped?: boolean
 
     /**
      * Keyword for searching.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly keyword?: string
 
     /**
      * Acceptable media types.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly accepts?: Array<string>
 }
 
 /**
  * Request parameters for uploadUcAttachment operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiUploadUcAttachmentRequest
  */
 export interface AttachmentV1alpha1UcApiUploadUcAttachmentRequest {
-    /**
-     * 
-     * @type {File}
-     * @memberof AttachmentV1alpha1UcApiUploadUcAttachment
-     */
     readonly file: File
 
-    /**
-     * 
-     * @type {UcUploadRequestFormData}
-     * @memberof AttachmentV1alpha1UcApiUploadUcAttachment
-     */
     readonly formData?: UcUploadRequestFormData
 }
 
 /**
  * AttachmentV1alpha1UcApi - object-oriented interface
- * @export
- * @class AttachmentV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class AttachmentV1alpha1UcApi extends BaseAPI {
     /**
@@ -547,7 +489,6 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @param {AttachmentV1alpha1UcApiCreateAttachmentForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public createAttachmentForPost(requestParameters: AttachmentV1alpha1UcApiCreateAttachmentForPostRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).createAttachmentForPost(requestParameters.file, requestParameters.waitForPermalink, requestParameters.postName, requestParameters.singlePageName, options).then((request) => request(this.axios, this.basePath));
@@ -558,7 +499,6 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @param {AttachmentV1alpha1UcApiExternalTransferAttachment1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).externalTransferAttachment1(requestParameters.ucUploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(this.axios, this.basePath));
@@ -569,7 +509,6 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @param {AttachmentV1alpha1UcApiListMyAttachmentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public listMyAttachments(requestParameters: AttachmentV1alpha1UcApiListMyAttachmentsRequest = {}, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).listMyAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(this.axios, this.basePath));
@@ -580,7 +519,6 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @param {AttachmentV1alpha1UcApiUploadUcAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public uploadUcAttachment(requestParameters: AttachmentV1alpha1UcApiUploadUcAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).uploadUcAttachment(requestParameters.file, requestParameters.formData, options).then((request) => request(this.axios, this.basePath));

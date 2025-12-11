@@ -15,37 +15,20 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuItemVo } from './menu-item-vo';
+import type { MenuItemVo } from './menu-item-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuSpec } from './menu-spec';
+import type { MenuSpec } from './menu-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link Menu Menu}.
- * @export
- * @interface MenuVo
  */
 export interface MenuVo {
-    /**
-     * 
-     * @type {Array<MenuItemVo>}
-     * @memberof MenuVo
-     */
     'menuItems'?: Array<MenuItemVo>;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof MenuVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {MenuSpec}
-     * @memberof MenuVo
-     */
     'spec'?: MenuSpec;
 }
 

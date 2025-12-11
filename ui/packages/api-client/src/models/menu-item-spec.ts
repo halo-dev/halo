@@ -15,49 +15,29 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref';
+import type { Ref } from './ref';
 
-/**
- * 
- * @export
- * @interface MenuItemSpec
- */
 export interface MenuItemSpec {
     /**
      * Children of this menu item
-     * @type {Array<string>}
-     * @memberof MenuItemSpec
      */
     'children'?: Array<string>;
     /**
      * The display name of menu item.
-     * @type {string}
-     * @memberof MenuItemSpec
      */
     'displayName'?: string;
     /**
      * The href of this menu item.
-     * @type {string}
-     * @memberof MenuItemSpec
      */
     'href'?: string;
     /**
      * The priority is for ordering.
-     * @type {number}
-     * @memberof MenuItemSpec
      */
     'priority'?: number;
     /**
      * The <a> target attribute of this menu item.
-     * @type {string}
-     * @memberof MenuItemSpec
      */
     'target'?: MenuItemSpecTargetEnum;
-    /**
-     * 
-     * @type {Ref}
-     * @memberof MenuItemSpec
-     */
     'targetRef'?: Ref;
 }
 

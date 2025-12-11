@@ -14,23 +14,8 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReasonSelector
- */
 export interface ReasonSelector {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSelector
-     */
     'language': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSelector
-     */
     'reasonType': string;
 }
 

@@ -14,25 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface UcUploadRequestFormData
- */
 export interface UcUploadRequestFormData {
     [key: string]: Array<object> | any;
 
-    /**
-     * 
-     * @type {{ [key: string]: object; }}
-     * @memberof UcUploadRequestFormData
-     */
     'all'?: { [key: string]: object; };
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UcUploadRequestFormData
-     */
     'empty'?: boolean;
 }
 

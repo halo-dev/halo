@@ -1,10 +1,10 @@
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import GzipPlugin from "rollup-plugin-gzip";
 import Icons from "unplugin-icons/vite";
-import { fileURLToPath } from "url";
 import { defineConfig, type Plugin } from "vite";
 import { setupLibraryExternal } from "./library-external";
 
@@ -46,7 +46,7 @@ export function createViteConfig(options: Options) {
   return defineConfig({
     base,
     experimental: {
-      enableNativePlugin: isProduction,
+      enableNativePlugin: true,
     },
     plugins: [
       ...sharedPlugins,
@@ -70,20 +70,17 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
           advancedChunks: {
             groups: [
-              "lodash-es",
+              "es-toolkit",
               "vue-grid-layout",
               "transliteration",
-              "vue-draggable-plus",
               "colorjs.io",
               "overlayscrollbars",
               "overlayscrollbars-vue",
-              "floating-vue",
               "@he-tree/vue",
-              "pretty-bytes",
             ].map((name) => ({
               name: "vendor",
               test: name,

@@ -1,6 +1,12 @@
 import { mergeAttributes, Node } from "@/tiptap/vue-3";
 
-const Column = Node.create({
+export type ExtensionColumnOptions = {
+  HTMLAttributes: {
+    class: string;
+  };
+};
+
+export const ExtensionColumn = Node.create<ExtensionColumnOptions>({
   name: "column",
   content: "block+",
   isolating: true,
@@ -43,5 +49,3 @@ const Column = Node.create({
     ];
   },
 });
-
-export default Column;

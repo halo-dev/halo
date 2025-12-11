@@ -14,28 +14,14 @@
 
 
 
-/**
- * 
- * @export
- * @interface CopyOperation
- */
 export interface CopyOperation {
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof CopyOperation
      */
     'from': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CopyOperation
-     */
     'op': CopyOperationOpEnum;
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof CopyOperation
      */
     'path': string;
 }

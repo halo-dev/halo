@@ -1,35 +1,30 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
-import type { EditorState } from "@/tiptap/pm";
 import {
   Editor,
   Node,
+  PluginKey,
   VueNodeViewRenderer,
   isActive,
   mergeAttributes,
   nodeInputRule,
   nodePasteRule,
+  type EditorState,
   type Range,
-} from "@/tiptap/vue-3";
+} from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
 import { markRaw } from "vue";
 import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
 import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
-import MdiCellphoneIphone from "~icons/mdi/cellphone-iphone";
-import MdiDesktopMac from "~icons/mdi/desktop-mac";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
-import MdiLinkVariant from "~icons/mdi/link-variant";
-import MdiShare from "~icons/mdi/share";
-import MdiTabletIpad from "~icons/mdi/tablet-ipad";
 import MdiWeb from "~icons/mdi/web";
 import MdiWebSync from "~icons/mdi/web-sync";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
+import BubbleItemIframeAlign from "./BubbleItemIframeAlign.vue";
 import BubbleIframeLink from "./BubbleItemIframeLink.vue";
 import BubbleIframeSize from "./BubbleItemIframeSize.vue";
 import IframeView from "./IframeView.vue";
@@ -42,7 +37,9 @@ declare module "@/tiptap" {
   }
 }
 
-const Iframe = Node.create<ExtensionOptions>({
+export const IFRAME_BUBBLE_MENU_KEY = new PluginKey("iframeBubbleMenu");
+
+export const ExtensionIframe = Node.create<ExtensionOptions>({
   name: "iframe",
   fakeSelection: true,
 
@@ -243,7 +240,7 @@ const Iframe = Node.create<ExtensionOptions>({
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {
-            priority: 40,
+            priority: 50,
             component: markRaw(ToolboxItem),
             props: {
               editor,
@@ -262,27 +259,29 @@ const Iframe = Node.create<ExtensionOptions>({
       },
       getBubbleMenu({ editor }: { editor: Editor }): NodeBubbleMenuType {
         return {
-          pluginKey: "iframeBubbleMenu",
+          pluginKey: IFRAME_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }) => {
-            return isActive(state, Iframe.name);
+            return isActive(state, ExtensionIframe.name);
           },
           items: [
             {
               priority: 10,
               props: {
                 isActive: () =>
-                  editor.getAttributes(Iframe.name).frameborder === "1",
+                  editor.getAttributes(ExtensionIframe.name).frameborder ===
+                  "1",
                 icon: markRaw(
-                  editor.getAttributes(Iframe.name).frameborder === "1"
+                  editor.getAttributes(ExtensionIframe.name).frameborder === "1"
                     ? MdiBorderAllVariant
                     : MdiBorderNoneVariant
                 ),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Iframe.name, {
+                    .updateAttributes(ExtensionIframe.name, {
                       frameborder:
-                        editor.getAttributes(Iframe.name).frameborder === "1"
+                        editor.getAttributes(ExtensionIframe.name)
+                          .frameborder === "1"
                           ? "0"
                           : "1",
                     })
@@ -291,7 +290,7 @@ const Iframe = Node.create<ExtensionOptions>({
                     .run();
                 },
                 title:
-                  editor.getAttributes(Iframe.name).frameborder === "1"
+                  editor.getAttributes(ExtensionIframe.name).frameborder === "1"
                     ? i18n.global.t(
                         "editor.extensions.iframe.disable_frameborder"
                       )
@@ -310,111 +309,30 @@ const Iframe = Node.create<ExtensionOptions>({
             },
             {
               priority: 40,
-              props: {
-                isActive: () => sizeMatch(editor, "390px", "844px"),
-                icon: markRaw(MdiCellphoneIphone),
-                action: () => {
-                  handleSetSize(editor, "390px", "844px");
-                },
-                title: i18n.global.t("editor.extensions.iframe.phone_size"),
-              },
+              component: markRaw(BubbleItemIframeAlign),
             },
             {
               priority: 50,
-              props: {
-                isActive: () => sizeMatch(editor, "834px", "1194px"),
-                icon: markRaw(MdiTabletIpad),
-                action: () => {
-                  handleSetSize(editor, "834px", "1194px");
-                },
-                title: i18n.global.t(
-                  "editor.extensions.iframe.tablet_vertical_size"
-                ),
-              },
+              component: markRaw(BlockActionSeparator),
             },
             {
               priority: 60,
-              props: {
-                isActive: () => sizeMatch(editor, "1194px", "834px"),
-                icon: markRaw(MdiTabletIpad),
-                iconStyle: "transform: rotate(90deg)",
-                action: () => {
-                  handleSetSize(editor, "1194px", "834px");
-                },
-                title: i18n.global.t(
-                  "editor.extensions.iframe.tablet_horizontal_size"
-                ),
-              },
-            },
-            {
-              priority: 70,
-              props: {
-                isActive: () => sizeMatch(editor, "100%", "834px"),
-                icon: markRaw(MdiDesktopMac),
-                action: () => {
-                  handleSetSize(editor, "100%", "834px");
-                },
-                title: i18n.global.t("editor.extensions.iframe.desktop_size"),
-              },
-            },
-            {
-              priority: 80,
-              component: markRaw(BlockActionSeparator),
-            },
-            {
-              priority: 90,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MdiFormatAlignLeft),
-                action: () => handleSetTextAlign(editor, "left"),
-              },
-            },
-            {
-              priority: 100,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MdiFormatAlignCenter),
-                action: () => handleSetTextAlign(editor, "center"),
-              },
-            },
-            {
-              priority: 110,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MdiFormatAlignRight),
-                action: () => handleSetTextAlign(editor, "right"),
-              },
-            },
-            {
-              priority: 120,
-              props: {
-                isActive: () => editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
-                action: () => handleSetTextAlign(editor, "justify"),
-              },
-            },
-            {
-              priority: 130,
-              component: markRaw(BlockActionSeparator),
-            },
-            {
-              priority: 140,
               props: {
                 icon: markRaw(MdiWebSync),
                 action: () => {
                   editor
                     .chain()
-                    .updateAttributes(Iframe.name, {
-                      src: editor.getAttributes(Iframe.name).src,
+                    .updateAttributes(ExtensionIframe.name, {
+                      src: editor.getAttributes(ExtensionIframe.name).src,
                     })
                     .run();
                 },
               },
             },
             {
-              priority: 150,
+              priority: 70,
               props: {
-                icon: markRaw(MdiLinkVariant),
+                icon: markRaw(MingcuteLinkLine),
                 title: i18n.global.t("editor.common.button.edit_link"),
                 action: () => {
                   return markRaw(BubbleIframeLink);
@@ -422,76 +340,31 @@ const Iframe = Node.create<ExtensionOptions>({
               },
             },
             {
-              priority: 160,
+              priority: 80,
               props: {
-                icon: markRaw(MdiShare),
+                icon: markRaw(MingcuteShare3Line),
                 title: i18n.global.t("editor.common.tooltip.open_link"),
                 action: () => {
-                  window.open(editor.getAttributes(Iframe.name).src, "_blank");
+                  window.open(
+                    editor.getAttributes(ExtensionIframe.name).src,
+                    "_blank"
+                  );
                 },
               },
             },
             {
-              priority: 190,
+              priority: 90,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
-                  deleteNode(Iframe.name, editor);
+                  deleteNode(ExtensionIframe.name, editor);
                 },
               },
             },
           ],
         };
       },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom, view }) {
-            let container = dom;
-            while (container && container.tagName !== "P") {
-              container = container.parentElement as HTMLElement;
-            }
-            if (container) {
-              container = container.firstElementChild
-                ?.firstElementChild as HTMLElement;
-            }
-            let node;
-            if (container.firstElementChild) {
-              const pos = view.posAtDOM(container.firstElementChild, 0);
-              const $pos = view.state.doc.resolve(pos);
-              node = $pos.node();
-            }
-
-            return {
-              node: node,
-              el: container as HTMLElement,
-            };
-          },
-        };
-      },
     };
   },
 });
-
-const sizeMatch = (editor: Editor, width: string, height: string) => {
-  const attr = editor.getAttributes(Iframe.name);
-  return width === attr.width && height === attr.height;
-};
-
-const handleSetSize = (editor: Editor, width: string, height: string) => {
-  editor
-    .chain()
-    .updateAttributes(Iframe.name, { width, height })
-    .focus()
-    .setNodeSelection(editor.state.selection.from)
-    .run();
-};
-
-const handleSetTextAlign = (
-  editor: Editor,
-  align: "left" | "center" | "right" | "justify"
-) => {
-  editor.chain().focus().setTextAlign(align).run();
-};
-
-export default Iframe;

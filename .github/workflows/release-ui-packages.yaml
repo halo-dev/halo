@@ -12,6 +12,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: github.repository == 'halo-dev/halo'
     steps:
       - uses: actions/checkout@v4
         with:

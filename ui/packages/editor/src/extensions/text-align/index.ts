@@ -1,25 +1,26 @@
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import { i18n } from "@/locales";
-import { type Editor } from "@/tiptap/vue-3";
+import { type Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import type { TextAlignOptions } from "@tiptap/extension-text-align";
-import TiptapTextAlign from "@tiptap/extension-text-align";
+import TiptapTextAlign, {
+  type TextAlignOptions,
+} from "@tiptap/extension-text-align";
 import { markRaw } from "vue";
-import MdiFormatAlignCenter from "~icons/mdi/format-align-center";
-import MdiFormatAlignJustify from "~icons/mdi/format-align-justify";
-import MdiFormatAlignLeft from "~icons/mdi/format-align-left";
-import MdiFormatAlignRight from "~icons/mdi/format-align-right";
+import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
+import MingcuteAlignJustifyLine from "~icons/mingcute/align-justify-line";
+import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
+import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 
 const iconComponent = {
-  left: MdiFormatAlignLeft,
-  center: MdiFormatAlignCenter,
-  right: MdiFormatAlignRight,
-  justify: MdiFormatAlignJustify,
+  left: MingcuteAlignLeftLine,
+  center: MingcuteAlignCenterLine,
+  right: MingcuteAlignRightLine,
+  justify: MingcuteAlignJustifyLine,
 };
 
 const getIcon = (editor: Editor) => {
-  let icon = MdiFormatAlignLeft;
+  let icon = MingcuteAlignLeftLine;
   Object.entries(iconComponent).forEach(([key, value]) => {
     if (editor.isActive({ textAlign: key })) {
       icon = value;
@@ -29,73 +30,78 @@ const getIcon = (editor: Editor) => {
   return icon;
 };
 
-const TextAlign = TiptapTextAlign.extend<ExtensionOptions & TextAlignOptions>({
-  addOptions() {
-    return {
-      ...this.parent?.(),
-      getToolbarItems({ editor }: { editor: Editor }) {
-        return {
-          priority: 180,
-          component: markRaw(ToolbarItem),
-          props: {
-            editor,
-            isActive: false,
-            icon: markRaw(getIcon(editor)),
-            title: i18n.global.t("editor.common.align_method"),
-          },
-          children: [
-            {
-              priority: 0,
-              component: markRaw(ToolbarSubItem),
-              props: {
-                editor,
-                isActive: editor.isActive({ textAlign: "left" }),
-                icon: markRaw(MdiFormatAlignLeft),
-                title: i18n.global.t("editor.common.align_left"),
-                action: () => editor.chain().focus().setTextAlign("left").run(),
-              },
-            },
-            {
-              priority: 10,
-              component: markRaw(ToolbarSubItem),
-              props: {
-                editor,
-                isActive: editor.isActive({ textAlign: "center" }),
-                icon: markRaw(MdiFormatAlignCenter),
-                title: i18n.global.t("editor.common.align_center"),
-                action: () =>
-                  editor.chain().focus().setTextAlign("center").run(),
-              },
-            },
-            {
-              priority: 20,
-              component: markRaw(ToolbarSubItem),
-              props: {
-                editor,
-                isActive: editor.isActive({ textAlign: "right" }),
-                icon: markRaw(MdiFormatAlignRight),
-                title: i18n.global.t("editor.common.align_right"),
-                action: () =>
-                  editor.chain().focus().setTextAlign("right").run(),
-              },
-            },
-            {
-              priority: 30,
-              component: markRaw(ToolbarSubItem),
-              props: {
-                editor,
-                isActive: editor.isActive({ textAlign: "justify" }),
-                icon: markRaw(MdiFormatAlignJustify),
-                title: i18n.global.t("editor.common.align_justify"),
-                action: () =>
-                  editor.chain().focus().setTextAlign("justify").run(),
-              },
-            },
-          ],
-        };
-      },
-    };
-  },
-});
+export type ExtensionTextAlignOptions = ExtensionOptions &
+  Partial<TextAlignOptions>;
 
-export default TextAlign;
+export const ExtensionTextAlign =
+  TiptapTextAlign.extend<ExtensionTextAlignOptions>({
+    addOptions() {
+      return {
+        ...this.parent?.(),
+        getToolbarItems({ editor }: { editor: Editor }) {
+          return {
+            priority: 180,
+            component: markRaw(ToolbarItem),
+            props: {
+              editor,
+              isActive: false,
+              icon: markRaw(getIcon(editor)),
+              title: i18n.global.t("editor.common.align_method"),
+            },
+            children: [
+              {
+                priority: 0,
+                component: markRaw(ToolbarSubItem),
+                props: {
+                  editor,
+                  isActive: editor.isActive({ textAlign: "left" }),
+                  icon: markRaw(MingcuteAlignLeftLine),
+                  title: i18n.global.t("editor.common.align_left"),
+                  action: () =>
+                    editor.chain().focus().setTextAlign("left").run(),
+                },
+              },
+              {
+                priority: 10,
+                component: markRaw(ToolbarSubItem),
+                props: {
+                  editor,
+                  isActive: editor.isActive({ textAlign: "center" }),
+                  icon: markRaw(MingcuteAlignCenterLine),
+                  title: i18n.global.t("editor.common.align_center"),
+                  action: () =>
+                    editor.chain().focus().setTextAlign("center").run(),
+                },
+              },
+              {
+                priority: 20,
+                component: markRaw(ToolbarSubItem),
+                props: {
+                  editor,
+                  isActive: editor.isActive({ textAlign: "right" }),
+                  icon: markRaw(MingcuteAlignRightLine),
+                  title: i18n.global.t("editor.common.align_right"),
+                  action: () =>
+                    editor.chain().focus().setTextAlign("right").run(),
+                },
+              },
+              {
+                priority: 30,
+                component: markRaw(ToolbarSubItem),
+                props: {
+                  editor,
+                  isActive: editor.isActive({ textAlign: "justify" }),
+                  icon: markRaw(MingcuteAlignJustifyLine),
+                  title: i18n.global.t("editor.common.align_justify"),
+                  action: () =>
+                    editor.chain().focus().setTextAlign("justify").run(),
+                },
+              },
+            ],
+          };
+        },
+      };
+    },
+  }).configure({
+    types: ["heading", "paragraph"],
+  });

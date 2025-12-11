@@ -14,23 +14,11 @@
 
 
 
-/**
- * 
- * @export
- * @interface UcUploadFromUrlRequest
- */
 export interface UcUploadFromUrlRequest {
     /**
      * Custom file name
-     * @type {string}
-     * @memberof UcUploadFromUrlRequest
      */
     'filename'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UcUploadFromUrlRequest
-     */
     'url': string;
 }
 

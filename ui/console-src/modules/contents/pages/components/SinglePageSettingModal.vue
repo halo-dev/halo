@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
-import { FormType } from "@/types/slug";
-import { toDatetimeLocal, toISOString } from "@/utils/date";
-import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -16,7 +13,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { cloneDeep } from "lodash-es";
+import { FormType, utils } from "@halo-dev/ui-shared";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
@@ -64,7 +62,7 @@ const formState = ref<SinglePage>({
   apiVersion: "content.halo.run/v1alpha1",
   kind: "SinglePage",
   metadata: {
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
 });
 const modal = ref<InstanceType<typeof VModal> | null>(null);
@@ -234,7 +232,9 @@ watch(
   (value) => {
     if (value) {
       formState.value = cloneDeep(value);
-      publishTime.value = toDatetimeLocal(formState.value.spec.publishTime);
+      publishTime.value = utils.date.toDatetimeLocal(
+        formState.value.spec.publishTime
+      );
     }
   },
   {
@@ -245,7 +245,9 @@ watch(
 watch(
   () => publishTime.value,
   (value) => {
-    formState.value.spec.publishTime = value ? toISOString(value) : undefined;
+    formState.value.spec.publishTime = value
+      ? utils.date.toISOString(value)
+      : undefined;
   }
 );
 

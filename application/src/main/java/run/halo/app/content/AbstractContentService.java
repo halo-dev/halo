@@ -1,9 +1,5 @@
 package run.halo.app.content;
 
-import static run.halo.app.extension.index.query.QueryFactory.and;
-import static run.halo.app.extension.index.query.QueryFactory.equal;
-import static run.halo.app.extension.index.query.QueryFactory.isNull;
-
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,6 +21,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
@@ -141,8 +138,8 @@ public abstract class AbstractContentService {
 
     protected Flux<Snapshot> listSnapshotsBy(Ref ref) {
         var snapshotListOptions = new ListOptions();
-        var query = and(isNull("metadata.deletionTimestamp"),
-            equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref)));
+        var query = Queries.isNull("metadata.deletionTimestamp")
+            .and(Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref)));
         snapshotListOptions.setFieldSelector(FieldSelector.of(query));
         var sort = Sort.by("metadata.creationTimestamp", "metadata.name").descending();
         return client.listAll(Snapshot.class, snapshotListOptions, sort);

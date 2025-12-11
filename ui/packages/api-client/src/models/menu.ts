@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { MenuSpec } from './menu-spec';
+import type { MenuSpec } from './menu-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface Menu
- */
 export interface Menu {
-    /**
-     * 
-     * @type {string}
-     * @memberof Menu
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Menu
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Menu
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {MenuSpec}
-     * @memberof Menu
-     */
     'spec': MenuSpec;
 }
 

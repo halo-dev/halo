@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { usePermission } from "@/utils/permission";
-import type {
-  DashboardWidget,
-  DashboardWidgetDefinition,
-} from "@halo-dev/console-shared";
+import {
+  utils,
+  type DashboardWidget,
+  type DashboardWidgetDefinition,
+} from "@halo-dev/ui-shared";
 import { inject, type ComputedRef } from "vue";
 
 defineProps<{
   item: DashboardWidget;
 }>();
-
-const { currentUserHasPermission } = usePermission();
 
 const availableWidgetDefinitions = inject<
   ComputedRef<DashboardWidgetDefinition[]>
@@ -25,7 +23,7 @@ const getWidgetDefinition = (id: string) => {
 
 <template>
   <grid-item
-    v-if="currentUserHasPermission(item.permissions)"
+    v-if="utils.permission.has(item.permissions || [])"
     :key="item.i"
     :h="item.h"
     :i="item.i"

@@ -16,26 +16,18 @@
 
 /**
  * Backup file.
- * @export
- * @interface BackupFile
  */
 export interface BackupFile {
     /**
      * Filename of backup file.
-     * @type {string}
-     * @memberof BackupFile
      */
     'filename'?: string;
     /**
      * Last modified time of backup file.
-     * @type {string}
-     * @memberof BackupFile
      */
     'lastModifiedTime'?: string;
     /**
      * Size of backup file.
-     * @type {number}
-     * @memberof BackupFile
      */
     'size'?: number;
 }

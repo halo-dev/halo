@@ -1,0 +1,61 @@
+diff --git a/dist/index.js b/dist/index.js
+index ad58ef1637a6e5544733f4002cd0cfcc8e43022a..b5b2d3d1a2b24340b688fe1d22e3c435da313d8d 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -3,13 +3,7 @@ import { Extension } from "@tiptap/core";
+ 
+ // src/drag-handle-plugin.ts
+ import { computePosition } from "@floating-ui/dom";
+-import { isChangeOrigin } from "@tiptap/extension-collaboration";
+ import { Plugin, PluginKey } from "@tiptap/pm/state";
+-import {
+-  absolutePositionToRelativePosition,
+-  relativePositionToAbsolutePosition,
+-  ySyncPluginKey
+-} from "@tiptap/y-tiptap";
+ 
+ // src/helpers/dragHandler.ts
+ import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
+@@ -220,18 +214,10 @@ var getOuterNode = (doc, pos) => {
+ 
+ // src/drag-handle-plugin.ts
+ var getRelativePos = (state, absolutePos) => {
+-  const ystate = ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return null;
+-  }
+-  return absolutePositionToRelativePosition(absolutePos, ystate.type, ystate.binding.mapping);
++  return null;
+ };
+ var getAbsolutePos = (state, relativePos) => {
+-  const ystate = ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return -1;
+-  }
+-  return relativePositionToAbsolutePosition(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
++  return -1;
+ };
+ var getOuterDomNode = (view, domNode) => {
+   let tmpDomNode = domNode;
+@@ -341,17 +327,10 @@ var DragHandlePlugin = ({
+             return value;
+           }
+           if (tr.docChanged && currentNodePos !== -1 && element) {
+-            if (isChangeOrigin(tr)) {
+-              const newPos = getAbsolutePos(state, currentNodeRelPos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-              }
+-            } else {
+-              const newPos = tr.mapping.map(currentNodePos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-                currentNodeRelPos = getRelativePos(state, currentNodePos);
+-              }
++            const newPos = tr.mapping.map(currentNodePos);
++            if (newPos !== currentNodePos) {
++              currentNodePos = newPos;
++              currentNodeRelPos = getRelativePos(state, currentNodePos);
+             }
+           }
+           return value;

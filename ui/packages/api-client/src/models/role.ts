@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PolicyRule } from './policy-rule';
+import type { PolicyRule } from './policy-rule';
 
-/**
- * 
- * @export
- * @interface Role
- */
 export interface Role {
-    /**
-     * 
-     * @type {string}
-     * @memberof Role
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Role
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Role
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {Array<PolicyRule>}
-     * @memberof Role
-     */
     'rules': Array<PolicyRule>;
 }
 

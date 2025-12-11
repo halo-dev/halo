@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3";
+import type { Meta, StoryObj } from "@storybook/vue3-vite";
 
 import { VDropdown, VDropdownDivider, VDropdownItem } from ".";
 import { VButton } from "../button";
@@ -17,7 +17,7 @@ const meta: Meta<typeof VDropdown> = {
     },
     template: `
     <div style="height: 300px">
-      <VDropdown>
+      <VDropdown class="inline-flex">
         <VButton>Hello</VButton>
         <template #popper>
           <VDropdownItem>删除</VDropdownItem>

@@ -16,39 +16,12 @@
 
 /**
  * Comment owner info.
- * @export
- * @interface OwnerInfo
  */
 export interface OwnerInfo {
-    /**
-     * 
-     * @type {string}
-     * @memberof OwnerInfo
-     */
     'avatar'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OwnerInfo
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OwnerInfo
-     */
     'email'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OwnerInfo
-     */
     'kind'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OwnerInfo
-     */
     'name'?: string;
 }
 

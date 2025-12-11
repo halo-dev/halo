@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { SYSTEM_PROTECTION } from "@/constants/finalizers";
-import { formatDatetime } from "@/utils/date";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -19,6 +18,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import {
@@ -76,6 +76,7 @@ const handleDelete = async (policy: Policy) => {
     description: t(
       "core.attachment.policies_modal.operations.delete.description"
     ),
+    confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
@@ -147,8 +148,8 @@ function getPolicyTemplateDisplayName(templateName: string) {
             </VButton>
             <template #popper>
               <VDropdownItem
-                v-for="(policyTemplate, index) in policyTemplates"
-                :key="index"
+                v-for="policyTemplate in policyTemplates"
+                :key="policyTemplate.metadata.name"
                 @click="handleOpenCreateNewPolicyModal(policyTemplate)"
               >
                 {{ policyTemplate.spec?.displayName }}
@@ -189,7 +190,7 @@ function getPolicyTemplateDisplayName(templateName: string) {
           <VEntityField>
             <template #description>
               <span class="truncate text-xs tabular-nums text-gray-500">
-                {{ formatDatetime(policy.metadata.creationTimestamp) }}
+                {{ utils.date.format(policy.metadata.creationTimestamp) }}
               </span>
             </template>
           </VEntityField>

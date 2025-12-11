@@ -217,16 +217,17 @@ core:
         original_comment: Original comment
         content: Reply content
   attachment:
+    common:
+      text:
+        original: Original
     filters:
       sort:
         items:
           display_name_asc: Ascending order by display name
           display_name_desc: Descending order by display name
     detail_modal:
-      fields:
-        thumbnails: Thumbnails
-      preview:
-        not_support_thumbnail: This image does not support generating thumbnails.
+      display_name_form:
+        help: Custom attachment name, only for display in the management interface, does not affect the file name and access link itself
     permalink_list:
       relative: Relative path
       absolute: Absolute path
@@ -237,6 +238,9 @@ core:
       fields:
         config:
           label: Policy configuration
+        priority:
+          label: Display priority on upload screen
+          help: Set the display priority on the upload screen. The higher the number, the closer it appears to the top of the list
       toast:
         policy_name_exists: Storage policy name already exists
     upload_modal:
@@ -325,6 +329,9 @@ core:
         license: License
         issues: Issues feedback
   plugin:
+    list:
+      fields:
+        system_reserved: System Reserved
     operations:
       uninstall_in_batch:
         title: Uninstall the selected plugins
@@ -421,7 +428,7 @@ core:
       detail: Detail
       notification-preferences: Notification Preferences
       pat: Personal Access Tokens
-      2fa: 2FA
+      authentication: Authentication
       devices: Devices
     actions:
       update_profile:
@@ -436,13 +443,6 @@ core:
         roles: Roles
         bio: Bio
         creation_time: Creation time
-        identity_authentication: Identity authentication
-      operations:
-        bind:
-          button: Bind
-        unbind:
-          button: Unbind
-          title: Unbind the login method for {display_name}
       email_not_set:
         description: Your email address has not been set yet. Click the button below to set it up.
         title: Set up email
@@ -451,6 +451,14 @@ core:
         title: Verify email
       email_verified:
         tooltip: Verified
+    auth_providers:
+      title: Auth providers
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: Unbind the login method for {display_name}
     2fa:
       operations:
         enable:
@@ -688,27 +696,17 @@ core:
         expand: View more
         collapse: Collapse
     default_editor:
-      extensions:
-        upload:
-          error: Upload failed
-          click_retry: Click to retry
-          loading: Loading
-          attachment:
-            title: Attachment Library
-          permalink:
-            title: Input Link
-            placeholder: Input link and press Enter to confirm
-          operations:
-            replace:
-              button: Replace
-            transfer:
-              button: Save locally
-              tooltip: This resource is detected as an external resource. Click this button to save it to the attachment library.
-            transfer_in_batch:
-              description: External link detected. Would you like to automatically upload it to the attachment library?
       toolbox:
         show_hide_sidebar: Show/Hide Sidebar
       title_placeholder: Please enter the title
+      cover:
+        options:
+          add: Add Cover
+          change: Change Cover
+          upload: Upload
+          attachment: Select from attachment library
+        toast:
+          upload_failed: "Failed to upload cover image: {message}"
     user_avatar:
       title: Avatar
       toast_upload_failed: Failed to upload avatar
@@ -741,6 +739,8 @@ core:
       title: "Warning: H2 database in use"
       description: The H2 database is only suitable for development and testing environments and is not recommended for use in production environments. H2 is very easy to cause data file corruption due to improper operation. If you must use it, please back up the data on time.
   formkit:
+    color:
+      placeholder: Select color
     select:
       no_data: No data
     validation:
@@ -771,6 +771,17 @@ core:
       fullscreen:
         exit: Exit fullscreen
         enter: Enter fullscreen to edit
+    iconify:
+      placeholder: Select icon
+      tabs:
+        collections: Collections
+        search: Search
+      collection_search_placeholder: Search icon collections
+      search_placeholder: Search icons
+      no_results: No results found, please try again
+      option_size: Size
+      option_color: Color
+      copyright: Icon data from {url}
   common:
     buttons:
       activate: Activate

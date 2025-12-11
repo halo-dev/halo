@@ -21,10 +21,10 @@ public interface ExtensionClient {
     /**
      * Lists Extensions by Extension type, filter and sorter.
      *
-     * @param type       is the class type of Extension.
-     * @param predicate  filters the reEnqueue.
+     * @param type is the class type of Extension.
+     * @param predicate filters the reEnqueue.
      * @param comparator sorts the reEnqueue.
-     * @param <E>        is Extension type.
+     * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
     <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate,
@@ -33,28 +33,40 @@ public interface ExtensionClient {
     /**
      * Lists Extensions by Extension type, filter, sorter and page info.
      *
-     * @param type       is the class type of Extension.
-     * @param predicate  filters the reEnqueue.
+     * @param type is the class type of Extension.
+     * @param predicate filters the reEnqueue.
      * @param comparator sorts the reEnqueue.
-     * @param page       is page number which starts from 0.
-     * @param size       is page size.
-     * @param <E>        is Extension type.
+     * @param page is page number which starts from 0.
+     * @param size is page size.
+     * @param <E> is Extension type.
      * @return a list of Extensions.
+     * @deprecated use {@link #listAll(Class, ListOptions, Sort)} instead.
      */
+    @Deprecated
     <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator, int page, int size);
 
     <E extends Extension> List<E> listAll(Class<E> type, ListOptions options, Sort sort);
 
+    <E extends Extension> List<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
+
+    <E extends Extension> List<String> listTopNames(Class<E> type, ListOptions options, Sort sort,
+        int topN);
+
     <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options,
         PageRequest page);
+
+    <E extends Extension> ListResult<String> listNamesBy(Class<E> type, ListOptions options,
+        PageRequest page);
+
+    <E extends Extension> long countBy(Class<E> type, ListOptions options);
 
     /**
      * Fetches Extension by its type and name.
      *
      * @param type is Extension type.
      * @param name is Extension name.
-     * @param <E>  is Extension type.
+     * @param <E> is Extension type.
      * @return an optional Extension.
      */
     <E extends Extension> Optional<E> fetch(Class<E> type, String name);
@@ -66,8 +78,8 @@ public interface ExtensionClient {
      * Creates an Extension.
      *
      * @param extension is fresh Extension to be created. Please make sure the Extension name does
-     *                  not exist.
-     * @param <E>       is Extension type.
+     * not exist.
+     * @param <E> is Extension type.
      */
     <E extends Extension> void create(E extension);
 
@@ -75,8 +87,8 @@ public interface ExtensionClient {
      * Updates an Extension.
      *
      * @param extension is an Extension to be updated. Please make sure the resource version is
-     *                  latest.
-     * @param <E>       is Extension type.
+     * latest.
+     * @param <E> is Extension type.
      */
     <E extends Extension> void update(E extension);
 
@@ -84,11 +96,12 @@ public interface ExtensionClient {
      * Deletes an Extension.
      *
      * @param extension is an Extension to be deleted. Please make sure the resource version is
-     *                  latest.
-     * @param <E>       is Extension type.
+     * latest.
+     * @param <E> is Extension type.
      */
     <E extends Extension> void delete(E extension);
 
+    @Deprecated(forRemoval = true, since = "2.22.0")
     IndexedQueryEngine indexedQueryEngine();
 
     void watch(Watcher watcher);

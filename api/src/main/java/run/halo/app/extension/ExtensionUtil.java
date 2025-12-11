@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.data.domain.Sort;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.index.query.Query;
-import run.halo.app.extension.index.query.QueryFactory;
 
 public enum ExtensionUtil {
     ;
@@ -46,7 +46,7 @@ public enum ExtensionUtil {
      * @return Query
      */
     public static Query notDeleting() {
-        return QueryFactory.isNull("metadata.deletionTimestamp");
+        return Queries.isNull("metadata.deletionTimestamp");
     }
 
     /**

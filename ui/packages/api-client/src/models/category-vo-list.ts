@@ -15,66 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryVo } from './category-vo';
+import type { CategoryVo } from './category-vo';
 
-/**
- * 
- * @export
- * @interface CategoryVoList
- */
 export interface CategoryVoList {
     /**
      * Indicates whether current page is the first page.
-     * @type {boolean}
-     * @memberof CategoryVoList
      */
     'first': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof CategoryVoList
      */
     'hasNext': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof CategoryVoList
      */
     'hasPrevious': boolean;
     /**
      * A chunk of items.
-     * @type {Array<CategoryVo>}
-     * @memberof CategoryVoList
      */
     'items': Array<CategoryVo>;
     /**
      * Indicates whether current page is the last page.
-     * @type {boolean}
-     * @memberof CategoryVoList
      */
     'last': boolean;
     /**
      * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof CategoryVoList
      */
     'page': number;
     /**
      * Size of each page. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof CategoryVoList
      */
     'size': number;
     /**
      * Total elements.
-     * @type {number}
-     * @memberof CategoryVoList
      */
     'total': number;
     /**
      * Indicates total pages.
-     * @type {number}
-     * @memberof CategoryVoList
      */
     'totalPages': number;
 }

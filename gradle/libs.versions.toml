@@ -2,6 +2,7 @@
 lucene = '10.3.0'
 resilience4j = '2.3.0'
 therapi = '0.15.0'
+checkstyle = "12.1.0"
 
 [libraries]
 lucene-core = { module = 'org.apache.lucene:lucene-core', version.ref = 'lucene' }
@@ -29,9 +30,7 @@ springdoc-openapi = 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.9'
 openapi-schema-validator = 'org.openapi4j:openapi-schema-validator:1.0.7'
 bouncycastle-bcpkix = 'org.bouncycastle:bcpkix-jdk18on:1.81'
 twofactor-auth = 'com.j256.two-factor-auth:two-factor-auth:1.3'
-imgscalr-lib = 'org.imgscalr:imgscalr-lib:4.2'
-thumbnailator = 'net.coobird:thumbnailator:0.4.20'
-metadata-extractor = 'com.drewnoakes:metadata-extractor:2.19.0'
+thumbnailator = 'net.coobird:thumbnailator:0.4.21'
 
 [bundles]
 lucene = ['lucene-core', 'lucene-queryparser', 'lucene-highlighter', 'lucene-backward-codecs', 'lucene-analyzers-common']
@@ -40,7 +39,7 @@ apache = ['apache-commons-lang3', 'apache-tika-core']
 therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 
 [plugins]
-spring-boot = 'org.springframework.boot:3.5.6'
+spring-boot = 'org.springframework.boot:3.5.7'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
 git-properties = 'com.gorylenko.gradle-git-properties:2.5.2'
 undercouch-download = 'de.undercouch.download:5.6.0'
@@ -50,4 +49,3 @@ node = 'com.github.node-gradle.node:7.1.0'
 openapi-generator = 'org.openapi.generator:7.12.0'
 springdoc-openapi = 'org.springdoc.openapi-gradle-plugin:1.9.0'
 versions = 'com.github.ben-manes.versions:0.52.0'
-grgit = 'org.ajoberstar.grgit:5.3.3'

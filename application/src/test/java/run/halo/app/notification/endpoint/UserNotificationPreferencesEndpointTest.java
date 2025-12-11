@@ -49,7 +49,7 @@ class UserNotificationPreferencesEndpointTest {
 
         when(client.listAll(eq(ReasonType.class), assertArg(option ->
                 assertThat(option.toString())
-                    .isEqualTo("labelSelector: (halo.run/hidden NOT_EXISTS)")),
+                    .isEqualTo("NOT EXISTS metadata.labels['halo.run/hidden']")),
             eq(ExtensionUtil.defaultSort()))
         ).thenReturn(Flux.empty());
     }

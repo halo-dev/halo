@@ -15,115 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Excerpt } from './excerpt';
+import type { Excerpt } from './excerpt';
 
-/**
- * 
- * @export
- * @interface SinglePageSpec
- */
 export interface SinglePageSpec {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SinglePageSpec
-     */
     'allowComment': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'baseSnapshot'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'cover'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SinglePageSpec
-     */
     'deleted': boolean;
-    /**
-     * 
-     * @type {Excerpt}
-     * @memberof SinglePageSpec
-     */
     'excerpt': Excerpt;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'headSnapshot'?: string;
-    /**
-     * 
-     * @type {Array<{ [key: string]: string; }>}
-     * @memberof SinglePageSpec
-     */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'owner'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SinglePageSpec
-     */
     'pinned': boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof SinglePageSpec
-     */
     'priority': number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SinglePageSpec
-     */
     'publish': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'publishTime'?: string;
     /**
      * 引用到的已发布的内容，用于主题端显示.
-     * @type {string}
-     * @memberof SinglePageSpec
      */
     'releaseSnapshot'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'slug': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'template'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'title': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SinglePageSpec
-     */
     'visible': SinglePageSpecVisibleEnum;
 }
 

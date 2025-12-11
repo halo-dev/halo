@@ -15,28 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListedSnapshotSpec } from './listed-snapshot-spec';
+import type { ListedSnapshotSpec } from './listed-snapshot-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface ListedSnapshotDto
- */
 export interface ListedSnapshotDto {
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof ListedSnapshotDto
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {ListedSnapshotSpec}
-     * @memberof ListedSnapshotDto
-     */
     'spec': ListedSnapshotSpec;
 }
 
