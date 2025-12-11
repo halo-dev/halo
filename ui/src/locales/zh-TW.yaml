@@ -1755,6 +1755,11 @@ core:
       copyright: 圖標數據來自 {url}
     color:
       placeholder: 選擇顏色
+    array:
+      empty_text: 沒有條目
+      image_tooltip: 查看圖片：{value}
+      item_modal:
+        title: 編輯條目
   common:
     buttons:
       save: 保存

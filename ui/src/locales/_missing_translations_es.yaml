@@ -782,6 +782,11 @@ core:
       option_size: Size
       option_color: Color
       copyright: Icon data from {url}
+    array:
+      empty_text: No items
+      image_tooltip: View image:{value}
+      item_modal:
+        title: Edit item
   common:
     buttons:
       activate: Activate

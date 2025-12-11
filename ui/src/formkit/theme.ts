@@ -109,6 +109,11 @@ const theme: Record<string, Record<string, string>> = {
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
+  array: {
+    label: textClassification.label,
+    wrapper: "flex flex-col gap-0",
+    help: "!mt-1",
+  },
   list: {
     label: textClassification.label,
     legend: `${textClassification.label} px-2`,
