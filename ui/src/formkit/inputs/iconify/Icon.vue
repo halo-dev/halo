@@ -87,7 +87,7 @@ async function handleConfirm() {
           />
         </div>
         <div class="space-y-3">
-          <FormKit v-if="format !== 'name'" type="form">
+          <FormKit v-if="format !== 'name'" type="form" ignore>
             <FormKit
               v-model="width"
               type="select"
@@ -95,6 +95,7 @@ async function handleConfirm() {
               :label="$t('core.formkit.iconify.option_size')"
               allow-create
               searchable
+              ignore
               :options="[
                 {
                   label: $t('core.common.text.none'),
@@ -136,6 +137,7 @@ async function handleConfirm() {
               type="color"
               name="color"
               :label="$t('core.formkit.iconify.option_color')"
+              ignore
             >
               <template v-if="color !== ''" #suffixIcon>
                 <IconClose aria-label="Clear color" @click="color = ''" />
