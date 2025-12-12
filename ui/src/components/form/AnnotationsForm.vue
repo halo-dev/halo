@@ -271,8 +271,9 @@ function onCustomFormToggle(e: Event) {
       >
         <FormKit
           v-model="customAnnotationsState"
-          type="repeater"
+          type="array"
           :label="$t('core.components.annotations_form.custom_fields.label')"
+          :item-labels="[{ type: 'text', label: '$value.key' }]"
         >
           <FormKit
             type="text"
