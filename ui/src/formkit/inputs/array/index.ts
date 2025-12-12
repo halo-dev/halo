@@ -48,13 +48,20 @@ export const array: FormKitTypeDefinition = {
   },
 };
 
+export type ArrayItemLabelType = "image" | "text" | "iconify";
+
+export type ArrayItemLabel = {
+  type: ArrayItemLabelType;
+  label: string;
+};
+
 declare module "@formkit/inputs" {
   export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
     array: {
       type: "array";
       value?: Record<string, unknown>[];
       itemLabels?: {
-        type: "image" | "text";
+        type: ArrayItemLabelType;
         label: string;
       }[];
     };
