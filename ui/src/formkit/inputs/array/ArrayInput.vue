@@ -2,6 +2,7 @@
 import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { Icon } from "@iconify/vue";
 import { cloneDeepWith, get } from "lodash-es";
 import objectHash from "object-hash";
@@ -10,6 +11,8 @@ import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
 import ArrayFormModal from "./ArrayFormModal.vue";
+
+const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
 
 export type ArrayProps = {
   removeControl?: boolean;
@@ -82,7 +85,7 @@ onMounted(() => {
   const node = props.node;
   node._c.sync = true;
   arrayFeature(node);
-  hiddenChildrenFormKit.value = getNode("hidden-children-formkit");
+  hiddenChildrenFormKit.value = getNode(formKitChildrenId);
 });
 
 const renderItemLabelValue = (
@@ -93,12 +96,22 @@ const renderItemLabelValue = (
     case "select": {
       let renderValue = value;
       const options = node.context?.attrs.options;
-      if (options && options.length > 0) {
-        renderValue =
-          options.find(
-            (option: { label: string; value: unknown }) =>
-              option.value === value
-          )?.label ?? value;
+      const selectedOption = findSelectedOption(options, value);
+      if (selectedOption) {
+        renderValue = selectedOption.label;
+      }
+      return {
+        value: renderValue,
+      };
+    }
+    case "nativeSelect": {
+      let renderValue = value;
+      const options = node.context?.options as unknown[];
+      const selectedOption = findSelectedOption(options, value);
+      if (selectedOption) {
+        renderValue = selectedOption.group
+          ? `${selectedOption.group}/${selectedOption.label}`
+          : selectedOption.label;
       }
       return {
         value: renderValue,
@@ -117,6 +130,66 @@ const renderItemLabelValue = (
     }
   }
 };
+
+/**
+ * from options to find the selected option
+ *
+ * @param options - the options to search
+ * @param value - the value to search for
+ * @returns the selected option
+ */
+function findSelectedOption(
+  options: unknown[],
+  value: unknown
+):
+  | {
+      label: string;
+      value: unknown;
+      group?: unknown;
+    }
+  | undefined {
+  if (!options || options.length === 0) {
+    return;
+  }
+
+  for (const option of options) {
+    if (!option) {
+      continue;
+    }
+
+    if (typeof option === "string") {
+      if (option === value) {
+        return {
+          label: option,
+          value: option,
+        };
+      }
+    }
+
+    if (typeof option === "object") {
+      if ("value" in option && "label" in option) {
+        if (option.value === value) {
+          return {
+            label: option.label as string,
+            value: option.value,
+          };
+        }
+      }
+
+      if ("group" in option && "options" in option) {
+        const options = option.options as unknown[];
+        const selectedOption = findSelectedOption(options, value);
+        if (selectedOption) {
+          return {
+            label: selectedOption.label,
+            value: selectedOption.value,
+            group: option.group,
+          };
+        }
+      }
+    }
+  }
+}
 
 const parseItemLabel = (
   itemLabel: ArrayItemLabel,
@@ -288,12 +361,7 @@ const handleRemoveItem = (index: number) => {
     </VButton>
   </div>
 
-  <FormKit
-    v-show="false"
-    id="hidden-children-formkit"
-    type="group"
-    ignore="true"
-  >
+  <FormKit v-show="false" :id="formKitChildrenId" type="group" ignore="true">
     <component :is="node.context?.slots.default" />
   </FormKit>
 
