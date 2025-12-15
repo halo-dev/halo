@@ -142,7 +142,6 @@ onMounted(() => {
   height: 100%;
   background-color: theme("colors.white");
   box-shadow: theme("boxShadow.DEFAULT");
-  z-index: 999;
   overflow-y: auto;
   display: none;
   flex-direction: column;
