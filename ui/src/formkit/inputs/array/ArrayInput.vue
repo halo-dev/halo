@@ -323,6 +323,7 @@ const handleRemoveItem = (index: number) => {
               <img
                 v-if="['url', 'dataurl'].includes(itemLabel.format)"
                 :src="itemLabel.value"
+                class="max-w-none"
               />
               <Icon
                 v-else-if="itemLabel.format === 'name'"
