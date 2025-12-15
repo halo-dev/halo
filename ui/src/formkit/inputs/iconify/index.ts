@@ -18,7 +18,7 @@ declare module "@formkit/inputs" {
     iconify: {
       type: "iconify";
       value?: string;
-      format?: IconifyFormat;
+      format: IconifyFormat;
     };
   }
 }
