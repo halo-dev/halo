@@ -1968,6 +1968,8 @@ core:
       enable: Enable
       continue: Continue
       retry: Retry
+      unfold: Unfold
+      fold: Fold
     radio:
       "yes": "Yes"
       "no": "No"

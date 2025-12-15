@@ -58,7 +58,9 @@ import LucideHeading3 from "~icons/lucide/heading-3";
 import LucideHeading4 from "~icons/lucide/heading-4";
 import LucideHeading5 from "~icons/lucide/heading-5";
 import LucideHeading6 from "~icons/lucide/heading-6";
+import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 import MingcuteLayoutRightLine from "~icons/mingcute/layout-right-line";
+import MingcuteUnfoldVerticalLine from "~icons/mingcute/unfold-vertical-line";
 
 const { t } = useI18n();
 
@@ -374,6 +376,8 @@ onCoverInputChange((files) => {
       uploadProgress.value = 0;
     });
 });
+
+const expandedCover = ref(false);
 </script>
 
 <template>
@@ -398,7 +402,11 @@ onCoverInputChange((files) => {
         <div class="group">
           <div
             v-if="cover || uploadProgress"
-            class="group/cover aspect-h-7 aspect-w-16 overflow-hidden rounded-lg"
+            class="group/cover aspect-w-16 overflow-hidden rounded-lg transition-all"
+            :class="{
+              'aspect-h-9': expandedCover,
+              'aspect-h-4': !expandedCover,
+            }"
           >
             <img
               v-if="cover"
@@ -417,14 +425,26 @@ onCoverInputChange((files) => {
               <VLoading class="!py-3" />
               <span class="text-sm">{{ uploadProgress }}%</span>
             </div>
-            <HasPermission
-              :permissions="[
-                'system:attachments:view',
-                'uc:attachments:manage',
-              ]"
+
+            <div
+              class="top-0 flex h-12 items-center justify-end gap-2 bg-gradient-to-b from-gray-300 to-transparent px-2 opacity-0 transition-all group-hover/cover:opacity-100"
             >
-              <div
-                class="!bottom-2 !left-auto !right-2 !top-auto !size-auto opacity-0 shadow-lg transition-opacity group-hover/cover:opacity-100"
+              <VButton size="sm" ghost @click="expandedCover = !expandedCover">
+                <template #icon>
+                  <MingcuteUnfoldVerticalLine v-if="!expandedCover" />
+                  <MingcuteFoldVerticalLine v-else />
+                </template>
+                {{
+                  expandedCover
+                    ? $t("core.common.buttons.fold")
+                    : $t("core.common.buttons.unfold")
+                }}
+              </VButton>
+              <HasPermission
+                :permissions="[
+                  'system:attachments:view',
+                  'uc:attachments:manage',
+                ]"
               >
                 <VDropdown>
                   <VButton type="secondary" size="sm">
@@ -460,8 +480,8 @@ onCoverInputChange((files) => {
                     </VDropdownItem>
                   </template>
                 </VDropdown>
-              </div>
-            </HasPermission>
+              </HasPermission>
+            </div>
           </div>
           <HasPermission
             :permissions="['system:attachments:view', 'uc:attachments:manage']"
