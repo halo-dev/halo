@@ -243,11 +243,13 @@ const handleRemoveItem = (index: number) => {
             <span v-if="itemLabel.type === 'text'">
               {{ itemLabel.value }}
             </span>
-            <div v-if="itemLabel.type === 'iconify'" class="[&>*]:size-4">
+            <div
+              v-if="itemLabel.type === 'iconify'"
+              class="inline-flex items-center [&>*]:size-4"
+            >
               <img
                 v-if="['url', 'dataurl'].includes(itemLabel.format)"
                 :src="itemLabel.value"
-                alt="Selected icon"
               />
               <Icon
                 v-else-if="itemLabel.format === 'name'"
@@ -255,7 +257,7 @@ const handleRemoveItem = (index: number) => {
               />
               <div
                 v-else
-                class="inline-flex size-full items-center justify-center"
+                class="inline-flex items-center justify-center"
                 v-html="itemLabel.value"
               ></div>
             </div>
