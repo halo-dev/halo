@@ -8,7 +8,7 @@ export const iconify = createInput(
   defineAsyncComponent(() => import("./IconifyInput.vue")),
   {
     type: "input",
-    props: ["format"],
+    props: ["format", "popperPlacement"],
     features: [initialValue, iconifyFeature],
   }
 );

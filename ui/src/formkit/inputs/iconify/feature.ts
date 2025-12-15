@@ -7,5 +7,6 @@ import type { FormKitNode } from "@formkit/core";
 export default function iconifyFeature(node: FormKitNode): void {
   node.on("created", () => {
     node.props.format = node.props.format ?? "svg";
+    node.props.popperPlacement = node.props.popperPlacement ?? "auto";
   });
 }

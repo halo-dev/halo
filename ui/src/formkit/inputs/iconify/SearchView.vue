@@ -35,7 +35,7 @@ const onSelect = (icon: string) => {
 };
 </script>
 <template>
-  <div class="flex h-[500px] flex-col gap-2 bg-white sm:w-[500px]">
+  <div class="flex h-[350px] flex-col gap-2 bg-white sm:h-[500px] sm:w-[500px]">
     <div class="flex-none">
       <SearchInput v-model="keyword" />
     </div>

@@ -47,7 +47,7 @@ const onSelect = (icon: string) => {
 </script>
 <template>
   <div
-    class="flex h-[500px] divide-x rounded-base border border-gray-200 bg-white sm:w-[700px]"
+    class="flex h-[350px] divide-x rounded-base border border-gray-200 bg-white sm:h-[500px] sm:w-[700px]"
   >
     <div
       class="flex h-full w-28 flex-none flex-col gap-2 overflow-auto p-1.5 sm:w-56"
