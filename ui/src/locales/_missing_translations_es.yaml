@@ -802,6 +802,8 @@ core:
       enable: Enable
       continue: Continue
       retry: Retry
+      unfold: Unfold
+      fold: Fold
     toast:
       disable_success: Disabled successfully
       enable_success: Enabled successfully

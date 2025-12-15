@@ -1805,6 +1805,8 @@ core:
       enable: 启用
       continue: 繼續
       retry: 重試
+      unfold: 展開
+      fold: 收起
     radio:
       "yes": 是
       "no": 否
