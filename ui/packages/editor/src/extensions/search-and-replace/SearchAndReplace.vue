@@ -166,7 +166,7 @@ watch(
               ref="searchInput"
               v-model="searchTerm"
               type="text"
-              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 !pr-[5.5rem] ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-2 !pr-[5.5rem] ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.search_placeholder'
@@ -299,7 +299,7 @@ watch(
             <input
               v-model="replaceTerm"
               type="text"
-              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-2 ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.replace_placeholder'
