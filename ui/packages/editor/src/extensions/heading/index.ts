@@ -15,14 +15,13 @@ import type { ExtensionOptions } from "@/types";
 import { generateAnchorId } from "@/utils";
 import TiptapHeading, { type HeadingOptions } from "@tiptap/extension-heading";
 import { markRaw } from "vue";
-import MdiFormatHeader1 from "~icons/mdi/format-header-1";
-import MdiFormatHeader2 from "~icons/mdi/format-header-2";
-import MdiFormatHeader3 from "~icons/mdi/format-header-3";
-import MdiFormatHeader4 from "~icons/mdi/format-header-4";
-import MdiFormatHeader5 from "~icons/mdi/format-header-5";
-import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import MdiFormatHeaderPound from "~icons/mdi/format-header-pound";
-import MdiFormatParagraph from "~icons/mdi/format-paragraph";
+import LucideHeading1 from "~icons/lucide/heading-1";
+import LucideHeading2 from "~icons/lucide/heading-2";
+import LucideHeading3 from "~icons/lucide/heading-3";
+import LucideHeading4 from "~icons/lucide/heading-4";
+import LucideHeading5 from "~icons/lucide/heading-5";
+import LucideHeading6 from "~icons/lucide/heading-6";
+import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
 
 export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
 
@@ -56,8 +55,10 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           props: {
             editor,
             isActive:
-              editor.isActive("paragraph") || editor.isActive("heading"),
-            icon: markRaw(MdiFormatHeaderPound),
+              editor.isActive(ExtensionParagraph.name) ||
+              editor.isActive(TiptapHeading.name),
+            icon: markRaw(getIcon(editor)),
+            title: i18n.global.t("editor.common.heading.title"),
           },
           children: [
             {
@@ -65,8 +66,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("paragraph"),
-                icon: markRaw(MdiFormatParagraph),
+                isActive: editor.isActive(ExtensionParagraph.name),
+                icon: markRaw(MingcuteParagraphLine),
                 title: i18n.global.t("editor.common.heading.paragraph"),
                 action: () => editor.chain().focus().setParagraph().run(),
               },
@@ -76,8 +77,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 1 }),
-                icon: markRaw(MdiFormatHeader1),
+                isActive: editor.isActive(TiptapHeading.name, { level: 1 }),
+                icon: markRaw(LucideHeading1),
                 title: i18n.global.t("editor.common.heading.header1"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run(),
@@ -88,8 +89,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 2 }),
-                icon: markRaw(MdiFormatHeader2),
+                isActive: editor.isActive(TiptapHeading.name, { level: 2 }),
+                icon: markRaw(LucideHeading2),
                 title: i18n.global.t("editor.common.heading.header2"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run(),
@@ -100,8 +101,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 3 }),
-                icon: markRaw(MdiFormatHeader3),
+                isActive: editor.isActive(TiptapHeading.name, { level: 3 }),
+                icon: markRaw(LucideHeading3),
                 title: i18n.global.t("editor.common.heading.header3"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run(),
@@ -112,8 +113,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 4 }),
-                icon: markRaw(MdiFormatHeader4),
+                isActive: editor.isActive(TiptapHeading.name, { level: 4 }),
+                icon: markRaw(LucideHeading4),
                 title: i18n.global.t("editor.common.heading.header4"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 4 }).run(),
@@ -124,8 +125,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 5 }),
-                icon: markRaw(MdiFormatHeader5),
+                isActive: editor.isActive(TiptapHeading.name, { level: 5 }),
+                icon: markRaw(LucideHeading5),
                 title: i18n.global.t("editor.common.heading.header5"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 5 }).run(),
@@ -136,8 +137,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               component: markRaw(ToolbarSubItem),
               props: {
                 editor,
-                isActive: editor.isActive("heading", { level: 6 }),
-                icon: markRaw(MdiFormatHeader6),
+                isActive: editor.isActive(TiptapHeading.name, { level: 6 }),
+                icon: markRaw(LucideHeading6),
                 title: i18n.global.t("editor.common.heading.header6"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 6 }).run(),
@@ -150,7 +151,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
         return [
           {
             priority: 10,
-            icon: markRaw(MdiFormatParagraph),
+            icon: markRaw(MingcuteParagraphLine),
             title: "editor.common.heading.paragraph",
             keywords: ["paragraph", "text", "putongwenben"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -159,7 +160,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           },
           {
             priority: 20,
-            icon: markRaw(MdiFormatHeader1),
+            icon: markRaw(LucideHeading1),
             title: "editor.common.heading.header1",
             keywords: ["h1", "header1", "1", "yijibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -167,13 +168,13 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 1 })
+                .setNode(TiptapHeading.name, { level: 1 })
                 .run();
             },
           },
           {
             priority: 30,
-            icon: markRaw(MdiFormatHeader2),
+            icon: markRaw(LucideHeading2),
             title: "editor.common.heading.header2",
             keywords: ["h2", "header2", "2", "erjibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -181,13 +182,13 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 2 })
+                .setNode(TiptapHeading.name, { level: 2 })
                 .run();
             },
           },
           {
             priority: 40,
-            icon: markRaw(MdiFormatHeader3),
+            icon: markRaw(LucideHeading3),
             title: "editor.common.heading.header3",
             keywords: ["h3", "header3", "3", "sanjibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -195,13 +196,13 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 3 })
+                .setNode(TiptapHeading.name, { level: 3 })
                 .run();
             },
           },
           {
             priority: 50,
-            icon: markRaw(MdiFormatHeader4),
+            icon: markRaw(LucideHeading4),
             title: "editor.common.heading.header4",
             keywords: ["h4", "header4", "4", "sijibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -209,13 +210,13 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 4 })
+                .setNode(TiptapHeading.name, { level: 4 })
                 .run();
             },
           },
           {
             priority: 60,
-            icon: markRaw(MdiFormatHeader5),
+            icon: markRaw(LucideHeading5),
             title: "editor.common.heading.header5",
             keywords: ["h5", "header5", "5", "wujibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -223,13 +224,13 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 5 })
+                .setNode(TiptapHeading.name, { level: 5 })
                 .run();
             },
           },
           {
             priority: 70,
-            icon: markRaw(MdiFormatHeader6),
+            icon: markRaw(LucideHeading6),
             title: "editor.common.heading.header6",
             keywords: ["h6", "header6", "6", "liujibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -237,7 +238,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 .chain()
                 .focus()
                 .deleteRange(range)
-                .setNode("heading", { level: 6 })
+                .setNode(TiptapHeading.name, { level: 6 })
                 .run();
             },
           },
@@ -250,49 +251,49 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
             items: [
               {
                 priority: 10,
-                icon: markRaw(MdiFormatParagraph),
+                icon: markRaw(MingcuteParagraphLine),
                 title: i18n.global.t("editor.common.heading.paragraph"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setParagraph().run(),
               },
               {
                 priority: 20,
-                icon: markRaw(MdiFormatHeader1),
+                icon: markRaw(LucideHeading1),
                 title: i18n.global.t("editor.common.heading.header1"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 1 }).run(),
               },
               {
                 priority: 30,
-                icon: markRaw(MdiFormatHeader2),
+                icon: markRaw(LucideHeading2),
                 title: i18n.global.t("editor.common.heading.header2"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 2 }).run(),
               },
               {
                 priority: 40,
-                icon: markRaw(MdiFormatHeader3),
+                icon: markRaw(LucideHeading3),
                 title: i18n.global.t("editor.common.heading.header3"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 3 }).run(),
               },
               {
                 priority: 50,
-                icon: markRaw(MdiFormatHeader4),
+                icon: markRaw(LucideHeading4),
                 title: i18n.global.t("editor.common.heading.header4"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 4 }).run(),
               },
               {
                 priority: 60,
-                icon: markRaw(MdiFormatHeader5),
+                icon: markRaw(LucideHeading5),
                 title: i18n.global.t("editor.common.heading.header5"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 5 }).run(),
               },
               {
                 priority: 70,
-                icon: markRaw(MdiFormatHeader6),
+                icon: markRaw(LucideHeading6),
                 title: i18n.global.t("editor.common.heading.header6"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 6 }).run(),
@@ -302,9 +303,6 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
         };
       },
     };
-  },
-  addExtensions() {
-    return [ExtensionParagraph];
   },
   addProseMirrorPlugins() {
     let beforeComposition: boolean | undefined = undefined;
@@ -348,3 +346,28 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
     ];
   },
 });
+
+function getIcon(editor: Editor) {
+  if (editor.isActive(ExtensionParagraph.name)) {
+    return MingcuteParagraphLine;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 1 })) {
+    return LucideHeading1;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 2 })) {
+    return LucideHeading2;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 3 })) {
+    return LucideHeading3;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 4 })) {
+    return LucideHeading4;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 5 })) {
+    return LucideHeading5;
+  }
+  if (editor.isActive(ExtensionHeading.name, { level: 6 })) {
+    return LucideHeading6;
+  }
+  return MingcuteParagraphLine;
+}

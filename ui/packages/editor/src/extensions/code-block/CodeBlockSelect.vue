@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VDropdown } from "@halo-dev/components";
 import { computed, ref, watch } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+import MingcuteDownLine from "~icons/mingcute/down-line";
 
 export interface Option {
   label: string;
@@ -151,7 +151,7 @@ const handleScrollIntoView = () => {
     <div class="relative inline-block w-full" @keydown="handleOptionKeydown">
       <div class="h-8">
         <div
-          class="select-input box-border grid h-full w-full cursor-pointer items-center rounded-md px-3 text-sm"
+          class="select-input box-border grid size-full cursor-pointer items-center rounded-md px-3 text-sm"
           :class="{
             'bg-white': isFocus,
             'border-[1px]': isFocus,
@@ -171,7 +171,7 @@ const handleScrollIntoView = () => {
             {{ displayLabel }}
           </span>
           <span class="justify-self-end" @click="inputRef?.focus()">
-            <IconArrowDownLine />
+            <MingcuteDownLine />
           </span>
         </div>
       </div>

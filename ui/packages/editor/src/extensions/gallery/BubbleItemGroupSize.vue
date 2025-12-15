@@ -1,33 +1,21 @@
 <script setup lang="ts">
 import { BlockActionSeparator } from "@/components";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import {
-  IconCheckboxCircle,
-  VDropdown,
-  VDropdownItem,
-  vTooltip,
-} from "@halo-dev/components";
-import { computed, ref, type Component } from "vue";
-import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown } from "@halo-dev/components";
+import { computed, ref } from "vue";
+import MingcuteDotGridLine from "~icons/mingcute/dot-grid-line";
 import { ExtensionGallery } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const dropdownRef = ref();
 
 const groupSize = computed(() => {
   return props.editor.getAttributes(ExtensionGallery.name).groupSize || 3;
 });
-
-const options = [1, 2, 3, 4, 5, 6];
 
 function handleSetGroupSize(size: number) {
   const currentImages =
@@ -54,29 +42,32 @@ function handleSetGroupSize(size: number) {
     :triggers="['click']"
     :distance="10"
   >
-    <button
-      v-tooltip="i18n.global.t('editor.extensions.gallery.group_size')"
-      class="flex items-center gap-1 rounded-md px-1 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.gallery.group_size')"
+      :text="
+        i18n.global.t('editor.extensions.gallery.group_size_label', {
+          count: groupSize,
+        })
+      "
+      show-more-indicator
     >
-      <span>{{ groupSize }}</span>
-      <IconArrowDownLine class="h-4 w-4" />
-    </button>
+      <template #icon>
+        <MingcuteDotGridLine />
+      </template>
+    </BubbleButton>
 
     <template #popper>
-      <VDropdownItem
-        v-for="option in options"
-        :key="option"
+      <DropdownItem
+        v-for="i in 10"
+        :key="i"
         class="!min-w-36"
-        @click="handleSetGroupSize(option)"
+        :is-active="i === groupSize"
+        @click="handleSetGroupSize(i)"
       >
-        {{ option }}
-
-        <template v-if="option === groupSize" #suffix-icon>
-          <IconCheckboxCircle class="size-4" />
-        </template>
-      </VDropdownItem>
+        {{ i }}
+      </DropdownItem>
     </template>
   </VDropdown>
 
-  <BlockActionSeparator />
+  <BlockActionSeparator :editor="editor" />
 </template>

@@ -1865,6 +1865,8 @@ core:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
   formkit:
+    color:
+      placeholder: Select color
     select:
       no_data: No data
     category_select:
@@ -1905,6 +1907,22 @@ core:
       fullscreen:
         exit: Exit fullscreen
         enter: Enter fullscreen to edit
+    iconify:
+      placeholder: Select icon
+      tabs:
+        collections: Collections
+        search: Search
+      collection_search_placeholder: Search icon collections
+      search_placeholder: Search icons
+      no_results: No results found, please try again
+      option_size: Size
+      option_color: Color
+      copyright: Icon data from {url}
+    array:
+      empty_text: No items
+      image_tooltip: View image:{value}
+      item_modal:
+        title: Edit item
   common:
     buttons:
       save: Save

@@ -1,14 +1,13 @@
 import { i18n } from "@/locales";
 import type { DragButtonType } from "@/types";
 import { copySelectionToClipboard, deleteNode } from "@/utils";
-
 import { isActive } from "@tiptap/core";
 import { markRaw } from "vue";
 import MdiContentCut from "~icons/mdi/content-cut";
-import MdiDeleteForeverOutline from "~icons/mdi/delete-forever-outline";
-import RiFileCopyLine from "~icons/ri/file-copy-line";
-import RiLoopLeftFill from "~icons/ri/loop-left-fill";
+import MingcuteCopyLine from "~icons/mingcute/copy-line";
+import MingcuteRefresh2Line from "~icons/mingcute/refresh-2-line";
 import BlockActionHorizontalSeparator from "../block/BlockActionHorizontalSeparator.vue";
+import MingcuteDelete2Line from "../icon/MingcuteDelete2Line.vue";
 
 export const CONVERT_TO_KEY = "convert-to";
 export const DELETE_KEY = "delete";
@@ -21,7 +20,7 @@ const defaultDragItems: DragButtonType[] = [
     priority: 10,
     title: () => i18n.global.t("editor.drag.menu.convert_to"),
     key: CONVERT_TO_KEY,
-    icon: markRaw(RiLoopLeftFill),
+    icon: markRaw(MingcuteRefresh2Line),
     children: {
       items: [
         // Internal sub-nodes are implemented by various extensions, such as the Header extension
@@ -42,7 +41,7 @@ const defaultDragItems: DragButtonType[] = [
     priority: 710,
     title: () => i18n.global.t("editor.drag.menu.copy"),
     key: COPY_KEY,
-    icon: markRaw(RiFileCopyLine),
+    icon: markRaw(MingcuteCopyLine),
     keyboard: "Mod-C",
     action: async ({ editor, pos, node }) => {
       if (node) {
@@ -82,7 +81,7 @@ const defaultDragItems: DragButtonType[] = [
     priority: 900,
     title: () => i18n.global.t("editor.drag.menu.delete"),
     key: DELETE_KEY,
-    icon: markRaw(MdiDeleteForeverOutline),
+    icon: markRaw(MingcuteDelete2Line),
     keyboard: "Delete",
     action: ({ editor, node }) => {
       if (node) {

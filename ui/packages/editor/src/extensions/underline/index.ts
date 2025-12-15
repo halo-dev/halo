@@ -6,7 +6,7 @@ import TiptapUnderline, {
   type UnderlineOptions,
 } from "@tiptap/extension-underline";
 import { markRaw } from "vue";
-import MdiFormatUnderline from "~icons/mdi/format-underline";
+import MingcuteUnderlineLine from "~icons/mingcute/underline-line";
 
 export type ExtensionUnderlineOptions = ExtensionOptions &
   Partial<UnderlineOptions>;
@@ -22,8 +22,8 @@ export const ExtensionUnderline =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("underline"),
-              icon: markRaw(MdiFormatUnderline),
+              isActive: editor.isActive(TiptapUnderline.name),
+              icon: markRaw(MingcuteUnderlineLine),
               title: i18n.global.t("editor.common.underline"),
               action: () => editor.chain().focus().toggleUnderline().run(),
             },

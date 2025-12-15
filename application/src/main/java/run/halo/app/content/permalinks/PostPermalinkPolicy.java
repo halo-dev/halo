@@ -5,6 +5,7 @@ import static org.springframework.web.util.UriUtils.encode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -20,6 +21,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * @author guqing
@@ -28,6 +30,9 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 @RequiredArgsConstructor
 public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
     public static final String DEFAULT_CATEGORY = "default";
     public static final String DEFAULT_PERMALINK_PATTERN =
         SystemSetting.ThemeRouteRules.empty().getPost();
@@ -48,7 +53,7 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
     public String pattern() {
         return environmentFetcher.fetchRouteRules()
             .map(SystemSetting.ThemeRouteRules::getPost)
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(DEFAULT_PERMALINK_PATTERN);
     }
 
@@ -67,7 +72,7 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
 
         var categorySlug = postService.listCategories(post.getSpec().getCategories())
             .next()
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .map(category -> category.getSpec().getSlug())
             .orElse(DEFAULT_CATEGORY);
         properties.put("categorySlug", categorySlug);

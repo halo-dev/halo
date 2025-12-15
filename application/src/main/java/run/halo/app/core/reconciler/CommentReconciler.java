@@ -8,6 +8,7 @@ import static run.halo.app.extension.index.query.Queries.and;
 import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.isNull;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * Reconciler for {@link Comment}.
@@ -46,6 +48,7 @@ import run.halo.app.extension.router.selector.FieldSelector;
 @Component
 @RequiredArgsConstructor
 public class CommentReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     public static final String FINALIZER_NAME = "comment-protection";
     private final ExtensionClient client;
     private final SchemeManager schemeManager;
@@ -176,7 +179,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     private void cleanUpResources(Comment comment) {
         // delete all replies under current comment
-        replyService.removeAllByComment(comment.getMetadata().getName()).block();
+        replyService.removeAllByComment(comment.getMetadata().getName()).block(BLOCKING_TIMEOUT);
 
         // decrement total comment count
         updateSameSubjectRefCommentCounter(comment);

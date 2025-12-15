@@ -3,6 +3,7 @@ package run.halo.app.core.reconciler;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUninstallException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.theme.TemplateEngineManager;
@@ -43,6 +45,7 @@ import run.halo.app.theme.TemplateEngineManager;
 @Component
 @RequiredArgsConstructor
 public class ThemeReconciler implements Reconciler<Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "theme-protection";
 
     private final ExtensionClient client;
@@ -170,7 +173,7 @@ public class ThemeReconciler implements Reconciler<Request> {
     }
 
     private void reconcileThemeDeletion(Theme theme) {
-        templateEngineManager.clearCache(theme.getMetadata().getName()).block();
+        templateEngineManager.clearCache(theme.getMetadata().getName()).block(BLOCKING_TIMEOUT);
         deleteThemeFiles(theme);
         // delete theme setting form
         String settingName = theme.getSpec().getSettingName();

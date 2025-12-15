@@ -6,7 +6,7 @@ import TiptapSubscript, {
   type SubscriptExtensionOptions,
 } from "@tiptap/extension-subscript";
 import { markRaw } from "vue";
-import MdiFormatSubscript from "~icons/mdi/format-subscript";
+import PhTextSubscript from "~icons/ph/text-subscript";
 
 export type ExtensionSubscriptOptions = Partial<SubscriptExtensionOptions> &
   ExtensionOptions;
@@ -22,8 +22,8 @@ export const ExtensionSubscript =
             component: markRaw(ToolbarItem),
             props: {
               editor,
-              isActive: editor.isActive("subscript"),
-              icon: markRaw(MdiFormatSubscript),
+              isActive: editor.isActive(TiptapSubscript.name),
+              icon: markRaw(PhTextSubscript),
               title: i18n.global.t("editor.common.subscript"),
               action: () => editor.chain().focus().toggleSubscript().run(),
             },

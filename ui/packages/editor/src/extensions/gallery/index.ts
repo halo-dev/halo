@@ -1,5 +1,5 @@
 import { BlockActionSeparator } from "@/components";
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -16,9 +16,10 @@ import { deleteNode } from "@/utils";
 import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
-import MdiImageMultiple from "~icons/mdi/image-multiple";
 import MdiImagePlus from "~icons/mdi/image-plus";
+import MingcutePhotoAlbumLine from "~icons/mingcute/photo-album-line";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
+import BubbleItemGap from "./BubbleItemGap.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
 import GalleryView from "./GalleryView.vue";
@@ -41,6 +42,7 @@ export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
 
 export type ExtensionGalleryOptions = ExtensionOptions & {
   groupSize?: number;
+  gap?: number;
   allowBase64: boolean;
   HTMLAttributes: Record<string, unknown>;
   uploadImage?: (
@@ -92,6 +94,16 @@ export const ExtensionGallery = Node.create<
           return element.getAttribute("data-layout") || "auto";
         },
       },
+      gap: {
+        default: 8,
+        parseHTML: (element) => {
+          const gap = Number(element.getAttribute("data-gap"));
+          if (isNaN(gap) || gap < 0) {
+            return 0;
+          }
+          return gap;
+        },
+      },
       file: {
         default: null,
         renderHTML() {
@@ -116,6 +128,7 @@ export const ExtensionGallery = Node.create<
     const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
     const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
     const layout = node.attrs.layout || "auto";
+    const gap = node.attrs.gap || this.options?.gap || 0;
     const imageGroups: ExtensionGalleryImageItem[][] = images.reduce(
       (
         acc: ExtensionGalleryImageItem[][],
@@ -134,8 +147,7 @@ export const ExtensionGallery = Node.create<
         "div",
         {
           "data-type": "gallery-group",
-          style:
-            "display: flex; flex-direction: row; justify-content: center; gap: 0.5rem;",
+          style: `display: flex; flex-direction: row; justify-content: center; gap: ${gap}px;`,
         },
         ...items.map((image: ExtensionGalleryImageItem) => {
           return [
@@ -164,8 +176,13 @@ export const ExtensionGallery = Node.create<
         "data-type": "gallery",
         "data-group-size": groupSize.toString(),
         "data-layout": layout,
+        "data-gap": gap?.toString(),
       },
-      ["div", { style: "display: grid; gap: 0.5rem;" }, ...imageGroupElements],
+      [
+        "div",
+        { style: `display: grid; gap: ${gap}px;` },
+        ...imageGroupElements,
+      ],
     ];
   },
 
@@ -200,7 +217,7 @@ export const ExtensionGallery = Node.create<
           component: markRaw(ToolboxItem),
           props: {
             editor,
-            icon: markRaw(MdiImageMultiple),
+            icon: markRaw(MingcutePhotoAlbumLine),
             title: i18n.global.t("editor.extensions.gallery.title"),
             action: () => {
               editor.chain().focus().setGallery({ images: [] }).run();
@@ -211,7 +228,7 @@ export const ExtensionGallery = Node.create<
       getCommandMenuItems() {
         return {
           priority: 96,
-          icon: markRaw(MdiImageMultiple),
+          icon: markRaw(MingcutePhotoAlbumLine),
           title: "editor.extensions.commands_menu.gallery",
           keywords: ["gallery", "hualang", "tupian", "images"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -257,8 +274,12 @@ export const ExtensionGallery = Node.create<
             },
             {
               priority: 50,
+              component: markRaw(BubbleItemGap),
+            },
+            {
+              priority: 60,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }) => {
                   deleteNode(ExtensionGallery.name, editor);

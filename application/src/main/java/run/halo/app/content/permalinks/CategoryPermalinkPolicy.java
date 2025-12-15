@@ -3,6 +3,7 @@ package run.halo.app.content.permalinks;
 import static org.springframework.web.util.UriUtils.encode;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * @author guqing
@@ -21,6 +23,7 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 @RequiredArgsConstructor
 public class CategoryPermalinkPolicy implements PermalinkPolicy<Category> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     public static final String DEFAULT_PERMALINK_PREFIX =
         SystemSetting.ThemeRouteRules.empty().getCategories();
 
@@ -42,7 +45,7 @@ public class CategoryPermalinkPolicy implements PermalinkPolicy<Category> {
     public String pattern() {
         return environmentFetcher.fetchRouteRules()
             .map(SystemSetting.ThemeRouteRules::getCategories)
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(DEFAULT_PERMALINK_PREFIX);
     }
 }

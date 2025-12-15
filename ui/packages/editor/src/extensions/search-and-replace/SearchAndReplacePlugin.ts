@@ -41,9 +41,9 @@ export class SearchAndReplacePluginView {
   }
 
   update() {
-    const editorParentElement = this.editor.options.element as HTMLElement;
-    if (!this.init && editorParentElement) {
-      editorParentElement.insertAdjacentElement(
+    const headerParentElement = this.findEditorEntryElement();
+    if (!this.init && headerParentElement) {
+      headerParentElement.insertAdjacentElement(
         "afterbegin",
         this.containerElement
       );
@@ -54,6 +54,22 @@ export class SearchAndReplacePluginView {
 
   destroy() {
     return false;
+  }
+
+  private findEditorEntryElement() {
+    const editorElement = this.editor.options.element as HTMLElement;
+    let currentElement = editorElement;
+    while (currentElement) {
+      if (currentElement.classList.contains("editor-main")) {
+        return currentElement;
+      }
+
+      if (!currentElement.parentElement) {
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+    return null;
   }
 }
 
