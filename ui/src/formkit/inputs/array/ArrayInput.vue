@@ -100,7 +100,9 @@ const renderItemLabelValue = (
       if (selectedOption) {
         renderValue = selectedOption.label;
       }
-      return renderValue;
+      return {
+        value: renderValue,
+      };
     }
     case "nativeSelect": {
       let renderValue = value;
