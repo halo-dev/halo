@@ -144,7 +144,7 @@ const updatePosition = (editor: Editor, element: HTMLElement) => {
     element.style.position = strategy;
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
-    element.style.zIndex = "10000";
+    element.style.zIndex = "1000";
   });
 };
 
