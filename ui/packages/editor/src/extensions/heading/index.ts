@@ -304,9 +304,6 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
       },
     };
   },
-  addExtensions() {
-    return [ExtensionParagraph];
-  },
   addProseMirrorPlugins() {
     let beforeComposition: boolean | undefined = undefined;
     return [
