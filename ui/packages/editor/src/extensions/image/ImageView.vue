@@ -91,7 +91,6 @@ const resetUpload = () => {
   if (file) {
     props.updateAttributes({
       width: undefined,
-      height: undefined,
       file: undefined,
     });
   }
@@ -116,7 +115,6 @@ function onImageLoaded(event: Event) {
       .chain()
       .updateAttributes(ExtensionImage.name, {
         width: `${target.naturalWidth}px`,
-        height: `${target.naturalHeight}px`,
       })
       .updateFigureContainerWidth(`${target.naturalWidth}px`)
       .setNodeSelection(props.getPos() || 0)
@@ -184,14 +182,9 @@ function setupResizeListener() {
       );
 
       const width = newWidth.toFixed(0) + "px";
-      const height =
-        aspectRatio.value > 0
-          ? (newWidth / aspectRatio.value).toFixed(0) + "px"
-          : "auto";
-
       props.editor
         .chain()
-        .updateAttributes(ExtensionImage.name, { width, height })
+        .updateAttributes(ExtensionImage.name, { width })
         .updateFigureContainerWidth(width)
         .setNodeSelection(props.getPos() || 0)
         .focus()
@@ -296,6 +289,11 @@ const isPercentageWidth = computed(() => {
           :alt="alt"
           :href="href"
           :width="isPercentageWidth ? '100%' : node.attrs.width"
+          :height="node.attrs.height"
+          :style="{
+            width: isPercentageWidth ? '100%' : node.attrs.width,
+            height: node.attrs.height,
+          }"
           class="max-w-full rounded-md"
           @load="onImageLoaded"
         />
