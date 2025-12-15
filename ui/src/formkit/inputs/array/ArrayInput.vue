@@ -3,11 +3,13 @@ import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
+import { Icon } from "@iconify/vue";
 import { cloneDeepWith, get } from "lodash-es";
 import objectHash from "object-hash";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, toRaw } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
+import type { ArrayItemLabel, ArrayItemLabelType } from ".";
 import ArrayFormModal from "./ArrayFormModal.vue";
 
 const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
@@ -19,7 +21,7 @@ export type ArrayProps = {
   addAttrs?: Record<string, unknown>;
   min?: number;
   max?: number;
-  itemLabels: { type: "image" | "text"; label: string }[];
+  itemLabels: ArrayItemLabelType[];
 };
 
 export type ArrayValue = Record<string, unknown>[];
@@ -28,6 +30,7 @@ const props = defineProps<{
   node: FormKitNode<ArrayValue>;
 }>();
 
+const arrayValue = ref<ArrayValue>(props.node.value);
 const hiddenChildrenFormKit = ref<FormKitNode<unknown>>();
 const arrayModal = ref<boolean>(false);
 const nodeProps = ref<Partial<FormKitProps<ArrayProps>>>(props.node.props);
@@ -72,6 +75,10 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
       false
     );
   }
+
+  node.on("input", ({ payload }) => {
+    arrayValue.value = toRaw(payload);
+  });
 }
 
 onMounted(() => {
@@ -84,7 +91,7 @@ onMounted(() => {
 const renderItemLabelValue = (
   node: FormKitNode<unknown>,
   value: unknown
-): unknown => {
+): Record<string, unknown> => {
   switch (node.props.type) {
     case "select": {
       let renderValue = value;
@@ -104,10 +111,20 @@ const renderItemLabelValue = (
           ? `${selectedOption.group}/${selectedOption.label}`
           : selectedOption.label;
       }
-      return renderValue;
+      return {
+        value: renderValue,
+      };
+    }
+    case "iconify": {
+      const format = node.props.format;
+      return {
+        format,
+      };
     }
     default: {
-      return value;
+      return {
+        value,
+      };
     }
   }
 };
@@ -173,7 +190,7 @@ function findSelectedOption(
 }
 
 const parseItemLabel = (
-  itemLabel: { type: "image" | "text"; label: string },
+  itemLabel: ArrayItemLabel,
   item: Record<string, unknown>
 ) => {
   if (!itemLabel.label) {
@@ -193,7 +210,8 @@ const parseItemLabel = (
     }
     return {
       type: itemLabel.type,
-      value: renderItemLabelValue(node, value),
+      value,
+      ...renderItemLabelValue(node, value),
     };
   }
 };
@@ -208,10 +226,11 @@ const formatItemLabel = (item: Record<string, unknown>) => {
   const itemLabels = props.node.props.itemLabels ?? defaultItemLabel;
   if (itemLabels.length > 0) {
     const result = itemLabels
-      .map((itemLabel: { type: "image" | "text"; label: string }) => {
+      .map((itemLabel: ArrayItemLabel) => {
         return parseItemLabel(itemLabel, item);
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((itemLabel) => !!itemLabel.value);
     return result;
   }
   return [];
@@ -228,8 +247,6 @@ const handleOpenArrayModal = (
   currentEditIndex.value = index ?? -1;
   arrayModal.value = true;
 };
-
-const arrayValue = ref<ArrayValue>(props.node.value);
 
 const handleCloseArrayModal = () => {
   currentEditIndex.value = -1;
@@ -297,6 +314,22 @@ const handleRemoveItem = (index: number) => {
             <span v-if="itemLabel.type === 'text'">
               {{ itemLabel.value }}
             </span>
+            <div v-if="itemLabel.type === 'iconify'" class="[&>*]:size-4">
+              <img
+                v-if="['url', 'dataurl'].includes(itemLabel.format)"
+                :src="itemLabel.value"
+                alt="Selected icon"
+              />
+              <Icon
+                v-else-if="itemLabel.format === 'name'"
+                :icon="itemLabel.value"
+              />
+              <div
+                v-else
+                class="inline-flex size-full items-center justify-center"
+                v-html="itemLabel.value"
+              ></div>
+            </div>
           </template>
         </div>
         <IconClose
