@@ -57,6 +57,10 @@ export class AttachmentUtils {
       return url;
     }
 
+    if (url.startsWith("data:")) {
+      return url;
+    }
+
     if (url.startsWith(origin) || url.startsWith("/")) {
       return `${url}?width=${width}`;
     }
