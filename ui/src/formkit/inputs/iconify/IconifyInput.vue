@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { FormKitFrameworkContext } from "@formkit/core";
-import { IconClose, VDropdown } from "@halo-dev/components";
+import {
+  IconClose,
+  VDropdown,
+  type VDropdownPlacement,
+} from "@halo-dev/components";
 import { Icon } from "@iconify/vue";
 import { computed, type PropType } from "vue";
 import IconifyPicker from "./IconifyPicker.vue";
@@ -14,6 +18,9 @@ const props = defineProps({
 });
 
 const format = computed(() => props.context.format as IconifyFormat);
+const popperPlacement = computed(
+  () => props.context.popperPlacement as VDropdownPlacement
+);
 
 const onSelect = (icon: string) => {
   props.context.node.input(icon);
@@ -25,7 +32,7 @@ const onSelect = (icon: string) => {
     <VDropdown
       class="inline-flex"
       popper-class="w-full sm:w-auto"
-      placement="bottom-start"
+      :placement="popperPlacement"
     >
       <button
         type="button"
