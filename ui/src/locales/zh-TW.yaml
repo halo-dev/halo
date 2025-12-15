@@ -1753,6 +1753,8 @@ core:
       option_size: 大小
       option_color: 顏色
       copyright: 圖標數據來自 {url}
+      operations:
+        edit: 手動編輯圖標
     color:
       placeholder: 選擇顏色
     array:
