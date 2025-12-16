@@ -369,6 +369,7 @@ onMounted(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="MenuItem"
+          :form-data="formState"
           group=""
         />
       </div>

@@ -460,6 +460,7 @@ async function slugUniqueValidation(node: FormKitNode) {
         <AnnotationsForm
           :key="formState.metadata.name"
           ref="annotationsFormRef"
+          :form-data="formState"
           :value="formState.metadata.annotations"
           kind="SinglePage"
           group="content.halo.run"
