@@ -1747,6 +1747,7 @@ core:
       tabs:
         collections: 圖標集
         search: 全局搜索
+        current: 當前圖標
       collection_search_placeholder: 搜索圖標集合
       search_placeholder: 搜索圖標
       no_results: 沒有找到結果，請嘗試其他關鍵詞

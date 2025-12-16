@@ -1,25 +1,22 @@
 <script setup lang="ts">
 import { VTabItem, VTabs } from "@halo-dev/components";
-import { provide, ref, toRefs, type Ref } from "vue";
+import { inject, ref, type Ref } from "vue";
 import CollectionsView from "./CollectionsView.vue";
+import IconConfirmPanel from "./IconConfirmPanel.vue";
 import SearchView from "./SearchView.vue";
-import type { IconifyFormat } from "./types";
+import type { IconifyValue } from "./types";
 
-const props = defineProps<{
-  format: IconifyFormat;
-}>();
-
-const { format } = toRefs(props);
-
-provide<Ref<IconifyFormat>>("format", format);
+const currentIconifyValue = inject<Ref<IconifyValue | undefined>>(
+  "currentIconifyValue"
+);
 
 const emit = defineEmits<{
-  (e: "select", icon: string): void;
+  (e: "select", icon: IconifyValue): void;
 }>();
 
 const activeTab = ref<"collections" | "search">("collections");
 
-const onSelect = (icon: string) => {
+const onSelect = (icon: IconifyValue) => {
   emit("select", icon);
 };
 </script>
@@ -35,6 +32,16 @@ const onSelect = (icon: string) => {
       </VTabItem>
       <VTabItem id="search" :label="$t('core.formkit.iconify.tabs.search')">
         <SearchView @select="onSelect" />
+      </VTabItem>
+      <VTabItem
+        v-if="currentIconifyValue?.name"
+        id="custom"
+        :label="$t('core.formkit.iconify.tabs.current')"
+      >
+        <IconConfirmPanel
+          :icon-name="currentIconifyValue.name"
+          @select="onSelect"
+        />
       </VTabItem>
     </VTabs>
 

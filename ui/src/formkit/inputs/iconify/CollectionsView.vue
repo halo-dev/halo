@@ -8,9 +8,10 @@ import { computed, ref } from "vue";
 import Collections from "./Collections.vue";
 import Icons from "./Icons.vue";
 import { iconifyClient } from "./api";
+import type { IconifyValue } from "./types";
 
 const emit = defineEmits<{
-  (e: "select", iconName: string): void;
+  (e: "select", icon: IconifyValue): void;
 }>();
 
 const selectedCollection = ref<string>();
@@ -41,7 +42,7 @@ const { results } = useFuse(keyword, icons, {
   matchAllWhenSearchEmpty: true,
 });
 
-const onSelect = (icon: string) => {
+const onSelect = (icon: IconifyValue) => {
   emit("select", icon);
 };
 </script>

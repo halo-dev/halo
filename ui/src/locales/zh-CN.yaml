@@ -1762,6 +1762,7 @@ core:
       tabs:
         collections: 图标集
         search: 全局搜索
+        current: 当前图标
       collection_search_placeholder: 搜索图标集合
       search_placeholder: 搜索图标
       no_results: 没有找到结果，请尝试其他关键词
