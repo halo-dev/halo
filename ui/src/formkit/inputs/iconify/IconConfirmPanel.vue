@@ -83,6 +83,7 @@ async function handleConfirm() {
       class="inline-flex items-center justify-center rounded-base border p-2"
     >
       <IconifyIcon
+        v-tooltip="iconName"
         :icon="iconName"
         :color="color"
         :width="width === 'none' ? undefined : width"
