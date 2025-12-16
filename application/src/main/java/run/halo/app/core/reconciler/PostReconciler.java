@@ -151,9 +151,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     publishPost(post, events);
                 }
 
-                var permalinkPattern = postPermalinkPolicy.pattern();
-                annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
-
+                if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+                    // only set the permalink pattern if not present
+                    var permalinkPattern = postPermalinkPolicy.pattern();
+                    annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
+                }
                 status.setPermalink(postPermalinkPolicy.permalink(post));
                 if (status.getPhase() == null) {
                     status.setPhase(PostPhase.DRAFT.toString());

@@ -38,7 +38,7 @@ import run.halo.app.core.user.service.SettingConfigService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.theme.TemplateEngineManager;
@@ -66,7 +66,7 @@ class ThemeEndpointTest {
     private ReactiveExtensionClient client;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @Mock
     private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;

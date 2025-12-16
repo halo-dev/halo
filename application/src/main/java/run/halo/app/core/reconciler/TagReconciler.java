@@ -47,8 +47,10 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
 
                 Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(tag);
 
-                String newPattern = tagPermalinkPolicy.pattern();
-                annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+                if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+                    var newPattern = tagPermalinkPolicy.pattern();
+                    annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+                }
 
                 var status = tag.getStatusOrDefault();
                 String permalink = tagPermalinkPolicy.permalink(tag);

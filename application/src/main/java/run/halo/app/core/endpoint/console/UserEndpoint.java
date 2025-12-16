@@ -84,7 +84,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.SortableRequest;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
@@ -105,7 +105,7 @@ public class UserEndpoint implements CustomEndpoint {
     private final AttachmentService attachmentService;
     private final EmailVerificationService emailVerificationService;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final Validator validator;
 
     @Override

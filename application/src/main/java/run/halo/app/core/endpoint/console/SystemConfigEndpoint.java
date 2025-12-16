@@ -23,13 +23,13 @@ import reactor.util.retry.Retry;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
 @RequiredArgsConstructor
 public class SystemConfigEndpoint implements CustomEndpoint {
-    private final SystemConfigurableEnvironmentFetcher configurableEnvironmentFetcher;
+    private final SystemConfigFetcher configurableEnvironmentFetcher;
     private final ReactiveExtensionClient client;
 
     @Override
@@ -76,7 +76,7 @@ public class SystemConfigEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> updateConfigByGroup(ServerRequest request) {
         final var group = request.pathVariable("group");
         return request.bodyToMono(ObjectNode.class)
-            .flatMap(objectNode -> configurableEnvironmentFetcher.loadConfigMap()
+            .flatMap(objectNode -> configurableEnvironmentFetcher.getConfigMap()
                 .flatMap(configMap -> {
                     var data = configMap.getData();
                     data.put(group, JsonUtils.objectToJson(objectNode));

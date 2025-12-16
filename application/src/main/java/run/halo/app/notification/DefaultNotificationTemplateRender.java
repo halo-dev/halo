@@ -15,7 +15,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 
 /**
@@ -36,7 +36,7 @@ public class DefaultNotificationTemplateRender implements NotificationTemplateRe
 
     private static final TemplateEngine TEMPLATE_ENGINE = createTemplateEngine();
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final ExternalUrlSupplier externalUrlSupplier;
 
     @Override

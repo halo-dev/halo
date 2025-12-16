@@ -23,7 +23,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
@@ -48,7 +48,7 @@ import run.halo.app.theme.router.UrlContextListResult;
 public class TagPostRouteFactory implements RouteFactory {
 
     private final ReactiveExtensionClient client;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final TagFinder tagFinder;
     private final PostFinder postFinder;
 

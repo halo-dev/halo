@@ -28,7 +28,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.utils.PathUtils;
 
 /**
@@ -48,7 +48,7 @@ class PostPermalinkPolicyTest {
     private ExternalUrlSupplier externalUrlSupplier;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @Mock
     private PostService postService;

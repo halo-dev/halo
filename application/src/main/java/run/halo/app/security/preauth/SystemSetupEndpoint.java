@@ -61,7 +61,7 @@ import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.ExternalUrlChangedEvent;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.InitializationStateGetter;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemState;
 import run.halo.app.infra.ValidationUtils;
@@ -84,7 +84,7 @@ public class SystemSetupEndpoint {
         );
 
     private final InitializationStateGetter initializationStateGetter;
-    private final SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+    private final SystemConfigFetcher systemConfigFetcher;
     private final SuperAdminInitializer superAdminInitializer;
     private final ReactiveExtensionClient client;
     private final PluginService pluginService;
@@ -184,7 +184,7 @@ public class SystemSetupEndpoint {
             )
             .subscribeOn(Schedulers.boundedElastic());
 
-        var basicConfigMono = Mono.defer(() -> systemConfigFetcher.loadConfigMap()
+        var basicConfigMono = Mono.defer(() -> systemConfigFetcher.getConfigMap()
                 .flatMap(configMap -> {
                     mergeToBasicConfig(body, configMap);
                     return client.update(configMap);
