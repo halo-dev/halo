@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconClose, VButton, VDropdown } from "@halo-dev/components";
+import { VButton, VDropdown } from "@halo-dev/components";
 import { Icon as IconifyIcon } from "@iconify/vue";
 import { refDefault } from "@vueuse/shared";
 import { inject, ref, useTemplateRef, type Ref } from "vue";
@@ -139,9 +139,6 @@ async function handleConfirm() {
               :label="$t('core.formkit.iconify.option_color')"
               ignore
             >
-              <template v-if="color !== ''" #suffixIcon>
-                <IconClose aria-label="Clear color" @click="color = ''" />
-              </template>
             </FormKit>
           </FormKit>
           <VButton :loading="isFetching" @click="handleConfirm()">

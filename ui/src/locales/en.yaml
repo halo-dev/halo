@@ -1867,6 +1867,8 @@ core:
   formkit:
     color:
       placeholder: Select color
+      operations:
+        edit: Edit color manually
     select:
       no_data: No data
     category_select:
