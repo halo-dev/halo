@@ -9,7 +9,7 @@ import {
   wrapper,
   type FormKitInputs,
 } from "@formkit/inputs";
-import ArrayInput from "./ArrayInput.vue";
+import { defineAsyncComponent } from "vue";
 import { arraySection } from "./sections/index";
 /**
  * Input definition for a array input.
@@ -44,7 +44,7 @@ export const array: FormKitTypeDefinition = {
    * Additional features that make this input work.
    */
   library: {
-    ArrayInput,
+    ArrayInput: defineAsyncComponent(() => import("./ArrayInput.vue")),
   },
 };
 
