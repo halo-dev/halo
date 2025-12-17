@@ -89,7 +89,7 @@ async function handleConfirm() {
         :width="width === 'none' ? undefined : width"
       />
     </div>
-    <div class="space-y-3">
+    <div>
       <FormKit type="form" ignore>
         <FormKit
           v-model="width"
@@ -147,9 +147,15 @@ async function handleConfirm() {
           </template>
         </FormKit>
       </FormKit>
-      <VButton :loading="isFetching" @click="handleConfirm()">
-        {{ $t("core.common.buttons.confirm") }}
-      </VButton>
+      <div class="mt-5">
+        <VButton
+          type="secondary"
+          :loading="isFetching"
+          @click="handleConfirm()"
+        >
+          {{ $t("core.common.buttons.confirm") }}
+        </VButton>
+      </div>
     </div>
   </div>
 </template>
