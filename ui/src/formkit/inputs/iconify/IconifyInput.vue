@@ -131,12 +131,25 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
               @submit="onEditFormSubmit"
             >
               <FormKit
+                v-if="format === 'svg'"
                 type="code"
                 height="120px"
                 :model-value="currentIconifyValue?.value"
                 language="html"
                 name="value"
               />
+              <FormKit
+                v-else-if="['dataurl', 'url'].includes(format)"
+                type="attachment"
+                name="value"
+                :model-value="currentIconifyValue?.value"
+              ></FormKit>
+              <FormKit
+                v-else
+                type="text"
+                name="value"
+                :model-value="currentIconifyValue?.value"
+              ></FormKit>
             </FormKit>
             <div class="mt-4">
               <VButton
