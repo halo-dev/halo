@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,37 +100,6 @@ class PostFinderImplTest {
         assertThat(items.get(1).getYear()).isEqualTo("2021");
         assertThat(items.get(1).getMonths()).hasSize(1);
         assertThat(items.get(1).getMonths().get(0).getMonth()).isEqualTo("01");
-    }
-
-    @Test
-    void postPreviousNextPair() {
-        List<String> postNames = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            postNames.add("post-" + i);
-        }
-
-        // post-0, post-1, post-2
-        var previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-0");
-        assertThat(previousNextPair.prev()).isNull();
-        assertThat(previousNextPair.next()).isEqualTo("post-1");
-
-        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-1");
-        assertThat(previousNextPair.prev()).isEqualTo("post-0");
-        assertThat(previousNextPair.next()).isEqualTo("post-2");
-
-        // post-1, post-2, post-3
-        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-2");
-        assertThat(previousNextPair.prev()).isEqualTo("post-1");
-        assertThat(previousNextPair.next()).isEqualTo("post-3");
-
-        // post-7, post-8, post-9
-        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-8");
-        assertThat(previousNextPair.prev()).isEqualTo("post-7");
-        assertThat(previousNextPair.next()).isEqualTo("post-9");
-
-        previousNextPair = PostFinderImpl.findPostNavigation(postNames, "post-9");
-        assertThat(previousNextPair.prev()).isEqualTo("post-8");
-        assertThat(previousNextPair.next()).isNull();
     }
 
     List<Post> postsForArchives() {

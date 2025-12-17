@@ -85,14 +85,7 @@ public class PostQueryEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getPostNavigationByName(ServerRequest request) {
         final var name = request.pathVariable("name");
         return postFinder.cursor(name)
-            .doOnNext(result -> {
-                if (result.getCurrent() == null) {
-                    throw new NotFoundException("Post not found");
-                }
-            })
-            .flatMap(result -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+            .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     private Mono<ServerResponse> getPostByName(ServerRequest request) {
