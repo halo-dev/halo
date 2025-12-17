@@ -778,6 +778,7 @@ core:
       tabs:
         collections: Collections
         search: Search
+        current: Current icon
       collection_search_placeholder: Search icon collections
       search_placeholder: Search icons
       no_results: No results found, please try again

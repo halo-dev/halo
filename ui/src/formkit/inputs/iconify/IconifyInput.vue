@@ -7,10 +7,16 @@ import {
   type VDropdownPlacement,
 } from "@halo-dev/components";
 import { Icon } from "@iconify/vue";
-import { computed, useTemplateRef, type PropType } from "vue";
+import {
+  computed,
+  provide,
+  useTemplateRef,
+  type PropType,
+  type Ref,
+} from "vue";
 import RiCodeSSlashLine from "~icons/ri/code-s-slash-line";
 import IconifyPicker from "./IconifyPicker.vue";
-import type { IconifyFormat } from "./types";
+import type { IconifyFormat, IconifyValue } from "./types";
 
 const props = defineProps({
   context: {
@@ -20,19 +26,44 @@ const props = defineProps({
 });
 
 const format = computed(() => props.context.format as IconifyFormat);
+const currentIconifyValue = computed(
+  () => props.context._value as IconifyValue
+);
+
+provide<Ref<IconifyFormat>>("format", format);
+
+provide<Ref<IconifyValue | undefined>>(
+  "currentIconifyValue",
+  currentIconifyValue
+);
+
 const popperPlacement = computed(
   () => props.context.popperPlacement as VDropdownPlacement
 );
 
-const onSelect = (icon: string) => {
+const dropdown = useTemplateRef<InstanceType<typeof VDropdown>>("dropdown");
+
+const onSelect = (icon: IconifyValue) => {
   props.context.node.input(icon);
+  dropdown.value?.hide();
 };
 
 const editFormDropdown =
   useTemplateRef<InstanceType<typeof VDropdown>>("editFormDropdown");
 
-function onEditFormSubmit({ value }: { value: string }) {
-  props.context.node.input(value);
+function onEditFormSubmit({ value: iconValue }: { value: string }) {
+  const valueToUpdate: IconifyValue = {
+    ...currentIconifyValue.value,
+    value: iconValue,
+  };
+
+  if (format.value === "name") {
+    valueToUpdate.name = iconValue;
+  } else if (iconValue !== currentIconifyValue.value.value) {
+    valueToUpdate.name = "";
+  }
+
+  props.context.node.input(valueToUpdate);
   editFormDropdown.value?.hide();
 }
 </script>
@@ -40,6 +71,7 @@ function onEditFormSubmit({ value }: { value: string }) {
 <template>
   <div class="group/iconify-input inline-flex items-center gap-2">
     <VDropdown
+      ref="dropdown"
       class="inline-flex"
       popper-class="w-full sm:w-auto"
       :placement="popperPlacement"
@@ -50,7 +82,7 @@ function onEditFormSubmit({ value }: { value: string }) {
         class="inline-flex h-9 items-center justify-center rounded-lg border bg-white px-2 transition-all hover:bg-gray-50 hover:shadow active:bg-gray-100"
         :aria-label="$t('core.formkit.iconify.placeholder')"
       >
-        <div v-if="!context._value" class="text-sm text-gray-600">
+        <div v-if="!currentIconifyValue" class="text-sm text-gray-600">
           {{ $t("core.formkit.iconify.placeholder") }}
         </div>
         <div
@@ -59,19 +91,21 @@ function onEditFormSubmit({ value }: { value: string }) {
         >
           <img
             v-if="['url', 'dataurl'].includes(format)"
-            :src="context._value"
-            alt="Selected icon"
+            :src="currentIconifyValue.value"
           />
-          <Icon v-else-if="format === 'name'" :icon="context._value" />
+          <Icon
+            v-else-if="format === 'name'"
+            :icon="currentIconifyValue.value"
+          />
           <div
             v-else
             class="inline-flex size-full items-center justify-center"
-            v-html="context._value"
+            v-html="currentIconifyValue.value"
           ></div>
         </div>
       </button>
       <template #popper>
-        <IconifyPicker :format="format" @select="onSelect" />
+        <IconifyPicker @select="onSelect" />
       </template>
     </VDropdown>
     <div class="inline-flex items-center gap-1.5">
@@ -97,12 +131,25 @@ function onEditFormSubmit({ value }: { value: string }) {
               @submit="onEditFormSubmit"
             >
               <FormKit
+                v-if="format === 'svg'"
                 type="code"
                 height="120px"
-                :model-value="context._value"
+                :model-value="currentIconifyValue?.value"
                 language="html"
                 name="value"
               />
+              <FormKit
+                v-else-if="['dataurl', 'url'].includes(format)"
+                type="attachment"
+                name="value"
+                :model-value="currentIconifyValue?.value"
+              ></FormKit>
+              <FormKit
+                v-else
+                type="text"
+                name="value"
+                :model-value="currentIconifyValue?.value"
+              ></FormKit>
             </FormKit>
             <div class="mt-4">
               <VButton
@@ -116,7 +163,7 @@ function onEditFormSubmit({ value }: { value: string }) {
         </template>
       </VDropdown>
       <button
-        v-if="context._value"
+        v-if="currentIconifyValue"
         v-tooltip="$t('core.common.buttons.delete')"
         type="button"
         :aria-label="$t('core.common.buttons.delete')"

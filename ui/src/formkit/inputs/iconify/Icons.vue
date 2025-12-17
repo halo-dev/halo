@@ -3,6 +3,7 @@ import { useVirtualizer } from "@tanstack/vue-virtual";
 import { chunk } from "es-toolkit";
 import { computed, useTemplateRef, watch } from "vue";
 import Icon from "./Icon.vue";
+import type { IconifyValue } from "./types";
 
 const COLUMNS = 12;
 const ROW_HEIGHT = 36;
@@ -12,7 +13,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "select", icon: string): void;
+  (e: "select", icon: IconifyValue): void;
 }>();
 
 const container = useTemplateRef<HTMLDivElement>("container");
@@ -38,7 +39,7 @@ watch(
   }
 );
 
-function onSelect(icon: string) {
+function onSelect(icon: IconifyValue) {
   emit("select", icon);
 }
 </script>
