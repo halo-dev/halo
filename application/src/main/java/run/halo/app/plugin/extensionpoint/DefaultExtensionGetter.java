@@ -15,7 +15,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
 import run.halo.app.plugin.SpringPlugin;
 
@@ -24,7 +24,7 @@ import run.halo.app.plugin.SpringPlugin;
 @RequiredArgsConstructor
 public class DefaultExtensionGetter implements ExtensionGetter {
 
-    private final SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+    private final SystemConfigFetcher systemConfigFetcher;
 
     private final PluginManager pluginManager;
 

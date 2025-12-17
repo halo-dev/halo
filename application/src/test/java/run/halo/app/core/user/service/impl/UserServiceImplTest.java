@@ -53,7 +53,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
@@ -68,7 +68,7 @@ class UserServiceImplTest {
     ReactiveExtensionClient client;
 
     @Mock
-    SystemConfigurableEnvironmentFetcher environmentFetcher;
+    SystemConfigFetcher environmentFetcher;
 
     @Mock
     PasswordEncoder passwordEncoder;

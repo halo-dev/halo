@@ -48,7 +48,7 @@ import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 
@@ -64,11 +64,11 @@ public class UcAttachmentEndpoint implements CustomEndpoint {
 
     private final PostService postService;
 
-    private final SystemConfigurableEnvironmentFetcher systemSettingFetcher;
+    private final SystemConfigFetcher systemSettingFetcher;
 
     public UcAttachmentEndpoint(AttachmentService attachmentService,
         AttachmentLister attachmentLister, PostService postService,
-        SystemConfigurableEnvironmentFetcher systemSettingFetcher) {
+        SystemConfigFetcher systemSettingFetcher) {
         this.attachmentService = attachmentService;
         this.attachmentLister = attachmentLister;
         this.postService = postService;

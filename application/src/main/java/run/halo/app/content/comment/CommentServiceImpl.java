@@ -29,7 +29,7 @@ import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -43,11 +43,11 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 public class CommentServiceImpl extends AbstractCommentService implements CommentService {
 
     private final ExtensionGetter extensionGetter;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     public CommentServiceImpl(RoleService roleService, ReactiveExtensionClient client,
         UserService userService, CounterService counterService, ExtensionGetter extensionGetter,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        SystemConfigFetcher environmentFetcher) {
         super(roleService, client, userService, counterService);
         this.extensionGetter = extensionGetter;
         this.environmentFetcher = environmentFetcher;

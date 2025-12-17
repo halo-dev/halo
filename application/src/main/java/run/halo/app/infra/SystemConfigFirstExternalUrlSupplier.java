@@ -29,14 +29,14 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
 
     private final WebFluxProperties webFluxProperties;
 
-    private final SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+    private final SystemConfigFetcher systemConfigFetcher;
 
     @Nullable
     private URL externalUrl;
 
     public SystemConfigFirstExternalUrlSupplier(HaloProperties haloProperties,
         WebFluxProperties webFluxProperties,
-        SystemConfigurableEnvironmentFetcher systemConfigFetcher) {
+        SystemConfigFetcher systemConfigFetcher) {
         this.haloProperties = haloProperties;
         this.webFluxProperties = webFluxProperties;
         this.systemConfigFetcher = systemConfigFetcher;

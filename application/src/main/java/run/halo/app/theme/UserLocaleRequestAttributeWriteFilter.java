@@ -12,7 +12,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 
 @Component
@@ -22,7 +22,7 @@ public class UserLocaleRequestAttributeWriteFilter implements WebFilter {
     public static final String USER_LOCALE_ATTRIBUTE =
         UserLocaleRequestAttributeWriteFilter.class.getName() + ".USER_LOCALE_ATTRIBUTE";
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     @Override
     @NonNull

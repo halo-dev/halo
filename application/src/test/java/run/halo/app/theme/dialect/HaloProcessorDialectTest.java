@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.CodeInjection;
 import run.halo.app.infra.SystemSetting.Seo;
@@ -72,7 +72,7 @@ class HaloProcessorDialectTest {
     private SinglePageFinder singlePageFinder;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher fetcher;
+    private SystemConfigFetcher fetcher;
 
     @Mock
     ExtensionGetter extensionGetter;
@@ -101,7 +101,7 @@ class HaloProcessorDialectTest {
         lenient().when(fetcher.fetch(eq(CodeInjection.GROUP), eq(CodeInjection.class)))
             .thenReturn(Mono.just(codeInjection));
 
-        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
             .thenReturn(fetcher);
         lenient().when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class)))
             .thenReturn(Mono.empty());

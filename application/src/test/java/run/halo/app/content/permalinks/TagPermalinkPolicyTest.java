@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContext;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 
 /**
  * Tests for {@link TagPermalinkPolicy}.
@@ -31,7 +31,7 @@ class TagPermalinkPolicyTest {
     private ExternalUrlSupplier externalUrlSupplier;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     private TagPermalinkPolicy tagPermalinkPolicy;
 

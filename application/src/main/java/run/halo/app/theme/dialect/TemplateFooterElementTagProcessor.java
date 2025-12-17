@@ -12,7 +12,7 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.templatemode.TemplateMode;
 import reactor.core.publisher.Flux;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -75,8 +75,8 @@ public class TemplateFooterElementTagProcessor extends AbstractElementTagProcess
     }
 
     private String getGlobalFooterText(ApplicationContext appCtx) {
-        SystemConfigurableEnvironmentFetcher fetcher =
-            appCtx.getBean(SystemConfigurableEnvironmentFetcher.class);
+        SystemConfigFetcher fetcher =
+            appCtx.getBean(SystemConfigFetcher.class);
         return fetcher.fetch(SystemSetting.CodeInjection.GROUP, SystemSetting.CodeInjection.class)
             .map(SystemSetting.CodeInjection::getFooter)
             .block(BLOCKING_TIMEOUT);

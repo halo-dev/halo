@@ -19,7 +19,7 @@ import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.notification.endpoint.SubscriptionRouter;
 
@@ -42,7 +42,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
     private final SubscriptionRouter subscriptionRouter;
     private final RecipientResolver recipientResolver;
     private final SubscriptionService subscriptionService;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     @Override
     public Mono<Void> notify(Reason reason) {

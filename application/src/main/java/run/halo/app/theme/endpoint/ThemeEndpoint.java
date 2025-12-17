@@ -45,7 +45,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
@@ -73,7 +73,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final TemplateEngineManager templateEngineManager;
 
-    private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
+    private final SystemConfigFetcher systemEnvironmentFetcher;
 
     private final ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 

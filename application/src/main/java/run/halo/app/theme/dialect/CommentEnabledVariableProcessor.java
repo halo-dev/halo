@@ -17,7 +17,7 @@ import org.thymeleaf.processor.templateboundaries.ITemplateBoundariesStructureHa
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -66,8 +66,8 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
 
     static Optional<CommentWidget> getCommentWidget(ITemplateContext context) {
         final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-        SystemConfigurableEnvironmentFetcher environmentFetcher =
-            appCtx.getBean(SystemConfigurableEnvironmentFetcher.class);
+        SystemConfigFetcher environmentFetcher =
+            appCtx.getBean(SystemConfigFetcher.class);
         var commentSetting = environmentFetcher.fetchComment()
             .blockOptional(BLOCKING_TIMEOUT)
             .orElseThrow();
