@@ -92,7 +92,7 @@ class PostQueryEndpointTest {
         Metadata metadata = new Metadata();
         metadata.setName("test");
         NavigationPostVo navigation = NavigationPostVo.builder()
-            .current(PostVo.builder().metadata(metadata).build())
+            .next(ListedPostVo.builder().metadata(metadata).build())
             .build();
         when(postFinder.cursor(anyString()))
             .thenReturn(Mono.just(navigation));
@@ -102,7 +102,7 @@ class PostQueryEndpointTest {
             .expectStatus().isOk()
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
             .expectBody()
-            .jsonPath("$.current.metadata.name").isEqualTo("test");
+            .jsonPath("$.next.metadata.name").isEqualTo("test");
 
         verify(postFinder).cursor(anyString());
     }
