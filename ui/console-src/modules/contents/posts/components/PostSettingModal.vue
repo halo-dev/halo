@@ -494,6 +494,7 @@ const showCancelPublishButton = computed(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="Post"
+          :form-data="formState"
           group="content.halo.run"
         />
       </div>

@@ -143,6 +143,7 @@ const handleUpdateUser = async () => {
           :key="formState.metadata.name"
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
+          :form-data="formState"
           kind="User"
           group=""
         />
