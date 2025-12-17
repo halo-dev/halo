@@ -1758,6 +1758,8 @@ core:
         edit: 手動編輯圖標
     color:
       placeholder: 選擇顏色
+      operations:
+        edit: 手動編輯顏色
     array:
       empty_text: 沒有條目
       image_tooltip: 查看圖片：{value}

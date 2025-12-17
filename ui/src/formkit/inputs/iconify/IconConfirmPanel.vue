@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconClose, Toast, VButton } from "@halo-dev/components";
+import { Toast, VButton } from "@halo-dev/components";
 import { Icon as IconifyIcon } from "@iconify/vue";
 import { refDefault } from "@vueuse/shared";
 import { AxiosError } from "axios";
@@ -142,9 +142,6 @@ async function handleConfirm() {
           :label="$t('core.formkit.iconify.option_color')"
           ignore
         >
-          <template v-if="color !== ''" #suffixIcon>
-            <IconClose aria-label="Clear color" @click="color = ''" />
-          </template>
         </FormKit>
       </FormKit>
       <div class="mt-5">

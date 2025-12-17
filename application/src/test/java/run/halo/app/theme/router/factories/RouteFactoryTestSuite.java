@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.router.EmptyView;
 
@@ -28,7 +28,7 @@ import run.halo.app.theme.router.EmptyView;
 @ExtendWith(MockitoExtension.class)
 abstract class RouteFactoryTestSuite {
     @Mock
-    protected SystemConfigurableEnvironmentFetcher environmentFetcher;
+    protected SystemConfigFetcher environmentFetcher;
     @Mock
     protected ViewResolver viewResolver;
 

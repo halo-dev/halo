@@ -31,7 +31,7 @@ import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -50,7 +50,7 @@ class TemplateFooterElementTagProcessorTest {
     ExtensionGetter extensionGetter;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher fetcher;
+    private SystemConfigFetcher fetcher;
 
     private TemplateEngine templateEngine;
 
@@ -73,7 +73,7 @@ class TemplateFooterElementTagProcessorTest {
                 when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
                 return objectProvider;
             });
-        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
             .thenReturn(fetcher);
     }
 

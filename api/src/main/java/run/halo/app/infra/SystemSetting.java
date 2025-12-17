@@ -5,12 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.convert.ApplicationConversionService;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -152,8 +153,8 @@ public class SystemSetting {
 
     }
 
-    public static <T> T get(ConfigMap configMap, String key, Class<T> type) {
-        var data = configMap.getData();
+    @Nullable
+    public static <T> T get(Map<String, String> data, String key, Class<T> type) {
         var valueString = data.get(key);
         if (valueString == null) {
             return null;

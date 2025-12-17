@@ -33,7 +33,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -66,7 +66,7 @@ class ContentTemplateHeadProcessorIntegrationTest {
     private SinglePageFinder singlePageFinder;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher fetcher;
+    private SystemConfigFetcher fetcher;
 
     @Mock
     ExtensionGetter extensionGetter;
@@ -115,7 +115,7 @@ class ContentTemplateHeadProcessorIntegrationTest {
         lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
             Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
         );
-        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
             .thenReturn(fetcher);
         lenient().when(fetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }

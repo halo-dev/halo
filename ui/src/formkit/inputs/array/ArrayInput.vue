@@ -4,7 +4,7 @@ import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { Icon } from "@iconify/vue";
-import { cloneDeepWith, get } from "lodash-es";
+import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { onMounted, ref, toRaw } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
@@ -309,7 +309,7 @@ const handleRemoveItem = (index: number) => {
                     value: itemLabel.value,
                   })
                 "
-                :src="itemLabel.value"
+                :src="utils.attachment.getThumbnailUrl(itemLabel.value, 'S')"
                 class="size-full object-cover"
               />
             </a>

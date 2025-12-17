@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.security.authorization.AuthorityUtils;
@@ -46,7 +46,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     private final PostFinder postFinder;
     private final ReactiveExtensionClient client;
     private final RoleService roleService;
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 

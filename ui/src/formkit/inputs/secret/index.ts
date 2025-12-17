@@ -11,7 +11,7 @@ import {
   suffix,
   wrapper,
 } from "@formkit/inputs";
-import SecretSelect from "./SecretSelect.vue";
+import { defineAsyncComponent } from "vue";
 import { SecretSection } from "./sections";
 
 export const secret: FormKitTypeDefinition = {
@@ -26,7 +26,7 @@ export const secret: FormKitTypeDefinition = {
   type: "input",
   props: ["requiredKey"],
   library: {
-    SecretSelect: SecretSelect,
+    SecretSelect: defineAsyncComponent(() => import("./SecretSelect.vue")),
   },
   schemaMemoKey: "custom-secret-select",
 };

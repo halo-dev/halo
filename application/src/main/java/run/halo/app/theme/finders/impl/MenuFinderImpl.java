@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.finders.Finder;
@@ -36,7 +36,7 @@ import run.halo.app.theme.finders.vo.MenuVo;
 public class MenuFinderImpl implements MenuFinder {
 
     private final ReactiveExtensionClient client;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     @Override
     public Mono<MenuVo> getByName(String name) {

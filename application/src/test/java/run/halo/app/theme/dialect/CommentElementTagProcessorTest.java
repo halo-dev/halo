@@ -28,7 +28,7 @@ import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -53,7 +53,7 @@ class CommentElementTagProcessorTest {
     private ObjectProvider<ExtensionGetter>  extensionGetterProvider;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     private TemplateEngine templateEngine;
 
@@ -74,7 +74,7 @@ class CommentElementTagProcessorTest {
     void doProcess() {
         Context context = getContext();
 
-        when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
             .thenReturn(environmentFetcher);
         var commentSetting = mock(SystemSetting.Comment.class);
         when(environmentFetcher.fetchComment())

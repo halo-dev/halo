@@ -1778,6 +1778,8 @@ core:
         title: 编辑条目
     color:
       placeholder: 选择颜色
+      operations:
+        edit: 手动编辑颜色
   common:
     buttons:
       save: 保存

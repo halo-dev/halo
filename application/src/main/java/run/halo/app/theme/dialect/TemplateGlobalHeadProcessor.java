@@ -9,7 +9,7 @@ import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.ModelConst;
@@ -25,9 +25,9 @@ import run.halo.app.theme.router.ModelConst;
 @Component
 public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
 
-    private final SystemConfigurableEnvironmentFetcher fetcher;
+    private final SystemConfigFetcher fetcher;
 
-    public TemplateGlobalHeadProcessor(SystemConfigurableEnvironmentFetcher fetcher) {
+    public TemplateGlobalHeadProcessor(SystemConfigFetcher fetcher) {
         this.fetcher = fetcher;
     }
 

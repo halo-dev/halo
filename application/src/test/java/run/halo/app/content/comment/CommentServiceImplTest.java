@@ -43,7 +43,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -59,7 +59,7 @@ import run.halo.app.security.authorization.AuthorityUtils;
 class CommentServiceImplTest {
 
     @Mock
-    SystemConfigurableEnvironmentFetcher environmentFetcher;
+    SystemConfigFetcher environmentFetcher;
 
     @Mock
     ReactiveExtensionClient client;

@@ -4,11 +4,12 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 import lombok.Builder;
-import lombok.Value;
 import lombok.With;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -17,46 +18,43 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
-@Value
 @Builder
-public class SiteSettingVo {
+public record SiteSettingVo(
 
-    String title;
+    String title,
 
-    @With
-    URL url;
+    @With URL url,
 
-    @With
-    String version;
+    @With String version,
 
-    String subtitle;
+    String subtitle,
 
-    String logo;
+    String logo,
 
-    String favicon;
+    String favicon,
 
-    String language;
+    String language,
 
-    Boolean allowRegistration;
+    Boolean allowRegistration,
 
-    PostSetting post;
+    PostSetting post,
 
-    SeoSetting seo;
+    SeoSetting seo,
 
-    CommentSetting comment;
+    Routes routes,
+
+    CommentSetting comment
+
+) {
 
     /**
      * Convert to system {@link ConfigMap} to {@link SiteSettingVo}.
      *
-     * @param configMap config map named system
+     * @param data config map data
      * @return site setting value object
      */
-    public static SiteSettingVo from(ConfigMap configMap) {
-        Assert.notNull(configMap, "The configMap must not be null.");
-        Map<String, String> data = configMap.getData();
-        if (data == null) {
-            return builder().build();
-        }
+    public static SiteSettingVo from(Map<String, String> data) {
+        Assert.notNull(data, "Config data must not be null");
         SystemSetting.Basic basicSetting =
             toObject(data.get(SystemSetting.Basic.GROUP), SystemSetting.Basic.class);
 
@@ -68,6 +66,8 @@ public class SiteSettingVo {
 
         SystemSetting.Seo seoSetting =
             toObject(data.get(SystemSetting.Seo.GROUP), SystemSetting.Seo.class);
+
+        var routeRules = toObject(data.get(ThemeRouteRules.GROUP), ThemeRouteRules.class);
 
         SystemSetting.Comment commentSetting = toObject(data.get(SystemSetting.Comment.GROUP),
             SystemSetting.Comment.class);
@@ -94,6 +94,12 @@ public class SiteSettingVo {
                 .requireReviewForNew(commentSetting.getRequireReviewForNew())
                 .systemUserOnly(commentSetting.getSystemUserOnly())
                 .build())
+            .routes(Routes.builder()
+                .categoriesUri(StringUtils.prependIfMissing(routeRules.getCategories(), "/"))
+                .tagsUri(StringUtils.prependIfMissing(routeRules.getTags(), "/"))
+                .archivesUri(StringUtils.prependIfMissing(routeRules.getArchives(), "/"))
+                .build()
+            )
             .build();
     }
 
@@ -105,35 +111,36 @@ public class SiteSettingVo {
         return JsonUtils.jsonToObject(json, type);
     }
 
-    @Value
     @Builder
-    public static class PostSetting {
-        Integer postPageSize;
-
-        Integer archivePageSize;
-
-        Integer categoryPageSize;
-
-        Integer tagPageSize;
+    public record PostSetting(
+        Integer postPageSize,
+        Integer archivePageSize,
+        Integer categoryPageSize,
+        Integer tagPageSize
+    ) {
     }
 
-    @Value
     @Builder
-    public static class SeoSetting {
-        Boolean blockSpiders;
-
-        String keywords;
-
-        String description;
+    public record SeoSetting(
+        Boolean blockSpiders,
+        String keywords,
+        String description
+    ) {
     }
 
-    @Value
     @Builder
-    public static class CommentSetting {
-        Boolean enable;
+    public record CommentSetting(
+        Boolean enable,
+        Boolean systemUserOnly,
+        Boolean requireReviewForNew
+    ) {
+    }
 
-        Boolean systemUserOnly;
-
-        Boolean requireReviewForNew;
+    @Builder
+    public record Routes(
+        String categoriesUri,
+        String tagsUri,
+        String archivesUri
+    ) {
     }
 }

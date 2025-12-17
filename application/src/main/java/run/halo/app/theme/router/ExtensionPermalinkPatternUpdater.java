@@ -1,12 +1,17 @@
 package run.halo.app.theme.router;
 
+import static run.halo.app.theme.utils.PatternUtils.normalizePattern;
+import static run.halo.app.theme.utils.PatternUtils.normalizePostPattern;
+
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
@@ -18,7 +23,9 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.MetadataUtil;
-import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.infra.SystemConfigChangedEvent;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 
 /**
  * {@link ExtensionPermalinkPatternUpdater} to update the value of key
@@ -34,26 +41,46 @@ import run.halo.app.theme.DefaultTemplateEnum;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ExtensionPermalinkPatternUpdater
-    implements ApplicationListener<PermalinkRuleChangedEvent> {
+class ExtensionPermalinkPatternUpdater implements ApplicationListener<SystemConfigChangedEvent> {
+
     private final ExtensionClient client;
 
     @Override
-    public void onApplicationEvent(@NonNull PermalinkRuleChangedEvent event) {
-        DefaultTemplateEnum template = event.getTemplate();
-        log.debug("Refresh permalink for template [{}]", template.getValue());
-        String pattern = event.getRule();
-        switch (template) {
-            case POST -> updatePostPermalink(pattern);
-            case CATEGORY -> updateCategoryPermalink(pattern);
-            case TAG -> updateTagPermalink(pattern);
-            default -> {
-            }
+    @Async
+    public void onApplicationEvent(@NonNull SystemConfigChangedEvent event) {
+        var oldData = event.getOldData();
+        var newData = event.getNewData();
+        var oldRules = SystemSetting.get(oldData, ThemeRouteRules.GROUP, ThemeRouteRules.class);
+        if (oldRules == null) {
+            oldRules = ThemeRouteRules.empty();
+        }
+        var newRules = SystemSetting.get(newData, ThemeRouteRules.GROUP, ThemeRouteRules.class);
+        if (newRules == null) {
+            newRules = ThemeRouteRules.empty();
+        }
+        var archivesRuleChanged = !Objects.equals(oldRules.getArchives(), newRules.getArchives());
+        var postRuleChanged = !Objects.equals(oldRules.getPost(), newRules.getPost());
+        var categoriesRuleChanged =
+            !Objects.equals(oldRules.getCategories(), newRules.getCategories());
+        if (categoriesRuleChanged) {
+            var categoriesPattern = normalizePattern(newRules.getCategories());
+            updateCategoryPermalink(categoriesPattern);
+        }
+        var tagsRuleChanged = !Objects.equals(oldRules.getTags(), newRules.getTags());
+        if (tagsRuleChanged) {
+            var tagsPattern = normalizePattern(newRules.getTags());
+            log.info("Update tag permalink pattern for tags change: {}", tagsPattern);
+            updateTagPermalink(tagsPattern);
+        }
+        if (archivesRuleChanged || categoriesRuleChanged || postRuleChanged) {
+            var postPattern = normalizePostPattern(newRules);
+            updatePostPermalink(postPattern);
         }
     }
 
     private void updatePostPermalink(String pattern) {
         log.debug("Update post permalink by new policy [{}]", pattern);
+        // TODO Optimize by batch update
         client.listAll(Post.class, new ListOptions(), Sort.unsorted())
             .forEach(post -> updateIfPermalinkPatternChanged(post, pattern));
     }

@@ -5,7 +5,6 @@ import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -119,9 +118,11 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     }
 
     void populatePermalinkPattern(Category category) {
-        Map<String, String> annotations = nullSafeAnnotations(category);
-        String newPattern = categoryPermalinkPolicy.pattern();
-        annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+        var annotations = nullSafeAnnotations(category);
+        if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+            var newPattern = categoryPermalinkPolicy.pattern();
+            annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+        }
     }
 
     void populatePermalink(Category category) {
