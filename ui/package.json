@@ -54,6 +54,7 @@
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.8",
+    "@ctrl/tinycolor": "^4.2.0",
     "@emoji-mart/data": "^1.2.1",
     "@formkit/addons": "^1.6.9",
     "@formkit/core": "^1.6.9",
