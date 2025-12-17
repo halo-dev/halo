@@ -309,7 +309,7 @@ const handleRemoveItem = (index: number) => {
                     value: itemLabel.value,
                   })
                 "
-                :src="itemLabel.value"
+                :src="utils.attachment.getThumbnailUrl(itemLabel.value, 'S')"
                 class="size-full object-cover"
               />
             </a>
