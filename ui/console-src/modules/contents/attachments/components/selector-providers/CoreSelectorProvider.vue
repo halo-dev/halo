@@ -51,7 +51,7 @@ const emit = defineEmits<{
   (event: "change-provider", providerId: string): void;
 }>();
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 
 const keyword = ref("");
 const selectedGroup = ref();

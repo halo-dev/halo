@@ -21,7 +21,7 @@ const props = withDefaults(
 
 const { attachment } = toRefs(props);
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 
 const emit = defineEmits<{
   (event: "select", attachment?: Attachment): void;
