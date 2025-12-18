@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
 import { matchMediaTypes } from "@/utils/media-type";
-import type { Attachment, Group } from "@halo-dev/api-client";
+import type { Attachment } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -24,11 +24,11 @@ import { useLocalStorage } from "@vueuse/core";
 import { computed, ref, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAttachmentControl } from "../../composables/use-attachment";
-import { useFetchAttachmentPolicy } from "../../composables/use-attachment-policy";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
-import AttachmentGroupList from "../AttachmentGroupList.vue";
-import AttachmentUploadModal from "../AttachmentUploadModal.vue";
+import AttachmentUploadArea from "../AttachmentUploadArea.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
+import GroupFilter from "./components/GroupFilter.vue";
+import PolicyFilter from "./components/PolicyFilter.vue";
 
 const { t } = useI18n();
 
@@ -51,8 +51,6 @@ const emit = defineEmits<{
   (event: "change-provider", providerId: string): void;
 }>();
 
-const { policies } = useFetchAttachmentPolicy();
-
 const keyword = ref("");
 const selectedGroup = ref();
 const selectedPolicy = ref();
@@ -71,7 +69,6 @@ const {
   handleSelect,
   handleSelectPrevious,
   handleSelectNext,
-  handleReset,
   isChecked,
   isFetching,
 } = useAttachmentControl({
@@ -87,19 +84,25 @@ const {
 });
 
 watch(
-  () => [selectedPolicy.value, selectedSort.value, keyword.value],
+  () => [
+    selectedPolicy.value,
+    selectedSort.value,
+    keyword.value,
+    selectedGroup.value,
+  ],
   () => {
     page.value = 1;
   }
 );
 
 const hasFilters = computed(() => {
-  return selectedPolicy.value || selectedSort.value;
+  return selectedPolicy.value || selectedSort.value || selectedGroup.value;
 });
 
 function handleClearFilters() {
   selectedPolicy.value = undefined;
   selectedSort.value = undefined;
+  selectedGroup.value = undefined;
 }
 
 const uploadVisible = ref(false);
@@ -129,18 +132,8 @@ const isDisabled = (attachment: Attachment) => {
   return !isMatchMediaType;
 };
 
-function onUploadModalClose() {
-  handleFetchAttachments();
-  uploadVisible.value = false;
-}
-
 function onDetailModalClose() {
   selectedAttachment.value = undefined;
-}
-
-function onGroupSelect(group: Group) {
-  selectedGroup.value = group.metadata.name;
-  handleReset();
 }
 
 // View type
@@ -158,6 +151,11 @@ const viewTypes = [
 ];
 
 const viewType = useLocalStorage("attachment-selector-view-type", "grid");
+
+function onUploadDone() {
+  handleFetchAttachments();
+  uploadVisible.value = false;
+}
 </script>
 <template>
   <div class="mb-3 block w-full rounded bg-gray-50 px-3 py-2">
@@ -168,22 +166,6 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
       <div class="mt-4 flex sm:mt-0">
         <VSpace spacing="lg">
           <FilterCleanButton v-if="hasFilters" @click="handleClearFilters" />
-
-          <FilterDropdown
-            v-model="selectedPolicy"
-            :label="$t('core.attachment.filters.storage_policy.label')"
-            :items="[
-              {
-                label: t('core.common.filters.item_labels.all'),
-              },
-              ...(policies?.map((policy) => {
-                return {
-                  label: policy.spec.displayName,
-                  value: policy.metadata.name,
-                };
-              }) || []),
-            ]"
-          />
 
           <FilterDropdown
             v-model="selectedSort"
@@ -223,8 +205,8 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
 
           <div class="flex flex-row gap-2">
             <div
-              v-for="(item, index) in viewTypes"
-              :key="index"
+              v-for="item in viewTypes"
+              :key="item.name"
               v-tooltip="`${item.tooltip}`"
               :class="{
                 'bg-gray-200 font-bold text-black': viewType === item.name,
@@ -253,19 +235,28 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
     </div>
   </div>
 
-  <AttachmentGroupList readonly @select="onGroupSelect" />
+  <div class="space-y-4">
+    <PolicyFilter v-model="selectedPolicy" />
+    <GroupFilter v-model="selectedGroup" />
+  </div>
 
-  <HasPermission
-    v-if="attachments?.length"
-    :permissions="['system:attachments:manage']"
-  >
-    <div class="mb-5">
-      <VButton @click="uploadVisible = true">
+  <HasPermission :permissions="['system:attachments:manage']">
+    <div class="my-5 space-y-3">
+      <VButton @click="uploadVisible = !uploadVisible">
         <template #icon>
           <IconUpload />
         </template>
-        {{ $t("core.common.buttons.upload") }}
+        {{ uploadVisible ? "取消上传" : $t("core.common.buttons.upload") }}
       </VButton>
+
+      <Transition v-if="uploadVisible" appear name="fade">
+        <AttachmentUploadArea
+          :policy-name="selectedPolicy"
+          :group-name="selectedGroup"
+          height="450px"
+          @done="onUploadDone"
+        />
+      </Transition>
     </div>
   </HasPermission>
 
@@ -353,14 +344,6 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
       :size-options="[60, 120, 200]"
     />
   </div>
-  <AttachmentUploadModal
-    v-if="uploadVisible"
-    :initial-group-name="
-      selectedGroup === 'ungrouped' ? undefined : selectedGroup
-    "
-    :initial-policy-name="selectedPolicy"
-    @close="onUploadModalClose"
-  />
   <AttachmentDetailModal
     v-if="selectedAttachment"
     :mount-to-body="true"
