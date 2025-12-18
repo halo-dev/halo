@@ -21,7 +21,7 @@ const props = withDefaults(
   }
 );
 
-const { policyTemplates } = useFetchAttachmentPolicyTemplate();
+const { data: policyTemplates } = useFetchAttachmentPolicyTemplate();
 
 const policyTemplate = computed(() => {
   return policyTemplates.value?.find(

@@ -44,7 +44,7 @@ const policyVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 const { groups } = useFetchAttachmentGroup();
 
 const selectedGroup = useRouteQuery<string | undefined>("group");
