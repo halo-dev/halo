@@ -114,6 +114,10 @@ const theme: Record<string, Record<string, string>> = {
     wrapper: "flex flex-col gap-0",
     help: "!mt-1",
   },
+  image: {
+    label: textClassification.label,
+    wrapper: "flex flex-col gap-4",
+  },
   list: {
     label: textClassification.label,
     legend: `${textClassification.label} px-2`,

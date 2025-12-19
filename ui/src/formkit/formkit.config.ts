@@ -14,6 +14,7 @@ import { color } from "./inputs/color";
 import { form } from "./inputs/form";
 import { group } from "./inputs/group";
 import { iconify } from "./inputs/iconify";
+import { image } from "./inputs/image";
 import { list } from "./inputs/list";
 import { menuCheckbox } from "./inputs/menu-checkbox";
 import { menuItemSelect } from "./inputs/menu-item-select";
@@ -79,6 +80,7 @@ const config: DefaultConfigOptions = {
     array,
     color,
     iconify,
+    image,
   },
   locales: { zh, en },
   locale: "zh",
