@@ -375,6 +375,16 @@ async function slugUniqueValidation(node: FormKitNode) {
               auto-height
               :max-auto-height="200"
             ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              :label="$t('core.page.settings.fields.cover.label')"
+              type="attachment"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :accepts="['image/*']"
+              validation="length:0,1024"
+            ></FormKit>
           </div>
         </div>
 
@@ -430,14 +440,6 @@ async function slugUniqueValidation(node: FormKitNode) {
               :label="$t('core.page.settings.fields.template.label')"
               type="select"
               name="template"
-            ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              :label="$t('core.page.settings.fields.cover.label')"
-              type="attachment"
-              name="cover"
-              :accepts="['image/*']"
-              validation="length:0,1024"
             ></FormKit>
           </div>
         </div>

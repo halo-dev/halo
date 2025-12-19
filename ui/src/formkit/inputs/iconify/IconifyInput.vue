@@ -131,7 +131,12 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
       </template>
     </VDropdown>
     <div class="inline-flex items-center gap-1.5">
-      <VDropdown ref="editFormDropdown" class="inline-flex">
+      <!-- @vue-ignore -->
+      <VDropdown
+        ref="editFormDropdown"
+        :dispose-timeout="null"
+        class="inline-flex"
+      >
         <template #default="{ shown }">
           <button
             v-tooltip="$t('core.formkit.iconify.operations.edit')"
