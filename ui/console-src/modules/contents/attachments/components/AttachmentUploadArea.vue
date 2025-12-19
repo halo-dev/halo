@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import type { Attachment } from "@halo-dev/api-client";
 import { VTabItem, VTabs } from "@halo-dev/components";
+import type { SuccessResponse } from "@uppy/core";
 import { ref } from "vue";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
@@ -15,9 +17,16 @@ const {
 
 const emit = defineEmits<{
   (event: "done"): void;
+  (event: "uploaded", response: Attachment): void;
 }>();
 
 const activeTab = ref("upload");
+
+const onUploaded = (response: SuccessResponse) => {
+  if (response.body) {
+    emit("uploaded", response.body as Attachment);
+  }
+};
 </script>
 <template>
   <VTabs v-model:active-id="activeTab" type="outline">
@@ -41,6 +50,7 @@ const activeTab = ref("upload");
             : $t('core.attachment.upload_modal.filters.policy.not_select')
         "
         :done-button-handler="() => emit('done')"
+        @uploaded="onUploaded"
       />
     </VTabItem>
     <VTabItem

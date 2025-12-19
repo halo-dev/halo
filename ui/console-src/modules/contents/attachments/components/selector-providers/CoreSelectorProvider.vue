@@ -21,6 +21,7 @@ import {
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useLocalStorage } from "@vueuse/core";
+import { throttle } from "es-toolkit/compat";
 import { computed, ref, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAttachmentControl } from "../../composables/use-attachment";
@@ -81,6 +82,11 @@ const {
   page,
   size,
   keyword,
+});
+
+const throttledFetchAttachments = throttle(handleFetchAttachments, 1000, {
+  leading: false,
+  trailing: true,
 });
 
 watch(
@@ -155,6 +161,12 @@ const viewType = useLocalStorage("attachment-selector-view-type", "grid");
 function onUploadDone() {
   handleFetchAttachments();
   uploadVisible.value = false;
+}
+
+function onUploaded(attachment: Attachment) {
+  handleSelect(attachment);
+  page.value = 1;
+  throttledFetchAttachments();
 }
 </script>
 <template>
@@ -255,6 +267,7 @@ function onUploadDone() {
           :group-name="selectedGroup"
           height="450px"
           @done="onUploadDone"
+          @uploaded="onUploaded"
         />
       </Transition>
     </div>

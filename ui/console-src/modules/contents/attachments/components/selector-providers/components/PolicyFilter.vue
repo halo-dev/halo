@@ -12,26 +12,14 @@ import AttachmentPolicyEditingModal from "../../AttachmentPolicyEditingModal.vue
 
 const modelValue = defineModel<string | undefined>();
 
-const { policyTemplates } = useFetchAttachmentPolicyTemplate();
-const { policies: allPolicies, handleFetchPolicies } =
+const { data: policyTemplates } = useFetchAttachmentPolicyTemplate();
+const { data: allPolicies, refetch: handleFetchPolicies } =
   useFetchAttachmentPolicy();
 
 const policies = computed(() => {
-  return allPolicies.value
-    ?.filter((policy) => {
-      return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
-    })
-    .sort((a, b) => {
-      const priorityA = parseInt(
-        a.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
-        10
-      );
-      const priorityB = parseInt(
-        b.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
-        10
-      );
-      return priorityB - priorityA;
-    });
+  return allPolicies.value?.filter((policy) => {
+    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+  });
 });
 
 const policyCreationModalVisible = ref(false);
