@@ -35,6 +35,7 @@ const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
 const i18n = createI18n({
   legacy: false,
   fallbackLocale: "en",
+  messages: {},
 });
 
 export function getEnvironmentLanguage(): string {
