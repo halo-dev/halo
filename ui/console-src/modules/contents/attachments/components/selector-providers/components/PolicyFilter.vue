@@ -39,7 +39,9 @@ function handleOpenCreationModal(policyTemplate: PolicyTemplate) {
 </script>
 <template>
   <div class="flex flex-col gap-2">
-    <div class="text-sm text-gray-800">存储策略：</div>
+    <div class="text-sm text-gray-800">
+      {{ $t("core.attachment.upload_modal.filters.policy.label") }}
+    </div>
     <div class="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-5">
       <AttachmentPolicyBadge
         :features="{ checkIcon: true }"
@@ -58,25 +60,28 @@ function handleOpenCreationModal(policyTemplate: PolicyTemplate) {
         :features="{ checkIcon: true }"
         @click="modelValue = policy.metadata.name"
       />
-      <VDropdown>
-        <AttachmentPolicyBadge>
-          <template #text>
-            <span>{{ $t("core.common.buttons.new") }}</span>
+
+      <HasPermission :permissions="['system:attachments:manage']">
+        <VDropdown>
+          <AttachmentPolicyBadge>
+            <template #text>
+              <span>{{ $t("core.common.buttons.new") }}</span>
+            </template>
+            <template #actions>
+              <IconAddCircle />
+            </template>
+          </AttachmentPolicyBadge>
+          <template #popper>
+            <VDropdownItem
+              v-for="policyTemplate in policyTemplates"
+              :key="policyTemplate.metadata.name"
+              @click="handleOpenCreationModal(policyTemplate)"
+            >
+              {{ policyTemplate.spec?.displayName }}
+            </VDropdownItem>
           </template>
-          <template #actions>
-            <IconAddCircle />
-          </template>
-        </AttachmentPolicyBadge>
-        <template #popper>
-          <VDropdownItem
-            v-for="policyTemplate in policyTemplates"
-            :key="policyTemplate.metadata.name"
-            @click="handleOpenCreationModal(policyTemplate)"
-          >
-            {{ policyTemplate.spec?.displayName }}
-          </VDropdownItem>
-        </template>
-      </VDropdown>
+        </VDropdown>
+      </HasPermission>
     </div>
   </div>
 

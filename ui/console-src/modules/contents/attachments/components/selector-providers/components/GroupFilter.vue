@@ -53,7 +53,9 @@ const moreGroups = computed(() => {
 </script>
 <template>
   <div class="flex flex-col gap-2">
-    <div class="text-sm text-gray-800">分组：</div>
+    <div class="text-sm text-gray-800">
+      {{ $t("core.attachment.upload_modal.filters.group.label") }}
+    </div>
     <div class="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-5">
       <AttachmentGroupBadge
         :is-selected="!modelValue"
@@ -76,7 +78,7 @@ const moreGroups = computed(() => {
 
       <VDropdown v-if="moreGroups.length > 0">
         <AttachmentGroupBadge :features="{ actions: false, checkIcon: false }">
-          <template #text> 更多 </template>
+          <template #text> {{ $t("core.common.buttons.more") }} </template>
           <template #actions>
             <IconArrowDown />
           </template>

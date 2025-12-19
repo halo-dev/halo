@@ -258,7 +258,11 @@ function onUploaded(attachment: Attachment) {
         <template #icon>
           <IconUpload />
         </template>
-        {{ uploadVisible ? "取消上传" : $t("core.common.buttons.upload") }}
+        {{
+          uploadVisible
+            ? $t("core.common.buttons.cancel_upload")
+            : $t("core.common.buttons.upload")
+        }}
       </VButton>
 
       <Transition v-if="uploadVisible" appear name="fade">
