@@ -6,11 +6,13 @@ import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { JsonPatchInner, Policy } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, onMounted, ref, toRaw, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 const CONFIG_MAP_GROUP = "default";
+
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -220,6 +222,7 @@ const handleSave = async (data: {
     console.error("Failed to save attachment policy", e);
   } finally {
     isSubmitting.value = false;
+    queryClient.invalidateQueries({ queryKey: ["attachment-policies"] });
   }
 };
 
