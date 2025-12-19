@@ -41,8 +41,8 @@ const policyTemplate = computed(() => {
         <div>
           {{ policy?.spec.displayName }}
         </div>
-        <div v-if="policyTemplate" class="text-xs font-normal text-gray-600">
-          {{ policyTemplate.spec?.displayName }}
+        <div class="text-xs font-normal text-gray-600">
+          {{ policyTemplate?.spec?.displayName || "--" }}
         </div>
       </slot>
     </div>
