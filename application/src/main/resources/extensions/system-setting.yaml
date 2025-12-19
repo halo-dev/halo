@@ -14,31 +14,31 @@ spec:
         - $formkit: text
           label: "站点副标题"
           name: subtitle
-        - $formkit: image
+        - $formkit: attachment
           label: Logo
           name: logo
           width: "4rem"
           accepts:
-            - "image/*"
-        - $formkit: image
+            - 'image/*'
+        - $formkit: attachment
           label: Favicon
           name: favicon
           width: "4rem"
           accepts:
-            - "image/*"
+            - 'image/*'
         - $formkit: select
           label: "首选语言"
           name: language
-          value: "zh-CN"
+          value: 'zh-CN'
           options:
-            - label: "English"
-              value: "en"
-            - label: "Español"
-              value: "es"
-            - label: "简体中文"
-              value: "zh-CN"
-            - label: "繁体中文"
-              value: "zh-TW"
+            - label: 'English'
+              value: 'en'
+            - label: 'Español'
+              value: 'es'
+            - label: '简体中文'
+              value: 'zh-CN'
+            - label: '繁体中文'
+              value: 'zh-TW'
     - group: post
       label: 文章设置
       formSchema:
@@ -73,16 +73,16 @@ spec:
         - $formkit: select
           label: "别名生成策略"
           name: slugGenerationStrategy
-          value: "generateByTitle"
+          value: 'generateByTitle'
           options:
-            - label: "根据标题"
-              value: "generateByTitle"
-            - label: "时间戳"
-              value: "timestamp"
-            - label: "Short UUID"
-              value: "shortUUID"
-            - label: "UUID"
-              value: "UUID"
+            - label: '根据标题'
+              value: 'generateByTitle'
+            - label: '时间戳'
+              value: 'timestamp'
+            - label: 'Short UUID'
+              value: 'shortUUID'
+            - label: 'UUID'
+              value: 'UUID'
           help: 此选项仅在创建文章时生效，修改此选项不会影响已有文章
         - $formkit: attachmentPolicySelect
           name: attachmentPolicyName
@@ -101,7 +101,7 @@ spec:
           name: blockSpiders
           label: "屏蔽搜索引擎"
           value: false
-          help: '为所有页面添加 <meta name="robots" content="noindex" /> 标签，阻止搜索引擎索引，但不是所有搜索引擎都会遵守'
+          help: "为所有页面添加 <meta name=\"robots\" content=\"noindex\" /> 标签，阻止搜索引擎索引，但不是所有搜索引擎都会遵守"
         - $formkit: textarea
           name: keywords
           label: "站点关键词"
@@ -136,7 +136,7 @@ spec:
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
-          validation: "required"
+          validation: 'required'
           if: "$get(allowRegistration).value === true"
           help: 用户注册之后默认为用户分配的角色
         - $formkit: attachmentPolicySelect
@@ -190,24 +190,24 @@ spec:
           validation: required | alphanumeric
         - $formkit: select
           label: 文章详情页访问规则
-          value: "/archives/{slug}"
+          value: '/archives/{slug}'
           options:
-            - label: "/archives/{slug}"
-              value: "/archives/{slug}"
-            - label: "/archives/{name}"
-              value: "/archives/{name}"
-            - label: "/?p={name}"
-              value: "/?p={name}"
-            - label: "/?p={slug}"
-              value: "/?p={slug}"
-            - label: "/{year}/{slug}"
+            - label: '/archives/{slug}'
+              value: '/archives/{slug}'
+            - label: '/archives/{name}'
+              value: '/archives/{name}'
+            - label: '/?p={name}'
+              value: '/?p={name}'
+            - label: '/?p={slug}'
+              value: '/?p={slug}'
+            - label: '/{year}/{slug}'
               value: '/{year:\d{4}}/{slug}'
-            - label: "/{year}/{month}/{slug}"
+            - label: '/{year}/{month}/{slug}'
               value: '/{year:\d{4}}/{month:\d{2}}/{slug}'
-            - label: "/{year}/{month}/{day}/{slug}"
+            - label: '/{year}/{month}/{day}/{slug}'
               value: '/{year:\d{4}}/{month:\d{2}}/{day:\d{2}}/{slug}'
-            - label: "/categories/{categorySlug}/{slug}"
-              value: "/categories/{categorySlug}/{slug}"
+            - label: '/categories/{categorySlug}/{slug}'
+              value: '/categories/{categorySlug}/{slug}'
           name: post
           validation: required
     - group: codeInjection

@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
-import { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
 import {
   IconAddCircle,
-  VButton,
+  IconSettings,
   VDropdown,
   VDropdownDivider,
   VDropdownItem,
@@ -11,6 +10,7 @@ import {
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, type PropType } from "vue";
 import AttachmentDropdownItem from "./AttachmentDropdownItem.vue";
+import AttachmentPreview from "./AttachmentPreview.vue";
 import CustomLinkDropdownItem from "./CustomLinkDropdownItem.vue";
 import UploadDropdownItem from "./UploadDropdownItem.vue";
 
@@ -71,11 +71,9 @@ function onAttachmentReplace(index: number, attachments: AttachmentLike[]) {
   }
 }
 
-const handleRemove = (item: string) => {
+const handleRemove = (index: number) => {
   if (multiple.value) {
-    props.context.node.input(
-      currentValue.value.filter((value) => value !== item)
-    );
+    props.context.node.input(currentValue.value.filter((_, i) => i !== index));
   } else {
     props.context.node.input(undefined);
   }
@@ -104,15 +102,10 @@ function onLinkReplace(index: number, url: string) {
     <div
       v-for="(item, index) in currentValue"
       :key="item"
-      class="group relative overflow-hidden rounded-lg border"
+      class="group relative overflow-hidden rounded-lg border bg-white"
       :style="{ width: width, aspectRatio: aspectRatio }"
     >
-      <img
-        :src="
-          utils.attachment.getThumbnailUrl(item, GetThumbnailByUriSizeEnum.S)
-        "
-        class="size-full object-cover"
-      />
+      <AttachmentPreview :url="item" />
 
       <!-- @vue-ignore -->
       <VDropdown
@@ -120,14 +113,17 @@ function onLinkReplace(index: number, url: string) {
         :dispose-timeout="null"
       >
         <template #default="{ shown }">
-          <VButton
-            class="group-hover:opacity-100"
-            :class="{ 'opacity-100': shown, 'opacity-0': !shown }"
-            size="xs"
-            type="secondary"
+          <button
+            type="button"
+            class="inline-flex size-5 items-center justify-center rounded transition-all"
+            :class="{
+              'bg-primary opacity-100': shown,
+              'bg-primary/80 opacity-0 hover:bg-primary active:bg-primary/80 group-hover:opacity-100':
+                !shown,
+            }"
           >
-            {{ $t("core.common.buttons.replace") }}
-          </VButton>
+            <IconSettings class="size-4 text-white" />
+          </button>
         </template>
         <template #popper>
           <UploadDropdownItem
@@ -145,7 +141,7 @@ function onLinkReplace(index: number, url: string) {
             @submit="(url) => onLinkReplace(index, url)"
           />
           <VDropdownDivider />
-          <VDropdownItem type="danger" @click="handleRemove(item)">
+          <VDropdownItem type="danger" @click="handleRemove(index)">
             {{ $t("core.common.buttons.remove") }}
           </VDropdownItem>
         </template>
@@ -161,9 +157,11 @@ function onLinkReplace(index: number, url: string) {
     >
       <button
         type="button"
-        class="group inline-flex size-full items-center justify-center rounded-lg border border-dashed"
+        class="group inline-flex size-full items-center justify-center rounded-lg border border-dashed transition-colors hover:border-primary"
       >
-        <IconAddCircle class="text-gray group-hover:text-gray-900" />
+        <IconAddCircle
+          class="text-gray-600 transition-colors group-hover:text-primary"
+        />
       </button>
       <template #popper>
         <UploadDropdownItem
