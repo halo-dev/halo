@@ -1,4 +1,4 @@
-import { DOMParser, Editor, elementFromString, type Content } from "@/tiptap";
+import { Editor, generateJSON, type Content } from "@/tiptap";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 
 export function convertToMediaContents(
@@ -96,12 +96,13 @@ function createFigureContent(
   };
 
   if (caption) {
-    const dom = elementFromString(caption);
-    const content = DOMParser.fromSchema(editor.schema).parse(dom).toJSON();
+    const captionContent = generateJSON(
+      caption,
+      editor.extensionManager.extensions
+    );
     baseContent.content?.push({
       type: "figureCaption",
-      // TODO: Find a better way to handle the caption content
-      content: content.content[0].content,
+      content: captionContent.content[0].content,
     });
   }
 
