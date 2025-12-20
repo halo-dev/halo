@@ -2,13 +2,14 @@
 import type { FormKitFrameworkContext } from "@formkit/core";
 import {
   IconAddCircle,
-  IconSettings,
   VDropdown,
   VDropdownDivider,
   VDropdownItem,
 } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { computed, type PropType } from "vue";
+import { computed, useTemplateRef, type PropType } from "vue";
+import { useDraggable } from "vue-draggable-plus";
+import MingcuteMore2Line from "~icons/mingcute/more-2-line";
 import AttachmentDropdownItem from "./AttachmentDropdownItem.vue";
 import AttachmentPreview from "./AttachmentPreview.vue";
 import CustomLinkDropdownItem from "./CustomLinkDropdownItem.vue";
@@ -28,14 +29,19 @@ const accepts = computed(() => {
   return props.context.accepts as string[];
 });
 
-const currentValue = computed(() => {
-  if (!props.context._value) {
-    return [];
-  }
-  if (multiple.value) {
-    return props.context._value as string[];
-  }
-  return [props.context._value as string];
+const currentValue = computed({
+  get() {
+    if (!props.context._value) {
+      return [];
+    }
+    if (multiple.value) {
+      return props.context._value as string[];
+    }
+    return [props.context._value as string];
+  },
+  set(value: string[]) {
+    props.context.node.input(value);
+  },
 });
 
 function onAttachmentsSelect(attachments: AttachmentLike[]) {
@@ -96,13 +102,22 @@ function onLinkReplace(index: number, url: string) {
     props.context.node.input(url);
   }
 }
+
+// Drag
+const container = useTemplateRef<HTMLDivElement>("container");
+
+useDraggable(container, currentValue, {
+  disabled: !multiple.value,
+  draggable: "[data-draggable='true']",
+});
 </script>
 <template>
-  <div class="inline-flex w-full flex-wrap gap-2">
+  <div ref="container" class="inline-flex w-full flex-wrap gap-2">
     <div
       v-for="(item, index) in currentValue"
       :key="item"
-      class="group relative overflow-hidden rounded-lg border bg-white"
+      data-draggable="true"
+      class="group/attachment-item relative overflow-hidden rounded-lg border bg-white"
       :style="{ width: width, aspectRatio: aspectRatio }"
     >
       <AttachmentPreview :url="item" />
@@ -118,11 +133,11 @@ function onLinkReplace(index: number, url: string) {
             class="inline-flex size-5 items-center justify-center rounded transition-all"
             :class="{
               'bg-primary opacity-100': shown,
-              'bg-primary/80 opacity-0 hover:bg-primary active:bg-primary/80 group-hover:opacity-100':
+              'bg-primary/80 opacity-0 hover:bg-primary active:bg-primary/80 group-hover/attachment-item:opacity-100':
                 !shown,
             }"
           >
-            <IconSettings class="size-4 text-white" />
+            <MingcuteMore2Line class="size-4 text-white" />
           </button>
         </template>
         <template #popper>
