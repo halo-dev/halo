@@ -35,6 +35,7 @@ const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
 const i18n = createI18n({
   legacy: false,
   fallbackLocale: "en",
+  messages: {},
 });
 
 export function getEnvironmentLanguage(): string {
@@ -71,18 +72,16 @@ export async function setLanguage(_language?: string): Promise<void> {
         i18n.global.setLocaleMessage(language, messages.default || messages);
       } catch (error) {
         console.error(`Failed to load locale file for ${language}:`, error);
-        await loadFallbackLocale();
-        return;
       }
     } else {
       console.warn(`Locale not found for ${language}, using fallback`);
-      await loadFallbackLocale();
-      return;
     }
   }
 
   i18n.global.locale.value = language;
   utils.date.setLocale(language);
+
+  await loadFallbackLocale();
 }
 
 async function loadFallbackLocale(): Promise<void> {
@@ -105,8 +104,6 @@ async function loadFallbackLocale(): Promise<void> {
       }
     }
   }
-
-  i18n.global.locale.value = fallback;
 }
 
 export function setupI18n(app: App): void {
