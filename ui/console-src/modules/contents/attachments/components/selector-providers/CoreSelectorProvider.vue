@@ -7,6 +7,7 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconCheckboxFill,
+  IconClose,
   IconEye,
   IconGrid,
   IconList,
@@ -256,7 +257,8 @@ function onUploaded(attachment: Attachment) {
     <div class="my-5 space-y-3">
       <VButton @click="uploadVisible = !uploadVisible">
         <template #icon>
-          <IconUpload />
+          <IconUpload v-if="!uploadVisible" />
+          <IconClose v-else />
         </template>
         {{
           uploadVisible

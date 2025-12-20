@@ -7,6 +7,7 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconCheckboxFill,
+  IconClose,
   IconEye,
   IconGrid,
   IconList,
@@ -317,11 +318,16 @@ function onUploaded(response: SuccessResponse) {
   </div>
 
   <div class="mb-5 space-y-3">
-    <VButton @click="uploadVisible = true">
+    <VButton @click="uploadVisible = !uploadVisible">
       <template #icon>
-        <IconUpload />
+        <IconUpload v-if="!uploadVisible" />
+        <IconClose v-else />
       </template>
-      {{ $t("core.common.buttons.upload") }}
+      {{
+        uploadVisible
+          ? $t("core.common.buttons.cancel_upload")
+          : $t("core.common.buttons.upload")
+      }}
     </VButton>
     <Transition v-if="uploadVisible" appear name="fade">
       <UppyUpload
