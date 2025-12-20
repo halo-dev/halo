@@ -51,7 +51,9 @@ function onAttachmentsSelect(attachments: AttachmentLike[]) {
   if (multiple.value) {
     props.context.node.input([
       ...currentValue.value,
-      ...attachments.map((attachment) => utils.attachment.getUrl(attachment)),
+      ...attachments
+        .map((attachment) => utils.attachment.getUrl(attachment))
+        .filter(Boolean),
     ]);
   } else {
     props.context.node.input(utils.attachment.getUrl(attachments[0]));

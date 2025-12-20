@@ -14,7 +14,7 @@ const emit = defineEmits<{
 const dropdown = useTemplateRef<InstanceType<typeof VDropdown>>("dropdown");
 
 function onSubmit({ value }: { value: string }) {
-  emit("submit", value);
+  emit("submit", value.trim());
   dropdown.value?.hide();
 }
 
