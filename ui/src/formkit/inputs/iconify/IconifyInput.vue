@@ -168,7 +168,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
               />
               <FormKit
                 v-else-if="['dataurl', 'url'].includes(format)"
-                type="attachment"
+                type="attachmentInput"
                 name="value"
                 :model-value="currentIconifyValue?.value"
               ></FormKit>
