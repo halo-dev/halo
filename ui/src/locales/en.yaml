@@ -1928,6 +1928,10 @@ core:
       image_tooltip: View image:{value}
       item_modal:
         title: Edit item
+    attachment:
+      operations:
+        select: Select from attachment library
+        input: Input link
   common:
     buttons:
       save: Save
@@ -1976,6 +1980,8 @@ core:
       retry: Retry
       unfold: Unfold
       fold: Fold
+      remove: Remove
+      replace: Replace
       more: More
     radio:
       "yes": "Yes"

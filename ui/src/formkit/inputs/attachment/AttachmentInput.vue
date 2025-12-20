@@ -1,8 +1,19 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
-import { IconFolder } from "@halo-dev/components";
+import {
+  IconAddCircle,
+  VDropdown,
+  VDropdownDivider,
+  VDropdownItem,
+} from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { defineAsyncComponent, ref, type PropType } from "vue";
+import { computed, useTemplateRef, type PropType } from "vue";
+import { useDraggable } from "vue-draggable-plus";
+import MingcuteMore2Line from "~icons/mingcute/more-2-line";
+import AttachmentDropdownItem from "./AttachmentDropdownItem.vue";
+import AttachmentPreview from "./AttachmentPreview.vue";
+import CustomLinkDropdownItem from "./CustomLinkDropdownItem.vue";
+import UploadDropdownItem from "./UploadDropdownItem.vue";
 
 const props = defineProps({
   context: {
@@ -11,63 +22,196 @@ const props = defineProps({
   },
 });
 
-const attachmentSelectorModalVisible = ref(false);
+const multiple = computed(() => props.context.multiple as boolean);
+const width = computed(() => props.context.width as string);
+const aspectRatio = computed(() => props.context.aspectRatio as string);
+const accepts = computed(() => {
+  return props.context.accepts as string[];
+});
 
-const AttachmentSelectorModal = defineAsyncComponent({
-  loader: () => {
-    if (utils.permission.has(["system:attachments:view"])) {
-      return import(
-        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-      );
+const currentValue = computed({
+  get() {
+    if (!props.context._value) {
+      return [];
     }
-    return import(
-      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-    );
+    if (multiple.value) {
+      return props.context._value as string[];
+    }
+    return [props.context._value as string];
+  },
+  set(value: string[]) {
+    props.context.node.input(value);
   },
 });
 
-const onInput = (e: Event) => {
-  props.context.handlers.DOMInput(e);
-};
-
-const onAttachmentSelect = (attachments: AttachmentLike[]) => {
+function onAttachmentsSelect(attachments: AttachmentLike[]) {
   if (!attachments.length) {
     return;
   }
-  const attachment = attachments[0];
-  props.context.node.input(utils.attachment.getUrl(attachment));
+  if (multiple.value) {
+    props.context.node.input([
+      ...currentValue.value,
+      ...attachments
+        .map((attachment) => utils.attachment.getUrl(attachment))
+        .filter(Boolean),
+    ]);
+  } else {
+    props.context.node.input(utils.attachment.getUrl(attachments[0]));
+  }
+}
+
+function onAttachmentReplace(index: number, attachments: AttachmentLike[]) {
+  if (!attachments.length) {
+    return;
+  }
+  if (multiple.value) {
+    const newAttachments = [...currentValue.value];
+
+    const url = utils.attachment.getUrl(attachments[0]);
+    if (!url) {
+      return;
+    }
+
+    newAttachments[index] = url;
+    props.context.node.input(newAttachments);
+  } else {
+    props.context.node.input(utils.attachment.getUrl(attachments[0]));
+  }
+}
+
+const handleRemove = (index: number) => {
+  if (multiple.value) {
+    props.context.node.input(currentValue.value.filter((_, i) => i !== index));
+  } else {
+    props.context.node.input(undefined);
+  }
 };
+
+function onCustomLinkSubmit(url: string) {
+  if (multiple.value) {
+    props.context.node.input([...currentValue.value, url]);
+  } else {
+    props.context.node.input(url);
+  }
+}
+
+function onLinkReplace(index: number, url: string) {
+  if (multiple.value) {
+    const newAttachments = [...currentValue.value];
+    newAttachments[index] = url;
+    props.context.node.input(newAttachments);
+  } else {
+    props.context.node.input(url);
+  }
+}
+
+// Drag
+const container = useTemplateRef<HTMLDivElement>("container");
+
+useDraggable(container, currentValue, {
+  disabled: !multiple.value,
+  draggable: "[data-draggable='true']",
+});
+
+// Permission
+const canUploadAttachment = computed(() => {
+  return utils.permission.has([
+    "system:attachments:manage",
+    "uc:attachments:manage",
+  ]);
+});
+
+const canViewAttachment = computed(() => {
+  return utils.permission.has([
+    "system:attachments:view",
+    "uc:attachments:manage",
+  ]);
+});
 </script>
-
 <template>
-  <input
-    :id="context.id"
-    :value="context._value"
-    :class="context.classes.input"
-    :name="context.node.name"
-    v-bind="context.attrs"
-    type="text"
-    @blur="context.handlers.blur()"
-    @input="onInput"
-  />
-
-  <HasPermission
-    :permissions="['uc:attachments:manage', 'system:attachments:view']"
-  >
+  <div ref="container" class="inline-flex w-full flex-wrap gap-2">
     <div
-      class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-      @click="attachmentSelectorModalVisible = true"
+      v-for="(item, index) in currentValue"
+      :key="item"
+      data-draggable="true"
+      class="group/attachment-item relative overflow-hidden rounded-lg border bg-white"
+      :style="{ width: width, aspectRatio: aspectRatio }"
     >
-      <IconFolder class="h-4 w-4 text-gray-500 group-hover:text-gray-700" />
-    </div>
-  </HasPermission>
+      <AttachmentPreview :url="item" />
 
-  <AttachmentSelectorModal
-    v-if="attachmentSelectorModalVisible"
-    :accepts="context.accepts as string[]"
-    :min="1"
-    :max="1"
-    @select="onAttachmentSelect"
-    @close="attachmentSelectorModalVisible = false"
-  />
+      <!-- @vue-ignore -->
+      <VDropdown
+        class="absolute right-1 top-1 inline-flex"
+        :dispose-timeout="null"
+      >
+        <template #default="{ shown }">
+          <button
+            type="button"
+            class="inline-flex size-5 items-center justify-center rounded transition-all"
+            :class="{
+              'bg-primary opacity-100': shown,
+              'bg-primary/80 opacity-0 hover:bg-primary active:bg-primary/80 group-hover/attachment-item:opacity-100':
+                !shown,
+            }"
+          >
+            <MingcuteMore2Line class="size-4 text-white" />
+          </button>
+        </template>
+        <template #popper>
+          <UploadDropdownItem
+            v-if="canUploadAttachment"
+            :multiple="false"
+            :accepts="accepts"
+            @selected="(attachments) => onAttachmentReplace(index, attachments)"
+          />
+          <AttachmentDropdownItem
+            v-if="canViewAttachment"
+            :multiple="false"
+            :accepts="accepts"
+            @selected="(attachments) => onAttachmentReplace(index, attachments)"
+          />
+          <CustomLinkDropdownItem
+            :url="item"
+            @submit="(url) => onLinkReplace(index, url)"
+          />
+          <VDropdownDivider />
+          <VDropdownItem type="danger" @click="handleRemove(index)">
+            {{ $t("core.common.buttons.remove") }}
+          </VDropdownItem>
+        </template>
+      </VDropdown>
+    </div>
+
+    <!-- @vue-ignore -->
+    <VDropdown
+      v-if="multiple || currentValue.length === 0"
+      class="inline-flex"
+      :style="{ width: width, aspectRatio: aspectRatio }"
+      :dispose-timeout="null"
+    >
+      <button
+        type="button"
+        class="group/trigger inline-flex size-full items-center justify-center rounded-lg border border-dashed transition-colors hover:border-primary"
+      >
+        <IconAddCircle
+          class="text-gray-600 transition-colors group-hover/trigger:text-primary"
+        />
+      </button>
+      <template #popper>
+        <UploadDropdownItem
+          v-if="canUploadAttachment"
+          :multiple="multiple"
+          :accepts="accepts"
+          @selected="onAttachmentsSelect"
+        />
+        <AttachmentDropdownItem
+          v-if="canViewAttachment"
+          :multiple="multiple"
+          :accepts="accepts"
+          @selected="onAttachmentsSelect"
+        />
+        <CustomLinkDropdownItem @submit="onCustomLinkSubmit" />
+      </template>
+    </VDropdown>
+  </div>
 </template>

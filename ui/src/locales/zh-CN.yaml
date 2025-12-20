@@ -1780,6 +1780,10 @@ core:
       placeholder: 选择颜色
       operations:
         edit: 手动编辑颜色
+    attachment:
+      operations:
+        select: 从附件库选择
+        input: 输入链接
   common:
     buttons:
       save: 保存
@@ -1827,6 +1831,8 @@ core:
       retry: 重试
       unfold: 展开
       fold: 收起
+      remove: 移除
+      replace: 替换
       cancel_upload: 取消上传
       more: 更多
     radio:

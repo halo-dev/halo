@@ -403,6 +403,16 @@ const showCancelPublishButton = computed(() => {
               :max-auto-height="200"
               validation="length:0,1024"
             ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :label="$t('core.post.settings.fields.cover.label')"
+              type="attachment"
+              :accepts="['image/*']"
+              validation="length:0,1024"
+            ></FormKit>
           </div>
         </div>
 
@@ -462,14 +472,6 @@ const showCancelPublishButton = computed(() => {
               :label="$t('core.post.settings.fields.template.label')"
               name="template"
               type="select"
-            ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              name="cover"
-              :label="$t('core.post.settings.fields.cover.label')"
-              type="attachment"
-              :accepts="['image/*']"
-              validation="length:0,1024"
             ></FormKit>
           </div>
         </div>
