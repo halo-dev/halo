@@ -768,9 +768,9 @@ core:
       title: Upload attachment
       filters:
         group:
-          label: "Select group:"
+          label: "Group:"
         policy:
-          label: "Select storage policy:"
+          label: "Storage policy:"
           empty:
             title: No storage policy
             description: Before uploading, a new storage policy needs to be created.
@@ -1944,7 +1944,7 @@ core:
       back: Back
       refresh: Refresh
       publish: Publish
-      cancel_publish: Cancel Publish
+      cancel_publish: Cancel publish
       next: Next
       previous: Previous
       install: Install
@@ -1953,12 +1953,13 @@ core:
       reset: Reset
       preview: Preview
       recovery: Recovery
-      delete_permanently: Delete Permanently
+      delete_permanently: Delete permanently
       activate: Activate
       inactivate: Inactivate
       download: Download
       copy: Copy
       upload: Upload
+      cancel_upload: Cancel upload
       add: Add
       submit: Submit
       detail: Detail
@@ -1975,6 +1976,7 @@ core:
       retry: Retry
       unfold: Unfold
       fold: Fold
+      more: More
     radio:
       "yes": "Yes"
       "no": "No"

@@ -796,6 +796,7 @@ core:
     buttons:
       activate: Activate
       inactivate: Inactivate
+      cancel_upload: Cancel upload
       select: Select
       view_all: View all
       verify: Verify
@@ -809,6 +810,7 @@ core:
       retry: Retry
       unfold: Unfold
       fold: Fold
+      more: More
     toast:
       disable_success: Disabled successfully
       enable_success: Enabled successfully

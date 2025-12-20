@@ -703,9 +703,9 @@ core:
       title: 上傳附件
       filters:
         group:
-          label: 選擇分組：
+          label: 分組：
         policy:
-          label: 選擇存儲策略：
+          label: 存儲策略：
           empty:
             title: 沒有存儲策略
             description: 在上傳之前，需要新建一個存儲策略
@@ -1812,6 +1812,8 @@ core:
       retry: 重試
       unfold: 展開
       fold: 收起
+      cancel_upload: 取消上傳
+      more: 更多
     radio:
       "yes": 是
       "no": 否
