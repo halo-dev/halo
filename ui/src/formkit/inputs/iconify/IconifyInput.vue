@@ -134,8 +134,9 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
       <!-- @vue-ignore -->
       <VDropdown
         ref="editFormDropdown"
-        :dispose-timeout="null"
         class="inline-flex"
+        :dispose-timeout="null"
+        :auto-hide="false"
       >
         <template #default="{ shown }">
           <button

@@ -718,9 +718,9 @@ core:
       title: 上传附件
       filters:
         group:
-          label: 选择分组：
+          label: 分组：
         policy:
-          label: 选择存储策略：
+          label: 存储策略：
           empty:
             title: 没有存储策略
             description: 在上传之前，需要新建一个存储策略
@@ -1833,6 +1833,8 @@ core:
       fold: 收起
       remove: 移除
       replace: 替换
+      cancel_upload: 取消上传
+      more: 更多
     radio:
       "yes": 是
       "no": 否
