@@ -110,6 +110,21 @@ useDraggable(container, currentValue, {
   disabled: !multiple.value,
   draggable: "[data-draggable='true']",
 });
+
+// Permission
+const canUploadAttachment = computed(() => {
+  return utils.permission.has([
+    "system:attachments:manage",
+    "uc:attachments:manage",
+  ]);
+});
+
+const canViewAttachment = computed(() => {
+  return utils.permission.has([
+    "system:attachments:view",
+    "uc:attachments:manage",
+  ]);
+});
 </script>
 <template>
   <div ref="container" class="inline-flex w-full flex-wrap gap-2">
@@ -142,23 +157,13 @@ useDraggable(container, currentValue, {
         </template>
         <template #popper>
           <UploadDropdownItem
-            v-if="
-              utils.permission.has([
-                'system:attachments:manage',
-                'uc:attachments:manage',
-              ])
-            "
+            v-if="canUploadAttachment"
             :multiple="false"
             :accepts="accepts"
             @selected="(attachments) => onAttachmentReplace(index, attachments)"
           />
           <AttachmentDropdownItem
-            v-if="
-              utils.permission.has([
-                'system:attachments:view',
-                'uc:attachments:manage',
-              ])
-            "
+            v-if="canViewAttachment"
             :multiple="false"
             :accepts="accepts"
             @selected="(attachments) => onAttachmentReplace(index, attachments)"
@@ -192,23 +197,13 @@ useDraggable(container, currentValue, {
       </button>
       <template #popper>
         <UploadDropdownItem
-          v-if="
-            utils.permission.has([
-              'system:attachments:manage',
-              'uc:attachments:manage',
-            ])
-          "
+          v-if="canUploadAttachment"
           :multiple="multiple"
           :accepts="accepts"
           @selected="onAttachmentsSelect"
         />
         <AttachmentDropdownItem
-          v-if="
-            utils.permission.has([
-              'system:attachments:view',
-              'uc:attachments:manage',
-            ])
-          "
+          v-if="canViewAttachment"
           :multiple="multiple"
           :accepts="accepts"
           @selected="onAttachmentsSelect"
