@@ -2,7 +2,7 @@
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { IconFolder } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { defineAsyncComponent, ref, type PropType } from "vue";
+import { ref, type PropType } from "vue";
 
 const props = defineProps({
   context: {
@@ -12,19 +12,6 @@ const props = defineProps({
 });
 
 const attachmentSelectorModalVisible = ref(false);
-
-const AttachmentSelectorModal = defineAsyncComponent({
-  loader: () => {
-    if (utils.permission.has(["system:attachments:view"])) {
-      return import(
-        "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-      );
-    }
-    return import(
-      "@uc/modules/contents/attachments/components/AttachmentSelectorModal.vue"
-    );
-  },
-});
 
 const onInput = (e: Event) => {
   props.context.handlers.DOMInput(e);

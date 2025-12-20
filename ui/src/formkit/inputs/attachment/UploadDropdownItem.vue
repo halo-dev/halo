@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { consoleApiClient, type Attachment } from "@halo-dev/api-client";
+import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import { VDropdownItem } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
 
 const props = defineProps<{
@@ -25,14 +26,23 @@ onFileInputChange(async (files) => {
 
   const attachments: Attachment[] = [];
   for (const file of files) {
-    const { data } = await consoleApiClient.storage.attachment.uploadAttachment(
-      {
-        // TODO: use policy name from context
-        policyName: "default-policy",
+    if (utils.permission.has(["system:attachments:manage"])) {
+      // fixme: we need unified upload attachment endpoint,
+      // See https://github.com/halo-dev/halo/issues/7973
+      const { data } =
+        await ucApiClient.storage.attachment.createAttachmentForPost({
+          file: file,
+          waitForPermalink: true,
+        });
+      attachments.push(data);
+    } else if (utils.permission.has(["uc:attachments:manage"])) {
+      const { data } = await ucApiClient.storage.attachment.uploadUcAttachment({
         file: file,
-      }
-    );
-    attachments.push(data);
+      });
+      attachments.push(data);
+    } else {
+      throw new Error("No permission to upload attachment");
+    }
   }
 
   emit("selected", attachments);

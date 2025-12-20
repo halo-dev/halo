@@ -142,11 +142,23 @@ useDraggable(container, currentValue, {
         </template>
         <template #popper>
           <UploadDropdownItem
+            v-if="
+              utils.permission.has([
+                'system:attachments:manage',
+                'uc:attachments:manage',
+              ])
+            "
             :multiple="false"
             :accepts="accepts"
             @selected="(attachments) => onAttachmentReplace(index, attachments)"
           />
           <AttachmentDropdownItem
+            v-if="
+              utils.permission.has([
+                'system:attachments:view',
+                'uc:attachments:manage',
+              ])
+            "
             :multiple="false"
             :accepts="accepts"
             @selected="(attachments) => onAttachmentReplace(index, attachments)"
@@ -180,11 +192,23 @@ useDraggable(container, currentValue, {
       </button>
       <template #popper>
         <UploadDropdownItem
+          v-if="
+            utils.permission.has([
+              'system:attachments:manage',
+              'uc:attachments:manage',
+            ])
+          "
           :multiple="multiple"
           :accepts="accepts"
           @selected="onAttachmentsSelect"
         />
         <AttachmentDropdownItem
+          v-if="
+            utils.permission.has([
+              'system:attachments:view',
+              'uc:attachments:manage',
+            ])
+          "
           :multiple="multiple"
           :accepts="accepts"
           @selected="onAttachmentsSelect"
