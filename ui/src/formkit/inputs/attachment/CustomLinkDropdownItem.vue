@@ -26,7 +26,9 @@ function onDropdownShown() {
 </script>
 <template>
   <VDropdown ref="dropdown" @show="onDropdownShown">
-    <VDropdownItem>输入链接</VDropdownItem>
+    <VDropdownItem>
+      {{ $t("core.formkit.attachment.operations.input") }}
+    </VDropdownItem>
     <template #popper>
       <div class="w-96">
         <FormKit

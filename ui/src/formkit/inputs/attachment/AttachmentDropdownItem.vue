@@ -23,7 +23,7 @@ function onAttachmentsSelect(attachments: AttachmentLike[]) {
 </script>
 <template>
   <VDropdownItem @click="selectorModalVisible = true">
-    从附件库选择
+    {{ $t("core.formkit.attachment.operations.select") }}
   </VDropdownItem>
 
   <AttachmentSelectorModal

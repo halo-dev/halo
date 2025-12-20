@@ -184,10 +184,10 @@ useDraggable(container, currentValue, {
     >
       <button
         type="button"
-        class="group inline-flex size-full items-center justify-center rounded-lg border border-dashed transition-colors hover:border-primary"
+        class="group/trigger inline-flex size-full items-center justify-center rounded-lg border border-dashed transition-colors hover:border-primary"
       >
         <IconAddCircle
-          class="text-gray-600 transition-colors group-hover:text-primary"
+          class="text-gray-600 transition-colors group-hover/trigger:text-primary"
         />
       </button>
       <template #popper>
