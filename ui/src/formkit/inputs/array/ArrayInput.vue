@@ -10,6 +10,7 @@ import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
 import ArrayFormModal from "./ArrayFormModal.vue";
+import ColorLabel from "./labels/ColorLabel.vue";
 import IconifyLabel from "./labels/IconifyLabel.vue";
 
 const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
@@ -318,6 +319,10 @@ const handleRemoveItem = (index: number) => {
             <span v-if="itemLabel.type === 'text'">
               {{ itemLabel.value }}
             </span>
+            <ColorLabel
+              v-if="itemLabel.type === 'color'"
+              :item-label="itemLabel"
+            />
             <IconifyLabel
               v-if="itemLabel.type === 'iconify'"
               :item-label="itemLabel"

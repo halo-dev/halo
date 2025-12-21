@@ -48,7 +48,7 @@ export const array: FormKitTypeDefinition = {
   },
 };
 
-export type ArrayItemLabelType = "image" | "text" | "iconify";
+export type ArrayItemLabelType = "image" | "text" | "iconify" | "color";
 
 export type ArrayItemLabel = {
   type: ArrayItemLabelType;
