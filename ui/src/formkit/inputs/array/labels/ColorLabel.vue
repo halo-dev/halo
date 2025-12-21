@@ -15,15 +15,19 @@ const colorValue = computed(() => {
   if (!value) {
     return "#000000";
   }
-  
+
   // Validate and sanitize color value using TinyColor
   const color = new TinyColor(value);
   if (!color.isValid) {
     return "#000000";
   }
-  
+
   // Return the validated color in hex format to prevent CSS injection
   return color.toHexString();
+});
+
+const displayValue = computed(() => {
+  return props.itemLabel.value || colorValue.value;
 });
 </script>
 <template>
@@ -34,6 +38,6 @@ const colorValue = computed(() => {
         backgroundColor: colorValue,
       }"
     ></div>
-    <span class="text-xs text-gray-500">{{ colorValue }}</span>
+    <span class="text-xs text-gray-500">{{ displayValue }}</span>
   </div>
 </template>
