@@ -67,6 +67,7 @@ function onSubmit(data: SecretFormState) {
 <template>
   <VModal
     ref="modal"
+    mount-to-body
     :title="$t('core.formkit.secret.creation_modal.title')"
     :width="600"
     @close="emit('close')"
