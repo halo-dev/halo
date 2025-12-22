@@ -13,13 +13,13 @@ const props = defineProps<{
 const colorValue = computed(() => {
   const value = props.itemLabel.value;
   if (!value) {
-    return "#000000";
+    return null;
   }
 
   // Validate and sanitize color value using TinyColor
   const color = new TinyColor(value);
   if (!color.isValid) {
-    return "#000000";
+    return null;
   }
 
   // Return the validated color in hex format to prevent CSS injection
@@ -28,6 +28,7 @@ const colorValue = computed(() => {
 </script>
 <template>
   <div
+    v-if="colorValue"
     class="size-4 rounded-full border border-gray-200"
     :style="{
       backgroundColor: colorValue,
