@@ -119,3 +119,6 @@ resilience4j.ratelimiter:
       limitForPeriod: 10
       limitRefreshPeriod: 1m
       timeoutDuration: 0s
+r2dbc:
+  migrate:
+    resources-path: classpath:/db/migration/${spring.sql.init.platform}/*.sql
