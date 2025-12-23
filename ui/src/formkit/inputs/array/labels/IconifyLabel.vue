@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { Icon } from "@iconify/vue";
 import { computed } from "vue";
 import type { ArrayItemLabelType } from "..";
 import type { IconifyFormat, IconifyValue } from "../../iconify/types";
