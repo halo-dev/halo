@@ -66,7 +66,11 @@ const finalGroupName = computed(() => {
       id="download"
       :label="$t('core.attachment.upload_modal.upload_options.download')"
     >
-      <UploadFromUrl :policy-name="policyName" :group-name="groupName" />
+      <UploadFromUrl
+        :policy-name="policyName"
+        :group-name="finalGroupName"
+        @uploaded="(attachment) => emit('uploaded', attachment)"
+      />
     </VTabItem>
   </VTabs>
 </template>
