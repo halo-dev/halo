@@ -81,6 +81,7 @@ const formState: SecretFormState = {
 <template>
   <VModal
     ref="modal"
+    mount-to-body
     :title="$t('core.formkit.secret.edit_modal.title')"
     :width="600"
     @close="emit('close')"
