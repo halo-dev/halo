@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
 import org.springframework.util.StringUtils;
@@ -32,14 +33,14 @@ public enum ThumbnailUtils {
      * @param fileSuffix the file suffix to check (without the dot)
      * @return true if the file suffix is supported, false otherwise
      */
-    public static boolean isSupportedImage(String fileSuffix) {
+    public static boolean isSupportedImage(@Nullable String fileSuffix) {
         if (!StringUtils.hasText(fileSuffix)) {
             return false;
         }
         return SUPPORTED_IMAGE_SUFFIXES.contains(fileSuffix.toLowerCase());
     }
 
-    public static boolean isSupportedImage(MimeType mimeType) {
+    public static boolean isSupportedImage(@Nullable MimeType mimeType) {
         return SUPPORTED_IMAGE_MIME_TYPES.stream()
             .anyMatch(supported -> supported.isCompatibleWith(mimeType));
     }
