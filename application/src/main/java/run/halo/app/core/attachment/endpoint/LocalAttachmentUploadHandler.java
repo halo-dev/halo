@@ -22,7 +22,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -52,7 +54,6 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.exception.FileSizeExceededException;
@@ -64,26 +65,16 @@ import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private static final String UPLOAD_PATH = "upload";
 
     private final AttachmentRootGetter attachmentDirGetter;
 
-    private final ExternalUrlSupplier externalUrl;
-
     private final LocalThumbnailService localThumbnailService;
 
     private Clock clock = Clock.systemUTC();
-
-    public LocalAttachmentUploadHandler(
-        AttachmentRootGetter attachmentDirGetter,
-        ExternalUrlSupplier externalUrl,
-        LocalThumbnailService localThumbnailService) {
-        this.attachmentDirGetter = attachmentDirGetter;
-        this.externalUrl = externalUrl;
-        this.localThumbnailService = localThumbnailService;
-    }
 
     /**
      * Set clock for test.
@@ -284,6 +275,7 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         if (!this.shouldHandle(policy)) {
             return Mono.empty();
         }
+
         return Mono.just(doGetThumbnailLinks(attachment));
     }
 
@@ -300,6 +292,23 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     private Map<ThumbnailSize, URI> doGetThumbnailLinks(Attachment attachment) {
         if (attachment.getStatus() == null
             || !StringUtils.hasText(attachment.getStatus().getPermalink())) {
+            return Map.of();
+        }
+        // Check media type first, then check file extension from permalink
+        var supported = Optional.ofNullable(attachment.getSpec().getMediaType())
+            .map(MediaType::parseMediaType)
+            .map(ThumbnailUtils::isSupportedImage)
+            .filter(Boolean::booleanValue)
+            .or(() -> Optional.ofNullable(attachment.getStatus().getPermalink())
+                .map(permalink -> {
+                    var path = URI.create(permalink).getPath();
+                    return FilenameUtils.getExtension(path);
+                })
+                .map(ThumbnailUtils::isSupportedImage)
+                .filter(Boolean::booleanValue)
+            )
+            .isPresent();
+        if (!supported) {
             return Map.of();
         }
         var permalinkUri = URI.create(attachment.getStatus().getPermalink());
