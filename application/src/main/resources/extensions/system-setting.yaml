@@ -147,6 +147,66 @@ spec:
           label: "个人中心附件存储位置"
           value: "default-policy"
           help: 指定用户在个人中心上传的附件的存储位置
+    - group: attachment
+      label: Attachment Settings
+      formSchema:
+        - $formkit: group
+          name: console
+          label: Attachment Console Settings
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "Storage Policy"
+              value: "default-policy"
+              help: For managing attachments in the admin console
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "Storage Group"
+              value: ""
+              help: For managing attachments in the admin console
+        - $formkit: group
+          name: uc
+          label: User Center Attachment Settings
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "Attachment Storage Policy"
+              value: "default-policy"
+              help: For managing attachments in the user center
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "Attachment Storage Group"
+              value: ""
+              help: For managing attachments in the user center
+        - $formkit: group
+          name: avatar
+          label: Avatar Attachment Settings
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "Avatar Storage Policy"
+              value: "default-policy"
+              help: For managing user avatars
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "Avatar Storage Group"
+              value: ""
+              help: For managing user avatars
+        - $formkit: group
+          name: comment
+          label: Comment Attachment Settings
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "Attachment Storage Policy"
+              value: "default-policy"
+              help: For managing attachments uploaded in comments
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "Attachment Storage Group"
+              value: ""
+              help: For managing attachments uploaded in comments
+
     - group: comment
       label: 评论设置
       formSchema:
