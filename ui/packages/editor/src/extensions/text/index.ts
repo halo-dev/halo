@@ -1,3 +1,4 @@
+import BlockActionSeparator from "@/components/block/BlockActionSeparator.vue";
 import ColorBubbleItem from "@/extensions/color/ColorBubbleItem.vue";
 import HighlightBubbleItem from "@/extensions/highlight/HighlightBubbleItem.vue";
 import LinkBubbleButton from "@/extensions/link/LinkBubbleButton.vue";
@@ -29,6 +30,7 @@ import { ExtensionStrike } from "../strike";
 import { ExtensionSubscript } from "../subscript";
 import { ExtensionSuperscript } from "../superscript";
 import { ExtensionUnderline } from "../underline";
+import BubbleItemTextType from "./BubbleItemTextType.vue";
 
 const OTHER_BUBBLE_MENU_TYPES = [
   "audio",
@@ -83,6 +85,14 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
           items: [
             {
               priority: 10,
+              component: markRaw(BubbleItemTextType),
+            },
+            {
+              priority: 20,
+              component: markRaw(BlockActionSeparator),
+            },
+            {
+              priority: 30,
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionBold.name),
                 icon: markRaw(MingcuteBoldLine),
@@ -93,7 +103,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 20,
+              priority: 40,
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionItalic.name),
                 icon: markRaw(MingcuteItalicLine),
@@ -104,7 +114,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 30,
+              priority: 50,
               props: {
                 isActive: ({ editor }) =>
                   editor.isActive(ExtensionUnderline.name),
@@ -115,7 +125,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 40,
+              priority: 60,
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionStrike.name),
                 icon: markRaw(MingcuteStrikethroughLine),
@@ -125,7 +135,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 50,
+              priority: 70,
               component: markRaw(HighlightBubbleItem),
               props: {
                 isActive: ({ editor }) =>
@@ -135,7 +145,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 60,
+              priority: 80,
               component: markRaw(ColorBubbleItem),
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionColor.name),
@@ -144,7 +154,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 70,
+              priority: 90,
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionCode.name),
                 icon: markRaw(MingcuteCodeLine),
@@ -154,7 +164,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 80,
+              priority: 100,
               props: {
                 isActive: ({ editor }) =>
                   editor.isActive(ExtensionSuperscript.name),
@@ -165,7 +175,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 90,
+              priority: 110,
               props: {
                 isActive: ({ editor }) =>
                   editor.isActive(ExtensionSubscript.name),
@@ -176,14 +186,14 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 100,
+              priority: 120,
               component: markRaw(LinkBubbleButton),
               props: {
                 isActive: ({ editor }) => editor.isActive(ExtensionLink.name),
               },
             },
             {
-              priority: 110,
+              priority: 130,
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive(ExtensionLink.name),
@@ -193,7 +203,7 @@ export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
               },
             },
             {
-              priority: 120,
+              priority: 140,
               props: {
                 isActive: () => false,
                 visible: ({ editor }) => editor.isActive(ExtensionLink.name),
