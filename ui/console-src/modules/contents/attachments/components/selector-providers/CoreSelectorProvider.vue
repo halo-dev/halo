@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
 import { matchMediaTypes } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
 import {
@@ -26,6 +27,7 @@ import { throttle } from "es-toolkit/compat";
 import { computed, ref, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAttachmentControl } from "../../composables/use-attachment";
+import { useFetchAttachmentPolicy } from "../../composables/use-attachment-policy";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentUploadArea from "../AttachmentUploadArea.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
@@ -83,6 +85,14 @@ const {
   page,
   size,
   keyword,
+});
+
+const { data: allPolicies } = useFetchAttachmentPolicy();
+
+const policies = computed(() => {
+  return allPolicies.value?.filter((policy) => {
+    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+  });
 });
 
 const throttledFetchAttachments = throttle(handleFetchAttachments, 1000, {
@@ -168,6 +178,19 @@ function onUploaded(attachment: Attachment) {
   handleSelect(attachment);
   page.value = 1;
   throttledFetchAttachments();
+}
+
+function handleToggleUploadView() {
+  if (uploadVisible.value) {
+    uploadVisible.value = false;
+    return;
+  }
+
+  if (!selectedPolicy.value) {
+    selectedPolicy.value = policies.value?.[0].metadata.name;
+  }
+
+  uploadVisible.value = true;
 }
 </script>
 <template>
@@ -255,7 +278,7 @@ function onUploaded(attachment: Attachment) {
 
   <HasPermission :permissions="['system:attachments:manage']">
     <div class="my-5 space-y-3">
-      <VButton @click="uploadVisible = !uploadVisible">
+      <VButton @click="handleToggleUploadView">
         <template #icon>
           <IconUpload v-if="!uploadVisible" />
           <IconClose v-else />
