@@ -10,6 +10,7 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -43,6 +44,7 @@ public class Attachment extends AbstractExtension {
         private String ownerName;
 
         @Schema(description = "Media type of attachment")
+        @Nullable
         private String mediaType;
 
         @Schema(description = "Size of attachment. Unit is Byte", minimum = "0")

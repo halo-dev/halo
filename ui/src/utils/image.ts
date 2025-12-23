@@ -8,7 +8,7 @@ export const imageTypes: string[] = [
   "image/avif",
 ];
 
-export function isImage(mediaType: string | undefined): boolean {
+export function isImage(mediaType: string | undefined | null): boolean {
   if (!mediaType) {
     return false;
   }

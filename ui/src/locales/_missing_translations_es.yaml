@@ -792,10 +792,15 @@ core:
       image_tooltip: View image:{value}
       item_modal:
         title: Edit item
+    attachment:
+      operations:
+        select: Select from attachment library
+        input: Input link
   common:
     buttons:
       activate: Activate
       inactivate: Inactivate
+      cancel_upload: Cancel upload
       select: Select
       view_all: View all
       verify: Verify
@@ -809,6 +814,9 @@ core:
       retry: Retry
       unfold: Unfold
       fold: Fold
+      remove: Remove
+      replace: Replace
+      more: More
     toast:
       disable_success: Disabled successfully
       enable_success: Enabled successfully

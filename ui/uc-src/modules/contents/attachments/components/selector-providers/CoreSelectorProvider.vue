@@ -7,6 +7,7 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconCheckboxFill,
+  IconClose,
   IconEye,
   IconGrid,
   IconList,
@@ -21,11 +22,12 @@ import {
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
+import type { SuccessResponse } from "@uppy/core";
 import { useLocalStorage } from "@vueuse/core";
+import { throttle } from "es-toolkit/compat";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
-import AttachmentUploadModal from "./AttachmentUploadModal.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
 
 const { t } = useI18n();
@@ -89,13 +91,13 @@ const {
   },
 });
 
+const throttledFetchAttachments = throttle(handleFetchAttachments, 1000, {
+  leading: false,
+  trailing: true,
+});
+
 // Upload
 const uploadVisible = ref(false);
-
-function onUploadModalClose() {
-  handleFetchAttachments();
-  uploadVisible.value = false;
-}
 
 // Select
 const selectedAttachment = ref<Attachment>();
@@ -217,6 +219,19 @@ const handleSelectNext = async () => {
     selectedAttachment.value = data.value.items[0];
   }
 };
+
+function onUploadDone() {
+  handleFetchAttachments();
+  uploadVisible.value = false;
+}
+
+function onUploaded(response: SuccessResponse) {
+  if (response.body) {
+    handleSelect(response.body as Attachment);
+    page.value = 1;
+    throttledFetchAttachments();
+  }
+}
 </script>
 <template>
   <div class="mb-3 block w-full rounded bg-gray-50 px-3 py-2">
@@ -302,13 +317,26 @@ const handleSelectNext = async () => {
     </div>
   </div>
 
-  <div v-if="data?.total" class="mb-5">
-    <VButton @click="uploadVisible = true">
+  <div class="mb-5 space-y-3">
+    <VButton @click="uploadVisible = !uploadVisible">
       <template #icon>
-        <IconUpload />
+        <IconUpload v-if="!uploadVisible" />
+        <IconClose v-else />
       </template>
-      {{ $t("core.common.buttons.upload") }}
+      {{
+        uploadVisible
+          ? $t("core.common.buttons.cancel_upload")
+          : $t("core.common.buttons.upload")
+      }}
     </VButton>
+    <Transition v-if="uploadVisible" appear name="fade">
+      <UppyUpload
+        endpoint="/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload"
+        width="100%"
+        :done-button-handler="onUploadDone"
+        @uploaded="onUploaded"
+      />
+    </Transition>
   </div>
 
   <VLoading v-if="isLoading" />
@@ -397,8 +425,6 @@ const handleSelectNext = async () => {
       :size-options="[60, 120, 200]"
     />
   </div>
-
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
 
   <AttachmentDetailModal
     v-if="selectedAttachment"

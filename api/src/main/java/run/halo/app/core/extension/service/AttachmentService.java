@@ -94,6 +94,13 @@ public interface AttachmentService {
      */
     Mono<URI> getSharedURL(Attachment attachment, Duration ttl);
 
+    /**
+     * Gets thumbnail links using handlers in plugins. Please make sure the attachment has
+     * permalink.
+     *
+     * @param attachment is created attachment.
+     * @return thumbnail links
+     */
     Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment);
 
     /**

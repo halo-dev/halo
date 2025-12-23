@@ -703,9 +703,9 @@ core:
       title: 上傳附件
       filters:
         group:
-          label: 選擇分組：
+          label: 分組：
         policy:
-          label: 選擇存儲策略：
+          label: 存儲策略：
           empty:
             title: 沒有存儲策略
             description: 在上傳之前，需要新建一個存儲策略
@@ -1765,6 +1765,10 @@ core:
       image_tooltip: 查看圖片：{value}
       item_modal:
         title: 編輯條目
+    attachment:
+      operations:
+        select: 從附件庫選擇
+        input: 輸入鏈接
   common:
     buttons:
       save: 保存
@@ -1812,6 +1816,10 @@ core:
       retry: 重試
       unfold: 展開
       fold: 收起
+      remove: 移除
+      replace: 替換
+      cancel_upload: 取消上傳
+      more: 更多
     radio:
       "yes": 是
       "no": 否

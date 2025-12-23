@@ -125,8 +125,10 @@ const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 // Attachment Selector Modal
 const attachmentSelectorModalVisible = ref(false);
 function onAttachmentSelect(attachments: AttachmentLike[]) {
-  const contents = convertToMediaContents(attachments);
-  editor.value?.chain().focus().insertContent(contents).run();
+  const contents = convertToMediaContents(editor.value!, attachments);
+  if (contents.length) {
+    editor.value?.chain().focus().insertContent(contents).run();
+  }
 }
 
 const customExtensions = [

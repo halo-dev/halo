@@ -3,7 +3,6 @@ import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import { Icon } from "@iconify/vue";
 import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { onMounted, ref, toRaw } from "vue";
@@ -11,6 +10,8 @@ import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
 import ArrayFormModal from "./ArrayFormModal.vue";
+import ColorLabel from "./labels/ColorLabel.vue";
+import IconifyLabel from "./labels/IconifyLabel.vue";
 
 const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
 
@@ -119,8 +120,10 @@ const renderItemLabelValue = (
     }
     case "iconify": {
       const format = node.props.format;
+      const valueOnly = node.props.valueOnly;
       return {
         format,
+        valueOnly,
       };
     }
     default: {
@@ -316,25 +319,14 @@ const handleRemoveItem = (index: number) => {
             <span v-if="itemLabel.type === 'text'">
               {{ itemLabel.value }}
             </span>
-            <div
+            <ColorLabel
+              v-if="itemLabel.type === 'color'"
+              :item-label="itemLabel"
+            />
+            <IconifyLabel
               v-if="itemLabel.type === 'iconify'"
-              class="inline-flex items-center [&>*]:size-4"
-            >
-              <img
-                v-if="['url', 'dataurl'].includes(itemLabel.format)"
-                :src="itemLabel.value?.value"
-                class="max-w-none"
-              />
-              <Icon
-                v-else-if="itemLabel.format === 'name'"
-                :icon="itemLabel.value?.value"
-              />
-              <div
-                v-else
-                class="inline-flex items-center justify-center"
-                v-html="itemLabel.value?.value"
-              ></div>
-            </div>
+              :item-label="itemLabel"
+            />
           </template>
         </div>
         <IconClose

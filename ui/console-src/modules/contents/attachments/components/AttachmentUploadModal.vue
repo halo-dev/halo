@@ -7,8 +7,6 @@ import {
   VDropdown,
   VDropdownItem,
   VModal,
-  VTabItem,
-  VTabs,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
@@ -20,7 +18,7 @@ import AttachmentGroupBadge from "./AttachmentGroupBadge.vue";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 import AttachmentPolicyBadge from "./AttachmentPolicyBadge.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import UploadFromUrl from "./UploadFromUrl.vue";
+import AttachmentUploadArea from "./AttachmentUploadArea.vue";
 
 const { initialPolicyName = undefined, initialGroupName = undefined } =
   defineProps<{
@@ -40,26 +38,14 @@ const groupEditingModal = ref(false);
 const policyTemplateNameToCreate = ref();
 
 const { groups, handleFetchGroups } = useFetchAttachmentGroup();
-const { policyTemplates } = useFetchAttachmentPolicyTemplate();
-const { policies: allPolicies, handleFetchPolicies } =
+const { data: policyTemplates } = useFetchAttachmentPolicyTemplate();
+const { data: allPolicies, refetch: handleFetchPolicies } =
   useFetchAttachmentPolicy();
 
 const policies = computed(() => {
-  return allPolicies.value
-    ?.filter((policy) => {
-      return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
-    })
-    .sort((a, b) => {
-      const priorityA = parseInt(
-        a.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
-        10
-      );
-      const priorityB = parseInt(
-        b.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
-        10
-      );
-      return priorityB - priorityA;
-    });
+  return allPolicies.value?.filter((policy) => {
+    return policy.metadata.labels?.[attachmentPolicyLabels.HIDDEN] !== "true";
+  });
 });
 
 onMounted(() => {
@@ -92,8 +78,6 @@ const onGroupEditingModalClose = async () => {
   await handleFetchGroups();
   groupEditingModal.value = false;
 };
-
-const activeTab = ref("upload");
 </script>
 
 <template>
@@ -190,40 +174,11 @@ const activeTab = ref("upload");
       </div>
 
       <div class="mb-3">
-        <VTabs v-model:active-id="activeTab" type="outline">
-          <VTabItem
-            id="upload"
-            :label="
-              $t('core.attachment.upload_modal.upload_options.local_upload')
-            "
-          >
-            <UppyUpload
-              endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
-              :disabled="!selectedPolicyName"
-              :meta="{
-                policyName: selectedPolicyName,
-                groupName: selectedGroupName,
-              }"
-              width="100%"
-              :allowed-meta-fields="['policyName', 'groupName']"
-              :note="
-                selectedPolicyName
-                  ? ''
-                  : $t('core.attachment.upload_modal.filters.policy.not_select')
-              "
-              :done-button-handler="() => modal?.close()"
-            />
-          </VTabItem>
-          <VTabItem
-            id="download"
-            :label="$t('core.attachment.upload_modal.upload_options.download')"
-          >
-            <UploadFromUrl
-              :policy-name="selectedPolicyName"
-              :group-name="selectedGroupName"
-            />
-          </VTabItem>
-        </VTabs>
+        <AttachmentUploadArea
+          :policy-name="selectedPolicyName"
+          :group-name="selectedGroupName"
+          @done="modal?.close()"
+        />
       </div>
     </div>
   </VModal>

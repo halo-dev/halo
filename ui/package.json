@@ -101,6 +101,7 @@
     "es-toolkit": "^1.41.0",
     "fuse.js": "^7.1.0",
     "lodash-es": "^4.17.21",
+    "mime": "^4.1.0",
     "nprogress": "^0.2.0",
     "object-hash": "^3.0.0",
     "overlayscrollbars": "^2.5.0",

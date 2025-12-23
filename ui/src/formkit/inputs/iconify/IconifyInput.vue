@@ -26,9 +26,21 @@ const props = defineProps({
 });
 
 const format = computed(() => props.context.format as IconifyFormat);
-const currentIconifyValue = computed(
-  () => props.context._value as IconifyValue
-);
+const valueOnly = computed(() => props.context.valueOnly as boolean);
+const currentIconifyValue = computed(() => {
+  const value = props.context._value;
+
+  if (!value) {
+    return undefined;
+  }
+
+  if (valueOnly.value) {
+    return {
+      value: value as string,
+    };
+  }
+  return value as IconifyValue;
+});
 
 provide<Ref<IconifyFormat>>("format", format);
 
@@ -44,7 +56,11 @@ const popperPlacement = computed(
 const dropdown = useTemplateRef<InstanceType<typeof VDropdown>>("dropdown");
 
 const onSelect = (icon: IconifyValue) => {
-  props.context.node.input(icon);
+  if (valueOnly.value) {
+    props.context.node.input(icon.value);
+  } else {
+    props.context.node.input(icon);
+  }
   dropdown.value?.hide();
 };
 
@@ -52,6 +68,12 @@ const editFormDropdown =
   useTemplateRef<InstanceType<typeof VDropdown>>("editFormDropdown");
 
 function onEditFormSubmit({ value: iconValue }: { value: string }) {
+  if (valueOnly.value) {
+    props.context.node.input(iconValue);
+    editFormDropdown.value?.hide();
+    return;
+  }
+
   const valueToUpdate: IconifyValue = {
     ...currentIconifyValue.value,
     value: iconValue,
@@ -59,7 +81,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
 
   if (format.value === "name") {
     valueToUpdate.name = iconValue;
-  } else if (iconValue !== currentIconifyValue.value.value) {
+  } else if (iconValue !== currentIconifyValue.value?.value) {
     valueToUpdate.name = "";
   }
 
@@ -82,11 +104,8 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
         class="inline-flex h-9 items-center justify-center rounded-lg border bg-white px-2 transition-all hover:bg-gray-50 hover:shadow active:bg-gray-100"
         :aria-label="$t('core.formkit.iconify.placeholder')"
       >
-        <div v-if="!currentIconifyValue" class="text-sm text-gray-600">
-          {{ $t("core.formkit.iconify.placeholder") }}
-        </div>
         <div
-          v-else
+          v-if="currentIconifyValue?.value"
           class="inline-flex size-full items-center justify-center [&>*]:size-5"
         >
           <img
@@ -103,13 +122,22 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
             v-html="currentIconifyValue.value"
           ></div>
         </div>
+        <div v-else class="text-sm text-gray-600">
+          {{ $t("core.formkit.iconify.placeholder") }}
+        </div>
       </button>
       <template #popper>
         <IconifyPicker @select="onSelect" />
       </template>
     </VDropdown>
     <div class="inline-flex items-center gap-1.5">
-      <VDropdown ref="editFormDropdown" class="inline-flex">
+      <!-- @vue-ignore -->
+      <VDropdown
+        ref="editFormDropdown"
+        class="inline-flex"
+        :dispose-timeout="null"
+        :auto-hide="false"
+      >
         <template #default="{ shown }">
           <button
             v-tooltip="$t('core.formkit.iconify.operations.edit')"
@@ -140,7 +168,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
               />
               <FormKit
                 v-else-if="['dataurl', 'url'].includes(format)"
-                type="attachment"
+                type="attachmentInput"
                 name="value"
                 :model-value="currentIconifyValue?.value"
               ></FormKit>

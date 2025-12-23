@@ -6,6 +6,7 @@ import type { DefaultConfigOptions } from "@formkit/vue";
 import { array } from "./inputs/array";
 import { attachment } from "./inputs/attachment";
 import { attachmentGroupSelect } from "./inputs/attachment-group-select";
+import { attachmentInput } from "./inputs/attachment-input";
 import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { categorySelect } from "./inputs/category-select";
@@ -50,7 +51,7 @@ const config: DefaultConfigOptions = {
     createAutoHeightTextareaPlugin(),
   ],
   inputs: {
-    attachment,
+    attachmentInput,
     attachmentGroupSelect,
     attachmentPolicySelect,
     categoryCheckbox,
@@ -79,6 +80,7 @@ const config: DefaultConfigOptions = {
     array,
     color,
     iconify,
+    attachment,
   },
   locales: { zh, en },
   locale: "zh",
