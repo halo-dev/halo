@@ -470,11 +470,9 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     return;
   }
 
-  const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
+  const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
     {
       file,
-      postName: formState.value.metadata.name,
-      waitForPermalink: true,
     },
     options
   );

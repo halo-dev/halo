@@ -181,13 +181,11 @@ export async function uploadExternalLink(
   }
 
   try {
-    const { data } =
-      await ucApiClient.storage.attachment.externalTransferAttachment1({
-        ucUploadFromUrlRequest: {
-          url: src,
-        },
-        waitForPermalink: true,
-      });
+    const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
+      {
+        url: src,
+      }
+    );
 
     const url = data.status?.permalink;
     const name = data.spec.displayName;

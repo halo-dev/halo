@@ -32,13 +32,11 @@ export function useExternalAssetsTransfer(
 
     transferring.value = true;
 
-    const { data } =
-      await ucApiClient.storage.attachment.externalTransferAttachment1({
-        ucUploadFromUrlRequest: {
-          url: src.value,
-        },
-        waitForPermalink: true,
-      });
+    const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
+      {
+        url: src.value,
+      }
+    );
 
     callback({
       url: data.status?.permalink || "",
