@@ -79,7 +79,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 1 }),
                 icon: markRaw(LucideHeading1),
-                title: i18n.global.t("editor.common.heading.header1"),
+                title: i18n.global.t("editor.common.heading.heading1"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 1 }).run(),
               },
@@ -91,7 +91,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 2 }),
                 icon: markRaw(LucideHeading2),
-                title: i18n.global.t("editor.common.heading.header2"),
+                title: i18n.global.t("editor.common.heading.heading2"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 2 }).run(),
               },
@@ -103,7 +103,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 3 }),
                 icon: markRaw(LucideHeading3),
-                title: i18n.global.t("editor.common.heading.header3"),
+                title: i18n.global.t("editor.common.heading.heading3"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 3 }).run(),
               },
@@ -115,7 +115,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 4 }),
                 icon: markRaw(LucideHeading4),
-                title: i18n.global.t("editor.common.heading.header4"),
+                title: i18n.global.t("editor.common.heading.heading4"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 4 }).run(),
               },
@@ -127,7 +127,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 5 }),
                 icon: markRaw(LucideHeading5),
-                title: i18n.global.t("editor.common.heading.header5"),
+                title: i18n.global.t("editor.common.heading.heading5"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 5 }).run(),
               },
@@ -139,7 +139,7 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
                 editor,
                 isActive: editor.isActive(TiptapHeading.name, { level: 6 }),
                 icon: markRaw(LucideHeading6),
-                title: i18n.global.t("editor.common.heading.header6"),
+                title: i18n.global.t("editor.common.heading.heading6"),
                 action: () =>
                   editor.chain().focus().toggleHeading({ level: 6 }).run(),
               },
@@ -161,8 +161,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 20,
             icon: markRaw(LucideHeading1),
-            title: "editor.common.heading.header1",
-            keywords: ["h1", "header1", "1", "yijibiaoti"],
+            title: "editor.common.heading.heading1",
+            keywords: ["h1", "heading1", "1", "yijibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -175,8 +175,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 30,
             icon: markRaw(LucideHeading2),
-            title: "editor.common.heading.header2",
-            keywords: ["h2", "header2", "2", "erjibiaoti"],
+            title: "editor.common.heading.heading2",
+            keywords: ["h2", "heading2", "2", "erjibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -189,8 +189,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 40,
             icon: markRaw(LucideHeading3),
-            title: "editor.common.heading.header3",
-            keywords: ["h3", "header3", "3", "sanjibiaoti"],
+            title: "editor.common.heading.heading3",
+            keywords: ["h3", "heading3", "3", "sanjibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -203,8 +203,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 50,
             icon: markRaw(LucideHeading4),
-            title: "editor.common.heading.header4",
-            keywords: ["h4", "header4", "4", "sijibiaoti"],
+            title: "editor.common.heading.heading4",
+            keywords: ["h4", "heading4", "4", "sijibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -217,8 +217,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 60,
             icon: markRaw(LucideHeading5),
-            title: "editor.common.heading.header5",
-            keywords: ["h5", "header5", "5", "wujibiaoti"],
+            title: "editor.common.heading.heading5",
+            keywords: ["h5", "heading5", "5", "wujibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -231,8 +231,8 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
           {
             priority: 70,
             icon: markRaw(LucideHeading6),
-            title: "editor.common.heading.header6",
-            keywords: ["h6", "header6", "6", "liujibiaoti"],
+            title: "editor.common.heading.heading6",
+            keywords: ["h6", "heading6", "6", "liujibiaoti"],
             command: ({ editor, range }: { editor: Editor; range: Range }) => {
               editor
                 .chain()
@@ -259,42 +259,42 @@ export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
               {
                 priority: 20,
                 icon: markRaw(LucideHeading1),
-                title: i18n.global.t("editor.common.heading.header1"),
+                title: i18n.global.t("editor.common.heading.heading1"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 1 }).run(),
               },
               {
                 priority: 30,
                 icon: markRaw(LucideHeading2),
-                title: i18n.global.t("editor.common.heading.header2"),
+                title: i18n.global.t("editor.common.heading.heading2"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 2 }).run(),
               },
               {
                 priority: 40,
                 icon: markRaw(LucideHeading3),
-                title: i18n.global.t("editor.common.heading.header3"),
+                title: i18n.global.t("editor.common.heading.heading3"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 3 }).run(),
               },
               {
                 priority: 50,
                 icon: markRaw(LucideHeading4),
-                title: i18n.global.t("editor.common.heading.header4"),
+                title: i18n.global.t("editor.common.heading.heading4"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 4 }).run(),
               },
               {
                 priority: 60,
                 icon: markRaw(LucideHeading5),
-                title: i18n.global.t("editor.common.heading.header5"),
+                title: i18n.global.t("editor.common.heading.heading5"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 5 }).run(),
               },
               {
                 priority: 70,
                 icon: markRaw(LucideHeading6),
-                title: i18n.global.t("editor.common.heading.header6"),
+                title: i18n.global.t("editor.common.heading.heading6"),
                 action: ({ editor }: { editor: Editor }) =>
                   editor.chain().focus().setHeading({ level: 6 }).run(),
               },
