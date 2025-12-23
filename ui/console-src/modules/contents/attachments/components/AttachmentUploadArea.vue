@@ -2,7 +2,7 @@
 import type { Attachment } from "@halo-dev/api-client";
 import { VTabItem, VTabs } from "@halo-dev/components";
 import type { SuccessResponse } from "@uppy/core";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
 const {
@@ -27,6 +27,15 @@ const onUploaded = (response: SuccessResponse) => {
     emit("uploaded", response.body as Attachment);
   }
 };
+
+const UNGROUPED_GROUP_NAME = "ungrouped";
+
+const finalGroupName = computed(() => {
+  if (!groupName || groupName === UNGROUPED_GROUP_NAME) {
+    return "";
+  }
+  return groupName;
+});
 </script>
 <template>
   <VTabs v-model:active-id="activeTab" type="outline">
@@ -39,7 +48,7 @@ const onUploaded = (response: SuccessResponse) => {
         :disabled="!policyName"
         :meta="{
           policyName: policyName,
-          groupName: groupName,
+          groupName: finalGroupName,
         }"
         width="100%"
         :height="height"
