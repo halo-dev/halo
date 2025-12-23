@@ -1333,7 +1333,8 @@
         ]
       },
       "post": {
-        "description": "Create attachment for the given post.",
+        "deprecated": true,
+        "description": "Create attachment for the given post. Deprecated in favor of /attachments/-/upload.",
         "operationId": "CreateAttachmentForPost",
         "parameters": [
           {
@@ -1374,16 +1375,15 @@
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
       "post": {
         "description": "Upload attachment to user center storage.",
-        "operationId": "UploadUcAttachment",
+        "operationId": "UploadAttachmentForUc",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UcUploadRequest"
+                "$ref": "#/components/schemas/UploadForm"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "default": {
@@ -1404,7 +1404,8 @@
     },
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
-        "description": "Upload attachment from the given URL.",
+        "deprecated": true,
+        "description": "Upload attachment from the given URL.\nDeprecated in favor of /attachments/-/upload.",
         "operationId": "ExternalTransferAttachment_1",
         "parameters": [
           {
@@ -2245,9 +2246,6 @@
           }
         }
       },
-      "Part": {
-        "type": "object"
-      },
       "PasswordRequest": {
         "required": [
           "password"
@@ -2927,38 +2925,24 @@
           }
         }
       },
-      "UcUploadRequest": {
-        "required": [
-          "file"
-        ],
+      "UploadForm": {
         "type": "object",
         "properties": {
           "file": {
             "type": "string",
+            "description": "The file to upload. If not provided, the url will be used.",
             "format": "binary"
           },
-          "formData": {
-            "type": "object",
-            "properties": {
-              "all": {
-                "type": "object",
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/Part"
-                },
-                "writeOnly": true
-              },
-              "empty": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Part"
-              }
-            }
+          "filename": {
+            "type": "string",
+            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+          },
+          "url": {
+            "type": "string",
+            "description": "The url to upload from. If not provided, the file will be used."
           }
-        }
+        },
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
       },
       "UserConnection": {
         "required": [

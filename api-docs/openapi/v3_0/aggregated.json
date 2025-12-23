@@ -7428,6 +7428,36 @@
         ]
       }
     },
+    "/apis/console.api.storage.halo.run/v1alpha1/attachments/-/upload": {
+      "post": {
+        "description": "Upload attachment endpoint for console.",
+        "operationId": "uploadAttachmentForConsole",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadForm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/console.api.storage.halo.run/v1alpha1/policies/{name}/configs/{group}": {
       "get": {
         "description": "Get policy config by group",
@@ -15353,7 +15383,8 @@
         ]
       },
       "post": {
-        "description": "Create attachment for the given post.",
+        "deprecated": true,
+        "description": "Create attachment for the given post. Deprecated in favor of /attachments/-/upload.",
         "operationId": "CreateAttachmentForPost",
         "parameters": [
           {
@@ -15394,16 +15425,15 @@
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
       "post": {
         "description": "Upload attachment to user center storage.",
-        "operationId": "UploadUcAttachment",
+        "operationId": "UploadAttachmentForUc",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UcUploadRequest"
+                "$ref": "#/components/schemas/UploadForm"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "default": {
@@ -15424,7 +15454,8 @@
     },
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
-        "description": "Upload attachment from the given URL.",
+        "deprecated": true,
+        "description": "Upload attachment from the given URL.\nDeprecated in favor of /attachments/-/upload.",
         "operationId": "ExternalTransferAttachment_1",
         "parameters": [
           {
@@ -19356,14 +19387,11 @@
       "NavigationPostVo": {
         "type": "object",
         "properties": {
-          "current": {
-            "$ref": "#/components/schemas/PostVo"
-          },
           "next": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           },
           "previous": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           }
         },
         "description": "Post navigation vo to hold previous and next item."
@@ -19739,9 +19767,6 @@
           }
         },
         "description": "Comment owner info."
-      },
-      "Part": {
-        "type": "object"
       },
       "PasswordRequest": {
         "required": [
@@ -23415,39 +23440,6 @@
           }
         }
       },
-      "UcUploadRequest": {
-        "required": [
-          "file"
-        ],
-        "type": "object",
-        "properties": {
-          "file": {
-            "type": "string",
-            "format": "binary"
-          },
-          "formData": {
-            "type": "object",
-            "properties": {
-              "all": {
-                "type": "object",
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/Part"
-                },
-                "writeOnly": true
-              },
-              "empty": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Part"
-              }
-            }
-          }
-        }
-      },
       "UpgradeFromUriRequest": {
         "required": [
           "uri"
@@ -23471,6 +23463,25 @@
             "format": "binary"
           }
         }
+      },
+      "UploadForm": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "The file to upload. If not provided, the url will be used.",
+            "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+          },
+          "url": {
+            "type": "string",
+            "description": "The url to upload from. If not provided, the file will be used."
+          }
+        },
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
       },
       "UploadFromUrlRequest": {
         "required": [
