@@ -1,16 +1,16 @@
 package run.halo.app.infra.actuator;
 
-import java.time.Duration;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * Global info endpoint.
  */
 @WebEndpoint(id = "globalinfo")
 @Component
-public class GlobalInfoEndpoint {
+class GlobalInfoEndpoint {
 
     private final GlobalInfoService globalInfoService;
 
@@ -19,8 +19,8 @@ public class GlobalInfoEndpoint {
     }
 
     @ReadOperation
-    public GlobalInfo globalInfo() {
-        return globalInfoService.getGlobalInfo().block(Duration.ofMinutes(1));
+    public Mono<GlobalInfo> globalInfo() {
+        return globalInfoService.getGlobalInfo();
     }
 
 }
