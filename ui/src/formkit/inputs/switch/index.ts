@@ -48,7 +48,7 @@ export const switchInput: FormKitTypeDefinition = {
    */
   family: "box",
 
-  props: ["onValue", "offValue", "disabled", "type"],
+  props: ["onValue", "offValue", "disabled"],
 
   features: [switchFeature],
 
@@ -68,8 +68,6 @@ declare module "@formkit/inputs" {
       onValue?: unknown;
       offValue?: unknown;
       disabled?: boolean;
-      size?: "xs" | "sm" | "md" | "lg";
-      state: "default" | "success" | "error";
     };
   }
 }
