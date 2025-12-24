@@ -404,7 +404,9 @@ public class UserEndpoint implements CustomEndpoint {
             environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
                 .mapNotNull(SystemSetting.User::getAvatarPolicy)
                 .filter(StringUtils::isNotBlank);
-        var getAvatarPolicy = environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
+        var getAvatarPolicy = environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )
             .mapNotNull(SystemSetting.Attachment::avatar)
             .mapNotNull(UploadOptions::policyName)
             .filter(StringUtils::isNotBlank)

@@ -75,7 +75,7 @@ public class AttachmentHandler {
                         return attachmentService.upload(
                             config.policyName(),
                             config.groupName(),
-                            file.name(),
+                            file.filename(),
                             file.content(),
                             mediaType
                         );
