@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -404,9 +403,15 @@ class UserEndpointTest {
                 .contentType(MediaType.IMAGE_JPEG)
                 .filename("fake-filename.jpg");
 
-            SystemSetting.User user = mock(SystemSetting.User.class);
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                .thenReturn(Mono.just(user));
+            when(environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                .avatar(null)
+                .build())
+            );
+            when(environmentFetcher.fetch(
+                SystemSetting.User.GROUP, SystemSetting.User.class)
+            ).thenReturn(Mono.empty());
 
             webClient
                 .post()
@@ -432,11 +437,66 @@ class UserEndpointTest {
                 .contentType(MediaType.IMAGE_PNG)
                 .filename("fake-filename.png");
 
-            SystemSetting.User user = mock(SystemSetting.User.class);
-            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                .thenReturn(Mono.just(user));
+
+            when(environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                .avatar(null)
+                .build())
+            );
+            when(environmentFetcher.fetch(
+                SystemSetting.User.GROUP, SystemSetting.User.class)
+            ).thenReturn(Mono.empty());
+
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
-            when(attachmentService.upload(anyString(), anyString(), anyString(),
+            when(attachmentService.upload(eq("default-policy"), anyString(), anyString(),
+                any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
+
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient.post()
+                .uri("/users/-/avatar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(User.class).isEqualTo(currentUser);
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(currentUser);
+        }
+
+        @Test
+        void shouldUseFallbackSetting() {
+            var currentUser = createUser("fake-user");
+
+            Attachment attachment = new Attachment();
+            Metadata metadata = new Metadata();
+            metadata.setName("fake-attachment");
+            attachment.setMetadata(metadata);
+
+            var multipartBodyBuilder = new MultipartBodyBuilder();
+            multipartBodyBuilder.part("file", "fake-file")
+                .contentType(MediaType.IMAGE_PNG)
+                .filename("fake-filename.png");
+
+            when(environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                .avatar(null)
+                .build())
+            );
+            when(environmentFetcher.fetch(
+                SystemSetting.User.GROUP, SystemSetting.User.class)
+            ).thenReturn(Mono.fromSupplier(() -> {
+                var us = new SystemSetting.User();
+                us.setAvatarPolicy("fake-avatar-policy");
+                return us;
+            }));
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(attachmentService.upload(eq("fake-avatar-policy"), anyString(), anyString(),
                 any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
 
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
