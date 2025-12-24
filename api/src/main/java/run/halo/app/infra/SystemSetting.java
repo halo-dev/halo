@@ -26,6 +26,7 @@ public class SystemSetting {
     public static final String SYSTEM_CONFIG_DEFAULT = "system-default";
     public static final String SYSTEM_CONFIG = "system";
 
+    @Builder
     public record Attachment(
 
         @Nullable
