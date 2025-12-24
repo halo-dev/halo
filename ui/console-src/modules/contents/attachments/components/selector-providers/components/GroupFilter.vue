@@ -84,14 +84,16 @@ const moreGroups = computed(() => {
           </template>
         </AttachmentGroupBadge>
         <template #popper>
-          <VDropdownItem
-            v-for="value in moreGroups"
-            :key="value.metadata.name"
-            :selected="value.metadata.name === modelValue"
-            @click="modelValue = value.metadata.name"
-          >
-            {{ value.spec.displayName }}
-          </VDropdownItem>
+          <div class="max-h-80 overflow-y-auto">
+            <VDropdownItem
+              v-for="value in moreGroups"
+              :key="value.metadata.name"
+              :selected="value.metadata.name === modelValue"
+              @click="modelValue = value.metadata.name"
+            >
+              {{ value.spec.displayName }}
+            </VDropdownItem>
+          </div>
         </template>
       </VDropdown>
 
