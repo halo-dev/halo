@@ -3,11 +3,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.repositories.PasswordCredentials
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -48,6 +44,11 @@ abstract class UploadBundleTask extends DefaultTask {
             logger.lifecycle("Snapshot bundle uploaded successfully.")
             return
         }
+        if (checkIfPublished()) {
+            logger.lifecycle("The component ${project.group}:${project.name}:${project.version} is already published, skipping upload.")
+            return
+        }
+
         def deploymentId = uploadReleaseBundle()
         def maxWait = Duration.ofMinutes(12)
         def pollingInterval = Duration.ofSeconds(10)
@@ -80,6 +81,25 @@ abstract class UploadBundleTask extends DefaultTask {
         }
     }
 
+    boolean checkIfPublished() {
+        createHttpClient().withCloseable { client ->
+            def endpoint = "https://central.sonatype.com/api/v1/publisher/published?namespace=${project.group}&name=${project.name}&version=${project.version}";
+            logger.debug("Checking if published at endpoint: ${endpoint}")
+            def request = HttpRequest.newBuilder(URI.create(endpoint))
+                    .header("Authorization", bearerAuthorizationHeader)
+                    .GET()
+                    .build()
+            def response = client.send(request, HttpResponse.BodyHandlers.ofString(UTF_8))
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Failed to check if published: status: ${response.statusCode()} - body: ${response.body()}")
+            }
+            logger.debug("Response body: ${response.body()}")
+            def result = new JsonSlurper().parseText(response.body())
+            logger.debug("Check if published result: ${result}")
+            return result.published as boolean
+        }
+    }
+
     DeploymentState checkDeploymentState(String deploymentId) {
         createHttpClient().withCloseable { client ->
             def endpoint = "https://central.sonatype.com/api/v1/publisher/status?id=${deploymentId}"
@@ -95,7 +115,7 @@ abstract class UploadBundleTask extends DefaultTask {
             logger.debug("Response body: ${response.body()}")
             def status = new JsonSlurper().parseText(response.body())
             logger.debug("Deployment status: ${status}")
-            return status.properties.deploymentState as DeploymentState
+            return status.deploymentState as DeploymentState
         }
     }
 
@@ -133,7 +153,7 @@ abstract class UploadBundleTask extends DefaultTask {
             def boundary = "------haloformboundary${UUID.randomUUID().toString().replace('-', '')}"
             def crlf = "\r\n"
             def delimiter = "${crlf}--${boundary}"
-            def endpoint = "https://central.sonatype.com/api/v1/publisher/upload?publishingType=${publishingType}"
+            def endpoint = "https://central.sonatype.com/api/v1/publisher/upload?publishingType=${publishingType.get()}"
 
             def publishers = new ArrayList<HttpRequest.BodyPublisher>()
             publishers.add(ofString("${delimiter}${crlf}"))
