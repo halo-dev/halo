@@ -150,65 +150,44 @@ spec:
           value: "default-policy"
           help: 指定用户在个人中心上传的附件的存储位置
     - group: attachment
-      label: Attachment Settings
+      label: 附件配置
       formSchema:
         - $formkit: group
           name: console
-          label: Attachment Console Settings
+          label: Console 端附件配置
+          help: 为 Console 端直接上传附件的地方设置默认的存储策略和分组
           children:
             - $formkit: attachmentPolicySelect
               name: policyName
-              label: "Storage Policy"
-              value: "default-policy"
-              help: For managing attachments in the admin console
+              label: "存储策略"
+              auto-select: false
             - $formkit: attachmentGroupSelect
               name: groupName
-              label: "Storage Group"
-              value: ""
-              help: For managing attachments in the admin console
+              label: "存储组"
+              auto-select: false
+              clearable: true
         - $formkit: group
           name: uc
-          label: User Center Attachment Settings
+          label: 个人中心附件配置
+          help: 为个人中心直接上传附件的地方设置默认的存储策略和分组，处于安全考虑，建议为所选存储策略限制文件类型和大小
           children:
             - $formkit: attachmentPolicySelect
               name: policyName
-              label: "Attachment Storage Policy"
-              value: "default-policy"
-              help: For managing attachments in the user center
+              label: "存储策略"
+              auto-select: false
             - $formkit: attachmentGroupSelect
               name: groupName
-              label: "Attachment Storage Group"
-              value: ""
-              help: For managing attachments in the user center
+              label: "存储组"
+              auto-select: false
+              clearable: true
         - $formkit: group
           name: avatar
-          label: Avatar Attachment Settings
+          label: 头像附件配置
+          help: 为用户头像设置存储策略和分组，处于安全考虑，建议为所选存储策略限制文件类型和大小
           children:
             - $formkit: attachmentPolicySelect
               name: policyName
-              label: "Avatar Storage Policy"
-              value: "default-policy"
-              help: For managing user avatars
-            - $formkit: attachmentGroupSelect
-              name: groupName
-              label: "Avatar Storage Group"
-              value: ""
-              help: For managing user avatars
-        - $formkit: group
-          name: comment
-          label: Comment Attachment Settings
-          children:
-            - $formkit: attachmentPolicySelect
-              name: policyName
-              label: "Attachment Storage Policy"
-              value: "default-policy"
-              help: For managing attachments uploaded in comments
-            - $formkit: attachmentGroupSelect
-              name: groupName
-              label: "Attachment Storage Group"
-              value: ""
-              help: For managing attachments uploaded in comments
-
+              label: "存储策略"
     - group: comment
       label: 评论设置
       formSchema:
