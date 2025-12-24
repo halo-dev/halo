@@ -27,6 +27,7 @@ import { roleSelect } from "./inputs/role-select";
 import { secret } from "./inputs/secret";
 import { select } from "./inputs/select";
 import { singlePageSelect } from "./inputs/singlePage-select";
+import { switchInput } from "./inputs/switch";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
 import { userSelect } from "./inputs/user-select";
@@ -81,6 +82,7 @@ const config: DefaultConfigOptions = {
     color,
     iconify,
     attachment,
+    switch: switchInput,
   },
   locales: { zh, en },
   locale: "zh",
