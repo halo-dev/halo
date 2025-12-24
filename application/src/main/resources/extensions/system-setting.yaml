@@ -88,12 +88,12 @@ spec:
           name: attachmentPolicyName
           label: "附件存储策略"
           value: "default-policy"
-          help: 用于指定在文章编辑器中上传的默认附件存储策略
+          help: 用于指定在文章编辑器中上传的默认附件存储策略（已过时，请使用附件配置中的管理端附件配置）
         - $formkit: attachmentGroupSelect
           name: attachmentGroupName
           label: "附件存储组"
           value: ""
-          help: 用于指定在文章编辑器中上传的默认附件存储分组
+          help: 用于指定在文章编辑器中上传的默认附件存储分组（已过时，请使用附件配置中的管理端附件配置）
     - group: seo
       label: SEO 设置
       formSchema:
@@ -143,12 +143,51 @@ spec:
           name: avatarPolicy
           label: "头像存储位置"
           value: "default-policy"
-          help: 指定用户上传头像的存储策略
+          help: 指定用户上传头像的存储策略（已过时，请使用附件配置中的头像附件配置）
         - $formkit: attachmentPolicySelect
           name: ucAttachmentPolicy
           label: "个人中心附件存储位置"
           value: "default-policy"
-          help: 指定用户在个人中心上传的附件的存储位置
+          help: 指定用户在个人中心上传的附件的存储位置（已过时，请使用附件配置中的个人中心附件配置）
+    - group: attachment
+      label: 附件配置
+      formSchema:
+        - $formkit: group
+          name: console
+          label: 管理端附件配置
+          help: 为管理端直接上传附件的地方设置默认的存储策略和分组
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "存储策略"
+              auto-select: false
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "存储组"
+              auto-select: false
+              clearable: true
+        - $formkit: group
+          name: uc
+          label: 个人中心附件配置
+          help: 为个人中心直接上传附件的地方设置默认的存储策略和分组，处于安全考虑，建议为所选存储策略限制文件类型和大小
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "存储策略"
+              auto-select: false
+            - $formkit: attachmentGroupSelect
+              name: groupName
+              label: "存储组"
+              auto-select: false
+              clearable: true
+        - $formkit: group
+          name: avatar
+          label: 头像附件配置
+          help: 为用户头像设置存储策略和分组，处于安全考虑，建议为所选存储策略限制文件类型和大小
+          children:
+            - $formkit: attachmentPolicySelect
+              name: policyName
+              label: "存储策略"
     - group: comment
       label: 评论设置
       formSchema:

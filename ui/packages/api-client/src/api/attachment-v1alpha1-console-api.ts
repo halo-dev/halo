@@ -212,6 +212,62 @@ export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAttachmentForConsole: async (file?: File, filename?: string, url?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/console.api.storage.halo.run/v1alpha1/attachments/-/upload`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (filename !== undefined) { 
+                localVarFormParams.append('filename', filename as any);
+            }
+    
+            if (url !== undefined) { 
+                localVarFormParams.append('url', url as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -266,6 +322,20 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
             const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1ConsoleApi.uploadAttachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadAttachmentForConsole(file?: File, filename?: string, url?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachmentForConsole(file, filename, url, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1ConsoleApi.uploadAttachmentForConsole']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -301,6 +371,15 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
          */
         uploadAttachment(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
             return localVarFp.uploadAttachment(requestParameters.file, requestParameters.policyName, requestParameters.groupName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAttachmentForConsole(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.uploadAttachmentForConsole(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -375,6 +454,26 @@ export interface AttachmentV1alpha1ConsoleApiUploadAttachmentRequest {
 }
 
 /**
+ * Request parameters for uploadAttachmentForConsole operation in AttachmentV1alpha1ConsoleApi.
+ */
+export interface AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest {
+    /**
+     * The file to upload. If not provided, the url will be used.
+     */
+    readonly file?: File
+
+    /**
+     * The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+     */
+    readonly filename?: string
+
+    /**
+     * The url to upload from. If not provided, the file will be used.
+     */
+    readonly url?: string
+}
+
+/**
  * AttachmentV1alpha1ConsoleApi - object-oriented interface
  */
 export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
@@ -406,6 +505,16 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
      */
     public uploadAttachment(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ConsoleApiFp(this.configuration).uploadAttachment(requestParameters.file, requestParameters.policyName, requestParameters.groupName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Upload attachment endpoint for console.
+     * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public uploadAttachmentForConsole(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest = {}, options?: RawAxiosRequestConfig) {
+        return AttachmentV1alpha1ConsoleApiFp(this.configuration).uploadAttachmentForConsole(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -2508,14 +2508,11 @@
       "NavigationPostVo": {
         "type": "object",
         "properties": {
-          "current": {
-            "$ref": "#/components/schemas/PostVo"
-          },
           "next": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           },
           "previous": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           }
         },
         "description": "Post navigation vo to hold previous and next item."
