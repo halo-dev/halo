@@ -62,6 +62,10 @@ const theme: Record<string, Record<string, string>> = {
     ...boxClassification,
     wrapper: "flex items-center mb-1 cursor-pointer",
   },
+  switch: {
+    ...boxClassification,
+    wrapper: "flex items-center mb-1 gap-2 cursor-pointer",
+  },
   radio: {
     ...boxClassification,
     input: boxClassification.input.replace("rounded-sm", "rounded-full"),

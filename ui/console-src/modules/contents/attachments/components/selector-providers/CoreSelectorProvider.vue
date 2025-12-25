@@ -314,7 +314,7 @@ function handleToggleUploadView() {
         <VButton @click="handleFetchAttachments">
           {{ $t("core.common.buttons.refresh") }}
         </VButton>
-        <VButton type="secondary" @click="uploadVisible = true">
+        <VButton type="secondary" @click="handleToggleUploadView">
           <template #icon>
             <IconUpload />
           </template>

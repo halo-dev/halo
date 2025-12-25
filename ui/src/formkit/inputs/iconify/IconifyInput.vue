@@ -6,6 +6,7 @@ import {
   VDropdown,
   type VDropdownPlacement,
 } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { Icon } from "@iconify/vue";
 import {
   computed,
@@ -88,6 +89,8 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
   props.context.node.input(valueToUpdate);
   editFormDropdown.value?.hide();
 }
+
+const editFormId = `icon-edit-form-${utils.id.uuid()}`;
 </script>
 
 <template>
@@ -106,7 +109,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
       >
         <div
           v-if="currentIconifyValue?.value"
-          class="inline-flex size-full items-center justify-center [&>*]:size-5"
+          class="inline-flex size-full items-center justify-center [&>*]:h-5"
         >
           <img
             v-if="['url', 'dataurl'].includes(format)"
@@ -136,7 +139,6 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
         ref="editFormDropdown"
         class="inline-flex"
         :dispose-timeout="null"
-        :auto-hide="false"
       >
         <template #default="{ shown }">
           <button
@@ -152,10 +154,10 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
         <template #popper>
           <div class="w-96">
             <FormKit
-              id="icon-edit-form"
+              :id="editFormId"
               type="form"
               ignore
-              name="icon-edit-form"
+              :name="editFormId"
               @submit="onEditFormSubmit"
             >
               <FormKit
@@ -180,10 +182,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
               ></FormKit>
             </FormKit>
             <div class="mt-4">
-              <VButton
-                type="secondary"
-                @click="$formkit.submit('icon-edit-form')"
-              >
+              <VButton type="secondary" @click="$formkit.submit(editFormId)">
                 {{ $t("core.common.buttons.save") }}
               </VButton>
             </div>

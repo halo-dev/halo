@@ -27,9 +27,9 @@ import { roleSelect } from "./inputs/role-select";
 import { secret } from "./inputs/secret";
 import { select } from "./inputs/select";
 import { singlePageSelect } from "./inputs/singlePage-select";
+import { switchInput } from "./inputs/switch";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
-import { toggle } from "./inputs/toggle";
 import { userSelect } from "./inputs/user-select";
 import { verificationForm } from "./inputs/verify-form";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
@@ -82,7 +82,7 @@ const config: DefaultConfigOptions = {
     color,
     iconify,
     attachment,
-    toggle,
+    switch: switchInput,
   },
   locales: { zh, en },
   locale: "zh",
