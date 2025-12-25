@@ -123,3 +123,4 @@ resilience4j.ratelimiter:
 r2dbc:
   migrate:
     resources-path: classpath:/db/migration/${spring.sql.init.platform}/*.sql
+    dialect: ${spring.sql.init.platform}
