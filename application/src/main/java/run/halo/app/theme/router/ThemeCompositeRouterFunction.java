@@ -172,12 +172,12 @@ public class ThemeCompositeRouterFunction implements
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAGS, tags));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAG, tags));
 
-        // Add the index route to the end to prevent conflict with the queryParam rule of the post
-        routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
-        routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
-
         var post = normalizePostPattern(rules);
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.POST, post));
+
+        // Add the index route to the end to prevent conflict with the queryParam rule of the post
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
         return routePatterns;
 
     }
