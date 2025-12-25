@@ -127,13 +127,13 @@ const publishTimeHelp = computed(() => {
             :label="$t('core.post.settings.fields.title.label')"
             type="text"
             name="title"
-            validation="required|length:0,100"
+            validation="required|length:0,1024"
           ></FormKit>
           <FormKit
             :label="$t('core.post.settings.fields.slug.label')"
             name="slug"
             type="text"
-            validation="required|length:0,100|slugUniqueValidation"
+            validation="required|length:0,1024|slugUniqueValidation"
             :validation-rules="{ slugUniqueValidation }"
             :validation-messages="{
               slugUniqueValidation: $t(
