@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import QueryString from "qs";
 import {
   AnnotationSettingV1alpha1Api,
+  AnnotationSettingV1AlphaUcApi,
   AttachmentV1alpha1Api,
   AttachmentV1alpha1ConsoleApi,
   AttachmentV1alpha1UcApi,
@@ -399,6 +400,13 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
     },
     user: {
       preference: new UserPreferenceV1alpha1UcApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+    },
+    core: {
+      annotationSetting: new AnnotationSettingV1AlphaUcApi(
         undefined,
         baseURL,
         axiosInstance

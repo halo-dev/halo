@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useThemeStore } from "@console/stores/theme";
 import {
   reset,
   submitForm,
@@ -9,13 +8,11 @@ import {
 } from "@formkit/core";
 import { getValidationMessages } from "@formkit/validation";
 import type { AnnotationSetting } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { ucApiClient } from "@halo-dev/api-client";
 import { IconArrowRight } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-
-const themeStore = useThemeStore();
 
 function keyValidationRule(node: FormKitNode) {
   const validAnnotations = [
@@ -43,27 +40,13 @@ const props = withDefaults(
 
 const annotationSettings = ref<AnnotationSetting[]>([] as AnnotationSetting[]);
 
-const availableAnnotationSettings = computed(() => {
-  return annotationSettings.value.filter((setting) => {
-    if (!setting.metadata.labels?.["theme.halo.run/theme-name"]) {
-      return true;
-    }
-    return (
-      setting.metadata.labels?.["theme.halo.run/theme-name"] ===
-      themeStore.activatedTheme?.metadata.name
-    );
-  });
-});
-
 const handleFetchAnnotationSettings = async () => {
   try {
     const { data } =
-      await coreApiClient.annotationSetting.listAnnotationSetting({
-        labelSelector: [
-          `halo.run/target-ref=${[props.group, props.kind].join("/")}`,
-        ],
+      await ucApiClient.core.annotationSetting.listAvailableAnnotationSettings({
+        targetRef: `${[props.group, props.kind].join("/")}`,
       });
-    annotationSettings.value = data.items;
+    annotationSettings.value = data;
   } catch (error) {
     console.error("Failed to fetch annotation settings", error);
   }
@@ -89,7 +72,7 @@ const customAnnotations = computed(() => {
 const handleProcessCustomAnnotations = () => {
   let formSchemas: FormKitSchemaNode[] = [];
 
-  availableAnnotationSettings.value.forEach((annotationSetting) => {
+  annotationSettings.value.forEach((annotationSetting) => {
     formSchemas = formSchemas.concat(
       annotationSetting.spec?.formSchema as FormKitSchemaNode[]
     );
@@ -166,12 +149,11 @@ watch(
 );
 
 // submit
-
 const specFormInvalid = ref(true);
 const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
-  if (availableAnnotationSettings.value.length) {
+  if (annotationSettings.value.length) {
     submitForm(specFormId);
   } else {
     specFormInvalid.value = false;
@@ -214,7 +196,7 @@ function onCustomFormToggle(e: Event) {
 <template>
   <div class="flex flex-col gap-3 divide-y divide-gray-100">
     <FormKit
-      v-if="annotations && availableAnnotationSettings.length > 0"
+      v-if="annotations && annotationSettings.length > 0"
       :id="specFormId"
       v-model="annotations"
       type="form"
@@ -222,12 +204,10 @@ function onCustomFormToggle(e: Event) {
       @submit-invalid="onSpecFormSubmitCheck"
       @submit="specFormInvalid = false"
     >
-      <template
-        v-for="(annotationSetting, index) in availableAnnotationSettings"
-      >
+      <template v-for="annotationSetting in annotationSettings">
         <FormKitSchema
           v-if="annotationSetting.spec?.formSchema"
-          :key="index"
+          :key="annotationSetting.metadata.name"
           :schema="
             annotationSetting.spec?.formSchema as FormKitSchemaDefinition
           "
@@ -270,7 +250,7 @@ function onCustomFormToggle(e: Event) {
         :id="customFormId"
         type="form"
         :preserve="true"
-        :form-class="`${availableAnnotationSettings.length ? 'py-4' : ''}`"
+        :form-class="`${annotationSettings.length ? 'py-4' : ''}`"
         @submit-invalid="onCustomFormSubmitCheck"
         @submit="customFormInvalid = false"
       >
