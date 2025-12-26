@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,13 +18,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.core.extension.Role;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
@@ -192,11 +194,40 @@ class DefaultUserDetailServiceTest {
             .verify();
     }
 
-    Role createRole(String roleName) {
-        var role = new Role();
-        role.setMetadata(new Metadata());
-        role.getMetadata().setName(roleName);
-        return role;
+    @Test
+    void shouldFindUserDetailsByEmail() {
+        var foundUser = createFakeUser();
+
+        when(userService.findUserByVerifiedEmail("faker@halo.run"))
+            .thenReturn(Mono.just(foundUser));
+        when(roleService.getRolesByUsername("faker")).thenReturn(Flux.just("fake-role"));
+
+        var userDetailsMono = userDetailService.findByUsername("faker@halo.run");
+
+        StepVerifier.create(userDetailsMono)
+            .expectSubscription()
+            .assertNext(gotUser -> {
+                assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
+                assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
+                assertEquals(
+                    Set.of("ROLE_fake-role", "ROLE_authenticated", "ROLE_anonymous"),
+                    authorityListToSet(gotUser.getAuthorities()));
+            })
+            .verifyComplete();
+
+        verify(userService, never()).getUser(any());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenEmailNotExists() {
+        when(userService.findUserByVerifiedEmail("non-existing-email@halo.run"))
+            .thenReturn(Mono.error(new UserNotFoundException("non-existing-email@halo.run")));
+
+        var userDetailsMono = userDetailService.findByUsername("non-existing-email@halo.run");
+
+        StepVerifier.create(userDetailsMono)
+            .expectError(BadCredentialsException.class)
+            .verify();
     }
 
     UserDetails createFakeUserDetails() {
