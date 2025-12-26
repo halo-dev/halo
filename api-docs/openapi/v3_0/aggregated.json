@@ -14876,6 +14876,41 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/annotationsettings": {
+      "get": {
+        "description": "List available AnnotationSettings for the given targetRef. The available AnnotationSettings are determined by the currently activated theme and started plugins.",
+        "operationId": "listAvailableAnnotationSettings",
+        "parameters": [
+          {
+            "description": "The targetRef of the AnnotationSetting. e.g.: \u0027content.halo.run/Post",
+            "in": "query",
+            "name": "targetRef",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnotationSetting"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AnnotationSettingV1AlphaUc"
+        ]
+      }
+    },
     "/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}": {
       "get": {
         "description": "Get my preference by group.",
@@ -20617,12 +20652,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -22393,12 +22428,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
