@@ -49,6 +49,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionException;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeInstallationException;
@@ -64,7 +66,10 @@ class ThemeServiceImplTest {
     ThemeRootGetter themeRoot;
 
     @Mock
-    private SystemVersionSupplier systemVersionSupplier;
+    SystemVersionSupplier systemVersionSupplier;
+
+    @Mock
+    SystemConfigFetcher systemConfigFetcher;
 
     @InjectMocks
     ThemeServiceImpl themeService;
@@ -461,5 +466,44 @@ class ThemeServiceImplTest {
         verify(client, times(1)).fetch(eq(ConfigMap.class), eq("fake-config"));
 
         verify(client, times(1)).update(any(ConfigMap.class));
+    }
+
+    @Test
+    void shouldFetchSystemSetting() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        StepVerifier.create(themeService.fetchSystemSetting())
+            .expectNext(themeSetting)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFetchActivatedTheme() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        var theme = createTheme();
+        when(client.fetch(Theme.class, "fake-theme")).thenReturn(Mono.just(theme));
+
+        StepVerifier.create(themeService.fetchActivatedTheme())
+            .expectNext(theme)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFetchActivatedThemeName() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        StepVerifier.create(themeService.fetchActivatedThemeName())
+            .expectNext("fake-theme")
+            .verifyComplete();
     }
 }

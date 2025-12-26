@@ -50,6 +50,8 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeAlreadyExistsException;
@@ -72,6 +74,8 @@ public class ThemeServiceImpl implements ThemeService {
     private final HaloProperties haloProperties;
 
     private final SystemVersionSupplier systemVersionSupplier;
+
+    private final SystemConfigFetcher systemConfigFetcher;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
@@ -290,6 +294,17 @@ public class ThemeServiceImpl implements ThemeService {
                     .map(SettingUtils::settingDefinedDefaultValueMap)
                     .flatMap(data -> updateConfigMapData(configMapName, data));
             });
+    }
+
+    @Override
+    public Mono<Theme> fetchActivatedTheme() {
+        return fetchSystemSetting().mapNotNull(SystemSetting.Theme::getActive)
+            .flatMap(name -> client.fetch(Theme.class, name));
+    }
+
+    @Override
+    public Mono<SystemSetting.Theme> fetchSystemSetting() {
+        return systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class);
     }
 
     private Mono<ConfigMap> updateConfigMapData(String configMapName, Map<String, String> data) {
