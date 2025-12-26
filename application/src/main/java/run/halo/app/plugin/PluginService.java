@@ -115,4 +115,12 @@ public interface PluginService {
      */
     List<String> getRequiredDependencies(Plugin plugin,
         Predicate<PluginWrapper> predicate);
+
+    /**
+     * Get started plugin names.
+     *
+     * @return started plugin names
+     */
+    Flux<String> getStartedPluginNames();
+
 }

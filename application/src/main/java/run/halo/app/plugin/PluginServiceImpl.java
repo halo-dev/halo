@@ -427,6 +427,12 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             .toList();
     }
 
+    @Override
+    public Flux<String> getStartedPluginNames() {
+        return Flux.fromIterable(List.copyOf(pluginManager.getStartedPlugins()))
+            .map(PluginWrapper::getPluginId);
+    }
+
     private static List<PluginDependency> getPluginDependency(Plugin plugin) {
         return plugin.getSpec().getPluginDependencies().keySet()
             .stream()
