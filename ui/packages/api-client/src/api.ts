@@ -14,6 +14,7 @@
 
 
 
+export * from './api/annotation-setting-v1-alpha-uc-api';
 export * from './api/annotation-setting-v1alpha1-api';
 export * from './api/attachment-v1alpha1-api';
 export * from './api/attachment-v1alpha1-console-api';

@@ -826,6 +826,41 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/annotationsettings": {
+      "get": {
+        "description": "List available AnnotationSettings for the given targetRef. The available AnnotationSettings are determined by the currently activated theme and started plugins.",
+        "operationId": "listAvailableAnnotationSettings",
+        "parameters": [
+          {
+            "description": "The targetRef of the AnnotationSetting. e.g.: \u0027content.halo.run/Post",
+            "in": "query",
+            "name": "targetRef",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnotationSetting"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AnnotationSettingV1AlphaUc"
+        ]
+      }
+    },
     "/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}": {
       "get": {
         "description": "Get my preference by group.",
@@ -1472,6 +1507,49 @@
           }
         }
       },
+      "AnnotationSetting": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/AnnotationSettingSpec"
+          }
+        }
+      },
+      "AnnotationSettingSpec": {
+        "required": [
+          "formSchema",
+          "targetRef"
+        ],
+        "type": "object",
+        "properties": {
+          "formSchema": {
+            "minLength": 1,
+            "type": "array",
+            "items": {
+              "minLength": 1,
+              "type": "object"
+            }
+          },
+          "targetRef": {
+            "$ref": "#/components/schemas/GroupKind"
+          }
+        }
+      },
       "Attachment": {
         "required": [
           "apiVersion",
@@ -1882,6 +1960,20 @@
             "type": "string"
           }
         }
+      },
+      "GroupKind": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "is group name of Extension."
+          },
+          "kind": {
+            "type": "string",
+            "description": "is kind name of Extension."
+          }
+        },
+        "description": "GroupKind contains group and kind data only."
       },
       "JsonNode": {
         "type": "object"
@@ -2468,12 +2560,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },

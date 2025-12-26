@@ -2,6 +2,7 @@
 .npmignore
 .openapi-generator-ignore
 api.ts
+api/annotation-setting-v1-alpha-uc-api.ts
 api/annotation-setting-v1alpha1-api.ts
 api/attachment-v1alpha1-api.ts
 api/attachment-v1alpha1-console-api.ts
