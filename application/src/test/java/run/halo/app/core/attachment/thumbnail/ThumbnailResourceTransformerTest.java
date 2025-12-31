@@ -91,7 +91,7 @@ class ThumbnailResourceTransformerTest {
         var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
         when(this.resource.isFile()).thenReturn(true);
         when(this.resource.getFilename()).thenReturn(sourcePath.getFileName().toString());
-        when(this.resource.getURI()).thenReturn(sourcePath.toUri());
+        when(this.resource.getFile()).thenReturn(sourcePath.toFile());
         thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
 
         when(localThumbnailService.generate(sourcePath, ThumbnailSize.S)).thenReturn(Mono.empty());
@@ -117,7 +117,7 @@ class ThumbnailResourceTransformerTest {
         var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
         when(this.resource.isFile()).thenReturn(true);
         when(this.resource.getFilename()).thenReturn(sourcePath.getFileName().toString());
-        when(this.resource.getURI()).thenReturn(sourcePath.toUri());
+        when(this.resource.getFile()).thenReturn(sourcePath.toFile());
         thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
 
         var generatedResource = mock(Resource.class);
