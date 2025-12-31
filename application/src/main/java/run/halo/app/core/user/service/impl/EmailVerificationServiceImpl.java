@@ -274,6 +274,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
 
         record UsernameEmail(String username, String email) {
+            public UsernameEmail {
+                // convert to lower case to make it case-insensitive
+                email = StringUtils.lowerCase(email);
+            }
         }
 
         @Data
