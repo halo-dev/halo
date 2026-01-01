@@ -2358,6 +2358,12 @@
         ],
         "type": "object",
         "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuItemVo"
+            }
+          },
           "displayName": {
             "type": "string",
             "description": "Gets menu item\u0027s display name."
