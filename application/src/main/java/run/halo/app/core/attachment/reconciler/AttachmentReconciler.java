@@ -37,7 +37,7 @@ class AttachmentReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Attachment.class, request.name()).ifPresent(attachment -> {
+        return client.fetch(Attachment.class, request.name()).map(attachment -> {
             if (ExtensionUtil.isDeleted(attachment)) {
                 if (removeFinalizers(attachment.getMetadata(),
                     Set.of(Constant.FINALIZER_NAME))) {
@@ -45,7 +45,7 @@ class AttachmentReconciler implements Reconciler<Request> {
                     client.update(attachment);
                     this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
                 }
-                return;
+                return null;
             }
             // add finalizer
             addFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME));
@@ -67,17 +67,21 @@ class AttachmentReconciler implements Reconciler<Request> {
                     .collect(Collectors.toMap(Enum::name, k -> map.get(k).toString()))
                 )
                 .blockOptional(Duration.ofSeconds(10))
-                .orElseThrow(() -> new RequeueException(new Result(true, null), """
-                    Attachment handler is unavailable for getting thumbnails links, \
-                    requeue the request\
-                    """
-                ));
+                .orElse(null);
+            Result result = null;
+            if (thumbnails == null) {
+                log.warn("""
+                    Failed to get thumbnails for attachment: {}, \
+                    consider upgrading storage plugins""", request.name()
+                );
+                result = new Result(true, Duration.ofSeconds(10));
+            }
             attachment.getStatus().setThumbnails(thumbnails);
             log.debug("Set attachment thumbnails: {} for {}", thumbnails, request.name());
             client.update(attachment);
             this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
-        });
-        return null;
+            return result;
+        }).orElse(null);
     }
 
     @Override
