@@ -19,18 +19,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.BaseStream;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
@@ -38,6 +48,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import run.halo.app.extension.ExtensionStoreUtil;
+import run.halo.app.extension.Scheme;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
@@ -50,7 +62,13 @@ import run.halo.app.migration.MigrationService;
 
 @Slf4j
 @Service
-public class MigrationServiceImpl implements MigrationService, InitializingBean {
+@RequiredArgsConstructor
+class MigrationServiceImpl implements MigrationService, InitializingBean {
+
+    private static final int BATCH_SIZE = 100;
+
+    private static final String BACKUP_STORE_PREFIX =
+        ExtensionStoreUtil.buildStoreNamePrefix(Scheme.buildFromType(Backup.class)) + "/";
 
     private final ExtensionStoreRepository repository;
 
@@ -58,9 +76,9 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
 
     private final BackupRootGetter backupRoot;
 
-    private final ObjectMapper objectMapper;
-
     private final ReactiveTransactionManager txManager;
+
+    private final R2dbcEntityTemplate entityTemplate;
 
     private final Set<String> excludes = Set.of(
         "**/.git/**",
@@ -78,25 +96,16 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
         "attachments/thumbnails/**"
     );
 
-    private final DateTimeFormatter dateTimeFormatter;
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+        .defaultPrettyPrinter(new MinimalPrettyPrinter())
+        .build();
+
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+        .ofPattern("yyyyMMddHHmmss")
+        .withLocale(Locale.getDefault())
+        .withZone(ZoneId.systemDefault());
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
-
-    public MigrationServiceImpl(ExtensionStoreRepository repository,
-        HaloProperties haloProperties, BackupRootGetter backupRoot,
-        ReactiveTransactionManager txManager) {
-        this.repository = repository;
-        this.haloProperties = haloProperties;
-        this.backupRoot = backupRoot;
-        this.txManager = txManager;
-        this.objectMapper = JsonMapper.builder()
-            .defaultPrettyPrinter(new MinimalPrettyPrinter())
-            .build();
-        this.dateTimeFormatter = DateTimeFormatter
-            .ofPattern("yyyyMMddHHmmss")
-            .withLocale(Locale.getDefault())
-            .withZone(ZoneId.systemDefault());
-    }
 
     DateTimeFormatter getDateTimeFormatter() {
         return dateTimeFormatter;
@@ -247,22 +256,29 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
             return Mono.error(new ServerWebInputException("Extensions data file not found."));
         }
         var reader = objectMapper.readerFor(ExtensionStore.class);
+        var total = new AtomicInteger(0);
         return Mono.<Void, MappingIterator<ExtensionStore>>using(
                 () -> reader.readValues(extensionsPath.toFile()),
-                itr -> Flux.<ExtensionStore>create(
-                        sink -> {
-                            while (itr.hasNext()) {
-                                sink.next(itr.next());
-                            }
-                            sink.complete();
-                        })
+                itr -> Flux.fromIterable(() -> itr)
                     // reset version
+                    .filter(Predicate.not(MigrationServiceImpl::isInBlocklist))
                     .doOnNext(extensionStore -> extensionStore.setVersion(null))
                     .buffer(100)
                     .flatMap(repository::saveAll)
-                    .doOnNext(extensionStore -> log.info("Restored extension store: {}",
-                        extensionStore.getName()))
-                    .then(),
+                    .doOnNext(store -> {
+                        var t = total.incrementAndGet();
+                        if (t % BATCH_SIZE == 0) {
+                            log.info("Restored {} extension stores so far...", t);
+                        }
+                        if (log.isDebugEnabled()) {
+                            log.debug("Restored extension store: {}", store.getName());
+                        }
+                    })
+                    .then()
+                    .doOnSuccess(ignored -> log.info(
+                        "Extension stores restore completed, total {} record(s) restored.",
+                        total.get())
+                    ),
                 FileUtils::closeQuietly)
             .subscribeOn(scheduler);
     }
@@ -309,24 +325,76 @@ public class MigrationServiceImpl implements MigrationService, InitializingBean 
     }
 
     private Mono<Void> backupExtensions(Path baseDir) {
+        var total = new AtomicInteger(0);
+        var excludes = new AtomicInteger(0);
         return Mono.fromCallable(() -> Files.createFile(baseDir.resolve("extensions.data")))
             .flatMap(extensionsPath -> Mono.using(
                 () -> objectMapper.writerFor(ExtensionStore.class)
                     .writeValuesAsArray(extensionsPath.toFile()),
-                seqWriter -> repository.findAll()
-                    .doOnNext(extensionStore -> {
-                        try {
-                            seqWriter.write(extensionStore);
-                        } catch (IOException e) {
-                            throw Exceptions.propagate(e);
+                seqWriter -> fetchAllExtensionStores(BATCH_SIZE)
+                    .doOnNext(stores ->
+                        log.info("Fetched {} extension stores for backup.", stores.size())
+                    )
+                    .flatMap(Flux::fromIterable)
+                    .filter(extensionStore -> {
+                        if (isInBlocklist(extensionStore)) {
+                            excludes.incrementAndGet();
+                            return false;
                         }
-                    }).then(),
-                FileUtils::closeQuietly))
+                        return true;
+                    })
+                    .flatMap(store -> Mono.fromCallable(() -> {
+                        total.incrementAndGet();
+                        seqWriter.write(store);
+                        return null;
+                    }))
+                    .then()
+                    .doOnSuccess(ignored -> log.info(
+                        """
+                            Extension stores backup completed, total {} record(s) backed up, \
+                            {} record(s) excluded.""",
+                        total.get(), excludes.get()
+                    )),
+                FileUtils::closeQuietly)
+            )
             .subscribeOn(scheduler);
+    }
+
+    Flux<List<ExtensionStore>> fetchAllExtensionStores(int batchSize) {
+        var txDefinition = new DefaultTransactionDefinition(TransactionDefinition.withDefaults());
+        txDefinition.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
+        txDefinition.setReadOnly(true);
+        var tx = TransactionalOperator.create(txManager, txDefinition);
+        var sort = Sort.by("name").ascending();
+        return entityTemplate.select(ExtensionStore.class)
+            .matching(Query.empty()
+                .limit(batchSize)
+                .sort(sort)
+            )
+            .all()
+            .collectList()
+            .expand(stores -> {
+                if (stores.isEmpty() || stores.size() < batchSize) {
+                    return Mono.empty();
+                }
+                var nameCursor = stores.getLast().getName();
+                var q = Query.query(Criteria.where("name").greaterThan(nameCursor))
+                    .limit(batchSize)
+                    .sort(sort);
+                return entityTemplate.select(ExtensionStore.class)
+                    .matching(q)
+                    .all()
+                    .collectList();
+            })
+            .as(tx::transactional);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Files.createDirectories(getBackupsRoot());
+    }
+
+    private static boolean isInBlocklist(ExtensionStore store) {
+        return store.getName().startsWith(BACKUP_STORE_PREFIX);
     }
 }

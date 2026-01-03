@@ -26,11 +26,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation.ReactiveSelect;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation.TerminatingSelect;
+import org.springframework.data.relational.core.query.Query;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
 import org.springframework.transaction.ReactiveTransaction;
-import org.springframework.transaction.ReactiveTransactionManager;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -56,10 +61,20 @@ class MigrationServiceImplTest {
     BackupRootGetter backupRoot;
 
     @Mock
-    ReactiveTransactionManager txManager;
+    R2dbcEntityTemplate entityTemplate;
+
+    @Mock
+    R2dbcTransactionManager txManager;
 
     @InjectMocks
+    @Spy
     MigrationServiceImpl migrationService;
+
+    @Mock
+    ReactiveSelect<ExtensionStore> reactiveSelect;
+
+    @Mock
+    TerminatingSelect<ExtensionStore> terminatingSelect;
 
     @TempDir
     Path tempDir;
@@ -70,7 +85,15 @@ class MigrationServiceImplTest {
         var extensionStores = List.of(
             createExtensionStore("fake-extension-store", "fake-data")
         );
-        when(repository.findAll()).thenReturn(Flux.fromIterable(extensionStores));
+        var tx = mock(ReactiveTransaction.class);
+        when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+        when(txManager.commit(tx)).thenReturn(Mono.empty());
+
+        when(entityTemplate.select(ExtensionStore.class)).thenReturn(reactiveSelect);
+        when(reactiveSelect.matching(any(Query.class))).thenReturn(terminatingSelect);
+        when(terminatingSelect.all())
+            .thenReturn(Flux.fromIterable(extensionStores))
+            .thenReturn(Flux.empty());
         when(haloProperties.getWorkDir()).thenReturn(tempDir);
         when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
         var startTimestamp = Instant.now();
@@ -78,7 +101,6 @@ class MigrationServiceImplTest {
         StepVerifier.create(migrationService.backup(backup))
             .verifyComplete();
 
-        verify(repository).findAll();
         // 1. backup workdir
         // 2. package backup
         verify(haloProperties).getWorkDir();
