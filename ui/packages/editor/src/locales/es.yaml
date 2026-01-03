@@ -1,0 +1,216 @@
+editor:
+  drag:
+    button:
+      insert_block: Insertar bloque
+      drag_handle: Tirador de arrastre
+    menu:
+      convert_to: Convertir a
+      copy: Copiar
+      cut: Cortar
+      delete: Eliminar
+  menus:
+    undo: Deshacer
+    redo: Rehacer
+    table:
+      title: Tabla
+      add: Añadir tabla
+      add_column_before: Añadir columna antes
+      add_column_after: Añadir columna después
+      delete_column: Eliminar columna
+      add_row_before: Añadir fila antes
+      add_row_after: Añadir fila después
+      toggle_header_column: Activar/Desactivar encabezado de primera columna
+      toggle_header_row: Activar/Desactivar encabezado de primera fila
+      toggle_header_cell: Activar/Desactivar celda actual como encabezado
+      delete_row: Eliminar fila
+      merge_cells: Combinar celdas
+      split_cell: Dividir celda
+      delete_table: Eliminar tabla
+  extensions:
+    commands_menu:
+      columns: Tarjeta de columnas
+      iframe: Iframe
+      image: Imagen
+      video: Vídeo
+      audio: Audio
+      table: Tabla
+      gallery: Galería
+      no_results: Sin resultados
+      placeholder: Introduce / para seleccionar el tipo de entrada
+    figure_caption:
+      empty_placeholder: Añadir descripción
+    link:
+      add_link: Añadir enlace
+      edit_link: Editar enlace
+      placeholder: Dirección del enlace
+      open_in_new_window: Abrir en una ventana nueva
+      cancel_link: Cancelar enlace
+      nofollow: No follow
+    audio:
+      src_input_label: Enlace de audio
+      disable_autoplay: Desactivar reproducción automática
+      enable_autoplay: Activar reproducción automática
+      disable_loop: Desactivar bucle
+      enable_loop: Activar bucle
+    iframe:
+      src_input_label: Enlace web
+      resize: Redimensionar
+      disable_frameborder: Ocultar borde de marco
+      enable_frameborder: Mostrar borde de marco
+      phone_size: Tamaño de teléfono móvil
+      tablet_vertical_size: Tamaño de tableta vertical
+      tablet_horizontal_size: Tamaño de tableta horizontal
+      desktop_size: Tamaño de escritorio
+    image:
+      src_input_label: Enlace de imagen
+      href_input_label: Hipervínculo de imagen
+      resize: Redimensionar
+      small_size: Tamaño pequeño
+      medium_size: Tamaño mediano
+      large_size: Tamaño grande
+      restore_size: Restaurar tamaño original
+      edit_link: Editar enlace
+      edit_alt: Editar texto alternativo
+      edit_href: Editar el hipervínculo de la imagen
+      edit_caption: Descripción de la imagen
+      image_load_error: Error al cargar la imagen
+    video:
+      src_input_label: Enlace de vídeo
+      resize: Redimensionar
+      disable_controls: Ocultar controles
+      enable_controls: Mostrar controles
+      disable_autoplay: Desactivar reproducción automática
+      enable_autoplay: Activar reproducción automática
+      disable_loop: Desactivar bucle
+      enable_loop: Activar bucle
+      small_size: Tamaño pequeño
+      medium_size: Tamaño mediano
+      large_size: Tamaño grande
+      edit_caption: Descripción del vídeo
+    highlight:
+      unset: Desactivar
+    columns:
+      add_column_before: Añadir columna antes
+      add_column_after: Añadir columna después
+      delete_column: Eliminar columna
+    search_and_replace:
+      title: Buscar y reemplazar
+      search_placeholder: Buscar
+      not_found: No encontrado
+      occurrence_found: "{index} de {total} ocurrencias"
+      find_previous: Buscar anterior
+      find_next: Buscar siguiente
+      replace_placeholder: Reemplazar
+      replace: Reemplazar
+      replace_all: Reemplazar todo
+      case_sensitive: Coincidir mayúsculas y minúsculas
+      match_word: Palabras completas
+      use_regex: Usar expresión regular
+      close: Cerrar
+    format_brush:
+      toolbar_item:
+        title: Pincel de formato
+        cancel: Cancelar pincel de formato
+    details:
+      command_item: Detalles
+    gallery:
+      title: Galería
+      add_image: Añadir imagen
+      empty_prompt: Haz clic para seleccionar imágenes o arrastra imágenes aquí
+      group_size: Imágenes por fila
+      group_size_label: "{count} imágenes por fila"
+      layout:
+        title: Diseño
+        auto: Automático
+        square: Cuadrado
+      gap: Espaciado
+    upload:
+      error: Error al cargar
+      click_retry: Haz clic para reintentar
+      loading: Cargando
+      attachment:
+        title: Biblioteca de adjuntos
+      permalink:
+        title: Enlace de entrada
+        placeholder: Introduce el enlace y presiona Enter para confirmar
+      operations:
+        remove:
+          button: Eliminar
+        replace:
+          button: Reemplazar
+        transfer:
+          button: Guardar localmente
+          tooltip: >-
+            Este recurso se detecta como recurso externo. Haz clic en este
+            botón para guardarlo en la biblioteca de adjuntos.
+        transfer_in_batch:
+          description: >-
+            Enlace externo detectado. ¿Deseas cargarlo automáticamente
+            a la biblioteca de adjuntos?
+    font_size:
+      title: Tamaño de fuente
+  components:
+    color_picker:
+      more_color: Más
+  common:
+    alt: Texto alternativo
+    width: Ancho
+    height: Alto
+    align_method: Método de alineación
+    align_left: Alinear a la izquierda
+    align_center: Centrar
+    align_right: Alinear a la derecha
+    align_justify: Justificar
+    bold: Negrita
+    italic: Cursiva
+    underline: Subrayado
+    strike: Tachado
+    quote: Cita
+    code: Código
+    superscript: Superíndice
+    subscript: Subíndice
+    codeblock:
+      title: Bloque de código
+      copy_code: Copiar código
+      copy_code_success: Copiado con éxito
+    image: Imagen
+    heading:
+      title: Tipo de texto
+      paragraph: Párrafo
+      heading1: Título 1
+      heading2: Título 2
+      heading3: Título 3
+      heading4: Título 4
+      heading5: Título 5
+      heading6: Título 6
+    list: Lista
+    bullet_list: Lista con viñetas
+    ordered_list: Lista ordenada
+    task_list: Lista de tareas
+    highlight: Resaltar
+    color: Color
+    tooltip:
+      custom_width_input: Ancho personalizado, presiona Enter para aplicar
+      custom_height_input: Alto personalizado, presiona Enter para aplicar
+      open_link: Abrir enlace
+    placeholder:
+      link_input: Introduce el enlace y presiona Enter para confirmar.
+      alt_input: Introduce el texto alternativo y presiona Enter para confirmar.
+      alt_href: Introduce el hipervínculo de la imagen y presiona Enter para confirmar.
+    button:
+      new_line: Nueva línea
+      delete: Eliminar
+      edit_link: Editar enlace
+      refresh: Refrescar
+      restore_default: Restaurar predeterminado
+      add: Añadir
+      cancel: Cancelar
+      upload: Cargar
+      confirm: Confirmar
+    text:
+      default: Predeterminado
+      tip: Consejo
+    toast:
+      save_success: Guardado con éxito
+    line_height: Altura de línea
+    clear_format: Limpiar formato
