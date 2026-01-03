@@ -160,7 +160,10 @@ class SchemeInitializer implements SmartLifecycle {
                 .indexFunc(user -> user.getSpec().isEmailVerified())
             );
             indexSpecs.add(IndexSpecs.<User, String>single("spec.email", String.class)
-                .indexFunc(user -> user.getSpec().getEmail())
+                .indexFunc(user -> Optional.ofNullable(user.getSpec().getEmail())
+                    .map(String::toLowerCase)
+                    .orElse(null)
+                )
             );
             indexSpecs.add(IndexSpecs.<User, String>multi(
                         User.USER_RELATED_ROLES_INDEX, String.class
