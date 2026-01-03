@@ -15550,8 +15550,27 @@
         ]
       },
       "post": {
-        "operationId": "SetNoCacheForSetUpPage",
-        "responses": {}
+        "description": "Setup system",
+        "operationId": "SetupSystem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "SystemV1alpha1Public"
+        ]
       }
     }
   },
@@ -17549,8 +17568,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "format": "email"
           }
         }
       },
@@ -19213,6 +19232,12 @@
         ],
         "type": "object",
         "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuItemVo"
+            }
+          },
           "displayName": {
             "type": "string",
             "description": "Gets menu item\u0027s display name."
@@ -22243,6 +22268,45 @@
             "items": {
               "$ref": "#/components/schemas/SettingForm"
             }
+          }
+        }
+      },
+      "SetupRequest": {
+        "required": [
+          "externalUrl",
+          "password",
+          "siteTitle",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "externalUrl": {
+            "type": "string"
+          },
+          "language": {
+            "pattern": "^(zh-CN|zh-TW|en|es)$",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 257,
+            "minLength": 5,
+            "pattern": "^[A-Za-z0-9!@#$%^\u0026*.?]+$",
+            "type": "string"
+          },
+          "siteTitle": {
+            "maxLength": 80,
+            "minLength": 0,
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 63,
+            "minLength": 4,
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+            "type": "string"
           }
         }
       },

@@ -132,9 +132,8 @@ public class UcPostEndpoint implements CustomEndpoint {
                         .parameter(namePathParam)
                         .response(responseBuilder().implementation(Post.class))
                     )
-                    .build(),
-                builder -> {
-                })
+                    .build()
+                )
             .build();
     }
 
