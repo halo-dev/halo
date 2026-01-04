@@ -114,7 +114,9 @@ public class DefaultController<R> implements Controller {
         return new SimpleAsyncTaskExecutorBuilder()
             .virtualThreads(virtualThreads)
             .concurrencyLimit(workerCount + 1)
-            .taskTerminationTimeout(Duration.ofSeconds(10))
+            .additionalCustomizers(
+                taskExecutor -> taskExecutor.setCancelRemainingTasksOnClose(true)
+            )
             .threadNamePrefix(name + "-")
             .build();
     }
