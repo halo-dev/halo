@@ -161,8 +161,10 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                     status = new Plugin.PluginStatus();
                     plugin.setStatus(status);
                 }
-                // reset phase to pending
-                status.setPhase(Plugin.Phase.PENDING);
+                if (status.getPhase() == null) {
+                    // reset phase to pending
+                    status.setPhase(Plugin.Phase.PENDING);
+                }
                 // init condition list if not exists
                 if (status.getConditions() == null) {
                     status.setConditions(new ConditionList());
@@ -627,14 +629,14 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             pluginManager.loadPlugin(Paths.get(loadLocation));
             plugin.getStatus().setPhase(Plugin.Phase.RESOLVED);
             log.info("Loaded plugin {} from {}", pluginName, loadLocation);
+            conditions.addAndEvictFIFO(Condition.builder()
+                .type(ConditionType.INITIALIZED)
+                .status(ConditionStatus.TRUE)
+                .reason(ConditionReason.LOADED)
+                .lastTransitionTime(clock.instant())
+                .build());
         }
 
-        conditions.addAndEvictFIFO(Condition.builder()
-            .type(ConditionType.INITIALIZED)
-            .status(ConditionStatus.TRUE)
-            .reason(ConditionReason.LOADED)
-            .lastTransitionTime(clock.instant())
-            .build());
         return null;
     }
 
@@ -730,7 +732,21 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             }
             try {
                 var loadLocation = ResourceUtils.getURL(pluginPathAnno).toURI();
-                status.setLoadLocation(loadLocation);
+                if (!Objects.equals(status.getLoadLocation(), loadLocation)) {
+                    log.debug("Populated load location {} for plugin {} from annotation {}",
+                        loadLocation, pluginName, pluginPathAnno);
+                    status.setLoadLocation(loadLocation);
+                    status.setPhase(Plugin.Phase.RESOLVED);
+                    status.getConditions().addAndEvictFIFO(Condition.builder()
+                        .type(ConditionType.INITIALIZED)
+                        .status(ConditionStatus.TRUE)
+                        .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
+                        .lastTransitionTime(clock.instant())
+                        .build());
+                    log.debug("Populated load location {} for plugin {}",
+                        status.getLoadLocation(), pluginName
+                    );
+                }
             } catch (URISyntaxException | FileNotFoundException e) {
                 // TODO Refactor this using event in the future.
                 var condition = Condition.builder()
@@ -788,17 +804,18 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                         oldLoadLocation, pluginName, e);
                 }
                 status.setPhase(Plugin.Phase.RESOLVED);
+                status.getConditions().addAndEvictFIFO(Condition.builder()
+                    .type(ConditionType.INITIALIZED)
+                    .status(ConditionStatus.TRUE)
+                    .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
+                    .lastTransitionTime(clock.instant())
+                    .build());
+                log.debug("Populated load location {} for plugin {}",
+                    status.getLoadLocation(), pluginName
+                );
             }
             status.setLoadLocation(newLoadLocation);
         }
-
-        status.getConditions().addAndEvictFIFO(Condition.builder()
-            .type(ConditionType.INITIALIZED)
-            .status(ConditionStatus.TRUE)
-            .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
-            .lastTransitionTime(clock.instant())
-            .build());
-        log.debug("Populated load location {} for plugin {}", status.getLoadLocation(), pluginName);
         return null;
     }
 
