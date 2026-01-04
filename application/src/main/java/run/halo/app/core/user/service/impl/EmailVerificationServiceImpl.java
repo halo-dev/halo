@@ -61,7 +61,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 .flatMap(user -> {
                     var userEmail = user.getSpec().getEmail();
                     var isVerified = user.getSpec().isEmailVerified();
-                    if (StringUtils.equals(userEmail, email) && isVerified) {
+                    if (StringUtils.equalsIgnoreCase(userEmail, email) && isVerified) {
                         return Mono.error(
                             () -> new ServerWebInputException("Email already verified."));
                     }
@@ -126,7 +126,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     Mono<Boolean> isEmailInUse(String username, String emailToVerify) {
         var listOptions = ListOptions.builder()
-            .andQuery(Queries.equal("spec.email", emailToVerify))
+            .andQuery(Queries.equal("spec.email", emailToVerify.toLowerCase()))
             .build();
         return client.listAll(User.class, listOptions, ExtensionUtil.defaultSort())
             .filter(user -> user.getSpec().isEmailVerified())
@@ -137,7 +137,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public Mono<Void> sendRegisterVerificationCode(String email) {
         Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
-        return sendVerificationNotification(email, email);
+        return sendVerificationNotification(email.toLowerCase(), email);
     }
 
     @Override
@@ -274,6 +274,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
 
         record UsernameEmail(String username, String email) {
+            public UsernameEmail {
+                // convert to lower case to make it case-insensitive
+                email = StringUtils.lowerCase(email);
+            }
         }
 
         @Data

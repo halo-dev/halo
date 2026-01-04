@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     public Mono<User> findUserByVerifiedEmail(String email) {
         var listOptions = ListOptions.builder()
             .andQuery(equal("spec.emailVerified", true))
-            .andQuery(equal("spec.email", email))
+            .andQuery(equal("spec.email", email.toLowerCase()))
             .build();
         return client.listAll(User.class, listOptions, defaultSort()).next();
     }
@@ -229,6 +229,9 @@ public class UserServiceImpl implements UserService {
                 "The default role is not configured by the administrator."
             )))
             .flatMap(setting -> {
+                var email = Optional.ofNullable(signUpData.getEmail())
+                    .map(String::toLowerCase)
+                    .orElse(null);
                 var user = new User();
                 user.setMetadata(new Metadata());
                 var metadata = user.getMetadata();
@@ -238,23 +241,23 @@ public class UserServiceImpl implements UserService {
                 spec.setPassword(passwordEncoder.encode(signUpData.getPassword()));
                 spec.setEmailVerified(false);
                 spec.setRegisteredAt(clock.instant());
-                spec.setEmail(signUpData.getEmail());
+                spec.setEmail(email);
                 spec.setDisplayName(signUpData.getDisplayName());
                 Mono<Void> verifyEmail = Mono.empty();
                 if (setting.isMustVerifyEmailOnRegistration()) {
-                    if (!StringUtils.hasText(signUpData.getEmailCode())) {
+                    if (!StringUtils.hasText(email)) {
                         return Mono.error(
                             new EmailVerificationFailed("Email captcha is required", null)
                         );
                     }
                     verifyEmail = emailVerificationService.verifyRegisterVerificationCode(
-                            signUpData.getEmail(), signUpData.getEmailCode()
+                            email, signUpData.getEmailCode()
                         )
                         .filter(Boolean::booleanValue)
                         .switchIfEmpty(Mono.error(() ->
                             new EmailVerificationFailed("Invalid email captcha.", null)
                         ))
-                        .then(this.checkEmailAlreadyVerified(signUpData.getEmail()))
+                        .then(this.checkEmailAlreadyVerified(email))
                         .filter(has -> !has)
                         .switchIfEmpty(Mono.error(
                             () -> new EmailAlreadyTakenException("Email is already taken")
@@ -327,7 +330,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Flux<User> listByEmail(String email) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email)));
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email.toLowerCase())));
         return client.listAll(User.class, listOptions, defaultSort());
     }
 
