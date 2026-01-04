@@ -113,11 +113,8 @@ public class DefaultController<R> implements Controller {
             JavaVersion.getJavaVersion().isEqualOrNewerThan(JavaVersion.TWENTY_ONE);
         return new SimpleAsyncTaskExecutorBuilder()
             .virtualThreads(virtualThreads)
-            .concurrencyLimit(workerCount)
-            // See https://github.com/spring-projects/spring-framework/issues/35254#issuecomment-3212944107
-            // for more
-            // After the problem resolved, we can set the task termination timeout
-            // .taskTerminationTimeout(Duration.ofSeconds(10))
+            .concurrencyLimit(workerCount + 1)
+            .taskTerminationTimeout(Duration.ofSeconds(10))
             .threadNamePrefix(name + "-")
             .build();
     }
@@ -139,7 +136,7 @@ public class DefaultController<R> implements Controller {
         }
         this.started = true;
         if (synchronizer != null) {
-            synchronizer.start();
+            executor.execute(synchronizer::start);
         }
         log.info("Starting controller {}", name);
         IntStream.range(0, getWorkerCount())
