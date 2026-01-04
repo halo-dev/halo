@@ -15,7 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.util.InvalidUrlException;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder.ParserType;
 import org.springframework.web.util.UriUtils;
 import run.halo.app.theme.router.ModelConst;
 
@@ -109,7 +111,13 @@ public class HaloUtils {
     public static URI safeToUri(String uri) {
         // try to decode first
         var decodedUri = UriUtils.decode(uri, StandardCharsets.UTF_8);
-        return UriComponentsBuilder.fromUriString(decodedUri)
+        UriComponentsBuilder uriBuilder;
+        try {
+            uriBuilder = UriComponentsBuilder.fromUriString(decodedUri);
+        } catch (InvalidUrlException e) {
+            uriBuilder = UriComponentsBuilder.fromUriString(decodedUri, ParserType.WHAT_WG);
+        }
+        return uriBuilder
             .build(false)
             .encode()
             .toUri();
