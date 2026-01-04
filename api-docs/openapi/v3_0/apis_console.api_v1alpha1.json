@@ -4357,8 +4357,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "format": "email"
           }
         }
       },

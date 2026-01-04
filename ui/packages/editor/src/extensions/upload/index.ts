@@ -50,12 +50,12 @@ export const ExtensionUpload = Extension.create({
             }
 
             const types = event.clipboardData.types;
-            // Only process when a single file is pasted.
-            if (types.length > 1) {
+            if (!containsFileClipboardIdentifier(types)) {
               return false;
             }
 
-            if (!containsFileClipboardIdentifier(types)) {
+            // If the copied content is Excel, do not process it.
+            if (isExcelPasted(event.clipboardData)) {
               return false;
             }
 
@@ -107,6 +107,40 @@ export const ExtensionUpload = Extension.create({
     ];
   },
 });
+
+function isExcelPasted(clipboardData: ClipboardEvent["clipboardData"]) {
+  if (!clipboardData) {
+    return false;
+  }
+
+  const types = clipboardData.types;
+  if (
+    types.includes("application/vnd.ms-excel") ||
+    types.includes(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+  ) {
+    return true;
+  }
+
+  if (types.includes("text/html")) {
+    try {
+      const html = clipboardData.getData("text/html");
+      if (
+        html.includes('ProgId="Excel.Sheet"') ||
+        html.includes('xmlns:x="urn:schemas-microsoft-com:office:excel"') ||
+        html.includes("urn:schemas-microsoft-com:office:spreadsheet") ||
+        html.includes("<x:ExcelWorkbook>")
+      ) {
+        return true;
+      }
+    } catch (e) {
+      console.warn("Failed to read clipboard HTML data:", e);
+    }
+  }
+
+  return false;
+}
 
 export function getAllExternalNodes(
   slice: Slice

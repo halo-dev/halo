@@ -100,8 +100,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                         .tag(tag)
                         .description("Get TOTP auth link, including secret")
                         .response(responseBuilder().implementation(TotpAuthLinkResponse.class)))
-                .build(),
-            builder -> builder.description("Two-factor authentication endpoint(User-scoped)")
+                .build()
         ).build();
     }
 
