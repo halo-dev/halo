@@ -11,11 +11,11 @@ import static run.halo.app.extension.index.query.Queries.isNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.comment.ReplyNotificationSubscriptionHelper;
 import run.halo.app.content.comment.ReplyService;
@@ -26,7 +26,6 @@ import run.halo.app.core.extension.content.Constant;
 import run.halo.app.event.post.CommentCreatedEvent;
 import run.halo.app.event.post.CommentUnreadReplyCountChangedEvent;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
@@ -135,13 +134,19 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     private void updateSameSubjectRefCommentCounter(Comment comment) {
         var commentSubjectRef = comment.getSpec().getSubjectRef();
-        GroupVersionKind groupVersionKind = groupVersionKind(commentSubjectRef);
-
         var totalCount = countTotalComments(commentSubjectRef);
         var approvedTotalCount = countApprovedComments(commentSubjectRef);
-        schemeManager.fetch(groupVersionKind).ifPresent(scheme -> {
-            String counterName = MeterUtils.nameOf(commentSubjectRef.getGroup(), scheme.plural(),
-                commentSubjectRef.getName());
+        var findScheme = schemeManager.schemes().stream()
+            .filter(scheme -> {
+                var gvk = scheme.groupVersionKind();
+                return Objects.equals(gvk.group(), commentSubjectRef.getGroup())
+                    && Objects.equals(gvk.kind(), commentSubjectRef.getKind());
+            })
+            .findFirst();
+        findScheme.ifPresent(scheme -> {
+            String counterName =
+                MeterUtils.nameOf(commentSubjectRef.getGroup(), scheme.plural(),
+                    commentSubjectRef.getName());
             client.fetch(Counter.class, counterName).ifPresentOrElse(counter -> {
                 counter.setTotalComment(totalCount);
                 counter.setApprovedComment(approvedTotalCount);
@@ -185,8 +190,4 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         updateSameSubjectRefCommentCounter(comment);
     }
 
-    @NonNull
-    private GroupVersionKind groupVersionKind(@NonNull Ref ref) {
-        return new GroupVersionKind(ref.getGroup(), ref.getVersion(), ref.getKind());
-    }
 }
