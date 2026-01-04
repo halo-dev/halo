@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -257,13 +258,22 @@ class DefaultControllerTest {
     }
 
     @Test
-    void shouldStartCorrectly() {
+    void shouldStartCorrectly() throws InterruptedException {
+        doAnswer(invocation -> {
+            // simulate starting synchronizer
+            invocation.getArgument(0, Runnable.class).run();
+            return null;
+        }).doAnswer(invocation -> {
+            // simulate starting worker
+            return null;
+        }).when(executor).execute(any(Runnable.class));
+
         controller.start();
         assertTrue(controller.isStarted());
         assertFalse(controller.isDisposed());
 
         verify(synchronizer).start();
-        verify(executor).execute(any(Runnable.class));
+        verify(executor, times(2)).execute(any(Runnable.class));
     }
 
     @Test
