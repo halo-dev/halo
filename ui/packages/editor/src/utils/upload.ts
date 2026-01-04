@@ -202,11 +202,23 @@ export async function uploadExternalLink(
 }
 
 export function isExternalAsset(src: string) {
-  if (src?.startsWith("/")) {
+  if (!src) {
+    return false;
+  }
+
+  if (src.startsWith("/")) {
+    return false;
+  }
+
+  const localProtocols = ["data:", "blob:", "file:"];
+  if (localProtocols.some((protocol) => src.startsWith(protocol))) {
     return false;
   }
 
   const currentOrigin = window.location.origin;
+  if (src.startsWith(currentOrigin)) {
+    return false;
+  }
 
-  return !src?.startsWith(currentOrigin);
+  return src.startsWith("http://") || src.startsWith("https://");
 }

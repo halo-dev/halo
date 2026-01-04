@@ -111,6 +111,26 @@ class UserServiceImplTest {
     }
 
     @Test
+    void shouldFindUserByVerifiedEmail() {
+        var fakeUser = createUser("fake-user", "fake-password");
+        when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.just(fakeUser));
+        userService.findUserByVerifiedEmail("faker@halo.run")
+            .as(StepVerifier::create)
+            .expectNext(fakeUser)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnEmptyIfNoUserWithVerifiedEmail() {
+        when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.empty());
+        userService.findUserByVerifiedEmail("faker@halo.run")
+            .as(StepVerifier::create)
+            .verifyComplete();
+    }
+
+    @Test
     void shouldGetGhostsIfUsersContainDeleted() {
         var fakeUser1 = createUser("fake-user1", "fake-password");
         var fakeUser2 = createUser("fake-user2", "fake-password");

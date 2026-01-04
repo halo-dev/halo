@@ -23,6 +23,10 @@ export function usePostUpdateMutate() {
               ...latestPost.spec,
               ...postToUpdate.spec,
             },
+            metadata: {
+              ...latestPost.metadata,
+              annotations: postToUpdate.metadata.annotations,
+            },
           },
         },
         {

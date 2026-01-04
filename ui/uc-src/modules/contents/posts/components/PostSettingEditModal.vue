@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import type { Post } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
-import { ref } from "vue";
+import { nextTick, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import type { PostFormState } from "../types";
 import PostSettingForm from "./PostSettingForm.vue";
@@ -26,9 +27,30 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const { mutateAsync, isLoading } = usePostUpdateMutate();
 
+const annotationsFormRef =
+  useTemplateRef<InstanceType<typeof AnnotationsForm>>("annotationsFormRef");
+
 async function onSubmit(data: PostFormState) {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
   const postToUpdate: Post = {
     ...props.post,
+    metadata: {
+      ...props.post.metadata,
+      annotations: {
+        ...(props.post.metadata.annotations || {}),
+        ...annotations,
+        ...customAnnotations,
+      },
+    },
     spec: {
       ...props.post.spec,
       allowComment: data.allowComment,
@@ -83,6 +105,30 @@ async function onSubmit(data: PostFormState) {
       update-mode
       @submit="onSubmit"
     />
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.post.settings.groups.annotations") }}
+          </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="post.metadata.name"
+          ref="annotationsFormRef"
+          :value="post.metadata.annotations || {}"
+          kind="Post"
+          :form-data="post"
+          group="content.halo.run"
+        />
+      </div>
+    </div>
 
     <template #footer>
       <VSpace>

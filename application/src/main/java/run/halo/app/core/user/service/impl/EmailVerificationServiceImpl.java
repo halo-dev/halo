@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -38,6 +39,7 @@ import run.halo.app.notification.UserIdentity;
  * @author guqing
  * @since 2.11.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class EmailVerificationServiceImpl implements EmailVerificationService {
@@ -149,6 +151,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     Mono<Void> sendVerificationNotification(String username, String email) {
         var code = emailVerificationManager.generateCode(username, email);
+        if (log.isDebugEnabled()) {
+            log.debug("Generated verification code for user '{}' and email '{}': {}",
+                username, email, code);
+        }
         var subscribeNotification = autoSubscribeVerificationEmailNotification(email);
         var interestReasonSubject = createInterestReason(email).getSubject();
         var emitReasonMono = reasonEmitter.emit(EMAIL_VERIFICATION_REASON_TYPE,

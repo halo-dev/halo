@@ -183,7 +183,7 @@ spec:
         - $formkit: group
           name: avatar
           label: 头像附件配置
-          help: 为用户头像设置存储策略和分组，处于安全考虑，建议为所选存储策略限制文件类型和大小
+          help: 为用户头像设置存储策略，处于安全考虑，建议为所选存储策略限制文件类型和大小
           children:
             - $formkit: attachmentPolicySelect
               name: policyName

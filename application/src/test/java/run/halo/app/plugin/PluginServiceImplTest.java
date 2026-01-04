@@ -281,6 +281,20 @@ class PluginServiceImplTest {
         verify(pluginManager, never()).getStartedPlugins();
     }
 
+    @Test
+    void shouldGetStartedPluginNames() {
+        var plugin1 = mock(PluginWrapper.class);
+        when(plugin1.getPluginId()).thenReturn("plugin-1");
+        var plugin2 = mock(PluginWrapper.class);
+        when(plugin2.getPluginId()).thenReturn("plugin-2");
+        when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2));
+
+        pluginService.getStartedPluginNames()
+            .as(StepVerifier::create)
+            .expectNext("plugin-1", "plugin-2")
+            .verifyComplete();
+    }
+
     @Nested
     class PluginStateChangeTest {
 

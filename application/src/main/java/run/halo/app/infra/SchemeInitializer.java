@@ -156,6 +156,9 @@ class SchemeInitializer implements SmartLifecycle {
             indexSpecs.add(IndexSpecs.<User, String>single("spec.displayName", String.class)
                 .indexFunc(user -> user.getSpec().getDisplayName())
             );
+            indexSpecs.add(IndexSpecs.<User, Boolean>single("spec.emailVerified", Boolean.class)
+                .indexFunc(user -> user.getSpec().isEmailVerified())
+            );
             indexSpecs.add(IndexSpecs.<User, String>single("spec.email", String.class)
                 .indexFunc(user -> user.getSpec().getEmail())
             );
@@ -180,7 +183,14 @@ class SchemeInitializer implements SmartLifecycle {
         });
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
-        schemeManager.register(AnnotationSetting.class);
+        schemeManager.register(AnnotationSetting.class, indexSpecs -> indexSpecs.add(
+            IndexSpecs.<AnnotationSetting, String>single("spec.targetRef", String.class)
+                .indexFunc(annotationSetting -> Optional.ofNullable(annotationSetting.getSpec())
+                    .map(AnnotationSetting.AnnotationSettingSpec::getTargetRef)
+                    .map(ref -> ref.group() + "/" + ref.kind())
+                    .orElse(null)
+                )
+        ));
         schemeManager.register(ConfigMap.class);
         schemeManager.register(Secret.class);
         schemeManager.register(Theme.class);

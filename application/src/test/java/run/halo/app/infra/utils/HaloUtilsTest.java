@@ -33,7 +33,8 @@ class HaloUtilsTest {
         "http://example.com/路径, http://example.com/%E8%B7%AF%E5%BE%84",
         "http://example.com/space%20space, http://example.com/space%20space",
         "http://example.com/100%100, http://example.com/100%100",
-        "http://example.com/mixed chars%20and 中文, http://example.com/mixed%20chars%20and%20%E4%B8%AD%E6%96%87"
+        "http://example.com/mixed chars%20and 中文, http://example.com/mixed%20chars%20and%20%E4%B8%AD%E6%96%87",
+        "http://中文.com/path/to/中文, http://xn--fiq228c.com/path/to/%E4%B8%AD%E6%96%87"
     })
     void shouldConvertUriSafely(String uri, String expected) {
         assertEquals(expected, HaloUtils.safeToUri(uri).toString());

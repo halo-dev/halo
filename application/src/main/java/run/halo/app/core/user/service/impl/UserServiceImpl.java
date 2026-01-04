@@ -93,6 +93,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Mono<User> findUserByVerifiedEmail(String email) {
+        var listOptions = ListOptions.builder()
+            .andQuery(equal("spec.emailVerified", true))
+            .andQuery(equal("spec.email", email))
+            .build();
+        return client.listAll(User.class, listOptions, defaultSort()).next();
+    }
+
+    @Override
     public Mono<User> getUserOrGhost(String username) {
         return client.fetch(User.class, username)
             .switchIfEmpty(Mono.defer(() -> client.get(User.class, GHOST_USER_NAME)));

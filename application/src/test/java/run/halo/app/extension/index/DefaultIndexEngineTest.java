@@ -9,6 +9,8 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +94,64 @@ class DefaultIndexEngineTest {
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
         assertEquals(List.of("3", "4"), result.getItems());
+    }
+
+    @Test
+    void shouldRetrieveWithConditionsAndFirstPage() {
+        when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
+        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        var options = ListOptions.builder()
+            .andQuery(Queries.all("metadata.name"))
+            .build();
+        var page = PageRequestImpl.of(1, 4);
+        var result = engine.retrieve(Fake.class, options, page);
+        assertEquals(6, result.getTotal());
+        assertEquals(List.of("1", "2", "3", "4"), result.getItems());
+    }
+
+    @Test
+    void shouldRetrieveWithConditionsAndLastPage() {
+        when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
+        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        var options = ListOptions.builder()
+            .andQuery(Queries.all("metadata.name"))
+            .build();
+        var page = PageRequestImpl.of(2, 4);
+        var result = engine.retrieve(Fake.class, options, page);
+        assertEquals(6, result.getTotal());
+        assertEquals(List.of("5", "6"), result.getItems());
+    }
+
+    @Test
+    void shouldRetrieveWithConditionsAndExceededPage() {
+        when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
+        when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
+        var options = ListOptions.builder()
+            .andQuery(Queries.all("metadata.name"))
+            .build();
+        var page = PageRequestImpl.of(4, 2);
+        var result = engine.retrieve(Fake.class, options, page);
+        assertEquals(6, result.getTotal());
+        assertEquals(List.of(), result.getItems());
+    }
+
+    @Test
+    void shouldRetrieveAllWithConditionsAndNonPositiveSize() {
+        var allResult = IntStream.rangeClosed(1, 1001)
+            .boxed()
+            .map(o -> String.format("%04d", o))
+            .collect(Collectors.toSet());
+        when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
+        when(singleValueIndex.all()).thenReturn(allResult);
+        var options = ListOptions.builder()
+            .andQuery(Queries.all("metadata.name"))
+            .build();
+        var page = PageRequestImpl.of(1, 0);
+        var result = engine.retrieve(Fake.class, options, page);
+        assertEquals(1001, result.getTotal());
+        assertEquals(1000, result.getItems().size());
+        assertEquals("0001", result.getItems().getFirst());
+        assertEquals("1000", result.getItems().getLast());
     }
 
     @Test
