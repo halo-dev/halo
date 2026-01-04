@@ -337,6 +337,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.FAILED);
+            removeStartTaskIfPresent(pluginName);
             return Result.doNotRetry();
         }
         var pluginState = current.getPluginState();
@@ -351,8 +352,9 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.STARTED);
+            removeStartTaskIfPresent(pluginName);
             requestToReloadPluginsOptionallyDependentOn(pluginName);
-            return null;
+            return Result.doNotRetry();
         }
         if (pluginState.isFailed()) {
             var t = current.getFailedException();
@@ -367,22 +369,30 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 .lastTransitionTime(clock.instant())
                 .build());
             status.setPhase(Plugin.Phase.FAILED);
+            removeStartTaskIfPresent(pluginName);
             return Result.doNotRetry();
         }
         if (!Plugin.Phase.STARTING.equals(status.getPhase())) {
-            pluginStartTasks.computeIfAbsent(pluginName, name -> scheduler.schedule(() -> {
-                log.info("Starting plugin {} in background thread.", name);
-                try {
-                    var state = pluginManager.startPlugin(name);
-                    log.info("Plugin {} started with state {}.", name, state);
-                } catch (Throwable t) {
-                    var pluginWrapper = pluginManager.getPlugin(name);
-                    if (pluginWrapper != null) {
-                        pluginWrapper.setPluginState(PluginState.FAILED);
-                        pluginWrapper.setFailedException(t);
-                    }
+            pluginStartTasks.compute(pluginName, (name, old) -> {
+                if (old != null && !old.isDisposed()) {
+                    log.info("Cancelling old starting task for plugin {}.", name);
+                    old.dispose();
+                    log.info("Cancelled old starting task for plugin {}.", name);
                 }
-            }));
+                return scheduler.schedule(() -> {
+                    log.info("Starting plugin {} in background thread.", name);
+                    try {
+                        var state = pluginManager.startPlugin(name);
+                        log.info("Plugin {} started with state {}.", name, state);
+                    } catch (Throwable t) {
+                        var pluginWrapper = pluginManager.getPlugin(name);
+                        if (pluginWrapper != null) {
+                            pluginWrapper.setPluginState(PluginState.FAILED);
+                            pluginWrapper.setFailedException(t);
+                        }
+                    }
+                });
+            });
             status.setPhase(Plugin.Phase.STARTING);
             conditions.addAndEvictFIFO(Condition.builder()
                 .type(ConditionType.PROGRESSING)
@@ -441,12 +451,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             }
             try {
                 // First, stop starting task if exists
-                pluginStartTasks.computeIfPresent(pluginName, (name, disposable) -> {
-                    log.info("Cancelling starting task for plugin {}.", name);
-                    disposable.dispose();
-                    log.info("Cancelled starting task for plugin {}.", name);
-                    return null;
-                });
+                removeStartTaskIfPresent(pluginName);
                 pluginManager.disablePlugin(pluginName);
             } catch (Throwable e) {
                 conditions.addAndEvictFIFO(Condition.builder()
@@ -803,6 +808,17 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             .extension(new Plugin())
             .syncAllOnStart(true)
             .build();
+    }
+
+    private void removeStartTaskIfPresent(String pluginName) {
+        pluginStartTasks.computeIfPresent(pluginName, (name, disposable) -> {
+            if (!disposable.isDisposed()) {
+                log.info("Cancelling starting task for plugin {}.", name);
+                disposable.dispose();
+                log.info("Cancelled starting task for plugin {}.", name);
+            }
+            return null;
+        });
     }
 
     private Result createOrUpdateReverseProxy(Plugin plugin) {
