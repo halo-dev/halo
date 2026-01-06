@@ -31,9 +31,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
-import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -97,7 +95,7 @@ public class CommentNotificationReasonPublisher {
     @Component
     @RequiredArgsConstructor
     static class CommentContentConverter {
-        private final ExternalUrlSupplier externalUrlSupplier;
+        private final ExternalLinkProcessor externalLinkProcessor;
 
         /**
          * Convert relative links to absolute links.
@@ -109,12 +107,7 @@ public class CommentNotificationReasonPublisher {
             Document parse = Jsoup.parse(content);
             parse.select("img").forEach(element -> {
                 var src = element.attr("src");
-                if (PathUtils.isAbsoluteUri(src)) {
-                    return;
-                }
-                src = StringUtils.prependIfMissing(src, "/");
-                src = externalUrlSupplier.get().resolve(src).normalize().toString();
-                element.attr("src", src);
+                element.attr("src",  externalLinkProcessor.processLink(src));
             });
             return parse.body().html();
         }
