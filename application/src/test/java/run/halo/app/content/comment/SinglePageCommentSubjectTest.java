@@ -1,6 +1,7 @@
 package run.halo.app.content.comment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
@@ -72,4 +74,15 @@ class SinglePageCommentSubjectTest {
         supports = singlePageCommentSubject.supports(Ref.of(fakeExtension));
         assertThat(supports).isFalse();
     }
+
+
+    @Test
+    void shouldSupportRefWithoutVersion() {
+        var ref = new Ref();
+        ref.setName("fake-post");
+        ref.setGroup(Constant.GROUP);
+        ref.setKind(SinglePage.KIND);
+        assertTrue(singlePageCommentSubject.supports(ref));
+    }
+
 }

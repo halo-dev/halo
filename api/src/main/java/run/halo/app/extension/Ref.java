@@ -5,19 +5,21 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import org.springframework.lang.NonNull;
 
 @Data
 @Schema(description = "Extension reference object. The name is mandatory")
 public class Ref {
 
-    @Schema(description = "Extension group")
+    @Schema(description = "Extension group", requiredMode = REQUIRED)
     private String group;
 
     @Schema(description = "Extension version")
+    @Nullable
     private String version;
 
-    @Schema(description = "Extension kind")
+    @Schema(description = "Extension kind", requiredMode = REQUIRED)
     private String kind;
 
     @Schema(requiredMode = REQUIRED, description = "Extension name. This field is mandatory")
