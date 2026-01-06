@@ -23,6 +23,7 @@ public interface SpringPlugin {
      * Gets application context of the plugin.
      *
      * @return application context of the plugin
+     * @throws IllegalStateException if the application context is not ready yet
      */
     @NonNull
     ApplicationContext getApplicationContext();

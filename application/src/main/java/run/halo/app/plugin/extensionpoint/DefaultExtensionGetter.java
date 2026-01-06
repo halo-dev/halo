@@ -7,7 +7,6 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ExtensionPoint;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
@@ -18,6 +17,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
 import run.halo.app.plugin.SpringPlugin;
+import run.halo.app.plugin.SpringPluginManager;
 
 @Slf4j
 @Component
@@ -26,7 +26,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
 
     private final SystemConfigFetcher systemConfigFetcher;
 
-    private final PluginManager pluginManager;
+    private final SpringPluginManager pluginManager;
 
     private final BeanFactory beanFactory;
 
@@ -104,13 +104,10 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     protected <T> List<T> lookExtensions(Class<T> type) {
         List<T> beans = new ArrayList<>();
         // avoid concurrent modification
-        var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
+        var startedPlugins = pluginManager.startedPlugins();
         for (PluginWrapper startedPlugin : startedPlugins) {
             if (startedPlugin.getPlugin() instanceof SpringPlugin springPlugin) {
                 var pluginApplicationContext = springPlugin.getApplicationContext();
-                if (pluginApplicationContext == null) {
-                    continue;
-                }
                 try {
                     pluginApplicationContext.getBeansOfType(type)
                         .forEach((name, bean) -> beans.add(bean));

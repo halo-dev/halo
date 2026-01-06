@@ -1,7 +1,6 @@
 package run.halo.app.plugin;
 
-import java.util.ArrayList;
-import org.pf4j.PluginManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.Lifecycle;
@@ -10,16 +9,12 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class SharedEventDispatcher {
 
-    private final PluginManager pluginManager;
+    private final SpringPluginManager pluginManager;
 
     private final ApplicationEventPublisher publisher;
-
-    public SharedEventDispatcher(PluginManager pluginManager, ApplicationEventPublisher publisher) {
-        this.pluginManager = pluginManager;
-        this.publisher = publisher;
-    }
 
     @EventListener(ApplicationEvent.class)
     void onApplicationEvent(ApplicationEvent event) {
@@ -27,7 +22,7 @@ public class SharedEventDispatcher {
             return;
         }
         // we should copy the plugins list to avoid ConcurrentModificationException
-        var startedPlugins = new ArrayList<>(pluginManager.getStartedPlugins());
+        var startedPlugins = pluginManager.startedPlugins();
         // broadcast event to all started plugins except the publisher
         for (var startedPlugin : startedPlugins) {
             var plugin = startedPlugin.getPlugin();

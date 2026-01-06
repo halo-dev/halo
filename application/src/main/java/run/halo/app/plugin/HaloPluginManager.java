@@ -181,6 +181,15 @@ class HaloPluginManager extends DefaultPluginManager
         return dependents;
     }
 
+    @Override
+    public List<PluginWrapper> startedPlugins() {
+        return List.copyOf(super.getStartedPlugins())
+            .stream()
+            // Make sure the plugin is really started
+            .filter(p -> p.getPluginState().isStarted())
+            .toList();
+    }
+
     /**
      * Listener for plugin started event.
      *

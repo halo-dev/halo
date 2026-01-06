@@ -408,7 +408,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     }
 
     void requestToReloadPluginsOptionallyDependentOn(String pluginName) {
-        var startedPlugins = pluginManager.getStartedPlugins()
+        var startedPlugins = pluginManager.startedPlugins()
             .stream()
             .map(PluginWrapper::getDescriptor)
             .toList();
@@ -454,6 +454,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 removeStartTaskIfPresent(pluginName);
                 pluginManager.disablePlugin(pluginName);
             } catch (Throwable e) {
+                log.error("Error occurred when disabling plugin {}", pluginName, e);
                 conditions.addAndEvictFIFO(Condition.builder()
                     .type(ConditionType.READY)
                     .status(ConditionStatus.FALSE)
