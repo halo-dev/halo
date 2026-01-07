@@ -40,4 +40,21 @@ public interface SpringPluginManager extends PluginManager {
      */
     @NonNull
     List<PluginWrapper> getDependents(@NonNull String pluginId);
+
+    /**
+     * Gets all started plugins.
+     *
+     * @return a list of started plugins. Mutable.
+     * @apiNote The plugin inside this list may not be really started
+     */
+    @Override
+    List<PluginWrapper> getStartedPlugins();
+
+    /**
+     * Gets all really started plugins.
+     *
+     * @return a list of really started plugins. Immutable.
+     */
+    List<PluginWrapper> startedPlugins();
+
 }
