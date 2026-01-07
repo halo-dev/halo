@@ -128,7 +128,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return Mono.fromCallable(
                 () -> indexEngine.retrieveAll(scheme.type(), options, nullSafeSort)
             )
-            .subscribeOn(this.scheduler)
             .flatMapMany(objectKeys -> {
                 var storeNames = StreamSupport.stream(objectKeys.spliterator(), false)
                     .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
@@ -159,7 +158,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     ) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, sort))
-            .subscribeOn(this.scheduler)
             .flatMapMany(Flux::fromIterable);
     }
 
@@ -169,7 +167,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     ) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveTopN(scheme.type(), options, sort, topN))
-            .subscribeOn(this.scheduler)
             .flatMapMany(Flux::fromIterable);
     }
 
@@ -178,7 +175,6 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         PageRequest page) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, page))
-            .subscribeOn(this.scheduler)
             .flatMap(listResult -> {
                 var storeNames = listResult.get()
                     .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
@@ -202,15 +198,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Mono<ListResult<String>> listNamesBy(Class<E> type,
         ListOptions options, PageRequest pageable) {
         var scheme = schemeManager.get(type);
-        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable))
-            .subscribeOn(this.scheduler);
+        return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable));
     }
 
     @Override
     public <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options) {
         var scheme = schemeManager.get(type);
-        return Mono.fromCallable(() -> indexEngine.count(scheme.type(), options))
-            .subscribeOn(this.scheduler);
+        return Mono.fromCallable(() -> indexEngine.count(scheme.type(), options));
     }
 
     @Override
