@@ -73,6 +73,7 @@ import {
 import { ExtensionPlaceholder } from "./placeholder";
 import { ExtensionRangeSelection } from "./range-selection";
 import { ExtensionSearchAndReplace } from "./search-and-replace";
+import { ExtensionSmartScroll, type SmartScrollOptions } from "./smart-scroll";
 import { ExtensionStrike, type ExtensionStrikeOptions } from "./strike";
 import {
   ExtensionSubscript,
@@ -138,6 +139,7 @@ export interface ExtensionsKitOptions {
   placeholder: Partial<PlaceholderOptions> | false;
   rangeSelection?: boolean;
   searchAndReplace?: boolean;
+  smartScroll: Partial<SmartScrollOptions> | false;
   strike: Partial<ExtensionStrikeOptions> | false;
   subscript: Partial<ExtensionSubscriptOptions> | false;
   superscript: Partial<ExtensionSuperscriptOptions> | false;
@@ -333,6 +335,12 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
 
     if (this.options.searchAndReplace !== false) {
       internalExtensions.push(ExtensionSearchAndReplace);
+    }
+
+    if (this.options.smartScroll !== false) {
+      internalExtensions.push(
+        ExtensionSmartScroll.configure(this.options.smartScroll)
+      );
     }
 
     if (this.options.strike !== false) {
