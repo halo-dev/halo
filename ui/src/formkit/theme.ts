@@ -120,7 +120,7 @@ const theme: Record<string, Record<string, string>> = {
   },
   toggle: {
     label: textClassification.label,
-    wrapper: "flex flex-col gap-1",
+    wrapper: textClassification.wrapper,
     help: "mb-1 !mt-0",
     inner: "inline-flex items-center gap-1",
   },

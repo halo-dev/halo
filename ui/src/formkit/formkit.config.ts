@@ -84,8 +84,8 @@ const config: DefaultConfigOptions = {
     iconify,
     attachment,
     switch: switchInput,
+    toggle,
   },
-  toggle,
   locales: { zh, en },
   locale: "zh",
 };
