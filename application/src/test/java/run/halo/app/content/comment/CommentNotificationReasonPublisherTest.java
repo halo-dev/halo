@@ -6,12 +6,10 @@ import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -143,6 +141,9 @@ class CommentNotificationReasonPublisherTest {
         @Mock
         ExternalUrlSupplier externalUrlSupplier;
 
+        @Mock
+        ExternalLinkProcessor externalLinkProcessor;
+
         @InjectMocks
         CommentNotificationReasonPublisher.CommentContentConverter commentContentConverter;
 
@@ -150,35 +151,41 @@ class CommentNotificationReasonPublisherTest {
         void shouldConvertRelativeImageLinksToAbsolute() {
             var content =
                 "<p>Test content <img src=\"/upload/image.jpg\" alt=\"Test image\" /></p>";
-            var baseUrl = URI.create("https://example.com");
-            when(externalUrlSupplier.get()).thenReturn(baseUrl);
+            
+            when(externalLinkProcessor.processLink("/upload/image.jpg"))
+                .thenReturn("https://example.com/upload/image.jpg");
 
             var result = commentContentConverter.convertRelativeLinks(content);
 
             assertThat(result).contains("https://example.com/upload/image.jpg");
             assertThat(result).contains("Test content");
-            verify(externalUrlSupplier).get();
+            verify(externalLinkProcessor).processLink("/upload/image.jpg");
         }
 
         @Test
         void shouldHandleRelativeImageLinksWithoutLeadingSlash() {
             var content = "<p><img src=\"upload/image.jpg\" /></p>";
-            var baseUrl = URI.create("https://example.com");
-            when(externalUrlSupplier.get()).thenReturn(baseUrl);
+            
+            when(externalLinkProcessor.processLink("upload/image.jpg"))
+                .thenReturn("https://example.com/upload/image.jpg");
 
             var result = commentContentConverter.convertRelativeLinks(content);
 
             assertThat(result).contains("https://example.com/upload/image.jpg");
+            verify(externalLinkProcessor).processLink("upload/image.jpg");
         }
 
         @Test
         void shouldNotConvertAbsoluteImageLinks() {
             var content = "<p><img src=\"https://cdn.example.com/image.jpg\" /></p>";
+            
+            when(externalLinkProcessor.processLink("https://cdn.example.com/image.jpg"))
+                .thenReturn("https://cdn.example.com/image.jpg");
 
             var result = commentContentConverter.convertRelativeLinks(content);
 
             assertThat(result).contains("https://cdn.example.com/image.jpg");
-            verify(externalUrlSupplier, never()).get();
+            verify(externalLinkProcessor).processLink("https://cdn.example.com/image.jpg");
         }
 
         @Test
@@ -188,14 +195,22 @@ class CommentNotificationReasonPublisherTest {
                 + "<img src=\"/img2.jpg\" />"
                 + "<img src=\"https://example.com/img3.jpg\" />"
                 + "</p>";
-            var baseUrl = URI.create("https://example.com");
-            when(externalUrlSupplier.get()).thenReturn(baseUrl);
+            
+            when(externalLinkProcessor.processLink("/img1.jpg"))
+                .thenReturn("https://example.com/img1.jpg");
+            when(externalLinkProcessor.processLink("/img2.jpg"))
+                .thenReturn("https://example.com/img2.jpg");
+            when(externalLinkProcessor.processLink("https://example.com/img3.jpg"))
+                .thenReturn("https://example.com/img3.jpg");
 
             var result = commentContentConverter.convertRelativeLinks(content);
 
             assertThat(result).contains("https://example.com/img1.jpg");
             assertThat(result).contains("https://example.com/img2.jpg");
             assertThat(result).contains("https://example.com/img3.jpg");
+            verify(externalLinkProcessor).processLink("/img1.jpg");
+            verify(externalLinkProcessor).processLink("/img2.jpg");
+            verify(externalLinkProcessor).processLink("https://example.com/img3.jpg");
         }
 
         @Test
@@ -206,7 +221,6 @@ class CommentNotificationReasonPublisherTest {
 
             assertThat(result).contains("This is a comment content without images");
             assertThat(result).doesNotContain("img");
-            verify(externalUrlSupplier, never()).get();
         }
 
         @Test
@@ -216,7 +230,6 @@ class CommentNotificationReasonPublisherTest {
             var result = commentContentConverter.convertRelativeLinks(content);
 
             assertThat(result).isEmpty();
-            verify(externalUrlSupplier, never()).get();
         }
 
         @Test
@@ -230,8 +243,11 @@ class CommentNotificationReasonPublisherTest {
                     <img src="assets/photo2.jpg" />
                 </div>
                 """;
-            var baseUrl = URI.create("https://example.com");
-            when(externalUrlSupplier.get()).thenReturn(baseUrl);
+            
+            when(externalLinkProcessor.processLink("/images/photo1.png"))
+                .thenReturn("https://example.com/images/photo1.png");
+            when(externalLinkProcessor.processLink("assets/photo2.jpg"))
+                .thenReturn("https://example.com/assets/photo2.jpg");
 
             var result = commentContentConverter.convertRelativeLinks(content);
 
@@ -239,6 +255,8 @@ class CommentNotificationReasonPublisherTest {
             assertThat(result).contains("https://example.com/assets/photo2.jpg");
             assertThat(result).contains("Title");
             assertThat(result).contains("Paragraph content");
+            verify(externalLinkProcessor).processLink("/images/photo1.png");
+            verify(externalLinkProcessor).processLink("assets/photo2.jpg");
         }
     }
 
