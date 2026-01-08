@@ -83,7 +83,7 @@ const handleRemove = (index: number) => {
   if (multiple.value) {
     props.context.node.input(currentValue.value.filter((_, i) => i !== index));
   } else {
-    props.context.node.input(undefined);
+    props.context.node.input("");
   }
 };
 
