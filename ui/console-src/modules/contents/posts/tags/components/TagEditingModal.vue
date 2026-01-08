@@ -41,7 +41,7 @@ const formState = ref<Tag>({
   spec: {
     displayName: "",
     slug: "",
-    color: "#ffffff",
+    color: "",
     cover: "",
   },
   apiVersion: "content.halo.run/v1alpha1",
