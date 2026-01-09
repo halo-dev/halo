@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.Plugin;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -24,7 +23,7 @@ import org.springframework.context.Lifecycle;
 class SharedEventDispatcherTest {
 
     @Mock
-    PluginManager pluginManager;
+    SpringPluginManager pluginManager;
 
     @Mock
     ApplicationEventPublisher publisher;
@@ -47,7 +46,7 @@ class SharedEventDispatcherTest {
         when(((Lifecycle) context).isRunning()).thenReturn(true);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
-        when(pluginManager.getStartedPlugins()).thenReturn(List.of(pw));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(pw));
 
         var event = new FakeSharedEvent(this);
         dispatcher.onApplicationEvent(event);
@@ -64,7 +63,7 @@ class SharedEventDispatcherTest {
         when(((Lifecycle) context).isRunning()).thenReturn(false);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
-        when(pluginManager.getStartedPlugins()).thenReturn(List.of(pw));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(pw));
         var event = new FakeSharedEvent(this);
         dispatcher.onApplicationEvent(event);
         verify(context, never()).publishEvent(event);
@@ -77,7 +76,7 @@ class SharedEventDispatcherTest {
         var context = mock(ApplicationContext.class);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
-        when(pluginManager.getStartedPlugins()).thenReturn(List.of(pw));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(pw));
         var event = new FakeSharedEvent(this);
         dispatcher.onApplicationEvent(event);
         verify(context, never()).publishEvent(event);
