@@ -4,6 +4,7 @@ import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.infra.utils.IpAddressUtils.getClientIp;
 import static run.halo.app.security.authentication.rememberme.PersistentTokenBasedRememberMeServices.REMEMBER_ME_SERIES_REQUEST_NAME;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,8 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.session.ReactiveSessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -40,6 +44,7 @@ public class DeviceServiceImpl implements DeviceService {
     private final ReactiveSessionRepository<?> sessionRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PersistentRememberMeTokenRepository rememberMeTokenRepository;
+    private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
     @Override
     public Mono<Void> loginSuccess(ServerWebExchange exchange, Authentication authentication) {
@@ -61,7 +66,9 @@ public class DeviceServiceImpl implements DeviceService {
             return Mono.empty();
         }
         return ReactiveSecurityContextHolder.getContext()
-            .map(context -> context.getAuthentication().getName())
+            .map(SecurityContext::getAuthentication)
+            .filter(trustResolver::isAuthenticated)
+            .map(Principal::getName)
             .flatMap(username -> {
                 var deviceId = deviceIdCookie.getValue();
                 return updateWithRetry(deviceId, username, device -> {
