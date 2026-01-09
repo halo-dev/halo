@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import java.util.Set;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.Extension;
 
 /**
@@ -17,7 +18,7 @@ import run.halo.app.extension.Extension;
 @Accessors(chain = true)
 @Deprecated(forRemoval = true, since = "2.22.0")
 public class IndexSpec<E extends Extension, K extends Comparable<K>>
-    implements MultiValueIndexSpec<E, K> {
+    implements ValueIndexSpec<E, K> {
 
     private String name;
 
@@ -27,7 +28,6 @@ public class IndexSpec<E extends Extension, K extends Comparable<K>>
 
     private boolean unique;
 
-    @Override
     public Set<K> getValues(E extension) {
         return indexFunc.getValues(extension);
     }
@@ -62,5 +62,26 @@ public class IndexSpec<E extends Extension, K extends Comparable<K>>
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    /**
+     * Normalize to single or multi value index spec.
+     *
+     * @return the normalized index spec
+     */
+    public ValueIndexSpec<E, K> normalize() {
+        if (this.indexFunc.singleValue()) {
+            return IndexSpecs.<E, K>single(name, getKeyType())
+                .unique(unique)
+                .indexFunc(e -> {
+                    var values = getValues(e);
+                    return CollectionUtils.isEmpty(values) ? null : values.iterator().next();
+                })
+                .build();
+        }
+        return IndexSpecs.<E, K>multi(name, getKeyType())
+            .unique(unique)
+            .indexFunc(this::getValues)
+            .build();
     }
 }
