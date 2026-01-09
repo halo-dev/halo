@@ -27,7 +27,8 @@ core:
       logout:
         title: ¿Estás seguro de que deseas cerrar sesión?
         tooltip: Cerrar sesión
-        description: Al hacer clic en Confirmar se te redirigirá a la página de cierre
+        description:
+          Al hacer clic en Confirmar se te redirigirá a la página de cierre
           de sesión. Asegúrate de que el contenido que estás editando esté guardado.
       profile:
         tooltip: Perfil
@@ -53,11 +54,11 @@ core:
           title: Páginas
         recent_published:
           title: Publicaciones Recientes
-          visits: '{visits} Visitas'
-          comments: '{comments} Comentarios'
+          visits: "{visits} Visitas"
+          comments: "{comments} Comentarios"
           empty:
             title: No hay publicaciones publicadas
-          comments-with-pending: ' ({count} comentarios pendientes)'
+          comments-with-pending: " ({count} comentarios pendientes)"
         quickaction:
           title: Acción Rápida
           actions:
@@ -80,7 +81,8 @@ core:
             refresh_search_engine:
               title: Actualizar Motor de Búsqueda
               dialog_title: ¿Deseas actualizar el índice del motor de búsqueda?
-              dialog_content: Esta operación recreará los índices del motor de búsqueda
+              dialog_content:
+                Esta operación recreará los índices del motor de búsqueda
                 para todas las publicaciones publicadas.
               success_message: Índice del motor de búsqueda actualizado exitosamente.
           config:
@@ -141,19 +143,23 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta publicación?
-        description: Esta operación moverá la publicación a la papelera de reciclaje,
+        description:
+          Esta operación moverá la publicación a la papelera de reciclaje,
           y podrá ser restaurada desde la papelera de reciclaje posteriormente.
       delete_in_batch:
         title: ¿Estás seguro de que deseas eliminar las publicaciones seleccionadas?
-        description: Esta operación moverá las publicaciones a la papelera de reciclaje,
+        description:
+          Esta operación moverá las publicaciones a la papelera de reciclaje,
           y podrán ser restauradas desde la papelera de reciclaje posteriormente.
       publish_in_batch:
         title: Publicar publicaciones
-        description: Publicar publicaciones por lotes, las publicaciones seleccionadas
+        description:
+          Publicar publicaciones por lotes, las publicaciones seleccionadas
           se establecerán como publicadas
       cancel_publish_in_batch:
         title: Cancelar publicación de publicaciones
-        description: Cancelar publicación por lotes, las publicaciones seleccionadas
+        description:
+          Cancelar publicación por lotes, las publicaciones seleccionadas
           se establecerán como no publicadas
       batch_setting:
         button: Ajustes por lotes
@@ -165,19 +171,19 @@ core:
           scheduling: Programando publicación
       visible:
         label: Visible
-        result: 'Visible: {visible}'
+        result: "Visible: {visible}"
         items:
           public: Público
           private: Privado
       category:
         label: Categoría
-        result: 'Categoría: {category}'
+        result: "Categoría: {category}"
       tag:
         label: Etiqueta
-        result: 'Etiqueta: {tag}'
+        result: "Etiqueta: {tag}"
       author:
         label: Autor
-        result: 'Autor: {author}'
+        result: "Autor: {author}"
       sort:
         items:
           publish_time_desc: Publicado más reciente
@@ -190,13 +196,13 @@ core:
           last_modify_time_asc: Actualizado más antiguo
     list:
       fields:
-        categories: 'Categorías:'
-        visits: '{visits} Visitas'
-        comments: '{comments} Comentarios'
+        categories: "Categorías:"
+        visits: "{visits} Visitas"
+        comments: "{comments} Comentarios"
         pinned: Fijado
         schedule_publish:
           tooltip: Programar publicación
-        comments-with-pending: ' ({count} comentarios pendientes)'
+        comments-with-pending: " ({count} comentarios pendientes)"
     settings:
       title: Configuraciones
       groups:
@@ -259,8 +265,8 @@ core:
         tag_group: Etiqueta
         tag_names: Seleccionar etiquetas
         visible_group: Visible
-        visible_value: 'Seleccionar opción de visibilidad '
-        allow_comment_group: ' Permitir comentarios'
+        visible_value: "Seleccionar opción de visibilidad "
+        allow_comment_group: " Permitir comentarios"
         allow_comment_value: Elige si permites comentarios
         owner_group: Propietario
         owner_value: Seleccionar propietario
@@ -274,16 +280,19 @@ core:
         title: ¿Estás seguro de que deseas eliminar permanentemente esta publicación?
         description: Después de la eliminación, no será posible recuperarla.
       delete_in_batch:
-        title: ¿Estás seguro de que deseas eliminar permanentemente las publicaciones
+        title:
+          ¿Estás seguro de que deseas eliminar permanentemente las publicaciones
           seleccionadas?
         description: Después de la eliminación, no será posible recuperarlas.
       recovery:
         title: ¿Quieres restaurar esta publicación?
-        description: Esta operación restaurará la publicación a su estado antes de
+        description:
+          Esta operación restaurará la publicación a su estado antes de
           la eliminación.
       recovery_in_batch:
         title: ¿Estás seguro de que deseas restaurar las publicaciones seleccionadas?
-        description: Esta operación restaurará las publicaciones a su estado antes
+        description:
+          Esta operación restaurará las publicaciones a su estado antes
           de la eliminación.
   post_editor:
     title: Edición de publicación
@@ -293,14 +302,15 @@ core:
   post_tag:
     title: Etiquetas de publicación
     header:
-      title: '{count} Etiquetas'
+      title: "{count} Etiquetas"
     empty:
       title: No hay etiquetas actualmente.
       message: Puedes intentar actualizar o crear una nueva etiqueta.
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta etiqueta?
-        description: Después de eliminar esta etiqueta, se eliminará la asociación
+        description:
+          Después de eliminar esta etiqueta, se eliminará la asociación
           con el artículo correspondiente. Esta operación no se puede deshacer.
       delete_in_batch:
         title: Eliminar las etiquetas seleccionadas
@@ -327,14 +337,15 @@ core:
   post_category:
     title: Categorías de publicación
     header:
-      title: '{count} Categorías'
+      title: "{count} Categorías"
     empty:
       title: No hay categorías actualmente.
       message: Puedes intentar actualizar o crear una nueva categoría.
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta categoría?
-        description: Después de eliminar esta categoría, se eliminará la asociación
+        description:
+          Después de eliminar esta categoría, se eliminará la asociación
           con los artículos correspondientes. Esta operación no se puede deshacer.
       add_sub_category:
         button: Agregar subcategoría
@@ -356,7 +367,8 @@ core:
           refresh_message: Regenerar slug basado en el nombre para mostrar.
         template:
           label: Plantilla personalizada
-          help: Personaliza la plantilla de renderizado de la página de archivo de
+          help:
+            Personaliza la plantilla de renderizado de la página de archivo de
             la categoría, lo que requiere soporte del tema
         cover:
           label: Portada
@@ -366,23 +378,28 @@ core:
           help: Se requiere adaptación del tema para ser compatible
         prevent_parent_post_cascade_query:
           label: Evitar consulta en cascada de publicación principal
-          help: Si se selecciona, las publicaciones de las subcategorías no se agregarán
+          help:
+            Si se selecciona, las publicaciones de las subcategorías no se agregarán
             a la categoría principal
         post_template:
           label: Plantilla de publicación personalizada
-          help: Personaliza la plantilla de renderizado de las publicaciones en la
+          help:
+            Personaliza la plantilla de renderizado de las publicaciones en la
             categoría actual, lo que requiere soporte del tema
         hide_from_list:
           label: Ocultar de la lista
-          help: Después de activar esta opción, esta categoría y sus subcategorías,
+          help:
+            Después de activar esta opción, esta categoría y sus subcategorías,
             así como sus publicaciones, no se mostrarán en la lista frontal. Necesitas
             visitar activamente la página de archivo de la categoría. Esta función
             solo es efectiva para el directorio de primer nivel.
     list:
       fields:
-        prevent_parent_post_cascade_query: Evitar que la categoría padre incluya esta
+        prevent_parent_post_cascade_query:
+          Evitar que la categoría padre incluya esta
           categoría y sus subcategorías en consultas de publicaciones en cascada
-        hide_from_list: Esta categoría está oculta. Esta categoría y sus subcategorías,
+        hide_from_list:
+          Esta categoría está oculta. Esta categoría y sus subcategorías,
           así como sus publicaciones, no se mostrarán en la lista frontal. Necesitas
           visitar activamente la página de archivo de la categoría.
   page:
@@ -395,11 +412,13 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar esta página?
-        description: Esta operación moverá la página a la papelera de reciclaje, y
+        description:
+          Esta operación moverá la página a la papelera de reciclaje, y
           podrá ser restaurada desde la papelera de reciclaje posteriormente.
       delete_in_batch:
         title: ¿Estás seguro de que deseas eliminar las páginas seleccionadas?
-        description: Esta operación moverá las páginas a la papelera de reciclaje,
+        description:
+          Esta operación moverá las páginas a la papelera de reciclaje,
           y podrá ser restaurada desde la papelera de reciclaje posteriormente.
     filters:
       status:
@@ -408,13 +427,13 @@ core:
           draft: Borrador
       visible:
         label: Visible
-        result: 'Visible: {visible}'
+        result: "Visible: {visible}"
         items:
           public: Público
           private: Privado
       author:
         label: Autor
-        result: 'Autor: {author}'
+        result: "Autor: {author}"
       sort:
         items:
           publish_time_desc: Publicado más reciente
@@ -423,9 +442,9 @@ core:
           create_time_asc: Creado más antiguo
     list:
       fields:
-        visits: '{visits} Visitas'
-        comments: '{comments} Comentarios'
-        comments-with-pending: ' ({count} comentarios pendientes)'
+        visits: "{visits} Visitas"
+        comments: "{comments} Comentarios"
+        comments-with-pending: " ({count} comentarios pendientes)"
     settings:
       title: Configuraciones
       groups:
@@ -472,7 +491,8 @@ core:
         description: Esta operación restaurará la página a su estado antes de la eliminación.
       recovery_in_batch:
         title: ¿Estás seguro de que deseas restaurar las páginas seleccionadas?
-        description: Esta operación restaurará las páginas a su estado antes de la
+        description:
+          Esta operación restaurará las páginas a su estado antes de la
           eliminación.
   page_editor:
     title: Edición de Página
@@ -491,19 +511,23 @@ core:
     operations:
       delete_comment:
         title: ¿Estás seguro de que deseas eliminar este comentario?
-        description: Todas las respuestas bajo los comentarios se eliminarán al mismo
+        description:
+          Todas las respuestas bajo los comentarios se eliminarán al mismo
           tiempo, y esta operación no se puede deshacer.
       delete_comment_in_batch:
         title: ¿Estás seguro de que deseas eliminar los comentarios seleccionados?
-        description: Todas las respuestas bajo los comentarios se eliminarán al mismo
+        description:
+          Todas las respuestas bajo los comentarios se eliminarán al mismo
           tiempo, y esta operación no se puede deshacer.
       approve_comment_in_batch:
         button: Aprobar
-        title: ¿Estás seguro de que deseas aprobar los comentarios seleccionados para
+        title:
+          ¿Estás seguro de que deseas aprobar los comentarios seleccionados para
           su revisión?
       approve_applies_in_batch:
         button: Aprobar todas las respuestas
-        title: ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario
+        title:
+          ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario
           para su revisión?
       delete_reply:
         title: ¿Estás seguro de que deseas eliminar esta respuesta?
@@ -524,7 +548,7 @@ core:
           pending_review: Pendiente de Revisión
       owner:
         label: Propietario
-        result: 'Propietario: {owner}'
+        result: "Propietario: {owner}"
       sort:
         items:
           last_reply_time_desc: Respuesta Reciente
@@ -535,7 +559,7 @@ core:
           create_time_asc: Creado más antiguo
     list:
       fields:
-        reply_count: '{count} Respuestas'
+        reply_count: "{count} Respuestas"
         has_new_replies: Nuevas respuestas
         pending_review: Pendiente de revisión
         private: Privado
@@ -553,7 +577,7 @@ core:
           toast_success: Respuesta enviada exitosamente
     text:
       commented_on: comentó en
-      replied_below: 'respondió:'
+      replied_below: "respondió:"
     detail_modal:
       fields:
         owner: Comentarista
@@ -580,7 +604,8 @@ core:
       storage_policies: Políticas de Almacenamiento
     empty:
       title: No hay adjuntos en el grupo actual.
-      message: El grupo actual no tiene adjuntos, puedes intentar actualizar o cargar
+      message:
+        El grupo actual no tiene adjuntos, puedes intentar actualizar o cargar
         adjuntos.
       actions:
         upload: Cargar Adjunto
@@ -597,10 +622,10 @@ core:
     filters:
       storage_policy:
         label: Política de Almacenamiento
-        result: 'Política de Almacenamiento: {storage_policy}'
+        result: "Política de Almacenamiento: {storage_policy}"
       owner:
         label: Propietario
-        result: 'Propietario: {owner}'
+        result: "Propietario: {owner}"
       sort:
         items:
           create_time_desc: Cargado más reciente
@@ -621,7 +646,7 @@ core:
           video: Video
           file: Archivo
     detail_modal:
-      title: 'Adjunto: {display_name}'
+      title: "Adjunto: {display_name}"
       fields:
         preview: Vista Previa
         storage_policy: Política de Almacenamiento
@@ -637,7 +662,8 @@ core:
         audio_not_support: El navegador actual no admite la reproducción de audio.
         not_support: Este archivo no admite la vista previa.
       display_name_form:
-        help: Nombre de adjunto personalizado, solo para visualización en la interfaz
+        help:
+          Nombre de adjunto personalizado, solo para visualización en la interfaz
           de gestión, no afecta al nombre del archivo ni al enlace de acceso
     group_editing_modal:
       titles:
@@ -657,21 +683,25 @@ core:
         delete:
           button: Y mover adjunto a sin grupo
           title: ¿Estás seguro de que deseas eliminar este grupo?
-          description: El grupo se eliminará, y los adjuntos bajo el grupo se moverán
+          description:
+            El grupo se eliminará, y los adjuntos bajo el grupo se moverán
             a sin grupo. Esta operación no se puede deshacer.
-          toast_success: Eliminación exitosa, {total} adjuntos se han movido a sin
+          toast_success:
+            Eliminación exitosa, {total} adjuntos se han movido a sin
             grupo
         delete_with_attachments:
           button: También eliminar adjuntos
           title: ¿Estás seguro de que deseas eliminar este grupo?
-          description: Al eliminar el grupo y todos los adjuntos dentro de él, esta
+          description:
+            Al eliminar el grupo y todos los adjuntos dentro de él, esta
             acción no se puede deshacer.
           toast_success: Eliminación exitosa, {total} adjuntos se han eliminado simultáneamente
     policies_modal:
       title: Políticas de Almacenamiento
       empty:
         title: Actualmente no hay estrategias de almacenamiento disponibles.
-        message: No hay políticas de almacenamiento disponibles en este momento. Puedes
+        message:
+          No hay políticas de almacenamiento disponibles en este momento. Puedes
           intentar actualizar o crear una nueva política.
       operations:
         delete:
@@ -682,8 +712,8 @@ core:
           description: Hay adjuntos bajo esta política, que no se pueden eliminar.
     policy_editing_modal:
       titles:
-        create: 'Nueva política: {policy_template}'
-        update: 'Editar política: {policy}'
+        create: "Nueva política: {policy_template}"
+        update: "Editar política: {policy}"
       fields:
         display_name:
           label: Nombre para Mostrar
@@ -694,7 +724,8 @@ core:
           label: Configuración de la política
         priority:
           label: Prioridad de visualización en la pantalla de carga
-          help: Establece la prioridad de visualización en la pantalla de carga. Cuanto
+          help:
+            Establece la prioridad de visualización en la pantalla de carga. Cuanto
             mayor sea el número, más arriba aparecerá en la lista
       toast:
         policy_name_exists: El nombre de la política de almacenamiento ya existe
@@ -702,12 +733,13 @@ core:
       title: Cargar adjunto
       filters:
         group:
-          label: 'Seleccionar grupo:'
+          label: "Seleccionar grupo:"
         policy:
-          label: 'Seleccionar política de almacenamiento:'
+          label: "Seleccionar política de almacenamiento:"
           empty:
             title: Sin política de almacenamiento
-            description: Antes de cargar, es necesario crear una nueva política de
+            description:
+              Antes de cargar, es necesario crear una nueva política de
               almacenamiento.
           not_select: Por favor, selecciona una política de almacenamiento primero
       upload_options:
@@ -749,16 +781,20 @@ core:
         title: ¿Estás seguro de activar el tema actual?
         toast_success: Tema activado exitosamente
       reset:
-        title: ¿Estás seguro de que deseas restablecer todas las configuraciones del
+        title:
+          ¿Estás seguro de que deseas restablecer todas las configuraciones del
           tema?
-        description: Esta operación eliminará la configuración guardada y la restablecerá
+        description:
+          Esta operación eliminará la configuración guardada y la restablecerá
           a los ajustes predeterminados.
         toast_success: Configuración restablecida exitosamente
       reload:
         button: Recargar
-        title: ¿Estás seguro de que deseas recargar todas las configuraciones del
+        title:
+          ¿Estás seguro de que deseas recargar todas las configuraciones del
           tema?
-        description: Esta operación solo recargará la configuración del tema y la
+        description:
+          Esta operación solo recargará la configuración del tema y la
           definición del formulario de ajustes, y no eliminará ninguna configuración
           guardada.
         toast_success: Recarga de configuración exitosa
@@ -766,19 +802,22 @@ core:
         title: ¿Estás seguro de que deseas desinstalar este tema?
       uninstall_and_delete_config:
         button: Desinstalar y eliminar configuración
-        title: ¿Estás seguro de que deseas desinstalar este tema y su configuración
+        title:
+          ¿Estás seguro de que deseas desinstalar este tema y su configuración
           correspondiente?
       remote_download:
         title: Se ha detectado una dirección de descarga remota, ¿deseas descargar?
-        description: 'Por favor, verifica cuidadosamente si esta dirección es confiable:
-          {url}'
+        description:
+          "Por favor, verifica cuidadosamente si esta dirección es confiable:
+          {url}"
       existed_during_installation:
         title: El tema ya existe.
         description: El tema que intentas instalar ya existe, ¿quieres actualizarlo?
       clear_templates_cache:
         button: Limpiar caché de plantillas
         title: Limpiar caché de plantillas
-        description: Esta función permite refrescar la caché para ver los últimos
+        description:
+          Esta función permite refrescar la caché para ver los últimos
           resultados web tras modificar archivos de plantilla en tiempo de ejecución.
       export_configuration:
         button: Exportar configuración del tema
@@ -786,7 +825,8 @@ core:
         button: Importar configuración del tema
         version_mismatch:
           title: Versión no coincidente
-          description: La versión del archivo de configuración importado no coincide
+          description:
+            La versión del archivo de configuración importado no coincide
             con la versión del tema actual, lo que puede causar problemas de compatibilidad.
             ¿Deseas continuar con la importación?
         invalid_format: Archivo de configuración de tema inválido
@@ -802,12 +842,13 @@ core:
             url: URL remota
       empty:
         title: No hay temas instalados actualmente.
-        message: No hay temas instalados actualmente, puedes intentar actualizar o
+        message:
+          No hay temas instalados actualmente, puedes intentar actualizar o
           instalar un nuevo tema.
       not_installed_empty:
         title: No hay temas actualmente no instalados.
     preview_model:
-      title: 'Vista Previa del Tema: {display_name}'
+      title: "Vista Previa del Tema: {display_name}"
       actions:
         switch: Cambiar de tema
         setting: Ajustes
@@ -842,18 +883,20 @@ core:
         toast_success: Configuración exitosa
       delete_menu:
         title: ¿Estás seguro de que deseas eliminar este menú?
-        description: Todos los elementos de menú de este menú se eliminarán al mismo
+        description:
+          Todos los elementos de menú de este menú se eliminarán al mismo
           tiempo y esta operación no se puede deshacer.
       delete_menu_item:
         title: ¿Estás seguro de que deseas eliminar este elemento de menú?
-        description: Todos los subelementos de menú se eliminarán al mismo tiempo
+        description:
+          Todos los subelementos de menú se eliminarán al mismo tiempo
           y no se pueden restaurar después de la eliminación.
       add_sub_menu_item:
         button: Agregar subelemento de menú
     list:
       fields:
         primary: Principal
-        items_count: '{count} elementos'
+        items_count: "{count} elementos"
     menu_editing_modal:
       titles:
         create: Crear menú
@@ -898,30 +941,35 @@ core:
       detail: Detail
     empty:
       title: There are no installed plugins currently.
-      message: There are no installed plugins currently, you can try refreshing or
+      message:
+        There are no installed plugins currently, you can try refreshing or
         installing new plugins.
       actions:
         install: Install Plugin
     operations:
       reset:
         title: Are you sure you want to reset all configurations of the plugin?
-        description: This operation will delete the saved configuration and reset
+        description:
+          This operation will delete the saved configuration and reset
           it to default settings.
         toast_success: Reset configuration successfully
       uninstall:
         title: Are you sure you want to uninstall this plugin?
       uninstall_and_delete_config:
-        title: Are you sure you want to uninstall this plugin and its corresponding
+        title:
+          Are you sure you want to uninstall this plugin and its corresponding
           configuration?
         button: Desinstalar y borrar configuración
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
-        description: The current plugin is still in the enabled state and will be
+        description:
+          The current plugin is still in the enabled state and will be
           uninstalled after it stops running. This operation cannot be undone.
       remote_download:
         title: Remote download address detected, do you want to download?
-        description: 'Please carefully verify whether this address can be trusted:
-          {url}'
+        description:
+          "Please carefully verify whether this address can be trusted:
+          {url}"
       uninstall_in_batch:
         title: Desinstalar los complementos seleccionados
       uninstall_and_delete_config_in_batch:
@@ -957,7 +1005,8 @@ core:
           description: Would you like to activate the currently installed plugin?
         existed_during_installation:
           title: The plugin already exists.
-          description: The currently installed plugin already exists, do you want
+          description:
+            The currently installed plugin already exists, do you want
             to upgrade?
     detail:
       title: Plugin detail
@@ -981,8 +1030,8 @@ core:
           button: Ver condiciones recientes
     loader:
       toast:
-        entry_load_failed: '{name}: Failed to load plugin entry file'
-        style_load_failed: '{name}: Failed to load plugin stylesheet file'
+        entry_load_failed: "{name}: Failed to load plugin entry file"
+        style_load_failed: "{name}: Failed to load plugin stylesheet file"
     extension_points:
       editor:
         providers:
@@ -1017,7 +1066,8 @@ core:
       identity_authentication: Autenticación de Identidad
     empty:
       title: Actualmente no hay usuarios que cumplan con los criterios de filtrado.
-      message: No hay usuarios que coincidan con los criterios de filtrado en este
+      message:
+        No hay usuarios que coincidan con los criterios de filtrado en este
         momento. Puedes intentar actualizar o crear un nuevo usuario.
     operations:
       delete:
@@ -1032,24 +1082,28 @@ core:
         title: Conceder permiso
       enable:
         title: Habilitar
-        description: ¿Estás seguro de que quieres habilitar a este usuario? Una vez
+        description:
+          ¿Estás seguro de que quieres habilitar a este usuario? Una vez
           habilitado, el usuario podrá volver a entrar en el sistema.
       enable_in_batch:
         title: Habilitar
-        description: ¿Estás seguro de que quieres habilitar a los usuarios seleccionados?
+        description:
+          ¿Estás seguro de que quieres habilitar a los usuarios seleccionados?
           Una vez habilitados, podrán volver a entrar en el sistema.
       disable:
         title: Deshabilitar
-        description: ¿Estás seguro de que quieres deshabilitar a este usuario? Una
+        description:
+          ¿Estás seguro de que quieres deshabilitar a este usuario? Una
           vez deshabilitado, ya no podrá entrar.
       disable_in_batch:
         title: Deshabilitar
-        description: ¿Estás seguro de que quieres deshabilitar a los usuarios seleccionados?
+        description:
+          ¿Estás seguro de que quieres deshabilitar a los usuarios seleccionados?
           Una vez deshabilitados, ya no podrán entrar.
     filters:
       role:
         label: Rol
-        result: 'Rol: {role}'
+        result: "Rol: {role}"
       sort:
         items:
           create_time_desc: Últimos creados
@@ -1090,7 +1144,7 @@ core:
           placeholder: Por favor, selecciona un rol
       roles_preview:
         all: El rol seleccionado actualmente contiene todos los permisos
-        includes: 'El rol seleccionado actualmente contiene los siguientes permisos:'
+        includes: "El rol seleccionado actualmente contiene los siguientes permisos:"
     detail:
       title: Detalles del usuario
       tabs:
@@ -1130,7 +1184,8 @@ core:
     operations:
       delete:
         title: ¿Estás seguro de que deseas eliminar este rol?
-        description: Una vez eliminado el rol, se eliminarán las asignaciones de rol
+        description:
+          Una vez eliminado el rol, se eliminarán las asignaciones de rol
           de los usuarios asociados y esta operación no se puede deshacer.
       create_based_on_this_role:
         button: Crear basado en este rol
@@ -1148,7 +1203,8 @@ core:
         creation_time: Fecha de creación
     permissions_detail:
       system_reserved_alert:
-        description: El rol reservado del sistema no admite modificaciones. Se recomienda
+        description:
+          El rol reservado del sistema no admite modificaciones. Se recomienda
           crear un nuevo rol basado en este.
     editing_modal:
       titles:
@@ -1169,10 +1225,12 @@ core:
       setting: Configuración
     operations:
       enable:
-        title: ¿Estás seguro de que deseas habilitar este método de autenticación
+        title:
+          ¿Estás seguro de que deseas habilitar este método de autenticación
           de identidad?
       disable:
-        title: ¿Estás seguro de que deseas deshabilitar este método de autenticación
+        title:
+          ¿Estás seguro de que deseas deshabilitar este método de autenticación
           de identidad?
       disable_privileged:
         tooltip: El método de autenticación reservado por el sistema no se puede deshabilitar
@@ -1220,21 +1278,23 @@ core:
       external_url:
         not_setup: No configurado
     copy_results:
-      external_url: 'URL externa: {external_url}'
-      start_time: 'Hora de inicio: {start_time}'
-      version: 'Versión: {version}'
-      build_time: 'Fecha de compilación: {build_time}'
-      database: 'Base de datos: {database}'
-      os: 'Sistema operativo: {os}'
+      external_url: "URL externa: {external_url}"
+      start_time: "Hora de inicio: {start_time}"
+      version: "Versión: {version}"
+      build_time: "Fecha de compilación: {build_time}"
+      database: "Base de datos: {database}"
+      os: "Sistema operativo: {os}"
     alert:
-      external_url_invalid: La URL de acceso externo detectada no coincide con la
+      external_url_invalid:
+        La URL de acceso externo detectada no coincide con la
         URL de acceso actual, lo que podría causar que algunos enlaces no se redirijan
         correctamente. Por favor, verifica la configuración de la URL de acceso externo.
     external_url_form:
       operations:
         save:
           title: Modificar URL externa
-          description: Modificar la dirección de acceso externa requiere reiniciar
+          description:
+            Modificar la dirección de acceso externa requiere reiniciar
             el servicio Halo. Se reiniciará automáticamente tras completar la modificación.
             ¿Deseas continuar?
       tips:
@@ -1251,7 +1311,8 @@ core:
       create:
         button: Crear copia de seguridad
         title: Crear copia de seguridad
-        description: ¿Estás seguro de que deseas crear una copia de seguridad? Esta
+        description:
+          ¿Estás seguro de que deseas crear una copia de seguridad? Esta
           operación puede tomar un tiempo.
         toast_success: Solicitud de creación de copia de seguridad realizada
       delete:
@@ -1259,7 +1320,8 @@ core:
         description: ¿Estás seguro de que deseas eliminar esta copia de seguridad?
       restore:
         title: Restauración exitosa
-        description: Después de una restauración exitosa, necesitas reiniciar Halo
+        description:
+          Después de una restauración exitosa, necesitas reiniciar Halo
           para cargar los recursos del sistema normalmente. Después de hacer clic
           en OK, reiniciaremos automáticamente Halo.
       restart:
@@ -1269,7 +1331,8 @@ core:
       restore_by_backup:
         button: Restaurar
         title: Restaurar desde archivo de respaldo
-        description: Tras hacer clic en Aceptar, los datos se restaurarán desde el
+        description:
+          Tras hacer clic en Aceptar, los datos se restaurarán desde el
           archivo de respaldo {filename}.
     list:
       phases:
@@ -1281,11 +1344,14 @@ core:
         expiresAt: Expira el {expiresAt}
     restore:
       tips:
-        first: 1. El proceso de restauración puede tomar un tiempo, por favor no actualices
+        first:
+          1. El proceso de restauración puede tomar un tiempo, por favor no actualices
           la página durante este período.
-        second: 2. Durante el proceso de restauración, aunque los datos existentes
+        second:
+          2. Durante el proceso de restauración, aunque los datos existentes
           no se eliminarán, si hay un conflicto, los datos se sobrescribirán.
-        third: 3. Después de completar la restauración, necesitas reiniciar Halo para
+        third:
+          3. Después de completar la restauración, necesitas reiniciar Halo para
           cargar los recursos del sistema normalmente.
         complete: Restauración completada, esperando reinicio...
       start: Iniciar Restauración
@@ -1300,7 +1366,8 @@ core:
           label: Restaurar desde archivos de respaldo
           empty:
             title: No hay archivos de respaldo
-            message: Actualmente no hay archivos de respaldo escaneados. Puedes cargar
+            message:
+              Actualmente no hay archivos de respaldo escaneados. Puedes cargar
               manualmente los archivos de respaldo al directorio backups del directorio
               de trabajo de Halo.
   exception:
@@ -1390,7 +1457,7 @@ core:
     role-template-recycle-my-post: Reciclar mi publicación
   components:
     submit_button:
-      computed_text: '{text} ({shortcut})'
+      computed_text: "{text} ({shortcut})"
     annotations_form:
       custom_fields:
         label: Personalizado
@@ -1427,7 +1494,7 @@ core:
           upload: Cargar
           attachment: Seleccionar de la biblioteca de adjuntos
         toast:
-          upload_failed: 'Error al cargar la imagen de portada: {message}'
+          upload_failed: "Error al cargar la imagen de portada: {message}"
     global_search:
       placeholder: Ingresa palabras clave para buscar
       no_results: Sin resultados de búsqueda
@@ -1449,11 +1516,12 @@ core:
       size_label: elementos por página
       total_label: Total de {total} elementos
     app_download_alert:
-      description: 'Los temas y complementos para Halo se pueden descargar en las
-        siguientes direcciones:'
+      description:
+        "Los temas y complementos para Halo se pueden descargar en las
+        siguientes direcciones:"
       sources:
-        app_store: 'Tienda de aplicaciones oficial: {url}'
-        github: 'GitHub: {url}'
+        app_store: "Tienda de aplicaciones oficial: {url}"
+        github: "GitHub: {url}"
     user_avatar:
       title: Avatar
       toast_upload_failed: Error al cargar el avatar
@@ -1483,8 +1551,9 @@ core:
         aspect_ratio_landscape: Recorte horizontal (16:9)
         aspect_ratio_portrait: Recorte vertical (9:16)
     h2_warning_alert:
-      title: 'Advertencia: Base de datos H2 en uso'
-      description: La base de datos H2 solo es apta para entornos de desarrollo y
+      title: "Advertencia: Base de datos H2 en uso"
+      description:
+        La base de datos H2 solo es apta para entornos de desarrollo y
         pruebas y no se recomienda para entornos de producción. H2 es muy propenso
         a corromper los archivos de datos por un uso inadecuado. Si debes usarla,
         por favor respalda los datos a tiempo.
@@ -1498,8 +1567,9 @@ core:
       creation_label: Crear etiqueta {text}
     validation:
       trim: Por favor, elimina los espacios al inicio y al final
-      password: 'La contraseña solo puede usar letras mayúsculas y minúsculas (A-Z,
-        a-z), números (0-9) y los siguientes caracteres especiales: !{''@''}#$%^&*'
+      password:
+        "La contraseña solo puede usar letras mayúsculas y minúsculas (A-Z,
+        a-z), números (0-9) y los siguientes caracteres especiales: !{'@'}#$%^&*"
     color:
       placeholder: Seleccionar color
       operations:
@@ -1508,13 +1578,15 @@ core:
       no_data: Sin datos
     verification_form:
       no_action_defined: Interfaz {label} no definida
-      verify_success: '{label} exitosa'
-      verify_failed: '{label} fallida'
+      verify_success: "{label} exitosa"
+      verify_failed: "{label} fallida"
     secret:
       creation_label: Crear un nuevo secreto basado en el texto introducido
-      placeholder: Busca un secreto existente o introduce nuevo contenido para crear
+      placeholder:
+        Busca un secreto existente o introduce nuevo contenido para crear
         uno
-      required_key_missing_label: Faltan los campos necesarios, por favor selecciónalos
+      required_key_missing_label:
+        Faltan los campos necesarios, por favor selecciónalos
         y complétalos
       creation_modal:
         title: Crear secreto
@@ -1525,7 +1597,8 @@ core:
       operations:
         delete:
           title: Eliminar secreto
-          description: ¿Estás seguro de que quieres eliminar este secreto? Por favor,
+          description:
+            ¿Estás seguro de que quieres eliminar este secreto? Por favor,
             asegúrate de que este secreto no se esté usando en ningún sitio, de lo
             contrario tendrás que restablecerlo en un lugar específico
       form:
@@ -1552,7 +1625,7 @@ core:
         edit: Editar icono manualmente
     array:
       empty_text: Sin elementos
-      image_tooltip: 'Ver imagen: {value}'
+      image_tooltip: "Ver imagen: {value}"
       item_modal:
         title: Editar elemento
     attachment:
@@ -1611,8 +1684,8 @@ core:
       replace: Reemplazar
       more: Más
     radio:
-      'yes': Sí
-      'no': 'No'
+      "yes": Sí
+      "no": "No"
     select:
       public: Público
       private: Privado
@@ -1651,17 +1724,19 @@ core:
         login_expired: Sesión expirada
       descriptions:
         cannot_be_recovered: Esta operación es irreversible.
-        editor_not_found: No se encontró ningún editor que coincida con el formato
+        editor_not_found:
+          No se encontró ningún editor que coincida con el formato
           {raw_type}. Por favor verifica si el complemento del editor ha sido instalado.
-        login_expired: La sesión actual ha expirado. Haz clic en Confirmar para ir
+        login_expired:
+          La sesión actual ha expirado. Haz clic en Confirmar para ir
           a la página de inicio de sesión. Por favor, asegúrate de que el contenido
           actual esté guardado. Puedes hacer clic en Cancelar para copiar manualmente
           cualquier contenido no guardado.
     filters:
       results:
-        keyword: 'Palabra clave: {keyword}'
-        sort: 'Ordenar: {sort}'
-        status: 'Estado: {status}'
+        keyword: "Palabra clave: {keyword}"
+        sort: "Ordenar: {sort}"
+        status: "Estado: {status}"
       labels:
         sort: Ordenar
         status: Estado
@@ -1685,12 +1760,13 @@ core:
       all: Todo
       detail: Detalle
     tooltips:
-      unpublished_content_tip: Hay contenido que ha sido guardado pero aún no ha sido
+      unpublished_content_tip:
+        Hay contenido que ha sido guardado pero aún no ha sido
         publicado.
       publishing: Publicando
       recovering: Recuperando
     fields:
-      post_count: '{count} Publicaciones'
+      post_count: "{count} Publicaciones"
     form:
       validation:
         slug_unique: El slug actual ya existe
@@ -1721,7 +1797,8 @@ core:
     operations:
       back:
         title: Diseño no guardado
-        description: El diseño actual no se ha guardado, si sales, se perderá. ¿Deseas
+        description:
+          El diseño actual no se ha guardado, si sales, se perderá. ¿Deseas
           continuar?
         confirm_text: Salir
       change_breakpoint:
@@ -1750,7 +1827,7 @@ core:
           grid: Modo cuadrícula
           list: Modo lista
     detail_modal:
-      title: 'Adjunto: {display_name}'
+      title: "Adjunto: {display_name}"
       fields:
         preview: Vista previa
         display_name: Nombre para mostrar
@@ -1796,11 +1873,13 @@ core:
         bio: Biografía
         creation_time: Hora de creación
       email_not_set:
-        description: Tu dirección de correo electrónico aún no se ha configurado.
+        description:
+          Tu dirección de correo electrónico aún no se ha configurado.
           Haz clic en el botón de abajo para configurarla.
         title: Configurar correo electrónico
       email_not_verified:
-        description: Tu dirección de correo electrónico aún no ha sido verificada,
+        description:
+          Tu dirección de correo electrónico aún no ha sido verificada,
           haz clic en el botón de abajo para verificarla
         title: Verificar correo electrónico
       email_verified:
@@ -1845,20 +1924,25 @@ core:
               fields:
                 code:
                   label: Código de verificación
-                  help: Código de verificación de 6 dígitos obtenido de la aplicación
+                  help:
+                    Código de verificación de 6 dígitos obtenido de la aplicación
                     validadora
                 password:
                   label: Contraseña
                   help: Contraseña de inicio de sesión de la cuenta actual
                 qrcode:
-                  label: 'Usa la aplicación validadora para escanear el código QR
-                    de abajo:'
+                  label:
+                    "Usa la aplicación validadora para escanear el código QR
+                    de abajo:"
                 manual:
-                  label: Si no puedes escanear el código QR, haz clic para ver los
+                  label:
+                    Si no puedes escanear el código QR, haz clic para ver los
                     pasos alternativos.
-                  help: 'Configura manualmente la aplicación validadora con el siguiente
-                    código:'
-              tips: Por favor, mantén seguro tu dispositivo de verificación en dos
+                  help:
+                    "Configura manualmente la aplicación validadora con el siguiente
+                    código:"
+              tips:
+                Por favor, mantén seguro tu dispositivo de verificación en dos
                 pasos. Si el dispositivo se pierde o se daña, no podrás iniciar sesión.
                 Se recomienda instalar la aplicación de autenticación en varios dispositivos
                 o guardar una copia de seguridad de la clave por si el dispositivo
@@ -1867,7 +1951,8 @@ core:
       operations:
         delete:
           title: Eliminar token de acceso personal
-          description: ¿Estás seguro de que quieres eliminar este token de acceso
+          description:
+            ¿Estás seguro de que quieres eliminar este token de acceso
             personal?
         revoke:
           button: Revocar
@@ -1875,7 +1960,8 @@ core:
           description: ¿Estás seguro de que quieres revocar este token de acceso personal?
           toast_success: Revocación exitosa
         copy:
-          title: Por favor, cópialo y guárdalo inmediatamente, el token solo se mostrará
+          title:
+            Por favor, cópialo y guárdalo inmediatamente, el token solo se mostrará
             una vez.
         restore:
           button: Restaurar
@@ -1916,7 +2002,8 @@ core:
       fields:
         username:
           label: Nombre de usuario
-          validation: Solo puede contener números, letras minúsculas, puntos (.) y
+          validation:
+            Solo puede contener números, letras minúsculas, puntos (.) y
             guiones (-), y no puede empezar ni terminar con punto (.) ni guion (-).
         display_name:
           label: Nombre para mostrar
@@ -1965,7 +2052,7 @@ core:
       list:
         fields:
           current: Actual
-          last_accessed_time: 'Última vez accedido: {time}'
+          last_accessed_time: "Última vez accedido: {time}"
       detail_modal:
         title: Detalles del dispositivo de inicio de sesión
         fields:
@@ -1977,13 +2064,16 @@ core:
       operations:
         revoke:
           title: Revocar dispositivo
-          description: ¿Estás seguro de que quieres revocar este dispositivo? Tras
+          description:
+            ¿Estás seguro de que quieres revocar este dispositivo? Tras
             revocarlo, se cerrará la sesión en este dispositivo
         revoke_others:
           title: Revocar todos los demás dispositivos
-          description: ¿Estás seguro de que quieres revocar todos los demás dispositivos?
+          description:
+            ¿Estás seguro de que quieres revocar todos los demás dispositivos?
             Tras revocar, se cerrará la sesión en los otros dispositivos
-          toast_success: El estado de inicio de sesión de los otros dispositivos ha
+          toast_success:
+            El estado de inicio de sesión de los otros dispositivos ha
             sido revocado
   uc_notification:
     title: Notificaciones
@@ -2002,7 +2092,8 @@ core:
         title: Eliminar
       delete_all:
         title: Eliminar todas las notificaciones actuales
-        description: ¿Estás seguro de que quieres eliminar todas las notificaciones
+        description:
+          ¿Estás seguro de que quieres eliminar todas las notificaciones
           actuales? No podrás restaurarlas tras la eliminación.
       mark_all_as_read:
         title: Marcar todas las notificaciones actuales como leídas
@@ -2016,7 +2107,8 @@ core:
         title: Cancelar publicación
       delete:
         title: Eliminar publicación
-        description: Esta acción moverá la publicación a la papelera de reciclaje,
+        description:
+          Esta acción moverá la publicación a la papelera de reciclaje,
           donde será gestionada por el administrador del sitio.
     publish_modal:
       title: Publicar publicación
@@ -2027,24 +2119,28 @@ core:
     title: Herramientas
     empty:
       title: No hay herramientas disponibles
-      message: Actualmente no hay herramientas disponibles, y las herramientas del
+      message:
+        Actualmente no hay herramientas disponibles, y las herramientas del
         sistema pueden ser proporcionadas por complementos
   post_snapshots:
     operations:
       revert:
         button: Revertir
         title: Revertir instantánea
-        description: ¿Estás seguro de que quieres restaurar esta instantánea? Esta
+        description:
+          ¿Estás seguro de que quieres restaurar esta instantánea? Esta
           operación creará una nueva instantánea basada en ésta y la publicará.
         toast_success: Revertido con éxito
       delete:
         title: Eliminar instantánea
-        description: ¿Estás seguro de que quieres eliminar esta instantánea? Esta
+        description:
+          ¿Estás seguro de que quieres eliminar esta instantánea? Esta
           operación es irreversible.
       cleanup:
         button: Limpieza
         title: Limpiar instantáneas
-        description: ¿Estás seguro de que quieres eliminar todas las instantáneas
+        description:
+          ¿Estás seguro de que quieres eliminar todas las instantáneas
           no utilizadas? Solo se conservarán las versiones publicada, base y borrador.
         toast_empty: No hay instantáneas para limpiar
         toast_success: Limpieza completada
@@ -2058,17 +2154,20 @@ core:
       revert:
         button: Revertir
         title: Revertir instantánea
-        description: ¿Estás seguro de que quieres restaurar esta instantánea? Esta
+        description:
+          ¿Estás seguro de que quieres restaurar esta instantánea? Esta
           operación creará una nueva instantánea basada en ésta y la publicará.
         toast_success: Revertido con éxito
       delete:
         title: Eliminar instantánea
-        description: ¿Estás seguro de que quieres eliminar esta instantánea? Esta
+        description:
+          ¿Estás seguro de que quieres eliminar esta instantánea? Esta
           operación es irreversible.
       cleanup:
         button: Limpieza
         title: Limpiar instantáneas
-        description: ¿Estás seguro de que quieres eliminar todas las instantáneas
+        description:
+          ¿Estás seguro de que quieres eliminar todas las instantáneas
           no utilizadas? Solo se conservarán las versiones publicada, base y borrador.
         toast_empty: No hay instantáneas para limpiar
         toast_success: Limpieza completada
