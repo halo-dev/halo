@@ -14,25 +14,12 @@
 
 
 
-/**
- * Extension reference object. The name is mandatory
- */
-export interface Ref {
-    /**
-     * Extension group
-     */
-    'group': string;
-    /**
-     * Extension kind
-     */
-    'kind': string;
-    /**
-     * Extension name. This field is mandatory
-     */
-    'name': string;
-    /**
-     * Extension version
-     */
-    'version'?: string;
+export interface SetupRequest {
+    'email'?: string;
+    'externalUrl': string;
+    'language'?: string;
+    'password': string;
+    'siteTitle': string;
+    'username': string;
 }
 

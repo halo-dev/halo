@@ -29,7 +29,6 @@ export * from './api/comment-v1alpha1-console-api';
 export * from './api/comment-v1alpha1-public-api';
 export * from './api/config-map-v1alpha1-api';
 export * from './api/counter-v1alpha1-api';
-export * from './api/default-api';
 export * from './api/device-v1alpha1-api';
 export * from './api/device-v1alpha1-uc-api';
 export * from './api/extension-definition-v1alpha1-api';
