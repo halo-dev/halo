@@ -17,7 +17,6 @@ api/comment-v1alpha1-console-api.ts
 api/comment-v1alpha1-public-api.ts
 api/config-map-v1alpha1-api.ts
 api/counter-v1alpha1-api.ts
-api/default-api.ts
 api/device-v1alpha1-api.ts
 api/device-v1alpha1-uc-api.ts
 api/extension-definition-v1alpha1-api.ts
@@ -286,6 +285,7 @@ models/setting-list.ts
 models/setting-ref.ts
 models/setting-spec.ts
 models/setting.ts
+models/setup-request.ts
 models/single-page-list.ts
 models/single-page-request.ts
 models/single-page-spec.ts

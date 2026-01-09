@@ -196,6 +196,7 @@ export * from './setting-form';
 export * from './setting-list';
 export * from './setting-ref';
 export * from './setting-spec';
+export * from './setup-request';
 export * from './single-page';
 export * from './single-page-list';
 export * from './single-page-request';
