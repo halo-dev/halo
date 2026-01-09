@@ -4,11 +4,16 @@ import en from "./en.yaml";
 // @ts-ignore
 import zhCN from "./zh-CN.yaml";
 
+// @ts-ignore
+import es from "./es.yaml";
+
 const messages = {
   en: en,
   zh: zhCN,
+  es: es,
   "en-US": en,
   "zh-CN": zhCN,
+  "es-ES": es,
 };
 
 const i18n = createI18n({
