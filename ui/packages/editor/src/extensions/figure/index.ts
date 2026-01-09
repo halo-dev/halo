@@ -54,15 +54,6 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
           };
         },
       },
-      position: {
-        default: "left",
-        parseHTML: (element) => {
-          return element.getAttribute("data-position");
-        },
-        renderHTML: (attributes) => {
-          return { "data-position": attributes.position };
-        },
-      },
     };
   },
 
@@ -75,17 +66,10 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const alignItemsMap: Record<string, string> = {
-      left: "start",
-      center: "center",
-      right: "end",
-    };
-    const alignItems =
-      alignItemsMap[HTMLAttributes["data-position"]] || "start";
     return [
       "figure",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        style: `display: flex; flex-direction: column; align-items: ${alignItems}`,
+        style: `display: flex; flex-direction: column;`,
       }),
       0,
     ];

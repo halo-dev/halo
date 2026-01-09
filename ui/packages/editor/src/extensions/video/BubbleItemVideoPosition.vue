@@ -4,11 +4,12 @@ import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
+import { findParentNode } from "@tiptap/core";
 import { computed } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
 import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
-import { ExtensionFigure, ExtensionVideo } from "..";
+import { ExtensionVideo } from "..";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
   visible: () => true,
@@ -17,7 +18,7 @@ const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
 const positionOptions = [
   {
     text: i18n.global.t("editor.common.align_left"),
-    value: "left",
+    value: "start",
     icon: MingcuteAlignLeftLine,
   },
   {
@@ -27,7 +28,7 @@ const positionOptions = [
   },
   {
     text: i18n.global.t("editor.common.align_right"),
-    value: "right",
+    value: "end",
     icon: MingcuteAlignRightLine,
   },
 ];
@@ -48,13 +49,18 @@ const currentPosition = computed(() => {
   return positionOption;
 });
 
+const isActive = (blockPosition: string) => {
+  const videoParent = findParentNode(
+    (node) => node.type.name === ExtensionVideo.name
+  )(props.editor.state.selection);
+  if (!videoParent) {
+    return false;
+  }
+  return videoParent.node.attrs.alignItems === blockPosition;
+};
+
 const handleSetPosition = (position: string) => {
-  return props.editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionVideo.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
-    .run();
+  return props.editor.chain().focus().setBlockPosition(position).run();
 };
 </script>
 <template>
@@ -79,7 +85,7 @@ const handleSetPosition = (position: string) => {
           v-for="option in positionOptions"
           :key="option.value"
           v-close-popper
-          :is-active="editor.isActive({ position: option.value })"
+          :is-active="isActive(option.value)"
           @click="handleSetPosition(option.value)"
         >
           <template #icon>

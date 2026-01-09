@@ -4,6 +4,7 @@ import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
+import { isActive } from "@tiptap/core";
 import { computed } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
@@ -17,7 +18,7 @@ const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
 const positionOptions = [
   {
     text: i18n.global.t("editor.common.align_left"),
-    value: "left",
+    value: "start",
     icon: MingcuteAlignLeftLine,
   },
   {
@@ -27,7 +28,7 @@ const positionOptions = [
   },
   {
     text: i18n.global.t("editor.common.align_right"),
-    value: "right",
+    value: "end",
     icon: MingcuteAlignRightLine,
   },
 ];
@@ -48,13 +49,8 @@ const currentPosition = computed(() => {
   return positionOption;
 });
 
-const handleSetPosition = (position: string) => {
-  props.editor
-    .chain()
-    .focus()
-    .updateAttributes(ExtensionImage.name, { position })
-    .updateAttributes(ExtensionFigure.name, { position })
-    .run();
+const handleSetPosition = (blockPosition: string) => {
+  props.editor.chain().focus().setBlockPosition(blockPosition).run();
 };
 </script>
 <template>
@@ -79,7 +75,11 @@ const handleSetPosition = (position: string) => {
           v-for="option in positionOptions"
           :key="option.value"
           v-close-popper
-          :is-active="editor.isActive({ position: option.value })"
+          :is-active="
+            isActive(props.editor.state, ExtensionFigure.name, {
+              alignItems: option.value,
+            })
+          "
           @click="handleSetPosition(option.value)"
         >
           <template #icon>

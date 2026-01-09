@@ -105,20 +105,6 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
           };
         },
       },
-      position: {
-        default: "left",
-        parseHTML: (element) => {
-          return (
-            element.getAttribute("data-position") ||
-            element.getAttribute("text-align")
-          );
-        },
-        renderHTML: (attributes) => {
-          return {
-            "data-position": attributes.position,
-          };
-        },
-      },
       file: {
         default: null,
         renderHTML() {
@@ -166,7 +152,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               return;
             }
 
-            let position = "left";
+            let blockPosition = "start";
             let deletePreviousNode = false;
             let previousNodePos = -1;
             let previousNodeSize = 0;
@@ -177,13 +163,15 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               previousNode.type.name === ExtensionParagraph.name
             ) {
               if (previousNode.attrs.textAlign) {
-                const positionMap: Record<string, string> = {
-                  left: "left",
+                const textAlignToBlockPositionMap: Record<string, string> = {
+                  left: "start",
                   center: "center",
-                  right: "right",
+                  right: "end",
                   justify: "center",
                 };
-                position = positionMap[previousNode.attrs.textAlign] || "left";
+                blockPosition =
+                  textAlignToBlockPositionMap[previousNode.attrs.textAlign] ??
+                  "start";
               }
               if (previousNode.textContent?.trim().length === 0) {
                 deletePreviousNode = true;
@@ -195,7 +183,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             const figureNode = newState.schema.nodes.figure.create(
               {
                 contentType: "image",
-                position,
+                alignItems: blockPosition,
               },
               [node]
             );
