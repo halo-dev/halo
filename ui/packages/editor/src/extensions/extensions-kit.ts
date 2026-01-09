@@ -8,8 +8,11 @@ import type {
   PlaceholderOptions,
 } from "@tiptap/extensions";
 import { filterDuplicateExtensions } from "../utils";
+import { ExtensionAlign } from "./align";
 import type { ExtensionAudioOptions } from "./audio";
 import { ExtensionAudio } from "./audio";
+import type { ExtensionBlockPositionOptions } from "./block-position";
+import { ExtensionBlockPosition } from "./block-position";
 import {
   ExtensionBlockquote,
   type ExtensionBlockquoteOptions,
@@ -153,6 +156,8 @@ export interface ExtensionsKitOptions {
   upload?: boolean;
   video: Partial<ExtensionVideoOptions> | false;
   listExtra: Partial<ExtensionOptions> | false;
+  blockPosition: Partial<ExtensionBlockPositionOptions> | false;
+  align: Partial<ExtensionOptions> | false;
   customExtensions?: Extensions;
 }
 
@@ -407,6 +412,16 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
       internalExtensions.push(
         ExtensionListExtra.configure(this.options.listExtra)
       );
+    }
+
+    if (this.options.blockPosition !== false) {
+      internalExtensions.push(
+        ExtensionBlockPosition.configure(this.options.blockPosition)
+      );
+    }
+
+    if (this.options.align !== false) {
+      internalExtensions.push(ExtensionAlign);
     }
 
     const extensions =

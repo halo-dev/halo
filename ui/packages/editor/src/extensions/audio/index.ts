@@ -98,20 +98,6 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
           };
         },
       },
-      position: {
-        default: "left",
-        parseHTML: (element) => {
-          return (
-            element.getAttribute("data-position") ||
-            element.getAttribute("text-align")
-          );
-        },
-        renderHTML: (attributes) => {
-          return {
-            "data-position": attributes.position,
-          };
-        },
-      },
       file: {
         default: null,
         renderHTML() {
