@@ -23,7 +23,6 @@ metadata:
 spec:
   displayName: Halo
   slug: halo
-  color: ""
   cover: ""
 status:
   permalink: "/tags/halo"

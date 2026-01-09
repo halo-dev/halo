@@ -212,7 +212,6 @@ const handleCreateTag = async () => {
       spec: {
         displayName: text.value,
         slug,
-        color: "",
         cover: "",
       },
       apiVersion: "content.halo.run/v1alpha1",
