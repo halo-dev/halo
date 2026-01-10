@@ -16,24 +16,26 @@ const renderType = computed<"text" | "image" | "color">(
   () => context.node.props.renderType ?? "text"
 );
 
-function isSelected(value: ToggleValue) {
-  const currentValue = context.node._value;
+const currentValue = computed<ToggleValue | ToggleValue[]>(
+  () => context._value
+);
 
+function isSelected(value: ToggleValue) {
   if (multiple.value) {
-    return (currentValue as ToggleValue[]).includes(value);
+    const valueArray = (currentValue.value as ToggleValue[]) || [];
+    return valueArray.includes(value);
   }
 
-  return currentValue === value;
+  return currentValue.value === value;
 }
 
 function handleSelect(value: ToggleValue) {
-  console.log(context);
   if (multiple.value) {
-    const currentValue = context.node._value as ToggleValue[];
-    if (currentValue.includes(value)) {
-      context.node.input(currentValue.filter((v) => v !== value));
+    const valueArray = (currentValue.value as ToggleValue[]) || [];
+    if (valueArray.includes(value)) {
+      context.node.input(valueArray.filter((v) => v !== value));
     } else {
-      context.node.input([...currentValue, value]);
+      context.node.input([...valueArray, value]);
     }
     return;
   }
