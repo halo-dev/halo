@@ -165,8 +165,7 @@ const theme: Record<string, Record<string, string>> = {
     "post-tag-close":
       "h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900",
     "post-tags-button": "inline-flex h-full cursor-pointer items-center px-1",
-    "dropdown-wrapper":
-      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+    "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   categorySelect: {
     ...textClassification,
@@ -176,8 +175,7 @@ const theme: Record<string, Record<string, string>> = {
     "post-categories": "flex w-full flex-wrap items-center",
     "post-categories-button":
       "inline-flex h-full cursor-pointer items-center px-1",
-    "dropdown-wrapper":
-      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+    "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   secret: {
     ...textClassification,
