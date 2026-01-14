@@ -1,15 +1,14 @@
+import { i18n } from "@/locales";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import { stores, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref, type Ref } from "vue";
-import { useI18n } from "vue-i18n";
 
 export function useExternalAssetsTransfer(
   src: Ref<string | undefined>,
   callback: (attachment: AttachmentSimple) => void
 ) {
   const { globalInfo } = stores.globalInfo();
-  const { t } = useI18n();
 
   const isExternalAsset = computed(() => {
     if (src.value?.startsWith("/")) {
@@ -43,7 +42,7 @@ export function useExternalAssetsTransfer(
       alt: data.spec.displayName,
     });
 
-    Toast.success(t("editor.common.toast.save_success"));
+    Toast.success(i18n.global.t("editor.common.toast.save_success"));
 
     transferring.value = false;
   }
