@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     sharedPlugins,
     VueI18nPlugin({
-      include: [path.resolve(__dirname, "./src/locales/*.yaml")],
+      include: [path.resolve(__dirname, "./src/locales/*.json")],
     }) as Plugin,
   ],
   resolve: {
