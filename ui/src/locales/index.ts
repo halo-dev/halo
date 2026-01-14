@@ -11,24 +11,24 @@ interface LocaleConfig {
 export const SUPPORTED_LOCALES: LocaleConfig[] = [
   {
     code: ["en"],
-    file: "en.yaml",
+    file: "en.json",
   },
   {
     code: ["es"],
-    file: "es.yaml",
+    file: "es.json",
   },
   {
     code: ["zh-CN", "zh"],
-    file: "zh-CN.yaml",
+    file: "zh-CN.json",
   },
   {
     code: ["zh-TW"],
-    file: "zh-TW.yaml",
+    file: "zh-TW.json",
   },
 ];
 
 const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
-  ["./*.yaml", "!**/_missing_translations_*.yaml"],
+  ["./*.json", "!**/_missing_translations_*.json"],
   { eager: false }
 );
 
