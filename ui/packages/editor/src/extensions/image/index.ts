@@ -9,6 +9,7 @@ import {
   mergeAttributes,
   Plugin,
   PluginKey,
+  PMNode,
   TextSelection,
   VueNodeViewRenderer,
   type Editor,
@@ -140,7 +141,15 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
           }
 
           const tr = newState.tr;
-          let modified = false;
+
+          const modifications: Array<{
+            pos: number;
+            node: PMNode;
+            figureNode: PMNode;
+            deletePreviousNode: boolean;
+            previousNodePos: number;
+            previousNodeSize: number;
+          }> = [];
 
           newState.doc.descendants((node, pos) => {
             if (node.type.name !== ExtensionImage.name) {
@@ -188,21 +197,37 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               [node]
             );
 
-            if (deletePreviousNode) {
-              tr.delete(previousNodePos, previousNodePos + previousNodeSize);
-              tr.replaceRangeWith(
-                pos - previousNodeSize,
-                pos - previousNodeSize + node.nodeSize,
-                figureNode
-              );
-            } else {
-              tr.replaceRangeWith(pos, pos + node.nodeSize, figureNode);
-            }
-
-            modified = true;
+            modifications.push({
+              pos,
+              node,
+              figureNode,
+              deletePreviousNode,
+              previousNodePos,
+              previousNodeSize,
+            });
           });
 
-          return modified ? tr : null;
+          modifications.reverse().forEach((mod) => {
+            if (mod.deletePreviousNode) {
+              tr.delete(
+                mod.previousNodePos,
+                mod.previousNodePos + mod.previousNodeSize
+              );
+              tr.replaceRangeWith(
+                mod.pos - mod.previousNodeSize,
+                mod.pos - mod.previousNodeSize + mod.node.nodeSize,
+                mod.figureNode
+              );
+            } else {
+              tr.replaceRangeWith(
+                mod.pos,
+                mod.pos + mod.node.nodeSize,
+                mod.figureNode
+              );
+            }
+          });
+
+          return modifications.length > 0 ? tr : null;
         },
       }),
     ];
