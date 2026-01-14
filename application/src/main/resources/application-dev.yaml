@@ -31,7 +31,9 @@ halo:
   work-dir: ${user.home}/halo2-dev
 logging:
   level:
-    run.halo.app: DEBUG
+    org.springframework.data.r2dbc: DEBUG
+    org.springframework.r2dbc: DEBUG
+    run.halo: DEBUG
     web: DEBUG
     org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler: DEBUG
 springdoc:
