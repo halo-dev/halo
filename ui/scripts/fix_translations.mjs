@@ -2,7 +2,7 @@
  * Fix Translations
  * -------------------------
  * This script removes translation keys that exist in language files but are not
- * present in the English base file (en.yaml).
+ * present in the English base file (en.json).
  *
  * For each language file, it:
  * 1. Compares it with the English base file
@@ -13,25 +13,24 @@
  * node scripts/fix_translations.mjs
  *
  * Example output:
- * Extra key found: common.outdatedKey
- * Removed 5 extra keys from src/locales/zh-TW.yaml
+ * Extra key found: core.common.outdatedKey
+ * Removed 5 extra keys from src/locales/zh-TW.json
  *
  * This script helps maintain consistency across language files by ensuring they
  * only contain keys that are present in the English base file.
  */
 
 import fs from "fs/promises";
-import yaml from "js-yaml";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const translationsDirPath = path.resolve(__dirname, "../src/locales");
-const baseFile = path.join(translationsDirPath, "en.yaml");
+const baseFile = path.join(translationsDirPath, "en.json");
 
 async function main() {
   try {
-    const baseTranslations = await loadYamlFile(baseFile);
+    const baseTranslations = await loadJsonFile(baseFile);
 
     const dirEntries = await fs.readdir(translationsDirPath, {
       withFileTypes: true,
@@ -41,15 +40,15 @@ async function main() {
       .filter(
         (entry) =>
           entry.isFile() &&
-          entry.name.endsWith(".yaml") &&
-          entry.name !== "en.yaml" &&
+          entry.name.endsWith(".json") &&
+          entry.name !== "en.json" &&
           !entry.name.includes("_missing_translations_")
       )
       .map((entry) => path.join(translationsDirPath, entry.name));
 
     for (const transFile of translationFiles) {
       try {
-        const translations = await loadYamlFile(transFile);
+        const translations = await loadJsonFile(transFile);
 
         const extraKeysCount = removeExtraTranslations(
           translations,
@@ -57,7 +56,7 @@ async function main() {
         );
 
         if (extraKeysCount > 0) {
-          await saveYamlFile(translations, transFile);
+          await saveJsonFile(translations, transFile);
           console.log(`Removed ${extraKeysCount} extra keys from ${transFile}`);
         } else {
           console.log(`No extra keys found in ${transFile}`);
@@ -71,46 +70,32 @@ async function main() {
   }
 }
 
-async function loadYamlFile(filePath) {
+async function loadJsonFile(filePath) {
   const content = await fs.readFile(filePath, "utf8");
-  return yaml.load(content) || {};
+  return JSON.parse(content) || {};
 }
 
-async function saveYamlFile(data, filePath) {
-  const yamlContent = yaml.dump(data, {
-    indent: 2,
-    lineWidth: -1,
-  });
-  await fs.writeFile(filePath, yamlContent, "utf8");
+async function saveJsonFile(data, filePath) {
+  const jsonContent = JSON.stringify(data, null, 2);
+  await fs.writeFile(filePath, jsonContent, "utf8");
 }
 
 function removeExtraTranslations(translations, baseTranslations) {
   let extraKeysCount = 0;
+  const keysToDelete = [];
 
-  function cleanObject(obj, baseObj, path = "") {
-    const keysToDelete = [];
-
-    for (const key of Object.keys(obj)) {
-      if (!Object.prototype.hasOwnProperty.call(baseObj, key)) {
-        keysToDelete.push(key);
-        extraKeysCount++;
-        console.log(`Extra key found: ${path}${key}`);
-      } else if (
-        typeof obj[key] === "object" &&
-        obj[key] !== null &&
-        typeof baseObj[key] === "object" &&
-        baseObj[key] !== null
-      ) {
-        cleanObject(obj[key], baseObj[key], `${path}${key}.`);
-      }
-    }
-
-    for (const key of keysToDelete) {
-      delete obj[key];
+  for (const key of Object.keys(translations)) {
+    if (!Object.prototype.hasOwnProperty.call(baseTranslations, key)) {
+      keysToDelete.push(key);
+      extraKeysCount++;
+      console.log(`Extra key found: ${key}`);
     }
   }
 
-  cleanObject(translations, baseTranslations);
+  for (const key of keysToDelete) {
+    delete translations[key];
+  }
+
   return extraKeysCount;
 }
 
