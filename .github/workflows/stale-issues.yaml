@@ -26,6 +26,6 @@ jobs:
           days-before-pr-stale: -1
           days-before-pr-close: -1
           stale-issue-label: "lifecycle/stale"
-          only-issue-labels: "triage/needs-information"
+          only-issue-labels: "triage/needs-information,priority/awaiting-more-evidence,help wanted"
           operations-per-run: 100
           ascending: true
