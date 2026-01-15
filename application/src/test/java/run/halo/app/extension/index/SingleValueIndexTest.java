@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -305,9 +306,15 @@ class SingleValueIndexTest {
             }
 
             @Test
-            void notInQuery() {
+            void notInQueryForSet() {
                 var result = index.notIn(Set.of("string1", "string3"));
                 assertEquals(Set.of("fake2"), result);
+            }
+
+            @Test
+            void notInQueryForList() {
+                var result = index.notIn(List.of("string2"));
+                assertEquals(Set.of("fake1", "fake3"), result);
             }
 
             @Test
