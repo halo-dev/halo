@@ -14,10 +14,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.session.ReactiveSessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -58,6 +60,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.security.device.DeviceService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -79,6 +82,8 @@ public class UserServiceImpl implements UserService {
     private final DeviceService deviceService;
 
     private final ReactiveTransactionManager transactionManager;
+
+    private final ReactiveSessionRegistry sessionRegistry;
 
     private Clock clock = Clock.systemUTC();
 
@@ -163,47 +168,84 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> grantRoles(String username, Set<String> roles) {
-        return client.get(User.class, username)
-            .flatMap(user -> {
-                var bindingsToUpdate = new HashSet<RoleBinding>();
-                var bindingsToDelete = new HashSet<RoleBinding>();
-                var existingRoles = new HashSet<String>();
-                var subject = new RoleBinding.Subject();
-                subject.setKind(User.KIND);
-                subject.setApiGroup(User.GROUP);
-                subject.setName(username);
-                return roleService.listRoleBindings(subject)
-                    .doOnNext(binding -> {
-                        var roleName = binding.getRoleRef().getName();
-                        if (roles.contains(roleName)) {
-                            existingRoles.add(roleName);
-                            return;
-                        }
-                        binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
-                        if (CollectionUtils.isEmpty(binding.getSubjects())) {
-                            // remove it if subjects is empty
-                            bindingsToDelete.add(binding);
-                        } else {
-                            bindingsToUpdate.add(binding);
-                        }
+        var bindingsToUpdate = new HashSet<RoleBinding>();
+        var bindingsToDelete = new HashSet<RoleBinding>();
+        var existingRoles = new HashSet<String>();
+        var subject = new RoleBinding.Subject();
+        subject.setKind(User.KIND);
+        subject.setApiGroup(User.GROUP);
+        subject.setName(username);
+        var tx = TransactionalOperator.create(transactionManager);
+        return roleService.listRoleBindings(subject)
+            .doOnNext(binding -> {
+                var roleName = binding.getRoleRef().getName();
+                if (roles.contains(roleName)) {
+                    existingRoles.add(roleName);
+                    return;
+                }
+                binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
+                if (CollectionUtils.isEmpty(binding.getSubjects())) {
+                    // remove it if subjects is empty
+                    bindingsToDelete.add(binding);
+                } else {
+                    bindingsToUpdate.add(binding);
+                }
+            })
+            .then(Mono.defer(() -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("""
+                            Updating roles for user {}: existingRoles={}, roles={}, \
+                            bindingsToUpdate={}, bindingsToDelete={}""",
+                        username, existingRoles, roles, bindingsToUpdate, bindingsToDelete
+                    );
+                }
+                var updateBindings = Flux.fromIterable(bindingsToUpdate)
+                    .flatMap(client::update)
+                    .then();
+                var deleteBindings = Flux.fromIterable(bindingsToDelete)
+                    .flatMap(client::delete)
+                    .then();
+                var createBindings = Flux.fromIterable(roles)
+                    .filter(role -> !existingRoles.contains(role))
+                    .filter(StringUtils::hasText)
+                    .map(role -> RoleBinding.create(username, role))
+                    .flatMap(client::create);
+                return Mono.when(updateBindings, deleteBindings, createBindings);
+            }))
+            .as(tx::transactional)
+            .then(Mono.defer(() -> {
+                if (Objects.equals(roles, existingRoles)) {
+                    // No need to update the user if roles are not changed
+                    log.debug("No role changes for user {}, skip updating user annotations.",
+                        username);
+                    return Mono.empty();
+                }
+                log.info("Updated roles for user {}: existingRoles={}, roles={}",
+                    username, existingRoles, roles
+                );
+                var invalidateSessions = sessionRegistry.getAllSessions(username)
+                    .flatMap(reactiveSessionInformation -> {
+                        log.info("Invalidating session {} for user {}",
+                            reactiveSessionInformation.getSessionId(), username
+                        );
+                        return reactiveSessionInformation.invalidate();
                     })
-                    .thenMany(Flux.fromIterable(bindingsToUpdate).flatMap(client::update))
-                    .thenMany(Flux.fromIterable(bindingsToDelete).flatMap(client::delete))
-                    .thenMany(Flux.fromStream(() -> {
-                        var mutableRoles = new HashSet<>(roles);
-                        mutableRoles.removeAll(existingRoles);
-                        return mutableRoles.stream()
-                            .filter(StringUtils::hasText)
-                            .map(roleName -> RoleBinding.create(username, roleName));
-                    }).flatMap(client::create))
-                    .then(Mono.defer(() -> {
-                        var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
-                            .orElseGet(HashMap::new);
-                        user.getMetadata().setAnnotations(annotations);
+                    .then();
+                var updateUser = client.get(User.class, username)
+                    .doOnNext(u -> {
+                        var annotations = u.getMetadata().getAnnotations();
+                        if (annotations == null) {
+                            annotations = new HashMap<>();
+                            u.getMetadata().setAnnotations(annotations);
+                        }
                         annotations.put(User.REQUEST_TO_UPDATE, clock.instant().toString());
-                        return client.update(user);
-                    }));
-            });
+                    })
+                    .flatMap(client::update)
+                    .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    );
+                return invalidateSessions.then(updateUser);
+            }));
     }
 
     @Override
@@ -297,11 +339,7 @@ public class UserServiceImpl implements UserService {
             .then(extensionGetter.getExtensions(UserPreCreatingHandler.class)
                 .concatMap(handler -> handler.preCreating(user))
                 .then(Mono.defer(() -> client.create(user)
-                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                            .filter(OptimisticLockingFailureException.class::isInstance)
-                        )
-                    )
+                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames))
                 ))
                 .flatMap(createdUser -> extensionGetter.getExtensions(UserPostCreatingHandler.class)
                     .concatMap(handler -> handler.postCreating(createdUser))
