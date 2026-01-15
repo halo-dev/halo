@@ -72,7 +72,7 @@ export function createViteConfig(options: Options) {
       chunkSizeWarningLimit: 2048,
       rolldownOptions: {
         output: {
-          advancedChunks: {
+          codeSplitting: {
             groups: [
               "es-toolkit",
               "vue-grid-layout",
