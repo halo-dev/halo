@@ -58,11 +58,11 @@ public class QueryVisitor<E extends Extension> implements Visitor {
         @Override
         public void enter(@NonNull Visitable segment) {
             switch (segment) {
-                case And(Condition left, Condition right) ->
+                case And(var left, var right) ->
                     // delegate to AndCondition for backward compatibility
                     new AndCondition(left, right).visit(this);
                 case EmptyCondition ignored -> result.addAll(allQuery("metadata.name", false));
-                case AndCondition(Condition left, Condition right) -> {
+                case AndCondition(var left, var right) -> {
                     if (left instanceof EmptyCondition) {
                         right.visit(this);
                         return;
@@ -93,23 +93,23 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                     right.visit(rightVisitor);
                     result.addAll(rightVisitor.getResult());
                 }
-                case NotCondition(Condition condition) -> {
+                case NotCondition(var condition) -> {
                     if (condition instanceof EmptyCondition) {
                         return;
                     }
                     condition.not().visit(this);
                 }
-                case EqualCondition(String indexName, Object key) ->
+                case EqualCondition(var indexName, var key) ->
                     result.addAll(equalQuery(indexName, key, false));
-                case NotEqualCondition(String indexName, Object key) ->
+                case NotEqualCondition(var indexName, var key) ->
                     result.addAll(equalQuery(indexName, key, true));
                 case InCondition(var indexName, var keys) ->
                     result.addAll(inQuery(indexName, keys, false));
-                case NotInCondition(String indexName, Set<Object> keys) ->
+                case NotInCondition(var indexName, var keys) ->
                     result.addAll(inQuery(indexName, keys, true));
-                case LessThanCondition(String indexName, Object upperBound, boolean inclusive) ->
+                case LessThanCondition(var indexName, var upperBound, var inclusive) ->
                     result.addAll(lessThanQuery(indexName, upperBound, inclusive, false));
-                case GreaterThanCondition(String indexName, Object lowerBound, boolean inclusive) ->
+                case GreaterThanCondition(var indexName, var lowerBound, var inclusive) ->
                     result.addAll(lessThanQuery(indexName, lowerBound, inclusive, true));
                 case BetweenCondition bc -> result.addAll(betweenQuery(
                         bc.indexName(), bc.fromKey(), bc.fromInclusive(), bc.toKey(),
@@ -120,34 +120,34 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                     nbc.indexName(), nbc.fromKey(), nbc.fromInclusive(), nbc.toKey(),
                     nbc.toInclusive(), true
                 ));
-                case IsNullCondition(String indexName) ->
+                case IsNullCondition(var indexName) ->
                     result.addAll(isNullQuery(indexName, false));
-                case IsNotNullCondition(String indexName) ->
+                case IsNotNullCondition(var indexName) ->
                     result.addAll(isNullQuery(indexName, true));
-                case StringContainsCondition(String indexName, String keyword) ->
+                case StringContainsCondition(var indexName, var keyword) ->
                     result.addAll(stringContainsQuery(indexName, keyword, false));
-                case StringNotContainsCondition(String indexName, String keyword) ->
+                case StringNotContainsCondition(var indexName, var keyword) ->
                     result.addAll(stringContainsQuery(indexName, keyword, true));
-                case StringStartsWithCondition(String indexName, String prefix) ->
+                case StringStartsWithCondition(var indexName, var prefix) ->
                     result.addAll(stringStartsWithQuery(indexName, prefix, false));
-                case StringNotStartsWithCondition(String indexName, String prefix) ->
+                case StringNotStartsWithCondition(var indexName, var prefix) ->
                     result.addAll(stringStartsWithQuery(indexName, prefix, true));
-                case StringEndsWithCondition(String indexName, String suffix) ->
+                case StringEndsWithCondition(var indexName, var suffix) ->
                     result.addAll(stringEndsWithQuery(indexName, suffix, false));
-                case StringNotEndsWithCondition(String indexName, String suffix) ->
+                case StringNotEndsWithCondition(var indexName, var suffix) ->
                     result.addAll(stringEndsWithQuery(indexName, suffix, true));
-                case AllCondition(String indexName) -> result.addAll(allQuery(indexName, false));
-                case NoneCondition(String indexName) -> result.addAll(allQuery(indexName, true));
-                case LabelExistsCondition(String labelKey) ->
+                case AllCondition(var indexName) -> result.addAll(allQuery(indexName, false));
+                case NoneCondition(var indexName) -> result.addAll(allQuery(indexName, true));
+                case LabelExistsCondition(var labelKey) ->
                     result.addAll(labelExistsQuery(labelKey));
-                case LabelNotExistsCondition(String labelKey) -> {
+                case LabelNotExistsCondition(var labelKey) -> {
                     // To get all extensions that do not have the label, we get all extensions
                     result.addAll(allQuery("metadata.name", false));
                     result.removeAll(labelExistsQuery(labelKey));
                 }
-                case LabelEqualsCondition(String labelKey, String labelValue) ->
+                case LabelEqualsCondition(var labelKey, var labelValue) ->
                     result.addAll(labelEqualsQuery(labelKey, labelValue, false));
-                case LabelNotEqualsCondition(String labelKey, String labelValue) -> {
+                case LabelNotEqualsCondition(var labelKey, var labelValue) -> {
                     // Only for backward compatibility
                     result.addAll(allQuery("metadata.name", false));
                     result.removeAll(labelEqualsQuery(labelKey, labelValue, false));
