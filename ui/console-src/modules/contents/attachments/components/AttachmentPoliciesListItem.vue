@@ -127,10 +127,7 @@ const isSystemProtection = computed(() => {
       </VEntityField>
     </template>
     <template #dropdownItems>
-      <VDropdownItem
-        :disabled="isSystemProtection"
-        @click="editingModalVisible = true"
-      >
+      <VDropdownItem @click="editingModalVisible = true">
         {{ $t("core.common.buttons.edit") }}
       </VDropdownItem>
       <VDropdownItem

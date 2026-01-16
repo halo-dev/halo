@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -38,11 +39,16 @@ class PluginStartedListener {
     private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
         var name = unstructured.getMetadata().getName();
         return client.fetch(unstructured.groupVersionKind(), name)
-            .doOnNext(old -> {
-                unstructured.getMetadata().setVersion(old.getMetadata().getVersion());
-            })
+            .doOnNext(old -> unstructured.getMetadata().setVersion(old.getMetadata().getVersion()))
             .map(ignored -> unstructured)
-            .flatMap(client::update)
+            .flatMap(extension -> {
+                if (ExtensionUtil.hasDoNotOverwriteLabel(extension)) {
+                    log.debug("Skip updating extension {} due to do-not-overwrite label",
+                        extension.getMetadata().getName());
+                    return Mono.just(extension);
+                }
+                return client.update(extension);
+            })
             .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
     }
 

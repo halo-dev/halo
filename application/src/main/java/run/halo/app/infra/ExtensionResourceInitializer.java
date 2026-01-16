@@ -118,6 +118,13 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
             .flatMap(ext -> extensionClient.fetch(extension.groupVersionKind(),
                 extension.getMetadata().getName()))
             .flatMap(existingExt -> {
+                if (ExtensionUtil.hasDoNotOverwriteLabel(existingExt)) {
+                    log.debug("Extension {} is marked as do-not-overwrite, skipping update",
+                        existingExt.getMetadata().getName()
+                    );
+                    // skip update
+                    return Mono.just(existingExt);
+                }
                 // force update
                 extension.getMetadata().setVersion(existingExt.getMetadata().getVersion());
                 return extensionClient.update(extension);
