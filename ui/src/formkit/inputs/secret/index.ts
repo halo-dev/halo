@@ -1,32 +1,23 @@
-import type { FormKitTypeDefinition } from "@formkit/core";
-import {
-  help,
-  icon,
-  inner,
-  label,
-  message,
-  messages,
-  outer,
-  prefix,
-  suffix,
-  wrapper,
-} from "@formkit/inputs";
+import { initialValue, type FormKitInputs } from "@formkit/inputs";
+import { createInput } from "@formkit/vue";
 import { defineAsyncComponent } from "vue";
-import { SecretSection } from "./sections";
+import secretFeature from "./feature";
+import type { RequiredKey } from "./types";
 
-export const secret: FormKitTypeDefinition = {
-  schema: outer(
-    wrapper(
-      label("$label"),
-      inner(icon("prefix"), prefix(), SecretSection(), suffix(), icon("suffix"))
-    ),
-    help("$help"),
-    messages(message("$message.value"))
-  ),
-  type: "input",
-  props: ["requiredKey"],
-  library: {
-    SecretSelect: defineAsyncComponent(() => import("./SecretSelect.vue")),
-  },
-  schemaMemoKey: "custom-secret-select",
-};
+export const secret = createInput(
+  defineAsyncComponent(() => import("./SecretSelect.vue")),
+  {
+    type: "input",
+    props: ["requiredKeys"],
+    features: [initialValue, secretFeature],
+  }
+);
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    secret: {
+      type: "secret";
+      requiredKeys?: RequiredKey[];
+    };
+  }
+}
