@@ -37,9 +37,9 @@ onMounted(() => {
   }
 });
 
-function getDescriptionOfRequiredKey(key: string) {
+function getHelpOfRequiredKey(key: string) {
   const requiredKey = props.requiredKeys.find((k) => k.key === key);
-  return requiredKey?.description;
+  return requiredKey?.help;
 }
 
 const missingKeys = computed(() => {
@@ -65,7 +65,7 @@ function handleAddMissingKeys() {
         {{ $t("core.formkit.secret.required_keys_tip") }}
         <ul class="mt-2">
           <li v-for="key in requiredKeys" :key="key.key">
-            {{ key.key }} : {{ key.description }}
+            {{ key.key }} : {{ key.help }}
           </li>
         </ul>
       </template>
@@ -101,7 +101,7 @@ function handleAddMissingKeys() {
         validation="required"
         name="key"
         label="Key"
-        :help="getDescriptionOfRequiredKey(value.key)"
+        :help="getHelpOfRequiredKey(value.key)"
       ></FormKit>
       <FormKit
         type="code"

@@ -5,5 +5,5 @@ export interface SecretFormState {
 
 export interface RequiredKey {
   key: string;
-  description?: string;
+  help?: string;
 }
