@@ -1,23 +1,25 @@
 <script lang="ts" setup>
 import { secretAnnotations } from "@/constants/annotations";
 import type { FormKitFrameworkContext } from "@formkit/core";
-import { coreApiClient, type Secret } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import {
-  IconArrowRight,
-  IconCheckboxCircle,
+  IconAddCircle,
   IconClose,
-  IconSettings,
+  IconExchange,
+  IconInformation,
 } from "@halo-dev/components";
-import { useQueryClient } from "@tanstack/vue-query";
-import { onClickOutside } from "@vueuse/core";
-import Fuse from "fuse.js";
-import { computed, ref, watch, type PropType } from "vue";
+import { utils } from "@halo-dev/ui-shared";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref, type PropType } from "vue";
+import { useI18n } from "vue-i18n";
+import MingcuteFileSecurityLine from "~icons/mingcute/file-security-line";
+import RiEditBoxLine from "~icons/ri/edit-box-line";
 import SecretCreationModal from "./components/SecretCreationModal.vue";
 import SecretEditModal from "./components/SecretEditModal.vue";
 import SecretListModal from "./components/SecretListModal.vue";
-import { Q_KEY, useSecretsFetch } from "./composables/use-secrets-fetch";
+import type { RequiredKey } from "./types";
 
-const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const props = defineProps({
   context: {
@@ -26,309 +28,195 @@ const props = defineProps({
   },
 });
 
-const requiredKey = computed(() => props.context.requiredKey);
+const currentValue = computed(() => props.context._value);
+const requiredKeys = computed(
+  () => props.context.requiredKeys as RequiredKey[]
+);
 
-const selectedSecret = ref<Secret>();
-const dropdownVisible = ref(false);
-const text = ref("");
-const wrapperRef = ref<HTMLElement>();
+const hasPermission = utils.permission.has(["*"]);
 
-const { data } = useSecretsFetch();
+const { data, isLoading, refetch } = useQuery({
+  queryKey: ["core:formkit:inputs:secret", currentValue, hasPermission],
+  queryFn: async () => {
+    if (!currentValue.value || !hasPermission) {
+      return null;
+    }
 
-onClickOutside(wrapperRef, () => {
-  dropdownVisible.value = false;
-});
-
-// search
-let fuse: Fuse<Secret> | undefined = undefined;
-
-watch(
-  () => data.value,
-  () => {
-    fuse = new Fuse(data.value?.items || [], {
-      keys: ["metadata.name", "metadata.stringData"],
-      useExtendedSearch: true,
-      threshold: 0.2,
+    const { data } = await coreApiClient.secret.getSecret({
+      name: currentValue.value as string,
     });
+
+    return data;
   },
-  {
-    immediate: true,
-  }
-);
-
-const searchResults = computed(() => {
-  if (!text.value) {
-    return data.value?.items;
-  }
-
-  return fuse?.search(text.value).map((item) => item.item) || [];
 });
 
-watch(
-  () => searchResults.value,
-  (value) => {
-    if (value?.length && text.value) {
-      selectedSecret.value = value[0];
-      scrollToSelected();
-    } else {
-      selectedSecret.value = undefined;
-    }
-  }
-);
-
-const handleKeydown = (e: KeyboardEvent) => {
-  if (!searchResults.value) return;
-
-  if (e.key === "ArrowDown") {
-    e.preventDefault();
-
-    const index = searchResults.value.findIndex(
-      (secret) => secret.metadata.name === selectedSecret.value?.metadata.name
-    );
-    if (index < searchResults.value.length - 1) {
-      selectedSecret.value = searchResults.value[index + 1];
-    }
-
-    scrollToSelected();
-  }
-  if (e.key === "ArrowUp") {
-    e.preventDefault();
-
-    const index = searchResults.value.findIndex(
-      (secret) => secret.metadata.name === selectedSecret.value?.metadata.name
-    );
-    if (index > 0) {
-      selectedSecret.value = searchResults.value[index - 1];
-    } else {
-      selectedSecret.value = undefined;
-    }
-
-    scrollToSelected();
+const title = computed(() => {
+  if (isLoading.value) {
+    return t("core.common.status.loading");
   }
 
-  if (e.key === "Enter") {
-    if (!selectedSecret.value && text.value) {
-      e.preventDefault();
-      handleCreateSecret();
-      return;
-    }
-
-    if (selectedSecret.value) {
-      handleSelect(selectedSecret.value);
-      text.value = "";
-
-      e.preventDefault();
-    }
-  }
-};
-
-const scrollToSelected = () => {
-  const selectedNodeName = selectedSecret.value
-    ? selectedSecret.value?.metadata.name
-    : "secret-create";
-
-  const selectedNode = document.getElementById(selectedNodeName);
-
-  if (selectedNode) {
-    selectedNode.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "start",
-    });
-  }
-};
-
-// Check required key and edit secret
-function hasRequiredKey(secret: Secret) {
-  return !!secret.stringData?.[requiredKey.value as string];
-}
-const secretToUpdate = ref<Secret>();
-const secretEditModalVisible = ref(false);
-const secretCreationModalVisible = ref(false);
-
-const handleSelect = (secret?: Secret) => {
-  if (!secret || secret.metadata.name === props.context._value) {
-    props.context.node.input("");
-    dropdownVisible.value = false;
+  if (!data.value) {
     return;
   }
 
-  props.context.node.input(secret.metadata.name);
+  return (
+    data.value?.metadata.annotations?.[secretAnnotations.DESCRIPTION] ||
+    data.value?.metadata.name
+  );
+});
 
-  text.value = "";
+const keys = computed(() => {
+  return Object.keys(data.value?.stringData || {});
+});
 
-  dropdownVisible.value = false;
-
-  // Check required key and open edit modal
-  if (!hasRequiredKey(secret)) {
-    const stringDataToUpdate = {
-      ...secret.stringData,
-      [requiredKey.value ? (requiredKey.value as string) : ""]: "",
-    };
-    secretToUpdate.value = {
-      ...secret,
-      stringData: stringDataToUpdate,
-    };
-    secretEditModalVisible.value = true;
-  }
-};
-
-const onTextInput = (e: Event) => {
-  text.value = (e.target as HTMLInputElement).value;
-};
-
-const secretListModalVisible = ref(false);
-
-// Create new secret
-async function handleCreateSecret() {
-  if (!requiredKey.value) {
-    secretCreationModalVisible.value = true;
-    return;
+const description = computed(() => {
+  if (isLoading.value) {
+    return "--";
   }
 
-  const { data: newSecret } = await coreApiClient.secret.createSecret({
-    secret: {
-      metadata: {
-        generateName: "secret-",
-        name: "",
-      },
-      kind: "Secret",
-      apiVersion: "v1alpha1",
-      type: "Opaque",
-      stringData: {
-        [requiredKey.value as string]: text.value,
-      },
-    },
-  });
+  if (!hasPermission) {
+    return "无权限查看密钥";
+  }
 
-  queryClient.invalidateQueries({ queryKey: Q_KEY() });
+  if (!data.value) {
+    return "当前没有选择密钥，你可以新建或者选择一个已有的密钥";
+  }
 
-  handleSelect(newSecret);
+  if (keys.value.length > 0) {
+    return `包含字段：${keys.value.join(", ")}`;
+  }
 
-  text.value = "";
+  return "没有字段";
+});
 
-  dropdownVisible.value = false;
+// Select
+const listModalVisible = ref(false);
+
+function onSelect(secretName: string) {
+  props.context.node.input(secretName);
+  listModalVisible.value = false;
 }
+
+function onListModalClose() {
+  listModalVisible.value = false;
+  refetch();
+}
+
+// Create
+const creationModalVisible = ref(false);
+
+function onCreated(secretName: string) {
+  props.context.node.input(secretName);
+  creationModalVisible.value = false;
+}
+
+// Edit
+const editModalVisible = ref(false);
+
+function onEditModalClose() {
+  editModalVisible.value = false;
+  refetch();
+}
+
+const missingKeys = computed(() => {
+  return requiredKeys.value.filter((key) => !keys.value.includes(key.key));
+});
 </script>
-
 <template>
-  <SecretListModal
-    v-if="secretListModalVisible"
-    @close="secretListModalVisible = false"
-  />
-  <SecretEditModal
-    v-if="secretEditModalVisible && secretToUpdate"
-    :secret="secretToUpdate"
-    @close="secretEditModalVisible = false"
-  />
-  <SecretCreationModal
-    v-if="secretCreationModalVisible"
-    :form-state="{
-      stringDataArray: [
-        { key: requiredKey ? (requiredKey as string) : '', value: text || '' },
-      ],
-    }"
-    @close="secretCreationModalVisible = false"
-  />
   <div
-    ref="wrapperRef"
-    class="flex h-full w-full items-center border border-gray-300 transition-all"
-    :class="[
-      { 'pointer-events-none': context.disabled },
-      { 'border-primary shadow-sm': dropdownVisible },
-    ]"
-    style="border-radius: inherit"
-    @keydown="handleKeydown"
+    class="flex items-center gap-2 rounded-lg px-2.5 py-2 ring-1 ring-gray-100"
   >
     <div
-      class="flex w-full min-w-0 flex-1 shrink flex-wrap items-center"
-      @click="dropdownVisible = true"
+      class="inline-flex size-8 flex-none items-center justify-center rounded-full"
+      :class="{
+        'bg-indigo-50': !!data,
+        'bg-gray-100': !data,
+        'bg-red-50': !hasPermission,
+      }"
     >
-      <div v-if="context._value" class="flex px-3 text-sm text-black">
-        {{ context._value }}
-      </div>
-      <input
-        v-else
-        :value="text"
-        :class="context.classes.input"
-        type="text"
-        :placeholder="$t('core.formkit.secret.placeholder')"
-        @input="onTextInput"
-        @focus="dropdownVisible = true"
+      <MingcuteFileSecurityLine
+        class="size-5"
+        :class="{
+          'text-indigo-500': !!data,
+          'text-gray-500': !data,
+          'text-red-500': !hasPermission,
+        }"
       />
     </div>
-
-    <div class="inline-flex h-full flex-none items-center gap-2">
-      <div v-if="context._value" class="cursor-pointer" @click="handleSelect()">
-        <IconClose
-          class="rotate-90 text-sm text-gray-500 hover:text-gray-700"
-        />
+    <div class="min-w-0 flex-1 shrink space-y-1">
+      <div v-if="title" class="line-clamp-1 text-sm font-semibold">
+        {{ title }}
       </div>
-      <div class="inline-flex h-full items-center">
-        <div
-          class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-          @click="dropdownVisible = !dropdownVisible"
-        >
-          <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
-        </div>
-        <div
-          class="group flex h-full cursor-pointer items-center rounded-r-base border-l px-3 transition-all hover:bg-gray-100"
-          @click="secretListModalVisible = true"
-        >
-          <IconSettings class="h-4 w-4 text-gray-500 hover:text-gray-700" />
-        </div>
+      <div class="line-clamp-1 text-xs text-gray-500">
+        {{ description || "--" }}
       </div>
     </div>
-
-    <div
-      v-if="dropdownVisible"
-      class="absolute bottom-auto right-0 top-full z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg ring-1 ring-gray-100"
-    >
-      <ul class="p-1">
-        <li
-          v-if="text.trim()"
-          id="secret-create"
-          class="group flex cursor-pointer items-center justify-between rounded p-2"
-          :class="{
-            'bg-gray-100': selectedSecret === undefined,
-          }"
-          @click="handleCreateSecret"
-        >
-          <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            {{ $t("core.formkit.secret.creation_label") }}
-          </span>
-        </li>
-        <li
-          v-for="secret in searchResults"
-          :id="secret.metadata.name"
-          :key="secret.metadata.name"
-          class="group flex cursor-pointer items-center rounded p-2 hover:bg-gray-100"
-          :class="{
-            'bg-gray-100':
-              selectedSecret?.metadata.name === secret.metadata.name,
-          }"
-          @click="handleSelect(secret)"
-        >
-          <div
-            class="inline-flex min-w-0 flex-1 shrink items-center space-x-2 overflow-hidden text-sm"
-          >
-            <span class="flex-none"> {{ secret.metadata.name }}</span>
-            <span
-              class="line-clamp-1 min-w-0 flex-1 shrink break-words text-xs text-gray-500"
-            >
-              {{
-                hasRequiredKey(secret)
-                  ? secret.metadata.annotations?.[secretAnnotations.DESCRIPTION]
-                  : $t("core.formkit.secret.required_key_missing_label")
-              }}
-            </span>
-          </div>
-          <IconCheckboxCircle
-            v-if="context._value === secret.metadata.name"
-            class="flex-none text-primary"
-          />
-        </li>
-      </ul>
+    <div v-if="hasPermission" class="flex items-center gap-1">
+      <button
+        v-if="data"
+        type="button"
+        class="p-1 text-gray-500 hover:text-gray-900"
+        @click="context.node.input('')"
+      >
+        <IconClose class="size-4" />
+      </button>
+      <button
+        v-if="data"
+        type="button"
+        class="p-1 text-gray-500 hover:text-gray-900"
+        @click="editModalVisible = true"
+      >
+        <RiEditBoxLine class="size-4" />
+      </button>
+      <button
+        v-else
+        type="button"
+        class="p-1 text-gray-500 hover:text-gray-900"
+        @click="creationModalVisible = true"
+      >
+        <IconAddCircle class="size-4" />
+      </button>
+      <button
+        type="button"
+        class="p-1 text-gray-500 hover:text-gray-900"
+        @click="listModalVisible = true"
+      >
+        <IconExchange class="size-4" />
+      </button>
     </div>
   </div>
+
+  <div
+    v-if="currentValue && missingKeys.length > 0"
+    class="my-2 flex items-center gap-1 text-xs text-red-500"
+  >
+    <IconInformation />
+    <span>
+      所选密钥还缺少字段：{{
+        missingKeys.map((key) => key.key).join(", ")
+      }}</span
+    >
+  </div>
+
+  <SecretCreationModal
+    v-if="creationModalVisible"
+    :required-keys="requiredKeys"
+    @close="creationModalVisible = false"
+    @created="onCreated"
+  />
+
+  <SecretEditModal
+    v-if="editModalVisible && data"
+    :secret="data"
+    :required-keys="requiredKeys"
+    @close="onEditModalClose"
+  />
+
+  <SecretListModal
+    v-if="listModalVisible"
+    :selected-secret-name="currentValue"
+    :required-keys="requiredKeys"
+    @select="onSelect"
+    @close="onListModalClose"
+  />
 </template>

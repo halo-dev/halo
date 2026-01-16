@@ -11,9 +11,10 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { Q_KEY } from "../composables/use-secrets-fetch";
+import type { RequiredKey } from "../types";
 import SecretEditModal from "./SecretEditModal.vue";
 
 const { t } = useI18n();
@@ -22,9 +23,18 @@ const queryClient = useQueryClient();
 const props = withDefaults(
   defineProps<{
     secret: Secret;
+    selected?: boolean;
+    requiredKeys?: RequiredKey[];
   }>(),
-  {}
+  {
+    selected: false,
+    requiredKeys: () => [],
+  }
 );
+
+const emit = defineEmits<{
+  (event: "click"): void;
+}>();
 
 function handleDelete() {
   Dialog.warning({
@@ -43,21 +53,40 @@ function handleDelete() {
 }
 
 const editModalVisible = ref(false);
+
+const description = computed(() => {
+  return (
+    props.secret.metadata.annotations?.[secretAnnotations.DESCRIPTION] || ""
+  );
+});
+
+const keys = computed(() => {
+  return Object.keys(props.secret.stringData || {});
+});
+
+const descriptionText = computed(() => {
+  if (keys.value.length > 0) {
+    return `包含 ${keys.value.join(", ")} 字段`;
+  }
+  return "没有字段";
+});
 </script>
 
 <template>
   <SecretEditModal
     v-if="editModalVisible"
     :secret="secret"
+    :required-keys="requiredKeys"
     @close="editModalVisible = false"
   />
-  <VEntity>
+  <VEntity :is-selected="selected" @click="emit('click')">
+    <template #checkbox>
+      <slot name="checkbox" />
+    </template>
     <template #start>
       <VEntityField
-        :title="secret.metadata.name"
-        :description="
-          secret.metadata.annotations?.[secretAnnotations.DESCRIPTION]
-        "
+        :title="description || secret.metadata.name"
+        :description="descriptionText"
       ></VEntityField>
     </template>
     <template #end>
