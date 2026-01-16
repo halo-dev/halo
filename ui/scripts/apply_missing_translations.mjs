@@ -1,7 +1,7 @@
 /**
  * Apply Missing Translations
  * -------------------------
- * This script applies translated entries from "_missing_translations_[lang].yaml" files
+ * This script applies translated entries from "_missing_translations_[lang].json" files
  * to their corresponding language files.
  *
  * For each missing translations file, it:
@@ -14,9 +14,9 @@
  * node scripts/apply_missing_translations.mjs
  *
  * Example output:
- * Processing: src/locales/_missing_translations_zh-TW.yaml for language: zh-TW
- * Updated src/locales/zh-TW.yaml with 15 translated entries.
- * Updated src/locales/_missing_translations_zh-TW.yaml with 10 remaining untranslated entries.
+ * Processing: src/locales/_missing_translations_zh-TW.json for language: zh-TW
+ * Updated src/locales/zh-TW.json with 15 translated entries.
+ * Updated src/locales/_missing_translations_zh-TW.json with 10 remaining untranslated entries.
  *
  * This script is designed to be run repeatedly as you translate more entries in the
  * missing translations files. It will only apply entries that differ from the English version.
@@ -24,13 +24,12 @@
 
 import { existsSync } from "fs";
 import fs from "fs/promises";
-import yaml from "js-yaml";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const translationsDirPath = path.resolve(__dirname, "../src/locales");
-const baseFile = path.join(translationsDirPath, "en.yaml");
+const baseFile = path.join(translationsDirPath, "en.json");
 
 const VERBOSE = true;
 
@@ -45,7 +44,7 @@ async function main() {
         (entry) =>
           entry.isFile() &&
           entry.name.includes("_missing_translations_") &&
-          entry.name.endsWith(".yaml")
+          entry.name.endsWith(".json")
       )
       .map((entry) => path.join(translationsDirPath, entry.name));
 
@@ -54,12 +53,12 @@ async function main() {
       return;
     }
 
-    const enTranslations = await loadYamlFile(baseFile);
+    const enTranslations = await loadJsonFile(baseFile);
 
     for (const missingFile of missingFiles) {
-      const fileName = path.basename(missingFile, ".yaml");
+      const fileName = path.basename(missingFile, ".json");
       const langCode = fileName.replace("_missing_translations_", "");
-      const targetFile = path.join(translationsDirPath, `${langCode}.yaml`);
+      const targetFile = path.join(translationsDirPath, `${langCode}.json`);
 
       console.log(`\nProcessing: ${missingFile} for language: ${langCode}`);
 
@@ -69,64 +68,66 @@ async function main() {
       }
 
       try {
-        const missingTranslations = await loadYamlFile(missingFile);
-        const currentTranslations = await loadYamlFile(targetFile);
+        const missingTranslations = await loadJsonFile(missingFile);
+        const currentTranslations = await loadJsonFile(targetFile);
 
         const translatedEntries = {};
         const untranslatedEntries = {};
         const stats = { added: 0, skipped: 0 };
 
-        const keyPaths = collectKeyPaths(missingTranslations);
-        console.log(
-          `Found ${keyPaths.length} keys in missing translations file.`
-        );
+        const keys = Object.keys(missingTranslations);
+        console.log(`Found ${keys.length} keys in missing translations file.`);
 
-        for (const keyPath of keyPaths) {
-          const missingValue = getValueByPath(missingTranslations, keyPath);
-          const enValue = getValueByPath(enTranslations, keyPath);
+        for (const key of keys) {
+          const missingValue = missingTranslations[key];
+          const enValue = enTranslations[key];
 
           if (
             missingValue !== enValue &&
             missingValue !== null &&
             missingValue !== undefined
           ) {
-            setValueByPath(translatedEntries, keyPath, missingValue);
+            translatedEntries[key] = missingValue;
             stats.added++;
             if (VERBOSE) {
               console.log(
-                `✓ TRANSLATED: ${keyPath.join(
-                  "."
-                )} = "${missingValue}" (EN: "${enValue}")`
+                `✓ TRANSLATED: ${key} = "${missingValue}" (EN: "${enValue}")`
               );
             }
           } else {
-            setValueByPath(untranslatedEntries, keyPath, missingValue);
+            untranslatedEntries[key] = missingValue;
             stats.skipped++;
             if (VERBOSE) {
               console.log(
-                `✗ NOT TRANSLATED: ${keyPath.join(
-                  "."
-                )} = "${missingValue}" (same as EN: "${enValue}")`
+                `✗ NOT TRANSLATED: ${key} = "${missingValue}" (same as EN: "${enValue}")`
               );
             }
           }
         }
 
         if (stats.added > 0) {
-          const updatedTranslations = deepMerge(
-            currentTranslations,
-            translatedEntries
-          );
+          const updatedTranslations = {
+            ...currentTranslations,
+            ...translatedEntries,
+          };
 
-          await saveYamlFile(updatedTranslations, targetFile);
+          await saveJsonFile(updatedTranslations, targetFile);
           console.log(
             `Updated ${targetFile} with ${stats.added} translated entries.`
           );
 
-          await saveYamlFile(untranslatedEntries, missingFile);
-          console.log(
-            `Updated ${missingFile} with ${stats.skipped} remaining untranslated entries.`
-          );
+          if (stats.skipped > 0) {
+            await saveJsonFile(untranslatedEntries, missingFile);
+            console.log(
+              `Updated ${missingFile} with ${stats.skipped} remaining untranslated entries.`
+            );
+          } else {
+            // Delete the missing file if all entries are translated
+            await fs.unlink(missingFile);
+            console.log(
+              `Deleted ${missingFile} as all entries are now translated.`
+            );
+          }
         } else {
           console.log(
             `No translated entries found in ${missingFile}, files not updated.`
@@ -145,96 +146,25 @@ async function main() {
   }
 }
 
-async function loadYamlFile(filePath) {
+async function loadJsonFile(filePath) {
   try {
     const content = await fs.readFile(filePath, "utf8");
-    return yaml.load(content) || {};
+    return JSON.parse(content) || {};
   } catch (error) {
     console.error(`Error loading file ${filePath}:`, error);
     return {};
   }
 }
 
-async function saveYamlFile(data, filePath) {
+async function saveJsonFile(data, filePath) {
   try {
-    const yamlContent = yaml.dump(data, {
-      indent: 2,
-      lineWidth: -1,
-    });
-    await fs.writeFile(filePath, yamlContent, "utf8");
+    const jsonContent = JSON.stringify(data, null, 2);
+    await fs.writeFile(filePath, jsonContent, "utf8");
     return true;
   } catch (error) {
     console.error(`Error saving file ${filePath}:`, error);
     return false;
   }
-}
-
-function collectKeyPaths(obj, currentPath = [], result = []) {
-  if (obj === null || typeof obj !== "object") {
-    return result;
-  }
-
-  for (const key of Object.keys(obj)) {
-    const newPath = [...currentPath, key];
-
-    if (obj[key] === null || typeof obj[key] !== "object") {
-      result.push(newPath);
-    } else {
-      collectKeyPaths(obj[key], newPath, result);
-    }
-  }
-
-  return result;
-}
-
-function getValueByPath(obj, path) {
-  let current = obj;
-
-  for (const key of path) {
-    if (
-      current === null ||
-      current === undefined ||
-      typeof current !== "object"
-    ) {
-      return undefined;
-    }
-    current = current[key];
-  }
-
-  return current;
-}
-
-function setValueByPath(obj, path, value) {
-  let current = obj;
-
-  for (let i = 0; i < path.length - 1; i++) {
-    const key = path[i];
-
-    if (!current[key] || typeof current[key] !== "object") {
-      current[key] = {};
-    }
-
-    current = current[key];
-  }
-
-  const lastKey = path[path.length - 1];
-  current[lastKey] = value;
-}
-
-function deepMerge(target, source) {
-  const result = { ...target };
-
-  for (const key of Object.keys(source)) {
-    if (source[key] === null || typeof source[key] !== "object") {
-      result[key] = source[key];
-    } else if (target[key] === null || typeof target[key] !== "object") {
-      result[key] = { ...source[key] };
-    } else {
-      result[key] = deepMerge(target[key], source[key]);
-    }
-  }
-
-  return result;
 }
 
 main();

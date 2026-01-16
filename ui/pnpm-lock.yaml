@@ -342,9 +342,6 @@ importers:
       husky:
         specifier: ^9.1.7
         version: 9.1.7
-      js-yaml:
-        specifier: ^4.1.1
-        version: 4.1.1
       jsdom:
         specifier: ^27.2.0
         version: 27.2.0
