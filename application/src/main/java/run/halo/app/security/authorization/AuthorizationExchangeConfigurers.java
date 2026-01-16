@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.security.authentication.SecurityConfigurer;
+import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 /**
  * Authorization exchange configurers.
@@ -61,13 +62,25 @@ class AuthorizationExchangeConfigurers {
             .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
             .pathMatchers("/logout/impersonate")
             .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)
+            .pathMatchers("/challenges/**")
+            .access((authentication, context) ->
+                authentication.map(TwoFactorAuthentication.class::isInstance)
+                    .map(AuthorizationDecision::new)
+                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
+            )
             .pathMatchers(
                 "/login/**",
-                "/challenges/**",
                 "/password-reset/**",
                 "/signup"
             )
-            .permitAll());
+            .permitAll()
+            .pathMatchers("/logout")
+            .access((authentication, context) ->
+                authentication.map(a -> !authenticationTrustResolver.isAnonymous(a))
+                    .map(AuthorizationDecision::new)
+                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
+            )
+        );
     }
 
     @Bean
@@ -76,10 +89,10 @@ class AuthorizationExchangeConfigurers {
         // Anonymous user is not allowed
         return http -> http.authorizeExchange(
             spec -> spec.pathMatchers(
-                "/console/**",
-                "/uc/**",
-                "/logout"
-            ).authenticated()
+                    "/console/**",
+                    "/uc/**"
+                )
+                .authenticated()
         );
     }
 

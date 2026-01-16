@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
 import Icons from "./Icons.vue";
 import { iconifyClient } from "./api";
+import type { IconifyValue } from "./types";
 
 const emit = defineEmits<{
-  (e: "select", iconName: string): void;
+  (e: "select", icon: IconifyValue): void;
 }>();
 
 const keyword = ref<string>("");
@@ -30,12 +31,12 @@ const { data, isLoading } = useQuery({
   },
 });
 
-const onSelect = (icon: string) => {
+const onSelect = (icon: IconifyValue) => {
   emit("select", icon);
 };
 </script>
 <template>
-  <div class="flex h-[500px] flex-col gap-2 bg-white sm:w-[500px]">
+  <div class="flex h-[350px] flex-col gap-2 bg-white sm:h-[500px] sm:w-[500px]">
     <div class="flex-none">
       <SearchInput v-model="keyword" />
     </div>

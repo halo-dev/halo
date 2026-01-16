@@ -1,18 +1,18 @@
 name: Release UI Packages
 
-permissions:
-  contents: write
-  id-token: write
-
 on:
   release:
     types:
       - published
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.repository == 'halo-dev/halo'
+    if: github.repository == 'halo-dev/halo' && github.event.release.prerelease == false
     steps:
       - uses: actions/checkout@v4
         with:

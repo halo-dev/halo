@@ -18,8 +18,9 @@ spring:
     init:
       mode: always
       platform: h2
-  codec:
-    max-in-memory-size: 10MB
+  http:
+    codecs:
+      max-in-memory-size: 10MB
   messages:
     basename: config.i18n.messages
   web:
@@ -119,3 +120,7 @@ resilience4j.ratelimiter:
       limitForPeriod: 10
       limitRefreshPeriod: 1m
       timeoutDuration: 0s
+r2dbc:
+  migrate:
+    resources-path: classpath:/db/migration/${spring.sql.init.platform}/*.sql
+    dialect: ${spring.sql.init.platform}

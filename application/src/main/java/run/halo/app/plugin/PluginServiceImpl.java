@@ -244,7 +244,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     @Override
     public Flux<DataBuffer> uglifyJsBundle() {
-        var startedPlugins = List.copyOf(pluginManager.getStartedPlugins());
+        var startedPlugins = pluginManager.startedPlugins();
         var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
         var end = Mono.fromSupplier(
             () -> {
@@ -289,7 +289,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     @Override
     public Flux<DataBuffer> uglifyCssBundle() {
-        return Flux.fromIterable(pluginManager.getStartedPlugins())
+        return Flux.fromIterable(pluginManager.startedPlugins())
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
             .flatMapSequential(pluginWrapper -> {
                 var pluginId = pluginWrapper.getPluginId();
@@ -319,7 +319,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         if (pluginManager.isDevelopment()) {
             return Mono.just(String.valueOf(clock.instant().toEpochMilli()));
         }
-        return Flux.fromIterable(new ArrayList<>(pluginManager.getStartedPlugins()))
+        return Flux.fromIterable(pluginManager.startedPlugins())
             .sort(Comparator.comparing(PluginWrapper::getPluginId))
             .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
             .collect(Collectors.joining())
@@ -425,6 +425,12 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             })
             .sorted()
             .toList();
+    }
+
+    @Override
+    public Flux<String> getStartedPluginNames() {
+        return Flux.fromIterable(pluginManager.startedPlugins())
+            .map(PluginWrapper::getPluginId);
     }
 
     private static List<PluginDependency> getPluginDependency(Plugin plugin) {

@@ -24,6 +24,7 @@ import static run.halo.app.extension.GroupVersionKind.fromExtension;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.session.ReactiveSessionInformation;
+import org.springframework.security.core.session.ReactiveSessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.ReactiveTransaction;
+import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,7 +58,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
@@ -68,7 +73,7 @@ class UserServiceImplTest {
     ReactiveExtensionClient client;
 
     @Mock
-    SystemConfigurableEnvironmentFetcher environmentFetcher;
+    SystemConfigFetcher environmentFetcher;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -84,6 +89,12 @@ class UserServiceImplTest {
 
     @Mock
     EmailVerificationService emailVerificationService;
+
+    @Mock
+    ReactiveTransactionManager txManager;
+
+    @Mock
+    ReactiveSessionRegistry sessionRegistry;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -108,6 +119,26 @@ class UserServiceImplTest {
             .verifyComplete();
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
+    }
+
+    @Test
+    void shouldFindUserByVerifiedEmail() {
+        var fakeUser = createUser("fake-user", "fake-password");
+        when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.just(fakeUser));
+        userService.findUserByVerifiedEmail("faker@halo.run")
+            .as(StepVerifier::create)
+            .expectNext(fakeUser)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnEmptyIfNoUserWithVerifiedEmail() {
+        when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.empty());
+        userService.findUserByVerifiedEmail("faker@halo.run")
+            .as(StepVerifier::create)
+            .verifyComplete();
     }
 
     @Test
@@ -260,11 +291,26 @@ class UserServiceImplTest {
     @Nested
     class GrantRolesTest {
 
+        @BeforeEach
+        void setUp() {
+            var tx = mock(ReactiveTransaction.class);
+
+            when(txManager.getReactiveTransaction(any()))
+                .thenReturn(Mono.just(tx));
+            when(txManager.commit(tx)).thenReturn(Mono.empty());
+        }
+
         @Test
         void shouldGetNotFoundIfUserNotFound() {
             when(client.get(User.class, "invalid-user"))
                 .thenReturn(Mono.error(
-                    new ExtensionNotFoundException(fromExtension(User.class), "invalid-user")));
+                    new ExtensionNotFoundException(fromExtension(User.class), "invalid-user"))
+                );
+
+            when(roleService.listRoleBindings(any())).thenReturn(Flux.empty());
+            when(client.create(isA(RoleBinding.class)))
+                .thenReturn(Mono.just(mock(RoleBinding.class)));
+            when(sessionRegistry.getAllSessions("invalid-user")).thenReturn(Flux.empty());
 
             var grantRolesMono = userService.grantRoles("invalid-user", Set.of("fake-role"));
             StepVerifier.create(grantRolesMono)
@@ -283,6 +329,9 @@ class UserServiceImplTest {
             when(client.create(isA(RoleBinding.class))).thenReturn(
                 Mono.just(mock(RoleBinding.class)));
             when(client.update(user)).thenReturn(Mono.just(user));
+            var session = mock(ReactiveSessionInformation.class);
+            when(session.invalidate()).thenReturn(Mono.empty());
+            when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.just(session));
 
             var grantRolesMono = userService.grantRoles("fake-user", Set.of("fake-role"));
             StepVerifier.create(grantRolesMono)
@@ -294,27 +343,19 @@ class UserServiceImplTest {
 
         @Test
         void shouldDeleteRoleBindingIfNotProvided() {
-            var user = createUser("fake-password");
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
             when(roleService.listRoleBindings(any(Subject.class)))
                 .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.delete(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
-            when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
-                .expectNextCount(1)
                 .verifyComplete();
-
-            verify(client).delete(notProvidedRoleBinding);
         }
 
         @Test
         void shouldUpdateRoleBindingIfExists() {
-            var user = createUser("fake-password");
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             // add another subject
             var anotherSubject = new Subject();
             anotherSubject.setName("another-fake-user");
@@ -329,10 +370,9 @@ class UserServiceImplTest {
                 .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.update(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
-            when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
-                .expectNextCount(1)
+                // Because the roles are the same, so no need to update the existingRoleBinding
                 .verifyComplete();
 
             verify(client).update(notProvidedRoleBinding);

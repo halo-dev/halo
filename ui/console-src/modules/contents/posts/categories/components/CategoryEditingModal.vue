@@ -245,7 +245,7 @@ async function slugUniqueValidation(node: FormKitNode) {
                 $t('core.post_category.editing_modal.fields.display_name.label')
               "
               type="text"
-              validation="required|length:0,50"
+              validation="required|length:0,512"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
@@ -253,7 +253,7 @@ async function slugUniqueValidation(node: FormKitNode) {
               name="slug"
               :label="$t('core.post_category.editing_modal.fields.slug.label')"
               type="text"
-              validation="required|length:0,50|slugUniqueValidation"
+              validation="required|length:0,512|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -378,6 +378,7 @@ async function slugUniqueValidation(node: FormKitNode) {
         <AnnotationsForm
           :key="formState.metadata.name"
           ref="annotationsFormRef"
+          :form-data="formState"
           :value="formState.metadata.annotations"
           kind="Category"
           group="content.halo.run"

@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>ConfigMap holds configuration data to consume.</p>
@@ -21,6 +22,7 @@ public class ConfigMap extends AbstractExtension {
 
     public static final String KIND = "ConfigMap";
 
+    @Nullable
     private Map<String, String> data;
 
     public ConfigMap putDataItem(String key, String dataItem) {

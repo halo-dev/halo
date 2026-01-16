@@ -15,14 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PostVo } from './post-vo';
+import type { ListedPostVo } from './listed-post-vo';
 
 /**
  * Post navigation vo to hold previous and next item.
  */
 export interface NavigationPostVo {
-    'current'?: PostVo;
-    'next'?: PostVo;
-    'previous'?: PostVo;
+    'next'?: ListedPostVo;
+    'previous'?: ListedPostVo;
 }
 

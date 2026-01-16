@@ -9,11 +9,7 @@ import { contentAnnotations } from "@/constants/annotations";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
-import {
-  consoleApiClient,
-  coreApiClient,
-  ucApiClient,
-} from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconEye,
@@ -416,18 +412,17 @@ useSessionKeepAlive();
 
 // Upload image
 async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
-  if (!utils.permission.has(["uc:attachments:manage"])) {
+  if (!utils.permission.has(["system:attachments:manage"])) {
     return;
   }
 
-  const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
-    {
-      file,
-      singlePageName: formState.value.page.metadata.name,
-      waitForPermalink: true,
-    },
-    options
-  );
+  const { data } =
+    await consoleApiClient.storage.attachment.uploadAttachmentForConsole(
+      {
+        file,
+      },
+      options
+    );
   return data;
 }
 </script>

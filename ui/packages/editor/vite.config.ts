@@ -27,7 +27,7 @@ export default ({ mode }: { mode: string }) => {
           insertTypesEntry: true,
         }),
       VueI18nPlugin({
-        include: [path.resolve(__dirname, "./src/locales/*.yaml")],
+        include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
     ],
     define: {

@@ -41,7 +41,6 @@ const formState = ref<Tag>({
   spec: {
     displayName: "",
     slug: "",
-    color: "#ffffff",
     cover: "",
   },
   apiVersion: "content.halo.run/v1alpha1",
@@ -274,6 +273,7 @@ async function slugUniqueValidation(node: FormKitNode) {
           :key="formState.metadata.name"
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
+          :form-data="formState"
           kind="Tag"
           group="content.halo.run"
         />

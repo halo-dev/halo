@@ -3285,6 +3285,36 @@
         ]
       }
     },
+    "/apis/console.api.storage.halo.run/v1alpha1/attachments/-/upload": {
+      "post": {
+        "description": "Upload attachment endpoint for console.",
+        "operationId": "uploadAttachmentForConsole",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadForm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/console.api.storage.halo.run/v1alpha1/policies/{name}/configs/{group}": {
       "get": {
         "description": "Get policy config by group",
@@ -4327,8 +4357,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "format": "email"
           }
         }
       },
@@ -5460,12 +5490,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -5521,6 +5551,8 @@
       },
       "Ref": {
         "required": [
+          "group",
+          "kind",
           "name"
         ],
         "type": "object",
@@ -6000,12 +6032,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -6452,6 +6484,25 @@
             "format": "binary"
           }
         }
+      },
+      "UploadForm": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "The file to upload. If not provided, the url will be used.",
+            "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+          },
+          "url": {
+            "type": "string",
+            "description": "The url to upload from. If not provided, the file will be used."
+          }
+        },
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
       },
       "UploadFromUrlRequest": {
         "required": [

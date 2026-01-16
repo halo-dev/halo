@@ -10,7 +10,21 @@ public interface UserService {
 
     String GHOST_USER_NAME = "ghost";
 
+    /**
+     * Get user by username.
+     *
+     * @param username username
+     * @return the mono user or user not found error
+     */
     Mono<User> getUser(String username);
+
+    /**
+     * Get user by verified email.
+     *
+     * @param email the verified email
+     * @return the mono user or empty if not found
+     */
+    Mono<User> findUserByVerifiedEmail(String email);
 
     Mono<User> getUserOrGhost(String username);
 

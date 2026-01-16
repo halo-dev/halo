@@ -31,7 +31,7 @@ class SystemConfigFirstExternalUrlSupplierTest {
     WebFluxProperties webFluxProperties;
 
     @Mock
-    SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+    SystemConfigFetcher systemConfigFetcher;
 
     @InjectMocks
     SystemConfigFirstExternalUrlSupplier externalUrl;

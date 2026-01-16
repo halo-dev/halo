@@ -8,8 +8,11 @@ import type {
   PlaceholderOptions,
 } from "@tiptap/extensions";
 import { filterDuplicateExtensions } from "../utils";
+import { ExtensionAlign } from "./align";
 import type { ExtensionAudioOptions } from "./audio";
 import { ExtensionAudio } from "./audio";
+import type { ExtensionBlockPositionOptions } from "./block-position";
+import { ExtensionBlockPosition } from "./block-position";
 import {
   ExtensionBlockquote,
   type ExtensionBlockquoteOptions,
@@ -73,6 +76,7 @@ import {
 import { ExtensionPlaceholder } from "./placeholder";
 import { ExtensionRangeSelection } from "./range-selection";
 import { ExtensionSearchAndReplace } from "./search-and-replace";
+import { ExtensionSmartScroll, type SmartScrollOptions } from "./smart-scroll";
 import { ExtensionStrike, type ExtensionStrikeOptions } from "./strike";
 import {
   ExtensionSubscript,
@@ -138,6 +142,7 @@ export interface ExtensionsKitOptions {
   placeholder: Partial<PlaceholderOptions> | false;
   rangeSelection?: boolean;
   searchAndReplace?: boolean;
+  smartScroll: Partial<SmartScrollOptions> | false;
   strike: Partial<ExtensionStrikeOptions> | false;
   subscript: Partial<ExtensionSubscriptOptions> | false;
   superscript: Partial<ExtensionSuperscriptOptions> | false;
@@ -151,6 +156,8 @@ export interface ExtensionsKitOptions {
   upload?: boolean;
   video: Partial<ExtensionVideoOptions> | false;
   listExtra: Partial<ExtensionOptions> | false;
+  blockPosition: Partial<ExtensionBlockPositionOptions> | false;
+  align: Partial<ExtensionOptions> | false;
   customExtensions?: Extensions;
 }
 
@@ -335,6 +342,12 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
       internalExtensions.push(ExtensionSearchAndReplace);
     }
 
+    if (this.options.smartScroll !== false) {
+      internalExtensions.push(
+        ExtensionSmartScroll.configure(this.options.smartScroll)
+      );
+    }
+
     if (this.options.strike !== false) {
       internalExtensions.push(ExtensionStrike.configure(this.options.strike));
     }
@@ -399,6 +412,16 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
       internalExtensions.push(
         ExtensionListExtra.configure(this.options.listExtra)
       );
+    }
+
+    if (this.options.blockPosition !== false) {
+      internalExtensions.push(
+        ExtensionBlockPosition.configure(this.options.blockPosition)
+      );
+    }
+
+    if (this.options.align !== false) {
+      internalExtensions.push(ExtensionAlign);
     }
 
     const extensions =

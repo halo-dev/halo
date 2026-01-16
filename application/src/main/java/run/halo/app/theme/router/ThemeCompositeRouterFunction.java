@@ -1,12 +1,16 @@
 package run.halo.app.theme.router;
 
+import static run.halo.app.theme.utils.PatternUtils.normalizePattern;
+import static run.halo.app.theme.utils.PatternUtils.normalizePostPattern;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -16,8 +20,10 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigChangedEvent;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.factories.ArchiveRouteFactory;
@@ -37,14 +43,17 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
  * @see SinglePageRoute
  * @since 2.0.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class ThemeCompositeRouterFunction
-    implements RouterFunction<ServerResponse>, SmartLifecycle {
+public class ThemeCompositeRouterFunction implements
+    RouterFunction<ServerResponse>,
+    SmartLifecycle,
+    ApplicationListener<SystemConfigChangedEvent> {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     private final ArchiveRouteFactory archiveRouteFactory;
     private final PostRouteFactory postRouteFactory;
@@ -59,6 +68,32 @@ public class ThemeCompositeRouterFunction
     private volatile boolean running;
 
     @Override
+    public void onApplicationEvent(SystemConfigChangedEvent event) {
+        var oldData = event.getOldData();
+        var newData = event.getNewData();
+        var oldRules = SystemSetting.get(oldData, ThemeRouteRules.GROUP,
+            ThemeRouteRules.class);
+        if (oldRules == null) {
+            oldRules = ThemeRouteRules.empty();
+        }
+        var newRules = SystemSetting.get(newData, ThemeRouteRules.GROUP,
+            ThemeRouteRules.class);
+        if (newRules == null) {
+            newRules = ThemeRouteRules.empty();
+        }
+        boolean rulesChanged = !Objects.equals(oldRules, newRules);
+        if (rulesChanged) {
+            log.info("Theme route rules changed, updating router functions...");
+            if (log.isDebugEnabled()) {
+                log.debug("Old theme route rules: {}", oldRules);
+                log.debug("New theme route rules: {}", newRules);
+            }
+            this.cachedRouters = routerFunctions(newRules);
+            log.info("Theme route rules updated.");
+        }
+    }
+
+    @Override
     @NonNull
     public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
         return Flux.fromIterable(cachedRouters)
@@ -71,11 +106,16 @@ public class ThemeCompositeRouterFunction
         cachedRouters.forEach(routerFunction -> routerFunction.accept(visitor));
     }
 
-    List<RouterFunction<ServerResponse>> routerFunctions() {
-        return transformedPatterns()
-            .stream()
+    private List<RouterFunction<ServerResponse>> routerFunctions(ThemeRouteRules rules) {
+        return transformedPatterns(rules).stream()
             .map(this::createRouterFunction)
-            .collect(Collectors.toList());
+            .toList();
+    }
+
+    private List<RouterFunction<ServerResponse>> routerFunctions() {
+        return transformedPatterns().stream()
+            .map(this::createRouterFunction)
+            .toList();
     }
 
     private RouterFunction<ServerResponse> createRouterFunction(RoutePattern routePattern) {
@@ -91,16 +131,6 @@ public class ThemeCompositeRouterFunction
             default ->
                 throw new IllegalStateException("Unexpected value: " + routePattern.identifier());
         };
-    }
-
-    /**
-     * Refresh the {@link #cachedRouters} when the permalink rule is changed.
-     *
-     * @param event {@link PermalinkRuleChangedEvent}
-     */
-    @EventListener
-    public void onPermalinkRuleChanged(PermalinkRuleChangedEvent event) {
-        this.cachedRouters = routerFunctions();
     }
 
     @Override
@@ -129,34 +159,34 @@ public class ThemeCompositeRouterFunction
     record RoutePattern(DefaultTemplateEnum identifier, String pattern) {
     }
 
-    private List<RoutePattern> transformedPatterns() {
+    private List<RoutePattern> transformedPatterns(ThemeRouteRules rules) {
         List<RoutePattern> routePatterns = new ArrayList<>();
+        var archives = normalizePattern(rules.getArchives());
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.ARCHIVES, archives));
 
-        SystemSetting.ThemeRouteRules rules =
-            environmentFetcher.fetch(SystemSetting.ThemeRouteRules.GROUP,
-                    SystemSetting.ThemeRouteRules.class)
-                .blockOptional(BLOCKING_TIMEOUT)
-                .orElse(SystemSetting.ThemeRouteRules.empty());
-        String post = rules.getPost();
-        routePatterns.add(new RoutePattern(DefaultTemplateEnum.POST, post));
+        var categories = normalizePattern(rules.getCategories());
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.CATEGORIES, categories));
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.CATEGORY, categories));
 
-        String archives = rules.getArchives();
-        routePatterns.add(
-            new RoutePattern(DefaultTemplateEnum.ARCHIVES, archives));
-
-        String categories = rules.getCategories();
-        routePatterns.add(
-            new RoutePattern(DefaultTemplateEnum.CATEGORIES, categories));
-        routePatterns.add(
-            new RoutePattern(DefaultTemplateEnum.CATEGORY, categories));
-
-        String tags = rules.getTags();
+        var tags = normalizePattern(rules.getTags());
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAGS, tags));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.TAG, tags));
 
+        var post = normalizePostPattern(rules);
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.POST, post));
+
         // Add the index route to the end to prevent conflict with the queryParam rule of the post
-        routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
         return routePatterns;
+
     }
+
+    private List<RoutePattern> transformedPatterns() {
+        var rules = environmentFetcher.fetch(ThemeRouteRules.GROUP, ThemeRouteRules.class)
+            .blockOptional(BLOCKING_TIMEOUT)
+            .orElseGet(ThemeRouteRules::empty);
+        return transformedPatterns(rules);
+    }
+
 }

@@ -7428,6 +7428,36 @@
         ]
       }
     },
+    "/apis/console.api.storage.halo.run/v1alpha1/attachments/-/upload": {
+      "post": {
+        "description": "Upload attachment endpoint for console.",
+        "operationId": "uploadAttachmentForConsole",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadForm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attachment"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Console"
+        ]
+      }
+    },
     "/apis/console.api.storage.halo.run/v1alpha1/policies/{name}/configs/{group}": {
       "get": {
         "description": "Get policy config by group",
@@ -14846,6 +14876,41 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/annotationsettings": {
+      "get": {
+        "description": "List available AnnotationSettings for the given targetRef. The available AnnotationSettings are determined by the currently activated theme and started plugins.",
+        "operationId": "listAvailableAnnotationSettings",
+        "parameters": [
+          {
+            "description": "The targetRef of the AnnotationSetting. e.g.: \u0027content.halo.run/Post",
+            "in": "query",
+            "name": "targetRef",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnotationSetting"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AnnotationSettingV1AlphaUc"
+        ]
+      }
+    },
     "/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}": {
       "get": {
         "description": "Get my preference by group.",
@@ -15353,7 +15418,8 @@
         ]
       },
       "post": {
-        "description": "Create attachment for the given post.",
+        "deprecated": true,
+        "description": "Create attachment for the given post. Deprecated in favor of /attachments/-/upload.",
         "operationId": "CreateAttachmentForPost",
         "parameters": [
           {
@@ -15394,16 +15460,15 @@
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
       "post": {
         "description": "Upload attachment to user center storage.",
-        "operationId": "UploadUcAttachment",
+        "operationId": "UploadAttachmentForUc",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UcUploadRequest"
+                "$ref": "#/components/schemas/UploadForm"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "default": {
@@ -15424,7 +15489,8 @@
     },
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
-        "description": "Upload attachment from the given URL.",
+        "deprecated": true,
+        "description": "Upload attachment from the given URL.\nDeprecated in favor of /attachments/-/upload.",
         "operationId": "ExternalTransferAttachment_1",
         "parameters": [
           {
@@ -15484,8 +15550,27 @@
         ]
       },
       "post": {
-        "operationId": "SetNoCacheForSetUpPage",
-        "responses": {}
+        "description": "Setup system",
+        "operationId": "SetupSystem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {},
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "SystemV1alpha1Public"
+        ]
       }
     }
   },
@@ -17483,8 +17568,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "format": "email"
           }
         }
       },
@@ -19147,6 +19232,12 @@
         ],
         "type": "object",
         "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuItemVo"
+            }
+          },
           "displayName": {
             "type": "string",
             "description": "Gets menu item\u0027s display name."
@@ -19356,14 +19447,11 @@
       "NavigationPostVo": {
         "type": "object",
         "properties": {
-          "current": {
-            "$ref": "#/components/schemas/PostVo"
-          },
           "next": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           },
           "previous": {
-            "$ref": "#/components/schemas/PostVo"
+            "$ref": "#/components/schemas/ListedPostVo"
           }
         },
         "description": "Post navigation vo to hold previous and next item."
@@ -19739,9 +19827,6 @@
           }
         },
         "description": "Comment owner info."
-      },
-      "Part": {
-        "type": "object"
       },
       "PasswordRequest": {
         "required": [
@@ -20592,12 +20677,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -21059,6 +21144,8 @@
       },
       "Ref": {
         "required": [
+          "group",
+          "kind",
           "name"
         ],
         "type": "object",
@@ -22186,6 +22273,45 @@
           }
         }
       },
+      "SetupRequest": {
+        "required": [
+          "externalUrl",
+          "password",
+          "siteTitle",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "externalUrl": {
+            "type": "string"
+          },
+          "language": {
+            "pattern": "^(zh-CN|zh-TW|en|es)$",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 257,
+            "minLength": 5,
+            "pattern": "^[A-Za-z0-9!@#$%^\u0026*.?]+$",
+            "type": "string"
+          },
+          "siteTitle": {
+            "maxLength": 80,
+            "minLength": 0,
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 63,
+            "minLength": 4,
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+            "type": "string"
+          }
+        }
+      },
       "SinglePage": {
         "required": [
           "apiVersion",
@@ -22368,12 +22494,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -23415,39 +23541,6 @@
           }
         }
       },
-      "UcUploadRequest": {
-        "required": [
-          "file"
-        ],
-        "type": "object",
-        "properties": {
-          "file": {
-            "type": "string",
-            "format": "binary"
-          },
-          "formData": {
-            "type": "object",
-            "properties": {
-              "all": {
-                "type": "object",
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/Part"
-                },
-                "writeOnly": true
-              },
-              "empty": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Part"
-              }
-            }
-          }
-        }
-      },
       "UpgradeFromUriRequest": {
         "required": [
           "uri"
@@ -23471,6 +23564,25 @@
             "format": "binary"
           }
         }
+      },
+      "UploadForm": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "The file to upload. If not provided, the url will be used.",
+            "format": "binary"
+          },
+          "filename": {
+            "type": "string",
+            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+          },
+          "url": {
+            "type": "string",
+            "description": "The url to upload from. If not provided, the file will be used."
+          }
+        },
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
       },
       "UploadFromUrlRequest": {
         "required": [

@@ -18,10 +18,11 @@ import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
+import run.halo.app.theme.utils.PatternUtils;
 
 /**
  * @author guqing
@@ -34,11 +35,11 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     public static final String DEFAULT_CATEGORY = "default";
-    public static final String DEFAULT_PERMALINK_PATTERN =
+    private static final String DEFAULT_PERMALINK_PATTERN =
         SystemSetting.ThemeRouteRules.empty().getPost();
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("00");
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final ExternalUrlSupplier externalUrlSupplier;
     private final PostService postService;
 
@@ -52,9 +53,9 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
 
     public String pattern() {
         return environmentFetcher.fetchRouteRules()
-            .map(SystemSetting.ThemeRouteRules::getPost)
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElse(DEFAULT_PERMALINK_PATTERN);
+            .map(PatternUtils::normalizePostPattern)
+            .defaultIfEmpty(DEFAULT_PERMALINK_PATTERN)
+            .block(BLOCKING_TIMEOUT);
     }
 
     private String createPermalink(Post post, String pattern) {

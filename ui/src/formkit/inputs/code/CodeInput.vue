@@ -45,39 +45,41 @@ const editorHeight = computed(() => {
 
 <template>
   <Suspense>
-    <div
-      ref="codeInputWrapperRef"
-      :style="{ height }"
-      :class="{ '!fixed inset-0 z-[999] !block bg-white': fullscreen }"
-      class="group relative h-9 w-full"
-    >
-      <VPageHeader v-if="fullscreen" :title="context.label" class="border-b">
-        <template #actions>
-          <VButton @click="fullscreen = false">
-            {{ $t("core.formkit.code.fullscreen.exit") }}
-          </VButton>
-        </template>
-      </VPageHeader>
-
-      <VCodemirror
-        :model-value="props.context._value"
-        v-bind="context.attrs"
-        :height="editorHeight"
-        :language="language"
-        class="block w-full"
-        @change="onChange"
-      />
-
-      <button
-        v-if="!fullscreen"
-        v-tooltip="$t('core.formkit.code.fullscreen.enter')"
-        class="absolute bottom-2 right-2 inline-flex cursor-pointer items-center justify-center rounded-full bg-primary p-1.5 text-white opacity-0 transition-all hover:!opacity-90 hover:shadow group-hover:opacity-100"
-        type="button"
-        @click="fullscreen = true"
+    <Teleport to="body" :disabled="!fullscreen">
+      <div
+        ref="codeInputWrapperRef"
+        :style="{ height }"
+        :class="{ '!fixed inset-0 z-[99999] !block bg-white': fullscreen }"
+        class="group relative h-9 w-full"
       >
-        <RiFullscreenLine class="text-xs" />
-      </button>
-    </div>
+        <VPageHeader v-if="fullscreen" :title="context.label" class="border-b">
+          <template #actions>
+            <VButton @click="fullscreen = false">
+              {{ $t("core.formkit.code.fullscreen.exit") }}
+            </VButton>
+          </template>
+        </VPageHeader>
+
+        <VCodemirror
+          :model-value="props.context._value"
+          v-bind="context.attrs"
+          :height="editorHeight"
+          :language="language"
+          class="block w-full"
+          @change="onChange"
+        />
+
+        <button
+          v-if="!fullscreen"
+          v-tooltip="$t('core.formkit.code.fullscreen.enter')"
+          class="absolute bottom-2 right-2 inline-flex cursor-pointer items-center justify-center rounded-full bg-primary p-1.5 text-white opacity-0 transition-all hover:!opacity-90 hover:shadow group-hover:opacity-100"
+          type="button"
+          @click="fullscreen = true"
+        >
+          <RiFullscreenLine class="text-xs" />
+        </button>
+      </div>
+    </Teleport>
 
     <template #fallback>
       <span class="p-1 text-xs text-gray-400">

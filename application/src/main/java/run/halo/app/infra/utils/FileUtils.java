@@ -1,8 +1,8 @@
 package run.halo.app.infra.utils;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.springframework.core.io.buffer.DataBufferUtils.subscriberInputStream;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
-import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -51,18 +51,15 @@ public abstract class FileUtils {
 
     public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath,
         Scheduler scheduler) {
-        return Mono.usingWhen(
-            toInputStream(content, scheduler),
-            is -> {
-                try (var zis = new ZipInputStream(is)) {
-                    unzip(zis, targetPath);
-                    return Mono.empty();
-                } catch (IOException e) {
-                    return Mono.error(e);
-                }
-            },
-            is -> Mono.fromRunnable(() -> closeQuietly(is))
-        );
+        return Mono.fromCallable(() -> {
+            try (var is = subscriberInputStream(content, 1);
+                 var zis = new ZipInputStream(is)) {
+                log.debug("Unzipping to target path: {}", targetPath);
+                unzip(zis, targetPath);
+                log.debug("Unzipped to target path: {}", targetPath);
+            }
+            return null;
+        }).subscribeOn(scheduler).then();
     }
 
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
@@ -195,7 +192,7 @@ public abstract class FileUtils {
      * the given {@code consumer}.
      *
      * @param closeable The resource to close, may be null.
-     * @param consumer  Consumes the IOException thrown by {@link Closeable#close()}.
+     * @param consumer Consumes the IOException thrown by {@link Closeable#close()}.
      */
     public static void closeQuietly(final Closeable closeable,
         final Consumer<IOException> consumer) {
@@ -213,7 +210,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -232,7 +229,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull String parentPath,
@@ -243,7 +240,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,

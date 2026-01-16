@@ -36,6 +36,7 @@ export * from "./paragraph";
 export * from "./placeholder";
 export * from "./range-selection";
 export * from "./search-and-replace";
+export * from "./smart-scroll";
 export * from "./strike";
 export * from "./subscript";
 export * from "./superscript";

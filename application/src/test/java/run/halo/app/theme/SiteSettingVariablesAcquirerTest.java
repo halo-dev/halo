@@ -18,9 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.theme.finders.vo.SiteSettingVo;
 
@@ -39,20 +38,17 @@ public class SiteSettingVariablesAcquirerTest {
     private SystemVersionSupplier systemVersionSupplier;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @InjectMocks
     private SiteSettingVariablesAcquirer siteSettingVariablesAcquirer;
 
     @Test
     void acquireWhenExternalUrlSet() throws MalformedURLException {
-        var configMap = new ConfigMap();
-        configMap.setData(Map.of());
-
         var url = new URL("https://halo.run");
         when(externalUrlSupplier.getURL(any())).thenReturn(url);
         when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
-        when(environmentFetcher.getConfigMap()).thenReturn(Mono.just(configMap));
+        when(environmentFetcher.getConfig()).thenReturn(Mono.just(Map.of()));
 
         siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
             .as(StepVerifier::create)
@@ -61,10 +57,10 @@ public class SiteSettingVariablesAcquirerTest {
                 assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
                 var site = (SiteSettingVo) result.get("site");
                 assertThat(site)
-                    .extracting(SiteSettingVo::getUrl)
+                    .extracting(SiteSettingVo::url)
                     .isEqualTo(url);
                 assertThat(site)
-                    .extracting(SiteSettingVo::getVersion)
+                    .extracting(SiteSettingVo::version)
                     .isEqualTo("0.0.0-alpha.1");
             })
             .verifyComplete();

@@ -15,9 +15,9 @@ public class ValidationUtils {
     public static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
 
     /**
-     * {@code A-Z, a-z, 0-9, !@#$%^&*} are allowed.
+     * {@code A-Z, a-z, 0-9, !@#$%^&*.?} are allowed.
      */
-    public static final String PASSWORD_REGEX = "^[A-Za-z0-9!@#$%^&*]+$";
+    public static final String PASSWORD_REGEX = "^[A-Za-z0-9!@#$%^&*.?]+$";
 
     public static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
 

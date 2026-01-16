@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import org.thymeleaf.context.LazyContextVariable;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -42,7 +42,7 @@ public class IndexRouteFactory implements RouteFactory {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private final PostFinder postFinder;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
     private final LocaleContextResolver localeContextResolver;
 

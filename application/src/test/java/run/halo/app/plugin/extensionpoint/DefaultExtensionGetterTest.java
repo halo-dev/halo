@@ -25,7 +25,7 @@ import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition.ExtensionPointType;
 
@@ -42,7 +42,7 @@ class DefaultExtensionGetterTest {
     PluginManager pluginManager;
 
     @Mock
-    SystemConfigurableEnvironmentFetcher configFetcher;
+    SystemConfigFetcher configFetcher;
 
     @Mock
     BeanFactory beanFactory;

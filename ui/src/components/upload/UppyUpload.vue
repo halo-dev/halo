@@ -15,7 +15,7 @@ import zh_TW from "@uppy/locales/lib/zh_TW";
 import { Dashboard } from "@uppy/vue";
 import XHRUpload from "@uppy/xhr-upload";
 import objectHash from "object-hash";
-import { computed, h, onUnmounted } from "vue";
+import { computed, h, onUnmounted, watchEffect } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -157,12 +157,16 @@ const uppy = computed(() => {
     });
 });
 
-uppy.value.on("upload-success", (_, response: SuccessResponse) => {
-  emit("uploaded", response);
-});
+watchEffect(() => {
+  if (uppy.value) {
+    uppy.value.on("upload-success", (_, response: SuccessResponse) => {
+      emit("uploaded", response);
+    });
 
-uppy.value.on("upload-error", (file, _, response) => {
-  emit("error", file, response);
+    uppy.value.on("upload-error", (file, _, response) => {
+      emit("error", file, response);
+    });
+  }
 });
 
 onUnmounted(() => {

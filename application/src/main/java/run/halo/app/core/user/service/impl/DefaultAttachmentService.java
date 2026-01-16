@@ -26,7 +26,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
-import run.halo.app.core.attachment.thumbnail.ThumbnailUtils;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
@@ -144,10 +143,7 @@ public class DefaultAttachmentService implements AttachmentService {
 
     @Override
     public Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment) {
-        var mediaType = MediaType.parseMediaType(attachment.getSpec().getMediaType());
-        if (!ThumbnailUtils.isSupportedImage(mediaType)) {
-            return Mono.just(Map.of());
-        }
+
         return client.get(Policy.class, attachment.getSpec().getPolicyName())
             .zipWhen(policy -> client.get(ConfigMap.class, policy.getSpec().getConfigMapName()))
             .flatMap(tuple2 -> {

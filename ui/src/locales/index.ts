@@ -11,30 +11,31 @@ interface LocaleConfig {
 export const SUPPORTED_LOCALES: LocaleConfig[] = [
   {
     code: ["en"],
-    file: "en.yaml",
+    file: "en.json",
   },
   {
     code: ["es"],
-    file: "es.yaml",
+    file: "es.json",
   },
   {
     code: ["zh-CN", "zh"],
-    file: "zh-CN.yaml",
+    file: "zh-CN.json",
   },
   {
     code: ["zh-TW"],
-    file: "zh-TW.yaml",
+    file: "zh-TW.json",
   },
 ];
 
 const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
-  ["./*.yaml", "!**/_missing_translations_*.yaml"],
+  ["./*.json", "!**/_missing_translations_*.json"],
   { eager: false }
 );
 
 const i18n = createI18n({
   legacy: false,
   fallbackLocale: "en",
+  messages: {},
 });
 
 export function getEnvironmentLanguage(): string {
@@ -71,18 +72,16 @@ export async function setLanguage(_language?: string): Promise<void> {
         i18n.global.setLocaleMessage(language, messages.default || messages);
       } catch (error) {
         console.error(`Failed to load locale file for ${language}:`, error);
-        await loadFallbackLocale();
-        return;
       }
     } else {
       console.warn(`Locale not found for ${language}, using fallback`);
-      await loadFallbackLocale();
-      return;
     }
   }
 
   i18n.global.locale.value = language;
   utils.date.setLocale(language);
+
+  await loadFallbackLocale();
 }
 
 async function loadFallbackLocale(): Promise<void> {
@@ -105,8 +104,6 @@ async function loadFallbackLocale(): Promise<void> {
       }
     }
   }
-
-  i18n.global.locale.value = fallback;
 }
 
 export function setupI18n(app: App): void {

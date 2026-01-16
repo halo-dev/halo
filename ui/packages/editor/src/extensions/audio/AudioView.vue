@@ -3,12 +3,16 @@ import { EditorLinkObtain } from "@/components";
 import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
-import type { NodeViewProps } from "@/tiptap";
-import { NodeViewWrapper } from "@/tiptap";
+import {
+  findParentNodeClosestToPos,
+  NodeViewWrapper,
+  type NodeViewProps,
+} from "@/tiptap";
 import { VButton } from "@halo-dev/components";
 import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import MingcuteMusic2Line from "~icons/mingcute/music-2-line";
+import { ExtensionFigure } from "../figure";
 
 const props = defineProps<NodeViewProps>();
 
@@ -33,8 +37,23 @@ const initialization = computed(() => {
   return !src.value;
 });
 
-const position = computed(() => {
-  return props.node?.attrs.position || "left";
+// Get the align items of the audio from the figure parent
+const alignItems = computed(() => {
+  const pos = props.getPos();
+  if (!pos) {
+    return "start";
+  }
+  const $pos = props.editor.state.doc.resolve(pos);
+  const figureParent = findParentNodeClosestToPos(
+    $pos,
+    (node) => node.type.name === ExtensionFigure.name
+  );
+
+  if (figureParent) {
+    return figureParent.node.attrs.alignItems;
+  }
+
+  return "start";
 });
 
 const editorLinkObtain = ref();
@@ -78,9 +97,7 @@ const isPercentageWidth = computed(() => {
     as="div"
     class="flex w-full"
     :class="{
-      'justify-start': position === 'left',
-      'justify-center': position === 'center',
-      'justify-end': position === 'right',
+      [`justify-${alignItems}`]: true,
     }"
   >
     <div

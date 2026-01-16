@@ -4,6 +4,7 @@ import static run.halo.app.plugin.PluginConst.PLUGIN_NAME_LABEL_NAME;
 import static run.halo.app.plugin.PluginExtensionLoaderUtils.isSetting;
 import static run.halo.app.plugin.PluginExtensionLoaderUtils.lookupExtensions;
 
+import java.time.Duration;
 import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -24,7 +25,9 @@ import run.halo.app.plugin.event.HaloPluginStartedEvent;
  */
 @Slf4j
 @Component
-public class PluginStartedListener {
+class PluginStartedListener {
+
+    private static final Duration TIMEOUT = Duration.ofMinutes(1);
 
     private final ReactiveExtensionClient client;
 
@@ -44,19 +47,19 @@ public class PluginStartedListener {
     }
 
     @EventListener
-    public Mono<Void> onApplicationEvent(HaloPluginStartedEvent event) {
+    void onApplicationEvent(HaloPluginStartedEvent event) {
         var pluginWrapper = event.getPlugin();
         var p = pluginWrapper.getPlugin();
         if (!(p instanceof SpringPlugin springPlugin)) {
-            return Mono.empty();
+            return;
         }
         var applicationContext = springPlugin.getApplicationContext();
         if (!(applicationContext instanceof PluginApplicationContext pluginApplicationContext)) {
-            return Mono.empty();
+            return;
         }
         var pluginName = pluginWrapper.getPluginId();
 
-        return client.get(Plugin.class, pluginName)
+        client.get(Plugin.class, pluginName)
             .flatMap(plugin -> Flux.fromStream(
                     () -> {
                         log.debug("Collecting extensions for plugin {}", pluginName);
@@ -80,6 +83,8 @@ public class PluginStartedListener {
                     labels.put(PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
                 })
                 .flatMap(this::createOrUpdate)
-                .then());
+                .then()
+            )
+            .block(TIMEOUT);
     }
 }

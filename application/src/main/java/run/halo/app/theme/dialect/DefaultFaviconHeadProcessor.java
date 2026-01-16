@@ -8,7 +8,7 @@ import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 
 /**
@@ -21,7 +21,7 @@ import run.halo.app.infra.SystemSetting;
 @AllArgsConstructor
 public class DefaultFaviconHeadProcessor implements TemplateHeadProcessor {
 
-    private final SystemConfigurableEnvironmentFetcher fetcher;
+    private final SystemConfigFetcher fetcher;
 
     @Override
     public Mono<Void> process(ITemplateContext context, IModel model,

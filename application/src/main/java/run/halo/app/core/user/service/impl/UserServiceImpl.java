@@ -14,10 +14,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.session.ReactiveSessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -45,7 +47,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.extension.router.selector.FieldSelector;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.DuplicateNameException;
@@ -58,6 +60,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
 import run.halo.app.security.device.DeviceService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -66,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -80,6 +83,8 @@ public class UserServiceImpl implements UserService {
 
     private final ReactiveTransactionManager transactionManager;
 
+    private final ReactiveSessionRegistry sessionRegistry;
+
     private Clock clock = Clock.systemUTC();
 
     void setClock(Clock clock) {
@@ -90,6 +95,15 @@ public class UserServiceImpl implements UserService {
     public Mono<User> getUser(String username) {
         return client.get(User.class, username)
             .onErrorMap(ExtensionNotFoundException.class, e -> new UserNotFoundException(username));
+    }
+
+    @Override
+    public Mono<User> findUserByVerifiedEmail(String email) {
+        var listOptions = ListOptions.builder()
+            .andQuery(equal("spec.emailVerified", true))
+            .andQuery(equal("spec.email", email.toLowerCase()))
+            .build();
+        return client.listAll(User.class, listOptions, defaultSort()).next();
     }
 
     @Override
@@ -154,47 +168,84 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> grantRoles(String username, Set<String> roles) {
-        return client.get(User.class, username)
-            .flatMap(user -> {
-                var bindingsToUpdate = new HashSet<RoleBinding>();
-                var bindingsToDelete = new HashSet<RoleBinding>();
-                var existingRoles = new HashSet<String>();
-                var subject = new RoleBinding.Subject();
-                subject.setKind(User.KIND);
-                subject.setApiGroup(User.GROUP);
-                subject.setName(username);
-                return roleService.listRoleBindings(subject)
-                    .doOnNext(binding -> {
-                        var roleName = binding.getRoleRef().getName();
-                        if (roles.contains(roleName)) {
-                            existingRoles.add(roleName);
-                            return;
-                        }
-                        binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
-                        if (CollectionUtils.isEmpty(binding.getSubjects())) {
-                            // remove it if subjects is empty
-                            bindingsToDelete.add(binding);
-                        } else {
-                            bindingsToUpdate.add(binding);
-                        }
+        var bindingsToUpdate = new HashSet<RoleBinding>();
+        var bindingsToDelete = new HashSet<RoleBinding>();
+        var existingRoles = new HashSet<String>();
+        var subject = new RoleBinding.Subject();
+        subject.setKind(User.KIND);
+        subject.setApiGroup(User.GROUP);
+        subject.setName(username);
+        var tx = TransactionalOperator.create(transactionManager);
+        return roleService.listRoleBindings(subject)
+            .doOnNext(binding -> {
+                var roleName = binding.getRoleRef().getName();
+                if (roles.contains(roleName)) {
+                    existingRoles.add(roleName);
+                    return;
+                }
+                binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
+                if (CollectionUtils.isEmpty(binding.getSubjects())) {
+                    // remove it if subjects is empty
+                    bindingsToDelete.add(binding);
+                } else {
+                    bindingsToUpdate.add(binding);
+                }
+            })
+            .then(Mono.defer(() -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("""
+                            Updating roles for user {}: existingRoles={}, roles={}, \
+                            bindingsToUpdate={}, bindingsToDelete={}""",
+                        username, existingRoles, roles, bindingsToUpdate, bindingsToDelete
+                    );
+                }
+                var updateBindings = Flux.fromIterable(bindingsToUpdate)
+                    .flatMap(client::update)
+                    .then();
+                var deleteBindings = Flux.fromIterable(bindingsToDelete)
+                    .flatMap(client::delete)
+                    .then();
+                var createBindings = Flux.fromIterable(roles)
+                    .filter(role -> !existingRoles.contains(role))
+                    .filter(StringUtils::hasText)
+                    .map(role -> RoleBinding.create(username, role))
+                    .flatMap(client::create);
+                return Mono.when(updateBindings, deleteBindings, createBindings);
+            }))
+            .as(tx::transactional)
+            .then(Mono.defer(() -> {
+                if (Objects.equals(roles, existingRoles)) {
+                    // No need to update the user if roles are not changed
+                    log.debug("No role changes for user {}, skip updating user annotations.",
+                        username);
+                    return Mono.empty();
+                }
+                log.info("Updated roles for user {}: existingRoles={}, roles={}",
+                    username, existingRoles, roles
+                );
+                var invalidateSessions = sessionRegistry.getAllSessions(username)
+                    .flatMap(reactiveSessionInformation -> {
+                        log.info("Invalidating session {} for user {}",
+                            reactiveSessionInformation.getSessionId(), username
+                        );
+                        return reactiveSessionInformation.invalidate();
                     })
-                    .thenMany(Flux.fromIterable(bindingsToUpdate).flatMap(client::update))
-                    .thenMany(Flux.fromIterable(bindingsToDelete).flatMap(client::delete))
-                    .thenMany(Flux.fromStream(() -> {
-                        var mutableRoles = new HashSet<>(roles);
-                        mutableRoles.removeAll(existingRoles);
-                        return mutableRoles.stream()
-                            .filter(StringUtils::hasText)
-                            .map(roleName -> RoleBinding.create(username, roleName));
-                    }).flatMap(client::create))
-                    .then(Mono.defer(() -> {
-                        var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
-                            .orElseGet(HashMap::new);
-                        user.getMetadata().setAnnotations(annotations);
+                    .then();
+                var updateUser = client.get(User.class, username)
+                    .doOnNext(u -> {
+                        var annotations = u.getMetadata().getAnnotations();
+                        if (annotations == null) {
+                            annotations = new HashMap<>();
+                            u.getMetadata().setAnnotations(annotations);
+                        }
                         annotations.put(User.REQUEST_TO_UPDATE, clock.instant().toString());
-                        return client.update(user);
-                    }));
-            });
+                    })
+                    .flatMap(client::update)
+                    .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    );
+                return invalidateSessions.then(updateUser);
+            }));
     }
 
     @Override
@@ -220,6 +271,9 @@ public class UserServiceImpl implements UserService {
                 "The default role is not configured by the administrator."
             )))
             .flatMap(setting -> {
+                var email = Optional.ofNullable(signUpData.getEmail())
+                    .map(String::toLowerCase)
+                    .orElse(null);
                 var user = new User();
                 user.setMetadata(new Metadata());
                 var metadata = user.getMetadata();
@@ -229,23 +283,23 @@ public class UserServiceImpl implements UserService {
                 spec.setPassword(passwordEncoder.encode(signUpData.getPassword()));
                 spec.setEmailVerified(false);
                 spec.setRegisteredAt(clock.instant());
-                spec.setEmail(signUpData.getEmail());
+                spec.setEmail(email);
                 spec.setDisplayName(signUpData.getDisplayName());
                 Mono<Void> verifyEmail = Mono.empty();
                 if (setting.isMustVerifyEmailOnRegistration()) {
-                    if (!StringUtils.hasText(signUpData.getEmailCode())) {
+                    if (!StringUtils.hasText(email)) {
                         return Mono.error(
                             new EmailVerificationFailed("Email captcha is required", null)
                         );
                     }
                     verifyEmail = emailVerificationService.verifyRegisterVerificationCode(
-                            signUpData.getEmail(), signUpData.getEmailCode()
+                            email, signUpData.getEmailCode()
                         )
                         .filter(Boolean::booleanValue)
                         .switchIfEmpty(Mono.error(() ->
                             new EmailVerificationFailed("Invalid email captcha.", null)
                         ))
-                        .then(this.checkEmailAlreadyVerified(signUpData.getEmail()))
+                        .then(this.checkEmailAlreadyVerified(email))
                         .filter(has -> !has)
                         .switchIfEmpty(Mono.error(
                             () -> new EmailAlreadyTakenException("Email is already taken")
@@ -285,11 +339,7 @@ public class UserServiceImpl implements UserService {
             .then(extensionGetter.getExtensions(UserPreCreatingHandler.class)
                 .concatMap(handler -> handler.preCreating(user))
                 .then(Mono.defer(() -> client.create(user)
-                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                            .filter(OptimisticLockingFailureException.class::isInstance)
-                        )
-                    )
+                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames))
                 ))
                 .flatMap(createdUser -> extensionGetter.getExtensions(UserPostCreatingHandler.class)
                     .concatMap(handler -> handler.postCreating(createdUser))
@@ -318,7 +368,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Flux<User> listByEmail(String email) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email)));
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.email", email.toLowerCase())));
         return client.listAll(User.class, listOptions, defaultSort());
     }
 

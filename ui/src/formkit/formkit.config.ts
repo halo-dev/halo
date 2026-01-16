@@ -3,8 +3,10 @@ import { en, zh } from "@formkit/i18n";
 import { group as nativeGroup, select as nativeSelect } from "@formkit/inputs";
 import { generateClasses } from "@formkit/themes";
 import type { DefaultConfigOptions } from "@formkit/vue";
+import { array } from "./inputs/array";
 import { attachment } from "./inputs/attachment";
 import { attachmentGroupSelect } from "./inputs/attachment-group-select";
+import { attachmentInput } from "./inputs/attachment-input";
 import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { categorySelect } from "./inputs/category-select";
@@ -25,8 +27,10 @@ import { roleSelect } from "./inputs/role-select";
 import { secret } from "./inputs/secret";
 import { select } from "./inputs/select";
 import { singlePageSelect } from "./inputs/singlePage-select";
+import { switchInput } from "./inputs/switch";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { tagSelect } from "./inputs/tag-select";
+import { toggle } from "./inputs/toggle";
 import { userSelect } from "./inputs/user-select";
 import { verificationForm } from "./inputs/verify-form";
 import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
@@ -49,7 +53,7 @@ const config: DefaultConfigOptions = {
     createAutoHeightTextareaPlugin(),
   ],
   inputs: {
-    attachment,
+    attachmentInput,
     attachmentGroupSelect,
     attachmentPolicySelect,
     categoryCheckbox,
@@ -75,8 +79,12 @@ const config: DefaultConfigOptions = {
     userSelect,
     nativeSelect,
     select,
+    array,
     color,
     iconify,
+    attachment,
+    switch: switchInput,
+    toggle,
   },
   locales: { zh, en },
   locale: "zh",

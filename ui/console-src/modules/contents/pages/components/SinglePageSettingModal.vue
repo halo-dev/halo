@@ -326,14 +326,14 @@ async function slugUniqueValidation(node: FormKitNode) {
               :label="$t('core.page.settings.fields.title.label')"
               type="text"
               name="title"
-              validation="required|length:0,100"
+              validation="required|length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
               :label="$t('core.page.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100|slugUniqueValidation"
+              validation="required|length:0,1024|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -374,6 +374,16 @@ async function slugUniqueValidation(node: FormKitNode) {
               validation="length:0,1024"
               auto-height
               :max-auto-height="200"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              :label="$t('core.page.settings.fields.cover.label')"
+              type="attachment"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :accepts="['image/*']"
+              validation="length:0,1024"
             ></FormKit>
           </div>
         </div>
@@ -431,14 +441,6 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="select"
               name="template"
             ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              :label="$t('core.page.settings.fields.cover.label')"
-              type="attachment"
-              name="cover"
-              :accepts="['image/*']"
-              validation="length:0,1024"
-            ></FormKit>
           </div>
         </div>
       </div>
@@ -460,6 +462,7 @@ async function slugUniqueValidation(node: FormKitNode) {
         <AnnotationsForm
           :key="formState.metadata.name"
           ref="annotationsFormRef"
+          :form-data="formState"
           :value="formState.metadata.annotations"
           kind="SinglePage"
           group="content.halo.run"

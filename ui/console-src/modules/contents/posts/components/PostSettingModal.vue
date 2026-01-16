@@ -340,14 +340,14 @@ const showCancelPublishButton = computed(() => {
               :label="$t('core.post.settings.fields.title.label')"
               type="text"
               name="title"
-              validation="required|length:0,100"
+              validation="required|length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
               :label="$t('core.post.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100|slugUniqueValidation"
+              validation="required|length:0,1024|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -401,6 +401,16 @@ const showCancelPublishButton = computed(() => {
               type="textarea"
               auto-height
               :max-auto-height="200"
+              validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :label="$t('core.post.settings.fields.cover.label')"
+              type="attachment"
+              :accepts="['image/*']"
               validation="length:0,1024"
             ></FormKit>
           </div>
@@ -463,14 +473,6 @@ const showCancelPublishButton = computed(() => {
               name="template"
               type="select"
             ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              name="cover"
-              :label="$t('core.post.settings.fields.cover.label')"
-              type="attachment"
-              :accepts="['image/*']"
-              validation="length:0,1024"
-            ></FormKit>
           </div>
         </div>
       </div>
@@ -494,6 +496,7 @@ const showCancelPublishButton = computed(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="Post"
+          :form-data="formState"
           group="content.halo.run"
         />
       </div>

@@ -6,4 +6,4 @@ spring:
   sql:
     init:
       mode: always
-      platform: mysql
+      platform: mariadb

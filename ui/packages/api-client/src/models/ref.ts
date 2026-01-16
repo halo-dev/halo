@@ -21,11 +21,11 @@ export interface Ref {
     /**
      * Extension group
      */
-    'group'?: string;
+    'group': string;
     /**
      * Extension kind
      */
-    'kind'?: string;
+    'kind': string;
     /**
      * Extension name. This field is mandatory
      */

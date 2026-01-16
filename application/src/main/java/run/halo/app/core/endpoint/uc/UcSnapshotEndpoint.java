@@ -66,9 +66,8 @@ public class UcSnapshotEndpoint implements CustomEndpoint {
                             )
                             .response(responseBuilder().implementation(Snapshot.class))
                             .tag(tag))
-                    .build(),
-                builder -> {
-                })
+                    .build()
+            )
             .build();
     }
 

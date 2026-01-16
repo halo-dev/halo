@@ -2,7 +2,7 @@ package run.halo.app.infra.actuator;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
@@ -12,12 +12,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import run.halo.app.Application;
 
 @WebEndpoint(id = "restart")
 @Component
 @Slf4j
-public class RestartEndpoint implements ApplicationListener<ApplicationStartedEvent> {
+class RestartEndpoint implements ApplicationListener<ApplicationStartedEvent> {
 
     private SpringApplication application;
 
@@ -26,13 +27,15 @@ public class RestartEndpoint implements ApplicationListener<ApplicationStartedEv
     private ConfigurableApplicationContext context;
 
     @WriteOperation
-    public Object restart() {
-        var threadGroup = new ThreadGroup("RestartGroup");
-        var thread = new Thread(threadGroup, this::doRestart, "restartMain");
-        thread.setDaemon(false);
-        thread.setContextClassLoader(Application.class.getClassLoader());
-        thread.start();
-        return Collections.singletonMap("message", "Restarting");
+    public Mono<Map<String, String>> restart() {
+        return Mono.fromSupplier(() -> {
+            var threadGroup = new ThreadGroup("RestartGroup");
+            var thread = new Thread(threadGroup, this::doRestart, "restartMain");
+            thread.setDaemon(false);
+            thread.setContextClassLoader(Application.class.getClassLoader());
+            thread.start();
+            return Map.of("message", "Restarting");
+        });
     }
 
     private synchronized void doRestart() {

@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import QueryString from "qs";
 import {
   AnnotationSettingV1alpha1Api,
+  AnnotationSettingV1AlphaUcApi,
   AttachmentV1alpha1Api,
   AttachmentV1alpha1ConsoleApi,
   AttachmentV1alpha1UcApi,
@@ -9,6 +10,7 @@ import {
   AuthProviderV1alpha1ConsoleApi,
   BackupV1alpha1Api,
   CategoryV1alpha1Api,
+  CategoryV1alpha1PublicApi,
   CommentV1alpha1Api,
   CommentV1alpha1ConsoleApi,
   CommentV1alpha1PublicApi,
@@ -18,6 +20,7 @@ import {
   ExtensionDefinitionV1alpha1Api,
   ExtensionPointDefinitionV1alpha1Api,
   GroupV1alpha1Api,
+  IndexV1alpha1PublicApi,
   IndicesV1alpha1ConsoleApi,
   LocalThumbnailV1alpha1Api,
   MenuItemV1alpha1Api,
@@ -53,6 +56,7 @@ import {
   SettingV1alpha1Api,
   SinglePageV1alpha1Api,
   SinglePageV1alpha1ConsoleApi,
+  SinglePageV1alpha1PublicApi,
   SnapshotV1alpha1Api,
   SnapshotV1alpha1UcApi,
   SubscriptionV1alpha1Api,
@@ -61,6 +65,7 @@ import {
   SystemV1alpha1PublicApi,
   TagV1alpha1Api,
   TagV1alpha1ConsoleApi,
+  TagV1alpha1PublicApi,
   ThemeV1alpha1Api,
   ThemeV1alpha1ConsoleApi,
   ThumbnailV1alpha1Api,
@@ -404,6 +409,13 @@ function createUcApiClient(axiosInstance: AxiosInstance) {
         axiosInstance
       ),
     },
+    core: {
+      annotationSetting: new AnnotationSettingV1AlphaUcApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+    },
   };
 }
 
@@ -442,9 +454,24 @@ function createPublicApiClient(axiosInstance: AxiosInstance) {
     menu: new MenuV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     stats: new SystemV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     content: {
+      category: new CategoryV1alpha1PublicApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
+      tag: new TagV1alpha1PublicApi(undefined, baseURL, axiosInstance),
+      singlePage: new SinglePageV1alpha1PublicApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
       post: new PostV1alpha1PublicApi(undefined, baseURL, axiosInstance),
+      /**
+       * @deprecated Use comment instead
+       */
       comment: new CommentV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     },
+    comment: new CommentV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     metrics: {
       metrics: new MetricsV1alpha1PublicApi(undefined, baseURL, axiosInstance),
     },
@@ -453,6 +480,7 @@ function createPublicApiClient(axiosInstance: AxiosInstance) {
       baseURL,
       axiosInstance
     ),
+    index: new IndexV1alpha1PublicApi(undefined, baseURL, axiosInstance),
   };
 }
 

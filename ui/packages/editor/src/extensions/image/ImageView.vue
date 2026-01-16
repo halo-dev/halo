@@ -3,11 +3,16 @@ import { EditorLinkObtain } from "@/components";
 import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
 import { i18n } from "@/locales";
-import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
+import {
+  findParentNodeClosestToPos,
+  NodeViewWrapper,
+  type NodeViewProps,
+} from "@/tiptap";
 import { fileToBase64 } from "@/utils/upload";
 import { IconImageAddLine, VButton } from "@halo-dev/components";
 import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { ExtensionFigure } from "../figure";
 import { ExtensionImage } from "./index";
 
 const props = defineProps<NodeViewProps>();
@@ -41,8 +46,23 @@ const href = computed({
   },
 });
 
-const position = computed(() => {
-  return props.node?.attrs.position || "left";
+// Get the align items of the image from the figure parent
+const alignItems = computed(() => {
+  const pos = props.getPos();
+  if (!pos) {
+    return "start";
+  }
+  const $pos = props.editor.state.doc.resolve(pos);
+  const figureParent = findParentNodeClosestToPos(
+    $pos,
+    (node) => node.type.name === ExtensionFigure.name
+  );
+
+  if (figureParent) {
+    return figureParent.node.attrs.alignItems;
+  }
+
+  return "start";
 });
 
 const fileBase64 = ref<string>();
@@ -91,7 +111,6 @@ const resetUpload = () => {
   if (file) {
     props.updateAttributes({
       width: undefined,
-      height: undefined,
       file: undefined,
     });
   }
@@ -116,7 +135,6 @@ function onImageLoaded(event: Event) {
       .chain()
       .updateAttributes(ExtensionImage.name, {
         width: `${target.naturalWidth}px`,
-        height: `${target.naturalHeight}px`,
       })
       .updateFigureContainerWidth(`${target.naturalWidth}px`)
       .setNodeSelection(props.getPos() || 0)
@@ -184,14 +202,9 @@ function setupResizeListener() {
       );
 
       const width = newWidth.toFixed(0) + "px";
-      const height =
-        aspectRatio.value > 0
-          ? (newWidth / aspectRatio.value).toFixed(0) + "px"
-          : "auto";
-
       props.editor
         .chain()
-        .updateAttributes(ExtensionImage.name, { width, height })
+        .updateAttributes(ExtensionImage.name, { width })
         .updateFigureContainerWidth(width)
         .setNodeSelection(props.getPos() || 0)
         .focus()
@@ -273,9 +286,7 @@ const isPercentageWidth = computed(() => {
     as="div"
     class="flex w-full"
     :class="{
-      'justify-start': position === 'left',
-      'justify-center': position === 'center',
-      'justify-end': position === 'right',
+      [`justify-${alignItems}`]: true,
     }"
   >
     <div
@@ -296,6 +307,11 @@ const isPercentageWidth = computed(() => {
           :alt="alt"
           :href="href"
           :width="isPercentageWidth ? '100%' : node.attrs.width"
+          :height="node.attrs.height"
+          :style="{
+            width: isPercentageWidth ? '100%' : node.attrs.width,
+            height: node.attrs.height,
+          }"
           class="max-w-full rounded-md"
           @load="onImageLoaded"
         />

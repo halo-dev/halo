@@ -58,9 +58,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         return SpringdocRouteBuilder.route()
-            .nest(RequestPredicates.path("/userspaces/{username}"), userspaceScopedApis(),
-                builder -> {
-                })
+            .nest(RequestPredicates.path("/userspaces/{username}"), userspaceScopedApis())
             .build();
     }
 

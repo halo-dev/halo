@@ -139,7 +139,7 @@ interface MenuItemRef {
   ref?: Ref;
 }
 
-const baseRef: Ref = {
+const baseRef: Omit<Ref, "kind"> = {
   group: "content.halo.run",
   version: "v1alpha1",
   name: "",
@@ -369,6 +369,7 @@ onMounted(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="MenuItem"
+          :form-data="formState"
           group=""
         />
       </div>

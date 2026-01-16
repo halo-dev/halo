@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuVo;
@@ -32,7 +32,7 @@ import run.halo.app.theme.finders.vo.MenuVo;
 public class MenuQueryEndpoint implements CustomEndpoint {
 
     private final MenuFinder menuFinder;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {

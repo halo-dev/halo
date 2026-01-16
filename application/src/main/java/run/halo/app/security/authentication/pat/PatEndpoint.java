@@ -87,8 +87,8 @@ class PatEndpoint implements CustomEndpoint {
                                 .required(true)
                                 .name("name")
                             ))
-                    .build(),
-                builder -> builder.description("User-scoped PersonalAccessToken endpoint"))
+                    .build()
+            )
             .build();
     }
 

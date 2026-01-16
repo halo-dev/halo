@@ -45,7 +45,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
@@ -73,7 +73,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final TemplateEngineManager templateEngineManager;
 
-    private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
+    private final SystemConfigFetcher systemEnvironmentFetcher;
 
     private final ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 
@@ -320,8 +320,7 @@ public class ThemeEndpoint implements CustomEndpoint {
         final var activatedThemeName = request.pathVariable("name");
         return client.fetch(Theme.class, activatedThemeName)
             .switchIfEmpty(Mono.error(new NotFoundException("Theme not found.")))
-            .flatMap(theme -> systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP,
-                    SystemSetting.Theme.class)
+            .flatMap(theme -> themeService.fetchSystemSetting()
                 .flatMap(themeSetting -> {
                     // update active theme config
                     themeSetting.setActive(activatedThemeName);
@@ -344,10 +343,11 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fetchActivatedTheme(ServerRequest request) {
-        return systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
-            .map(SystemSetting.Theme::getActive)
-            .flatMap(activatedName -> client.fetch(Theme.class, activatedName))
-            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+        var activatedTheme = themeService.fetchActivatedTheme()
+            .switchIfEmpty(
+                Mono.error(() -> new NotFoundException("Activated theme not found or not set"))
+            );
+        return ServerResponse.ok().body(activatedTheme, Theme.class);
     }
 
     private Mono<ServerResponse> fetchThemeSetting(ServerRequest request) {
@@ -360,16 +360,14 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private Mono<String> themeNameInPathVariableOrActivated(ServerRequest request) {
         Assert.notNull(request, "request must not be null.");
-        return Mono.fromSupplier(() -> request.pathVariable("name"))
-            .flatMap(name -> {
-                if ("-".equals(name)) {
-                    return systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP,
-                            SystemSetting.Theme.class)
-                        .mapNotNull(SystemSetting.Theme::getActive)
-                        .defaultIfEmpty(name);
-                }
-                return Mono.just(name);
-            });
+        var themeName = request.pathVariable("name");
+        if ("-".equals(themeName)) {
+            return themeService.fetchActivatedThemeName()
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                    "No activated theme found, unable to proceed the request."
+                )));
+        }
+        return Mono.just(themeName);
     }
 
     public static class ThemeQuery extends IListRequest.QueryListRequest {

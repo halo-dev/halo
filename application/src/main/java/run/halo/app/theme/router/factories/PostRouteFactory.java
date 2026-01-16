@@ -71,8 +71,7 @@ public class PostRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
-        PatternParser postParamPredicate =
-            new PatternParser(pattern);
+        var postParamPredicate = new PatternParser(pattern);
         if (postParamPredicate.isQueryParamPattern()) {
             RequestPredicate requestPredicate = postParamPredicate.toRequestPredicate();
             return RouterFunctions.route(GET("/")

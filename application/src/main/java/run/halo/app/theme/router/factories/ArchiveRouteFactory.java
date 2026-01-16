@@ -19,7 +19,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
@@ -44,7 +44,7 @@ public class ArchiveRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 

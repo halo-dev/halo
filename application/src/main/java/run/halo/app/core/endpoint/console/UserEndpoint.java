@@ -84,8 +84,9 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.SortableRequest;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.Attachment.UploadOptions;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
@@ -105,7 +106,7 @@ public class UserEndpoint implements CustomEndpoint {
     private final AttachmentService attachmentService;
     private final EmailVerificationService emailVerificationService;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final Validator validator;
 
     @Override
@@ -399,26 +400,28 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<Attachment> uploadAvatar(AvatarUploadRequest uploadRequest) {
-        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalStateException("User setting is not configured"))
+        var fallbackSetting =
+            environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                .mapNotNull(SystemSetting.User::getAvatarPolicy)
+                .filter(StringUtils::isNotBlank);
+        var getAvatarPolicy = environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
             )
-            .flatMap(userSetting -> Mono.defer(
-                () -> {
-                    String avatarPolicy = userSetting.getAvatarPolicy();
-                    if (StringUtils.isBlank(avatarPolicy)) {
-                        avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
-                    }
-                    FilePart filePart = uploadRequest.getFile();
-                    var ext = Files.getFileExtension(filePart.filename());
-                    return attachmentService.upload(avatarPolicy,
-                        USER_AVATAR_GROUP_NAME,
-                        UUID.randomUUID() + "." + ext,
-                        maxSizeCheck(filePart.content()),
-                        filePart.headers().getContentType()
-                    );
-                })
+            .mapNotNull(SystemSetting.Attachment::avatar)
+            .mapNotNull(UploadOptions::policyName)
+            .filter(StringUtils::isNotBlank)
+            .switchIfEmpty(fallbackSetting)
+            .defaultIfEmpty(DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME);
+        return getAvatarPolicy.flatMap(avatarPolicy -> {
+            FilePart filePart = uploadRequest.getFile();
+            var ext = Files.getFileExtension(filePart.filename());
+            return attachmentService.upload(avatarPolicy,
+                USER_AVATAR_GROUP_NAME,
+                UUID.randomUUID() + "." + ext,
+                maxSizeCheck(filePart.content()),
+                filePart.headers().getContentType()
             );
+        });
     }
 
     private Flux<DataBuffer> maxSizeCheck(Flux<DataBuffer> content) {

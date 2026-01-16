@@ -9,6 +9,7 @@ import {
   mergeAttributes,
   Plugin,
   PluginKey,
+  PMNode,
   TextSelection,
   VueNodeViewRenderer,
   type Editor,
@@ -105,20 +106,6 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
           };
         },
       },
-      position: {
-        default: "left",
-        parseHTML: (element) => {
-          return (
-            element.getAttribute("data-position") ||
-            element.getAttribute("text-align")
-          );
-        },
-        renderHTML: (attributes) => {
-          return {
-            "data-position": attributes.position,
-          };
-        },
-      },
       file: {
         default: null,
         renderHTML() {
@@ -154,7 +141,15 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
           }
 
           const tr = newState.tr;
-          let modified = false;
+
+          const modifications: Array<{
+            pos: number;
+            node: PMNode;
+            figureNode: PMNode;
+            deletePreviousNode: boolean;
+            previousNodePos: number;
+            previousNodeSize: number;
+          }> = [];
 
           newState.doc.descendants((node, pos) => {
             if (node.type.name !== ExtensionImage.name) {
@@ -166,7 +161,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               return;
             }
 
-            let position = "left";
+            let blockPosition = "start";
             let deletePreviousNode = false;
             let previousNodePos = -1;
             let previousNodeSize = 0;
@@ -177,13 +172,15 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
               previousNode.type.name === ExtensionParagraph.name
             ) {
               if (previousNode.attrs.textAlign) {
-                const positionMap: Record<string, string> = {
-                  left: "left",
+                const textAlignToBlockPositionMap: Record<string, string> = {
+                  left: "start",
                   center: "center",
-                  right: "right",
+                  right: "end",
                   justify: "center",
                 };
-                position = positionMap[previousNode.attrs.textAlign] || "left";
+                blockPosition =
+                  textAlignToBlockPositionMap[previousNode.attrs.textAlign] ??
+                  "start";
               }
               if (previousNode.textContent?.trim().length === 0) {
                 deletePreviousNode = true;
@@ -195,26 +192,42 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
             const figureNode = newState.schema.nodes.figure.create(
               {
                 contentType: "image",
-                position,
+                alignItems: blockPosition,
               },
               [node]
             );
 
-            if (deletePreviousNode) {
-              tr.delete(previousNodePos, previousNodePos + previousNodeSize);
-              tr.replaceRangeWith(
-                pos - previousNodeSize,
-                pos - previousNodeSize + node.nodeSize,
-                figureNode
-              );
-            } else {
-              tr.replaceRangeWith(pos, pos + node.nodeSize, figureNode);
-            }
-
-            modified = true;
+            modifications.push({
+              pos,
+              node,
+              figureNode,
+              deletePreviousNode,
+              previousNodePos,
+              previousNodeSize,
+            });
           });
 
-          return modified ? tr : null;
+          modifications.reverse().forEach((mod) => {
+            if (mod.deletePreviousNode) {
+              tr.delete(
+                mod.previousNodePos,
+                mod.previousNodePos + mod.previousNodeSize
+              );
+              tr.replaceRangeWith(
+                mod.pos - mod.previousNodeSize,
+                mod.pos - mod.previousNodeSize + mod.node.nodeSize,
+                mod.figureNode
+              );
+            } else {
+              tr.replaceRangeWith(
+                mod.pos,
+                mod.pos + mod.node.nodeSize,
+                mod.figureNode
+              );
+            }
+          });
+
+          return modifications.length > 0 ? tr : null;
         },
       }),
     ];

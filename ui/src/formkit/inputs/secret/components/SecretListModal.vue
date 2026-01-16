@@ -27,6 +27,8 @@ const creationModalVisible = ref(false);
     :body-class="['!p-0']"
     :title="$t('core.formkit.secret.list_modal.title')"
     :width="650"
+    mount-to-body
+    layer-closable
     @close="emit('close')"
   >
     <template #actions>

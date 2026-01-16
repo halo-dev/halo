@@ -30,7 +30,7 @@
 如果你的设备有 Docker 环境，可以使用以下命令快速启动一个 Halo 的体验环境：
 
 ```bash
-docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.21
+docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.22
 ```
 
 或者点击下方按钮使用 [Gitpod](https://gitpod.io/) 或 [ClawCloud Run](https://template.us-west-1.run.claw.cloud/deploy?templateName=halo) 启动一个体验环境：
@@ -48,9 +48,9 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
 
-## 专业版
+## 付费版
 
-相比于社区版，Halo 专业版为用户提供了大量增强功能及技术支持服务，增强功能包括短信验证码注册登录、全站私有化、LDAP 登录、三方账号登录及自定义 LOGO 等。 [点击查看专业版详细介绍](https://www.lxware.cn/halo)。
+相比于社区版，Halo 付费版为用户提供了大量增强功能及技术支持服务，增强功能包括商城、短信验证码注册登录、全站私有化、LDAP 登录、三方账号登录及自定义 Logo 等。 [点击查看付费版详细介绍](https://www.lxware.cn/halo)。
 
 ## 生态
 
@@ -61,16 +61,6 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
-
-## 赞助
-
-如果 Halo 对你有帮助，欢迎[赞助我们](https://afdian.com/a/halo-dev)，感谢以下赞助者对 Halo 项目的支持：
-
-<p align="center">
-  <a target="_blank" href="https://afdian.com/a/halo-dev">
-    <img alt="sponsors" src="https://github.com/halo-sigs/sponsor-images/blob/main/sponsorkit/sponsors.svg?raw=true">
-  </a>
-</p>
 
 ## 贡献
 

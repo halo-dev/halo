@@ -92,7 +92,6 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
 
         int offset = (page.getPageNumber() - 1) * page.getPageSize();
         int limit = page.getPageSize();
-
         if (limit <= 0) {
             // return all results for backward compatibility
             var finalResult = result.stream().sorted(comparator).toList();
@@ -100,10 +99,13 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
                 page.getPageNumber(), page.getPageSize(), total, finalResult
             );
         }
-        if (offset > total) {
+        if (offset >= total) {
             return new ListResult<>(
                 page.getPageNumber(), page.getPageSize(), total, new LinkedList<>()
             );
+        }
+        if (offset + limit > total) {
+            limit = total - offset;
         }
         var n = offset + limit;
         if (n > 1000) {

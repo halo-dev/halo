@@ -91,9 +91,14 @@ const handleConfirm = () => {
 };
 
 const confirmDisabled = computed(() => {
+  if (!selected.value.length) {
+    return true;
+  }
+
   if (props.min === undefined) {
     return false;
   }
+
   return selected.value.length < props.min;
 });
 

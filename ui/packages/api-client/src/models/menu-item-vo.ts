@@ -27,6 +27,7 @@ import type { Metadata } from './metadata';
  * A value object for {@link MenuItem MenuItem}.
  */
 export interface MenuItemVo {
+    'children'?: Array<MenuItemVo>;
     /**
      * Gets menu item\'s display name.
      */

@@ -226,7 +226,7 @@ class PluginServiceImplTest {
         var plugin1 = mock(PluginWrapper.class);
         var plugin2 = mock(PluginWrapper.class);
         var plugin3 = mock(PluginWrapper.class);
-        when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin3));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin3));
 
         var descriptor1 = mock(PluginDescriptor.class);
         var descriptor2 = mock(PluginDescriptor.class);
@@ -259,7 +259,7 @@ class PluginServiceImplTest {
         when(descriptor4.getVersion()).thenReturn("3.0.0");
         var str2 = "fake-1:1.0.0fake-2:2.0.0fake-4:3.0.0";
         var result2 = Hashing.sha256().hashUnencodedChars(str2).toString();
-        when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin4));
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin4));
         pluginService.generateBundleVersion()
             .as(StepVerifier::create)
             .consumeNextWith(version -> assertThat(version).isEqualTo(result2))
@@ -278,7 +278,21 @@ class PluginServiceImplTest {
             .expectNext(String.valueOf(clock.instant().toEpochMilli()))
             .verifyComplete();
 
-        verify(pluginManager, never()).getStartedPlugins();
+        verify(pluginManager, never()).startedPlugins();
+    }
+
+    @Test
+    void shouldGetStartedPluginNames() {
+        var plugin1 = mock(PluginWrapper.class);
+        when(plugin1.getPluginId()).thenReturn("plugin-1");
+        var plugin2 = mock(PluginWrapper.class);
+        when(plugin2.getPluginId()).thenReturn("plugin-2");
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin1, plugin2));
+
+        pluginService.getStartedPluginNames()
+            .as(StepVerifier::create)
+            .expectNext("plugin-1", "plugin-2")
+            .verifyComplete();
     }
 
     @Nested

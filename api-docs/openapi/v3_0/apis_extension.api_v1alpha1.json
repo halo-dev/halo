@@ -12876,12 +12876,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -13223,6 +13223,8 @@
       },
       "Ref": {
         "required": [
+          "group",
+          "kind",
           "name"
         ],
         "type": "object",
@@ -14254,12 +14256,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
