@@ -66,9 +66,11 @@ const keys = computed(() => {
 
 const descriptionText = computed(() => {
   if (keys.value.length > 0) {
-    return `包含 ${keys.value.join(", ")} 字段`;
+    return t("core.formkit.secret.includes_keys", {
+      keys: keys.value.join(", "),
+    });
   }
-  return "没有字段";
+  return t("core.formkit.secret.no_fields");
 });
 </script>
 

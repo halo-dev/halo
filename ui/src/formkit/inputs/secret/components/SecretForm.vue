@@ -62,7 +62,7 @@ function handleAddMissingKeys() {
   <div v-if="missingKeys.length > 0" class="mb-4">
     <VAlert :title="$t('core.common.text.tip')">
       <template #description>
-        当前表单项所需的密钥字段包括：
+        {{ $t("core.formkit.secret.required_keys_tip") }}
         <ul class="mt-2">
           <li v-for="key in requiredKeys" :key="key.key">
             {{ key.key }} : {{ key.description }}
@@ -70,9 +70,9 @@ function handleAddMissingKeys() {
         </ul>
       </template>
       <template #actions>
-        <VButton size="sm" @click="handleAddMissingKeys">{{
-          $t("core.common.buttons.add")
-        }}</VButton>
+        <VButton size="sm" @click="handleAddMissingKeys">
+          {{ $t("core.common.buttons.add") }}
+        </VButton>
       </template>
     </VAlert>
   </div>

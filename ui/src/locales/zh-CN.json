@@ -1053,9 +1053,6 @@
   "core.formkit.verification_form.no_action_defined": "未定义{label}接口",
   "core.formkit.verification_form.verify_success": "{label}成功",
   "core.formkit.verification_form.verify_failed": "{label}失败",
-  "core.formkit.secret.creation_label": "根据输入的文本创建新密钥",
-  "core.formkit.secret.placeholder": "搜索已存在的密钥或者输入内容以创建新的密钥",
-  "core.formkit.secret.required_key_missing_label": "缺少当前选项所需的字段，请选择之后补充完整",
   "core.formkit.secret.creation_modal.title": "创建密钥",
   "core.formkit.secret.edit_modal.title": "编辑密钥",
   "core.formkit.secret.list_modal.title": "选择密钥",
@@ -1226,5 +1223,11 @@
   "core.page_snapshots.status.released": "已发布",
   "core.page_snapshots.status.draft": "草稿",
   "core.page_snapshots.status.base": "基础",
-  "core.page_snapshots.title": "页面版本历史"
+  "core.page_snapshots.title": "页面版本历史",
+  "core.formkit.secret.no_permission": "无权限查看密钥",
+  "core.formkit.secret.no_selected": "当前没有选择密钥，你可以新建或者选择一个已有的密钥",
+  "core.formkit.secret.missing_keys": "所选密钥还缺少字段：{keys}",
+  "core.formkit.secret.includes_keys": "包含字段：{keys}",
+  "core.formkit.secret.no_fields": "没有字段",
+  "core.formkit.secret.required_keys_tip": "当前表单项所需的密钥字段包括："
 }

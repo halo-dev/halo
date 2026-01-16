@@ -75,18 +75,20 @@ const description = computed(() => {
   }
 
   if (!hasPermission) {
-    return "无权限查看密钥";
+    return t("core.formkit.secret.no_permission");
   }
 
   if (!data.value) {
-    return "当前没有选择密钥，你可以新建或者选择一个已有的密钥";
+    return t("core.formkit.secret.no_selected");
   }
 
   if (keys.value.length > 0) {
-    return `包含字段：${keys.value.join(", ")}`;
+    return t("core.formkit.secret.includes_keys", {
+      keys: keys.value.join(", "),
+    });
   }
 
-  return "没有字段";
+  return t("core.formkit.secret.no_fields");
 });
 
 // Select
@@ -192,10 +194,12 @@ const missingKeys = computed(() => {
   >
     <IconInformation />
     <span>
-      所选密钥还缺少字段：{{
-        missingKeys.map((key) => key.key).join(", ")
-      }}</span
-    >
+      {{
+        t("core.formkit.secret.missing_keys", {
+          keys: missingKeys.map((key) => key.key).join(", "),
+        })
+      }}
+    </span>
   </div>
 
   <SecretCreationModal
