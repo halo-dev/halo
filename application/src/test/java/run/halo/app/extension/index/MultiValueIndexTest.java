@@ -256,9 +256,13 @@ class MultiValueIndexTest {
                 var fake3 = createFake("fake3");
                 fake3.setStringValues(Set.of("string3"));
 
+                var fakenull = createFake("fakenull");
+                fakenull.setStringValues(Set.of());
+
                 insert(fake1);
                 insert(fake2);
                 insert(fake3);
+                insert(fakenull);
             }
 
             @Test
@@ -288,7 +292,7 @@ class MultiValueIndexTest {
             @Test
             void allQuery() {
                 var result = index.all();
-                assertEquals(Set.of("fake1", "fake2", "fake3"), result);
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), result);
             }
 
             @Test
@@ -305,8 +309,7 @@ class MultiValueIndexTest {
 
             @Test
             void isNullQuery() {
-                // none of the 3 inserted are null
-                assertTrue(index.isNull().isEmpty());
+                assertEquals(Set.of("fakenull"), index.isNull());
             }
 
             @Test
@@ -599,9 +602,13 @@ class MultiValueIndexTest {
                 var fake3 = createFake("fake3");
                 fake3.setStringValues(Set.of("string3"));
 
+                var fakenull = createFake("fakenull");
+                fakenull.setStringValues(Set.of());
+
                 insert(fake1);
                 insert(fake2);
                 insert(fake3);
+                insert(fakenull);
             }
 
             @Test
@@ -649,13 +656,12 @@ class MultiValueIndexTest {
             @Test
             void allQuery() {
                 var result = index.all();
-                assertEquals(Set.of("fake1", "fake2", "fake3"), result);
+                assertEquals(Set.of("fake1", "fake2", "fake3", "fakenull"), result);
             }
 
             @Test
             void isNullQuery() {
-                // none of the 3 inserted are null
-                assertTrue(index.isNull().isEmpty());
+                assertEquals(Set.of("fakenull"), index.isNull());
             }
 
             @Test
