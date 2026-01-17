@@ -55,18 +55,18 @@ public class IndexRouteFactory implements RouteFactory {
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
-        return request -> {
+        return request -> Mono.deferContextual(contextView -> {
             var posts = new LazyContextVariable<UrlContextListResult<ListedPostVo>>() {
                 @Override
                 protected UrlContextListResult<ListedPostVo> loadValue() {
-                    return postList(request).block(BLOCKING_TIMEOUT);
+                    return postList(request).contextWrite(contextView).block(BLOCKING_TIMEOUT);
                 }
             };
             return ServerResponse.ok().render(DefaultTemplateEnum.INDEX.getValue(), Map.of(
                 "posts", posts,
                 ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue()
             ));
-        };
+        });
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request) {

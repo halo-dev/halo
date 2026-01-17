@@ -85,6 +85,8 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
 
     public static class HaloView extends ThymeleafReactiveView {
 
+        public static final String CONTEXT_VIEW_KEY = "reactorContextView";
+
         @Autowired
         private TemplateEngineManager engineManager;
 
@@ -131,13 +133,16 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
             Mono<Map<String, Object>> contextBasedStaticVariables =
                 getContextBasedStaticVariables(exchange);
             Mono<Map<String, Object>> modelAttributes = super.getModelAttributes(model, exchange);
-            return Flux.merge(modelAttributes, contextBasedStaticVariables)
-                .collectList()
-                .map(modelMapList -> {
-                    Map<String, Object> result = new HashMap<>();
-                    modelMapList.forEach(result::putAll);
-                    return result;
-                });
+            return Mono.deferContextual(
+                contextView -> Flux.merge(modelAttributes, contextBasedStaticVariables)
+                    .collectList()
+                    .map(modelMapList -> {
+                        Map<String, Object> result = new HashMap<>();
+                        modelMapList.forEach(result::putAll);
+                        return result;
+                    })
+                    .doOnNext(attributes -> attributes.put(CONTEXT_VIEW_KEY, contextView))
+            );
         }
 
         @NonNull
