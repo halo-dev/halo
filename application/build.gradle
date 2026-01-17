@@ -109,7 +109,7 @@ dependencies {
     annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe'
 
     // webjars
-    runtimeOnly 'org.webjars.npm:jsencrypt:3.3.2'
+    runtimeOnly 'org.webjars.npm:jsencrypt:3.5.4'
     runtimeOnly 'org.webjars.npm:normalize.css:8.0.1'
 }
 
