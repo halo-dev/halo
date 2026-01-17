@@ -1,11 +1,14 @@
 package run.halo.app.theme;
 
+import static run.halo.app.theme.HaloViewResolver.HaloView.CONTEXT_VIEW_KEY;
+
 import java.util.Optional;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.spring6.expression.SPELVariableExpressionEvaluator;
 import org.thymeleaf.standard.expression.IStandardVariableExpression;
 import org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator;
 import org.thymeleaf.standard.expression.StandardExpressionExecutionContext;
+import reactor.util.context.ContextView;
 import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
@@ -34,8 +37,13 @@ public class ReactiveSpelVariableExpressionEvaluator
     public Object evaluate(IExpressionContext context, IStandardVariableExpression expression,
         StandardExpressionExecutionContext expContext) {
         var returnValue = delegate.evaluate(context, expression, expContext);
+
+        var contextView = (ContextView) Optional.ofNullable(context.getVariable(CONTEXT_VIEW_KEY))
+            .filter(ContextView.class::isInstance)
+            .orElse(null);
+
         return Optional.ofNullable(returnValue)
-            .map(ReactiveUtils::blockReactiveValue)
+            .map(value -> ReactiveUtils.blockReactiveValue(value, contextView))
             .orElse(null);
     }
 }
