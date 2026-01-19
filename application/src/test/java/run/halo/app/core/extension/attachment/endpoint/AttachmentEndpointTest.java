@@ -1,6 +1,8 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -9,7 +11,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
 import java.util.Map;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.AttachmentLister;
 import run.halo.app.core.attachment.endpoint.AttachmentEndpoint;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.Policy.PolicySpec;
 import run.halo.app.core.user.service.impl.DefaultAttachmentService;
@@ -140,44 +142,6 @@ class AttachmentEndpointTest {
                 .expectStatus().isBadRequest();
         }
 
-        void prepareForUploading(Consumer<MultipartBodyBuilder> consumer) {
-            var policySpec = new PolicySpec();
-            policySpec.setConfigMapName("fake-configmap");
-            var policyMetadata = new Metadata();
-            policyMetadata.setName("fake-policy");
-            var policy = new Policy();
-            policy.setSpec(policySpec);
-            policy.setMetadata(policyMetadata);
-
-            var cm = new ConfigMap();
-            var cmMetadata = new Metadata();
-            cmMetadata.setName("fake-configmap");
-            cm.setData(Map.of());
-
-            when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
-            when(client.get(ConfigMap.class, "fake-configmap")).thenReturn(Mono.just(cm));
-
-            var handler = mock(AttachmentHandler.class);
-            var metadata = new Metadata();
-            metadata.setName("fake-attachment");
-            var attachment = new Attachment();
-            attachment.setMetadata(metadata);
-
-            when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(extensionGetter.getExtensions(AttachmentHandler.class))
-                .thenReturn(Flux.just(handler));
-            when(client.create(attachment)).thenReturn(Mono.just(attachment));
-
-            var builder = new MultipartBodyBuilder();
-            builder.part("policyName", "fake-policy");
-            builder.part("groupName", "fake-group");
-            builder.part("file", "fake-file")
-                .contentType(MediaType.TEXT_PLAIN)
-                .filename("fake-filename");
-
-            consumer.accept(builder);
-        }
-
         @Test
         void shouldUploadSuccessfully() {
             var policySpec = new PolicySpec();
@@ -193,8 +157,13 @@ class AttachmentEndpointTest {
             cmMetadata.setName("fake-configmap");
             cm.setData(Map.of());
 
+            var group = new Group();
+            group.setMetadata(new Metadata());
+            group.getMetadata().setName("fake-group");
+
             when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
             when(client.get(ConfigMap.class, "fake-configmap")).thenReturn(Mono.just(cm));
+            when(client.get(Group.class, "fake-group")).thenReturn(Mono.just(group));
 
             var handler = mock(AttachmentHandler.class);
             var metadata = new Metadata();
@@ -230,8 +199,13 @@ class AttachmentEndpointTest {
 
             verify(client).get(Policy.class, "fake-policy");
             verify(client).get(ConfigMap.class, "fake-configmap");
+            verify(client).get(Group.class, "fake-group");
             verify(client).create(attachment);
-            verify(handler).upload(any());
+            verify(handler).upload(assertArg(context -> {
+                assertEquals(policy, context.policy());
+                assertEquals(cm, context.configMap());
+                assertEquals(group, context.group());
+            }));
         }
     }
 

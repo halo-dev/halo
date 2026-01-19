@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -176,21 +175,6 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                         .bodyValue(listResult)
                     );
             });
-    }
-
-    @Builder
-    record UploadContext(String owner, String storagePolicy, FilePart filePart) {
-    }
-
-    public record UcUploadRequest(MultiValueMap<String, Part> formData) {
-
-        @Schema(description = "The file to upload.", requiredMode = REQUIRED)
-        public FilePart getFile() {
-            if (formData.getFirst("file") instanceof FilePart file) {
-                return file;
-            }
-            throw new ServerWebInputException("Invalid part of file");
-        }
     }
 
     @Getter
