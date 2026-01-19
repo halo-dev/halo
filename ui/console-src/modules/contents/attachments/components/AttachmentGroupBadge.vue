@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Group } from "@halo-dev/api-client";
+import type { Attachment, Group } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
+import { chunk } from "es-toolkit";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
@@ -49,43 +50,61 @@ const handleDelete = () => {
       }
 
       // TODO: 后续将修改为在后端进行批量操作处理
-      const { data } =
-        await consoleApiClient.storage.attachment.searchAttachments({
-          fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
-          page: 0,
-          size: 0,
-        });
+      const attachments = await fetchAllAttachmentsByGroupName(
+        props.group.metadata.name
+      );
 
       await coreApiClient.storage.group.deleteGroup({
         name: props.group.metadata.name,
       });
 
-      // move attachments to none group
-      const moveToUnGroupRequests = data.items.map((attachment) => {
-        return coreApiClient.storage.attachment.patchAttachment({
-          name: attachment.metadata.name,
-          jsonPatchInner: [
-            {
-              op: "remove",
-              path: "/spec/groupName",
-            },
-          ],
-        });
-      });
+      const attachmentChunks = chunk(attachments, 10);
 
-      await Promise.all(moveToUnGroupRequests);
+      for (const attachmentChunk of attachmentChunks) {
+        const moveToUnGroupRequests = attachmentChunk.map((attachment) => {
+          return coreApiClient.storage.attachment.patchAttachment({
+            name: attachment.metadata.name,
+            jsonPatchInner: [
+              {
+                op: "remove",
+                path: "/spec/groupName",
+              },
+            ],
+          });
+        });
+
+        await Promise.all(moveToUnGroupRequests);
+      }
 
       queryClient.invalidateQueries({ queryKey: ["attachment-groups"] });
       queryClient.invalidateQueries({ queryKey: ["attachments"] });
 
       Toast.success(
         t("core.attachment.group_list.operations.delete.toast_success", {
-          total: data.total,
+          total: attachments.length,
         })
       );
     },
   });
 };
+
+async function fetchAllAttachmentsByGroupName(groupName: string) {
+  const result: Attachment[] = [];
+  let page = 1;
+  let hasNext = true;
+  while (hasNext) {
+    const { data } =
+      await consoleApiClient.storage.attachment.searchAttachments({
+        fieldSelector: [`spec.groupName=${groupName}`],
+        page: page,
+        size: 1000,
+      });
+    result.push(...data.items);
+    page++;
+    hasNext = data.hasNext;
+  }
+  return result;
+}
 
 const handleDeleteWithAttachments = () => {
   Dialog.warning({
@@ -104,24 +123,24 @@ const handleDeleteWithAttachments = () => {
       }
 
       // TODO: 后续将修改为在后端进行批量操作处理
-      const { data } =
-        await consoleApiClient.storage.attachment.searchAttachments({
-          fieldSelector: [`spec.groupName=${props.group.metadata.name}`],
-          page: 0,
-          size: 0,
-        });
+      const attachments = await fetchAllAttachmentsByGroupName(
+        props.group.metadata.name
+      );
 
       await coreApiClient.storage.group.deleteGroup({
         name: props.group.metadata.name,
       });
 
-      const deleteAttachmentRequests = data.items.map((attachment) => {
-        return coreApiClient.storage.attachment.deleteAttachment({
-          name: attachment.metadata.name,
-        });
-      });
+      const attachmentChunks = chunk(attachments, 10);
 
-      await Promise.all(deleteAttachmentRequests);
+      for (const attachmentChunk of attachmentChunks) {
+        const deleteAttachmentRequests = attachmentChunk.map((attachment) => {
+          return coreApiClient.storage.attachment.deleteAttachment({
+            name: attachment.metadata.name,
+          });
+        });
+        await Promise.all(deleteAttachmentRequests);
+      }
 
       queryClient.invalidateQueries({ queryKey: ["attachment-groups"] });
       queryClient.invalidateQueries({ queryKey: ["attachments"] });
@@ -129,7 +148,7 @@ const handleDeleteWithAttachments = () => {
       Toast.success(
         t(
           "core.attachment.group_list.operations.delete_with_attachments.toast_success",
-          { total: data.total }
+          { total: attachments.length }
         )
       );
     },

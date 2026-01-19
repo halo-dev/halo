@@ -162,12 +162,22 @@ const {
     showReplies,
   ],
   queryFn: async () => {
-    const { data } = await consoleApiClient.content.reply.listReplies({
-      commentName: props.comment.comment.metadata.name,
-      page: 0,
-      size: 0,
-    });
-    return data.items;
+    const result: ListedReply[] = [];
+    let page = 1;
+    let hasNext = true;
+
+    while (hasNext) {
+      const { data } = await consoleApiClient.content.reply.listReplies({
+        commentName: props.comment.comment.metadata.name,
+        page: page,
+        size: 1000,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+
+    return result;
   },
   refetchInterval(data) {
     const hasDeletingReplies = data?.some(

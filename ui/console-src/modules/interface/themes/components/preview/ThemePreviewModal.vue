@@ -61,12 +61,19 @@ const selectedTheme = ref<Theme>();
 const { data: themes } = useQuery<Theme[]>({
   queryKey: ["themes"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.listThemes({
-      page: 0,
-      size: 0,
-      uninstalled: false,
-    });
-    return data.items;
+    const result: Theme[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await consoleApiClient.theme.theme.listThemes({
+        page: page,
+        size: 1000,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
 });
 

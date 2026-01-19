@@ -20,8 +20,8 @@ const { data: total } = useQuery({
         `${singlePageLabels.DELETED}=false`,
         `${singlePageLabels.PUBLISHED}=true`,
       ],
-      page: 0,
-      size: 0,
+      page: 1,
+      size: 1,
     });
     return data.total;
   },

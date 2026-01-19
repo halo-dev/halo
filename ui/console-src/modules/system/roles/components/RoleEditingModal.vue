@@ -33,12 +33,20 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
+    const result: Role[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await coreApiClient.role.listRole({
+        page: page,
+        size: 1000,
+        labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
 });
 

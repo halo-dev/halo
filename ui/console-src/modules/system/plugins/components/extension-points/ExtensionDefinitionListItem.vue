@@ -21,11 +21,19 @@ const props = withDefaults(
 const { data: plugins } = useQuery<Plugin[]>({
   queryKey: ["extension-definition-related-plugins"],
   queryFn: async () => {
-    const { data } = await coreApiClient.plugin.plugin.listPlugin({
-      page: 0,
-      size: 0,
-    });
-    return data.items;
+    const result: Plugin[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await coreApiClient.plugin.plugin.listPlugin({
+        page: page,
+        size: 1000,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
 });
 

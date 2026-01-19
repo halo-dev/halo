@@ -3,7 +3,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { roleLabels } from "@/constants/labels";
 import { resolveDeepDependencies } from "@/utils/role";
-import type { Role, RoleList } from "@halo-dev/api-client";
+import type { Role } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -38,12 +38,22 @@ let fuse: Fuse<Role> | undefined = undefined;
 const { data: roleTemplates } = useQuery({
   queryKey: ["role-templates"],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
+    const result: Role[] = [];
+    let page = 1;
+    let hasNext = true;
+
+    while (hasNext) {
+      const { data } = await coreApiClient.role.listRole({
+        page: page,
+        size: 1000,
+        labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+
+    return result;
   },
 });
 
@@ -51,24 +61,32 @@ const {
   data: roles,
   isLoading,
   refetch,
-} = useQuery<RoleList>({
+} = useQuery<Role[]>({
   queryKey: ["roles"],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`!${roleLabels.TEMPLATE}`],
-    });
-    return data;
+    const result: Role[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await coreApiClient.role.listRole({
+        page: page,
+        size: 1000,
+        labelSelector: [`!${roleLabels.TEMPLATE}`],
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
   refetchInterval(data) {
-    const hasDeletingRole = data?.items.some(
+    const hasDeletingRole = data?.some(
       (item) => !!item.metadata.deletionTimestamp
     );
     return hasDeletingRole ? 1000 : false;
   },
   onSuccess(data) {
-    fuse = new Fuse(data.items, {
+    fuse = new Fuse(data, {
       keys: [
         {
           name: "displayName",
@@ -91,7 +109,7 @@ const keyword = ref("");
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
-    return roles.value?.items || [];
+    return roles.value || [];
   }
 
   return fuse?.search(keyword.value).map((item) => item.item);
@@ -146,12 +164,23 @@ const handleCloneRole = async (role: Role) => {
 
   // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    const roleTemplateNames = data.items.map((item) => item.metadata.name);
+    const allRoleTemplates: Role[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await coreApiClient.role.listRole({
+        page: page,
+        size: 1000,
+        labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+      });
+      allRoleTemplates.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+
+    const roleTemplateNames = allRoleTemplates.map(
+      (item) => item.metadata.name
+    );
     if (roleToCreate.metadata.annotations) {
       roleToCreate.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
         JSON.stringify(roleTemplateNames);
