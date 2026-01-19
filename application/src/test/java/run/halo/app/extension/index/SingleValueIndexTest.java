@@ -554,6 +554,150 @@ class SingleValueIndexTest {
 
             assertEquals(Set.of("fake"), index.equal("string"));
         }
+
+        @Nested
+        class IndexQueryTest {
+
+            @BeforeEach
+            void setUp() {
+                // insert some data for query tests
+                var fake1 = createFake("fake1");
+                fake1.setStringValue("string1");
+
+                var fake2 = createFake("fake2");
+                fake2.setStringValue("string2");
+
+                var fake3 = createFake("fake3");
+                fake3.setStringValue("string3");
+
+                var fakenull = createFake("fakenull");
+                fakenull.setStringValue(null);
+
+                insert(fake1);
+                insert(fake2);
+                insert(fake3);
+                insert(fakenull);
+            }
+
+            @Test
+            void equalQuery() {
+                var result1 = index.equal("string1");
+                assertEquals(Set.of("fake1"), result1);
+
+                var result2 = index.equal("string2");
+                assertEquals(Set.of("fake2"), result2);
+
+                var result3 = index.equal("non-existent-string");
+                assertTrue(result3.isEmpty());
+            }
+
+            @Test
+            void notEqualQuery() {
+                var result1 = index.notEqual("string1");
+                assertEquals(Set.of("fake2", "fake3"), result1);
+
+                var result2 = index.notEqual("string2");
+                assertEquals(Set.of("fake1", "fake3"), result2);
+
+                var result3 = index.notEqual("non-existent-string");
+                assertEquals(Set.of("fake1", "fake2", "fake3"), result3);
+            }
+
+            @Test
+            void allQuery() {
+                var result = index.all();
+                assertEquals(Set.of("fake1", "fake2", "fake3"), result);
+            }
+
+            @Test
+            void betweenQuery() {
+                var result = index.between("string1", true, "string3", false);
+                assertEquals(Set.of("fake1", "fake2"), result);
+            }
+
+            @Test
+            void notBetweenQuery() {
+                var result = index.notBetween("string1", true, "string2", false);
+                assertEquals(Set.of("fake2", "fake3"), result);
+            }
+
+            @Test
+            void inQuery() {
+                var result = index.in(Set.of("string1", "string3"));
+                assertEquals(Set.of("fake1", "fake3"), result);
+            }
+
+            @Test
+            void notInQueryForSet() {
+                var result = index.notIn(Set.of("string1", "string3"));
+                assertEquals(Set.of("fake2"), result);
+            }
+
+            @Test
+            void notInQueryForList() {
+                var result = index.notIn(List.of("string2"));
+                assertEquals(Set.of("fake1", "fake3"), result);
+            }
+
+            @Test
+            void lessThanQuery() {
+                var result = index.lessThan("string3", false);
+                assertEquals(Set.of("fake1", "fake2"), result);
+            }
+
+            @Test
+            void greaterThanQuery() {
+                var result = index.greaterThan("string1", false);
+                assertEquals(Set.of("fake2", "fake3"), result);
+            }
+
+            @Test
+            void isNullQuery() {
+                assertEquals(Set.of("fakenull"), index.isNull());
+            }
+
+            @Test
+            void isNotNullQuery() {
+                assertEquals(Set.of("fake1", "fake2", "fake3"), index.isNotNull());
+            }
+
+            @Test
+            void stringContainsQuery() {
+                assertEquals(Set.of("fake1", "fake2", "fake3"), index.stringContains("ing"));
+                assertEquals(Set.of("fake2"), index.stringContains("ing2"));
+            }
+
+            @Test
+            void stringNotContainsQuery() {
+                assertEquals(Set.of(), index.stringNotContains("ing"));
+                assertEquals(Set.of("fake1", "fake3"), index.stringNotContains("ing2"));
+            }
+
+            @Test
+            void stringStartsWithQuery() {
+                assertEquals(Set.of("fake1", "fake2", "fake3"), index.stringStartsWith("string"));
+                assertEquals(Set.of("fake2"), index.stringStartsWith("string2"));
+            }
+
+            @Test
+            void stringNotStartsWithQuery() {
+                assertEquals(Set.of(), index.stringNotStartsWith("string"));
+                assertEquals(Set.of("fake1", "fake3"), index.stringNotStartsWith("string2"));
+            }
+
+            @Test
+            void stringEndsWithQuery() {
+                assertEquals(Set.of("fake1"), index.stringEndsWith("ing1"));
+                assertEquals(Set.of("fake3"), index.stringEndsWith("ing3"));
+            }
+
+            @Test
+            void stringNotEndsWithQuery() {
+                assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
+                assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
+            }
+
+        }
     }
 
     void insert(Fake fake) {
