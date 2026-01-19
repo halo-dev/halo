@@ -57,13 +57,23 @@ const {
     }
 
     const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
-    const { data } = await coreApiClient.menuItem.listMenuItem({
-      page: 0,
-      size: 0,
-      fieldSelector: [`name=(${menuItemNames.join(",")})`],
-    });
 
-    return data.items;
+    const result: MenuItem[] = [];
+    let page = 1;
+    let hasNext = true;
+
+    while (hasNext) {
+      const { data } = await coreApiClient.menuItem.listMenuItem({
+        page: page,
+        size: 1000,
+        fieldSelector: [`name=(${menuItemNames.join(",")})`],
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+
+    return result;
   },
   onSuccess(data) {
     menuTreeItems.value = buildMenuItemsTree(data);

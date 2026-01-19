@@ -1,4 +1,8 @@
-import { BackupStatusPhaseEnum, coreApiClient } from "@halo-dev/api-client";
+import {
+  BackupStatusPhaseEnum,
+  coreApiClient,
+  type Backup,
+} from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -8,13 +12,22 @@ export function useBackupFetch() {
   return useQuery({
     queryKey: ["backups"],
     queryFn: async () => {
-      const { data } = await coreApiClient.migration.backup.listBackup({
-        sort: ["metadata.creationTimestamp,desc"],
-      });
-      return data;
+      const result: Backup[] = [];
+      let page = 1;
+      let hasNext = true;
+      while (hasNext) {
+        const { data } = await coreApiClient.migration.backup.listBackup({
+          page: page,
+          size: 1000,
+        });
+        result.push(...data.items);
+        page++;
+        hasNext = data.hasNext;
+      }
+      return result;
     },
     refetchInterval(data) {
-      const deletingBackups = data?.items.filter((backup) => {
+      const deletingBackups = data?.filter((backup) => {
         return !!backup.metadata.deletionTimestamp;
       });
 
@@ -22,7 +35,7 @@ export function useBackupFetch() {
         return 1000;
       }
 
-      const pendingBackups = data?.items.filter((backup) => {
+      const pendingBackups = data?.filter((backup) => {
         return (
           backup.status?.phase === BackupStatusPhaseEnum.Pending ||
           backup.status?.phase === BackupStatusPhaseEnum.Running

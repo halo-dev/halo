@@ -1,4 +1,4 @@
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, type Category } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
 import { buildCategoriesTree, type CategoryTreeNode } from "../utils";
@@ -13,13 +13,22 @@ export function usePostCategory() {
   } = useQuery({
     queryKey: ["post-categories"],
     queryFn: async () => {
-      const { data } = await coreApiClient.content.category.listCategory({
-        page: 0,
-        size: 0,
-        sort: ["metadata.creationTimestamp,desc"],
-      });
+      const result: Category[] = [];
+      let page = 1;
+      let hasNext = true;
 
-      return data.items;
+      while (hasNext) {
+        const { data } = await coreApiClient.content.category.listCategory({
+          page: page,
+          size: 1000,
+          sort: ["metadata.creationTimestamp,desc"],
+        });
+        result.push(...data.items);
+        page++;
+        hasNext = data.hasNext;
+      }
+
+      return result;
     },
     refetchInterval(data) {
       const hasAbnormalCategory = data?.some(

@@ -55,13 +55,22 @@ const { data: startup } = useQuery<Startup>({
 const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
   queryKey: ["enabled-plugins"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
-      page: 0,
-      size: 0,
-      enabled: true,
-    });
+    const result: Plugin[] = [];
+    let page = 1;
+    let hasNext = true;
 
-    return data.items;
+    while (hasNext) {
+      const { data } = await consoleApiClient.plugin.plugin.listPlugins({
+        page: page,
+        size: 1000,
+        enabled: true,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+
+    return result;
   },
   enabled: computed(() => utils.permission.has(["system:plugins:view"])),
 });

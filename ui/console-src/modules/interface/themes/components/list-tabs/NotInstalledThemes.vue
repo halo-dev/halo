@@ -13,12 +13,20 @@ const {
 } = useQuery<Theme[]>({
   queryKey: ["not-installed-themes"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.listThemes({
-      page: 0,
-      size: 0,
-      uninstalled: true,
-    });
-    return data.items;
+    const result: Theme[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await consoleApiClient.theme.theme.listThemes({
+        page: page,
+        size: 1000,
+        uninstalled: true,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
 });
 </script>

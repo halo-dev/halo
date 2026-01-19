@@ -53,19 +53,28 @@ const total = ref(0);
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
-      page: 0,
-      size: 0,
-      keyword: keyword.value,
-      enabled: selectedEnabledValue.value
-        ? JSON.parse(selectedEnabledValue.value)
-        : undefined,
-      sort: [selectedSortValue.value].filter(Boolean) as string[],
-    });
+    const result: Plugin[] = [];
+    let page = 1;
+    let hasNext = true;
 
-    total.value = data.total;
+    while (hasNext) {
+      const { data } = await consoleApiClient.plugin.plugin.listPlugins({
+        page: page,
+        size: 1000,
+        keyword: keyword.value,
+        enabled: selectedEnabledValue.value
+          ? JSON.parse(selectedEnabledValue.value)
+          : undefined,
+        sort: [selectedSortValue.value].filter(Boolean) as string[],
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
 
-    return data.items;
+    total.value = result.length;
+
+    return result;
   },
   keepPreviousData: true,
   refetchInterval: (data) => {

@@ -51,11 +51,19 @@ const {
 } = useQuery<Menu[]>({
   queryKey: ["menus"],
   queryFn: async () => {
-    const { data } = await coreApiClient.menu.listMenu({
-      page: 0,
-      size: 0,
-    });
-    return data.items;
+    const result: Menu[] = [];
+    let page = 1;
+    let hasNext = true;
+    while (hasNext) {
+      const { data } = await coreApiClient.menu.listMenu({
+        page: page,
+        size: 1000,
+      });
+      result.push(...data.items);
+      page++;
+      hasNext = data.hasNext;
+    }
+    return result;
   },
   onSuccess(data) {
     if (props.selectedMenu) {
