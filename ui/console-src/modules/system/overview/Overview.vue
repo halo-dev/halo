@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
+import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
-import type { Plugin } from "@halo-dev/api-client";
+import type {
+  Plugin,
+  PluginV1alpha1ConsoleApiListPluginsRequest,
+} from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconClipboardLine,
@@ -55,22 +59,13 @@ const { data: startup } = useQuery<Startup>({
 const { data: plugins, isLoading: isPluginsLoading } = useQuery<Plugin[]>({
   queryKey: ["enabled-plugins"],
   queryFn: async () => {
-    const result: Plugin[] = [];
-    let page = 1;
-    let hasNext = true;
-
-    while (hasNext) {
-      const { data } = await consoleApiClient.plugin.plugin.listPlugins({
-        page: page,
+    return await paginate<PluginV1alpha1ConsoleApiListPluginsRequest, Plugin>(
+      (params) => consoleApiClient.plugin.plugin.listPlugins(params),
+      {
         size: 1000,
         enabled: true,
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
-
-    return result;
+      }
+    );
   },
   enabled: computed(() => utils.permission.has(["system:plugins:view"])),
 });

@@ -1,7 +1,9 @@
+import { paginate } from "@/utils/paginate";
 import {
   BackupStatusPhaseEnum,
   coreApiClient,
   type Backup,
+  type BackupV1alpha1ApiListBackupRequest,
 } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
@@ -12,19 +14,12 @@ export function useBackupFetch() {
   return useQuery({
     queryKey: ["backups"],
     queryFn: async () => {
-      const result: Backup[] = [];
-      let page = 1;
-      let hasNext = true;
-      while (hasNext) {
-        const { data } = await coreApiClient.migration.backup.listBackup({
-          page: page,
+      return await paginate<BackupV1alpha1ApiListBackupRequest, Backup>(
+        (params) => coreApiClient.migration.backup.listBackup(params),
+        {
           size: 1000,
-        });
-        result.push(...data.items);
-        page++;
-        hasNext = data.hasNext;
-      }
-      return result;
+        }
+      );
     },
     refetchInterval(data) {
       const deletingBackups = data?.filter((backup) => {

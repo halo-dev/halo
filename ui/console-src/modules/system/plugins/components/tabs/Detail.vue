@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
+import { paginate } from "@/utils/paginate";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
@@ -32,17 +33,14 @@ interface RoleTemplateGroup {
 const { data: pluginRoleTemplates } = useQuery({
   queryKey: ["plugin-roles", plugin?.value?.metadata.name],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
+    return await paginate((params) => coreApiClient.role.listRole(params), {
+      size: 1000,
       labelSelector: [
         `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
         `${roleLabels.TEMPLATE}=true`,
         "!halo.run/hidden",
       ],
     });
-
-    return data.items;
   },
   cacheTime: 0,
   enabled: computed(

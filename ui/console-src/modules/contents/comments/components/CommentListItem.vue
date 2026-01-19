@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { paginate } from "@/utils/paginate";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import type { ListedComment, ListedReply } from "@halo-dev/api-client";
+import type {
+  ListedComment,
+  ListedReply,
+  ReplyV1alpha1ConsoleApiListRepliesRequest,
+} from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -162,22 +167,13 @@ const {
     showReplies,
   ],
   queryFn: async () => {
-    const result: ListedReply[] = [];
-    let page = 1;
-    let hasNext = true;
-
-    while (hasNext) {
-      const { data } = await consoleApiClient.content.reply.listReplies({
-        commentName: props.comment.comment.metadata.name,
-        page: page,
-        size: 1000,
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
-
-    return result;
+    return await paginate<
+      ReplyV1alpha1ConsoleApiListRepliesRequest,
+      ListedReply
+    >((params) => consoleApiClient.content.reply.listReplies(params), {
+      commentName: props.comment.comment.metadata.name,
+      size: 1000,
+    });
   },
   refetchInterval(data) {
     const hasDeletingReplies = data?.some(

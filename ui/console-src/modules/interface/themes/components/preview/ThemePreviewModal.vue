@@ -1,8 +1,14 @@
 <script lang="ts" setup>
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
+import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
-import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
+import type {
+  Setting,
+  SettingForm,
+  Theme,
+  ThemeV1alpha1ConsoleApiListThemesRequest,
+} from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconComputer,
@@ -61,19 +67,12 @@ const selectedTheme = ref<Theme>();
 const { data: themes } = useQuery<Theme[]>({
   queryKey: ["themes"],
   queryFn: async () => {
-    const result: Theme[] = [];
-    let page = 1;
-    let hasNext = true;
-    while (hasNext) {
-      const { data } = await consoleApiClient.theme.theme.listThemes({
-        page: page,
+    return await paginate<ThemeV1alpha1ConsoleApiListThemesRequest, Theme>(
+      (params) => consoleApiClient.theme.theme.listThemes(params),
+      {
         size: 1000,
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
-    return result;
+      }
+    );
   },
 });
 

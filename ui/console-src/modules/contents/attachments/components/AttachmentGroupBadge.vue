@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import type { Attachment, Group } from "@halo-dev/api-client";
+import { paginate } from "@/utils/paginate";
+import type {
+  Attachment,
+  AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest,
+  Group,
+} from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -89,21 +94,13 @@ const handleDelete = () => {
 };
 
 async function fetchAllAttachmentsByGroupName(groupName: string) {
-  const result: Attachment[] = [];
-  let page = 1;
-  let hasNext = true;
-  while (hasNext) {
-    const { data } =
-      await consoleApiClient.storage.attachment.searchAttachments({
-        fieldSelector: [`spec.groupName=${groupName}`],
-        page: page,
-        size: 1000,
-      });
-    result.push(...data.items);
-    page++;
-    hasNext = data.hasNext;
-  }
-  return result;
+  return await paginate<
+    AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest,
+    Attachment
+  >((params) => consoleApiClient.storage.attachment.searchAttachments(params), {
+    fieldSelector: [`spec.groupName=${groupName}`],
+    size: 1000,
+  });
 }
 
 const handleDeleteWithAttachments = () => {

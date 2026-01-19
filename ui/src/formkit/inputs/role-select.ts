@@ -1,29 +1,27 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
+import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
-import { coreApiClient, type Role } from "@halo-dev/api-client";
+import {
+  coreApiClient,
+  type Role,
+  type RoleV1alpha1ApiListRoleRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const result: Role[] = [];
-    let page = 1;
-    let hasNext = true;
-
-    while (hasNext) {
-      const { data } = await coreApiClient.role.listRole({
-        page: page,
+    const roles = await paginate<RoleV1alpha1ApiListRoleRequest, Role>(
+      (params) => coreApiClient.role.listRole(params),
+      {
         size: 1000,
         labelSelector: [`!${roleLabels.TEMPLATE}`],
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
+      }
+    );
 
     const options = [
-      ...result.map((role) => {
+      ...roles.map((role) => {
         return {
           label:
             role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||

@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import type { Menu, MenuItem } from "@halo-dev/api-client";
+import { paginate } from "@/utils/paginate";
+import type {
+  Menu,
+  MenuItem,
+  MenuItemV1alpha1ApiListMenuItemRequest,
+} from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -58,22 +63,13 @@ const {
 
     const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
 
-    const result: MenuItem[] = [];
-    let page = 1;
-    let hasNext = true;
-
-    while (hasNext) {
-      const { data } = await coreApiClient.menuItem.listMenuItem({
-        page: page,
-        size: 1000,
+    return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
+      (params) => coreApiClient.menuItem.listMenuItem(params),
+      {
         fieldSelector: [`name=(${menuItemNames.join(",")})`],
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
-
-    return result;
+        size: 1000,
+      }
+    );
   },
   onSuccess(data) {
     menuTreeItems.value = buildMenuItemsTree(data);

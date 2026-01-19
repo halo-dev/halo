@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
   type ExtensionDefinition,
   type Plugin,
+  type PluginV1alpha1ApiListPluginRequest,
 } from "@halo-dev/api-client";
 import {
   IconSettings,
@@ -21,19 +23,12 @@ const props = withDefaults(
 const { data: plugins } = useQuery<Plugin[]>({
   queryKey: ["extension-definition-related-plugins"],
   queryFn: async () => {
-    const result: Plugin[] = [];
-    let page = 1;
-    let hasNext = true;
-    while (hasNext) {
-      const { data } = await coreApiClient.plugin.plugin.listPlugin({
-        page: page,
+    return await paginate<PluginV1alpha1ApiListPluginRequest, Plugin>(
+      (params) => coreApiClient.plugin.plugin.listPlugin(params),
+      {
         size: 1000,
-      });
-      result.push(...data.items);
-      page++;
-      hasNext = data.hasNext;
-    }
-    return result;
+      }
+    );
   },
 });
 

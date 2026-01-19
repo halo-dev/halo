@@ -1,4 +1,8 @@
-import type { Group } from "@halo-dev/api-client";
+import { paginate } from "@/utils/paginate";
+import type {
+  Group,
+  GroupV1alpha1ApiListGroupRequest,
+} from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
@@ -13,12 +17,14 @@ export function useFetchAttachmentGroup(): useFetchAttachmentGroupReturn {
   const { data, isLoading, refetch } = useQuery<Group[]>({
     queryKey: ["attachment-groups"],
     queryFn: async () => {
-      const { data } = await coreApiClient.storage.group.listGroup({
-        labelSelector: ["!halo.run/hidden"],
-        sort: ["metadata.creationTimestamp,asc"],
-      });
-
-      return data.items;
+      return await paginate<GroupV1alpha1ApiListGroupRequest, Group>(
+        (params) => coreApiClient.storage.group.listGroup(params),
+        {
+          size: 1000,
+          labelSelector: ["!halo.run/hidden"],
+          sort: ["metadata.creationTimestamp,asc"],
+        }
+      );
     },
     refetchInterval(data) {
       const hasDeletingGroup = data?.some(
