@@ -179,8 +179,8 @@ public class UserServiceImpl implements UserService {
         return roleService.listRoleBindings(subject)
             .doOnNext(binding -> {
                 var roleName = binding.getRoleRef().getName();
+                existingRoles.add(roleName);
                 if (roles.contains(roleName)) {
-                    existingRoles.add(roleName);
                     return;
                 }
                 binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));

@@ -349,8 +349,13 @@ class UserServiceImplTest {
                 .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.delete(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
+            when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.empty());
+            var user = createUser("fake-password");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
+            when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
+                .expectNext(user)
                 .verifyComplete();
         }
 
@@ -371,8 +376,15 @@ class UserServiceImplTest {
             when(client.update(isA(RoleBinding.class)))
                 .thenReturn(Mono.just(mock(RoleBinding.class)));
 
+            when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.empty());
+
+            var user = createUser("fake-password");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
+            when(client.update(user)).thenReturn(Mono.just(user));
+
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
                 // Because the roles are the same, so no need to update the existingRoleBinding
+                .expectNext(user)
                 .verifyComplete();
 
             verify(client).update(notProvidedRoleBinding);
