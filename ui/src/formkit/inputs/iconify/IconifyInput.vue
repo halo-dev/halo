@@ -121,7 +121,7 @@ const editFormId = `icon-edit-form-${utils.id.uuid()}`;
           />
           <div
             v-else
-            class="inline-flex size-full items-center justify-center"
+            class="inline-flex size-full items-center justify-center [&>*]:h-full"
             v-html="currentIconifyValue.value"
           ></div>
         </div>
