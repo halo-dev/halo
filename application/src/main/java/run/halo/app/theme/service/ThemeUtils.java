@@ -18,11 +18,11 @@ import java.util.stream.BaseStream;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
@@ -104,7 +104,7 @@ public class ThemeUtils {
     }
 
     static Mono<Unstructured> unzipThemeTo(Publisher<DataBuffer> content, Path themeWorkDir,
-        Scheduler scheduler) {
+        @Nullable Scheduler scheduler) {
         return unzipThemeTo(content, themeWorkDir, false, scheduler)
             .onErrorMap(e -> !(e instanceof ResponseStatusException), e -> {
                 log.error("Failed to unzip theme", e);
@@ -113,14 +113,20 @@ public class ThemeUtils {
     }
 
     static Mono<Unstructured> unzipThemeTo(Publisher<DataBuffer> content, Path themeWorkDir,
-        boolean override, Scheduler scheduler) {
-        return Mono.usingWhen(
-            createTempDir(THEME_TMP_PREFIX, scheduler),
+        boolean override, @Nullable Scheduler scheduler) {
+        var unzipThem = Mono.usingWhen(
+            createTempDir(THEME_TMP_PREFIX, null),
             tempDir -> {
-                var locateThemeManifest = Mono.fromCallable(() -> locateThemeManifest(tempDir)
-                    .orElseThrow(() -> new ThemeInstallationException("Missing theme manifest",
-                        "problemDetail.theme.install.missingManifest", null)));
-                return unzip(content, tempDir, scheduler)
+                var locateThemeManifest = Mono.fromCallable(
+                        () -> locateThemeManifest(tempDir).orElse(null)
+                    )
+                    .switchIfEmpty(
+                        Mono.error(() -> new ThemeInstallationException(
+                            "Missing theme manifest",
+                            "problemDetail.theme.install.missingManifest", null
+                        ))
+                    );
+                return unzip(content, tempDir, null)
                     .then(locateThemeManifest)
                     .<Unstructured>handle((themeManifestPath, sink) -> {
                         var theme = loadThemeManifest(themeManifestPath);
@@ -138,11 +144,14 @@ public class ThemeUtils {
                             deleteRecursivelyAndSilently(themeTargetPath);
                             sink.error(e);
                         }
-                    })
-                    .subscribeOn(scheduler);
+                    });
             },
-            tempDir -> FileUtils.deleteRecursivelyAndSilently(tempDir, scheduler)
+            tempDir -> FileUtils.deleteRecursivelyAndSilently(tempDir, null)
         );
+        if (scheduler != null) {
+            return unzipThem.subscribeOn(scheduler);
+        }
+        return unzipThem;
     }
 
     static Unstructured loadThemeManifest(Path themeManifestPath) {

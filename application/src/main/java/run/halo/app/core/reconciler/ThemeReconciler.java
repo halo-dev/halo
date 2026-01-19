@@ -1,14 +1,14 @@
 package run.halo.app.core.reconciler;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static run.halo.app.extension.ExtensionUtil.addFinalizers;
+import static run.halo.app.extension.ExtensionUtil.isDeleted;
+import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,6 @@ import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUninstallException;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
@@ -65,12 +64,17 @@ public class ThemeReconciler implements Reconciler<Request> {
         client.fetch(Theme.class, request.name())
             .ifPresent(theme -> {
                 if (isDeleted(theme)) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    if (removeFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME))) {
+                        cleanUpResources(theme);
+                        client.update(theme);
+                    }
                     return;
                 }
-                addFinalizerIfNecessary(theme);
+                addFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME));
+
                 themeSettingDefaultConfig(theme);
-                reconcileStatus(request.name());
+                reconcileStatus(theme);
+                client.update(theme);
             });
         return new Result(false, null);
     }
@@ -82,104 +86,64 @@ public class ThemeReconciler implements Reconciler<Request> {
             .build();
     }
 
-    void reconcileStatus(String name) {
-        client.fetch(Theme.class, name).ifPresent(theme -> {
-            final Theme.ThemeStatus status =
-                defaultIfNull(theme.getStatus(), new Theme.ThemeStatus());
-            final Theme.ThemeStatus oldStatus = JsonUtils.deepCopy(status);
+    void reconcileStatus(Theme theme) {
+        var status = theme.getStatus();
+        if (status == null) {
+            status = new Theme.ThemeStatus();
             theme.setStatus(status);
+        }
+        var name = theme.getMetadata().getName();
+        var themePath = themeRoot.get().resolve(name);
+        status.setLocation(themePath.toAbsolutePath().toString());
 
-            var themePath = themeRoot.get().resolve(name);
-            status.setLocation(themePath.toAbsolutePath().toString());
+        status.setPhase(Theme.ThemePhase.READY);
+        var conditionBuilder = Condition.builder()
+            .type(Theme.ThemePhase.READY.name())
+            .status(ConditionStatus.TRUE)
+            .reason(Theme.ThemePhase.READY.name())
+            .message(StringUtils.EMPTY)
+            .lastTransitionTime(Instant.now());
 
-            status.setPhase(Theme.ThemePhase.READY);
-            Condition.ConditionBuilder conditionBuilder = Condition.builder()
-                .type(Theme.ThemePhase.READY.name())
-                .status(ConditionStatus.TRUE)
-                .reason(Theme.ThemePhase.READY.name())
-                .message(StringUtils.EMPTY)
-                .lastTransitionTime(Instant.now());
-
-            // Check if this theme version is match requires param.
-            String normalVersion = systemVersionSupplier.get().getNormalVersion();
-            String requires = theme.getSpec().getRequires();
-            if (!VersionUtils.satisfiesRequires(normalVersion, requires)) {
-                status.setPhase(Theme.ThemePhase.FAILED);
-                conditionBuilder
-                    .type(Theme.ThemePhase.FAILED.name())
-                    .status(ConditionStatus.FALSE)
-                    .reason("UnsatisfiedRequiresVersion")
-                    .message(String.format(
-                        "Theme requires a minimum system version of [%s], and you have [%s].",
-                        requires, normalVersion));
-            }
-            Theme.nullSafeConditionList(theme).addAndEvictFIFO(conditionBuilder.build());
-
-            if (!Objects.equals(oldStatus, status)) {
-                client.update(theme);
-            }
-        });
+        // Check if this theme version is match requires param.
+        var normalVersion = systemVersionSupplier.get().toStableVersion().toString();
+        var requires = theme.getSpec().getRequires();
+        if (!VersionUtils.satisfiesRequires(normalVersion, requires)) {
+            status.setPhase(Theme.ThemePhase.FAILED);
+            conditionBuilder
+                .type(Theme.ThemePhase.FAILED.name())
+                .status(ConditionStatus.FALSE)
+                .reason("UnsatisfiedRequiresVersion")
+                .message(String.format(
+                    "Theme requires a minimum system version of [%s], and you have [%s].",
+                    requires, normalVersion));
+        }
+        Theme.nullSafeConditionList(theme).addAndEvictFIFO(conditionBuilder.build());
     }
 
     private void themeSettingDefaultConfig(Theme theme) {
-        if (StringUtils.isBlank(theme.getSpec().getSettingName())) {
+        var spec = theme.getSpec();
+        var settingName = spec.getSettingName();
+        if (StringUtils.isBlank(settingName)) {
             return;
         }
-        final String userDefinedConfigMapName = theme.getSpec().getConfigMapName();
-
-        final String newConfigMapName = UUID.randomUUID().toString();
-        if (StringUtils.isBlank(userDefinedConfigMapName)) {
-            client.fetch(Theme.class, theme.getMetadata().getName())
-                .ifPresent(themeToUse -> {
-                    Theme oldTheme = JsonUtils.deepCopy(themeToUse);
-                    themeToUse.getSpec().setConfigMapName(newConfigMapName);
-                    if (!oldTheme.equals(themeToUse)) {
-                        client.update(themeToUse);
-                    }
-                });
+        var configMapName = spec.getConfigMapName();
+        if (StringUtils.isBlank(configMapName)) {
+            configMapName = UUID.randomUUID().toString();
         }
-
-        final String configMapNameToUse =
-            StringUtils.defaultIfBlank(userDefinedConfigMapName, newConfigMapName);
-        SettingUtils.createOrUpdateConfigMap(client, theme.getSpec().getSettingName(),
-            configMapNameToUse);
+        spec.setConfigMapName(configMapName);
+        SettingUtils.createOrUpdateConfigMap(client, settingName, configMapName);
     }
 
-    private void addFinalizerIfNecessary(Theme oldTheme) {
-        Set<String> finalizers = oldTheme.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(Theme.class, oldTheme.getMetadata().getName())
-            .ifPresent(theme -> {
-                Set<String> newFinalizers = theme.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    theme.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(theme);
-            });
-    }
-
-    private void cleanUpResourcesAndRemoveFinalizer(String themeName) {
-        client.fetch(Theme.class, themeName).ifPresent(theme -> {
-            reconcileThemeDeletion(theme);
-            if (theme.getMetadata().getFinalizers() != null) {
-                theme.getMetadata().getFinalizers().remove(FINALIZER_NAME);
-            }
-            client.update(theme);
-        });
+    private void cleanUpResources(Theme theme) {
+        reconcileThemeDeletion(theme);
     }
 
     private void reconcileThemeDeletion(Theme theme) {
         templateEngineManager.clearCache(theme.getMetadata().getName()).block(BLOCKING_TIMEOUT);
-        deleteThemeFiles(theme);
         // delete theme setting form
-        String settingName = theme.getSpec().getSettingName();
+        var settingName = theme.getSpec().getSettingName();
         if (StringUtils.isNotBlank(settingName)) {
-            client.fetch(Setting.class, settingName)
-                .ifPresent(client::delete);
+            client.fetch(Setting.class, settingName).ifPresent(client::delete);
             retryTemplate.execute(callback -> {
                 client.fetch(Setting.class, settingName).ifPresent(setting -> {
                     throw new IllegalStateException("Waiting for setting to be deleted.");
@@ -189,18 +153,18 @@ public class ThemeReconciler implements Reconciler<Request> {
         }
         // delete annotation setting
         deleteAnnotationSettings(theme.getMetadata().getName());
+        deleteThemeFiles(theme);
     }
 
     private void deleteAnnotationSettings(String themeName) {
-        List<AnnotationSetting> result = listAnnotationSettingsByThemeName(themeName);
+        var result = listAnnotationSettingsByThemeName(themeName);
 
         for (AnnotationSetting annotationSetting : result) {
             client.delete(annotationSetting);
         }
 
         retryTemplate.execute(callback -> {
-            List<AnnotationSetting> annotationSettings =
-                listAnnotationSettingsByThemeName(themeName);
+            var annotationSettings = listAnnotationSettingsByThemeName(themeName);
             if (annotationSettings.isEmpty()) {
                 return null;
             }
@@ -224,7 +188,4 @@ public class ThemeReconciler implements Reconciler<Request> {
         }
     }
 
-    private boolean isDeleted(Theme theme) {
-        return theme.getMetadata().getDeletionTimestamp() != null;
-    }
 }
