@@ -1,5 +1,7 @@
 package run.halo.app.theme.dialect;
 
+import static run.halo.app.theme.HaloViewResolver.HaloView.CONTEXT_VIEW_KEY;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,7 @@ import org.thymeleaf.processor.templateboundaries.ITemplateBoundariesStructureHa
 import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
+import reactor.util.context.ContextView;
 import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
@@ -52,7 +55,7 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         if (evluationContextObject instanceof ThymeleafEvaluationContext evaluationContext) {
             evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
             ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
-            ReactiveMethodResolver.wrap(evaluationContext);
+            ReactiveMethodResolver.wrap(evaluationContext, context);
         }
     }
 
@@ -163,21 +166,27 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      * reactive value.
      *
      * @param delegate the original {@link MethodResolver}
+     * @param templateContext the template context
      */
-    private record ReactiveMethodResolver(MethodResolver delegate) implements MethodResolver {
+    private record ReactiveMethodResolver(MethodResolver delegate, ITemplateContext templateContext)
+        implements MethodResolver {
 
         @Override
         @Nullable
         public MethodExecutor resolve(EvaluationContext context, Object targetObject, String name,
             List<TypeDescriptor> argumentTypes) throws AccessException {
             var executor = delegate.resolve(context, targetObject, name, argumentTypes);
-            return Optional.ofNullable(executor).map(ReactiveMethodExecutor::new).orElse(null);
+            return Optional.ofNullable(executor)
+                .map(methodExecutor -> new ReactiveMethodExecutor(methodExecutor, templateContext))
+                .orElse(null);
         }
 
-        static void wrap(ThymeleafEvaluationContext evaluationContext) {
+        static void wrap(ThymeleafEvaluationContext evaluationContext, ITemplateContext context) {
             var wrappedMethodResolvers = evaluationContext.getMethodResolvers()
                 .stream()
-                .<MethodResolver>map(ReactiveMethodResolver::new)
+                .<MethodResolver>map(
+                    methodResolver -> new ReactiveMethodResolver(methodResolver, context)
+                )
                 // make the list mutable
                 .collect(Collectors.toCollection(ArrayList::new));
             evaluationContext.setMethodResolvers(wrappedMethodResolvers);
@@ -190,8 +199,10 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      * reactive value.
      *
      * @param delegate the original {@link MethodExecutor}
+     * @param templateContext the template context
      */
-    private record ReactiveMethodExecutor(MethodExecutor delegate) implements MethodExecutor {
+    private record ReactiveMethodExecutor(MethodExecutor delegate, ITemplateContext templateContext)
+        implements MethodExecutor {
 
         @Override
         public TypedValue execute(EvaluationContext context, Object target, Object... arguments)
@@ -203,7 +214,16 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
                         && Objects.nonNull(tv.getTypeDescriptor())
                         && ReactiveUtils.isReactiveType(tv.getTypeDescriptor().getType())
                 )
-                .map(tv -> new TypedValue(ReactiveUtils.blockReactiveValue(tv.getValue())))
+                .map(tv -> {
+                    var contextView = (ContextView) Optional.ofNullable(
+                            templateContext.getVariable(CONTEXT_VIEW_KEY)
+                        )
+                        .filter(ContextView.class::isInstance)
+                        .orElse(null);
+                    return new TypedValue(
+                        ReactiveUtils.blockReactiveValue(tv.getValue(), contextView)
+                    );
+                })
                 .orElse(typedValue);
         }
 
