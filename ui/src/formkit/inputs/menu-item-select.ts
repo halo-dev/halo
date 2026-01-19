@@ -1,16 +1,24 @@
+import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
-import { coreApiClient } from "@halo-dev/api-client";
+import {
+  coreApiClient,
+  type MenuItem,
+  type MenuItemV1alpha1ApiListMenuItemRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.menuItem.listMenuItem({
+    const menuItems = await paginate<
+      MenuItemV1alpha1ApiListMenuItemRequest,
+      MenuItem
+    >((params) => coreApiClient.menuItem.listMenuItem(params), {
       fieldSelector: [`name=(${node.props.menuItems.join(",")})`],
     });
 
     if (node.context) {
-      node.context.attrs.options = data.items.map((menuItem) => {
+      node.context.attrs.options = menuItems.map((menuItem) => {
         return {
           value: menuItem.metadata.name,
           label: menuItem.status?.displayName,
