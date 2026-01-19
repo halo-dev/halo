@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,6 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.SystemVersionSupplier;
@@ -94,6 +94,8 @@ class ThemeReconcilerTest {
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
         metadata.setName("theme-test");
+        metadata.setFinalizers(new HashSet<>());
+        metadata.getFinalizers().add("theme-protection");
         metadata.setDeletionTimestamp(Instant.now());
         theme.setMetadata(metadata);
         theme.setKind(Theme.KIND);
@@ -117,7 +119,7 @@ class ThemeReconcilerTest {
 
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
-        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
 
         verify(extensionClient, times(2)).list(eq(AnnotationSetting.class), any(), any());
@@ -128,8 +130,13 @@ class ThemeReconcilerTest {
 
     @Test
     void reconcileDeleteRetry() {
-        Theme theme = fakeTheme();
-        final MetadataOperator metadata = theme.getMetadata();
+        var theme = fakeTheme();
+        var metadata = theme.getMetadata();
+        metadata.setDeletionTimestamp(Instant.now());
+        metadata.setFinalizers(new HashSet<>());
+        metadata.getFinalizers().add("theme-protection");
+
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
 
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
@@ -162,7 +169,7 @@ class ThemeReconcilerTest {
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
         String settingName = theme.getSpec().getSettingName();
-        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(3)).fetch(eq(Setting.class), eq(settingName));
         verify(extensionClient, times(3)).list(eq(AnnotationSetting.class), any(), eq(null));
         verify(templateEngineManager).clearCache(eq(metadata.getName()));
@@ -170,14 +177,16 @@ class ThemeReconcilerTest {
 
     @Test
     void reconcileDeleteRetryWhenThrowException() {
-        Theme theme = fakeTheme();
+        var theme = fakeTheme();
+        theme.getMetadata().setDeletionTimestamp(Instant.now());
+        theme.getMetadata().setFinalizers(new HashSet<>());
+        theme.getMetadata().getFinalizers().add("theme-protection");
 
-        Path testWorkDir = tempDirectory.resolve("reconcile-delete");
-        when(themeRoot.get()).thenReturn(testWorkDir);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
 
-        final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
-                templateEngineManager);
+        var themeReconciler = new ThemeReconciler(
+            extensionClient, themeRoot, systemVersionSupplier, templateEngineManager
+        );
 
         final int[] retryFlags = {0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -200,21 +209,23 @@ class ThemeReconcilerTest {
     }
 
     @Test
-    void reconcileStatus() {
+    void shouldBeFailedIfVersionNotSatisfied() {
         when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
-        Path testWorkDir = tempDirectory.resolve("reconcile-delete");
+        var testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
-
-        final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier,
-                templateEngineManager);
-        Theme theme = fakeTheme();
+        var theme = fakeTheme();
         theme.setStatus(null);
         theme.getSpec().setRequires(">2.3.0");
-        when(extensionClient.fetch(eq(Theme.class), eq("fake-theme")))
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test"))
             .thenReturn(Optional.of(theme));
-        themeReconciler.reconcileStatus("fake-theme");
-        ArgumentCaptor<Theme> themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+        var themeReconciler = new ThemeReconciler(
+            extensionClient, themeRoot, systemVersionSupplier, templateEngineManager
+        );
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
         verify(extensionClient).update(themeUpdateCaptor.capture());
         Theme value = themeUpdateCaptor.getValue();
         assertThat(value.getStatus()).isNotNull();
@@ -222,12 +233,25 @@ class ThemeReconcilerTest {
             .isEqualTo(Theme.ThemePhase.FAILED.name());
         assertThat(value.getStatus().getPhase())
             .isEqualTo(Theme.ThemePhase.FAILED);
+    }
 
+    @Test
+    void shouldBeReadyIfVersionSatisfied() {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-delete");
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
         theme.getSpec().setRequires(">=2.3.0");
-        when(extensionClient.fetch(eq(Theme.class), eq("fake-theme")))
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test"))
             .thenReturn(Optional.of(theme));
-        themeReconciler.reconcileStatus("fake-theme");
-        verify(extensionClient, times(2)).update(themeUpdateCaptor.capture());
+        var themeReconciler = new ThemeReconciler(
+            extensionClient, themeRoot, systemVersionSupplier, templateEngineManager
+        );
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+        verify(extensionClient).update(themeUpdateCaptor.capture());
         assertThat(themeUpdateCaptor.getValue().getStatus().getPhase())
             .isEqualTo(Theme.ThemePhase.READY);
     }
@@ -236,15 +260,12 @@ class ThemeReconcilerTest {
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
         metadata.setName("theme-test");
-        metadata.setDeletionTimestamp(Instant.now());
         theme.setMetadata(metadata);
         theme.setKind(Theme.KIND);
         theme.setApiVersion("theme.halo.run/v1alpha1");
         Theme.ThemeSpec themeSpec = new Theme.ThemeSpec();
         themeSpec.setSettingName("theme-test-setting");
         theme.setSpec(themeSpec);
-        lenient().when(extensionClient.fetch(eq(Theme.class), eq(metadata.getName())))
-            .thenReturn(Optional.of(theme));
         return theme;
     }
 
@@ -266,10 +287,9 @@ class ThemeReconcilerTest {
 
         when(extensionClient.fetch(eq(Theme.class), eq(metadata.getName())))
             .thenReturn(Optional.of(theme));
-        Reconciler.Result reconcile =
-            themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
+        var reconcile = themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
         assertThat(reconcile.reEnqueue()).isFalse();
-        verify(extensionClient, times(3)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
 
         // setting exists
         themeSpec.setSettingName("theme-test-setting");
@@ -278,10 +298,8 @@ class ThemeReconcilerTest {
         Assertions.assertThrows(RequeueException.class,
             () -> themeReconciler.reconcile(new Reconciler.Request(metadata.getName()))
         );
-        verify(extensionClient, times(5))
-            .fetch(eq(Theme.class), eq(metadata.getName()));
-        verify(extensionClient, times(3))
-            .update(captor.capture());
+        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient).update(captor.capture());
         Theme value = captor.getValue();
         assertThat(value.getSpec().getConfigMapName()).isNotNull();
 

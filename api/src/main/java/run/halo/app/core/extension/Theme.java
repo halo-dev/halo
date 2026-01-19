@@ -5,10 +5,10 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
@@ -89,11 +89,10 @@ public class Theme extends AbstractExtension {
      */
     public static ConditionList nullSafeConditionList(Theme theme) {
         Assert.notNull(theme, "The theme must not be null");
-        ThemeStatus status = ObjectUtils.defaultIfNull(theme.getStatus(), new ThemeStatus());
+        var status = Objects.requireNonNullElseGet(theme.getStatus(), ThemeStatus::new);
         theme.setStatus(status);
 
-        ConditionList conditions =
-            ObjectUtils.defaultIfNull(status.getConditions(), new ConditionList());
+        var conditions = Objects.requireNonNullElseGet(status.getConditions(), ConditionList::new);
         status.setConditions(conditions);
         return conditions;
     }
