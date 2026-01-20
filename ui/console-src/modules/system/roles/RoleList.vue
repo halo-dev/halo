@@ -2,13 +2,12 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { roleLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import { resolveDeepDependencies } from "@/utils/role";
 import type {
   Role,
   RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,

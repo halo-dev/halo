@@ -1,7 +1,7 @@
-import { paginate } from "@/utils/paginate";
 import {
   BackupStatusPhaseEnum,
   coreApiClient,
+  paginate,
   type Backup,
   type BackupV1alpha1ApiListBackupRequest,
 } from "@halo-dev/api-client";

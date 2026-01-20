@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import {
+  paginate,
   ucApiClient,
   type Notification,
   type NotificationV1alpha1UcApiListUserNotificationsRequest,

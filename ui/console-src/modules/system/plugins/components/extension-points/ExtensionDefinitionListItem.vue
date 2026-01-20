@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
+  paginate,
   type ExtensionDefinition,
   type Plugin,
   type PluginV1alpha1ApiListPluginRequest,

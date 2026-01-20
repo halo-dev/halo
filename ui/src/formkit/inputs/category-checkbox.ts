@@ -1,4 +1,3 @@
-import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import {
   checkbox,
@@ -8,6 +7,7 @@ import {
 } from "@formkit/inputs";
 import {
   coreApiClient,
+  paginate,
   type Category,
   type CategoryV1alpha1ApiListCategoryRequest,
 } from "@halo-dev/api-client";

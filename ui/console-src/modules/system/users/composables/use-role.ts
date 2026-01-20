@@ -1,7 +1,7 @@
 import { roleLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
+  paginate,
   type Role,
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";

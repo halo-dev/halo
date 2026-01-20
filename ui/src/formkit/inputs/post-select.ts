@@ -1,9 +1,9 @@
 import { postLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
   consoleApiClient,
+  paginate,
   type ListedPost,
   type PostV1alpha1ConsoleApiListPostsRequest,
 } from "@halo-dev/api-client";

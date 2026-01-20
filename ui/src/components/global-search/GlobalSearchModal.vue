@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
 import {
   consoleApiClient,
   coreApiClient,
+  paginate,
   type Attachment,
   type AttachmentV1alpha1ApiListAttachmentRequest,
   type Category,

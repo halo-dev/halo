@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import type {
   Theme,
   ThemeV1alpha1ConsoleApiListThemesRequest,
 } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import { VButton, VEmpty, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import ThemeListItem from "../ThemeListItem.vue";

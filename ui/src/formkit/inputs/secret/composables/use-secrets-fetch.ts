@@ -1,6 +1,6 @@
-import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
+  paginate,
   type Secret,
   type SecretV1alpha1ApiListSecretRequest,
 } from "@halo-dev/api-client";

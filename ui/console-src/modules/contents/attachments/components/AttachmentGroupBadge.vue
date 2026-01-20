@@ -1,11 +1,14 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import type {
   Attachment,
   AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest,
   Group,
 } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconCheckboxCircle,

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
+  paginate,
   type Plugin,
   type Role,
   type RoleV1alpha1ApiListRoleRequest,

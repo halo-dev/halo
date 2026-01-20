@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
 import type {
   Theme,
   ThemeV1alpha1ConsoleApiListThemesRequest,
 } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   VButton,

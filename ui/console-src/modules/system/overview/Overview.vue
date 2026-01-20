@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
-import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
 import type {
   Plugin,
   PluginV1alpha1ConsoleApiListPluginsRequest,
 } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import {
   IconClipboardLine,
   IconTerminalBoxLine,

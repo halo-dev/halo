@@ -5,6 +5,13 @@ type ListResponse<TItem> = {
   hasNext: boolean;
 };
 
+/**
+ * Query all items from the list function.
+ *
+ * @param listFn - The function to list the items.
+ * @param params - The parameters to list the items.
+ * @returns The items.
+ */
 export async function paginate<TParams extends { page?: number }, TItem>(
   listFn: (params: TParams) => Promise<AxiosResponse<ListResponse<TItem>>>,
   params?: Omit<TParams, "page">

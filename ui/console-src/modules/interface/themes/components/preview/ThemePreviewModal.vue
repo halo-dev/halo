@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { paginate } from "@/utils/paginate";
 import { useThemeStore } from "@console/stores/theme";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type {
@@ -9,7 +8,7 @@ import type {
   Theme,
   ThemeV1alpha1ConsoleApiListThemesRequest,
 } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import {
   IconComputer,
   IconLink,

@@ -1,12 +1,11 @@
 import { attachmentPolicyLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import type {
   Policy,
   PolicyTemplate,
   PolicyTemplateV1alpha1ApiListPolicyTemplateRequest,
   PolicyV1alpha1ApiListPolicyRequest,
 } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 export function useFetchAttachmentPolicy() {

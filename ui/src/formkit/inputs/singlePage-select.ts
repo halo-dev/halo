@@ -1,9 +1,9 @@
 import { singlePageLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
   consoleApiClient,
+  paginate,
   type ListedSinglePage,
   type SinglePageV1alpha1ConsoleApiListSinglePagesRequest,
 } from "@halo-dev/api-client";

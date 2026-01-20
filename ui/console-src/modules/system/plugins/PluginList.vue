@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
+  paginate,
   type Plugin,
   type PluginV1alpha1ConsoleApiListPluginsRequest,
 } from "@halo-dev/api-client";

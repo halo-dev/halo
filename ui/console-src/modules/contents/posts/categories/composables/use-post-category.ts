@@ -1,6 +1,6 @@
-import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
+  paginate,
   type Category,
   type CategoryV1alpha1ApiListCategoryRequest,
 } from "@halo-dev/api-client";

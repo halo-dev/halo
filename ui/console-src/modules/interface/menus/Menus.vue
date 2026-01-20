@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import type {
   Menu,
   MenuItem,
   MenuItemV1alpha1ApiListMenuItemRequest,
 } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,

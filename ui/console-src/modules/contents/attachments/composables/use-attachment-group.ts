@@ -1,9 +1,8 @@
-import { paginate } from "@/utils/paginate";
 import type {
   Group,
   GroupV1alpha1ApiListGroupRequest,
 } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 

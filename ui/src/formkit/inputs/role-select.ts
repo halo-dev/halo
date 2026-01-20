@@ -1,10 +1,10 @@
 import { rbacAnnotations } from "@/constants/annotations";
 import { roleLabels } from "@/constants/labels";
-import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
   coreApiClient,
+  paginate,
   type Role,
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";

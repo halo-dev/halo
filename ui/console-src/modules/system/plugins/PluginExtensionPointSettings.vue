@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { paginate } from "@/utils/paginate";
 import {
   coreApiClient,
+  paginate,
   type ExtensionPointDefinition,
   type ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest,
 } from "@halo-dev/api-client";

@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { paginate } from "@/utils/paginate";
 import type {
   Group,
   GroupV1alpha1ApiListGroupRequest,
 } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";

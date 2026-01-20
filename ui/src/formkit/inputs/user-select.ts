@@ -1,8 +1,8 @@
-import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
   consoleApiClient,
+  paginate,
   type ListedUser,
   type UserV1alpha1ConsoleApiListUsersRequest,
 } from "@halo-dev/api-client";

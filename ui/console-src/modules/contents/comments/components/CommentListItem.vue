@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { paginate } from "@/utils/paginate";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
   ListedComment,
   ListedReply,
   ReplyV1alpha1ConsoleApiListRepliesRequest,
 } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
