@@ -45,6 +45,8 @@ const editingModalVisible = ref(false);
 const handleDelete = async () => {
   const { data } = await consoleApiClient.storage.attachment.searchAttachments({
     fieldSelector: [`spec.policyName=${props.policy.metadata.name}`],
+    page: 1,
+    size: 1,
   });
 
   if (data.total > 0) {

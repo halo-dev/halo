@@ -1,6 +1,11 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
-import { consoleApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  paginate,
+  type ListedUser,
+  type UserV1alpha1ConsoleApiListUsersRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
@@ -31,11 +36,15 @@ const findOptionsByValues = async (values: string[]) => {
     return [];
   }
 
-  const { data } = await consoleApiClient.user.listUsers({
+  const users = await paginate<
+    UserV1alpha1ConsoleApiListUsersRequest,
+    ListedUser
+  >((params) => consoleApiClient.user.listUsers(params), {
     fieldSelector: [`metadata.name=(${values.join(",")})`],
+    size: 1000,
   });
 
-  return data.items?.map((user) => {
+  return users.map((user) => {
     return {
       value: user.user.metadata.name,
       label: user.user.spec.displayName,

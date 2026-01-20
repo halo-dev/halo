@@ -277,6 +277,8 @@ async function slugUniqueValidation(node: FormKitNode) {
   const { data: postsWithSameSlug } = await coreApiClient.content.post.listPost(
     {
       fieldSelector,
+      page: 1,
+      size: 1,
     }
   );
 

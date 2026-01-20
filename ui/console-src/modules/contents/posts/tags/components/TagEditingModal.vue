@@ -161,6 +161,8 @@ async function slugUniqueValidation(node: FormKitNode) {
 
   const { data: tagsWithSameSlug } = await coreApiClient.content.tag.listTag({
     fieldSelector,
+    page: 1,
+    size: 1,
   });
 
   return !tagsWithSameSlug.total;

@@ -13,7 +13,7 @@ const { data: backups, isLoading, isFetching, refetch } = useBackupFetch();
 
 <template>
   <VLoading v-if="isLoading" />
-  <Transition v-else-if="!backups?.items?.length" appear name="fade">
+  <Transition v-else-if="!backups?.length" appear name="fade">
     <VEmpty
       :message="$t('core.backup.empty.message')"
       :title="$t('core.backup.empty.title')"
@@ -28,7 +28,7 @@ const { data: backups, isLoading, isFetching, refetch } = useBackupFetch();
   <Transition v-else appear name="fade">
     <VEntityContainer>
       <BackupListItem
-        v-for="backup in backups?.items"
+        v-for="backup in backups"
         :key="backup.metadata.name"
         :backup="backup"
       />

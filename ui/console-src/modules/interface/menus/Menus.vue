@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import type { Menu, MenuItem } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  Menu,
+  MenuItem,
+  MenuItemV1alpha1ApiListMenuItemRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -57,13 +61,14 @@ const {
     }
 
     const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
-    const { data } = await coreApiClient.menuItem.listMenuItem({
-      page: 0,
-      size: 0,
-      fieldSelector: [`name=(${menuItemNames.join(",")})`],
-    });
 
-    return data.items;
+    return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
+      (params) => coreApiClient.menuItem.listMenuItem(params),
+      {
+        fieldSelector: [`name=(${menuItemNames.join(",")})`],
+        size: 1000,
+      }
+    );
   },
   onSuccess(data) {
     menuTreeItems.value = buildMenuItemsTree(data);

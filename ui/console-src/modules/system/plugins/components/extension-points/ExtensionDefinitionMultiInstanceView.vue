@@ -20,11 +20,7 @@ const { data: extensionDefinitions, isLoading } = useExtensionDefinitionFetch(
 <template>
   <div class="p-4">
     <VLoading v-if="isLoading"></VLoading>
-    <Transition
-      v-else-if="!extensionDefinitions?.items.length"
-      appear
-      name="fade"
-    >
+    <Transition v-else-if="!extensionDefinitions?.length" appear name="fade">
       <VEmpty
         :title="
           $t('core.plugin.extension-settings.extension-definition.empty.title')
@@ -35,7 +31,7 @@ const { data: extensionDefinitions, isLoading } = useExtensionDefinitionFetch(
       <div class="overflow-hidden rounded-base border">
         <VEntityContainer>
           <ExtensionDefinitionListItem
-            v-for="item in extensionDefinitions?.items"
+            v-for="item in extensionDefinitions"
             :key="item.metadata.name"
             :extension-definition="item"
           />

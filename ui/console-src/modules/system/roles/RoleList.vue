@@ -3,8 +3,11 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { roleLabels } from "@/constants/labels";
 import { resolveDeepDependencies } from "@/utils/role";
-import type { Role, RoleList } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  Role,
+  RoleV1alpha1ApiListRoleRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -26,6 +29,7 @@ import { useQuery } from "@tanstack/vue-query";
 import Fuse from "fuse.js";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useFetchRoleTemplates } from "../users/composables/use-role";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
 const { t } = useI18n();
@@ -35,40 +39,31 @@ const selectedRole = ref<Role>();
 
 let fuse: Fuse<Role> | undefined = undefined;
 
-const { data: roleTemplates } = useQuery({
-  queryKey: ["role-templates"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
-  },
-});
+const { data: roleTemplates } = useFetchRoleTemplates();
 
 const {
   data: roles,
   isLoading,
   refetch,
-} = useQuery<RoleList>({
+} = useQuery<Role[]>({
   queryKey: ["roles"],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`!${roleLabels.TEMPLATE}`],
-    });
-    return data;
+    return await paginate<RoleV1alpha1ApiListRoleRequest, Role>(
+      (params) => coreApiClient.role.listRole(params),
+      {
+        size: 1000,
+        labelSelector: [`!${roleLabels.TEMPLATE}`],
+      }
+    );
   },
   refetchInterval(data) {
-    const hasDeletingRole = data?.items.some(
+    const hasDeletingRole = data?.some(
       (item) => !!item.metadata.deletionTimestamp
     );
     return hasDeletingRole ? 1000 : false;
   },
   onSuccess(data) {
-    fuse = new Fuse(data.items, {
+    fuse = new Fuse(data, {
       keys: [
         {
           name: "displayName",
@@ -91,7 +86,7 @@ const keyword = ref("");
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
-    return roles.value?.items || [];
+    return roles.value || [];
   }
 
   return fuse?.search(keyword.value).map((item) => item.item);
@@ -146,12 +141,17 @@ const handleCloneRole = async (role: Role) => {
 
   // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
+    const allRoleTemplates = await paginate<
+      RoleV1alpha1ApiListRoleRequest,
+      Role
+    >((params) => coreApiClient.role.listRole(params), {
+      size: 1000,
       labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
     });
-    const roleTemplateNames = data.items.map((item) => item.metadata.name);
+
+    const roleTemplateNames = allRoleTemplates.map(
+      (item) => item.metadata.name
+    );
     if (roleToCreate.metadata.annotations) {
       roleToCreate.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
         JSON.stringify(roleTemplateNames);

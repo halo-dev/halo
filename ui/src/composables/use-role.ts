@@ -1,28 +1,14 @@
 import { rbacAnnotations } from "@/constants/annotations";
-import { roleLabels } from "@/constants/labels";
 import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  type ComputedRef,
-  type Ref,
-} from "vue";
+import { computed, ref, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
   roles: Role[];
-}
-
-interface useFetchRoleReturn {
-  roles: Ref<Role[]>;
-  loading: Ref<boolean>;
-  handleFetchRoles: () => void;
 }
 
 interface useRoleFormReturn {
@@ -36,60 +22,6 @@ interface useRoleTemplateSelectionReturn {
   selectedRoleTemplates: Ref<Set<string>>;
   roleTemplateGroups: ComputedRef<RoleTemplateGroup[]>;
   handleRoleTemplateSelect: (e: Event) => void;
-}
-
-/**
- * Fetch all roles(without role templates) from the API.
- *
- * @returns {useFetchRoleReturn}
- */
-export function useFetchRole(): useFetchRoleReturn {
-  const roles = ref<Role[]>([]);
-  const loading = ref(false);
-  const refreshInterval = ref();
-
-  const handleFetchRoles = async (options?: { mute?: boolean }) => {
-    try {
-      clearInterval(refreshInterval.value);
-
-      if (!options?.mute) {
-        loading.value = true;
-      }
-
-      const { data } = await coreApiClient.role.listRole({
-        page: 0,
-        size: 0,
-        labelSelector: [`!${roleLabels.TEMPLATE}`],
-      });
-      roles.value = data.items;
-
-      const deletedRoles = roles.value.filter(
-        (role) => !!role.metadata.deletionTimestamp
-      );
-
-      if (deletedRoles.length) {
-        refreshInterval.value = setInterval(() => {
-          handleFetchRoles({ mute: true });
-        }, 1000);
-      }
-    } catch (e) {
-      console.error("Failed to fetch roles", e);
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  onMounted(handleFetchRoles);
-
-  onUnmounted(() => {
-    clearInterval(refreshInterval.value);
-  });
-
-  return {
-    roles,
-    loading,
-    handleFetchRoles,
-  };
 }
 
 /**

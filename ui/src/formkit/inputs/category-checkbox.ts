@@ -5,15 +5,23 @@ import {
   defaultIcon,
   type FormKitInputs,
 } from "@formkit/inputs";
-import { coreApiClient } from "@halo-dev/api-client";
+import {
+  coreApiClient,
+  paginate,
+  type Category,
+  type CategoryV1alpha1ApiListCategoryRequest,
+} from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.content.category.listCategory({
+    const categories = await paginate<
+      CategoryV1alpha1ApiListCategoryRequest,
+      Category
+    >((params) => coreApiClient.content.category.listCategory(params), {
       sort: ["metadata.creationTimestamp,desc"],
     });
 
-    node.props.options = data.items.map((category) => {
+    node.props.options = categories.map((category) => {
       return {
         value: category.metadata.name,
         label: category.spec.displayName,
