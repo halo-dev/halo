@@ -27,6 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.core.extension.attachment.endpoint.DeleteOption;
@@ -62,16 +63,25 @@ public class DefaultAttachmentService implements AttachmentService {
         @Nullable String groupName,
         @NonNull FilePart filePart,
         @Nullable Consumer<Attachment> beforeCreating) {
-        return client.get(Policy.class, policyName)
-            .flatMap(policy -> {
-                var configMapName = policy.getSpec().getConfigMapName();
-                if (!StringUtils.hasText(configMapName)) {
-                    return Mono.error(new ServerWebInputException(
-                        "ConfigMap name not found in Policy " + policyName));
-                }
-                return client.get(ConfigMap.class, configMapName)
-                    .map(configMap -> new UploadOption(filePart, policy, configMap));
-            })
+        var builder = UploadOption.builder();
+        builder.file(filePart);
+        var getPolicyAndConfigMap = client.get(Policy.class, policyName)
+            .doOnNext(builder::policy)
+            .mapNotNull(p -> p.getSpec().getConfigMapName())
+            .filter(StringUtils::hasText)
+            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                "ConfigMap name not found in Policy " + policyName
+            )))
+            .flatMap(configMapName -> client.get(ConfigMap.class, configMapName))
+            .doOnNext(builder::configMap)
+            .then();
+
+        var getGroup = Mono.justOrEmpty(groupName)
+            .filter(StringUtils::hasText)
+            .flatMap(name -> client.get(Group.class, name))
+            .doOnNext(builder::group)
+            .then();
+        return Mono.when(getPolicyAndConfigMap, getGroup).then(Mono.fromSupplier(builder::build))
             .flatMap(uploadContext -> extensionGetter.getExtensions(AttachmentHandler.class)
                 .concatMap(handler -> handler.upload(uploadContext))
                 .next())
