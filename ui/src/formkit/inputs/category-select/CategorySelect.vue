@@ -244,6 +244,8 @@ const handleCreateCategory = async () => {
   const { data: categoriesWithSameSlug } =
     await coreApiClient.content.category.listCategory({
       fieldSelector: [`spec.slug=${slug}`],
+      page: 1,
+      size: 1,
     });
 
   if (categoriesWithSameSlug.total) {

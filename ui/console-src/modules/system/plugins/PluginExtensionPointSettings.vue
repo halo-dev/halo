@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { coreApiClient } from "@halo-dev/api-client";
+import { paginate } from "@/utils/paginate";
+import {
+  coreApiClient,
+  type ExtensionPointDefinition,
+  type ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest,
+} from "@halo-dev/api-client";
 import {
   IconSettings,
   VButton,
@@ -15,9 +20,18 @@ import ExtensionDefinitionSingletonView from "./components/extension-points/Exte
 const { data: extensionPointDefinitions } = useQuery({
   queryKey: ["extension-point-definitions"],
   queryFn: async () => {
-    const { data } =
-      await coreApiClient.plugin.extensionPointDefinition.listExtensionPointDefinition();
-    return data;
+    return await paginate<
+      ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest,
+      ExtensionPointDefinition
+    >(
+      (params) =>
+        coreApiClient.plugin.extensionPointDefinition.listExtensionPointDefinition(
+          params
+        ),
+      {
+        size: 1000,
+      }
+    );
   },
 });
 

@@ -1,7 +1,12 @@
 import { singlePageLabels } from "@/constants/labels";
+import { paginate } from "@/utils/paginate";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
-import { consoleApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  type ListedSinglePage,
+  type SinglePageV1alpha1ConsoleApiListSinglePagesRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 async function search({ page, size, keyword }) {
@@ -33,11 +38,15 @@ async function findOptionsByValues(values: string[]) {
     return [];
   }
 
-  const { data } = await consoleApiClient.content.singlePage.listSinglePages({
+  const singlePages = await paginate<
+    SinglePageV1alpha1ConsoleApiListSinglePagesRequest,
+    ListedSinglePage
+  >((params) => consoleApiClient.content.singlePage.listSinglePages(params), {
     fieldSelector: [`metadata.name=(${values.join(",")})`],
+    size: 1000,
   });
 
-  return data.items.map((singlePage) => {
+  return singlePages.map((singlePage) => {
     return {
       value: singlePage.page.metadata.name,
       label: singlePage.page.spec.title,

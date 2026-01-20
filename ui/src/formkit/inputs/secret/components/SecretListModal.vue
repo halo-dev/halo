@@ -57,7 +57,7 @@ function handleSelect() {
     </template>
     <VEntityContainer>
       <SecretListItem
-        v-for="secret in data?.items"
+        v-for="secret in data"
         :key="secret.metadata.name"
         :secret="secret"
         :selected="selectedSecretName === secret.metadata.name"
