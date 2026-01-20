@@ -21,7 +21,7 @@ const value = computed(() => {
 });
 </script>
 <template>
-  <div class="inline-flex items-center [&>*]:h-4">
+  <div class="inline-flex items-center [&>*]:size-4">
     <img
       v-if="['url', 'dataurl'].includes(itemLabel.format)"
       :src="value"
