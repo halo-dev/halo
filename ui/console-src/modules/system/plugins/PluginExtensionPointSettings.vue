@@ -40,7 +40,7 @@ const selectedExtensionPointDefinitionName = useRouteQuery<string | undefined>(
 );
 
 const selectedExtensionPointDefinition = computed(() => {
-  return extensionPointDefinitions.value?.items.find(
+  return extensionPointDefinitions.value?.find(
     (item) => item.metadata.name === selectedExtensionPointDefinitionName.value
   );
 });
@@ -48,9 +48,8 @@ const selectedExtensionPointDefinition = computed(() => {
 watch(
   () => extensionPointDefinitions.value,
   (value) => {
-    if (value?.items.length && !selectedExtensionPointDefinitionName.value) {
-      selectedExtensionPointDefinitionName.value =
-        value?.items[0].metadata.name;
+    if (value?.length && !selectedExtensionPointDefinitionName.value) {
+      selectedExtensionPointDefinitionName.value = value?.[0].metadata.name;
     }
   },
   {
@@ -94,7 +93,7 @@ watch(
             role="list"
           >
             <li
-              v-for="extensionPointDefinition in extensionPointDefinitions?.items"
+              v-for="extensionPointDefinition in extensionPointDefinitions"
               :key="extensionPointDefinition.metadata.name"
               class="relative cursor-pointer"
               @click="
