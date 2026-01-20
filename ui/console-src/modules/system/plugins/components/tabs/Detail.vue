@@ -7,6 +7,7 @@ import {
   coreApiClient,
   type Plugin,
   type Role,
+  type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
 import {
   VAlert,
@@ -33,14 +34,17 @@ interface RoleTemplateGroup {
 const { data: pluginRoleTemplates } = useQuery({
   queryKey: ["plugin-roles", plugin?.value?.metadata.name],
   queryFn: async () => {
-    return await paginate((params) => coreApiClient.role.listRole(params), {
-      size: 1000,
-      labelSelector: [
-        `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
-        `${roleLabels.TEMPLATE}=true`,
-        "!halo.run/hidden",
-      ],
-    });
+    return await paginate<RoleV1alpha1ApiListRoleRequest, Role>(
+      (params) => coreApiClient.role.listRole(params),
+      {
+        size: 1000,
+        labelSelector: [
+          `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
+          `${roleLabels.TEMPLATE}=true`,
+          "!halo.run/hidden",
+        ],
+      }
+    );
   },
   cacheTime: 0,
   enabled: computed(
