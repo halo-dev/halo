@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { FormKitSchemaDefinition } from "@formkit/core";
 import {
   IconToolsFill,
   VButton,
@@ -68,24 +67,6 @@ const fetchRoutes = async () => {
 onMounted(() => {
   fetchRoutes();
 });
-
-const formkitSchema: FormKitSchemaDefinition = {
-  $formkit: "array",
-  name: "socials",
-  label: "社区账号",
-  itemLabels: [
-    {
-      type: "image",
-      label: "$value.attachment",
-    },
-  ],
-  children: [
-    {
-      $formkit: "attachment",
-      name: "attachment",
-    },
-  ],
-};
 </script>
 
 <template>
@@ -96,7 +77,6 @@ const formkitSchema: FormKitSchemaDefinition = {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <FormKitSchema :schema="formkitSchema" />
     <VCard :body-class="['!p-0']">
       <VEmpty
         v-if="!routes?.length"
