@@ -5,13 +5,15 @@ import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
-import { onMounted, ref, toRaw } from "vue";
+import { onMounted, ref, toRaw, watch } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
+import type { IconifyFormat, IconifyValue } from "../iconify/types";
 import ArrayFormModal from "./ArrayFormModal.vue";
 import ColorLabel from "./labels/ColorLabel.vue";
 import IconifyLabel from "./labels/IconifyLabel.vue";
+import { renderItemLabelValue } from "./renderers";
 
 const formKitChildrenId = `formkit-children-${utils.id.uuid()}`;
 
@@ -82,122 +84,30 @@ function arrayFeature(node: FormKitNode<ArrayValue>) {
   });
 }
 
-onMounted(() => {
+onMounted(async () => {
   const node = props.node;
   node._c.sync = true;
   arrayFeature(node);
   hiddenChildrenFormKit.value = getNode(formKitChildrenId);
+  await updateFormattedLabels();
 });
 
-const renderItemLabelValue = (
-  node: FormKitNode<unknown>,
-  value: unknown
-): Record<string, unknown> => {
-  switch (node.props.type) {
-    case "select": {
-      let renderValue = value;
-      const options = node.context?.attrs.options;
-      const selectedOption = findSelectedOption(options, value);
-      if (selectedOption) {
-        renderValue = selectedOption.label;
-      }
-      return {
-        value: renderValue,
-      };
-    }
-    case "nativeSelect": {
-      let renderValue = value;
-      const options = node.context?.options as unknown[];
-      const selectedOption = findSelectedOption(options, value);
-      if (selectedOption) {
-        renderValue = selectedOption.group
-          ? `${selectedOption.group}/${selectedOption.label}`
-          : selectedOption.label;
-      }
-      return {
-        value: renderValue,
-      };
-    }
-    case "iconify": {
-      const format = node.props.format;
-      const valueOnly = node.props.valueOnly;
-      return {
-        format,
-        valueOnly,
-      };
-    }
-    default: {
-      return {
-        value,
-      };
-    }
-  }
-};
-
-/**
- * from options to find the selected option
- *
- * @param options - the options to search
- * @param value - the value to search for
- * @returns the selected option
- */
-function findSelectedOption(
-  options: unknown[],
-  value: unknown
-):
+type FormattedItemLabel =
   | {
-      label: string;
-      value: unknown;
-      group?: unknown;
+      type: "text" | "image" | "color";
+      value: string;
     }
-  | undefined {
-  if (!options || options.length === 0) {
-    return;
-  }
+  | {
+      type: "iconify";
+      value: string | IconifyValue;
+      format: IconifyFormat;
+      valueOnly?: boolean;
+    };
 
-  for (const option of options) {
-    if (!option) {
-      continue;
-    }
-
-    if (typeof option === "string") {
-      if (option === value) {
-        return {
-          label: option,
-          value: option,
-        };
-      }
-    }
-
-    if (typeof option === "object") {
-      if ("value" in option && "label" in option) {
-        if (option.value === value) {
-          return {
-            label: option.label as string,
-            value: option.value,
-          };
-        }
-      }
-
-      if ("group" in option && "options" in option) {
-        const options = option.options as unknown[];
-        const selectedOption = findSelectedOption(options, value);
-        if (selectedOption) {
-          return {
-            label: selectedOption.label,
-            value: selectedOption.value,
-            group: option.group,
-          };
-        }
-      }
-    }
-  }
-}
-
-const parseItemLabel = (
+const parseItemLabel = async (
   itemLabel: ArrayItemLabel,
   item: Record<string, unknown>
-) => {
+): Promise<FormattedItemLabel | undefined> => {
   if (!itemLabel.label) {
     return;
   }
@@ -210,39 +120,69 @@ const parseItemLabel = (
     if (!node) {
       return {
         type: itemLabel.type,
-        value: value,
-      };
+        value: String(value ?? ""),
+      } as FormattedItemLabel;
     }
+    const renderedValue = await renderItemLabelValue(node, value);
     return {
       type: itemLabel.type,
-      value,
-      ...renderItemLabelValue(node, value),
-    };
+      value:
+        renderedValue.value !== undefined
+          ? String(renderedValue.value)
+          : String(value ?? ""),
+      ...renderedValue,
+    } as FormattedItemLabel;
   }
 };
 
-const formatItemLabel = (item: Record<string, unknown>) => {
+const formatItemLabel = async (
+  item: Record<string, unknown>
+): Promise<FormattedItemLabel[]> => {
   const defaultItemLabel = Object.keys(item).map((key) => {
     return {
-      type: "text",
+      type: "text" as ArrayItemLabelType,
       label: `$value.${key}`,
     };
   });
   const itemLabels = props.node.props.itemLabels ?? defaultItemLabel;
   if (itemLabels.length > 0) {
-    const result = itemLabels
-      .map((itemLabel: ArrayItemLabel) => {
+    const results = await Promise.all(
+      itemLabels.map((itemLabel: ArrayItemLabel) => {
         return parseItemLabel(itemLabel, item);
       })
-      .filter(Boolean)
-      .filter((itemLabel) => !!itemLabel.value);
-    return result;
+    );
+    return results.filter(
+      (itemLabel): itemLabel is FormattedItemLabel => !!itemLabel?.value
+    );
   }
   return [];
 };
 
 const itemValue = ref<Record<string, unknown>>({});
 const currentEditIndex = ref<number>(-1);
+
+const formattedItemLabels = ref<Map<string, FormattedItemLabel[]>>(new Map());
+
+const updateFormattedLabels = async () => {
+  const newLabelsMap = new Map();
+
+  for (let index = 0; index < arrayValue.value.length; index++) {
+    const item = arrayValue.value[index];
+    const key = generateKey(item, index);
+    const labels = await formatItemLabel(item);
+    newLabelsMap.set(key, labels);
+  }
+
+  formattedItemLabels.value = newLabelsMap;
+};
+
+watch(
+  () => arrayValue.value,
+  async () => {
+    await updateFormattedLabels();
+  },
+  { deep: true, immediate: false }
+);
 
 const handleOpenArrayModal = (
   item?: Record<string, unknown>,
@@ -296,8 +236,10 @@ const handleRemoveItem = (index: number) => {
           class="line-clamp-1 flex min-w-0 flex-1 shrink cursor-pointer items-center gap-2 whitespace-nowrap text-sm text-gray-900"
         >
           <template
-            v-for="itemLabel in formatItemLabel(item)"
-            :key="itemLabel.label"
+            v-for="(itemLabel, labelIndex) in formattedItemLabels.get(
+              generateKey(item, index)
+            ) || []"
+            :key="labelIndex"
           >
             <a
               v-if="itemLabel.type === 'image'"

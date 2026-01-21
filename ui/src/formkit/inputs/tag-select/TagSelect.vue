@@ -92,6 +92,16 @@ watch(
       useExtendedSearch: true,
       threshold: 0.2,
     });
+    if (props.context) {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.context.options =
+        postTags.value?.map((tag) => {
+          return {
+            label: tag.spec.displayName,
+            value: tag.metadata.name,
+          };
+        }) || [];
+    }
   },
   {
     immediate: true,
