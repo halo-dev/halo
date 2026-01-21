@@ -130,7 +130,7 @@ async function findSelectedOptionByRemote(
         size: 20,
       });
       if (options.length > 0) {
-        const selectedOption = findSelectedOption(options, value);
+        const selectedOption = findOptions(options, value);
         if (selectedOption) {
           return selectedOption;
         }
