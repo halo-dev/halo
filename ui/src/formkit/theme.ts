@@ -178,6 +178,7 @@ const theme: Record<string, Record<string, string>> = {
     "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   secret: {
+    inner: "w-full sm:max-w-lg",
     wrapper: textClassification.wrapper,
     label: textClassification.label,
   },
