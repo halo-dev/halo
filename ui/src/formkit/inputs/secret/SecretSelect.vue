@@ -126,7 +126,7 @@ const missingKeys = computed(() => {
 </script>
 <template>
   <div
-    class="flex items-center gap-2 rounded-lg px-2.5 py-2 ring-1 ring-gray-100"
+    class="flex items-center gap-2 rounded-lg border border-gray-100 px-2.5 py-2"
   >
     <div
       class="inline-flex size-8 flex-none items-center justify-center rounded-full"
