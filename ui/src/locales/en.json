@@ -1229,5 +1229,6 @@
   "core.page_snapshots.status.released": "Released",
   "core.page_snapshots.status.draft": "Draft",
   "core.page_snapshots.status.base": "Base",
-  "core.page_snapshots.title": "Page snapshots"
+  "core.page_snapshots.title": "Page snapshots",
+  "core.dashboard.widgets.presets.upvotes_stats.title": "Upvotes"
 }

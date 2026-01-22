@@ -1229,5 +1229,6 @@
   "core.formkit.secret.missing_keys": "El secreto seleccionado falta los siguientes campos: {keys}",
   "core.formkit.secret.includes_keys": "Incluye campos: {keys}",
   "core.formkit.secret.no_fields": "No hay campos",
-  "core.formkit.secret.required_keys_tip": "Los campos requeridos para el elemento del formulario actual incluyen:"
+  "core.formkit.secret.required_keys_tip": "Los campos requeridos para el elemento del formulario actual incluyen:",
+  "core.dashboard.widgets.presets.upvotes_stats.title": "Me gusta"
 }
