@@ -64,6 +64,7 @@ import IconStopCircle from "~icons/ri/stop-circle-line";
 import IconTablet from "~icons/ri/tablet-line";
 import IconTeam from "~icons/ri/team-fill";
 import IconTerminalBoxLine from "~icons/ri/terminal-box-line";
+import IconThumbUpLine from "~icons/ri/thumb-up-line";
 import IconTimerLine from "~icons/ri/timer-line";
 import IconToolsFill from "~icons/ri/tools-fill";
 import IconRiUpload2Fill from "~icons/ri/upload-2-fill";
@@ -143,6 +144,7 @@ export {
   IconTablet,
   IconTeam,
   IconTerminalBoxLine,
+  IconThumbUpLine,
   IconTimerLine,
   IconToolsFill,
   IconUpload,

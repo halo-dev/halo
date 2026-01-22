@@ -1229,5 +1229,6 @@
   "core.formkit.secret.missing_keys": "所選密鈅還缺少字段：{keys}",
   "core.formkit.secret.includes_keys": "包含字段：{keys}",
   "core.formkit.secret.no_fields": "沒有字段",
-  "core.formkit.secret.required_keys_tip": "當前表單項所需的密鈅字段包括："
+  "core.formkit.secret.required_keys_tip": "當前表單項所需的密鈅字段包括：",
+  "core.dashboard.widgets.presets.upvotes_stats.title": "點讚"
 }
