@@ -7,10 +7,6 @@ export interface GlobalInfo {
   allowComments: boolean;
   allowAnonymousComments: boolean;
   allowRegistration: boolean;
-  socialAuthProviders: SocialAuthProvider[];
-  useAbsolutePermalink: boolean;
-  userInitialized: boolean;
-  dataInitialized: boolean;
   favicon?: string;
   postSlugGenerationStrategy: ModeType;
   mustVerifyEmailOnRegistration: boolean;
@@ -104,14 +100,4 @@ export interface Timeline {
 export interface Startup {
   springBootVersion: string;
   timeline: Timeline;
-}
-
-export interface SocialAuthProvider {
-  name: string;
-  displayName: string;
-  description: string;
-  logo: string;
-  website: string;
-  authenticationUrl: string;
-  bindingUrl?: string;
 }

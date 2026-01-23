@@ -92,6 +92,16 @@ watch(
       useExtendedSearch: true,
       threshold: 0.2,
     });
+    if (props.context) {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.context.options =
+        postTags.value?.map((tag) => {
+          return {
+            label: tag.spec.displayName,
+            value: tag.metadata.name,
+          };
+        }) || [];
+    }
   },
   {
     immediate: true,
@@ -215,6 +225,8 @@ const handleCreateTag = async () => {
   // Check if slug is unique, if not, add -1 to the slug
   const { data: tagsWithSameSlug } = await coreApiClient.content.tag.listTag({
     fieldSelector: [`spec.slug=${slug}`],
+    page: 1,
+    size: 1,
   });
 
   if (tagsWithSameSlug.total) {

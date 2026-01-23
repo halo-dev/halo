@@ -1,6 +1,13 @@
 <script lang="ts" setup>
-import type { Menu } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import type {
+  Menu,
+  MenuV1alpha1ApiListMenuRequest,
+} from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   Toast,
@@ -51,11 +58,12 @@ const {
 } = useQuery<Menu[]>({
   queryKey: ["menus"],
   queryFn: async () => {
-    const { data } = await coreApiClient.menu.listMenu({
-      page: 0,
-      size: 0,
-    });
-    return data.items;
+    return await paginate<MenuV1alpha1ApiListMenuRequest, Menu>(
+      (params) => coreApiClient.menu.listMenu(params),
+      {
+        size: 1000,
+      }
+    );
   },
   onSuccess(data) {
     if (props.selectedMenu) {

@@ -22,23 +22,14 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
+import { useFetchRoleTemplates } from "../users/composables/use-role";
 
 const route = useRoute();
 const { t } = useI18n();
 
 const tabActiveId = ref("detail");
 
-const { data: roleTemplates } = useQuery({
-  queryKey: ["role-templates"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
-  },
-});
+const { data: roleTemplates } = useFetchRoleTemplates();
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(roleTemplates);

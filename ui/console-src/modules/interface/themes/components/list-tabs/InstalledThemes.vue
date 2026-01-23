@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { useThemeStore } from "@console/stores/theme";
-import type { Theme } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type {
+  Theme,
+  ThemeV1alpha1ConsoleApiListThemesRequest,
+} from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   VButton,
@@ -31,12 +34,15 @@ const {
 } = useQuery<Theme[]>({
   queryKey: ["installed-themes"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.listThemes({
-      page: 0,
-      size: 0,
+    const themes = await paginate<
+      ThemeV1alpha1ConsoleApiListThemesRequest,
+      Theme
+    >((params) => consoleApiClient.theme.theme.listThemes(params), {
       uninstalled: false,
+      size: 1000,
     });
-    return data.items.sort((a, b) => {
+
+    return themes.sort((a, b) => {
       const activatedThemeName = themeStore.activatedTheme?.metadata.name;
       if (a.metadata.name === activatedThemeName) {
         return -1;

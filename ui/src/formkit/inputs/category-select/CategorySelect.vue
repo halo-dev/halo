@@ -106,6 +106,16 @@ watch(
       useExtendedSearch: true,
       threshold: 0.2,
     });
+    if (props.context) {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.context.options =
+        categories.value?.map((category) => {
+          return {
+            label: category.spec.displayName,
+            value: category.metadata.name,
+          };
+        }) || [];
+    }
   },
   {
     immediate: true,
@@ -244,6 +254,8 @@ const handleCreateCategory = async () => {
   const { data: categoriesWithSameSlug } =
     await coreApiClient.content.category.listCategory({
       fieldSelector: [`spec.slug=${slug}`],
+      page: 1,
+      size: 1,
     });
 
   if (categoriesWithSameSlug.total) {

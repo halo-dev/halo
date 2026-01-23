@@ -197,6 +197,8 @@ const handleSave = async (options?: { mute?: boolean }) => {
       const { data: postsWithSameSlug } =
         await coreApiClient.content.post.listPost({
           fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
+          page: 1,
+          size: 1,
         });
 
       if (postsWithSameSlug.total) {

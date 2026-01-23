@@ -1,8 +1,16 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import type { ListedComment, ListedReply } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import type {
+  ListedComment,
+  ListedReply,
+  ReplyV1alpha1ConsoleApiListRepliesRequest,
+} from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -162,12 +170,13 @@ const {
     showReplies,
   ],
   queryFn: async () => {
-    const { data } = await consoleApiClient.content.reply.listReplies({
+    return await paginate<
+      ReplyV1alpha1ConsoleApiListRepliesRequest,
+      ListedReply
+    >((params) => consoleApiClient.content.reply.listReplies(params), {
       commentName: props.comment.comment.metadata.name,
-      page: 0,
-      size: 0,
+      size: 1000,
     });
-    return data.items;
   },
   refetchInterval(data) {
     const hasDeletingReplies = data?.some(

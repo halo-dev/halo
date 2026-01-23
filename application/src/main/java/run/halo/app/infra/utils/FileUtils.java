@@ -24,6 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -45,13 +46,29 @@ public abstract class FileUtils {
     private FileUtils() {
     }
 
+    /**
+     * Unzip the given content to target path. Please note that no default scheduler will be used.
+     *
+     * @param content the zip content
+     * @param targetPath the target path
+     * @return a Mono signaling when unzip is complete
+     */
     public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath) {
-        return unzip(content, targetPath, Schedulers.boundedElastic());
+        return unzip(content, targetPath, null);
     }
 
-    public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath,
-        Scheduler scheduler) {
-        return Mono.fromCallable(() -> {
+    /**
+     * Unzip the given content to target path.
+     *
+     * @param content the zip content
+     * @param targetPath the target path
+     * @param scheduler the scheduler
+     * @return a Mono signaling when unzip is complete
+     */
+    public static Mono<Void> unzip(
+        Publisher<DataBuffer> content, @NonNull Path targetPath, @Nullable Scheduler scheduler
+    ) {
+        var unzip = Mono.fromCallable(() -> {
             try (var is = subscriberInputStream(content, 1);
                  var zis = new ZipInputStream(is)) {
                 log.debug("Unzipping to target path: {}", targetPath);
@@ -59,7 +76,11 @@ public abstract class FileUtils {
                 log.debug("Unzipped to target path: {}", targetPath);
             }
             return null;
-        }).subscribeOn(scheduler).then();
+        }).then();
+        if (scheduler != null) {
+            return unzip.subscribeOn(scheduler);
+        }
+        return unzip;
     }
 
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
@@ -264,14 +285,20 @@ public abstract class FileUtils {
         }
     }
 
-    public static Mono<Boolean> deleteRecursivelyAndSilently(Path root, Scheduler scheduler) {
-        return Mono.fromSupplier(() -> {
+    public static Mono<Boolean> deleteRecursivelyAndSilently(
+        Path root, @Nullable Scheduler scheduler
+    ) {
+        var delete =  Mono.fromSupplier(() -> {
             try {
                 return deleteRecursively(root);
             } catch (IOException ignored) {
                 return false;
             }
-        }).subscribeOn(scheduler);
+        });
+        if (scheduler != null) {
+            return delete.subscribeOn(scheduler);
+        }
+        return delete;
     }
 
 
@@ -337,7 +364,11 @@ public abstract class FileUtils {
         });
     }
 
-    public static Mono<Path> createTempDir(String prefix, Scheduler scheduler) {
-        return Mono.fromCallable(() -> Files.createTempDirectory(prefix)).subscribeOn(scheduler);
+    public static Mono<Path> createTempDir(String prefix, @Nullable Scheduler scheduler) {
+        var createTempDir = Mono.fromCallable(() -> Files.createTempDirectory(prefix));
+        if (scheduler != null) {
+            return createTempDir.subscribeOn(scheduler);
+        }
+        return createTempDir;
     }
 }

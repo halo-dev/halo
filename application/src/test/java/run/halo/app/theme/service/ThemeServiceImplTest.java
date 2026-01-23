@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -154,9 +155,10 @@ class ThemeServiceImplTest {
                 // for theme deleted check
                 .thenReturn(Mono.empty());
 
-            when(client.delete(oldTheme)).thenReturn(Mono.just(oldTheme));
-            when(client.create(isA(Unstructured.class))).thenReturn(
-                Mono.just(convert(createTheme(t -> t.getSpec().setDisplayName("New fake theme")))));
+            when(client.get(Theme.class, "default")).thenReturn(Mono.just(oldTheme));
+            when(client.update(oldTheme)).thenReturn(Mono.just(createTheme(t -> {
+                t.getSpec().setDisplayName("New fake theme");
+            })));
 
             StepVerifier.create(themeService.upgrade("default", content(themeZipPath)))
                 .consumeNextWith(newTheme -> {
@@ -165,9 +167,8 @@ class ThemeServiceImplTest {
                 })
                 .verifyComplete();
 
-            verify(client, times(3)).fetch(Theme.class, "default");
-            verify(client).delete(oldTheme);
-            verify(client).create(isA(Unstructured.class));
+            verify(client).fetch(Theme.class, "default");
+            verify(client, never()).delete(oldTheme);
         }
     }
 
@@ -178,8 +179,7 @@ class ThemeServiceImplTest {
         @Test
         void shouldInstallSuccessfully() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("default");
-            when(client.create(isA(Unstructured.class))).thenReturn(
-                Mono.just(convert(createTheme())));
+            when(client.create(isA(Theme.class))).thenReturn(Mono.just(createTheme()));
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                 .consumeNextWith(theme -> {
                     assertEquals("default", theme.getMetadata().getName());
@@ -191,7 +191,7 @@ class ThemeServiceImplTest {
         @Test
         void shouldFailWhenPersistentError() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("default");
-            when(client.create(isA(Unstructured.class))).thenReturn(
+            when(client.create(isA(Theme.class))).thenReturn(
                 Mono.error(() -> new ExtensionException("Failed to create the extension")));
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                 .verifyError(ExtensionException.class);

@@ -4,8 +4,10 @@ import { pluginLabels, roleLabels } from "@/constants/labels";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
+  paginate,
   type Plugin,
   type Role,
+  type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
 import {
   VAlert,
@@ -32,17 +34,17 @@ interface RoleTemplateGroup {
 const { data: pluginRoleTemplates } = useQuery({
   queryKey: ["plugin-roles", plugin?.value?.metadata.name],
   queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [
-        `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
-        `${roleLabels.TEMPLATE}=true`,
-        "!halo.run/hidden",
-      ],
-    });
-
-    return data.items;
+    return await paginate<RoleV1alpha1ApiListRoleRequest, Role>(
+      (params) => coreApiClient.role.listRole(params),
+      {
+        size: 1000,
+        labelSelector: [
+          `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
+          `${roleLabels.TEMPLATE}=true`,
+          "!halo.run/hidden",
+        ],
+      }
+    );
   },
   cacheTime: 0,
   enabled: computed(

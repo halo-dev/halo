@@ -43,8 +43,8 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 
 ## 在线体验
 
-- 环境地址：<https://demo.halo.run>
-- 后台地址：<https://demo.halo.run/console>
+- 环境地址：<https://demo.halocms.site>
+- 后台地址：<https://demo.halocms.site/console>
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
 

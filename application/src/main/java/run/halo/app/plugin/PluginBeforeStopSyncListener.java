@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.SchemeNotFoundException;
@@ -53,6 +54,7 @@ class PluginBeforeStopSyncListener {
             .flatMap(entry -> Flux.fromIterable(entry.getValue())
                 .flatMap(extensionName -> client.fetch(entry.getKey(), extensionName)
                     .onErrorComplete(SchemeNotFoundException.class)
+                    .filter(e -> !ExtensionUtil.hasDoNotOverwriteLabel(e))
                     .flatMap(client::delete)
                     .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
                         .filter(OptimisticLockingFailureException.class::isInstance)

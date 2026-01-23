@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -56,4 +57,30 @@ class ExtensionUtilTest {
         assertEquals(Set.of(), metadata.getFinalizers());
     }
 
+    @Test
+    void hasDoNotOverwriteLabelTests() {
+        var extension = mock(ExtensionOperator.class);
+        when(extension.getMetadata()).thenReturn(null);
+        assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
+
+        var metadata = mock(Metadata.class);
+        when(extension.getMetadata()).thenReturn(metadata);
+        when(metadata.getLabels()).thenReturn(null);
+        assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
+
+        when(metadata.getLabels()).thenReturn(
+            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "false")
+        );
+        assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
+
+        when(metadata.getLabels()).thenReturn(
+            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true")
+        );
+        assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
+
+        when(metadata.getLabels()).thenReturn(
+            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "TrUe")
+        );
+        assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
+    }
 }

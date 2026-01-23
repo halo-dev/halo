@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useFetchRole } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { ListedUser, User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
@@ -28,6 +27,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
 import UserListItem from "./components/UserListItem.vue";
+import { useFetchRoles } from "./composables/use-role";
 
 const { t } = useI18n();
 
@@ -43,7 +43,7 @@ const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
 
 // Filters
-const { roles } = useFetchRole();
+const { data: roles } = useFetchRoles();
 const page = useRouteQuery<number>("page", 1, {
   transform: Number,
 });
@@ -313,7 +313,7 @@ function onCreationModalClose() {
                   {
                     label: t('core.common.filters.item_labels.all'),
                   },
-                  ...roles.map((role) => {
+                  ...(roles?.map((role) => {
                     return {
                       label:
                         role.metadata.annotations?.[
@@ -321,7 +321,7 @@ function onCreationModalClose() {
                         ] || role.metadata.name,
                       value: role.metadata.name,
                     };
-                  }),
+                  }) || []),
                 ]"
               />
               <FilterDropdown

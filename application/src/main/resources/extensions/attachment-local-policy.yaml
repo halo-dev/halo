@@ -23,6 +23,7 @@ metadata:
   name: default-policy-config
   labels:
     storage.halo.run/policy-owner: default-policy
+    halo.run/do-not-overwrite: "true"
 data:
   default: "{\"location\":\"\"}"
 ---

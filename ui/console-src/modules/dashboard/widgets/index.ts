@@ -6,6 +6,7 @@ import PendingCommentsWidget from "./presets/comments/PendingCommentsWidget.vue"
 import IframeWidget from "./presets/core/iframe/IframeWidget.vue";
 import QuickActionWidget from "./presets/core/quick-action/QuickActionWidget.vue";
 import StackWidget from "./presets/core/stack/StackWidget.vue";
+import UpvotesStatsWidget from "./presets/core/upvotes-stats/UpvotesStatsWidget.vue";
 import ViewsStatsWidget from "./presets/core/view-stats/ViewsStatsWidget.vue";
 import PostStatsWidget from "./presets/posts/PostStatsWidget.vue";
 import RecentPublishedWidget from "./presets/posts/RecentPublishedWidget.vue";
@@ -137,6 +138,29 @@ export const internalWidgetDefinitions: DashboardWidgetDefinition[] = [
   {
     id: "core:view:stats",
     component: markRaw(ViewsStatsWidget),
+    group: "core.dashboard.widgets.groups.other",
+    configFormKitSchema: () => [
+      {
+        $formkit: "checkbox",
+        label: i18n.global.t(
+          "core.dashboard.widgets.common_form.fields.enable_animation.label"
+        ),
+        name: "enable_animation",
+      },
+    ],
+    defaultConfig: {
+      enable_animation: true,
+    },
+    defaultSize: {
+      w: 3,
+      h: 3,
+      minH: 2,
+      minW: 2,
+    },
+  },
+  {
+    id: "core:upvotes:stats",
+    component: markRaw(UpvotesStatsWidget),
     group: "core.dashboard.widgets.groups.other",
     configFormKitSchema: () => [
       {

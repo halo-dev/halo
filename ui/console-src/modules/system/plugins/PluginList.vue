@@ -2,7 +2,9 @@
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
+  paginate,
   type Plugin,
+  type PluginV1alpha1ConsoleApiListPluginsRequest,
 } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -48,24 +50,20 @@ function handleClearFilters() {
   selectedEnabledValue.value = undefined;
 }
 
-const total = ref(0);
-
-const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
+const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
-      page: 0,
-      size: 0,
-      keyword: keyword.value,
-      enabled: selectedEnabledValue.value
-        ? JSON.parse(selectedEnabledValue.value)
-        : undefined,
-      sort: [selectedSortValue.value].filter(Boolean) as string[],
-    });
-
-    total.value = data.total;
-
-    return data.items;
+    return await paginate<PluginV1alpha1ConsoleApiListPluginsRequest, Plugin>(
+      (params) => consoleApiClient.plugin.plugin.listPlugins(params),
+      {
+        size: 1000,
+        keyword: keyword.value,
+        enabled: selectedEnabledValue.value
+          ? JSON.parse(selectedEnabledValue.value)
+          : undefined,
+        sort: [selectedSortValue.value].filter(Boolean) as string[],
+      }
+    );
   },
   keepPreviousData: true,
   refetchInterval: (data) => {
@@ -329,7 +327,11 @@ onMounted(() => {
       <template #footer>
         <div class="flex h-8 items-center">
           <span class="text-sm text-gray-500">
-            {{ $t("core.components.pagination.total_label", { total: total }) }}
+            {{
+              $t("core.components.pagination.total_label", {
+                total: data?.length,
+              })
+            }}
           </span>
         </div>
       </template>

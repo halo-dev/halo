@@ -45,6 +45,8 @@ const editingModalVisible = ref(false);
 const handleDelete = async () => {
   const { data } = await consoleApiClient.storage.attachment.searchAttachments({
     fieldSelector: [`spec.policyName=${props.policy.metadata.name}`],
+    page: 1,
+    size: 1,
   });
 
   if (data.total > 0) {
@@ -127,10 +129,7 @@ const isSystemProtection = computed(() => {
       </VEntityField>
     </template>
     <template #dropdownItems>
-      <VDropdownItem
-        :disabled="isSystemProtection"
-        @click="editingModalVisible = true"
-      >
+      <VDropdownItem @click="editingModalVisible = true">
         {{ $t("core.common.buttons.edit") }}
       </VDropdownItem>
       <VDropdownItem

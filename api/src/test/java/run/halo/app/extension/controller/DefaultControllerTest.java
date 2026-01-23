@@ -224,7 +224,7 @@ class DefaultControllerTest {
     }
 
     @Test
-    void shouldDisposeCorrectly() throws InterruptedException {
+    void shouldDisposeCorrectlyIfShutdownInTime() throws InterruptedException {
         when(executor.awaitTermination(anyLong(), any())).thenReturn(true);
 
         controller.dispose();
@@ -234,9 +234,27 @@ class DefaultControllerTest {
 
         verify(synchronizer, times(1)).dispose();
         verify(queue, times(1)).dispose();
-        verify(executor).shutdown();
-        verify(executor, never()).shutdownNow();
+        verify(executor).shutdownNow();
+        verify(executor, never()).shutdown();
         verify(executor, times(1)).awaitTermination(anyLong(), any());
+    }
+
+    @Test
+    void shouldDisposeCorrectlyIfNotShutdownInTime() throws InterruptedException {
+        when(executor.awaitTermination(anyLong(), any()))
+            .thenReturn(false)
+            .thenReturn(true);
+
+        controller.dispose();
+
+        assertTrue(controller.isDisposed());
+        assertFalse(controller.isStarted());
+
+        verify(synchronizer).dispose();
+        verify(queue).dispose();
+        verify(executor).shutdown();
+        verify(executor).shutdownNow();
+        verify(executor, times(2)).awaitTermination(anyLong(), any());
     }
 
     @Test

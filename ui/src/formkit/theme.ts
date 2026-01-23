@@ -178,9 +178,9 @@ const theme: Record<string, Record<string, string>> = {
     "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   secret: {
-    ...textClassification,
-    inner: `${textClassification.inner} !overflow-visible min-h-[2.25rem] !border-none`,
-    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
+    inner: "w-full sm:max-w-lg",
+    wrapper: textClassification.wrapper,
+    label: textClassification.label,
   },
 };
 

@@ -84,6 +84,8 @@ async function slugUniqueValidation(node: FormKitNode) {
   const { data: postsWithSameSlug } =
     await publicApiClient.content.post.queryPosts({
       fieldSelector,
+      page: 1,
+      size: 1,
     });
 
   return !postsWithSameSlug.total;

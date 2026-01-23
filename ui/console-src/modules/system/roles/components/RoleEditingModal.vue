@@ -2,16 +2,15 @@
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
-import { pluginLabels, roleLabels } from "@/constants/labels";
+import { pluginLabels } from "@/constants/labels";
 import { setFocus } from "@/formkit/utils/focus";
 import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useFetchRoleTemplates } from "../../users/composables/use-role";
 
 const { t } = useI18n();
 
@@ -30,17 +29,7 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 
-const { data: roleTemplates } = useQuery({
-  queryKey: ["role-templates"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
-  },
-});
+const { data: roleTemplates } = useFetchRoleTemplates();
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(roleTemplates);
