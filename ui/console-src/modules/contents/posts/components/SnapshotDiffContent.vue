@@ -65,7 +65,9 @@ const diffContent = computed(() => {
   const newContent = document.createElement("div");
   newContent.innerHTML = snapshot.value.new.content || "";
 
-  const diffDocument = visualDomDiff(oldContent, newContent);
+  const diffDocument = visualDomDiff(oldContent, newContent, {
+    skipModified: true,
+  });
 
   const diffNode = document.createElement("div");
   diffNode.append(diffDocument.cloneNode(true));
