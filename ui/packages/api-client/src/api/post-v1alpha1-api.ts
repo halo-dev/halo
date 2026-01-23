@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Post } from '../models';
+import type { Post } from '../models';
 // @ts-ignore
-import { PostList } from '../models';
+import type { PostList } from '../models';
 /**
  * PostV1alpha1Api - axios parameter creator
- * @export
  */
 export const PostV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const PostV1alpha1ApiAxiosParamCreator = function (configuration?: Config
 
 /**
  * PostV1alpha1Api - functional programming interface
- * @export
  */
 export const PostV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const PostV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * PostV1alpha1Api - factory interface
- * @export
  */
 export const PostV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PostV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const PostV1alpha1ApiFactory = function (configuration?: Configuration, b
 
 /**
  * Request parameters for createPost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiCreatePostRequest
  */
 export interface PostV1alpha1ApiCreatePostRequest {
     /**
      * Fresh post
-     * @type {Post}
-     * @memberof PostV1alpha1ApiCreatePost
      */
     readonly post?: Post
 }
 
 /**
  * Request parameters for deletePost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiDeletePostRequest
  */
 export interface PostV1alpha1ApiDeletePostRequest {
     /**
      * Name of post
-     * @type {string}
-     * @memberof PostV1alpha1ApiDeletePost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getPost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiGetPostRequest
  */
 export interface PostV1alpha1ApiGetPostRequest {
     /**
      * Name of post
-     * @type {string}
-     * @memberof PostV1alpha1ApiGetPost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listPost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiListPostRequest
  */
 export interface PostV1alpha1ApiListPostRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1ApiListPost
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1ApiListPost
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ApiListPost
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ApiListPost
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PostV1alpha1ApiListPost
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchPost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiPatchPostRequest
  */
 export interface PostV1alpha1ApiPatchPostRequest {
     /**
      * Name of post
-     * @type {string}
-     * @memberof PostV1alpha1ApiPatchPost
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof PostV1alpha1ApiPatchPost
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updatePost operation in PostV1alpha1Api.
- * @export
- * @interface PostV1alpha1ApiUpdatePostRequest
  */
 export interface PostV1alpha1ApiUpdatePostRequest {
     /**
      * Name of post
-     * @type {string}
-     * @memberof PostV1alpha1ApiUpdatePost
      */
     readonly name: string
 
     /**
      * Updated post
-     * @type {Post}
-     * @memberof PostV1alpha1ApiUpdatePost
      */
     readonly post?: Post
 }
 
 /**
  * PostV1alpha1Api - object-oriented interface
- * @export
- * @class PostV1alpha1Api
- * @extends {BaseAPI}
  */
 export class PostV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiCreatePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public createPost(requestParameters: PostV1alpha1ApiCreatePostRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).createPost(requestParameters.post, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiDeletePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public deletePost(requestParameters: PostV1alpha1ApiDeletePostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).deletePost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiGetPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public getPost(requestParameters: PostV1alpha1ApiGetPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).getPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiListPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public listPost(requestParameters: PostV1alpha1ApiListPostRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).listPost(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiPatchPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public patchPost(requestParameters: PostV1alpha1ApiPatchPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).patchPost(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class PostV1alpha1Api extends BaseAPI {
      * @param {PostV1alpha1ApiUpdatePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1Api
      */
     public updatePost(requestParameters: PostV1alpha1ApiUpdatePostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1ApiFp(this.configuration).updatePost(requestParameters.name, requestParameters.post, options).then((request) => request(this.axios, this.basePath));

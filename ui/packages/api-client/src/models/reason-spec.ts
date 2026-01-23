@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonAttributes } from './reason-attributes';
+import type { ReasonAttributes } from './reason-attributes';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonSubject } from './reason-subject';
+import type { ReasonSubject } from './reason-subject';
 
-/**
- * 
- * @export
- * @interface ReasonSpec
- */
 export interface ReasonSpec {
-    /**
-     * 
-     * @type {ReasonAttributes}
-     * @memberof ReasonSpec
-     */
     'attributes'?: ReasonAttributes;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSpec
-     */
     'author': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonSpec
-     */
     'reasonType': string;
-    /**
-     * 
-     * @type {ReasonSubject}
-     * @memberof ReasonSpec
-     */
     'subject': ReasonSubject;
 }
 

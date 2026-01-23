@@ -1,14 +1,27 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
-import { coreApiClient } from "@halo-dev/api-client";
+import {
+  checkbox,
+  checkboxes,
+  defaultIcon,
+  type FormKitInputs,
+} from "@formkit/inputs";
+import {
+  coreApiClient,
+  paginate,
+  type Category,
+  type CategoryV1alpha1ApiListCategoryRequest,
+} from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.content.category.listCategory({
+    const categories = await paginate<
+      CategoryV1alpha1ApiListCategoryRequest,
+      Category
+    >((params) => coreApiClient.content.category.listCategory(params), {
       sort: ["metadata.creationTimestamp,desc"],
     });
 
-    node.props.options = data.items.map((category) => {
+    node.props.options = categories.map((category) => {
       return {
         value: category.metadata.name,
         label: category.spec.displayName,
@@ -27,3 +40,12 @@ export const categoryCheckbox: FormKitTypeDefinition = {
     defaultIcon("decorator", "checkboxDecorator"),
   ],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    categoryCheckbox: {
+      type: "categoryCheckbox";
+      value?: string[];
+    };
+  }
+}

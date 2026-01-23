@@ -1,6 +1,7 @@
 // plugin
 export enum pluginLabels {
   NAME = "plugin.halo.run/plugin-name",
+  SYSTEM_RESERVED = "plugin.halo.run/system-reserved",
 }
 
 // role

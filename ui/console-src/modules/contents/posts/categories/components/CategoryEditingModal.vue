@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
@@ -14,9 +14,9 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType } from "@halo-dev/console-shared";
+import { FormType } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -199,6 +199,8 @@ async function slugUniqueValidation(node: FormKitNode) {
   const { data: categoriesWithSameSlug } =
     await coreApiClient.content.category.listCategory({
       fieldSelector,
+      page: 1,
+      size: 1,
     });
 
   return !categoriesWithSameSlug.total;
@@ -245,7 +247,7 @@ async function slugUniqueValidation(node: FormKitNode) {
                 $t('core.post_category.editing_modal.fields.display_name.label')
               "
               type="text"
-              validation="required|length:0,50"
+              validation="required|length:0,512"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
@@ -253,7 +255,7 @@ async function slugUniqueValidation(node: FormKitNode) {
               name="slug"
               :label="$t('core.post_category.editing_modal.fields.slug.label')"
               type="text"
-              validation="required|length:0,50|slugUniqueValidation"
+              validation="required|length:0,512|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -378,6 +380,7 @@ async function slugUniqueValidation(node: FormKitNode) {
         <AnnotationsForm
           :key="formState.metadata.name"
           ref="annotationsFormRef"
+          :form-data="formState"
           :value="formState.metadata.annotations"
           kind="Category"
           group="content.halo.run"

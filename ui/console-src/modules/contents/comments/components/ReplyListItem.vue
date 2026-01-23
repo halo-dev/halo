@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -15,7 +14,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -35,7 +34,6 @@ const props = withDefaults(
     replies?: ListedReply[];
   }>(),
   {
-    reply: undefined,
     replies: undefined,
   }
 );
@@ -143,7 +141,7 @@ function onReplyCreationModalClose() {
   detailModalVisible.value = false;
 }
 
-const { operationItems } = useOperationItemExtensionPoint<ListedReply>(
+const { data: operationItems } = useOperationItemExtensionPoint<ListedReply>(
   "reply:list-item:operation:create",
   reply,
   computed((): OperationItem<ListedReply>[] => [
@@ -288,7 +286,10 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       v-if="utils.permission.has(['system:comments:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="reply" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="reply"
+      />
     </template>
   </VEntity>
 </template>

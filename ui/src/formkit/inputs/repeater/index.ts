@@ -12,6 +12,7 @@ import {
   outer,
   prefix,
   suffix,
+  type FormKitInputs,
 } from "@formkit/inputs";
 import {
   IconAddCircle,
@@ -45,7 +46,12 @@ import {
 
 /**
  * Input definition for a repeater input.
+ *
+ * it is recommended to use array instead of repeater. {@link array}
+ *
  * @public
+ * @deprecated Use array instead.
+ * @see array
  */
 export const repeater: FormKitTypeDefinition = {
   /**
@@ -111,3 +117,12 @@ export const repeater: FormKitTypeDefinition = {
     AddButton,
   },
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    repeater: {
+      type: "repeater";
+      value?: Record<string, unknown>[];
+    };
+  }
+}

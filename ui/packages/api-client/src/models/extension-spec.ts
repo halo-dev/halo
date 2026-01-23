@@ -14,41 +14,11 @@
 
 
 
-/**
- * 
- * @export
- * @interface ExtensionSpec
- */
 export interface ExtensionSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionSpec
-     */
     'className': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionSpec
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionSpec
-     */
     'extensionPointName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionSpec
-     */
     'icon'?: string;
 }
 

@@ -4,7 +4,7 @@ import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
 import type {
   AttachmentLike,
   AttachmentSelectProvider,
-} from "@halo-dev/console-shared";
+} from "@halo-dev/ui-shared";
 import {
   computed,
   markRaw,
@@ -91,9 +91,14 @@ const handleConfirm = () => {
 };
 
 const confirmDisabled = computed(() => {
+  if (!selected.value.length) {
+    return true;
+  }
+
   if (props.min === undefined) {
     return false;
   }
+
   return selected.value.length < props.min;
 });
 

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
@@ -9,13 +8,14 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconClose,
+  VDropdown,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
-import { onClickOutside } from "@vueuse/core";
+import { utils } from "@halo-dev/ui-shared";
+import { onClickOutside, useResizeObserver } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
-import { computed, ref, watch, type PropType } from "vue";
+import { computed, ref, useTemplateRef, watch, type PropType } from "vue";
 
 const props = defineProps({
   context: {
@@ -40,11 +40,24 @@ const multiple = computed(() => {
 const selectedTag = ref<Tag>();
 const dropdownVisible = ref(false);
 const text = ref("");
-const wrapperRef = ref<HTMLElement>();
+const wrapperRef = useTemplateRef<HTMLElement>("wrapperRef");
+const popperRef = useTemplateRef<HTMLElement>("popperRef");
 
-onClickOutside(wrapperRef, () => {
-  dropdownVisible.value = false;
+// resolve the issue of the dropdown position when the container size changes
+// https://github.com/Akryum/floating-vue/issues/977#issuecomment-1651898070
+useResizeObserver(wrapperRef, () => {
+  window.dispatchEvent(new Event("resize"));
 });
+
+onClickOutside(
+  wrapperRef,
+  () => {
+    dropdownVisible.value = false;
+  },
+  {
+    ignore: [popperRef],
+  }
+);
 
 const { tags: postTags, handleFetchTags } = usePostTag();
 
@@ -79,6 +92,16 @@ watch(
       useExtendedSearch: true,
       threshold: 0.2,
     });
+    if (props.context) {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.context.options =
+        postTags.value?.map((tag) => {
+          return {
+            label: tag.spec.displayName,
+            value: tag.metadata.name,
+          };
+        }) || [];
+    }
   },
   {
     immediate: true,
@@ -202,6 +225,8 @@ const handleCreateTag = async () => {
   // Check if slug is unique, if not, add -1 to the slug
   const { data: tagsWithSameSlug } = await coreApiClient.content.tag.listTag({
     fieldSelector: [`spec.slug=${slug}`],
+    page: 1,
+    size: 1,
   });
 
   if (tagsWithSameSlug.total) {
@@ -213,7 +238,6 @@ const handleCreateTag = async () => {
       spec: {
         displayName: text.value,
         slug,
-        color: "#ffffff",
         cover: "",
       },
       apiVersion: "content.halo.run/v1alpha1",
@@ -252,78 +276,102 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <div
-    ref="wrapperRef"
-    :class="context.classes['post-tags-wrapper']"
-    @keydown="handleKeydown"
+  <VDropdown
+    :triggers="[]"
+    :shown="dropdownVisible"
+    auto-size
+    :auto-hide="false"
+    container="body"
+    :distance="10"
+    class="w-full"
+    popper-class="post-tag-dropdown"
   >
-    <div :class="context.classes['post-tags']">
-      <div
-        v-for="(tag, index) in selectedTags"
-        :key="index"
-        :class="context.classes['post-tag-wrapper']"
-      >
-        <PostTag :tag="tag" rounded>
-          <template #rightIcon>
-            <IconClose
-              :class="context.classes['post-tag-close']"
-              @click="handleSelect(tag)"
-            />
-          </template>
-        </PostTag>
-      </div>
-      <input
-        :value="text"
-        :class="context.classes.input"
-        type="text"
-        @input="onTextInput"
-        @focus="dropdownVisible = true"
-        @keydown.delete="handleDelete"
-      />
-    </div>
-
     <div
-      :class="context.classes['post-tags-button']"
-      @click="dropdownVisible = !dropdownVisible"
+      ref="wrapperRef"
+      :class="context.classes['post-tags-wrapper']"
+      @keydown="handleKeydown"
     >
-      <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
-    </div>
+      <div :class="context.classes['post-tags']">
+        <div
+          v-for="(tag, index) in selectedTags"
+          :key="index"
+          :class="context.classes['post-tag-wrapper']"
+        >
+          <PostTag :tag="tag" rounded>
+            <template #rightIcon>
+              <IconClose
+                :class="context.classes['post-tag-close']"
+                @click="handleSelect(tag)"
+              />
+            </template>
+          </PostTag>
+        </div>
+        <input
+          :value="text"
+          :class="context.classes.input"
+          type="text"
+          @input="onTextInput"
+          @focus="dropdownVisible = true"
+          @keydown.delete="handleDelete"
+        />
+      </div>
 
-    <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
-      <ul class="p-1">
-        <HasPermission
-          v-if="text.trim()"
-          :permissions="['system:posts:manage']"
-        >
-          <li
-            id="tag-create"
-            class="group flex cursor-pointer items-center justify-between rounded p-2"
-            :class="{
-              'bg-gray-100': selectedTag === undefined,
-            }"
-            @click="handleCreateTag"
-          >
-            <span class="text-xs text-gray-700 group-hover:text-gray-900">
-              {{ $t("core.formkit.tag_select.creation_label", { text: text }) }}
-            </span>
-          </li>
-        </HasPermission>
-        <li
-          v-for="tag in searchResults"
-          :id="tag.metadata.name"
-          :key="tag.metadata.name"
-          class="group flex cursor-pointer items-center justify-between rounded p-2 hover:bg-gray-100"
-          :class="{
-            'bg-gray-100': selectedTag?.metadata.name === tag.metadata.name,
-          }"
-          @click="handleSelect(tag)"
-        >
-          <div class="inline-flex items-center overflow-hidden">
-            <PostTag :tag="tag" />
-          </div>
-          <IconCheckboxCircle v-if="isSelected(tag)" class="text-primary" />
-        </li>
-      </ul>
+      <div
+        :class="context.classes['post-tags-button']"
+        @click="dropdownVisible = !dropdownVisible"
+      >
+        <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
+      </div>
     </div>
-  </div>
+    <template #popper>
+      <div ref="popperRef" :class="context.classes['dropdown-wrapper']">
+        <ul class="p-1">
+          <HasPermission
+            v-if="text.trim()"
+            :permissions="['system:posts:manage']"
+          >
+            <li
+              id="tag-create"
+              class="group flex cursor-pointer items-center justify-between rounded p-2"
+              :class="{
+                'bg-gray-100': selectedTag === undefined,
+              }"
+              @click="handleCreateTag"
+            >
+              <span class="text-xs text-gray-700 group-hover:text-gray-900">
+                {{
+                  $t("core.formkit.tag_select.creation_label", { text: text })
+                }}
+              </span>
+            </li>
+          </HasPermission>
+          <li
+            v-for="tag in searchResults"
+            :id="tag.metadata.name"
+            :key="tag.metadata.name"
+            class="group flex cursor-pointer items-center justify-between rounded p-2 hover:bg-gray-100"
+            :class="{
+              'bg-gray-100': selectedTag?.metadata.name === tag.metadata.name,
+            }"
+            @click="handleSelect(tag)"
+          >
+            <div class="inline-flex items-center overflow-hidden">
+              <PostTag :tag="tag" />
+            </div>
+            <IconCheckboxCircle v-if="isSelected(tag)" class="text-primary" />
+          </li>
+        </ul>
+      </div>
+    </template>
+  </VDropdown>
 </template>
+<style lang="scss">
+.post-tag-dropdown {
+  .v-popper__arrow-container {
+    display: none;
+  }
+  .v-popper__inner {
+    padding: 0 !important;
+  }
+}
+</style>

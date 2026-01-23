@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ListedSinglePage } from "@halo-dev/api-client";
 import { VEntityField } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 
 withDefaults(
   defineProps<{

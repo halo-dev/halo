@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { postLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -14,8 +13,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType, utils } from "@halo-dev/console-shared";
-import { cloneDeep } from "lodash-es";
+import { FormType, utils } from "@halo-dev/ui-shared";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
@@ -66,7 +65,7 @@ const formState = ref<Post>({
   apiVersion: "content.halo.run/v1alpha1",
   kind: "Post",
   metadata: {
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
 });
 const isSubmitting = ref(false);
@@ -278,6 +277,8 @@ async function slugUniqueValidation(node: FormKitNode) {
   const { data: postsWithSameSlug } = await coreApiClient.content.post.listPost(
     {
       fieldSelector,
+      page: 1,
+      size: 1,
     }
   );
 
@@ -341,14 +342,14 @@ const showCancelPublishButton = computed(() => {
               :label="$t('core.post.settings.fields.title.label')"
               type="text"
               name="title"
-              validation="required|length:0,100"
+              validation="required|length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
               :label="$t('core.post.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100|slugUniqueValidation"
+              validation="required|length:0,1024|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -402,6 +403,16 @@ const showCancelPublishButton = computed(() => {
               type="textarea"
               auto-height
               :max-auto-height="200"
+              validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :label="$t('core.post.settings.fields.cover.label')"
+              type="attachment"
+              :accepts="['image/*']"
               validation="length:0,1024"
             ></FormKit>
           </div>
@@ -464,14 +475,6 @@ const showCancelPublishButton = computed(() => {
               name="template"
               type="select"
             ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              name="cover"
-              :label="$t('core.post.settings.fields.cover.label')"
-              type="attachment"
-              :accepts="['image/*']"
-              validation="length:0,1024"
-            ></FormKit>
           </div>
         </div>
       </div>
@@ -495,6 +498,7 @@ const showCancelPublishButton = computed(() => {
           ref="annotationsFormRef"
           :value="formState.metadata.annotations"
           kind="Post"
+          :form-data="formState"
           group="content.halo.run"
         />
       </div>

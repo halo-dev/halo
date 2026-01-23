@@ -1,14 +1,27 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
-import { coreApiClient } from "@halo-dev/api-client";
+import {
+  checkbox,
+  checkboxes,
+  defaultIcon,
+  type FormKitInputs,
+} from "@formkit/inputs";
+import {
+  coreApiClient,
+  paginate,
+  type Tag,
+  type TagV1alpha1ApiListTagRequest,
+} from "@halo-dev/api-client";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.content.tag.listTag({
-      sort: ["metadata.creationTimestamp,desc"],
-    });
+    const tags = await paginate<TagV1alpha1ApiListTagRequest, Tag>(
+      (params) => coreApiClient.content.tag.listTag(params),
+      {
+        sort: ["metadata.creationTimestamp,desc"],
+      }
+    );
 
-    node.props.options = data.items.map((tag) => {
+    node.props.options = tags.map((tag) => {
       return {
         value: tag.metadata.name,
         label: tag.spec.displayName,
@@ -27,3 +40,12 @@ export const tagCheckbox: FormKitTypeDefinition = {
     defaultIcon("decorator", "checkboxDecorator"),
   ],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    tagCheckbox: {
+      type: "tagCheckbox";
+      value?: string[];
+    };
+  }
+}

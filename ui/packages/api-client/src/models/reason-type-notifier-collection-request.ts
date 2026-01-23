@@ -15,19 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonTypeNotifierRequest } from './reason-type-notifier-request';
+import type { ReasonTypeNotifierRequest } from './reason-type-notifier-request';
 
-/**
- * 
- * @export
- * @interface ReasonTypeNotifierCollectionRequest
- */
 export interface ReasonTypeNotifierCollectionRequest {
-    /**
-     * 
-     * @type {Array<ReasonTypeNotifierRequest>}
-     * @memberof ReasonTypeNotifierCollectionRequest
-     */
     'reasonTypeNotifiers': Array<ReasonTypeNotifierRequest>;
 }
 

@@ -17,10 +17,10 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { storeToRefs } from "pinia";
 import {
   computed,

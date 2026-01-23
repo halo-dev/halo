@@ -20,30 +20,29 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ChangeOwnPasswordRequest } from '../models';
+import type { ChangeOwnPasswordRequest } from '../models';
 // @ts-ignore
-import { ChangePasswordRequest } from '../models';
+import type { ChangePasswordRequest } from '../models';
 // @ts-ignore
-import { CreateUserRequest } from '../models';
+import type { CreateUserRequest } from '../models';
 // @ts-ignore
-import { DetailedUser } from '../models';
+import type { DetailedUser } from '../models';
 // @ts-ignore
-import { EmailVerifyRequest } from '../models';
+import type { EmailVerifyRequest } from '../models';
 // @ts-ignore
-import { GrantRequest } from '../models';
+import type { GrantRequest } from '../models';
 // @ts-ignore
-import { User } from '../models';
+import type { User } from '../models';
 // @ts-ignore
-import { UserEndpointListedUserList } from '../models';
+import type { UserEndpointListedUserList } from '../models';
 // @ts-ignore
-import { UserPermission } from '../models';
+import type { UserPermission } from '../models';
 // @ts-ignore
-import { VerifyCodeRequest } from '../models';
+import type { VerifyCodeRequest } from '../models';
 /**
  * UserV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -727,7 +726,6 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
 
 /**
  * UserV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -925,7 +923,6 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
 
 /**
  * UserV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = UserV1alpha1ConsoleApiFp(configuration)
@@ -1069,268 +1066,167 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
 
 /**
  * Request parameters for changeAnyonePassword operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiChangeAnyonePasswordRequest
  */
 export interface UserV1alpha1ConsoleApiChangeAnyonePasswordRequest {
     /**
      * Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiChangeAnyonePassword
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {ChangePasswordRequest}
-     * @memberof UserV1alpha1ConsoleApiChangeAnyonePassword
-     */
     readonly changePasswordRequest: ChangePasswordRequest
 }
 
 /**
  * Request parameters for changeOwnPassword operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiChangeOwnPasswordRequest
  */
 export interface UserV1alpha1ConsoleApiChangeOwnPasswordRequest {
-    /**
-     * 
-     * @type {ChangeOwnPasswordRequest}
-     * @memberof UserV1alpha1ConsoleApiChangeOwnPassword
-     */
     readonly changeOwnPasswordRequest: ChangeOwnPasswordRequest
 }
 
 /**
  * Request parameters for createUser operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiCreateUserRequest
  */
 export interface UserV1alpha1ConsoleApiCreateUserRequest {
-    /**
-     * 
-     * @type {CreateUserRequest}
-     * @memberof UserV1alpha1ConsoleApiCreateUser
-     */
     readonly createUserRequest: CreateUserRequest
 }
 
 /**
  * Request parameters for deleteUserAvatar operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiDeleteUserAvatarRequest
  */
 export interface UserV1alpha1ConsoleApiDeleteUserAvatarRequest {
     /**
      * User name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiDeleteUserAvatar
      */
     readonly name: string
 }
 
 /**
  * Request parameters for disableUser operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiDisableUserRequest
  */
 export interface UserV1alpha1ConsoleApiDisableUserRequest {
     /**
      * Username
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiDisableUser
      */
     readonly username: string
 }
 
 /**
  * Request parameters for enableUser operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiEnableUserRequest
  */
 export interface UserV1alpha1ConsoleApiEnableUserRequest {
     /**
      * Username
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiEnableUser
      */
     readonly username: string
 }
 
 /**
  * Request parameters for getPermissions operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiGetPermissionsRequest
  */
 export interface UserV1alpha1ConsoleApiGetPermissionsRequest {
     /**
      * User name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiGetPermissions
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getUserDetail operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiGetUserDetailRequest
  */
 export interface UserV1alpha1ConsoleApiGetUserDetailRequest {
     /**
      * User name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiGetUserDetail
      */
     readonly name: string
 }
 
 /**
  * Request parameters for grantPermission operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiGrantPermissionRequest
  */
 export interface UserV1alpha1ConsoleApiGrantPermissionRequest {
     /**
      * User name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiGrantPermission
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {GrantRequest}
-     * @memberof UserV1alpha1ConsoleApiGrantPermission
-     */
     readonly grantRequest: GrantRequest
 }
 
 /**
  * Request parameters for listUsers operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiListUsersRequest
  */
 export interface UserV1alpha1ConsoleApiListUsersRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly sort?: Array<string>
 
     /**
      * Keyword to search
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly keyword?: string
 
     /**
      * Role name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiListUsers
      */
     readonly role?: string
 }
 
 /**
  * Request parameters for sendEmailVerificationCode operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest
  */
 export interface UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest {
-    /**
-     * 
-     * @type {EmailVerifyRequest}
-     * @memberof UserV1alpha1ConsoleApiSendEmailVerificationCode
-     */
     readonly emailVerifyRequest: EmailVerifyRequest
 }
 
 /**
  * Request parameters for updateCurrentUser operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiUpdateCurrentUserRequest
  */
 export interface UserV1alpha1ConsoleApiUpdateCurrentUserRequest {
-    /**
-     * 
-     * @type {User}
-     * @memberof UserV1alpha1ConsoleApiUpdateCurrentUser
-     */
     readonly user: User
 }
 
 /**
  * Request parameters for uploadUserAvatar operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiUploadUserAvatarRequest
  */
 export interface UserV1alpha1ConsoleApiUploadUserAvatarRequest {
     /**
      * User name
-     * @type {string}
-     * @memberof UserV1alpha1ConsoleApiUploadUserAvatar
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {File}
-     * @memberof UserV1alpha1ConsoleApiUploadUserAvatar
-     */
     readonly file: File
 }
 
 /**
  * Request parameters for verifyEmail operation in UserV1alpha1ConsoleApi.
- * @export
- * @interface UserV1alpha1ConsoleApiVerifyEmailRequest
  */
 export interface UserV1alpha1ConsoleApiVerifyEmailRequest {
-    /**
-     * 
-     * @type {VerifyCodeRequest}
-     * @memberof UserV1alpha1ConsoleApiVerifyEmail
-     */
     readonly verifyCodeRequest: VerifyCodeRequest
 }
 
 /**
  * UserV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class UserV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class UserV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -1338,7 +1234,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiChangeAnyonePasswordRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public changeAnyonePassword(requestParameters: UserV1alpha1ConsoleApiChangeAnyonePasswordRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).changeAnyonePassword(requestParameters.name, requestParameters.changePasswordRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1349,7 +1244,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiChangeOwnPasswordRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public changeOwnPassword(requestParameters: UserV1alpha1ConsoleApiChangeOwnPasswordRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).changeOwnPassword(requestParameters.changeOwnPasswordRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1360,7 +1254,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiCreateUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public createUser(requestParameters: UserV1alpha1ConsoleApiCreateUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).createUser(requestParameters.createUserRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1371,7 +1264,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiDeleteUserAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public deleteUserAvatar(requestParameters: UserV1alpha1ConsoleApiDeleteUserAvatarRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).deleteUserAvatar(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1382,7 +1274,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiDisableUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public disableUser(requestParameters: UserV1alpha1ConsoleApiDisableUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).disableUser(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
@@ -1393,7 +1284,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiEnableUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public enableUser(requestParameters: UserV1alpha1ConsoleApiEnableUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).enableUser(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
@@ -1403,7 +1293,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * Get current user detail
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public getCurrentUserDetail(options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).getCurrentUserDetail(options).then((request) => request(this.axios, this.basePath));
@@ -1414,7 +1303,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiGetPermissionsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public getPermissions(requestParameters: UserV1alpha1ConsoleApiGetPermissionsRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).getPermissions(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1425,7 +1313,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiGetUserDetailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public getUserDetail(requestParameters: UserV1alpha1ConsoleApiGetUserDetailRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).getUserDetail(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1436,7 +1323,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiGrantPermissionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public grantPermission(requestParameters: UserV1alpha1ConsoleApiGrantPermissionRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).grantPermission(requestParameters.name, requestParameters.grantRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1447,7 +1333,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiListUsersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public listUsers(requestParameters: UserV1alpha1ConsoleApiListUsersRequest = {}, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).listUsers(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.role, options).then((request) => request(this.axios, this.basePath));
@@ -1458,7 +1343,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public sendEmailVerificationCode(requestParameters: UserV1alpha1ConsoleApiSendEmailVerificationCodeRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).sendEmailVerificationCode(requestParameters.emailVerifyRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1469,7 +1353,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiUpdateCurrentUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public updateCurrentUser(requestParameters: UserV1alpha1ConsoleApiUpdateCurrentUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).updateCurrentUser(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
@@ -1480,7 +1363,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiUploadUserAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public uploadUserAvatar(requestParameters: UserV1alpha1ConsoleApiUploadUserAvatarRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).uploadUserAvatar(requestParameters.name, requestParameters.file, options).then((request) => request(this.axios, this.basePath));
@@ -1491,7 +1373,6 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
      * @param {UserV1alpha1ConsoleApiVerifyEmailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1ConsoleApi
      */
     public verifyEmail(requestParameters: UserV1alpha1ConsoleApiVerifyEmailRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ConsoleApiFp(this.configuration).verifyEmail(requestParameters.verifyCodeRequest, options).then((request) => request(this.axios, this.basePath));

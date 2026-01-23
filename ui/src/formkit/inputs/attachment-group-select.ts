@@ -1,16 +1,25 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { coreApiClient } from "@halo-dev/api-client";
+import type { FormKitInputs } from "@formkit/inputs";
+import {
+  coreApiClient,
+  paginate,
+  type Group,
+  type GroupV1alpha1ApiListGroupRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
-    const { data } = await coreApiClient.storage.group.listGroup({
-      labelSelector: ["!halo.run/hidden"],
-      sort: ["metadata.creationTimestamp,desc"],
-    });
+    const groups = await paginate<GroupV1alpha1ApiListGroupRequest, Group>(
+      (params) => coreApiClient.storage.group.listGroup(params),
+      {
+        labelSelector: ["!halo.run/hidden"],
+        sort: ["metadata.creationTimestamp,desc"],
+      }
+    );
 
     if (node.context) {
-      node.context.attrs.options = data.items.map((group) => {
+      node.context.attrs.options = groups.map((group) => {
         return {
           value: group.metadata.name,
           label: group.spec.displayName,
@@ -25,3 +34,12 @@ export const attachmentGroupSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    attachmentGroupSelect: {
+      type: "attachmentGroupSelect";
+      value?: string;
+    };
+  }
+}

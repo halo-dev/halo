@@ -31,7 +31,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -48,10 +48,10 @@ class AuthProviderServiceImplTest {
     ReactiveExtensionClient client;
 
     @Mock
-    ObjectProvider<SystemConfigurableEnvironmentFetcher> systemFetchProvider;
+    ObjectProvider<SystemConfigFetcher> systemFetchProvider;
 
     @Mock
-    SystemConfigurableEnvironmentFetcher systemConfigFetcher;
+    SystemConfigFetcher systemConfigFetcher;
 
     @InjectMocks
     AuthProviderServiceImpl authProviderService;

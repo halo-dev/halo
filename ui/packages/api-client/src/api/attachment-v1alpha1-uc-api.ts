@@ -20,28 +20,26 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Attachment } from '../models';
+import type { Attachment } from '../models';
 // @ts-ignore
-import { AttachmentList } from '../models';
+import type { AttachmentList } from '../models';
 // @ts-ignore
-import { UcUploadFromUrlRequest } from '../models';
-// @ts-ignore
-import { UcUploadRequestFormData } from '../models';
+import type { UcUploadFromUrlRequest } from '../models';
 /**
  * AttachmentV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create attachment for the given post.
+         * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
          * @param {File} file 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {string} [postName] Post name.
          * @param {string} [singlePageName] Single page name.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createAttachmentForPost: async (file: File, waitForPermalink?: boolean, postName?: string, singlePageName?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -99,10 +97,11 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Upload attachment from the given URL.
+         * Upload attachment from the given URL. Deprecated in favor of /attachments/-/upload.
          * @param {UcUploadFromUrlRequest} ucUploadFromUrlRequest 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         externalTransferAttachment1: async (ucUploadFromUrlRequest: UcUploadFromUrlRequest, waitForPermalink?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -225,14 +224,13 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
         },
         /**
          * Upload attachment to user center storage.
-         * @param {File} file 
-         * @param {UcUploadRequestFormData} [formData] 
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadUcAttachment: async (file: File, formData?: UcUploadRequestFormData, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'file' is not null or undefined
-            assertParamExists('uploadUcAttachment', 'file', file)
+        uploadAttachmentForUc: async (file?: File, filename?: string, url?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -259,8 +257,12 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
                 localVarFormParams.append('file', file as any);
             }
     
-            if (formData !== undefined) { 
-                localVarFormParams.append('formData', new Blob([JSON.stringify(formData)], { type: "application/json", }));
+            if (filename !== undefined) { 
+                localVarFormParams.append('filename', filename as any);
+            }
+    
+            if (url !== undefined) { 
+                localVarFormParams.append('url', url as any);
             }
     
     
@@ -281,18 +283,18 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
 
 /**
  * AttachmentV1alpha1UcApi - functional programming interface
- * @export
  */
 export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AttachmentV1alpha1UcApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create attachment for the given post.
+         * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
          * @param {File} file 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {string} [postName] Post name.
          * @param {string} [singlePageName] Single page name.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async createAttachmentForPost(file: File, waitForPermalink?: boolean, postName?: string, singlePageName?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
@@ -302,10 +304,11 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Upload attachment from the given URL.
+         * Upload attachment from the given URL. Deprecated in favor of /attachments/-/upload.
          * @param {UcUploadFromUrlRequest} ucUploadFromUrlRequest 
          * @param {boolean} [waitForPermalink] Wait for permalink.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async externalTransferAttachment1(ucUploadFromUrlRequest: UcUploadFromUrlRequest, waitForPermalink?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
@@ -335,15 +338,16 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
         },
         /**
          * Upload attachment to user center storage.
-         * @param {File} file 
-         * @param {UcUploadRequestFormData} [formData] 
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadUcAttachment(file: File, formData?: UcUploadRequestFormData, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadUcAttachment(file, formData, options);
+        async uploadAttachmentForUc(file?: File, filename?: string, url?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachmentForUc(file, filename, url, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1UcApi.uploadUcAttachment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1UcApi.uploadAttachmentForUc']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -351,24 +355,25 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
 
 /**
  * AttachmentV1alpha1UcApi - factory interface
- * @export
  */
 export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AttachmentV1alpha1UcApiFp(configuration)
     return {
         /**
-         * Create attachment for the given post.
+         * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
          * @param {AttachmentV1alpha1UcApiCreateAttachmentForPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createAttachmentForPost(requestParameters: AttachmentV1alpha1UcApiCreateAttachmentForPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
             return localVarFp.createAttachmentForPost(requestParameters.file, requestParameters.waitForPermalink, requestParameters.postName, requestParameters.singlePageName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Upload attachment from the given URL.
+         * Upload attachment from the given URL. Deprecated in favor of /attachments/-/upload.
          * @param {AttachmentV1alpha1UcApiExternalTransferAttachment1Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
@@ -385,180 +390,136 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
         },
         /**
          * Upload attachment to user center storage.
-         * @param {AttachmentV1alpha1UcApiUploadUcAttachmentRequest} requestParameters Request parameters.
+         * @param {AttachmentV1alpha1UcApiUploadAttachmentForUcRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadUcAttachment(requestParameters: AttachmentV1alpha1UcApiUploadUcAttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
-            return localVarFp.uploadUcAttachment(requestParameters.file, requestParameters.formData, options).then((request) => request(axios, basePath));
+        uploadAttachmentForUc(requestParameters: AttachmentV1alpha1UcApiUploadAttachmentForUcRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.uploadAttachmentForUc(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
  * Request parameters for createAttachmentForPost operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest
  */
 export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
-    /**
-     * 
-     * @type {File}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
-     */
     readonly file: File
 
     /**
      * Wait for permalink.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly waitForPermalink?: boolean
 
     /**
      * Post name.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly postName?: string
 
     /**
      * Single page name.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiCreateAttachmentForPost
      */
     readonly singlePageName?: string
 }
 
 /**
  * Request parameters for externalTransferAttachment1 operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request
  */
 export interface AttachmentV1alpha1UcApiExternalTransferAttachment1Request {
-    /**
-     * 
-     * @type {UcUploadFromUrlRequest}
-     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
-     */
     readonly ucUploadFromUrlRequest: UcUploadFromUrlRequest
 
     /**
      * Wait for permalink.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiExternalTransferAttachment1
      */
     readonly waitForPermalink?: boolean
 }
 
 /**
  * Request parameters for listMyAttachments operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiListMyAttachmentsRequest
  */
 export interface AttachmentV1alpha1UcApiListMyAttachmentsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly sort?: Array<string>
 
     /**
      * Filter attachments without group. This parameter will ignore group parameter.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly ungrouped?: boolean
 
     /**
      * Keyword for searching.
-     * @type {string}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly keyword?: string
 
     /**
      * Acceptable media types.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1UcApiListMyAttachments
      */
     readonly accepts?: Array<string>
 }
 
 /**
- * Request parameters for uploadUcAttachment operation in AttachmentV1alpha1UcApi.
- * @export
- * @interface AttachmentV1alpha1UcApiUploadUcAttachmentRequest
+ * Request parameters for uploadAttachmentForUc operation in AttachmentV1alpha1UcApi.
  */
-export interface AttachmentV1alpha1UcApiUploadUcAttachmentRequest {
+export interface AttachmentV1alpha1UcApiUploadAttachmentForUcRequest {
     /**
-     * 
-     * @type {File}
-     * @memberof AttachmentV1alpha1UcApiUploadUcAttachment
+     * The file to upload. If not provided, the url will be used.
      */
-    readonly file: File
+    readonly file?: File
 
     /**
-     * 
-     * @type {UcUploadRequestFormData}
-     * @memberof AttachmentV1alpha1UcApiUploadUcAttachment
+     * The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
      */
-    readonly formData?: UcUploadRequestFormData
+    readonly filename?: string
+
+    /**
+     * The url to upload from. If not provided, the file will be used.
+     */
+    readonly url?: string
 }
 
 /**
  * AttachmentV1alpha1UcApi - object-oriented interface
- * @export
- * @class AttachmentV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class AttachmentV1alpha1UcApi extends BaseAPI {
     /**
-     * Create attachment for the given post.
+     * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
      * @param {AttachmentV1alpha1UcApiCreateAttachmentForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public createAttachmentForPost(requestParameters: AttachmentV1alpha1UcApiCreateAttachmentForPostRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).createAttachmentForPost(requestParameters.file, requestParameters.waitForPermalink, requestParameters.postName, requestParameters.singlePageName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Upload attachment from the given URL.
+     * Upload attachment from the given URL. Deprecated in favor of /attachments/-/upload.
      * @param {AttachmentV1alpha1UcApiExternalTransferAttachment1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public externalTransferAttachment1(requestParameters: AttachmentV1alpha1UcApiExternalTransferAttachment1Request, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).externalTransferAttachment1(requestParameters.ucUploadFromUrlRequest, requestParameters.waitForPermalink, options).then((request) => request(this.axios, this.basePath));
@@ -569,7 +530,6 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
      * @param {AttachmentV1alpha1UcApiListMyAttachmentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
     public listMyAttachments(requestParameters: AttachmentV1alpha1UcApiListMyAttachmentsRequest = {}, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1UcApiFp(this.configuration).listMyAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(this.axios, this.basePath));
@@ -577,13 +537,12 @@ export class AttachmentV1alpha1UcApi extends BaseAPI {
 
     /**
      * Upload attachment to user center storage.
-     * @param {AttachmentV1alpha1UcApiUploadUcAttachmentRequest} requestParameters Request parameters.
+     * @param {AttachmentV1alpha1UcApiUploadAttachmentForUcRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1UcApi
      */
-    public uploadUcAttachment(requestParameters: AttachmentV1alpha1UcApiUploadUcAttachmentRequest, options?: RawAxiosRequestConfig) {
-        return AttachmentV1alpha1UcApiFp(this.configuration).uploadUcAttachment(requestParameters.file, requestParameters.formData, options).then((request) => request(this.axios, this.basePath));
+    public uploadAttachmentForUc(requestParameters: AttachmentV1alpha1UcApiUploadAttachmentForUcRequest = {}, options?: RawAxiosRequestConfig) {
+        return AttachmentV1alpha1UcApiFp(this.configuration).uploadAttachmentForUc(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

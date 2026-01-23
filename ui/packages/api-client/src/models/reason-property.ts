@@ -14,35 +14,10 @@
 
 
 
-/**
- * 
- * @export
- * @interface ReasonProperty
- */
 export interface ReasonProperty {
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonProperty
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonProperty
-     */
     'name': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof ReasonProperty
-     */
     'optional'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof ReasonProperty
-     */
     'type': string;
 }
 

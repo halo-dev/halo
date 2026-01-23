@@ -2,6 +2,7 @@ package run.halo.app.theme.dialect;
 
 import static org.thymeleaf.spring6.context.SpringContextUtils.getApplicationContext;
 
+import java.time.Duration;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.ITemplateEvent;
@@ -18,6 +19,8 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  * @since 2.0.0
  */
 public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor {
+
+    private static final Duration BLOCKING_TIMEOUT = Duration.ofSeconds(10);
     /**
      * Inserting tag will re-trigger this processor, in order to avoid the loop out trigger,
      * this flag is required to prevent the loop problem.
@@ -78,7 +81,7 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
                 SecureTemplateContextWrapper.wrap(context), modelToInsert, structureHandler)
             )
             .then()
-            .block();
+            .block(BLOCKING_TIMEOUT);
 
         // reset model to insert
         model.reset();

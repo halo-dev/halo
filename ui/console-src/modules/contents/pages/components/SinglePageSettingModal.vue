@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { singlePageLabels } from "@/constants/labels";
-import { randomUUID } from "@/utils/id";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -14,8 +13,8 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { FormType, utils } from "@halo-dev/console-shared";
-import { cloneDeep } from "lodash-es";
+import { FormType, utils } from "@halo-dev/ui-shared";
+import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
@@ -63,7 +62,7 @@ const formState = ref<SinglePage>({
   apiVersion: "content.halo.run/v1alpha1",
   kind: "SinglePage",
   metadata: {
-    name: randomUUID(),
+    name: utils.id.uuid(),
   },
 });
 const modal = ref<InstanceType<typeof VModal> | null>(null);
@@ -287,6 +286,8 @@ async function slugUniqueValidation(node: FormKitNode) {
   const { data: pagesWithSameSlug } =
     await coreApiClient.content.singlePage.listSinglePage({
       fieldSelector,
+      page: 1,
+      size: 1,
     });
 
   return !pagesWithSameSlug.total;
@@ -327,14 +328,14 @@ async function slugUniqueValidation(node: FormKitNode) {
               :label="$t('core.page.settings.fields.title.label')"
               type="text"
               name="title"
-              validation="required|length:0,100"
+              validation="required|length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
               :label="$t('core.page.settings.fields.slug.label')"
               name="slug"
               type="text"
-              validation="required|length:0,100|slugUniqueValidation"
+              validation="required|length:0,1024|slugUniqueValidation"
               :validation-rules="{ slugUniqueValidation }"
               :validation-messages="{
                 slugUniqueValidation: $t(
@@ -375,6 +376,16 @@ async function slugUniqueValidation(node: FormKitNode) {
               validation="length:0,1024"
               auto-height
               :max-auto-height="200"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              :label="$t('core.page.settings.fields.cover.label')"
+              type="attachment"
+              name="cover"
+              width="50%"
+              aspect-ratio="16/9"
+              :accepts="['image/*']"
+              validation="length:0,1024"
             ></FormKit>
           </div>
         </div>
@@ -432,14 +443,6 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="select"
               name="template"
             ></FormKit>
-            <FormKit
-              v-model="formState.spec.cover"
-              :label="$t('core.page.settings.fields.cover.label')"
-              type="attachment"
-              name="cover"
-              :accepts="['image/*']"
-              validation="length:0,1024"
-            ></FormKit>
           </div>
         </div>
       </div>
@@ -461,6 +464,7 @@ async function slugUniqueValidation(node: FormKitNode) {
         <AnnotationsForm
           :key="formState.metadata.name"
           ref="annotationsFormRef"
+          :form-data="formState"
           :value="formState.metadata.annotations"
           kind="SinglePage"
           group="content.halo.run"

@@ -1,7 +1,12 @@
 package run.halo.app.extension.index;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Test;
@@ -65,6 +70,41 @@ class IndexSpecTest {
         var spec3 = new IndexSpec()
             .setName("metadata.name");
         assertThat(spec3.equals(new Object())).isFalse();
+    }
+
+    @Test
+    void shouldNormalizeToSingleValueIndexSpec() {
+        var spec = new IndexSpec()
+            .setName("metadata.name")
+            .setOrder(IndexSpec.OrderType.ASC)
+            .setIndexFunc(IndexAttributeFactory.simpleAttribute(FakeExtension.class,
+                e -> e.getMetadata().getName())
+            )
+            .setUnique(true);
+
+        var normalized = spec.normalize();
+
+        assertEquals("metadata.name", normalized.getName());
+        assertTrue(normalized.isUnique());
+        assertTrue(normalized.isNullable());
+        assertInstanceOf(SingleValueIndexSpec.class, normalized);
+    }
+
+    @Test
+    void shouldNormalizeToMultiValueIndexSpec() {
+        var spec = new IndexSpec()
+            .setName("slug")
+            .setOrder(IndexSpec.OrderType.ASC)
+            .setIndexFunc(IndexAttributeFactory.multiValueAttribute(FakeExtension.class,
+                e -> Set.of(e.getSlug())))
+            .setUnique(false);
+
+        var normalized = spec.normalize();
+
+        assertEquals("slug", normalized.getName());
+        assertFalse(normalized.isUnique());
+        assertTrue(normalized.isNullable());
+        assertInstanceOf(MultiValueIndexSpec.class, normalized);
     }
 
     @Data

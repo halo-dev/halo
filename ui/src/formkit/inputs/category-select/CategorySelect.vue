@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
   convertTreeToCategories,
@@ -8,13 +7,21 @@ import {
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
-import { IconArrowRight } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
-import { onClickOutside } from "@vueuse/core";
+import { IconArrowRight, VDropdown } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
+import { onClickOutside, useResizeObserver } from "@vueuse/core";
 import Fuse from "fuse.js";
 import ShortUniqueId from "short-unique-id";
 import { slugify } from "transliteration";
-import { computed, provide, ref, watch, type PropType, type Ref } from "vue";
+import {
+  computed,
+  provide,
+  ref,
+  useTemplateRef,
+  watch,
+  type PropType,
+  type Ref,
+} from "vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
@@ -50,11 +57,24 @@ provide<Ref<Category | CategoryTreeNode | undefined>>(
 
 const dropdownVisible = ref(false);
 const text = ref("");
-const wrapperRef = ref<HTMLElement>();
+const wrapperRef = useTemplateRef<HTMLElement>("wrapperRef");
+const popperRef = useTemplateRef<HTMLElement>("popperRef");
 
-onClickOutside(wrapperRef, () => {
-  dropdownVisible.value = false;
+// resolve the issue of the dropdown position when the container size changes
+// https://github.com/Akryum/floating-vue/issues/977#issuecomment-1651898070
+useResizeObserver(wrapperRef, () => {
+  window.dispatchEvent(new Event("resize"));
 });
+
+onClickOutside(
+  wrapperRef,
+  () => {
+    dropdownVisible.value = false;
+  },
+  {
+    ignore: [popperRef],
+  }
+);
 
 // search
 let fuse: Fuse<Category> | undefined = undefined;
@@ -86,6 +106,16 @@ watch(
       useExtendedSearch: true,
       threshold: 0.2,
     });
+    if (props.context) {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.context.options =
+        categories.value?.map((category) => {
+          return {
+            label: category.spec.displayName,
+            value: category.metadata.name,
+          };
+        }) || [];
+    }
   },
   {
     immediate: true,
@@ -224,6 +254,8 @@ const handleCreateCategory = async () => {
   const { data: categoriesWithSameSlug } =
     await coreApiClient.content.category.listCategory({
       fieldSelector: [`spec.slug=${slug}`],
+      page: 1,
+      size: 1,
     });
 
   if (categoriesWithSameSlug.total) {
@@ -275,76 +307,95 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <div
-    ref="wrapperRef"
-    :class="context.classes['post-categories-wrapper']"
-    @keydown="handleKeydown"
+  <VDropdown
+    :triggers="[]"
+    :shown="dropdownVisible"
+    auto-size
+    :auto-hide="false"
+    container="body"
+    :distance="10"
+    class="w-full"
+    popper-class="post-category-dropdown"
   >
-    <div :class="context.classes['post-categories']">
-      <CategoryTag
-        v-for="(category, index) in selectedCategories"
-        :key="index"
-        :category="category"
-        @select="handleSelect"
-      />
-      <input
-        :value="text"
-        :class="context.classes.input"
-        type="text"
-        @input="onTextInput"
-        @focus="dropdownVisible = true"
-        @keydown.delete="handleDelete"
-      />
-    </div>
+    <div ref="wrapperRef" :class="context.classes['post-categories-wrapper']">
+      <div :class="context.classes['post-categories']">
+        <CategoryTag
+          v-for="(category, index) in selectedCategories"
+          :key="index"
+          :category="category"
+          @select="handleSelect"
+        />
+        <input
+          :value="text"
+          :class="context.classes.input"
+          type="text"
+          @input="onTextInput"
+          @focus="dropdownVisible = true"
+          @keydown="handleKeydown"
+          @keydown.delete="handleDelete"
+        />
+      </div>
 
-    <div
-      :class="context.classes['post-categories-button']"
-      @click="dropdownVisible = !dropdownVisible"
-    >
-      <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
+      <div
+        :class="context.classes['post-categories-button']"
+        @click="dropdownVisible = !dropdownVisible"
+      >
+        <IconArrowRight class="rotate-90 text-gray-500 hover:text-gray-700" />
+      </div>
     </div>
-
-    <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
-      <ul class="p-1">
-        <HasPermission
-          v-if="text.trim()"
-          :permissions="['system:posts:manage']"
-        >
-          <li
-            id="category-create"
-            class="group flex cursor-pointer items-center justify-between rounded p-2"
-            :class="{
-              'bg-gray-100': selectedCategory === undefined,
-            }"
-            @click="handleCreateCategory"
+    <template #popper>
+      <div ref="popperRef" :class="context.classes['dropdown-wrapper']">
+        <ul class="p-1">
+          <HasPermission
+            v-if="text.trim()"
+            :permissions="['system:posts:manage']"
           >
-            <span class="text-xs text-gray-700 group-hover:text-gray-900">
-              {{
-                $t("core.formkit.category_select.creation_label", {
-                  text: text,
-                })
-              }}
-            </span>
-          </li>
-        </HasPermission>
+            <li
+              id="category-create"
+              class="group flex cursor-pointer items-center justify-between rounded p-2"
+              :class="{
+                'bg-gray-100': selectedCategory === undefined,
+              }"
+              @click="handleCreateCategory"
+            >
+              <span class="text-xs text-gray-700 group-hover:text-gray-900">
+                {{
+                  $t("core.formkit.category_select.creation_label", {
+                    text: text,
+                  })
+                }}
+              </span>
+            </li>
+          </HasPermission>
 
-        <template v-if="text">
-          <SearchResultListItem
-            v-for="category in searchResults"
-            :key="category.metadata.name"
-            :category="category"
-            @select="handleSelect"
-          />
-        </template>
-        <template v-else>
-          <CategoryListItem
-            v-for="category in categoriesTree"
-            :key="category.metadata.name"
-            :category="category"
-            @select="handleSelect"
-          />
-        </template>
-      </ul>
-    </div>
-  </div>
+          <template v-if="text">
+            <SearchResultListItem
+              v-for="category in searchResults"
+              :key="category.metadata.name"
+              :category="category"
+              @select="handleSelect"
+            />
+          </template>
+          <template v-else>
+            <CategoryListItem
+              v-for="category in categoriesTree"
+              :key="category.metadata.name"
+              :category="category"
+              @select="handleSelect"
+            />
+          </template>
+        </ul>
+      </div>
+    </template>
+  </VDropdown>
 </template>
+<style lang="scss">
+.post-category-dropdown {
+  .v-popper__arrow-container {
+    display: none;
+  }
+  .v-popper__inner {
+    padding: 0 !important;
+  }
+}
+</style>

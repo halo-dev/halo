@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { User } from '../models';
+import type { User } from '../models';
 // @ts-ignore
-import { UserList } from '../models';
+import type { UserList } from '../models';
 /**
  * UserV1alpha1Api - axios parameter creator
- * @export
  */
 export const UserV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const UserV1alpha1ApiAxiosParamCreator = function (configuration?: Config
 
 /**
  * UserV1alpha1Api - functional programming interface
- * @export
  */
 export const UserV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const UserV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * UserV1alpha1Api - factory interface
- * @export
  */
 export const UserV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = UserV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const UserV1alpha1ApiFactory = function (configuration?: Configuration, b
 
 /**
  * Request parameters for createUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiCreateUserRequest
  */
 export interface UserV1alpha1ApiCreateUserRequest {
     /**
      * Fresh user
-     * @type {User}
-     * @memberof UserV1alpha1ApiCreateUser
      */
     readonly user?: User
 }
 
 /**
  * Request parameters for deleteUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiDeleteUserRequest
  */
 export interface UserV1alpha1ApiDeleteUserRequest {
     /**
      * Name of user
-     * @type {string}
-     * @memberof UserV1alpha1ApiDeleteUser
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiGetUserRequest
  */
 export interface UserV1alpha1ApiGetUserRequest {
     /**
      * Name of user
-     * @type {string}
-     * @memberof UserV1alpha1ApiGetUser
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiListUserRequest
  */
 export interface UserV1alpha1ApiListUserRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof UserV1alpha1ApiListUser
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof UserV1alpha1ApiListUser
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ApiListUser
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ApiListUser
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof UserV1alpha1ApiListUser
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiPatchUserRequest
  */
 export interface UserV1alpha1ApiPatchUserRequest {
     /**
      * Name of user
-     * @type {string}
-     * @memberof UserV1alpha1ApiPatchUser
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof UserV1alpha1ApiPatchUser
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateUser operation in UserV1alpha1Api.
- * @export
- * @interface UserV1alpha1ApiUpdateUserRequest
  */
 export interface UserV1alpha1ApiUpdateUserRequest {
     /**
      * Name of user
-     * @type {string}
-     * @memberof UserV1alpha1ApiUpdateUser
      */
     readonly name: string
 
     /**
      * Updated user
-     * @type {User}
-     * @memberof UserV1alpha1ApiUpdateUser
      */
     readonly user?: User
 }
 
 /**
  * UserV1alpha1Api - object-oriented interface
- * @export
- * @class UserV1alpha1Api
- * @extends {BaseAPI}
  */
 export class UserV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiCreateUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public createUser(requestParameters: UserV1alpha1ApiCreateUserRequest = {}, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).createUser(requestParameters.user, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiDeleteUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public deleteUser(requestParameters: UserV1alpha1ApiDeleteUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).deleteUser(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiGetUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public getUser(requestParameters: UserV1alpha1ApiGetUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).getUser(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiListUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public listUser(requestParameters: UserV1alpha1ApiListUserRequest = {}, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).listUser(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiPatchUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public patchUser(requestParameters: UserV1alpha1ApiPatchUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).patchUser(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class UserV1alpha1Api extends BaseAPI {
      * @param {UserV1alpha1ApiUpdateUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserV1alpha1Api
      */
     public updateUser(requestParameters: UserV1alpha1ApiUpdateUserRequest, options?: RawAxiosRequestConfig) {
         return UserV1alpha1ApiFp(this.configuration).updateUser(requestParameters.name, requestParameters.user, options).then((request) => request(this.axios, this.basePath));

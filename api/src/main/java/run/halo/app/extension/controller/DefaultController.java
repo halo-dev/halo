@@ -4,14 +4,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.system.JavaVersion;
-import org.springframework.boot.task.SimpleAsyncTaskExecutorBuilder;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -105,21 +103,17 @@ public class DefaultController<R> implements Controller {
         Duration minDelay,
         Duration maxDelay, int workerCount) {
         this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
-            executor(workerCount, name), workerCount);
+            executor(name), workerCount);
     }
 
-    private static SimpleAsyncTaskExecutor executor(int workerCount, String name) {
-        boolean virtualThreads =
-            JavaVersion.getJavaVersion().isEqualOrNewerThan(JavaVersion.TWENTY_ONE);
-        return new SimpleAsyncTaskExecutorBuilder()
-            .virtualThreads(virtualThreads)
-            .concurrencyLimit(workerCount)
-            // See https://github.com/spring-projects/spring-framework/issues/35254#issuecomment-3212944107
-            // for more
-            // After the problem resolved, we can set the task termination timeout
-            // .taskTerminationTimeout(Duration.ofSeconds(10))
-            .threadNamePrefix(name + "-")
-            .build();
+    private static Executor executor(String name) {
+        return Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
+            .name(name, 1)
+            .uncaughtExceptionHandler(
+                (t, e) -> log.error("Uncaught exception in thread: {}", t.getName(), e)
+            )
+            .factory()
+        );
     }
 
     @Override
@@ -139,7 +133,7 @@ public class DefaultController<R> implements Controller {
         }
         this.started = true;
         if (synchronizer != null) {
-            synchronizer.start();
+            executor.execute(synchronizer::start);
         }
         log.info("Starting controller {}", name);
         IntStream.range(0, getWorkerCount())
@@ -277,27 +271,23 @@ public class DefaultController<R> implements Controller {
 
     /**
      * Close executor service.
-     * <br>
-     * This method copied from
-     * <a href="https://github.com/openjdk/jdk/blob/890adb6410dab4606a4f26a942aed02fb2f55387/src/java.base/share/classes/java/util/concurrent/ExecutorService.java#L410-L429">ExecutorService#close implemented in JDK 21</a>
      *
      * @param executorService executor service to be closed
      */
-    // TODO Remove this method and use ExecutorService#close instead after using JDK 21 as the
-    // minimum version
     private static void closeExecutorService(ExecutorService executorService) {
         boolean terminated = executorService.isTerminated();
         if (!terminated) {
-            executorService.shutdown();
-            boolean interrupted = false;
+            // Interrupt all running tasks first because of while loop waiting
+            executorService.shutdownNow();
+            var interrupted = false;
             while (!terminated) {
                 try {
-                    terminated = executorService.awaitTermination(1L, TimeUnit.MINUTES);
-                } catch (InterruptedException e) {
-                    if (!interrupted) {
-                        executorService.shutdownNow();
-                        interrupted = true;
-                    }
+                    terminated = executorService.awaitTermination(1L, TimeUnit.SECONDS);
+                } catch (InterruptedException ignored) {
+                    interrupted = true;
+                }
+                if (!terminated) {
+                    executorService.shutdown();
                 }
             }
             if (interrupted) {

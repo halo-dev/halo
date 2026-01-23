@@ -15,39 +15,20 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { InterestReason } from './interest-reason';
+import type { InterestReason } from './interest-reason';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SubscriptionSubscriber } from './subscription-subscriber';
+import type { SubscriptionSubscriber } from './subscription-subscriber';
 
-/**
- * 
- * @export
- * @interface SubscriptionSpec
- */
 export interface SubscriptionSpec {
     /**
      * Perhaps users need to unsubscribe and interact without receiving notifications again
-     * @type {boolean}
-     * @memberof SubscriptionSpec
      */
     'disabled'?: boolean;
-    /**
-     * 
-     * @type {InterestReason}
-     * @memberof SubscriptionSpec
-     */
     'reason': InterestReason;
-    /**
-     * 
-     * @type {SubscriptionSubscriber}
-     * @memberof SubscriptionSpec
-     */
     'subscriber': SubscriptionSubscriber;
     /**
      * The token to unsubscribe
-     * @type {string}
-     * @memberof SubscriptionSpec
      */
     'unsubscribeToken': string;
 }

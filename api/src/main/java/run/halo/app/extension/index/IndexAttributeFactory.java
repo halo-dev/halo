@@ -37,15 +37,19 @@ public class IndexAttributeFactory {
     private static <E extends Extension, K extends Comparable<K>> IndexAttribute<E, K> attributes(
         Class<E> objectType, Class<K> keyType, Function<E, Set<K>> valuesFunc
     ) {
-        return new DefaultIndexAttribute<>(valuesFunc, objectType, keyType);
+        return new DefaultIndexAttribute<>(valuesFunc, objectType, keyType, false);
     }
 
     private static <E extends Extension, K extends Comparable<K>> IndexAttribute<E, K> attribute(
         Class<E> objectType, Class<K> keyType, Function<E, K> valueFunc
     ) {
-        return new DefaultIndexAttribute<>(e -> Optional.ofNullable(valueFunc.apply(e))
-            .map(Set::of)
-            .orElse(null), objectType, keyType);
+        return new DefaultIndexAttribute<>(
+            e -> Optional.ofNullable(valueFunc.apply(e))
+                .map(Set::of)
+                .orElse(null),
+            objectType,
+            keyType,
+            true);
     }
 
 }

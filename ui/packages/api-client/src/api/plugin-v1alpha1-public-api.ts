@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * PluginV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const PluginV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -73,7 +72,6 @@ export const PluginV1alpha1PublicApiAxiosParamCreator = function (configuration?
 
 /**
  * PluginV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const PluginV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PluginV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -95,7 +93,6 @@ export const PluginV1alpha1PublicApiFp = function(configuration?: Configuration)
 
 /**
  * PluginV1alpha1PublicApi - factory interface
- * @export
  */
 export const PluginV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PluginV1alpha1PublicApiFp(configuration)
@@ -114,23 +111,16 @@ export const PluginV1alpha1PublicApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for queryPluginAvailableByName operation in PluginV1alpha1PublicApi.
- * @export
- * @interface PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest
  */
 export interface PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest {
     /**
      * Plugin name
-     * @type {string}
-     * @memberof PluginV1alpha1PublicApiQueryPluginAvailableByName
      */
     readonly name: string
 }
 
 /**
  * PluginV1alpha1PublicApi - object-oriented interface
- * @export
- * @class PluginV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class PluginV1alpha1PublicApi extends BaseAPI {
     /**
@@ -138,7 +128,6 @@ export class PluginV1alpha1PublicApi extends BaseAPI {
      * @param {PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1PublicApi
      */
     public queryPluginAvailableByName(requestParameters: PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1PublicApiFp(this.configuration).queryPluginAvailableByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));

@@ -40,12 +40,12 @@
 import { computed } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRouter } from "vue-router";
-import type { Size, Type } from "./interface";
+import type { ButtonSize, ButtonType } from "./types";
 
 const props = withDefaults(
   defineProps<{
-    type?: Type;
-    size?: Size;
+    type?: ButtonType;
+    size?: ButtonSize;
     circle?: boolean;
     block?: boolean;
     disabled?: boolean;

@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface ConfigMapRef
- */
 export interface ConfigMapRef {
-    /**
-     * 
-     * @type {string}
-     * @memberof ConfigMapRef
-     */
     'name': string;
 }
 

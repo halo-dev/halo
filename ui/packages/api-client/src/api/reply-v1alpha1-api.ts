@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Reply } from '../models';
+import type { Reply } from '../models';
 // @ts-ignore
-import { ReplyList } from '../models';
+import type { ReplyList } from '../models';
 /**
  * ReplyV1alpha1Api - axios parameter creator
- * @export
  */
 export const ReplyV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ReplyV1alpha1ApiAxiosParamCreator = function (configuration?: Confi
 
 /**
  * ReplyV1alpha1Api - functional programming interface
- * @export
  */
 export const ReplyV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ReplyV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ReplyV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * ReplyV1alpha1Api - factory interface
- * @export
  */
 export const ReplyV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ReplyV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ReplyV1alpha1ApiFactory = function (configuration?: Configuration, 
 
 /**
  * Request parameters for createReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiCreateReplyRequest
  */
 export interface ReplyV1alpha1ApiCreateReplyRequest {
     /**
      * Fresh reply
-     * @type {Reply}
-     * @memberof ReplyV1alpha1ApiCreateReply
      */
     readonly reply?: Reply
 }
 
 /**
  * Request parameters for deleteReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiDeleteReplyRequest
  */
 export interface ReplyV1alpha1ApiDeleteReplyRequest {
     /**
      * Name of reply
-     * @type {string}
-     * @memberof ReplyV1alpha1ApiDeleteReply
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiGetReplyRequest
  */
 export interface ReplyV1alpha1ApiGetReplyRequest {
     /**
      * Name of reply
-     * @type {string}
-     * @memberof ReplyV1alpha1ApiGetReply
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiListReplyRequest
  */
 export interface ReplyV1alpha1ApiListReplyRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ReplyV1alpha1ApiListReply
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ReplyV1alpha1ApiListReply
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ApiListReply
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ApiListReply
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ReplyV1alpha1ApiListReply
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiPatchReplyRequest
  */
 export interface ReplyV1alpha1ApiPatchReplyRequest {
     /**
      * Name of reply
-     * @type {string}
-     * @memberof ReplyV1alpha1ApiPatchReply
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ReplyV1alpha1ApiPatchReply
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateReply operation in ReplyV1alpha1Api.
- * @export
- * @interface ReplyV1alpha1ApiUpdateReplyRequest
  */
 export interface ReplyV1alpha1ApiUpdateReplyRequest {
     /**
      * Name of reply
-     * @type {string}
-     * @memberof ReplyV1alpha1ApiUpdateReply
      */
     readonly name: string
 
     /**
      * Updated reply
-     * @type {Reply}
-     * @memberof ReplyV1alpha1ApiUpdateReply
      */
     readonly reply?: Reply
 }
 
 /**
  * ReplyV1alpha1Api - object-oriented interface
- * @export
- * @class ReplyV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ReplyV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiCreateReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public createReply(requestParameters: ReplyV1alpha1ApiCreateReplyRequest = {}, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).createReply(requestParameters.reply, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiDeleteReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public deleteReply(requestParameters: ReplyV1alpha1ApiDeleteReplyRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).deleteReply(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiGetReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public getReply(requestParameters: ReplyV1alpha1ApiGetReplyRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).getReply(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiListReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public listReply(requestParameters: ReplyV1alpha1ApiListReplyRequest = {}, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).listReply(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiPatchReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public patchReply(requestParameters: ReplyV1alpha1ApiPatchReplyRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).patchReply(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ReplyV1alpha1Api extends BaseAPI {
      * @param {ReplyV1alpha1ApiUpdateReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReplyV1alpha1Api
      */
     public updateReply(requestParameters: ReplyV1alpha1ApiUpdateReplyRequest, options?: RawAxiosRequestConfig) {
         return ReplyV1alpha1ApiFp(this.configuration).updateReply(requestParameters.name, requestParameters.reply, options).then((request) => request(this.axios, this.basePath));

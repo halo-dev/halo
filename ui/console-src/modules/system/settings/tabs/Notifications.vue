@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import type { NotifierDescriptor } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  NotifierDescriptor,
+  NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { VTabbar } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import type { Component, ComputedRef, Raw } from "vue";
@@ -20,9 +23,18 @@ const activeTab = ref();
 const { data: notifierDescriptors } = useQuery({
   queryKey: ["notifier-descriptors"],
   queryFn: async () => {
-    const { data } =
-      await coreApiClient.notification.notifierDescriptor.listNotifierDescriptor();
-    return data.items;
+    return await paginate<
+      NotifierDescriptorV1alpha1ApiListNotifierDescriptorRequest,
+      NotifierDescriptor
+    >(
+      (params) =>
+        coreApiClient.notification.notifierDescriptor.listNotifierDescriptor(
+          params
+        ),
+      {
+        size: 1000,
+      }
+    );
   },
   onSuccess(data) {
     if (data) {

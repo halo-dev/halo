@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { UserConnection } from '../models';
+import type { UserConnection } from '../models';
 // @ts-ignore
-import { UserConnectionList } from '../models';
+import type { UserConnectionList } from '../models';
 /**
  * UserConnectionV1alpha1Api - axios parameter creator
- * @export
  */
 export const UserConnectionV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const UserConnectionV1alpha1ApiAxiosParamCreator = function (configuratio
 
 /**
  * UserConnectionV1alpha1Api - functional programming interface
- * @export
  */
 export const UserConnectionV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserConnectionV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const UserConnectionV1alpha1ApiFp = function(configuration?: Configuratio
 
 /**
  * UserConnectionV1alpha1Api - factory interface
- * @export
  */
 export const UserConnectionV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = UserConnectionV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const UserConnectionV1alpha1ApiFactory = function (configuration?: Config
 
 /**
  * Request parameters for createUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiCreateUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiCreateUserConnectionRequest {
     /**
      * Fresh userconnection
-     * @type {UserConnection}
-     * @memberof UserConnectionV1alpha1ApiCreateUserConnection
      */
     readonly userConnection?: UserConnection
 }
 
 /**
  * Request parameters for deleteUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiDeleteUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiDeleteUserConnectionRequest {
     /**
      * Name of userconnection
-     * @type {string}
-     * @memberof UserConnectionV1alpha1ApiDeleteUserConnection
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiGetUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiGetUserConnectionRequest {
     /**
      * Name of userconnection
-     * @type {string}
-     * @memberof UserConnectionV1alpha1ApiGetUserConnection
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiListUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiListUserConnectionRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof UserConnectionV1alpha1ApiListUserConnection
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof UserConnectionV1alpha1ApiListUserConnection
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof UserConnectionV1alpha1ApiListUserConnection
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof UserConnectionV1alpha1ApiListUserConnection
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof UserConnectionV1alpha1ApiListUserConnection
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiPatchUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiPatchUserConnectionRequest {
     /**
      * Name of userconnection
-     * @type {string}
-     * @memberof UserConnectionV1alpha1ApiPatchUserConnection
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof UserConnectionV1alpha1ApiPatchUserConnection
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateUserConnection operation in UserConnectionV1alpha1Api.
- * @export
- * @interface UserConnectionV1alpha1ApiUpdateUserConnectionRequest
  */
 export interface UserConnectionV1alpha1ApiUpdateUserConnectionRequest {
     /**
      * Name of userconnection
-     * @type {string}
-     * @memberof UserConnectionV1alpha1ApiUpdateUserConnection
      */
     readonly name: string
 
     /**
      * Updated userconnection
-     * @type {UserConnection}
-     * @memberof UserConnectionV1alpha1ApiUpdateUserConnection
      */
     readonly userConnection?: UserConnection
 }
 
 /**
  * UserConnectionV1alpha1Api - object-oriented interface
- * @export
- * @class UserConnectionV1alpha1Api
- * @extends {BaseAPI}
  */
 export class UserConnectionV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiCreateUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public createUserConnection(requestParameters: UserConnectionV1alpha1ApiCreateUserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).createUserConnection(requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiDeleteUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public deleteUserConnection(requestParameters: UserConnectionV1alpha1ApiDeleteUserConnectionRequest, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).deleteUserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiGetUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public getUserConnection(requestParameters: UserConnectionV1alpha1ApiGetUserConnectionRequest, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).getUserConnection(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiListUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public listUserConnection(requestParameters: UserConnectionV1alpha1ApiListUserConnectionRequest = {}, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).listUserConnection(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiPatchUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public patchUserConnection(requestParameters: UserConnectionV1alpha1ApiPatchUserConnectionRequest, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).patchUserConnection(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class UserConnectionV1alpha1Api extends BaseAPI {
      * @param {UserConnectionV1alpha1ApiUpdateUserConnectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserConnectionV1alpha1Api
      */
     public updateUserConnection(requestParameters: UserConnectionV1alpha1ApiUpdateUserConnectionRequest, options?: RawAxiosRequestConfig) {
         return UserConnectionV1alpha1ApiFp(this.configuration).updateUserConnection(requestParameters.name, requestParameters.userConnection, options).then((request) => request(this.axios, this.basePath));

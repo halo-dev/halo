@@ -16,80 +16,54 @@
 
 /**
  * Search option. It is used to control search behavior.
- * @export
- * @interface SearchOption
  */
 export interface SearchOption {
     /**
      * Additional annotations for extending search option by other search engines.
-     * @type {{ [key: string]: string; }}
-     * @memberof SearchOption
      */
     'annotations'?: { [key: string]: string; };
     /**
      * Whether to filter exposed content. If null, it will not filter.
-     * @type {boolean}
-     * @memberof SearchOption
      */
     'filterExposed'?: boolean;
     /**
      * Whether to filter published content. If null, it will not filter.
-     * @type {boolean}
-     * @memberof SearchOption
      */
     'filterPublished'?: boolean;
     /**
      * Whether to filter recycled content. If null, it will not filter.
-     * @type {boolean}
-     * @memberof SearchOption
      */
     'filterRecycled'?: boolean;
     /**
      * Post HTML tag of highlighted fragment.
-     * @type {string}
-     * @memberof SearchOption
      */
     'highlightPostTag'?: string;
     /**
      * Pre HTML tag of highlighted fragment.
-     * @type {string}
-     * @memberof SearchOption
      */
     'highlightPreTag'?: string;
     /**
      * Category names to include(and). If null, it will include all categories.
-     * @type {Array<string>}
-     * @memberof SearchOption
      */
     'includeCategoryNames'?: Array<string>;
     /**
      * Owner names to include(or). If null, it will include all owners.
-     * @type {Array<string>}
-     * @memberof SearchOption
      */
     'includeOwnerNames'?: Array<string>;
     /**
      * Tag names to include(and). If null, it will include all tags.
-     * @type {Array<string>}
-     * @memberof SearchOption
      */
     'includeTagNames'?: Array<string>;
     /**
      * Types to include(or). If null, it will include all types.
-     * @type {Array<string>}
-     * @memberof SearchOption
      */
     'includeTypes'?: Array<string>;
     /**
      * Search keyword.
-     * @type {string}
-     * @memberof SearchOption
      */
     'keyword': string;
     /**
      * Limit of result.
-     * @type {number}
-     * @memberof SearchOption
      */
     'limit'?: number;
 }

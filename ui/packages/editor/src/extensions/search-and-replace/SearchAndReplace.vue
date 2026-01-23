@@ -2,15 +2,18 @@
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { PluginKey } from "@/tiptap/pm";
+import { vTooltip } from "@halo-dev/components";
 import { computed, nextTick, ref, watch, type PropType } from "vue";
 import LucideReplace from "~icons/lucide/replace";
 import LucideReplaceAll from "~icons/lucide/replace-all";
-import MdiArrowDown from "~icons/mdi/arrow-down";
-import MdiArrowUp from "~icons/mdi/arrow-up";
-import MdiClose from "~icons/mdi/close";
 import MdiFormatLetterCase from "~icons/mdi/format-letter-case";
 import MdiFormatLetterMatches from "~icons/mdi/format-letter-matches";
 import MdiRegex from "~icons/mdi/regex";
+import MingcuteArrowDownLine from "~icons/mingcute/arrow-down-line";
+import MingcuteArrowUpLine from "~icons/mingcute/arrow-up-line";
+import MingcuteCloseLine from "~icons/mingcute/close-line";
+import IconButton from "./IconButton.vue";
+import MatchToggleButton from "./MatchToggleButton.vue";
 import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";
 
 const props = defineProps({
@@ -159,14 +162,14 @@ watch(
       class="absolute right-5 top-0 z-50 float-right flex min-w-[500px] justify-end rounded bg-white p-1 !pt-2 shadow"
       @keydown.escape.prevent="handleCloseSearch"
     >
-      <section class="flex w-full flex-col gap-1">
+      <section class="flex w-full flex-col gap-2">
         <div class="relative flex items-center">
           <div class="relative w-full max-w-[55%]">
             <input
               ref="searchInput"
               v-model="searchTerm"
               type="text"
-              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 !pr-[5.5rem] ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block size-full h-9 rounded-md bg-white px-3 text-sm text-gray-900 ring-1 ring-gray-100 transition-all placeholder:text-gray-400 focus:!ring-1 focus:!ring-primary"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.search_placeholder'
@@ -176,117 +179,91 @@ watch(
               @keydown.enter.prevent="findNextSearchResult"
             />
             <div class="absolute inset-y-0 end-0 flex items-center gap-1 pr-1">
-              <button
-                :title="
+              <MatchToggleButton
+                v-tooltip="
                   i18n.global.t(
                     'editor.extensions.search_and_replace.case_sensitive'
                   )
                 "
-                type="button"
-                class="rounded-sm p-0.5 hover:bg-gray-200"
-                :class="{
-                  '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
-                    caseSensitive,
-                }"
+                :is-active="caseSensitive"
                 @click="caseSensitive = !caseSensitive"
               >
-                <MdiFormatLetterCase></MdiFormatLetterCase>
-              </button>
-              <button
-                :title="
+                <MdiFormatLetterCase />
+              </MatchToggleButton>
+              <MatchToggleButton
+                v-tooltip="
                   i18n.global.t(
                     'editor.extensions.search_and_replace.match_word'
                   )
                 "
-                type="button"
-                class="rounded-sm p-0.5 hover:bg-gray-200"
-                :class="{
-                  '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
-                    matchWord,
-                }"
+                :is-active="matchWord"
                 @click="matchWord = !matchWord"
               >
-                <MdiFormatLetterMatches></MdiFormatLetterMatches>
-              </button>
-              <button
-                :title="
+                <MdiFormatLetterMatches />
+              </MatchToggleButton>
+              <MatchToggleButton
+                v-tooltip="
                   i18n.global.t(
                     'editor.extensions.search_and_replace.use_regex'
                   )
                 "
-                type="button"
-                class="rounded-sm p-0.5 hover:bg-gray-200"
-                :class="{
-                  '!bg-blue-200 outline outline-1 outline-blue-500 hover:!bg-blue-200':
-                    regex,
-                }"
+                :is-active="regex"
                 @click="regex = !regex"
               >
-                <MdiRegex></MdiRegex>
-              </button>
+                <MdiRegex />
+              </MatchToggleButton>
             </div>
           </div>
           <div class="mx-2 min-w-[130px] text-sm">
-            <div v-if="findState.findCount === 0">
-              <span :class="{ 'text-red-600': searchTerm.length > 0 }">{{
+            <span
+              v-if="findState.findCount === 0"
+              :class="{ 'text-red-600': searchTerm.length > 0 }"
+            >
+              {{
                 i18n.global.t("editor.extensions.search_and_replace.not_found")
-              }}</span>
-            </div>
-            <div v-else>
-              <span>
-                {{
-                  i18n.global.t(
-                    "editor.extensions.search_and_replace.occurrence_found",
-                    {
-                      index: findState.findIndex + 1,
-                      total: findState.findCount,
-                    }
-                  )
-                }}
-              </span>
-            </div>
+              }}
+            </span>
+            <span v-else>
+              {{
+                i18n.global.t(
+                  "editor.extensions.search_and_replace.occurrence_found",
+                  {
+                    index: findState.findIndex + 1,
+                    total: findState.findCount,
+                  }
+                )
+              }}
+            </span>
           </div>
           <div class="absolute right-0 flex h-full items-center">
-            <button
-              :title="
+            <IconButton
+              v-tooltip="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.find_previous'
                 )
               "
-              type="button"
-              class="rounded-sm p-0.5 opacity-50"
-              :class="{
-                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
-              }"
               :disabled="findState.findCount === 0"
               @click="findPreviousSearchResult"
             >
-              <MdiArrowUp></MdiArrowUp>
-            </button>
-            <button
-              :title="
+              <MingcuteArrowUpLine />
+            </IconButton>
+            <IconButton
+              v-tooltip="
                 i18n.global.t('editor.extensions.search_and_replace.find_next')
               "
-              type="button"
-              class="rounded-sm p-0.5 opacity-50"
-              :class="{
-                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
-              }"
               :disabled="findState.findCount === 0"
               @click="findNextSearchResult"
             >
-              <MdiArrowDown></MdiArrowDown>
-            </button>
-            <button
-              :title="
+              <MingcuteArrowDownLine />
+            </IconButton>
+            <IconButton
+              v-tooltip="
                 i18n.global.t('editor.extensions.search_and_replace.close')
               "
-              type="button"
-              class="rounded-sm p-0.5 hover:bg-gray-200"
               @click="handleCloseSearch"
             >
-              <MdiClose></MdiClose>
-            </button>
+              <MingcuteCloseLine />
+            </IconButton>
           </div>
         </div>
 
@@ -295,7 +272,7 @@ watch(
             <input
               v-model="replaceTerm"
               type="text"
-              class="block w-full rounded border !border-solid border-gray-300 bg-gray-50 p-1 ps-2 !text-sm !leading-7 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              class="block size-full h-9 rounded-md bg-white px-3 text-sm text-gray-900 ring-1 ring-gray-100 transition-all placeholder:text-gray-400 focus:!ring-1 focus:!ring-primary"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.replace_placeholder'
@@ -306,36 +283,27 @@ watch(
             />
           </div>
           <div class="mx-2 flex items-center gap-2">
-            <button
-              :title="
+            <IconButton
+              v-tooltip="
                 i18n.global.t('editor.extensions.search_and_replace.replace')
               "
-              type="button"
-              class="rounded-sm p-0.5 opacity-50"
-              :class="{
-                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
-              }"
               :disabled="findState.findCount === 0"
               @click="replace"
             >
-              <LucideReplace></LucideReplace>
-            </button>
-            <button
-              :title="
+              <LucideReplace />
+            </IconButton>
+
+            <IconButton
+              v-tooltip="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.replace_all'
                 )
               "
-              type="button"
-              class="rounded-sm p-0.5 opacity-50"
-              :class="{
-                '!opacity-100 hover:!bg-gray-200': findState.findCount > 0,
-              }"
               :disabled="findState.findCount === 0"
               @click="replaceAll"
             >
-              <LucideReplaceAll></LucideReplaceAll>
-            </button>
+              <LucideReplaceAll />
+            </IconButton>
           </div>
         </div>
       </section>

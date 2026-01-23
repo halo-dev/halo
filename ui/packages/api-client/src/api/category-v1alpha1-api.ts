@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Category } from '../models';
+import type { Category } from '../models';
 // @ts-ignore
-import { CategoryList } from '../models';
+import type { CategoryList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * CategoryV1alpha1Api - axios parameter creator
- * @export
  */
 export const CategoryV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const CategoryV1alpha1ApiAxiosParamCreator = function (configuration?: Co
 
 /**
  * CategoryV1alpha1Api - functional programming interface
- * @export
  */
 export const CategoryV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CategoryV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const CategoryV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * CategoryV1alpha1Api - factory interface
- * @export
  */
 export const CategoryV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CategoryV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const CategoryV1alpha1ApiFactory = function (configuration?: Configuratio
 
 /**
  * Request parameters for createCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiCreateCategoryRequest
  */
 export interface CategoryV1alpha1ApiCreateCategoryRequest {
     /**
      * Fresh category
-     * @type {Category}
-     * @memberof CategoryV1alpha1ApiCreateCategory
      */
     readonly category?: Category
 }
 
 /**
  * Request parameters for deleteCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiDeleteCategoryRequest
  */
 export interface CategoryV1alpha1ApiDeleteCategoryRequest {
     /**
      * Name of category
-     * @type {string}
-     * @memberof CategoryV1alpha1ApiDeleteCategory
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiGetCategoryRequest
  */
 export interface CategoryV1alpha1ApiGetCategoryRequest {
     /**
      * Name of category
-     * @type {string}
-     * @memberof CategoryV1alpha1ApiGetCategory
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiListCategoryRequest
  */
 export interface CategoryV1alpha1ApiListCategoryRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1ApiListCategory
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1ApiListCategory
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1ApiListCategory
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1ApiListCategory
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1ApiListCategory
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiPatchCategoryRequest
  */
 export interface CategoryV1alpha1ApiPatchCategoryRequest {
     /**
      * Name of category
-     * @type {string}
-     * @memberof CategoryV1alpha1ApiPatchCategory
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof CategoryV1alpha1ApiPatchCategory
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateCategory operation in CategoryV1alpha1Api.
- * @export
- * @interface CategoryV1alpha1ApiUpdateCategoryRequest
  */
 export interface CategoryV1alpha1ApiUpdateCategoryRequest {
     /**
      * Name of category
-     * @type {string}
-     * @memberof CategoryV1alpha1ApiUpdateCategory
      */
     readonly name: string
 
     /**
      * Updated category
-     * @type {Category}
-     * @memberof CategoryV1alpha1ApiUpdateCategory
      */
     readonly category?: Category
 }
 
 /**
  * CategoryV1alpha1Api - object-oriented interface
- * @export
- * @class CategoryV1alpha1Api
- * @extends {BaseAPI}
  */
 export class CategoryV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiCreateCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public createCategory(requestParameters: CategoryV1alpha1ApiCreateCategoryRequest = {}, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).createCategory(requestParameters.category, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiDeleteCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public deleteCategory(requestParameters: CategoryV1alpha1ApiDeleteCategoryRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).deleteCategory(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiGetCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public getCategory(requestParameters: CategoryV1alpha1ApiGetCategoryRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).getCategory(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiListCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public listCategory(requestParameters: CategoryV1alpha1ApiListCategoryRequest = {}, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).listCategory(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiPatchCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public patchCategory(requestParameters: CategoryV1alpha1ApiPatchCategoryRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).patchCategory(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class CategoryV1alpha1Api extends BaseAPI {
      * @param {CategoryV1alpha1ApiUpdateCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1Api
      */
     public updateCategory(requestParameters: CategoryV1alpha1ApiUpdateCategoryRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1ApiFp(this.configuration).updateCategory(requestParameters.name, requestParameters.category, options).then((request) => request(this.axios, this.basePath));

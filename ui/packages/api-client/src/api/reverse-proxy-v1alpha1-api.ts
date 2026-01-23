@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { ReverseProxy } from '../models';
+import type { ReverseProxy } from '../models';
 // @ts-ignore
-import { ReverseProxyList } from '../models';
+import type { ReverseProxyList } from '../models';
 /**
  * ReverseProxyV1alpha1Api - axios parameter creator
- * @export
  */
 export const ReverseProxyV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ReverseProxyV1alpha1ApiAxiosParamCreator = function (configuration?
 
 /**
  * ReverseProxyV1alpha1Api - functional programming interface
- * @export
  */
 export const ReverseProxyV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ReverseProxyV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ReverseProxyV1alpha1ApiFp = function(configuration?: Configuration)
 
 /**
  * ReverseProxyV1alpha1Api - factory interface
- * @export
  */
 export const ReverseProxyV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ReverseProxyV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ReverseProxyV1alpha1ApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for createReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiCreateReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiCreateReverseProxyRequest {
     /**
      * Fresh reverseproxy
-     * @type {ReverseProxy}
-     * @memberof ReverseProxyV1alpha1ApiCreateReverseProxy
      */
     readonly reverseProxy?: ReverseProxy
 }
 
 /**
  * Request parameters for deleteReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiDeleteReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiDeleteReverseProxyRequest {
     /**
      * Name of reverseproxy
-     * @type {string}
-     * @memberof ReverseProxyV1alpha1ApiDeleteReverseProxy
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiGetReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiGetReverseProxyRequest {
     /**
      * Name of reverseproxy
-     * @type {string}
-     * @memberof ReverseProxyV1alpha1ApiGetReverseProxy
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiListReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiListReverseProxyRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ReverseProxyV1alpha1ApiListReverseProxy
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ReverseProxyV1alpha1ApiListReverseProxy
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ReverseProxyV1alpha1ApiListReverseProxy
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ReverseProxyV1alpha1ApiListReverseProxy
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ReverseProxyV1alpha1ApiListReverseProxy
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiPatchReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiPatchReverseProxyRequest {
     /**
      * Name of reverseproxy
-     * @type {string}
-     * @memberof ReverseProxyV1alpha1ApiPatchReverseProxy
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ReverseProxyV1alpha1ApiPatchReverseProxy
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateReverseProxy operation in ReverseProxyV1alpha1Api.
- * @export
- * @interface ReverseProxyV1alpha1ApiUpdateReverseProxyRequest
  */
 export interface ReverseProxyV1alpha1ApiUpdateReverseProxyRequest {
     /**
      * Name of reverseproxy
-     * @type {string}
-     * @memberof ReverseProxyV1alpha1ApiUpdateReverseProxy
      */
     readonly name: string
 
     /**
      * Updated reverseproxy
-     * @type {ReverseProxy}
-     * @memberof ReverseProxyV1alpha1ApiUpdateReverseProxy
      */
     readonly reverseProxy?: ReverseProxy
 }
 
 /**
  * ReverseProxyV1alpha1Api - object-oriented interface
- * @export
- * @class ReverseProxyV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ReverseProxyV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiCreateReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public createReverseProxy(requestParameters: ReverseProxyV1alpha1ApiCreateReverseProxyRequest = {}, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).createReverseProxy(requestParameters.reverseProxy, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiDeleteReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public deleteReverseProxy(requestParameters: ReverseProxyV1alpha1ApiDeleteReverseProxyRequest, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).deleteReverseProxy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiGetReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public getReverseProxy(requestParameters: ReverseProxyV1alpha1ApiGetReverseProxyRequest, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).getReverseProxy(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiListReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public listReverseProxy(requestParameters: ReverseProxyV1alpha1ApiListReverseProxyRequest = {}, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).listReverseProxy(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiPatchReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public patchReverseProxy(requestParameters: ReverseProxyV1alpha1ApiPatchReverseProxyRequest, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).patchReverseProxy(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ReverseProxyV1alpha1Api extends BaseAPI {
      * @param {ReverseProxyV1alpha1ApiUpdateReverseProxyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ReverseProxyV1alpha1Api
      */
     public updateReverseProxy(requestParameters: ReverseProxyV1alpha1ApiUpdateReverseProxyRequest, options?: RawAxiosRequestConfig) {
         return ReverseProxyV1alpha1ApiFp(this.configuration).updateReverseProxy(requestParameters.name, requestParameters.reverseProxy, options).then((request) => request(this.axios, this.basePath));

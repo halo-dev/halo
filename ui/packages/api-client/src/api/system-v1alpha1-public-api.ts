@@ -20,12 +20,13 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { SiteStatsVo } from '../models';
+import type { SetupRequest } from '../models';
+// @ts-ignore
+import type { SiteStatsVo } from '../models';
 /**
  * SystemV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const SystemV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -103,12 +104,54 @@ export const SystemV1alpha1PublicApiAxiosParamCreator = function (configuration?
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Setup system
+         * @param {SetupRequest} setupRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setupSystem: async (setupRequest: SetupRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'setupRequest' is not null or undefined
+            assertParamExists('setupSystem', 'setupRequest', setupRequest)
+            const localVarPath = `/system/setup`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(setupRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
  * SystemV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const SystemV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SystemV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -135,12 +178,23 @@ export const SystemV1alpha1PublicApiFp = function(configuration?: Configuration)
             const localVarOperationServerBasePath = operationServerMap['SystemV1alpha1PublicApi.queryStats']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Setup system
+         * @param {SetupRequest} setupRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setupSystem(setupRequest: SetupRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setupSystem(setupRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SystemV1alpha1PublicApi.setupSystem']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
 /**
  * SystemV1alpha1PublicApi - factory interface
- * @export
  */
 export const SystemV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SystemV1alpha1PublicApiFp(configuration)
@@ -161,21 +215,33 @@ export const SystemV1alpha1PublicApiFactory = function (configuration?: Configur
         queryStats(options?: RawAxiosRequestConfig): AxiosPromise<SiteStatsVo> {
             return localVarFp.queryStats(options).then((request) => request(axios, basePath));
         },
+        /**
+         * Setup system
+         * @param {SystemV1alpha1PublicApiSetupSystemRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setupSystem(requestParameters: SystemV1alpha1PublicApiSetupSystemRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.setupSystem(requestParameters.setupRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
 /**
+ * Request parameters for setupSystem operation in SystemV1alpha1PublicApi.
+ */
+export interface SystemV1alpha1PublicApiSetupSystemRequest {
+    readonly setupRequest: SetupRequest
+}
+
+/**
  * SystemV1alpha1PublicApi - object-oriented interface
- * @export
- * @class SystemV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class SystemV1alpha1PublicApi extends BaseAPI {
     /**
      * Jump to setup page
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemV1alpha1PublicApi
      */
     public jumpToSetupPage(options?: RawAxiosRequestConfig) {
         return SystemV1alpha1PublicApiFp(this.configuration).jumpToSetupPage(options).then((request) => request(this.axios, this.basePath));
@@ -185,10 +251,19 @@ export class SystemV1alpha1PublicApi extends BaseAPI {
      * Gets site stats
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SystemV1alpha1PublicApi
      */
     public queryStats(options?: RawAxiosRequestConfig) {
         return SystemV1alpha1PublicApiFp(this.configuration).queryStats(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Setup system
+     * @param {SystemV1alpha1PublicApiSetupSystemRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public setupSystem(requestParameters: SystemV1alpha1PublicApiSetupSystemRequest, options?: RawAxiosRequestConfig) {
+        return SystemV1alpha1PublicApiFp(this.configuration).setupSystem(requestParameters.setupRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

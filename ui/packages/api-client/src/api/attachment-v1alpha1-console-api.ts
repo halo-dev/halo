@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Attachment } from '../models';
+import type { Attachment } from '../models';
 // @ts-ignore
-import { AttachmentList } from '../models';
+import type { AttachmentList } from '../models';
 // @ts-ignore
-import { UploadFromUrlRequest } from '../models';
+import type { UploadFromUrlRequest } from '../models';
 /**
  * AttachmentV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -213,12 +212,67 @@ export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAttachmentForConsole: async (file?: File, filename?: string, url?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/console.api.storage.halo.run/v1alpha1/attachments/-/upload`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (filename !== undefined) { 
+                localVarFormParams.append('filename', filename as any);
+            }
+    
+            if (url !== undefined) { 
+                localVarFormParams.append('url', url as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
  * AttachmentV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AttachmentV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -268,12 +322,25 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
             const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1ConsoleApi.uploadAttachment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {File} [file] The file to upload. If not provided, the url will be used.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [url] The url to upload from. If not provided, the file will be used.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadAttachmentForConsole(file?: File, filename?: string, url?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachmentForConsole(file, filename, url, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AttachmentV1alpha1ConsoleApi.uploadAttachmentForConsole']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
 /**
  * AttachmentV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AttachmentV1alpha1ConsoleApiFp(configuration)
@@ -305,119 +372,109 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
         uploadAttachment(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
             return localVarFp.uploadAttachment(requestParameters.file, requestParameters.policyName, requestParameters.groupName, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Upload attachment endpoint for console.
+         * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAttachmentForConsole(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Attachment> {
+            return localVarFp.uploadAttachmentForConsole(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
 /**
  * Request parameters for externalTransferAttachment operation in AttachmentV1alpha1ConsoleApi.
- * @export
- * @interface AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest
  */
 export interface AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest {
-    /**
-     * 
-     * @type {UploadFromUrlRequest}
-     * @memberof AttachmentV1alpha1ConsoleApiExternalTransferAttachment
-     */
     readonly uploadFromUrlRequest: UploadFromUrlRequest
 }
 
 /**
  * Request parameters for searchAttachments operation in AttachmentV1alpha1ConsoleApi.
- * @export
- * @interface AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest
  */
 export interface AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly sort?: Array<string>
 
     /**
      * Filter attachments without group. This parameter will ignore group parameter.
-     * @type {boolean}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly ungrouped?: boolean
 
     /**
      * Keyword for searching.
-     * @type {string}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly keyword?: string
 
     /**
      * Acceptable media types.
-     * @type {Array<string>}
-     * @memberof AttachmentV1alpha1ConsoleApiSearchAttachments
      */
     readonly accepts?: Array<string>
 }
 
 /**
  * Request parameters for uploadAttachment operation in AttachmentV1alpha1ConsoleApi.
- * @export
- * @interface AttachmentV1alpha1ConsoleApiUploadAttachmentRequest
  */
 export interface AttachmentV1alpha1ConsoleApiUploadAttachmentRequest {
-    /**
-     * 
-     * @type {File}
-     * @memberof AttachmentV1alpha1ConsoleApiUploadAttachment
-     */
     readonly file: File
 
     /**
      * Storage policy name
-     * @type {string}
-     * @memberof AttachmentV1alpha1ConsoleApiUploadAttachment
      */
     readonly policyName: string
 
     /**
      * The name of the group to which the attachment belongs
-     * @type {string}
-     * @memberof AttachmentV1alpha1ConsoleApiUploadAttachment
      */
     readonly groupName?: string
 }
 
 /**
+ * Request parameters for uploadAttachmentForConsole operation in AttachmentV1alpha1ConsoleApi.
+ */
+export interface AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest {
+    /**
+     * The file to upload. If not provided, the url will be used.
+     */
+    readonly file?: File
+
+    /**
+     * The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+     */
+    readonly filename?: string
+
+    /**
+     * The url to upload from. If not provided, the file will be used.
+     */
+    readonly url?: string
+}
+
+/**
  * AttachmentV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class AttachmentV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -425,7 +482,6 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
      * @param {AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1ConsoleApi
      */
     public externalTransferAttachment(requestParameters: AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ConsoleApiFp(this.configuration).externalTransferAttachment(requestParameters.uploadFromUrlRequest, options).then((request) => request(this.axios, this.basePath));
@@ -436,7 +492,6 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
      * @param {AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1ConsoleApi
      */
     public searchAttachments(requestParameters: AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest = {}, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ConsoleApiFp(this.configuration).searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(this.axios, this.basePath));
@@ -447,10 +502,19 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
      * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AttachmentV1alpha1ConsoleApi
      */
     public uploadAttachment(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentRequest, options?: RawAxiosRequestConfig) {
         return AttachmentV1alpha1ConsoleApiFp(this.configuration).uploadAttachment(requestParameters.file, requestParameters.policyName, requestParameters.groupName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Upload attachment endpoint for console.
+     * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public uploadAttachmentForConsole(requestParameters: AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest = {}, options?: RawAxiosRequestConfig) {
+        return AttachmentV1alpha1ConsoleApiFp(this.configuration).uploadAttachmentForConsole(requestParameters.file, requestParameters.filename, requestParameters.url, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

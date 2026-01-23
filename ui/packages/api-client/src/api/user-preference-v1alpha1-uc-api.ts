@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * UserPreferenceV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -120,7 +119,6 @@ export const UserPreferenceV1alpha1UcApiAxiosParamCreator = function (configurat
 
 /**
  * UserPreferenceV1alpha1UcApi - functional programming interface
- * @export
  */
 export const UserPreferenceV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserPreferenceV1alpha1UcApiAxiosParamCreator(configuration)
@@ -155,7 +153,6 @@ export const UserPreferenceV1alpha1UcApiFp = function(configuration?: Configurat
 
 /**
  * UserPreferenceV1alpha1UcApi - factory interface
- * @export
  */
 export const UserPreferenceV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = UserPreferenceV1alpha1UcApiFp(configuration)
@@ -183,44 +180,28 @@ export const UserPreferenceV1alpha1UcApiFactory = function (configuration?: Conf
 
 /**
  * Request parameters for getMyPreference operation in UserPreferenceV1alpha1UcApi.
- * @export
- * @interface UserPreferenceV1alpha1UcApiGetMyPreferenceRequest
  */
 export interface UserPreferenceV1alpha1UcApiGetMyPreferenceRequest {
     /**
      * Group of user preference, e.g. &#x60;notification&#x60;.
-     * @type {string}
-     * @memberof UserPreferenceV1alpha1UcApiGetMyPreference
      */
     readonly group: string
 }
 
 /**
  * Request parameters for updateMyPreference operation in UserPreferenceV1alpha1UcApi.
- * @export
- * @interface UserPreferenceV1alpha1UcApiUpdateMyPreferenceRequest
  */
 export interface UserPreferenceV1alpha1UcApiUpdateMyPreferenceRequest {
     /**
      * Group of user preference, e.g. &#x60;notification&#x60;.
-     * @type {string}
-     * @memberof UserPreferenceV1alpha1UcApiUpdateMyPreference
      */
     readonly group: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof UserPreferenceV1alpha1UcApiUpdateMyPreference
-     */
     readonly body: object
 }
 
 /**
  * UserPreferenceV1alpha1UcApi - object-oriented interface
- * @export
- * @class UserPreferenceV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class UserPreferenceV1alpha1UcApi extends BaseAPI {
     /**
@@ -228,7 +209,6 @@ export class UserPreferenceV1alpha1UcApi extends BaseAPI {
      * @param {UserPreferenceV1alpha1UcApiGetMyPreferenceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserPreferenceV1alpha1UcApi
      */
     public getMyPreference(requestParameters: UserPreferenceV1alpha1UcApiGetMyPreferenceRequest, options?: RawAxiosRequestConfig) {
         return UserPreferenceV1alpha1UcApiFp(this.configuration).getMyPreference(requestParameters.group, options).then((request) => request(this.axios, this.basePath));
@@ -239,7 +219,6 @@ export class UserPreferenceV1alpha1UcApi extends BaseAPI {
      * @param {UserPreferenceV1alpha1UcApiUpdateMyPreferenceRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof UserPreferenceV1alpha1UcApi
      */
     public updateMyPreference(requestParameters: UserPreferenceV1alpha1UcApiUpdateMyPreferenceRequest, options?: RawAxiosRequestConfig) {
         return UserPreferenceV1alpha1UcApiFp(this.configuration).updateMyPreference(requestParameters.group, requestParameters.body, options).then((request) => request(this.axios, this.basePath));

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import LazyImage from "@/components/image/LazyImage.vue";
-import { isImage } from "@/utils/image";
+import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
 import { matchMediaTypes } from "@/utils/media-type";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import {
@@ -8,33 +7,34 @@ import {
   IconArrowRight,
   IconCheckboxCircle,
   IconCheckboxFill,
+  IconClose,
   IconEye,
   IconGrid,
   IconList,
   IconRefreshLine,
   IconUpload,
   VButton,
-  VCard,
   VEmpty,
   VEntityContainer,
   VLoading,
   VPagination,
   VSpace,
 } from "@halo-dev/components";
-import type { AttachmentLike } from "@halo-dev/console-shared";
+import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
+import type { SuccessResponse } from "@uppy/core";
 import { useLocalStorage } from "@vueuse/core";
+import { throttle } from "es-toolkit/compat";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
-import AttachmentUploadModal from "./AttachmentUploadModal.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
 
 const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    selected: AttachmentLike[];
+    selected?: AttachmentLike[];
     accepts?: string[];
     min?: number;
     max?: number;
@@ -91,13 +91,13 @@ const {
   },
 });
 
+const throttledFetchAttachments = throttle(handleFetchAttachments, 1000, {
+  leading: false,
+  trailing: true,
+});
+
 // Upload
 const uploadVisible = ref(false);
-
-function onUploadModalClose() {
-  handleFetchAttachments();
-  uploadVisible.value = false;
-}
 
 // Select
 const selectedAttachment = ref<Attachment>();
@@ -219,6 +219,19 @@ const handleSelectNext = async () => {
     selectedAttachment.value = data.value.items[0];
   }
 };
+
+function onUploadDone() {
+  handleFetchAttachments();
+  uploadVisible.value = false;
+}
+
+function onUploaded(response: SuccessResponse) {
+  if (response.body) {
+    handleSelect(response.body as Attachment);
+    page.value = 1;
+    throttledFetchAttachments();
+  }
+}
 </script>
 <template>
   <div class="mb-3 block w-full rounded bg-gray-50 px-3 py-2">
@@ -304,13 +317,26 @@ const handleSelectNext = async () => {
     </div>
   </div>
 
-  <div v-if="data?.total" class="mb-5">
-    <VButton @click="uploadVisible = true">
+  <div class="mb-5 space-y-3">
+    <VButton @click="uploadVisible = !uploadVisible">
       <template #icon>
-        <IconUpload />
+        <IconUpload v-if="!uploadVisible" />
+        <IconClose v-else />
       </template>
-      {{ $t("core.common.buttons.upload") }}
+      {{
+        uploadVisible
+          ? $t("core.common.buttons.cancel_upload")
+          : $t("core.common.buttons.upload")
+      }}
     </VButton>
+    <Transition v-if="uploadVisible" appear name="fade">
+      <UppyUpload
+        endpoint="/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload"
+        width="100%"
+        :done-button-handler="onUploadDone"
+        @uploaded="onUploaded"
+      />
+    </Transition>
   </div>
 
   <VLoading v-if="isLoading" />
@@ -341,79 +367,22 @@ const handleSelectNext = async () => {
         class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
         role="list"
       >
-        <VCard
-          v-for="(attachment, index) in data.items"
-          :key="index"
-          :body-class="['!p-0']"
-          :class="{
-            'ring-1 ring-primary': isChecked(attachment),
-            'pointer-events-none !cursor-not-allowed opacity-50':
-              isDisabled(attachment),
-          }"
-          class="hover:shadow"
-          @click.stop="handleSelect(attachment)"
+        <AttachmentGridListItem
+          v-for="attachment in data.items"
+          :key="attachment.metadata.name"
+          :attachment="attachment"
+          :is-selected="isChecked(attachment)"
+          :is-disabled="isDisabled(attachment)"
+          @select="handleSelect(attachment)"
+          @click="handleSelect(attachment)"
         >
-          <div class="group relative bg-white">
-            <div
-              class="aspect-h-8 aspect-w-10 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
-            >
-              <LazyImage
-                v-if="isImage(attachment.spec.mediaType)"
-                :key="attachment.metadata.name"
-                :alt="attachment.spec.displayName"
-                :src="
-                  attachment.status?.thumbnails?.S ||
-                  attachment.status?.permalink
-                "
-                classes="pointer-events-none object-cover group-hover:opacity-75 transform-gpu"
-              >
-                <template #loading>
-                  <div
-                    class="flex h-full items-center justify-center object-cover"
-                  >
-                    <span class="text-xs text-gray-400">
-                      {{ $t("core.common.status.loading") }}...
-                    </span>
-                  </div>
-                </template>
-                <template #error>
-                  <div
-                    class="flex h-full items-center justify-center object-cover"
-                  >
-                    <span class="text-xs text-red-400">
-                      {{ $t("core.common.status.loading_error") }}
-                    </span>
-                  </div>
-                </template>
-              </LazyImage>
-              <AttachmentFileTypeIcon
-                v-else
-                :file-name="attachment.spec.displayName"
-              />
-            </div>
-            <p
-              class="pointer-events-none block truncate px-2 py-1 text-center text-xs font-medium text-gray-700"
-            >
-              {{ attachment.spec.displayName }}
-            </p>
-
-            <div
-              :class="{ '!flex': isChecked(attachment) }"
-              class="absolute left-0 top-0 hidden h-1/3 w-full justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
-            >
-              <IconEye
-                class="mr-1 mt-1 hidden h-6 w-6 cursor-pointer text-white transition-all hover:text-primary group-hover:block"
-                @click.stop="handleOpenDetail(attachment)"
-              />
-              <IconCheckboxFill
-                :class="{
-                  '!text-primary': isChecked(attachment),
-                }"
-                class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
-              />
-            </div>
-          </div>
-        </VCard>
+          <template #actions>
+            <IconEye
+              class="mr-1 mt-1 hidden h-6 w-6 cursor-pointer text-white transition-all hover:text-primary group-hover:block"
+              @click.stop="handleOpenDetail(attachment)"
+            />
+          </template>
+        </AttachmentGridListItem>
       </div>
     </Transition>
     <Transition v-if="viewType === 'list'" appear name="fade">
@@ -456,8 +425,6 @@ const handleSelectNext = async () => {
       :size-options="[60, 120, 200]"
     />
   </div>
-
-  <AttachmentUploadModal v-if="uploadVisible" @close="onUploadModalClose" />
 
   <AttachmentDetailModal
     v-if="selectedAttachment"

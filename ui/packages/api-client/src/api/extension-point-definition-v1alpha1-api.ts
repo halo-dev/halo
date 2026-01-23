@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ExtensionPointDefinition } from '../models';
+import type { ExtensionPointDefinition } from '../models';
 // @ts-ignore
-import { ExtensionPointDefinitionList } from '../models';
+import type { ExtensionPointDefinitionList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * ExtensionPointDefinitionV1alpha1Api - axios parameter creator
- * @export
  */
 export const ExtensionPointDefinitionV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const ExtensionPointDefinitionV1alpha1ApiAxiosParamCreator = function (co
 
 /**
  * ExtensionPointDefinitionV1alpha1Api - functional programming interface
- * @export
  */
 export const ExtensionPointDefinitionV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ExtensionPointDefinitionV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const ExtensionPointDefinitionV1alpha1ApiFp = function(configuration?: Co
 
 /**
  * ExtensionPointDefinitionV1alpha1Api - factory interface
- * @export
  */
 export const ExtensionPointDefinitionV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ExtensionPointDefinitionV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const ExtensionPointDefinitionV1alpha1ApiFactory = function (configuratio
 
 /**
  * Request parameters for createExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiCreateExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiCreateExtensionPointDefinitionRequest {
     /**
      * Fresh extensionpointdefinition
-     * @type {ExtensionPointDefinition}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiCreateExtensionPointDefinition
      */
     readonly extensionPointDefinition?: ExtensionPointDefinition
 }
 
 /**
  * Request parameters for deleteExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiDeleteExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiDeleteExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
-     * @type {string}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiDeleteExtensionPointDefinition
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiGetExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiGetExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
-     * @type {string}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiGetExtensionPointDefinition
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinition
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinition
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinition
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinition
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinition
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
-     * @type {string}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinition
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinition
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateExtensionPointDefinition operation in ExtensionPointDefinitionV1alpha1Api.
- * @export
- * @interface ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinitionRequest
  */
 export interface ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinitionRequest {
     /**
      * Name of extensionpointdefinition
-     * @type {string}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinition
      */
     readonly name: string
 
     /**
      * Updated extensionpointdefinition
-     * @type {ExtensionPointDefinition}
-     * @memberof ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinition
      */
     readonly extensionPointDefinition?: ExtensionPointDefinition
 }
 
 /**
  * ExtensionPointDefinitionV1alpha1Api - object-oriented interface
- * @export
- * @class ExtensionPointDefinitionV1alpha1Api
- * @extends {BaseAPI}
  */
 export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiCreateExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public createExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiCreateExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).createExtensionPointDefinition(requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiDeleteExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public deleteExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiDeleteExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).deleteExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiGetExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public getExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiGetExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).getExtensionPointDefinition(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public listExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiListExtensionPointDefinitionRequest = {}, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).listExtensionPointDefinition(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public patchExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiPatchExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).patchExtensionPointDefinition(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class ExtensionPointDefinitionV1alpha1Api extends BaseAPI {
      * @param {ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinitionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof ExtensionPointDefinitionV1alpha1Api
      */
     public updateExtensionPointDefinition(requestParameters: ExtensionPointDefinitionV1alpha1ApiUpdateExtensionPointDefinitionRequest, options?: RawAxiosRequestConfig) {
         return ExtensionPointDefinitionV1alpha1ApiFp(this.configuration).updateExtensionPointDefinition(requestParameters.name, requestParameters.extensionPointDefinition, options).then((request) => request(this.axios, this.basePath));

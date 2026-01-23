@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.finders.Finder;
@@ -25,10 +25,10 @@ import tools.jackson.databind.JsonNode;
 public class ThemeFinderImpl implements ThemeFinder {
 
     private final ReactiveExtensionClient client;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     public ThemeFinderImpl(ReactiveExtensionClient client,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        SystemConfigFetcher environmentFetcher) {
         this.client = client;
         this.environmentFetcher = environmentFetcher;
     }

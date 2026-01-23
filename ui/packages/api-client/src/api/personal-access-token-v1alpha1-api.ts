@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { PersonalAccessToken } from '../models';
+import type { PersonalAccessToken } from '../models';
 // @ts-ignore
-import { PersonalAccessTokenList } from '../models';
+import type { PersonalAccessTokenList } from '../models';
 /**
  * PersonalAccessTokenV1alpha1Api - axios parameter creator
- * @export
  */
 export const PersonalAccessTokenV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const PersonalAccessTokenV1alpha1ApiAxiosParamCreator = function (configu
 
 /**
  * PersonalAccessTokenV1alpha1Api - functional programming interface
- * @export
  */
 export const PersonalAccessTokenV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonalAccessTokenV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const PersonalAccessTokenV1alpha1ApiFp = function(configuration?: Configu
 
 /**
  * PersonalAccessTokenV1alpha1Api - factory interface
- * @export
  */
 export const PersonalAccessTokenV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PersonalAccessTokenV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const PersonalAccessTokenV1alpha1ApiFactory = function (configuration?: C
 
 /**
  * Request parameters for createPersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiCreatePersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiCreatePersonalAccessTokenRequest {
     /**
      * Fresh personalaccesstoken
-     * @type {PersonalAccessToken}
-     * @memberof PersonalAccessTokenV1alpha1ApiCreatePersonalAccessToken
      */
     readonly personalAccessToken?: PersonalAccessToken
 }
 
 /**
  * Request parameters for deletePersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiDeletePersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiDeletePersonalAccessTokenRequest {
     /**
      * Name of personalaccesstoken
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1ApiDeletePersonalAccessToken
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getPersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiGetPersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiGetPersonalAccessTokenRequest {
     /**
      * Name of personalaccesstoken
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1ApiGetPersonalAccessToken
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listPersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiListPersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiListPersonalAccessTokenRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PersonalAccessTokenV1alpha1ApiListPersonalAccessToken
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PersonalAccessTokenV1alpha1ApiListPersonalAccessToken
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PersonalAccessTokenV1alpha1ApiListPersonalAccessToken
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PersonalAccessTokenV1alpha1ApiListPersonalAccessToken
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PersonalAccessTokenV1alpha1ApiListPersonalAccessToken
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchPersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiPatchPersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiPatchPersonalAccessTokenRequest {
     /**
      * Name of personalaccesstoken
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1ApiPatchPersonalAccessToken
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof PersonalAccessTokenV1alpha1ApiPatchPersonalAccessToken
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updatePersonalAccessToken operation in PersonalAccessTokenV1alpha1Api.
- * @export
- * @interface PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessTokenRequest
  */
 export interface PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessTokenRequest {
     /**
      * Name of personalaccesstoken
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessToken
      */
     readonly name: string
 
     /**
      * Updated personalaccesstoken
-     * @type {PersonalAccessToken}
-     * @memberof PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessToken
      */
     readonly personalAccessToken?: PersonalAccessToken
 }
 
 /**
  * PersonalAccessTokenV1alpha1Api - object-oriented interface
- * @export
- * @class PersonalAccessTokenV1alpha1Api
- * @extends {BaseAPI}
  */
 export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiCreatePersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public createPersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiCreatePersonalAccessTokenRequest = {}, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).createPersonalAccessToken(requestParameters.personalAccessToken, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiDeletePersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public deletePersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiDeletePersonalAccessTokenRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).deletePersonalAccessToken(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiGetPersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public getPersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiGetPersonalAccessTokenRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).getPersonalAccessToken(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiListPersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public listPersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiListPersonalAccessTokenRequest = {}, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).listPersonalAccessToken(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiPatchPersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public patchPersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiPatchPersonalAccessTokenRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).patchPersonalAccessToken(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class PersonalAccessTokenV1alpha1Api extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessTokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1Api
      */
     public updatePersonalAccessToken(requestParameters: PersonalAccessTokenV1alpha1ApiUpdatePersonalAccessTokenRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1ApiFp(this.configuration).updatePersonalAccessToken(requestParameters.name, requestParameters.personalAccessToken, options).then((request) => request(this.axios, this.basePath));

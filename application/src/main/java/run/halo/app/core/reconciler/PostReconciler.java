@@ -66,6 +66,7 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -85,6 +86,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @AllArgsConstructor
 @Component
 public class PostReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
     private final PostService postService;
@@ -149,9 +151,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     publishPost(post, events);
                 }
 
-                var permalinkPattern = postPermalinkPolicy.pattern();
-                annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
-
+                if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+                    // only set the permalink pattern if not present
+                    var permalinkPattern = postPermalinkPolicy.pattern();
+                    annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
+                }
                 status.setPermalink(postPermalinkPolicy.permalink(post));
                 if (status.getPhase() == null) {
                     status.setPhase(PostPhase.DRAFT.toString());
@@ -209,7 +213,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var hidden = categories.stream()
             .anyMatch(categoryName -> categoryService.isCategoryHidden(categoryName)
-                .blockOptional().orElse(false)
+                .blockOptional(BLOCKING_TIMEOUT).orElse(false)
             );
         post.getStatusOrDefault().setHideFromList(hidden);
     }
@@ -287,7 +291,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
         interestReason.setExpression(
             "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
-        notificationCenter.subscribe(subscriber, interestReason).block();
+        notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
     private void publishPost(Post post, Set<ApplicationEvent> events) {
@@ -366,18 +370,18 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         listSnapshots(ref).forEach(client::delete);
 
         // clean up comments
-        commentService.removeBySubject(ref).block();
+        commentService.removeBySubject(ref).block(BLOCKING_TIMEOUT);
 
         // delete counter
         counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
-            .block();
+            .block(BLOCKING_TIMEOUT);
     }
 
     private String getExcerpt(Post post) {
         Optional<ContentWrapper> contentWrapper =
             postService.getContent(post.getSpec().getReleaseSnapshot(),
                     post.getSpec().getBaseSnapshot())
-                .blockOptional();
+                .blockOptional(BLOCKING_TIMEOUT);
         if (contentWrapper.isEmpty()) {
             return StringUtils.EMPTY;
         }
@@ -415,7 +419,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     post.getMetadata().getName(), e);
                 return Mono.empty();
             })
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElse(StringUtils.EMPTY);
     }
 

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { NodeViewProps } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
-import { computed, onMounted, ref } from "vue";
+import { computed } from "vue";
 
 const props = defineProps<NodeViewProps>();
 
@@ -26,13 +27,6 @@ const frameborder = computed(() => {
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos() || 0);
 }
-const inputRef = ref();
-
-onMounted(() => {
-  if (!src.value) {
-    inputRef.value.focus();
-  }
-});
 </script>
 
 <template>
@@ -44,12 +38,12 @@ onMounted(() => {
       }"
     >
       <div v-if="!src" class="p-1.5">
-        <input
+        <Input
           ref="inputRef"
           v-model.lazy="src"
-          class="block w-full rounded-md border border-gray-300 bg-gray-50 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
           :placeholder="i18n.global.t('editor.common.placeholder.link_input')"
           tabindex="-1"
+          auto-focus
           @focus="handleSetFocus"
         />
       </div>

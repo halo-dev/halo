@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import LazyImage from "@/components/image/LazyImage.vue";
 import type { Theme } from "@halo-dev/api-client";
 import {
   VDropdownItem,
@@ -7,6 +6,7 @@ import {
   VEntityField,
   VTag,
 } from "@halo-dev/components";
+import { UseImage } from "@vueuse/components";
 import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 
@@ -32,17 +32,16 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
 <template>
   <VEntity :is-selected="isSelected">
     <template #start>
-      <VEntityField>
+      <VEntityField v-if="theme.spec.logo">
         <template #description>
-          <div class="w-32">
+          <div class="w-20">
             <div
               class="group aspect-h-3 aspect-w-4 block w-full overflow-hidden rounded border bg-gray-100"
             >
-              <LazyImage
-                :key="theme.metadata.name"
+              <UseImage
                 :src="theme.spec.logo"
                 :alt="theme.spec.displayName"
-                classes="pointer-events-none object-cover group-hover:opacity-75"
+                class="pointer-events-none object-cover group-hover:opacity-75"
               >
                 <template #loading>
                   <div
@@ -62,7 +61,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
                     </span>
                   </div>
                 </template>
-              </LazyImage>
+              </UseImage>
             </div>
           </div>
         </template>

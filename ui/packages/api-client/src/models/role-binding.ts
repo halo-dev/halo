@@ -15,48 +15,24 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { RoleRef } from './role-ref';
+import type { RoleRef } from './role-ref';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Subject } from './subject';
+import type { Subject } from './subject';
 
 /**
  * RoleBinding references a role, but does not contain it.  It can reference a Role in the global.  It adds who information via Subjects.
- * @export
- * @interface RoleBinding
  */
 export interface RoleBinding {
-    /**
-     * 
-     * @type {string}
-     * @memberof RoleBinding
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RoleBinding
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof RoleBinding
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {RoleRef}
-     * @memberof RoleBinding
-     */
     'roleRef'?: RoleRef;
     /**
      * Subjects holds references to the objects the role applies to.
-     * @type {Array<Subject>}
-     * @memberof RoleBinding
      */
     'subjects'?: Array<Subject>;
 }

@@ -1,5 +1,5 @@
 import type { Category } from "@halo-dev/api-client";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 
 export interface CategoryTreeNode extends Category {
   children: CategoryTreeNode[];

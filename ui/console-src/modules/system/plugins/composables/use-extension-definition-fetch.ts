@@ -1,5 +1,9 @@
-import type { ExtensionPointDefinition } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  ExtensionDefinition,
+  ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest,
+  ExtensionPointDefinition,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, type Ref } from "vue";
 
@@ -9,13 +13,21 @@ export function useExtensionDefinitionFetch(
   return useQuery({
     queryKey: ["extension-definitions", extensionPointDefinition],
     queryFn: async () => {
-      const { data } =
-        await coreApiClient.plugin.extensionDefinition.listExtensionDefinition({
+      return await paginate<
+        ExtensionDefinitionV1alpha1ApiListExtensionDefinitionRequest,
+        ExtensionDefinition
+      >(
+        (params) =>
+          coreApiClient.plugin.extensionDefinition.listExtensionDefinition(
+            params
+          ),
+        {
+          size: 1000,
           fieldSelector: [
             `spec.extensionPointName=${extensionPointDefinition.value?.metadata.name}`,
           ],
-        });
-      return data;
+        }
+      );
     },
     enabled: computed(() => !!extensionPointDefinition.value),
   });

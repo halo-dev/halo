@@ -38,7 +38,8 @@ const range = {
   head: 0,
   enable: false,
 };
-const ExtensionRangeSelection = Extension.create({
+
+export const ExtensionRangeSelection = Extension.create({
   priority: 100,
   name: "rangeSelectionExtension",
 
@@ -157,4 +158,4 @@ const ExtensionRangeSelection = Extension.create({
   },
 });
 
-export { ExtensionRangeSelection, RangeSelection };
+export { RangeSelection };

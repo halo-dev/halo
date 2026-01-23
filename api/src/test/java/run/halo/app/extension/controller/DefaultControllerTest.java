@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -223,7 +224,7 @@ class DefaultControllerTest {
     }
 
     @Test
-    void shouldDisposeCorrectly() throws InterruptedException {
+    void shouldDisposeCorrectlyIfShutdownInTime() throws InterruptedException {
         when(executor.awaitTermination(anyLong(), any())).thenReturn(true);
 
         controller.dispose();
@@ -233,9 +234,27 @@ class DefaultControllerTest {
 
         verify(synchronizer, times(1)).dispose();
         verify(queue, times(1)).dispose();
-        verify(executor).shutdown();
-        verify(executor, never()).shutdownNow();
+        verify(executor).shutdownNow();
+        verify(executor, never()).shutdown();
         verify(executor, times(1)).awaitTermination(anyLong(), any());
+    }
+
+    @Test
+    void shouldDisposeCorrectlyIfNotShutdownInTime() throws InterruptedException {
+        when(executor.awaitTermination(anyLong(), any()))
+            .thenReturn(false)
+            .thenReturn(true);
+
+        controller.dispose();
+
+        assertTrue(controller.isDisposed());
+        assertFalse(controller.isStarted());
+
+        verify(synchronizer).dispose();
+        verify(queue).dispose();
+        verify(executor).shutdown();
+        verify(executor).shutdownNow();
+        verify(executor, times(2)).awaitTermination(anyLong(), any());
     }
 
     @Test
@@ -257,13 +276,22 @@ class DefaultControllerTest {
     }
 
     @Test
-    void shouldStartCorrectly() {
+    void shouldStartCorrectly() throws InterruptedException {
+        doAnswer(invocation -> {
+            // simulate starting synchronizer
+            invocation.getArgument(0, Runnable.class).run();
+            return null;
+        }).doAnswer(invocation -> {
+            // simulate starting worker
+            return null;
+        }).when(executor).execute(any(Runnable.class));
+
         controller.start();
         assertTrue(controller.isStarted());
         assertFalse(controller.isDisposed());
 
         verify(synchronizer).start();
-        verify(executor).execute(any(Runnable.class));
+        verify(executor, times(2)).execute(any(Runnable.class));
     }
 
     @Test

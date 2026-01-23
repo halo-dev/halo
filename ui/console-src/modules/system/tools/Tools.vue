@@ -9,7 +9,7 @@ import {
   VEntityField,
   VPageHeader,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { onMounted, ref } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { useRouter } from "vue-router";

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,6 +50,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionException;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeInstallationException;
@@ -64,7 +67,10 @@ class ThemeServiceImplTest {
     ThemeRootGetter themeRoot;
 
     @Mock
-    private SystemVersionSupplier systemVersionSupplier;
+    SystemVersionSupplier systemVersionSupplier;
+
+    @Mock
+    SystemConfigFetcher systemConfigFetcher;
 
     @InjectMocks
     ThemeServiceImpl themeService;
@@ -149,9 +155,10 @@ class ThemeServiceImplTest {
                 // for theme deleted check
                 .thenReturn(Mono.empty());
 
-            when(client.delete(oldTheme)).thenReturn(Mono.just(oldTheme));
-            when(client.create(isA(Unstructured.class))).thenReturn(
-                Mono.just(convert(createTheme(t -> t.getSpec().setDisplayName("New fake theme")))));
+            when(client.get(Theme.class, "default")).thenReturn(Mono.just(oldTheme));
+            when(client.update(oldTheme)).thenReturn(Mono.just(createTheme(t -> {
+                t.getSpec().setDisplayName("New fake theme");
+            })));
 
             StepVerifier.create(themeService.upgrade("default", content(themeZipPath)))
                 .consumeNextWith(newTheme -> {
@@ -160,9 +167,8 @@ class ThemeServiceImplTest {
                 })
                 .verifyComplete();
 
-            verify(client, times(3)).fetch(Theme.class, "default");
-            verify(client).delete(oldTheme);
-            verify(client).create(isA(Unstructured.class));
+            verify(client).fetch(Theme.class, "default");
+            verify(client, never()).delete(oldTheme);
         }
     }
 
@@ -173,8 +179,7 @@ class ThemeServiceImplTest {
         @Test
         void shouldInstallSuccessfully() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("default");
-            when(client.create(isA(Unstructured.class))).thenReturn(
-                Mono.just(convert(createTheme())));
+            when(client.create(isA(Theme.class))).thenReturn(Mono.just(createTheme()));
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                 .consumeNextWith(theme -> {
                     assertEquals("default", theme.getMetadata().getName());
@@ -186,7 +191,7 @@ class ThemeServiceImplTest {
         @Test
         void shouldFailWhenPersistentError() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("default");
-            when(client.create(isA(Unstructured.class))).thenReturn(
+            when(client.create(isA(Theme.class))).thenReturn(
                 Mono.error(() -> new ExtensionException("Failed to create the extension")));
             StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
                 .verifyError(ExtensionException.class);
@@ -461,5 +466,44 @@ class ThemeServiceImplTest {
         verify(client, times(1)).fetch(eq(ConfigMap.class), eq("fake-config"));
 
         verify(client, times(1)).update(any(ConfigMap.class));
+    }
+
+    @Test
+    void shouldFetchSystemSetting() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        StepVerifier.create(themeService.fetchSystemSetting())
+            .expectNext(themeSetting)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFetchActivatedTheme() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        var theme = createTheme();
+        when(client.fetch(Theme.class, "fake-theme")).thenReturn(Mono.just(theme));
+
+        StepVerifier.create(themeService.fetchActivatedTheme())
+            .expectNext(theme)
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldFetchActivatedThemeName() {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("fake-theme");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+            .thenReturn(Mono.just(themeSetting));
+
+        StepVerifier.create(themeService.fetchActivatedThemeName())
+            .expectNext("fake-theme")
+            .verifyComplete();
     }
 }

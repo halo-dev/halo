@@ -9,6 +9,7 @@ import org.pf4j.CompoundPluginLoader;
 import org.pf4j.CompoundPluginRepository;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.DefaultPluginRepository;
+import org.pf4j.DefaultPluginStatusProvider;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
 import org.pf4j.JarPluginLoader;
@@ -37,7 +38,7 @@ import run.halo.app.plugin.event.PluginStartedEvent;
  * @since 2.0.0
  */
 @Slf4j
-public class HaloPluginManager extends DefaultPluginManager
+class HaloPluginManager extends DefaultPluginManager
     implements SpringPluginManager, InitializingBean {
 
     private final ApplicationContext rootContext;
@@ -115,7 +116,8 @@ public class HaloPluginManager extends DefaultPluginManager
         if (PropertyPluginStatusProvider.isPropertySet(pluginProperties)) {
             return new PropertyPluginStatusProvider(pluginProperties);
         }
-        return super.createPluginStatusProvider();
+        // Only plugins root is writeable
+        return new DefaultPluginStatusProvider(pluginsRootGetter.get());
     }
 
     @Override
@@ -177,6 +179,15 @@ public class HaloPluginManager extends DefaultPluginManager
             }
         }
         return dependents;
+    }
+
+    @Override
+    public List<PluginWrapper> startedPlugins() {
+        return List.copyOf(super.getStartedPlugins())
+            .stream()
+            // Make sure the plugin is really started
+            .filter(p -> p.getPluginState().isStarted())
+            .toList();
     }
 
     /**

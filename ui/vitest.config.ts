@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     sharedPlugins,
     VueI18nPlugin({
-      include: [path.resolve(__dirname, "./src/locales/*.yaml")],
+      include: [path.resolve(__dirname, "./src/locales/*.json")],
     }) as Plugin,
   ],
   resolve: {
@@ -33,8 +33,5 @@ export default defineConfig({
     ],
     reporters: "html",
     outputFile: "build/test-result/index.html",
-    transformMode: {
-      web: [/\.[jt]sx$/],
-    },
   },
 });

@@ -3,14 +3,24 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import { attachmentPolicyLabels } from "@/constants/labels";
 import { setFocus } from "@/formkit/utils/focus";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
-import type { JsonPatchInner, Policy } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import type {
+  JsonPatchInner,
+  Policy,
+  PolicyV1alpha1ApiListPolicyRequest,
+} from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, onMounted, ref, toRaw, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 
 const CONFIG_MAP_GROUP = "default";
+
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -165,10 +175,14 @@ const handleSave = async (data: {
         jsonPatchInner: jsonPatchInner,
       });
     } else {
-      const { data: policies } =
-        await coreApiClient.storage.policy.listPolicy();
+      const policies = await paginate<
+        PolicyV1alpha1ApiListPolicyRequest,
+        Policy
+      >((params) => coreApiClient.storage.policy.listPolicy(params), {
+        size: 1000,
+      });
 
-      const hasDisplayNameDuplicate = policies.items.some(
+      const hasDisplayNameDuplicate = policies.some(
         (policy) => policy.spec.displayName === data.displayName
       );
 
@@ -220,6 +234,7 @@ const handleSave = async (data: {
     console.error("Failed to save attachment policy", e);
   } finally {
     isSubmitting.value = false;
+    queryClient.invalidateQueries({ queryKey: ["attachment-policies"] });
   }
 };
 

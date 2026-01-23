@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import HasPermission from "@/components/permission/HasPermission.vue";
 import CommentDetailModal from "@console/modules/contents/comments/components/CommentDetailModal.vue";
 import OwnerButton from "@console/modules/contents/comments/components/OwnerButton.vue";
 import { useContentProviderExtensionPoint } from "@console/modules/contents/comments/composables/use-content-provider-extension-point";
@@ -13,7 +12,7 @@ import {
   VEntityField,
   VStatusDot,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";

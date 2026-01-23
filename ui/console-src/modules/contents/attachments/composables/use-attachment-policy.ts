@@ -1,26 +1,34 @@
-import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { attachmentPolicyLabels } from "@/constants/labels";
+import type {
+  Policy,
+  PolicyTemplate,
+  PolicyTemplateV1alpha1ApiListPolicyTemplateRequest,
+  PolicyV1alpha1ApiListPolicyRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import type { Ref } from "vue";
 
-interface useFetchAttachmentPolicyReturn {
-  policies: Ref<Policy[] | undefined>;
-  isLoading: Ref<boolean>;
-  handleFetchPolicies: () => void;
-}
-
-interface useFetchAttachmentPolicyTemplatesReturn {
-  policyTemplates: Ref<PolicyTemplate[] | undefined>;
-  isLoading: Ref<boolean>;
-  handleFetchPolicyTemplates: () => void;
-}
-
-export function useFetchAttachmentPolicy(): useFetchAttachmentPolicyReturn {
-  const { data, isLoading, refetch } = useQuery<Policy[]>({
+export function useFetchAttachmentPolicy() {
+  return useQuery<Policy[]>({
     queryKey: ["attachment-policies"],
     queryFn: async () => {
-      const { data } = await coreApiClient.storage.policy.listPolicy();
-      return data.items;
+      const policies = await paginate<
+        PolicyV1alpha1ApiListPolicyRequest,
+        Policy
+      >((params) => coreApiClient.storage.policy.listPolicy(params), {
+        size: 1000,
+      });
+      return policies.sort((a, b) => {
+        const priorityA = parseInt(
+          a.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+          10
+        );
+        const priorityB = parseInt(
+          b.metadata.labels?.[attachmentPolicyLabels.PRIORITY] || "0",
+          10
+        );
+        return priorityB - priorityA;
+      });
     },
     refetchInterval(data) {
       const hasDeletingPolicy = data?.some(
@@ -29,27 +37,22 @@ export function useFetchAttachmentPolicy(): useFetchAttachmentPolicyReturn {
       return hasDeletingPolicy ? 1000 : false;
     },
   });
-
-  return {
-    policies: data,
-    isLoading,
-    handleFetchPolicies: refetch,
-  };
 }
 
-export function useFetchAttachmentPolicyTemplate(): useFetchAttachmentPolicyTemplatesReturn {
-  const { data, isLoading, refetch } = useQuery<PolicyTemplate[]>({
+export function useFetchAttachmentPolicyTemplate() {
+  return useQuery<PolicyTemplate[]>({
     queryKey: ["attachment-policy-templates"],
     queryFn: async () => {
-      const { data } =
-        await coreApiClient.storage.policyTemplate.listPolicyTemplate();
-      return data.items;
+      return await paginate<
+        PolicyTemplateV1alpha1ApiListPolicyTemplateRequest,
+        PolicyTemplate
+      >(
+        (params) =>
+          coreApiClient.storage.policyTemplate.listPolicyTemplate(params),
+        {
+          size: 1000,
+        }
+      );
     },
   });
-
-  return {
-    policyTemplates: data,
-    isLoading,
-    handleFetchPolicyTemplates: refetch,
-  };
 }

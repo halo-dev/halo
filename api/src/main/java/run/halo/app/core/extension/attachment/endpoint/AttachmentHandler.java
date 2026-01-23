@@ -3,11 +3,13 @@ package run.halo.app.core.extension.attachment.endpoint;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.pf4j.ExtensionPoint;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 
@@ -76,6 +78,16 @@ public interface AttachmentHandler extends ExtensionPoint {
         Policy policy();
 
         ConfigMap configMap();
+
+        /**
+         * Gets the group info if available.
+         *
+         * @return the group info, or null if not available
+         */
+        @Nullable
+        default Group group() {
+            return null;
+        }
 
     }
 

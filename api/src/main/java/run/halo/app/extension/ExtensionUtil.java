@@ -13,6 +13,26 @@ import run.halo.app.extension.index.query.Query;
 public enum ExtensionUtil {
     ;
 
+    /**
+     * Label to mark an extension resource should not be overwritten during initialization.
+     */
+    public static final String DO_NOT_OVERWRITE_LABEL = "halo.run/do-not-overwrite";
+
+    /**
+     * Check if the extension has the do-not-overwrite label. If the label is present and set to
+     * true, it indicates that the extension should not be overwritten during initialization.
+     *
+     * @param extension the extension
+     * @return true if it has the label, false otherwise
+     */
+    public static boolean hasDoNotOverwriteLabel(ExtensionOperator extension) {
+        if (extension.getMetadata() == null) {
+            return false;
+        }
+        var labels = extension.getMetadata().getLabels();
+        return labels != null && Boolean.parseBoolean(labels.get(DO_NOT_OVERWRITE_LABEL));
+    }
+
     public static boolean isDeleted(ExtensionOperator extension) {
         return extension.getMetadata() != null
             && extension.getMetadata().getDeletionTimestamp() != null;

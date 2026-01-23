@@ -2,8 +2,13 @@
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import { useThemeStore } from "@console/stores/theme";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
-import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type {
+  Setting,
+  SettingForm,
+  Theme,
+  ThemeV1alpha1ConsoleApiListThemesRequest,
+} from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import {
   IconComputer,
   IconLink,
@@ -20,7 +25,8 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { cloneDeep, set } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";
@@ -60,12 +66,12 @@ const selectedTheme = ref<Theme>();
 const { data: themes } = useQuery<Theme[]>({
   queryKey: ["themes"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.listThemes({
-      page: 0,
-      size: 0,
-      uninstalled: false,
-    });
-    return data.items;
+    return await paginate<ThemeV1alpha1ConsoleApiListThemesRequest, Theme>(
+      (params) => consoleApiClient.theme.theme.listThemes(params),
+      {
+        size: 1000,
+      }
+    );
   },
 });
 

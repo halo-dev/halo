@@ -16,21 +16,9 @@
 
 /**
  * A value object for Content from {@link Snapshot Snapshot}.
- * @export
- * @interface ContentVo
  */
 export interface ContentVo {
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentVo
-     */
     'content'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContentVo
-     */
     'raw'?: string;
 }
 

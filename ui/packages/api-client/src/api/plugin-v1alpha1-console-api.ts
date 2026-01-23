@@ -20,24 +20,23 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ConfigMap } from '../models';
+import type { ConfigMap } from '../models';
 // @ts-ignore
-import { InstallFromUriRequest } from '../models';
+import type { InstallFromUriRequest } from '../models';
 // @ts-ignore
-import { Plugin } from '../models';
+import type { Plugin } from '../models';
 // @ts-ignore
-import { PluginList } from '../models';
+import type { PluginList } from '../models';
 // @ts-ignore
-import { PluginRunningStateRequest } from '../models';
+import type { PluginRunningStateRequest } from '../models';
 // @ts-ignore
-import { Setting } from '../models';
+import type { Setting } from '../models';
 // @ts-ignore
-import { UpgradeFromUriRequest } from '../models';
+import type { UpgradeFromUriRequest } from '../models';
 /**
  * PluginV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -656,7 +655,6 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
 
 /**
  * PluginV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PluginV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -834,7 +832,6 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
 
 /**
  * PluginV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PluginV1alpha1ConsoleApiFp(configuration)
@@ -959,261 +956,144 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
 
 /**
  * Request parameters for changePluginRunningState operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiChangePluginRunningStateRequest
  */
 export interface PluginV1alpha1ConsoleApiChangePluginRunningStateRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiChangePluginRunningState
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {PluginRunningStateRequest}
-     * @memberof PluginV1alpha1ConsoleApiChangePluginRunningState
-     */
     readonly pluginRunningStateRequest: PluginRunningStateRequest
 }
 
 /**
  * Request parameters for fetchPluginJsonConfig operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest
  */
 export interface PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiFetchPluginJsonConfig
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for fetchPluginSetting operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiFetchPluginSettingRequest
  */
 export interface PluginV1alpha1ConsoleApiFetchPluginSettingRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiFetchPluginSetting
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for installPlugin operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiInstallPluginRequest
  */
 export interface PluginV1alpha1ConsoleApiInstallPluginRequest {
-    /**
-     * 
-     * @type {File}
-     * @memberof PluginV1alpha1ConsoleApiInstallPlugin
-     */
     readonly file?: File
 
     /**
      * Plugin preset name. We will find the plugin from plugin presets
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiInstallPlugin
      */
     readonly presetName?: string
 
     /**
      * Install source. Default is file.
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiInstallPlugin
      */
     readonly source?: InstallPluginSourceEnum
 }
 
 /**
  * Request parameters for installPluginFromUri operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiInstallPluginFromUriRequest
  */
 export interface PluginV1alpha1ConsoleApiInstallPluginFromUriRequest {
-    /**
-     * 
-     * @type {InstallFromUriRequest}
-     * @memberof PluginV1alpha1ConsoleApiInstallPluginFromUri
-     */
     readonly installFromUriRequest: InstallFromUriRequest
 }
 
 /**
  * Request parameters for listPlugins operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiListPluginsRequest
  */
 export interface PluginV1alpha1ConsoleApiListPluginsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly sort?: Array<string>
 
     /**
      * Keyword of plugin name or description
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly keyword?: string
 
     /**
      * Whether the plugin is enabled
-     * @type {boolean}
-     * @memberof PluginV1alpha1ConsoleApiListPlugins
      */
     readonly enabled?: boolean
 }
 
 /**
  * Request parameters for reloadPlugin operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiReloadPluginRequest
  */
 export interface PluginV1alpha1ConsoleApiReloadPluginRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiReloadPlugin
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for resetPluginConfig operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiResetPluginConfigRequest
  */
 export interface PluginV1alpha1ConsoleApiResetPluginConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiResetPluginConfig
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for updatePluginJsonConfig operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest
  */
 export interface PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiUpdatePluginJsonConfig
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof PluginV1alpha1ConsoleApiUpdatePluginJsonConfig
-     */
     readonly body: object
 }
 
 /**
  * Request parameters for upgradePlugin operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiUpgradePluginRequest
  */
 export interface PluginV1alpha1ConsoleApiUpgradePluginRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePlugin
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {File}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePlugin
-     */
     readonly file?: File
 
     /**
      * Plugin preset name. We will find the plugin from plugin presets
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePlugin
      */
     readonly presetName?: string
 
     /**
      * Install source. Default is file.
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePlugin
      */
     readonly source?: UpgradePluginSourceEnum
 }
 
 /**
  * Request parameters for upgradePluginFromUri operation in PluginV1alpha1ConsoleApi.
- * @export
- * @interface PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest
  */
 export interface PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePluginFromUri
-     */
     readonly name: string
 
-    /**
-     * 
-     * @type {UpgradeFromUriRequest}
-     * @memberof PluginV1alpha1ConsoleApiUpgradePluginFromUri
-     */
     readonly upgradeFromUriRequest: UpgradeFromUriRequest
 }
 
 /**
  * PluginV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class PluginV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class PluginV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -1221,7 +1101,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiChangePluginRunningStateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public changePluginRunningState(requestParameters: PluginV1alpha1ConsoleApiChangePluginRunningStateRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).changePluginRunningState(requestParameters.name, requestParameters.pluginRunningStateRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1231,7 +1110,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * Merge all CSS bundles of enabled plugins into one.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public fetchCssBundle(options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).fetchCssBundle(options).then((request) => request(this.axios, this.basePath));
@@ -1241,7 +1119,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * Merge all JS bundles of enabled plugins into one.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public fetchJsBundle(options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).fetchJsBundle(options).then((request) => request(this.axios, this.basePath));
@@ -1252,7 +1129,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public fetchPluginJsonConfig(requestParameters: PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).fetchPluginJsonConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1263,7 +1139,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiFetchPluginSettingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public fetchPluginSetting(requestParameters: PluginV1alpha1ConsoleApiFetchPluginSettingRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).fetchPluginSetting(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1274,7 +1149,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiInstallPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public installPlugin(requestParameters: PluginV1alpha1ConsoleApiInstallPluginRequest = {}, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).installPlugin(requestParameters.file, requestParameters.presetName, requestParameters.source, options).then((request) => request(this.axios, this.basePath));
@@ -1285,7 +1159,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiInstallPluginFromUriRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public installPluginFromUri(requestParameters: PluginV1alpha1ConsoleApiInstallPluginFromUriRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).installPluginFromUri(requestParameters.installFromUriRequest, options).then((request) => request(this.axios, this.basePath));
@@ -1296,7 +1169,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiListPluginsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public listPlugins(requestParameters: PluginV1alpha1ConsoleApiListPluginsRequest = {}, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).listPlugins(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.enabled, options).then((request) => request(this.axios, this.basePath));
@@ -1307,7 +1179,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiReloadPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public reloadPlugin(requestParameters: PluginV1alpha1ConsoleApiReloadPluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).reloadPlugin(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1318,7 +1189,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiResetPluginConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public resetPluginConfig(requestParameters: PluginV1alpha1ConsoleApiResetPluginConfigRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).resetPluginConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -1329,7 +1199,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public updatePluginJsonConfig(requestParameters: PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).updatePluginJsonConfig(requestParameters.name, requestParameters.body, options).then((request) => request(this.axios, this.basePath));
@@ -1340,7 +1209,6 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiUpgradePluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public upgradePlugin(requestParameters: PluginV1alpha1ConsoleApiUpgradePluginRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).upgradePlugin(requestParameters.name, requestParameters.file, requestParameters.presetName, requestParameters.source, options).then((request) => request(this.axios, this.basePath));
@@ -1351,25 +1219,18 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
      * @param {PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PluginV1alpha1ConsoleApi
      */
     public upgradePluginFromUri(requestParameters: PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest, options?: RawAxiosRequestConfig) {
         return PluginV1alpha1ConsoleApiFp(this.configuration).upgradePluginFromUri(requestParameters.name, requestParameters.upgradeFromUriRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
-/**
- * @export
- */
 export const InstallPluginSourceEnum = {
     File: 'FILE',
     Preset: 'PRESET',
     Url: 'URL'
 } as const;
 export type InstallPluginSourceEnum = typeof InstallPluginSourceEnum[keyof typeof InstallPluginSourceEnum];
-/**
- * @export
- */
 export const UpgradePluginSourceEnum = {
     File: 'FILE',
     Preset: 'PRESET',

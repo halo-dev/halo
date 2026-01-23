@@ -16,38 +16,26 @@
 
 /**
  * PolicyRule holds information that describes a policy rule, but does not contain information  about whom the rule applies to or which namespace the rule applies to.
- * @export
- * @interface PolicyRule
  */
 export interface PolicyRule {
     /**
      * APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of the enumerated  resources in any API group will be allowed.
-     * @type {Array<string>}
-     * @memberof PolicyRule
      */
     'apiGroups'?: Array<string>;
     /**
      * NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path  If an action is not a resource API request, then the URL is split on \'/\' and is checked  against the NonResourceURLs to look for a match.  Since non-resource URLs are not namespaced, this field is only applicable for  ClusterRoles referenced from a ClusterRoleBinding.  Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource  URL paths (such as \"/api\"),  but not both.
-     * @type {Array<string>}
-     * @memberof PolicyRule
      */
     'nonResourceURLs'?: Array<string>;
     /**
      * ResourceNames is an optional white list of names that the rule applies to.  An empty set  means that everything is allowed.
-     * @type {Array<string>}
-     * @memberof PolicyRule
      */
     'resourceNames'?: Array<string>;
     /**
      * Resources is a list of resources this rule applies to.  \'*\' represents all resources in  the specified apiGroups.  \'*&#47;foo\' represents the subresource \'foo\' for all resources in the specified  apiGroups.
-     * @type {Array<string>}
-     * @memberof PolicyRule
      */
     'resources'?: Array<string>;
     /**
      * about who the rule applies to or which namespace the rule applies to.
-     * @type {Array<string>}
-     * @memberof PolicyRule
      */
     'verbs'?: Array<string>;
 }

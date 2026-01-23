@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ListedPostList } from '../models';
+import type { ListedPostList } from '../models';
 // @ts-ignore
-import { Post } from '../models';
+import type { Post } from '../models';
 // @ts-ignore
-import { Snapshot } from '../models';
+import type { Snapshot } from '../models';
 /**
  * PostV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -456,7 +455,6 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
 
 /**
  * PostV1alpha1UcApi - functional programming interface
- * @export
  */
 export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1UcApiAxiosParamCreator(configuration)
@@ -584,7 +582,6 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
 
 /**
  * PostV1alpha1UcApi - factory interface
- * @export
  */
 export const PostV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PostV1alpha1UcApiFp(configuration)
@@ -675,205 +672,137 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
 
 /**
  * Request parameters for createMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiCreateMyPostRequest
  */
 export interface PostV1alpha1UcApiCreateMyPostRequest {
-    /**
-     * 
-     * @type {Post}
-     * @memberof PostV1alpha1UcApiCreateMyPost
-     */
     readonly post?: Post
 }
 
 /**
  * Request parameters for getMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiGetMyPostRequest
  */
 export interface PostV1alpha1UcApiGetMyPostRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiGetMyPost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getMyPostDraft operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiGetMyPostDraftRequest
  */
 export interface PostV1alpha1UcApiGetMyPostDraftRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiGetMyPostDraft
      */
     readonly name: string
 
     /**
      * Should include patched content and raw or not.
-     * @type {boolean}
-     * @memberof PostV1alpha1UcApiGetMyPostDraft
      */
     readonly patched?: boolean
 }
 
 /**
  * Request parameters for listMyPosts operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiListMyPostsRequest
  */
 export interface PostV1alpha1UcApiListMyPostsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly sort?: Array<string>
 
     /**
      * Posts filtered by publish phase.
-     * @type {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly publishPhase?: ListMyPostsPublishPhaseEnum
 
     /**
      * Posts filtered by keyword.
-     * @type {string}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly keyword?: string
 
     /**
      * Posts filtered by category including sub-categories.
-     * @type {string}
-     * @memberof PostV1alpha1UcApiListMyPosts
      */
     readonly categoryWithChildren?: string
 }
 
 /**
  * Request parameters for publishMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiPublishMyPostRequest
  */
 export interface PostV1alpha1UcApiPublishMyPostRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiPublishMyPost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for recycleMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiRecycleMyPostRequest
  */
 export interface PostV1alpha1UcApiRecycleMyPostRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiRecycleMyPost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for unpublishMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiUnpublishMyPostRequest
  */
 export interface PostV1alpha1UcApiUnpublishMyPostRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiUnpublishMyPost
      */
     readonly name: string
 }
 
 /**
  * Request parameters for updateMyPost operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiUpdateMyPostRequest
  */
 export interface PostV1alpha1UcApiUpdateMyPostRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiUpdateMyPost
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Post}
-     * @memberof PostV1alpha1UcApiUpdateMyPost
-     */
     readonly post?: Post
 }
 
 /**
  * Request parameters for updateMyPostDraft operation in PostV1alpha1UcApi.
- * @export
- * @interface PostV1alpha1UcApiUpdateMyPostDraftRequest
  */
 export interface PostV1alpha1UcApiUpdateMyPostDraftRequest {
     /**
      * Post name
-     * @type {string}
-     * @memberof PostV1alpha1UcApiUpdateMyPostDraft
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Snapshot}
-     * @memberof PostV1alpha1UcApiUpdateMyPostDraft
-     */
     readonly snapshot?: Snapshot
 }
 
 /**
  * PostV1alpha1UcApi - object-oriented interface
- * @export
- * @class PostV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class PostV1alpha1UcApi extends BaseAPI {
     /**
@@ -881,7 +810,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiCreateMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public createMyPost(requestParameters: PostV1alpha1UcApiCreateMyPostRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).createMyPost(requestParameters.post, options).then((request) => request(this.axios, this.basePath));
@@ -892,7 +820,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiGetMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public getMyPost(requestParameters: PostV1alpha1UcApiGetMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).getMyPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -903,7 +830,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiGetMyPostDraftRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public getMyPostDraft(requestParameters: PostV1alpha1UcApiGetMyPostDraftRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).getMyPostDraft(requestParameters.name, requestParameters.patched, options).then((request) => request(this.axios, this.basePath));
@@ -914,7 +840,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiListMyPostsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public listMyPosts(requestParameters: PostV1alpha1UcApiListMyPostsRequest = {}, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).listMyPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(this.axios, this.basePath));
@@ -925,7 +850,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiPublishMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public publishMyPost(requestParameters: PostV1alpha1UcApiPublishMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).publishMyPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -936,7 +860,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiRecycleMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public recycleMyPost(requestParameters: PostV1alpha1UcApiRecycleMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).recycleMyPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -947,7 +870,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiUnpublishMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public unpublishMyPost(requestParameters: PostV1alpha1UcApiUnpublishMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).unpublishMyPost(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -958,7 +880,6 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiUpdateMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public updateMyPost(requestParameters: PostV1alpha1UcApiUpdateMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).updateMyPost(requestParameters.name, requestParameters.post, options).then((request) => request(this.axios, this.basePath));
@@ -969,16 +890,12 @@ export class PostV1alpha1UcApi extends BaseAPI {
      * @param {PostV1alpha1UcApiUpdateMyPostDraftRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PostV1alpha1UcApi
      */
     public updateMyPostDraft(requestParameters: PostV1alpha1UcApiUpdateMyPostDraftRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).updateMyPostDraft(requestParameters.name, requestParameters.snapshot, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
-/**
- * @export
- */
 export const ListMyPostsPublishPhaseEnum = {
     Draft: 'DRAFT',
     PendingApproval: 'PENDING_APPROVAL',

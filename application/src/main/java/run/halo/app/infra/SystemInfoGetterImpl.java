@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class SystemInfoGetterImpl implements SystemInfoGetter {
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final SystemVersionSupplier systemVersionSupplier;
     private final ExternalUrlSupplier externalUrlSupplier;
     private final ServerProperties serverProperties;

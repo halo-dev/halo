@@ -18,7 +18,7 @@ import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.web.IWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
@@ -37,7 +37,7 @@ class CommentEnabledVariableProcessorTest {
     private ExtensionGetter extensionGetter;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +47,7 @@ class CommentEnabledVariableProcessorTest {
 
     @Test
     void getCommentWidget() {
-        when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
             .thenReturn(environmentFetcher);
         SystemSetting.Comment commentSetting = mock(SystemSetting.Comment.class);
         when(environmentFetcher.fetchComment())

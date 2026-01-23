@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Menu } from '../models';
+import type { Menu } from '../models';
 // @ts-ignore
-import { MenuList } from '../models';
+import type { MenuList } from '../models';
 /**
  * MenuV1alpha1Api - axios parameter creator
- * @export
  */
 export const MenuV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const MenuV1alpha1ApiAxiosParamCreator = function (configuration?: Config
 
 /**
  * MenuV1alpha1Api - functional programming interface
- * @export
  */
 export const MenuV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MenuV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const MenuV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * MenuV1alpha1Api - factory interface
- * @export
  */
 export const MenuV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = MenuV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const MenuV1alpha1ApiFactory = function (configuration?: Configuration, b
 
 /**
  * Request parameters for createMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiCreateMenuRequest
  */
 export interface MenuV1alpha1ApiCreateMenuRequest {
     /**
      * Fresh menu
-     * @type {Menu}
-     * @memberof MenuV1alpha1ApiCreateMenu
      */
     readonly menu?: Menu
 }
 
 /**
  * Request parameters for deleteMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiDeleteMenuRequest
  */
 export interface MenuV1alpha1ApiDeleteMenuRequest {
     /**
      * Name of menu
-     * @type {string}
-     * @memberof MenuV1alpha1ApiDeleteMenu
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiGetMenuRequest
  */
 export interface MenuV1alpha1ApiGetMenuRequest {
     /**
      * Name of menu
-     * @type {string}
-     * @memberof MenuV1alpha1ApiGetMenu
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiListMenuRequest
  */
 export interface MenuV1alpha1ApiListMenuRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof MenuV1alpha1ApiListMenu
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof MenuV1alpha1ApiListMenu
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof MenuV1alpha1ApiListMenu
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof MenuV1alpha1ApiListMenu
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof MenuV1alpha1ApiListMenu
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiPatchMenuRequest
  */
 export interface MenuV1alpha1ApiPatchMenuRequest {
     /**
      * Name of menu
-     * @type {string}
-     * @memberof MenuV1alpha1ApiPatchMenu
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof MenuV1alpha1ApiPatchMenu
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateMenu operation in MenuV1alpha1Api.
- * @export
- * @interface MenuV1alpha1ApiUpdateMenuRequest
  */
 export interface MenuV1alpha1ApiUpdateMenuRequest {
     /**
      * Name of menu
-     * @type {string}
-     * @memberof MenuV1alpha1ApiUpdateMenu
      */
     readonly name: string
 
     /**
      * Updated menu
-     * @type {Menu}
-     * @memberof MenuV1alpha1ApiUpdateMenu
      */
     readonly menu?: Menu
 }
 
 /**
  * MenuV1alpha1Api - object-oriented interface
- * @export
- * @class MenuV1alpha1Api
- * @extends {BaseAPI}
  */
 export class MenuV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiCreateMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public createMenu(requestParameters: MenuV1alpha1ApiCreateMenuRequest = {}, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).createMenu(requestParameters.menu, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiDeleteMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public deleteMenu(requestParameters: MenuV1alpha1ApiDeleteMenuRequest, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).deleteMenu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiGetMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public getMenu(requestParameters: MenuV1alpha1ApiGetMenuRequest, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).getMenu(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiListMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public listMenu(requestParameters: MenuV1alpha1ApiListMenuRequest = {}, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).listMenu(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiPatchMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public patchMenu(requestParameters: MenuV1alpha1ApiPatchMenuRequest, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).patchMenu(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class MenuV1alpha1Api extends BaseAPI {
      * @param {MenuV1alpha1ApiUpdateMenuRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MenuV1alpha1Api
      */
     public updateMenu(requestParameters: MenuV1alpha1ApiUpdateMenuRequest, options?: RawAxiosRequestConfig) {
         return MenuV1alpha1ApiFp(this.configuration).updateMenu(requestParameters.name, requestParameters.menu, options).then((request) => request(this.axios, this.basePath));

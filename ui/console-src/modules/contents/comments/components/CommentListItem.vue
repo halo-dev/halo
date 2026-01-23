@@ -1,9 +1,16 @@
 <script lang="ts" setup>
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
-import type { ListedComment, ListedReply } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import type {
+  ListedComment,
+  ListedReply,
+  ReplyV1alpha1ConsoleApiListRepliesRequest,
+} from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -21,7 +28,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -163,12 +170,13 @@ const {
     showReplies,
   ],
   queryFn: async () => {
-    const { data } = await consoleApiClient.content.reply.listReplies({
+    return await paginate<
+      ReplyV1alpha1ConsoleApiListRepliesRequest,
+      ListedReply
+    >((params) => consoleApiClient.content.reply.listReplies(params), {
       commentName: props.comment.comment.metadata.name,
-      page: 0,
-      size: 0,
+      size: 1000,
     });
-    return data.items;
   },
   refetchInterval(data) {
     const hasDeletingReplies = data?.some(
@@ -203,7 +211,7 @@ const onReplyCreationModalClose = () => {
 
 const { subjectRefResult } = useSubjectRef(props.comment);
 
-const { operationItems } = useOperationItemExtensionPoint<ListedComment>(
+const { data: operationItems } = useOperationItemExtensionPoint<ListedComment>(
   "comment:list-item:operation:create",
   comment,
   computed((): OperationItem<ListedComment>[] => [
@@ -371,7 +379,10 @@ const { data: contentProvider } = useContentProviderExtensionPoint();
       v-if="utils.permission.has(['system:comments:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="operationItems" :item="comment" />
+      <EntityDropdownItems
+        :dropdown-items="operationItems || []"
+        :item="comment"
+      />
     </template>
 
     <template v-if="showReplies" #footer>

@@ -20,10 +20,9 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 /**
  * NotifierV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const NotifierV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -120,7 +119,6 @@ export const NotifierV1alpha1UcApiAxiosParamCreator = function (configuration?: 
 
 /**
  * NotifierV1alpha1UcApi - functional programming interface
- * @export
  */
 export const NotifierV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotifierV1alpha1UcApiAxiosParamCreator(configuration)
@@ -155,7 +153,6 @@ export const NotifierV1alpha1UcApiFp = function(configuration?: Configuration) {
 
 /**
  * NotifierV1alpha1UcApi - factory interface
- * @export
  */
 export const NotifierV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotifierV1alpha1UcApiFp(configuration)
@@ -183,44 +180,28 @@ export const NotifierV1alpha1UcApiFactory = function (configuration?: Configurat
 
 /**
  * Request parameters for fetchReceiverConfig operation in NotifierV1alpha1UcApi.
- * @export
- * @interface NotifierV1alpha1UcApiFetchReceiverConfigRequest
  */
 export interface NotifierV1alpha1UcApiFetchReceiverConfigRequest {
     /**
      * Notifier name
-     * @type {string}
-     * @memberof NotifierV1alpha1UcApiFetchReceiverConfig
      */
     readonly name: string
 }
 
 /**
  * Request parameters for saveReceiverConfig operation in NotifierV1alpha1UcApi.
- * @export
- * @interface NotifierV1alpha1UcApiSaveReceiverConfigRequest
  */
 export interface NotifierV1alpha1UcApiSaveReceiverConfigRequest {
     /**
      * Notifier name
-     * @type {string}
-     * @memberof NotifierV1alpha1UcApiSaveReceiverConfig
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {object}
-     * @memberof NotifierV1alpha1UcApiSaveReceiverConfig
-     */
     readonly body: object
 }
 
 /**
  * NotifierV1alpha1UcApi - object-oriented interface
- * @export
- * @class NotifierV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class NotifierV1alpha1UcApi extends BaseAPI {
     /**
@@ -228,7 +209,6 @@ export class NotifierV1alpha1UcApi extends BaseAPI {
      * @param {NotifierV1alpha1UcApiFetchReceiverConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierV1alpha1UcApi
      */
     public fetchReceiverConfig(requestParameters: NotifierV1alpha1UcApiFetchReceiverConfigRequest, options?: RawAxiosRequestConfig) {
         return NotifierV1alpha1UcApiFp(this.configuration).fetchReceiverConfig(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -239,7 +219,6 @@ export class NotifierV1alpha1UcApi extends BaseAPI {
      * @param {NotifierV1alpha1UcApiSaveReceiverConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotifierV1alpha1UcApi
      */
     public saveReceiverConfig(requestParameters: NotifierV1alpha1UcApiSaveReceiverConfigRequest, options?: RawAxiosRequestConfig) {
         return NotifierV1alpha1UcApiFp(this.configuration).saveReceiverConfig(requestParameters.name, requestParameters.body, options).then((request) => request(this.axios, this.basePath));

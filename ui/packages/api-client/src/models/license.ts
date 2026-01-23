@@ -16,21 +16,9 @@
 
 /**
  * Common data objects for license.
- * @export
- * @interface License
  */
 export interface License {
-    /**
-     * 
-     * @type {string}
-     * @memberof License
-     */
     'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof License
-     */
     'url'?: string;
 }
 

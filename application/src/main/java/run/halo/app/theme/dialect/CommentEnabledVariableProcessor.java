@@ -3,6 +3,7 @@ package run.halo.app.theme.dialect;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
+import java.time.Duration;
 import java.util.Optional;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -16,7 +17,8 @@ import org.thymeleaf.processor.templateboundaries.ITemplateBoundariesStructureHa
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
@@ -29,6 +31,8 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  * @since 2.9.0
  */
 public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesProcessor {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     public static final String COMMENT_WIDGET_OBJECT_VARIABLE = CommentWidget.class.getName();
     public static final String COMMENT_ENABLED_MODEL_ATTRIBUTE = "haloCommentEnabled";
@@ -62,10 +66,10 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
 
     static Optional<CommentWidget> getCommentWidget(ITemplateContext context) {
         final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-        SystemConfigurableEnvironmentFetcher environmentFetcher =
-            appCtx.getBean(SystemConfigurableEnvironmentFetcher.class);
+        SystemConfigFetcher environmentFetcher =
+            appCtx.getBean(SystemConfigFetcher.class);
         var commentSetting = environmentFetcher.fetchComment()
-            .blockOptional()
+            .blockOptional(BLOCKING_TIMEOUT)
             .orElseThrow();
         var globalEnabled = isTrue(commentSetting.getEnable());
         if (!globalEnabled) {
@@ -86,6 +90,6 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
         ExtensionGetter extensionGetter = appCtx.getBean(ExtensionGetter.class);
         return extensionGetter.getEnabledExtensions(CommentWidget.class)
             .next()
-            .blockOptional();
+            .blockOptional(BLOCKING_TIMEOUT);
     }
 }

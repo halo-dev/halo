@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { NotificationTemplate } from '../models';
+import type { NotificationTemplate } from '../models';
 // @ts-ignore
-import { NotificationTemplateList } from '../models';
+import type { NotificationTemplateList } from '../models';
 /**
  * NotificationTemplateV1alpha1Api - axios parameter creator
- * @export
  */
 export const NotificationTemplateV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const NotificationTemplateV1alpha1ApiAxiosParamCreator = function (config
 
 /**
  * NotificationTemplateV1alpha1Api - functional programming interface
- * @export
  */
 export const NotificationTemplateV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = NotificationTemplateV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const NotificationTemplateV1alpha1ApiFp = function(configuration?: Config
 
 /**
  * NotificationTemplateV1alpha1Api - factory interface
- * @export
  */
 export const NotificationTemplateV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = NotificationTemplateV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const NotificationTemplateV1alpha1ApiFactory = function (configuration?: 
 
 /**
  * Request parameters for createNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiCreateNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiCreateNotificationTemplateRequest {
     /**
      * Fresh notificationtemplate
-     * @type {NotificationTemplate}
-     * @memberof NotificationTemplateV1alpha1ApiCreateNotificationTemplate
      */
     readonly notificationTemplate?: NotificationTemplate
 }
 
 /**
  * Request parameters for deleteNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiDeleteNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiDeleteNotificationTemplateRequest {
     /**
      * Name of notificationtemplate
-     * @type {string}
-     * @memberof NotificationTemplateV1alpha1ApiDeleteNotificationTemplate
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiGetNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiGetNotificationTemplateRequest {
     /**
      * Name of notificationtemplate
-     * @type {string}
-     * @memberof NotificationTemplateV1alpha1ApiGetNotificationTemplate
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiListNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiListNotificationTemplateRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof NotificationTemplateV1alpha1ApiListNotificationTemplate
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof NotificationTemplateV1alpha1ApiListNotificationTemplate
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof NotificationTemplateV1alpha1ApiListNotificationTemplate
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof NotificationTemplateV1alpha1ApiListNotificationTemplate
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof NotificationTemplateV1alpha1ApiListNotificationTemplate
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiPatchNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiPatchNotificationTemplateRequest {
     /**
      * Name of notificationtemplate
-     * @type {string}
-     * @memberof NotificationTemplateV1alpha1ApiPatchNotificationTemplate
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof NotificationTemplateV1alpha1ApiPatchNotificationTemplate
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateNotificationTemplate operation in NotificationTemplateV1alpha1Api.
- * @export
- * @interface NotificationTemplateV1alpha1ApiUpdateNotificationTemplateRequest
  */
 export interface NotificationTemplateV1alpha1ApiUpdateNotificationTemplateRequest {
     /**
      * Name of notificationtemplate
-     * @type {string}
-     * @memberof NotificationTemplateV1alpha1ApiUpdateNotificationTemplate
      */
     readonly name: string
 
     /**
      * Updated notificationtemplate
-     * @type {NotificationTemplate}
-     * @memberof NotificationTemplateV1alpha1ApiUpdateNotificationTemplate
      */
     readonly notificationTemplate?: NotificationTemplate
 }
 
 /**
  * NotificationTemplateV1alpha1Api - object-oriented interface
- * @export
- * @class NotificationTemplateV1alpha1Api
- * @extends {BaseAPI}
  */
 export class NotificationTemplateV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiCreateNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public createNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiCreateNotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).createNotificationTemplate(requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiDeleteNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public deleteNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiDeleteNotificationTemplateRequest, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).deleteNotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiGetNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public getNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiGetNotificationTemplateRequest, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).getNotificationTemplate(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiListNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public listNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiListNotificationTemplateRequest = {}, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).listNotificationTemplate(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiPatchNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public patchNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiPatchNotificationTemplateRequest, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).patchNotificationTemplate(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class NotificationTemplateV1alpha1Api extends BaseAPI {
      * @param {NotificationTemplateV1alpha1ApiUpdateNotificationTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof NotificationTemplateV1alpha1Api
      */
     public updateNotificationTemplate(requestParameters: NotificationTemplateV1alpha1ApiUpdateNotificationTemplateRequest, options?: RawAxiosRequestConfig) {
         return NotificationTemplateV1alpha1ApiFp(this.configuration).updateNotificationTemplate(requestParameters.name, requestParameters.notificationTemplate, options).then((request) => request(this.axios, this.basePath));

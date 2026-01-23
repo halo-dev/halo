@@ -15,61 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A counter for number of requests by extension resource name.
- * @export
- * @interface Counter
  */
 export interface Counter {
-    /**
-     * 
-     * @type {string}
-     * @memberof Counter
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Counter
-     */
     'approvedComment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Counter
-     */
     'downvote'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Counter
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Counter
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {number}
-     * @memberof Counter
-     */
     'totalComment'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Counter
-     */
     'upvote'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Counter
-     */
     'visit'?: number;
 }
 

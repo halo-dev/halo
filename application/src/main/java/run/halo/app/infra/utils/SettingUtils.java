@@ -13,6 +13,8 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.controller.Reconciler.Result;
+import run.halo.app.extension.controller.RequeueException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.JsonNodeFactory;
@@ -67,7 +69,7 @@ public class SettingUtils {
         Assert.hasText(configMapName, "Config map name must not be blank");
 
         client.fetch(Setting.class, settingName)
-            .ifPresent(setting -> {
+            .ifPresentOrElse(setting -> {
                 final var source = SettingUtils.settingDefinedDefaultValueMap(setting);
                 client.fetch(ConfigMap.class, configMapName)
                     .ifPresentOrElse(configMap -> {
@@ -88,6 +90,11 @@ public class SettingUtils {
                         configMap.setData(source);
                         client.create(configMap);
                     });
+            }, () -> {
+                // requeue if setting was not found
+                throw new RequeueException(Result.requeue(null),
+                    "Theme setting %s was not found".formatted(settingName)
+                );
             });
     }
 

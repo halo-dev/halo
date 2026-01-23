@@ -142,3 +142,7 @@ tasks.named('jacocoTestReport') {
         html.required = false
     }
 }
+
+tasks.named('uploadBundle') {
+    mustRunAfter project(':platform:application').tasks.named('uploadBundle')
+}

@@ -15,40 +15,18 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { SettingSpec } from './setting-spec';
+import type { SettingSpec } from './setting-spec';
 
 /**
  * {@link Setting Setting} is a custom extension to generate forms based on configuration.
- * @export
- * @interface Setting
  */
 export interface Setting {
-    /**
-     * 
-     * @type {string}
-     * @memberof Setting
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Setting
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Setting
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {SettingSpec}
-     * @memberof Setting
-     */
     'spec': SettingSpec;
 }
 

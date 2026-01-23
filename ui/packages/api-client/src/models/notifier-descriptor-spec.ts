@@ -15,43 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { NotifierSettingRef } from './notifier-setting-ref';
+import type { NotifierSettingRef } from './notifier-setting-ref';
 
-/**
- * 
- * @export
- * @interface NotifierDescriptorSpec
- */
 export interface NotifierDescriptorSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierDescriptorSpec
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierDescriptorSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NotifierDescriptorSpec
-     */
     'notifierExtName': string;
-    /**
-     * 
-     * @type {NotifierSettingRef}
-     * @memberof NotifierDescriptorSpec
-     */
     'receiverSettingRef'?: NotifierSettingRef;
-    /**
-     * 
-     * @type {NotifierSettingRef}
-     * @memberof NotifierDescriptorSpec
-     */
     'senderSettingRef'?: NotifierSettingRef;
 }
 

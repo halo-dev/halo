@@ -53,8 +53,8 @@ declare module "@tiptap/core" {
  *  - Backspace on an empty line
  *  - Tab key
  */
-const GapCursor = Extension.create({
-  priority: 9999,
+export const ExtensionGapCursor = Extension.create({
+  priority: 900,
   name: "gapCursor",
 
   addProseMirrorPlugins() {
@@ -113,12 +113,16 @@ const GapCursor = Extension.create({
             Backspace: (state, dispatch) => {
               const { selection, tr } = state;
               if (
-                isActive(state, "paragraph") &&
-                isEmpty(state.selection.$from.parent) &&
                 selection instanceof TextSelection &&
+                isActive(state, "paragraph") &&
+                isEmpty(selection.$from.parent) &&
                 selection.empty
               ) {
                 const { $from } = selection;
+                const beforePos = $from.before($from.depth);
+                if (beforePos === 0) {
+                  return true;
+                }
                 deleteNodeByPos($from)(tr);
                 if (dispatch) {
                   const $found = arrowGapCursor(-1, "left", state)(tr);
@@ -136,6 +140,11 @@ const GapCursor = Extension.create({
 
               const { isStart, $from } = selection;
               const nodeOffset = state.doc.childBefore($from.pos);
+
+              if (!nodeOffset || nodeOffset.index === undefined) {
+                return false;
+              }
+
               const index = nodeOffset.index;
               const pos = state.doc.resolve(0).posAtIndex(index);
 
@@ -211,7 +220,7 @@ const GapCursor = Extension.create({
   },
 });
 
-export function handleBackspaceAtStart(
+function handleBackspaceAtStart(
   pos: number,
   state: EditorState,
   dispatch: Dispatch
@@ -240,7 +249,7 @@ export function handleBackspaceAtStart(
   return false;
 }
 
-export function handleInlineContent(
+function handleInlineContent(
   $beforePos: ResolvedPos,
   state: EditorState,
   dispatch: Dispatch
@@ -267,7 +276,7 @@ export function handleInlineContent(
  * @param {("vert" | "horiz")} axis - The axis of movement, either vertical ("vert") or horizontal ("horiz").
  * @param {number} dir - The direction of movement, positive (1) or negative (-1).
  */
-export function arrow(axis: "vert" | "horiz", dir: number): Command {
+function arrow(axis: "vert" | "horiz", dir: number): Command {
   const dirStr =
     axis == "vert" ? (dir > 0 ? "down" : "up") : dir > 0 ? "right" : "left";
   return (state, dispatch, view) => {
@@ -280,7 +289,7 @@ export function arrow(axis: "vert" | "horiz", dir: number): Command {
   };
 }
 
-export const arrowGapCursor = (
+const arrowGapCursor = (
   dir: number,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dirStr: any,
@@ -391,5 +400,3 @@ function drawGapCursor(state: EditorState) {
     }),
   ]);
 }
-
-export default GapCursor;

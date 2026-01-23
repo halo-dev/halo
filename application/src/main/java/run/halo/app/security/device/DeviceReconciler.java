@@ -5,6 +5,7 @@ import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.index.query.Queries.equal;
 
+import java.time.Duration;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -17,10 +18,12 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.infra.utils.ReactiveUtils;
 
 @Component
 @RequiredArgsConstructor
 public class DeviceReconciler implements Reconciler<Reconciler.Request> {
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final int MAX_DEVICES = 10;
     static final String FINALIZER_NAME = "device-protection";
     private final ReactiveSessionRepository<?> sessionRepository;
@@ -33,7 +36,7 @@ public class DeviceReconciler implements Reconciler<Reconciler.Request> {
                 if (isDeleted(device)) {
                     if (removeFinalizers(device.getMetadata(), Set.of(FINALIZER_NAME))) {
                         sessionRepository.deleteById(device.getSpec().getSessionId())
-                            .block();
+                            .block(BLOCKING_TIMEOUT);
                         client.update(device);
                     }
                     return;
@@ -56,7 +59,7 @@ public class DeviceReconciler implements Reconciler<Reconciler.Request> {
             .stream()
             .skip(MAX_DEVICES)
             .filter(device -> sessionRepository.findById(device.getSpec().getSessionId())
-                .blockOptional()
+                .blockOptional(BLOCKING_TIMEOUT)
                 .isEmpty()
             )
             .forEach(client::delete);

@@ -1,82 +1,112 @@
 <script lang="ts" setup>
 import { extname } from "path-browserify";
-import { computed, markRaw } from "vue";
-import VscodeIconsDefaultFile from "~icons/vscode-icons/default-file";
-import VscodeIconsFileTypeAi from "~icons/vscode-icons/file-type-ai";
-import VscodeIconsFileTypeAstro from "~icons/vscode-icons/file-type-astro";
-import VscodeIconsFileTypeBat from "~icons/vscode-icons/file-type-bat";
-import VscodeIconsFileTypeC from "~icons/vscode-icons/file-type-c";
-import VscodeIconsFileTypeClass from "~icons/vscode-icons/file-type-class";
-import VscodeIconsFileTypeCpp from "~icons/vscode-icons/file-type-cpp";
-import VscodeIconsFileTypeCss from "~icons/vscode-icons/file-type-css";
-import VscodeIconsFileTypeDb from "~icons/vscode-icons/file-type-db";
-import VscodeIconsFileTypeExcel from "~icons/vscode-icons/file-type-excel";
-import VscodeIconsFileTypeGo from "~icons/vscode-icons/file-type-go";
-import VscodeIconsFileTypeGradle from "~icons/vscode-icons/file-type-gradle";
-import VscodeIconsFileTypeHtml from "~icons/vscode-icons/file-type-html";
-import VscodeIconsFileTypeImage from "~icons/vscode-icons/file-type-image";
-import VscodeIconsFileTypeJar from "~icons/vscode-icons/file-type-jar";
-import VscodeIconsFileTypeJava from "~icons/vscode-icons/file-type-java";
-import VscodeIconsFileTypeJsOfficial from "~icons/vscode-icons/file-type-js-official";
-import VscodeIconsFileTypeJson from "~icons/vscode-icons/file-type-json";
-import VscodeIconsFileTypeMarkdown from "~icons/vscode-icons/file-type-markdown";
-import VscodeIconsFileTypePhotoshop from "~icons/vscode-icons/file-type-photoshop";
-import VscodeIconsFileTypePhp3 from "~icons/vscode-icons/file-type-php3";
-import VscodeIconsFileTypePowerpoint from "~icons/vscode-icons/file-type-powerpoint";
-import VscodeIconsFileTypePython from "~icons/vscode-icons/file-type-python";
-import VscodeIconsFileTypeShell from "~icons/vscode-icons/file-type-shell";
-import VscodeIconsFileTypeText from "~icons/vscode-icons/file-type-text";
-import VscodeIconsFileTypeTypescriptOfficial from "~icons/vscode-icons/file-type-typescript-official";
-import VscodeIconsFileTypeVue from "~icons/vscode-icons/file-type-vue";
-import VscodeIconsFileTypeWord from "~icons/vscode-icons/file-type-word";
-import VscodeIconsFileTypeXml from "~icons/vscode-icons/file-type-xml";
-import VscodeIconsFileTypeYaml from "~icons/vscode-icons/file-type-yaml";
+import { computed, defineAsyncComponent } from "vue";
 
 const FileTypeIconsMap = {
   // image
-  ".jpg": markRaw(VscodeIconsFileTypeImage),
-  ".jpeg": markRaw(VscodeIconsFileTypeImage),
-  ".png": markRaw(VscodeIconsFileTypeImage),
-  ".gif": markRaw(VscodeIconsFileTypeImage),
-  ".webp": markRaw(VscodeIconsFileTypeImage),
-  ".svg": markRaw(VscodeIconsFileTypeImage),
+  ".jpg": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
+  ".jpeg": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
+  ".png": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
+  ".gif": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
+  ".webp": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
+  ".svg": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-image")
+  ),
 
   // document
-  ".docx": markRaw(VscodeIconsFileTypeWord),
-  ".pptx": markRaw(VscodeIconsFileTypePowerpoint),
-  ".xlsx": markRaw(VscodeIconsFileTypeExcel),
-  ".psd": markRaw(VscodeIconsFileTypePhotoshop),
-  ".ai": markRaw(VscodeIconsFileTypeAi),
-  ".txt": markRaw(VscodeIconsFileTypeText),
+  ".docx": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-word")
+  ),
+  ".pptx": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-powerpoint")
+  ),
+  ".xlsx": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-excel")
+  ),
+  ".psd": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-photoshop")
+  ),
+  ".ai": defineAsyncComponent(() => import("~icons/vscode-icons/file-type-ai")),
+  ".txt": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-text")
+  ),
 
   // programming languages or frameworks
-  ".json": markRaw(VscodeIconsFileTypeJson),
-  ".html": markRaw(VscodeIconsFileTypeHtml),
-  ".yaml": markRaw(VscodeIconsFileTypeYaml),
-  ".xml": markRaw(VscodeIconsFileTypeXml),
-  ".java": markRaw(VscodeIconsFileTypeJava),
-  ".jar": markRaw(VscodeIconsFileTypeJar),
-  ".class": markRaw(VscodeIconsFileTypeClass),
-  ".js": markRaw(VscodeIconsFileTypeJsOfficial),
-  ".ts": markRaw(VscodeIconsFileTypeTypescriptOfficial),
-  ".vue": markRaw(VscodeIconsFileTypeVue),
-  ".go": markRaw(VscodeIconsFileTypeGo),
-  ".c": markRaw(VscodeIconsFileTypeC),
-  ".cpp": markRaw(VscodeIconsFileTypeCpp),
-  ".astro": markRaw(VscodeIconsFileTypeAstro),
-  ".bat": markRaw(VscodeIconsFileTypeBat),
-  ".css": markRaw(VscodeIconsFileTypeCss),
-  ".db": markRaw(VscodeIconsFileTypeDb),
-  ".gradle": markRaw(VscodeIconsFileTypeGradle),
-  ".md": markRaw(VscodeIconsFileTypeMarkdown),
-  ".py": markRaw(VscodeIconsFileTypePython),
-  ".sh": markRaw(VscodeIconsFileTypeShell),
-  ".php": markRaw(VscodeIconsFileTypePhp3),
+  ".json": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-json")
+  ),
+  ".html": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-html")
+  ),
+  ".yaml": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-yaml")
+  ),
+  ".xml": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-xml")
+  ),
+  ".java": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-java")
+  ),
+  ".jar": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-jar")
+  ),
+  ".class": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-class")
+  ),
+  ".js": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-js-official")
+  ),
+  ".ts": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-typescript-official")
+  ),
+  ".vue": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-vue")
+  ),
+  ".go": defineAsyncComponent(() => import("~icons/vscode-icons/file-type-go")),
+  ".c": defineAsyncComponent(() => import("~icons/vscode-icons/file-type-c")),
+  ".cpp": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-cpp")
+  ),
+  ".astro": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-astro")
+  ),
+  ".bat": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-bat")
+  ),
+  ".css": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-css")
+  ),
+  ".db": defineAsyncComponent(() => import("~icons/vscode-icons/file-type-db")),
+  ".gradle": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-gradle")
+  ),
+  ".md": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-markdown")
+  ),
+  ".py": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-python")
+  ),
+  ".sh": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-shell")
+  ),
+  ".php": defineAsyncComponent(
+    () => import("~icons/vscode-icons/file-type-php3")
+  ),
 };
 
 const props = withDefaults(
   defineProps<{
-    fileName: string | undefined;
+    fileName?: string;
     displayExt?: boolean;
     width?: number;
     height?: number;
@@ -98,7 +128,7 @@ const getExtname = computed(() => {
 const getIcon = computed(() => {
   const icon = FileTypeIconsMap[getExtname.value];
   if (icon) return icon;
-  return markRaw(VscodeIconsDefaultFile);
+  return defineAsyncComponent(() => import("~icons/vscode-icons/default-file"));
 });
 
 const iconClass = computed(() => {

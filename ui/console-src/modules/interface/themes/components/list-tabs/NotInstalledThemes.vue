@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import type { Theme } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type {
+  Theme,
+  ThemeV1alpha1ConsoleApiListThemesRequest,
+} from "@halo-dev/api-client";
+import { consoleApiClient, paginate } from "@halo-dev/api-client";
 import { VButton, VEmpty, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import ThemeListItem from "../ThemeListItem.vue";
@@ -13,12 +16,13 @@ const {
 } = useQuery<Theme[]>({
   queryKey: ["not-installed-themes"],
   queryFn: async () => {
-    const { data } = await consoleApiClient.theme.theme.listThemes({
-      page: 0,
-      size: 0,
-      uninstalled: true,
-    });
-    return data.items;
+    return await paginate<ThemeV1alpha1ConsoleApiListThemesRequest, Theme>(
+      (params) => consoleApiClient.theme.theme.listThemes(params),
+      {
+        uninstalled: true,
+        size: 1000,
+      }
+    );
   },
 });
 </script>

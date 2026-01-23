@@ -20,7 +20,7 @@ import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuItemVo;
@@ -39,7 +39,7 @@ class MenuQueryEndpointTest {
     private MenuFinder menuFinder;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @InjectMocks
     private MenuQueryEndpoint endpoint;

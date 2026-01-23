@@ -4,34 +4,35 @@ import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
-import MdiEraser from "~icons/mdi/eraser";
+import MingcuteEraserLine from "~icons/mingcute/eraser-line";
 
-const clearFormat = Extension.create<ExtensionOptions>({
-  name: "clearFormat",
+export type ExtensionClearFormatOptions = ExtensionOptions;
 
-  addOptions() {
-    return {
-      getToolbarItems({ editor }: { editor: Editor }) {
-        return {
-          priority: 23,
-          component: markRaw(ToolbarItem),
-          props: {
-            editor,
-            isActive: false,
-            icon: markRaw(MdiEraser),
-            title: i18n.global.t("editor.common.clear_format"),
-            action: () => editor.chain().focus().unsetAllMarks().run(),
-          },
-        };
-      },
-    };
-  },
+export const ExtensionClearFormat =
+  Extension.create<ExtensionClearFormatOptions>({
+    name: "clearFormat",
 
-  addKeyboardShortcuts() {
-    return {
-      "Mod-\\": () => this.editor.chain().focus().unsetAllMarks().run(),
-    };
-  },
-});
+    addOptions() {
+      return {
+        getToolbarItems({ editor }: { editor: Editor }) {
+          return {
+            priority: 23,
+            component: markRaw(ToolbarItem),
+            props: {
+              editor,
+              isActive: false,
+              icon: markRaw(MingcuteEraserLine),
+              title: i18n.global.t("editor.common.clear_format"),
+              action: () => editor.chain().focus().unsetAllMarks().run(),
+            },
+          };
+        },
+      };
+    },
 
-export default clearFormat;
+    addKeyboardShortcuts() {
+      return {
+        "Mod-\\": () => this.editor.chain().focus().unsetAllMarks().run(),
+      };
+    },
+  });

@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import type { Group } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  Group,
+  GroupV1alpha1ApiListGroupRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -50,8 +53,13 @@ const handleSave = async () => {
         group: formState.value,
       });
     } else {
-      const { data: groups } = await coreApiClient.storage.group.listGroup();
-      const hasDisplayNameDuplicate = groups.items.some(
+      const groups = await paginate<GroupV1alpha1ApiListGroupRequest, Group>(
+        (params) => coreApiClient.storage.group.listGroup(params),
+        {
+          size: 1000,
+        }
+      );
+      const hasDisplayNameDuplicate = groups.some(
         (group) => group.spec.displayName === formState.value.spec.displayName
       );
       if (hasDisplayNameDuplicate) {

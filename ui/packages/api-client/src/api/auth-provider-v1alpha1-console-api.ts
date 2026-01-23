@@ -20,14 +20,13 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { AuthProvider } from '../models';
+import type { AuthProvider } from '../models';
 // @ts-ignore
-import { ListedAuthProvider } from '../models';
+import type { ListedAuthProvider } from '../models';
 /**
  * AuthProviderV1alpha1ConsoleApi - axios parameter creator
- * @export
  */
 export const AuthProviderV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -155,7 +154,6 @@ export const AuthProviderV1alpha1ConsoleApiAxiosParamCreator = function (configu
 
 /**
  * AuthProviderV1alpha1ConsoleApi - functional programming interface
- * @export
  */
 export const AuthProviderV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthProviderV1alpha1ConsoleApiAxiosParamCreator(configuration)
@@ -200,7 +198,6 @@ export const AuthProviderV1alpha1ConsoleApiFp = function(configuration?: Configu
 
 /**
  * AuthProviderV1alpha1ConsoleApi - factory interface
- * @export
  */
 export const AuthProviderV1alpha1ConsoleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AuthProviderV1alpha1ConsoleApiFp(configuration)
@@ -236,37 +233,20 @@ export const AuthProviderV1alpha1ConsoleApiFactory = function (configuration?: C
 
 /**
  * Request parameters for disableAuthProvider operation in AuthProviderV1alpha1ConsoleApi.
- * @export
- * @interface AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ConsoleApiDisableAuthProvider
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for enableAuthProvider operation in AuthProviderV1alpha1ConsoleApi.
- * @export
- * @interface AuthProviderV1alpha1ConsoleApiEnableAuthProviderRequest
  */
 export interface AuthProviderV1alpha1ConsoleApiEnableAuthProviderRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthProviderV1alpha1ConsoleApiEnableAuthProvider
-     */
     readonly name: string
 }
 
 /**
  * AuthProviderV1alpha1ConsoleApi - object-oriented interface
- * @export
- * @class AuthProviderV1alpha1ConsoleApi
- * @extends {BaseAPI}
  */
 export class AuthProviderV1alpha1ConsoleApi extends BaseAPI {
     /**
@@ -274,7 +254,6 @@ export class AuthProviderV1alpha1ConsoleApi extends BaseAPI {
      * @param {AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1ConsoleApi
      */
     public disableAuthProvider(requestParameters: AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ConsoleApiFp(this.configuration).disableAuthProvider(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -285,7 +264,6 @@ export class AuthProviderV1alpha1ConsoleApi extends BaseAPI {
      * @param {AuthProviderV1alpha1ConsoleApiEnableAuthProviderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1ConsoleApi
      */
     public enableAuthProvider(requestParameters: AuthProviderV1alpha1ConsoleApiEnableAuthProviderRequest, options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ConsoleApiFp(this.configuration).enableAuthProvider(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -295,7 +273,6 @@ export class AuthProviderV1alpha1ConsoleApi extends BaseAPI {
      * Lists all auth providers
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AuthProviderV1alpha1ConsoleApi
      */
     public listAuthProviders(options?: RawAxiosRequestConfig) {
         return AuthProviderV1alpha1ConsoleApiFp(this.configuration).listAuthProviders(options).then((request) => request(this.axios, this.basePath));

@@ -33,8 +33,8 @@ rules:
     resources: [ "user-connections/disconnect" ]
     verbs: [ "update" ]
   - apiGroups: [ "uc.api.halo.run" ]
-    resources: [ "user-preferences" ]
-    verbs: [ "get", "update" ]
+    resources: [ "user-preferences", "annotationsettings" ]
+    verbs: [ "get", "list", "update" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -29,16 +30,16 @@ import run.halo.app.extension.controller.Reconciler;
 class NotificationTriggerTest {
 
     @Mock
-    private ExtensionClient client;
+    ExtensionClient client;
 
     @Mock
-    private NotificationCenter notificationCenter;
+    NotificationCenter notificationCenter;
 
     @InjectMocks
-    private NotificationTrigger notificationTrigger;
+    NotificationTrigger notificationTrigger;
 
     @Test
-    void reconcile() {
+    void shouldCleanUpAfterNotified() {
         var reason = mock(Reason.class);
         var metadata = mock(Metadata.class);
         when(reason.getMetadata()).thenReturn(metadata);
@@ -53,6 +54,24 @@ class NotificationTriggerTest {
 
         verify(notificationCenter).notify(eq(reason));
         verify(metadata).setFinalizers(eq(Set.of(NotificationTrigger.TRIGGERED_FINALIZER)));
-        verify(client).update(any(Reason.class));
+        verify(client).delete(any(Reason.class));
+    }
+
+    @Test
+    void shouldRemoveFinalizerAfterDeleted() {
+        var reason = mock(Reason.class);
+        var metadata = mock(Metadata.class);
+        when(reason.getMetadata()).thenReturn(metadata);
+        when(metadata.getDeletionTimestamp()).thenReturn(Instant.now());
+        when(metadata.getFinalizers())
+            .thenReturn(Set.of(NotificationTrigger.TRIGGERED_FINALIZER));
+
+        when(client.fetch(eq(Reason.class), eq("fake-reason")))
+            .thenReturn(Optional.of(reason));
+
+        notificationTrigger.reconcile(new Reconciler.Request("fake-reason"));
+
+        verify(metadata).setFinalizers(eq(Set.of()));
+        verify(client).update(eq(reason));
     }
 }

@@ -1,4 +1,4 @@
-import MdiDeleteForeverOutline from "@/components/icon/MdiDeleteForeverOutline.vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import {
@@ -12,29 +12,20 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
-import TiptapDetails, { type DetailsOptions } from "@tiptap/extension-details";
-import TiptapDetailsContent from "@tiptap/extension-details-content";
-import TiptapDetailsSummary from "@tiptap/extension-details-summary";
+import TiptapDetails, {
+  DetailsContent,
+  DetailsSummary,
+  type DetailsOptions,
+} from "@tiptap/extension-details";
 import { markRaw } from "vue";
-import MdiExpandHorizontal from "~icons/mdi/expand-horizontal";
+import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 
 export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 
-const getRenderContainer = (node: HTMLElement) => {
-  let container = node;
-  if (container.nodeName === "#text") {
-    container = node.parentElement as HTMLElement;
-  }
+export type ExtensionDetailsOptions = Partial<DetailsOptions> &
+  ExtensionOptions;
 
-  while (container && container.dataset.type !== "details") {
-    container = container.parentElement as HTMLElement;
-  }
-  return container;
-};
-
-const Details = TiptapDetails.extend<
-  ExtensionOptions & Partial<DetailsOptions>
->({
+export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -44,7 +35,7 @@ const Details = TiptapDetails.extend<
       getCommandMenuItems() {
         return {
           priority: 160,
-          icon: markRaw(MdiExpandHorizontal),
+          icon: markRaw(MingcuteFoldVerticalLine),
           title: "editor.extensions.details.command_item",
           keywords: ["details"],
           command: ({ editor, range }: { editor: Editor; range: Range }) => {
@@ -53,7 +44,7 @@ const Details = TiptapDetails.extend<
               .focus()
               .deleteRange(range)
               .setDetails()
-              .updateAttributes("details", { open: true })
+              .updateAttributes(TiptapDetails.name, { open: true })
               .run();
           },
         };
@@ -64,18 +55,18 @@ const Details = TiptapDetails.extend<
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("details"),
-            icon: markRaw(MdiExpandHorizontal),
+            isActive: editor.isActive(TiptapDetails.name),
+            icon: markRaw(MingcuteFoldVerticalLine),
             title: i18n.global.t("editor.extensions.details.command_item"),
             action: () => {
-              if (editor.isActive("details")) {
+              if (editor.isActive(TiptapDetails.name)) {
                 editor.chain().focus().unsetDetails().run();
               } else {
                 editor
                   .chain()
                   .focus()
                   .setDetails()
-                  .updateAttributes("details", { open: true })
+                  .updateAttributes(TiptapDetails.name, { open: true })
                   .run();
               }
             },
@@ -86,7 +77,7 @@ const Details = TiptapDetails.extend<
         return {
           pluginKey: DETAILS_BUBBLE_MENU_KEY,
           shouldShow: ({ state }: { state: EditorState }): boolean => {
-            return isActive(state, Details.name);
+            return isActive(state, ExtensionDetails.name);
           },
           options: {
             placement: "top-start",
@@ -97,7 +88,7 @@ const Details = TiptapDetails.extend<
               return null;
             }
             const parentNode = findParentNode(
-              (node) => node.type.name === Details.name
+              (node) => node.type.name === ExtensionDetails.name
             )(editor.state.selection);
             if (parentNode) {
               const domRect = posToDOMRect(
@@ -116,29 +107,20 @@ const Details = TiptapDetails.extend<
             {
               priority: 10,
               props: {
-                icon: markRaw(MdiDeleteForeverOutline),
+                icon: markRaw(MingcuteDelete2Line),
                 title: i18n.global.t("editor.common.button.delete"),
                 action: ({ editor }: { editor: Editor }): boolean =>
-                  deleteNode(Details.name, editor),
+                  deleteNode(ExtensionDetails.name, editor),
               },
             },
           ],
         };
       },
-      getDraggable() {
-        return {
-          getRenderContainer({ dom }: { dom: HTMLElement }) {
-            return {
-              el: getRenderContainer(dom),
-            };
-          },
-        };
-      },
     };
   },
   addExtensions() {
-    return [TiptapDetailsSummary, TiptapDetailsContent];
+    return [DetailsSummary, DetailsContent];
   },
+}).configure({
+  persist: true,
 });
-
-export default Details;

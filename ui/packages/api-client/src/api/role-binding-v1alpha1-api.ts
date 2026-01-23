@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { RoleBinding } from '../models';
+import type { RoleBinding } from '../models';
 // @ts-ignore
-import { RoleBindingList } from '../models';
+import type { RoleBindingList } from '../models';
 /**
  * RoleBindingV1alpha1Api - axios parameter creator
- * @export
  */
 export const RoleBindingV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const RoleBindingV1alpha1ApiAxiosParamCreator = function (configuration?:
 
 /**
  * RoleBindingV1alpha1Api - functional programming interface
- * @export
  */
 export const RoleBindingV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RoleBindingV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const RoleBindingV1alpha1ApiFp = function(configuration?: Configuration) 
 
 /**
  * RoleBindingV1alpha1Api - factory interface
- * @export
  */
 export const RoleBindingV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = RoleBindingV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const RoleBindingV1alpha1ApiFactory = function (configuration?: Configura
 
 /**
  * Request parameters for createRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiCreateRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiCreateRoleBindingRequest {
     /**
      * Fresh rolebinding
-     * @type {RoleBinding}
-     * @memberof RoleBindingV1alpha1ApiCreateRoleBinding
      */
     readonly roleBinding?: RoleBinding
 }
 
 /**
  * Request parameters for deleteRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiDeleteRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiDeleteRoleBindingRequest {
     /**
      * Name of rolebinding
-     * @type {string}
-     * @memberof RoleBindingV1alpha1ApiDeleteRoleBinding
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiGetRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiGetRoleBindingRequest {
     /**
      * Name of rolebinding
-     * @type {string}
-     * @memberof RoleBindingV1alpha1ApiGetRoleBinding
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiListRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiListRoleBindingRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof RoleBindingV1alpha1ApiListRoleBinding
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof RoleBindingV1alpha1ApiListRoleBinding
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof RoleBindingV1alpha1ApiListRoleBinding
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof RoleBindingV1alpha1ApiListRoleBinding
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof RoleBindingV1alpha1ApiListRoleBinding
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiPatchRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiPatchRoleBindingRequest {
     /**
      * Name of rolebinding
-     * @type {string}
-     * @memberof RoleBindingV1alpha1ApiPatchRoleBinding
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof RoleBindingV1alpha1ApiPatchRoleBinding
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateRoleBinding operation in RoleBindingV1alpha1Api.
- * @export
- * @interface RoleBindingV1alpha1ApiUpdateRoleBindingRequest
  */
 export interface RoleBindingV1alpha1ApiUpdateRoleBindingRequest {
     /**
      * Name of rolebinding
-     * @type {string}
-     * @memberof RoleBindingV1alpha1ApiUpdateRoleBinding
      */
     readonly name: string
 
     /**
      * Updated rolebinding
-     * @type {RoleBinding}
-     * @memberof RoleBindingV1alpha1ApiUpdateRoleBinding
      */
     readonly roleBinding?: RoleBinding
 }
 
 /**
  * RoleBindingV1alpha1Api - object-oriented interface
- * @export
- * @class RoleBindingV1alpha1Api
- * @extends {BaseAPI}
  */
 export class RoleBindingV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiCreateRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public createRoleBinding(requestParameters: RoleBindingV1alpha1ApiCreateRoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).createRoleBinding(requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiDeleteRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public deleteRoleBinding(requestParameters: RoleBindingV1alpha1ApiDeleteRoleBindingRequest, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).deleteRoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiGetRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public getRoleBinding(requestParameters: RoleBindingV1alpha1ApiGetRoleBindingRequest, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).getRoleBinding(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiListRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public listRoleBinding(requestParameters: RoleBindingV1alpha1ApiListRoleBindingRequest = {}, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).listRoleBinding(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiPatchRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public patchRoleBinding(requestParameters: RoleBindingV1alpha1ApiPatchRoleBindingRequest, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).patchRoleBinding(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class RoleBindingV1alpha1Api extends BaseAPI {
      * @param {RoleBindingV1alpha1ApiUpdateRoleBindingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof RoleBindingV1alpha1Api
      */
     public updateRoleBinding(requestParameters: RoleBindingV1alpha1ApiUpdateRoleBindingRequest, options?: RawAxiosRequestConfig) {
         return RoleBindingV1alpha1ApiFp(this.configuration).updateRoleBinding(requestParameters.name, requestParameters.roleBinding, options).then((request) => request(this.axios, this.basePath));

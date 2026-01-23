@@ -7,8 +7,8 @@
 假设以文章为例：
 
 ```ts
-import { definePlugin } from "@halo-dev/console-shared";
-import type { CommentSubjectRefResult } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/ui-shared";
+import type { CommentSubjectRefResult } from "@halo-dev/ui-shared";
 import type { Extension } from "@halo-dev/api-client";
 import type { Post } from "./types";
 

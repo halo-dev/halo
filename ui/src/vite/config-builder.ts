@@ -70,20 +70,17 @@ export function createViteConfig(options: Options) {
       outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          advancedChunks: {
+          codeSplitting: {
             groups: [
-              "lodash-es",
+              "es-toolkit",
               "vue-grid-layout",
               "transliteration",
-              "vue-draggable-plus",
               "colorjs.io",
               "overlayscrollbars",
               "overlayscrollbars-vue",
-              "floating-vue",
               "@he-tree/vue",
-              "pretty-bytes",
             ].map((name) => ({
               name: "vendor",
               test: name,

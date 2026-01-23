@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import type { Menu, MenuItem } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import type {
+  Menu,
+  MenuItem,
+  MenuItemV1alpha1ApiListMenuItemRequest,
+} from "@halo-dev/api-client";
+import { coreApiClient, paginate } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -19,7 +23,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { Draggable } from "@he-tree/vue";
 import "@he-tree/vue/style/default.css";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -57,13 +61,14 @@ const {
     }
 
     const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
-    const { data } = await coreApiClient.menuItem.listMenuItem({
-      page: 0,
-      size: 0,
-      fieldSelector: [`name=(${menuItemNames.join(",")})`],
-    });
 
-    return data.items;
+    return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
+      (params) => coreApiClient.menuItem.listMenuItem(params),
+      {
+        fieldSelector: [`name=(${menuItemNames.join(",")})`],
+        size: 1000,
+      }
+    );
   },
   onSuccess(data) {
     menuTreeItems.value = buildMenuItemsTree(data);

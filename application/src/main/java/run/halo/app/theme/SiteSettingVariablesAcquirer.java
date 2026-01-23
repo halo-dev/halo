@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.theme.finders.vo.SiteSettingVo;
 
@@ -20,16 +20,15 @@ import run.halo.app.theme.finders.vo.SiteSettingVo;
 @AllArgsConstructor
 public class SiteSettingVariablesAcquirer implements ViewContextBasedVariablesAcquirer {
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final ExternalUrlSupplier externalUrlSupplier;
     private final SystemVersionSupplier systemVersionSupplier;
 
     @Override
     public Mono<Map<String, Object>> acquire(ServerWebExchange exchange) {
-        return environmentFetcher.getConfigMap()
-            .filter(configMap -> configMap.getData() != null)
-            .map(configMap -> {
-                SiteSettingVo siteSettingVo = SiteSettingVo.from(configMap)
+        return environmentFetcher.getConfig()
+            .map(config -> {
+                var siteSettingVo = SiteSettingVo.from(config)
                     .withUrl(externalUrlSupplier.getURL(exchange.getRequest()))
                     .withVersion(systemVersionSupplier.get().toString());
                 return Map.of("site", siteSettingVo);

@@ -38,7 +38,7 @@ class SystemSettingTest {
         configMap.putDataItem("comment", """
             {"enable": true}
             """);
-        var comment = SystemSetting.get(configMap, Comment.GROUP, Comment.class);
+        var comment = SystemSetting.get(configMap.getData(), Comment.GROUP, Comment.class);
         assertTrue(comment.getEnable());
     }
 
@@ -46,7 +46,7 @@ class SystemSettingTest {
     void shouldGetNullIfKeyNotExist() {
         var configMap = new ConfigMap();
         configMap.setData(new HashMap<>());
-        String fake = SystemSetting.get(configMap, "fake-key", String.class);
+        String fake = SystemSetting.get(configMap.getData(), "fake-key", String.class);
         assertNull(fake);
     }
 
@@ -54,7 +54,7 @@ class SystemSettingTest {
     void shouldGetConfigViaConversionService() {
         var configMap = new ConfigMap();
         configMap.putDataItem("int", "100");
-        var integer = SystemSetting.get(configMap, "int", Integer.class);
+        var integer = SystemSetting.get(configMap.getData(), "int", Integer.class);
         assertEquals(100, integer);
     }
 }

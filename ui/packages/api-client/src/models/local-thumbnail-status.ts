@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface LocalThumbnailStatus
- */
 export interface LocalThumbnailStatus {
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalThumbnailStatus
-     */
     'phase'?: LocalThumbnailStatusPhaseEnum;
 }
 

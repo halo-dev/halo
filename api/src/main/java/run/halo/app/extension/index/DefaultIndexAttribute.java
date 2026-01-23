@@ -16,8 +16,15 @@ class DefaultIndexAttribute<E extends Extension, K extends Comparable<K>>
 
     private final Function<E, Set<K>> valuesFunc;
 
-    public DefaultIndexAttribute(Function<E, Set<K>> valuesFunc, Class<E> objectType,
-        Class<K> keyType) {
+    private final boolean singleValue;
+
+    public DefaultIndexAttribute(
+        Function<E, Set<K>> valuesFunc,
+        Class<E> objectType,
+        Class<K> keyType,
+        boolean singleValue
+    ) {
+        this.singleValue = singleValue;
         Assert.notNull(valuesFunc, "Values function must not be null");
         Assert.notNull(objectType, "Cannot resolve object type");
         Assert.notNull(keyType, "Cannot resolve key type");
@@ -46,5 +53,10 @@ class DefaultIndexAttribute<E extends Extension, K extends Comparable<K>>
 
     private boolean checkType(Extension object) {
         return getObjectType().isInstance(object);
+    }
+
+    @Override
+    public boolean singleValue() {
+        return this.singleValue;
     }
 }

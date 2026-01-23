@@ -25,6 +25,7 @@ import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.time.Duration;
 import java.util.Collection;
@@ -83,8 +84,9 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.SortableRequest;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.Attachment.UploadOptions;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
@@ -104,7 +106,7 @@ public class UserEndpoint implements CustomEndpoint {
     private final AttachmentService attachmentService;
     private final EmailVerificationService emailVerificationService;
     private final RateLimiterRegistry rateLimiterRegistry;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final Validator validator;
 
     @Override
@@ -282,9 +284,11 @@ public class UserEndpoint implements CustomEndpoint {
             .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED)
-                                     @Email
-                                     String email) {
+    public record EmailVerifyRequest(
+        @Schema(requiredMode = REQUIRED)
+        @Email
+        @NotBlank
+        String email) {
     }
 
     public record VerifyCodeRequest(
@@ -305,7 +309,8 @@ public class UserEndpoint implements CustomEndpoint {
                     throw new ServerWebInputException("validation.error.email.pattern");
                 }
             })
-            .map(EmailVerifyRequest::email);
+            .map(EmailVerifyRequest::email)
+            .map(String::toLowerCase);
         return Mono.zip(emailMono, getAuthenticatedUserName())
             .flatMap(tuple -> {
                 var email = tuple.getT1();
@@ -395,26 +400,28 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<Attachment> uploadAvatar(AvatarUploadRequest uploadRequest) {
-        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalStateException("User setting is not configured"))
+        var fallbackSetting =
+            environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                .mapNotNull(SystemSetting.User::getAvatarPolicy)
+                .filter(StringUtils::isNotBlank);
+        var getAvatarPolicy = environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
             )
-            .flatMap(userSetting -> Mono.defer(
-                () -> {
-                    String avatarPolicy = userSetting.getAvatarPolicy();
-                    if (StringUtils.isBlank(avatarPolicy)) {
-                        avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
-                    }
-                    FilePart filePart = uploadRequest.getFile();
-                    var ext = Files.getFileExtension(filePart.filename());
-                    return attachmentService.upload(avatarPolicy,
-                        USER_AVATAR_GROUP_NAME,
-                        UUID.randomUUID() + "." + ext,
-                        maxSizeCheck(filePart.content()),
-                        filePart.headers().getContentType()
-                    );
-                })
+            .mapNotNull(SystemSetting.Attachment::avatar)
+            .mapNotNull(UploadOptions::policyName)
+            .filter(StringUtils::isNotBlank)
+            .switchIfEmpty(fallbackSetting)
+            .defaultIfEmpty(DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME);
+        return getAvatarPolicy.flatMap(avatarPolicy -> {
+            FilePart filePart = uploadRequest.getFile();
+            var ext = Files.getFileExtension(filePart.filename());
+            return attachmentService.upload(avatarPolicy,
+                USER_AVATAR_GROUP_NAME,
+                UUID.randomUUID() + "." + ext,
+                maxSizeCheck(filePart.content()),
+                filePart.headers().getContentType()
             );
+        });
     }
 
     private Flux<DataBuffer> maxSizeCheck(Flux<DataBuffer> content) {

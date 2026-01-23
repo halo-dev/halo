@@ -6,16 +6,11 @@ import { useContentCache } from "@/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { contentAnnotations } from "@/constants/annotations";
-import { randomUUID } from "@/utils/id";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Post, PostRequest } from "@halo-dev/api-client";
-import {
-  consoleApiClient,
-  coreApiClient,
-  ucApiClient,
-} from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconBookRead,
@@ -28,12 +23,12 @@ import {
   VButton,
   VPageHeader,
 } from "@halo-dev/components";
-import type { EditorProvider } from "@halo-dev/console-shared";
-import { FormType, utils } from "@halo-dev/console-shared";
+import type { EditorProvider } from "@halo-dev/ui-shared";
+import { FormType, utils } from "@halo-dev/ui-shared";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouteQuery } from "@vueuse/router";
 import type { AxiosRequestConfig } from "axios";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import ShortUniqueId from "short-unique-id";
 import {
   computed,
@@ -79,17 +74,8 @@ const handleChangeEditorProvider = async (provider: EditorProvider) => {
   }
 };
 
-// fixme: PostRequest type may be wrong
-interface PostRequestWithContent extends PostRequest {
-  content: {
-    raw: string;
-    content: string;
-    rawType: string;
-  };
-}
-
 // Post form
-const formState = ref<PostRequestWithContent>({
+const formState = ref<PostRequest>({
   post: {
     spec: {
       title: "",
@@ -114,7 +100,7 @@ const formState = ref<PostRequestWithContent>({
     apiVersion: "content.halo.run/v1alpha1",
     kind: "Post",
     metadata: {
-      name: randomUUID(),
+      name: utils.id.uuid(),
       annotations: {},
     },
   },
@@ -211,6 +197,8 @@ const handleSave = async (options?: { mute?: boolean }) => {
       const { data: postsWithSameSlug } =
         await coreApiClient.content.post.listPost({
           fieldSelector: [`spec.slug=${formState.value.post.spec.slug}`],
+          page: 1,
+          size: 1,
         });
 
       if (postsWithSameSlug.total) {
@@ -469,18 +457,17 @@ useSessionKeepAlive();
 
 // Upload image
 async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
-  if (!utils.permission.has(["uc:attachments:manage"])) {
+  if (!utils.permission.has(["system:attachments:manage"])) {
     return;
   }
 
-  const { data } = await ucApiClient.storage.attachment.createAttachmentForPost(
-    {
-      file,
-      postName: formState.value.post.metadata.name,
-      waitForPermalink: true,
-    },
-    options
-  );
+  const { data } =
+    await consoleApiClient.storage.attachment.uploadAttachmentForConsole(
+      {
+        file,
+      },
+      options
+    );
   return data;
 }
 </script>
@@ -574,7 +561,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-model:title="formState.post.spec.title"
       v-model:cover="formState.post.spec.cover"
       :upload-image="handleUploadImage"
-      class="h-full"
+      class="size-full"
       @update="handleSetContentCache"
     />
   </div>

@@ -81,6 +81,7 @@ function handleCleanup() {
     description: t("core.post_snapshots.operations.cleanup.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
     async onConfirm() {
       const { releaseSnapshot, baseSnapshot, headSnapshot } =
         post.value?.spec || {};

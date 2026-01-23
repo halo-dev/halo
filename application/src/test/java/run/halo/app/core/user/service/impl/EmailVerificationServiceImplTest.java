@@ -2,13 +2,14 @@ package run.halo.app.core.user.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static run.halo.app.core.user.service.impl.EmailVerificationServiceImpl.MAX_ATTEMPTS;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.core.user.service.impl.EmailVerificationServiceImpl;
+import run.halo.app.core.user.service.impl.EmailVerificationServiceImpl.EmailVerificationManager.UsernameEmail;
 import run.halo.app.infra.exception.EmailVerificationFailed;
 
 /**
@@ -83,5 +84,12 @@ class EmailVerificationServiceImplTest {
                 .isInstanceOf(EmailVerificationFailed.class)
                 .hasMessage("400 BAD_REQUEST \"Too many attempts. Please try again later.\"");
         }
+    }
+
+    @Test
+    void shouldBeEqualUsernameEmailWithDifferentCase() {
+        var expected = new UsernameEmail("faker", "a@b.com");
+        var got = new UsernameEmail("faker", "A@B.com");
+        assertEquals(expected, got);
     }
 }

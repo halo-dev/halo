@@ -14,65 +14,15 @@
 
 
 
-/**
- * 
- * @export
- * @interface CreateUserRequest
- */
 export interface CreateUserRequest {
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof CreateUserRequest
-     */
     'annotations'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'avatar'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'bio'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'displayName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'email': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'password'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateUserRequest
-     */
     'phone'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof CreateUserRequest
-     */
     'roles'?: Array<string>;
 }
 

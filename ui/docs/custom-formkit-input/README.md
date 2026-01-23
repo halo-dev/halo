@@ -57,7 +57,7 @@
     3. buttonAttrs: 验证按钮的额外属性
 - `secret`: 用于选择或者管理密钥（Secret）
   - 参数
-    1. requiredKey：用于确认所需密钥的字段名称
+    1. requiredKeys：用于确认所需密钥的字段名称，数组类型，每个元素包含 `key` 和 `help` 两个属性。
 - `select`: 自定义的选择器组件，用于在备选项中选择一个或多个选项
   - 参数
     1. `options`：静态数据源。当 `action` 或 `remote` 存在时，此参数无效。

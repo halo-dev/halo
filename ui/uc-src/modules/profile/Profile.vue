@@ -1,83 +1,80 @@
 <script lang="ts" setup>
 import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { DetailedUser } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
 import {
   VButton,
   VDropdown,
   VDropdownItem,
+  VLoading,
   VTabbar,
 } from "@halo-dev/components";
-import type { UserProfileTab } from "@halo-dev/console-shared";
-import { useQuery } from "@tanstack/vue-query";
+import { stores, type UserProfileTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
+import { storeToRefs } from "pinia";
 import {
   computed,
-  markRaw,
+  defineAsyncComponent,
   onMounted,
-  provide,
   ref,
   shallowRef,
-  type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
-import DetailTab from "./tabs/Detail.vue";
-import Devices from "./tabs/Devices.vue";
-import NotificationPreferences from "./tabs/NotificationPreferences.vue";
-import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
-import TwoFactor from "./tabs/TwoFactor.vue";
 
 const { t } = useI18n();
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
-const {
-  data: user,
-  isLoading,
-  refetch,
-} = useQuery({
-  queryKey: ["user-detail"],
-  queryFn: async () => {
-    const { data } = await consoleApiClient.user.getCurrentUserDetail();
-    return data;
-  },
-});
-
-provide<Ref<DetailedUser | undefined>>("user", user);
+const { currentUser } = storeToRefs(stores.currentUser());
+const { fetchCurrentUser } = stores.currentUser();
+fetchCurrentUser();
 
 const tabs = shallowRef<UserProfileTab[]>([
   {
     id: "detail",
     label: t("core.uc_profile.tabs.detail"),
-    component: markRaw(DetailTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Detail.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 10,
   },
   {
     id: "notification-preferences",
     label: t("core.uc_profile.tabs.notification-preferences"),
-    component: markRaw(NotificationPreferences),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/NotificationPreferences.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 20,
   },
   {
     id: "pat",
     label: t("core.uc_profile.tabs.pat"),
-    component: markRaw(PersonalAccessTokensTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/PersonalAccessTokens.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 30,
   },
   {
-    id: "2fa",
-    label: t("core.uc_profile.tabs.2fa"),
-    component: markRaw(TwoFactor),
+    id: "authentication",
+    label: t("core.uc_profile.tabs.authentication"),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Authentication.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 40,
   },
   {
     id: "devices",
     label: t("core.uc_profile.tabs.devices"),
-    component: markRaw(Devices),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Devices.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 50,
   },
 ]);
@@ -115,19 +112,13 @@ const tabbarItems = computed(() => {
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
   mode: "push",
 });
-
-function onPasswordChangeModalClose() {
-  passwordChangeModal.value = false;
-  refetch();
-}
 </script>
 <template>
   <ProfileEditingModal v-if="editingModal" @close="editingModal = false" />
 
   <PasswordChangeModal
     v-if="passwordChangeModal"
-    :user="user?.user"
-    @close="onPasswordChangeModalClose"
+    @close="passwordChangeModal = false"
   />
 
   <header class="bg-white">
@@ -135,14 +126,17 @@ function onPasswordChangeModalClose() {
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <UserAvatar :name="user?.user.metadata.name" is-current-user />
+            <UserAvatar
+              :name="currentUser?.user.metadata.name"
+              is-current-user
+            />
           </div>
           <div class="block">
             <h1 class="truncate text-lg font-bold text-gray-900">
-              {{ user?.user.spec.displayName }}
+              {{ currentUser?.user.spec.displayName }}
             </h1>
-            <span v-if="!isLoading" class="text-sm text-gray-600">
-              @{{ user?.user.metadata.name }}
+            <span class="text-sm text-gray-600">
+              @{{ currentUser?.user.metadata.name }}
             </span>
           </div>
         </div>
@@ -173,11 +167,7 @@ function onPasswordChangeModalClose() {
     ></VTabbar>
     <div class="mt-2">
       <template v-for="tab in tabs" :key="tab.id">
-        <component
-          :is="tab.component"
-          v-if="activeTab === tab.id"
-          :user="user"
-        />
+        <component :is="tab.component" v-if="activeTab === tab.id" />
       </template>
     </div>
   </section>

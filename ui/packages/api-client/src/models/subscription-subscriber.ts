@@ -16,15 +16,8 @@
 
 /**
  * The subscriber to be notified
- * @export
- * @interface SubscriptionSubscriber
  */
 export interface SubscriptionSubscriber {
-    /**
-     * 
-     * @type {string}
-     * @memberof SubscriptionSubscriber
-     */
     'name': string;
 }
 

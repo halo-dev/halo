@@ -2,11 +2,13 @@ import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import TiptapStrike from "@tiptap/extension-strike";
+import TiptapStrike, { type StrikeOptions } from "@tiptap/extension-strike";
 import { markRaw } from "vue";
-import MdiFormatStrikethrough from "~icons/mdi/format-strikethrough";
+import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 
-const Strike = TiptapStrike.extend<ExtensionOptions>({
+export type ExtensionStrikeOptions = ExtensionOptions & Partial<StrikeOptions>;
+
+export const ExtensionStrike = TiptapStrike.extend<ExtensionStrikeOptions>({
   addOptions() {
     return {
       ...this.parent?.(),
@@ -16,8 +18,8 @@ const Strike = TiptapStrike.extend<ExtensionOptions>({
           component: markRaw(ToolbarItem),
           props: {
             editor,
-            isActive: editor.isActive("strike"),
-            icon: markRaw(MdiFormatStrikethrough),
+            isActive: editor.isActive(TiptapStrike.name),
+            icon: markRaw(MingcuteStrikethroughLine),
             title: i18n.global.t("editor.common.strike"),
             action: () => editor.chain().focus().toggleStrike().run(),
           },
@@ -26,5 +28,3 @@ const Strike = TiptapStrike.extend<ExtensionOptions>({
     };
   },
 });
-
-export default Strike;

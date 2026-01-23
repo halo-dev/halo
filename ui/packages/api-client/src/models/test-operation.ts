@@ -14,28 +14,14 @@
 
 
 
-/**
- * 
- * @export
- * @interface TestOperation
- */
 export interface TestOperation {
-    /**
-     * 
-     * @type {string}
-     * @memberof TestOperation
-     */
     'op': TestOperationOpEnum;
     /**
      * A JSON Pointer path pointing to the location to move/copy from.
-     * @type {string}
-     * @memberof TestOperation
      */
     'path': string;
     /**
      * Value can be any JSON value
-     * @type {any}
-     * @memberof TestOperation
      */
     'value': any;
 }

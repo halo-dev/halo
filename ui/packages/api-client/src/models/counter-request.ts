@@ -14,53 +14,13 @@
 
 
 
-/**
- * 
- * @export
- * @interface CounterRequest
- */
 export interface CounterRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'group'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'hostname'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'language'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'plural'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'referrer'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CounterRequest
-     */
     'screen'?: string;
 }
 

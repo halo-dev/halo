@@ -34,9 +34,6 @@ public class SpringPluginFactory implements PluginFactory {
             .version(pluginWrapper.getDescriptor().getVersion())
             .runtimeMode(pluginWrapper.getRuntimeMode())
             .build();
-        return new SpringPlugin(
-            contextFactory,
-            pluginContext
-        );
+        return new DefaultSpringPlugin(contextFactory, pluginContext);
     }
 }

@@ -15,31 +15,11 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition';
+import type { Condition } from './condition';
 
-/**
- * 
- * @export
- * @interface ThemeStatus
- */
 export interface ThemeStatus {
-    /**
-     * 
-     * @type {Array<Condition>}
-     * @memberof ThemeStatus
-     */
     'conditions'?: Array<Condition>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeStatus
-     */
     'location'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ThemeStatus
-     */
     'phase'?: ThemeStatusPhaseEnum;
 }
 

@@ -4,7 +4,7 @@ import {
   VAlert,
   VDescriptionItem,
 } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ExternalUrlForm from "./ExternalUrlForm.vue";

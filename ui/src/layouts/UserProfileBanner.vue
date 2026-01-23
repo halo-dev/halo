@@ -12,7 +12,7 @@ import {
   VDropdown,
   VTag,
 } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -22,9 +22,8 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const userStore = stores.currentUser();
 
-const { currentUser } = storeToRefs(userStore);
+const { currentUser } = storeToRefs(stores.currentUser());
 
 const handleLogout = () => {
   Dialog.warning({
@@ -92,6 +91,7 @@ const actions = computed(() => {
   <div class="user-profile">
     <div v-if="currentUser?.user.spec.avatar" class="user-profile__avatar">
       <VAvatar
+        :key="currentUser?.user.spec.avatar"
         :src="currentUser?.user.spec.avatar"
         :alt="currentUser?.user.spec.displayName"
         size="sm"

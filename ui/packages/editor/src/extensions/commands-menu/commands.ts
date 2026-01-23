@@ -12,7 +12,7 @@ import { computePosition, flip, shift } from "@floating-ui/dom";
 import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import CommandsView from "./CommandsView.vue";
 
-export default Extension.create({
+export const ExtensionCommandsMenu = Extension.create({
   name: "commands-menu",
 
   addProseMirrorPlugins() {
@@ -144,6 +144,7 @@ const updatePosition = (editor: Editor, element: HTMLElement) => {
     element.style.position = strategy;
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
+    element.style.zIndex = "1000";
   });
 };
 

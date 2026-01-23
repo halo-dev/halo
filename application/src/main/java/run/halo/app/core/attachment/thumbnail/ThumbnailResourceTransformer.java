@@ -1,7 +1,6 @@
 package run.halo.app.core.attachment.thumbnail;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
@@ -41,7 +40,7 @@ public class ThumbnailResourceTransformer implements ResourceTransformer {
         }
         var size = ThumbnailSize.fromWidth(width);
         try {
-            var source = Path.of(resource.getURI());
+            var source = resource.getFile().toPath();
             return localThumbnailService.generate(source, size)
                 .switchIfEmpty(Mono.fromSupplier(() -> new PathResource(source)))
                 .flatMap(transformed -> transformerChain.transform(exchange, transformed));

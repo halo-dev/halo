@@ -14,28 +14,14 @@
 
 
 
-/**
- * 
- * @export
- * @interface CategoryStatus
- */
 export interface CategoryStatus {
-    /**
-     * 
-     * @type {string}
-     * @memberof CategoryStatus
-     */
     'permalink'?: string;
     /**
      * 包括当前和其下所有层级的文章数量 (depth=max).
-     * @type {number}
-     * @memberof CategoryStatus
      */
     'postCount'?: number;
     /**
      * 包括当前和其下所有层级的已发布且公开的文章数量 (depth=max).
-     * @type {number}
-     * @memberof CategoryStatus
      */
     'visiblePostCount'?: number;
 }

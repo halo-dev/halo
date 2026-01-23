@@ -15,66 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ExtensionPointDefinition } from './extension-point-definition';
+import type { ExtensionPointDefinition } from './extension-point-definition';
 
-/**
- * 
- * @export
- * @interface ExtensionPointDefinitionList
- */
 export interface ExtensionPointDefinitionList {
     /**
      * Indicates whether current page is the first page.
-     * @type {boolean}
-     * @memberof ExtensionPointDefinitionList
      */
     'first': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof ExtensionPointDefinitionList
      */
     'hasNext': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof ExtensionPointDefinitionList
      */
     'hasPrevious': boolean;
     /**
      * A chunk of items.
-     * @type {Array<ExtensionPointDefinition>}
-     * @memberof ExtensionPointDefinitionList
      */
     'items': Array<ExtensionPointDefinition>;
     /**
      * Indicates whether current page is the last page.
-     * @type {boolean}
-     * @memberof ExtensionPointDefinitionList
      */
     'last': boolean;
     /**
      * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionList
      */
     'page': number;
     /**
      * Size of each page. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionList
      */
     'size': number;
     /**
      * Total elements.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionList
      */
     'total': number;
     /**
      * Indicates total pages.
-     * @type {number}
-     * @memberof ExtensionPointDefinitionList
      */
     'totalPages': number;
 }

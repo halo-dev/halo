@@ -10,15 +10,16 @@ import {
   VDropdown,
   VDropdownDivider,
   VDropdownItem,
+  VLoading,
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { stores, utils, type UserTab } from "@halo-dev/console-shared";
+import { stores, utils, type UserTab } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
-  markRaw,
+  defineAsyncComponent,
   onMounted,
   provide,
   ref,
@@ -31,7 +32,6 @@ import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { useUserEnableDisable } from "./composables/use-user";
-import DetailTab from "./tabs/Detail.vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -61,7 +61,10 @@ const tabs = shallowRef<UserTab[]>([
   {
     id: "detail",
     label: t("core.user.detail.tabs.detail"),
-    component: markRaw(DetailTab),
+    component: defineAsyncComponent({
+      loader: () => import("./tabs/Detail.vue"),
+      loadingComponent: VLoading,
+    }),
     priority: 10,
   },
 ]);
@@ -162,7 +165,12 @@ const { handleEnableOrDisableUser } = useUserEnableDisable();
       <div class="flex items-center justify-between">
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
-            <UserAvatar :name="user?.user.metadata.name" />
+            <UserAvatar
+              :name="user?.user.metadata.name"
+              :is-current-user="
+                user?.user.metadata.name === currentUser?.user.metadata.name
+              "
+            />
           </div>
           <div class="block">
             <div class="flex items-center gap-2">

@@ -15,40 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { PolicySpec } from './policy-spec';
+import type { PolicySpec } from './policy-spec';
 
-/**
- * 
- * @export
- * @interface Policy
- */
 export interface Policy {
-    /**
-     * 
-     * @type {string}
-     * @memberof Policy
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Policy
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Policy
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {PolicySpec}
-     * @memberof Policy
-     */
     'spec': PolicySpec;
 }
 

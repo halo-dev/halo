@@ -13,7 +13,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { stores, utils } from "@halo-dev/console-shared";
+import { stores, utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";

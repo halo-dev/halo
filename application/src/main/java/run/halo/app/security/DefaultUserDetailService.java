@@ -6,6 +6,7 @@ import static run.halo.app.security.authorization.AuthorityUtils.AUTHENTICATED_R
 import static run.halo.app.security.authorization.AuthorityUtils.ROLE_PREFIX;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
@@ -19,6 +20,7 @@ import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.security.authentication.login.HaloUser;
 import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 
+@Slf4j
 public class DefaultUserDetailService
     implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
 
@@ -45,9 +47,19 @@ public class DefaultUserDetailService
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userService.getUser(username)
+        var getUser = Mono.defer(() -> {
+            var isEmail = username.contains("@");
+            if (isEmail) {
+                log.debug("Try to authenticate by email: {}", username);
+                return userService.findUserByVerifiedEmail(username);
+            } else {
+                log.debug("Try to authenticate by username: {}", username);
+                return userService.getUser(username);
+            }
+        });
+        return getUser.switchIfEmpty(Mono.error(() -> new UserNotFoundException(username)))
             .onErrorMap(UserNotFoundException.class,
-                e -> new BadCredentialsException("Invalid Credentials"))
+                ignored -> new BadCredentialsException("Invalid Credentials"))
             .flatMap(user -> {
                 var name = user.getMetadata().getName();
                 var userBuilder = User.withUsername(name)

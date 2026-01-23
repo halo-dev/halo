@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { CategoryVo } from '../models';
+import type { CategoryVo } from '../models';
 // @ts-ignore
-import { CategoryVoList } from '../models';
+import type { CategoryVoList } from '../models';
 // @ts-ignore
-import { ListedPostVoList } from '../models';
+import type { ListedPostVoList } from '../models';
 /**
  * CategoryV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -207,7 +206,6 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
 
 /**
  * CategoryV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CategoryV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -262,7 +260,6 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
 
 /**
  * CategoryV1alpha1PublicApi - factory interface
- * @export
  */
 export const CategoryV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = CategoryV1alpha1PublicApiFp(configuration)
@@ -299,114 +296,81 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
 
 /**
  * Request parameters for queryCategories operation in CategoryV1alpha1PublicApi.
- * @export
- * @interface CategoryV1alpha1PublicApiQueryCategoriesRequest
  */
 export interface CategoryV1alpha1PublicApiQueryCategoriesRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1PublicApiQueryCategories
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1PublicApiQueryCategories
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryCategories
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryCategories
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryCategories
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for queryCategoryByName operation in CategoryV1alpha1PublicApi.
- * @export
- * @interface CategoryV1alpha1PublicApiQueryCategoryByNameRequest
  */
 export interface CategoryV1alpha1PublicApiQueryCategoryByNameRequest {
     /**
      * Category name
-     * @type {string}
-     * @memberof CategoryV1alpha1PublicApiQueryCategoryByName
      */
     readonly name: string
 }
 
 /**
  * Request parameters for queryPostsByCategoryName operation in CategoryV1alpha1PublicApi.
- * @export
- * @interface CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest
  */
 export interface CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest {
     /**
      * Category name
-     * @type {string}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly name: string
 
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof CategoryV1alpha1PublicApiQueryPostsByCategoryName
      */
     readonly sort?: Array<string>
 }
 
 /**
  * CategoryV1alpha1PublicApi - object-oriented interface
- * @export
- * @class CategoryV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class CategoryV1alpha1PublicApi extends BaseAPI {
     /**
@@ -414,7 +378,6 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @param {CategoryV1alpha1PublicApiQueryCategoriesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1PublicApi
      */
     public queryCategories(requestParameters: CategoryV1alpha1PublicApiQueryCategoriesRequest = {}, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1PublicApiFp(this.configuration).queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -425,7 +388,6 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @param {CategoryV1alpha1PublicApiQueryCategoryByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1PublicApi
      */
     public queryCategoryByName(requestParameters: CategoryV1alpha1PublicApiQueryCategoryByNameRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1PublicApiFp(this.configuration).queryCategoryByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -436,7 +398,6 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
      * @param {CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CategoryV1alpha1PublicApi
      */
     public queryPostsByCategoryName(requestParameters: CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest, options?: RawAxiosRequestConfig) {
         return CategoryV1alpha1PublicApiFp(this.configuration).queryPostsByCategoryName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));

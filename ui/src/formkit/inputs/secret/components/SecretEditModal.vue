@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { Q_KEY } from "../composables/use-secrets-fetch";
-import type { SecretFormState } from "../types";
+import type { RequiredKey, SecretFormState } from "../types";
 import SecretForm from "./SecretForm.vue";
 
 const { t } = useI18n();
@@ -15,8 +15,9 @@ const queryClient = useQueryClient();
 const props = withDefaults(
   defineProps<{
     secret: Secret;
+    requiredKeys?: RequiredKey[];
   }>(),
-  {}
+  { requiredKeys: () => [] }
 );
 
 const emit = defineEmits<{
@@ -28,13 +29,15 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 const { mutate, isLoading } = useMutation({
   mutationKey: ["create-secret"],
   mutationFn: async ({ data }: { data: SecretFormState }) => {
-    const stringData = data.stringDataArray.reduce(
-      (acc, { key, value }) => {
-        acc[key] = value;
-        return acc;
-      },
-      {} as Record<string, string>
-    );
+    const stringData = data.stringDataArray
+      .filter(({ key }) => !!key)
+      .reduce(
+        (acc, { key, value }) => {
+          acc[key] = value || "";
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
     return await coreApiClient.secret.patchSecret({
       name: props.secret.metadata.name,
@@ -71,8 +74,8 @@ const formState: SecretFormState = {
     props.secret.metadata.annotations?.[secretAnnotations.DESCRIPTION],
   stringDataArray: Object.entries(props.secret.stringData || {}).map(
     ([key, value]) => ({
-      key,
-      value,
+      key: key || "",
+      value: value || "",
     })
   ),
 };
@@ -81,11 +84,17 @@ const formState: SecretFormState = {
 <template>
   <VModal
     ref="modal"
+    mount-to-body
     :title="$t('core.formkit.secret.edit_modal.title')"
     :width="600"
+    :centered="false"
     @close="emit('close')"
   >
-    <SecretForm :form-state="formState" @submit="onSubmit" />
+    <SecretForm
+      :form-state="formState"
+      :required-keys="requiredKeys"
+      @submit="onSubmit"
+    />
 
     <template #footer>
       <VSpace>

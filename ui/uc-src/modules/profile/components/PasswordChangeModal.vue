@@ -4,7 +4,7 @@ import { PASSWORD_REGEX } from "@/constants/regex";
 import { setFocus } from "@/formkit/utils/focus";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 
 const emit = defineEmits<{

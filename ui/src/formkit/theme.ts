@@ -44,9 +44,13 @@ const theme: Record<string, Record<string, string>> = {
   button: buttonClassification,
   color: {
     ...textClassification,
-    inner: "",
+    inner: "inline-flex items-center gap-1",
     input:
-      "w-16 h-8 appearance-none cursor-pointer border border-gray-300 rounded-md mb-2 p-1",
+      "w-16 h-8 appearance-none cursor-pointer border border-gray-300 rounded-md p-1",
+  },
+  iconify: {
+    ...textClassification,
+    inner: "inline-flex items-center gap-1",
   },
   file: {
     ...textClassification,
@@ -57,6 +61,10 @@ const theme: Record<string, Record<string, string>> = {
   checkbox: {
     ...boxClassification,
     wrapper: "flex items-center mb-1 cursor-pointer",
+  },
+  switch: {
+    ...boxClassification,
+    wrapper: "flex items-center mb-1 gap-2 cursor-pointer",
   },
   radio: {
     ...boxClassification,
@@ -105,6 +113,22 @@ const theme: Record<string, Record<string, string>> = {
     control:
       "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
+  array: {
+    label: textClassification.label,
+    wrapper: "flex flex-col gap-0",
+    help: "!mt-1",
+  },
+  toggle: {
+    label: textClassification.label,
+    wrapper: textClassification.wrapper,
+    help: "mb-1 !mt-0",
+    inner: "inline-flex items-center gap-1",
+  },
+  attachment: {
+    label: textClassification.label,
+    inner: "inline-flex w-full",
+    wrapper: "flex flex-col gap-4 w-full",
+  },
   list: {
     label: textClassification.label,
     legend: `${textClassification.label} px-2`,
@@ -141,8 +165,7 @@ const theme: Record<string, Record<string, string>> = {
     "post-tag-close":
       "h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900",
     "post-tags-button": "inline-flex h-full cursor-pointer items-center px-1",
-    "dropdown-wrapper":
-      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+    "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   categorySelect: {
     ...textClassification,
@@ -152,13 +175,12 @@ const theme: Record<string, Record<string, string>> = {
     "post-categories": "flex w-full flex-wrap items-center",
     "post-categories-button":
       "inline-flex h-full cursor-pointer items-center px-1",
-    "dropdown-wrapper":
-      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+    "dropdown-wrapper": "max-h-96 w-full overflow-auto bg-white",
   },
   secret: {
-    ...textClassification,
-    inner: `${textClassification.inner} !overflow-visible min-h-[2.25rem] !border-none`,
-    input: `w-0 flex-grow bg-transparent py-1 px-3 block transition-all text-sm`,
+    inner: "w-full sm:max-w-lg",
+    wrapper: textClassification.wrapper,
+    label: textClassification.label,
   },
 };
 

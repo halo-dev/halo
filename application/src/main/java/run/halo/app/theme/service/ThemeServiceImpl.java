@@ -1,7 +1,6 @@
 package run.halo.app.theme.service;
 
 import static org.springframework.util.FileSystemUtils.copyRecursively;
-import static run.halo.app.infra.utils.FileUtils.createTempDir;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 import static run.halo.app.theme.service.ThemeUtils.loadThemeManifest;
@@ -21,6 +20,7 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
@@ -49,6 +49,8 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.SystemConfigFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeAlreadyExistsException;
@@ -72,21 +74,33 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final SystemVersionSupplier systemVersionSupplier;
 
+    private final SystemConfigFetcher systemConfigFetcher;
+
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
     @Override
     public Mono<Void> installPresetTheme() {
         var themeProps = haloProperties.getTheme();
         var location = themeProps.getInitializer().getLocation();
-        return createThemeTempPath()
-            .flatMap(tempPath -> Mono.usingWhen(copyPresetThemeToPath(location, tempPath),
-                path -> {
-                    var content = DataBufferUtils.read(new FileSystemResource(path),
+        return Mono.using(
+                () -> Files.createTempDirectory("halo-theme-preset"),
+                tempDir -> Mono.fromCallable(() -> {
+                    var themeUrl = ResourceUtils.getURL(location);
+                    var resource = new UrlResource(themeUrl);
+                    var tempThemePath = tempDir.resolve("theme.zip");
+                    FileUtils.copyResource(resource, tempThemePath);
+                    return tempThemePath;
+                }).flatMap(themePath -> {
+                    var content = DataBufferUtils.read(new FileSystemResource(themePath),
                         DefaultDataBufferFactory.sharedInstance,
                         StreamUtils.BUFFER_SIZE);
-                    return install(content);
-                }, path -> deleteRecursivelyAndSilently(tempPath, scheduler)
-            ))
+                    // We don't want to run on the bounded elastic scheduler again, so pass null
+                    // here.
+                    return doInstall(content, null);
+                }),
+                FileUtils::deleteRecursivelyAndSilently
+            )
+            .subscribeOn(scheduler)
             .onErrorResume(IOException.class, e -> {
                 log.warn("Failed to initialize theme from {}", location, e);
                 return Mono.empty();
@@ -98,42 +112,28 @@ public class ThemeServiceImpl implements ThemeService {
             .then();
     }
 
-    private Mono<Path> copyPresetThemeToPath(String location, Path tempDir) {
-        return Mono.fromCallable(
-            () -> {
-                var themeUrl = ResourceUtils.getURL(location);
-                var resource = new UrlResource(themeUrl);
-                var tempThemePath = tempDir.resolve("theme.zip");
-                FileUtils.copyResource(resource, tempThemePath);
-                return tempThemePath;
-            });
-    }
-
-    private static Mono<Path> createThemeTempPath() {
-        return Mono.fromCallable(() -> Files.createTempDirectory("halo-theme-preset"))
-            .subscribeOn(Schedulers.boundedElastic());
-    }
-
     @Override
     public Mono<Theme> install(Publisher<DataBuffer> content) {
-        var themeRoot = this.themeRoot.get();
-        return unzipThemeTo(content, themeRoot, scheduler)
-            .flatMap(theme -> persistent(theme, false));
+        return doInstall(content, this.scheduler);
     }
 
     @Override
     public Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content) {
         var checkTheme = client.fetch(Theme.class, themeName)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "The given theme with name " + themeName + " did not exist")));
-        var upgradeTheme = Mono.usingWhen(
-            createTempDir("halo-theme-", scheduler),
+                "The given theme with name " + themeName + " did not exist")
+            ));
+        var upgradeTheme = Mono.using(
+            () -> Files.createTempDirectory("halo-theme-"),
             tempDir -> {
-                var locateThemeManifest = Mono.fromCallable(() -> locateThemeManifest(tempDir)
-                    .orElseThrow(() -> new ThemeUpgradeException(
+                var locateThemeManifest = Mono.fromCallable(
+                        () -> locateThemeManifest(tempDir).orElse(null)
+                    )
+                    .switchIfEmpty(Mono.error(() -> new ThemeUpgradeException(
                         "Missing theme manifest file: theme.yaml or theme.yml",
-                        "problemDetail.theme.upgrade.missingManifest", null)));
-                return unzip(content, tempDir, scheduler)
+                        "problemDetail.theme.upgrade.missingManifest", null)
+                    ));
+                return unzip(content, tempDir)
                     .then(locateThemeManifest)
                     .flatMap(themeManifest -> {
                         if (log.isDebugEnabled()) {
@@ -150,22 +150,25 @@ public class ThemeServiceImpl implements ThemeService {
                                 "problemDetail.theme.upgrade.nameMismatch",
                                 new Object[] {newTheme.getMetadata().getName(), themeName}));
                         }
-
                         var copyTheme = Mono.fromCallable(() -> {
                             var themePath = themeRoot.get().resolve(themeName);
+                            // TODO Create backup before deleting
+                            deleteRecursivelyAndSilently(themePath);
                             copyRecursively(themeManifest.getParent(), themePath);
                             return themePath;
                         });
-
-                        return deleteThemeAndWaitForComplete(themeName)
-                            .then(copyTheme)
-                            .then(this.persistent(newTheme, true));
+                        return copyTheme.then(this.persistent(newTheme, true));
                     });
             },
-            tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
-        );
-
+            FileUtils::deleteRecursivelyAndSilently
+        ).subscribeOn(scheduler);
         return checkTheme.then(upgradeTheme);
+    }
+
+    private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler) {
+        var themeRoot = this.themeRoot.get();
+        return unzipThemeTo(content, themeRoot, scheduler)
+            .flatMap(theme -> persistent(theme, false));
     }
 
     /**
@@ -180,10 +183,18 @@ public class ThemeServiceImpl implements ThemeService {
     private Mono<Theme> persistent(Unstructured themeManifest, boolean isUpgrade) {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
             "Theme manifest kind must be Theme.");
-        return client.create(themeManifest)
-            .map(theme -> Unstructured.OBJECT_MAPPER.convertValue(theme, Theme.class))
+        var newTheme = Unstructured.OBJECT_MAPPER.convertValue(themeManifest, Theme.class);
+        final Mono<Theme> createOrUpdateTheme;
+        if (isUpgrade) {
+            createOrUpdateTheme = client.get(Theme.class, newTheme.getMetadata().getName())
+                .doOnNext(theme -> updateTheme(theme, newTheme))
+                .flatMap(client::update);
+        } else {
+            createOrUpdateTheme = client.create(newTheme);
+        }
+        return createOrUpdateTheme
             .doOnNext(theme -> {
-                String systemVersion = systemVersionSupplier.get().getNormalVersion();
+                String systemVersion = systemVersionSupplier.get().toStableVersion().toString();
                 String requires = theme.getSpec().getRequires();
                 if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
                     throw new UnsatisfiedAttributeValueException(
@@ -218,7 +229,8 @@ public class ThemeServiceImpl implements ThemeService {
                         }
                         return client.create(unstructured);
                     })
-                    .then(Mono.just(theme));
+                    .then()
+                    .thenReturn(theme);
             });
     }
 
@@ -289,6 +301,17 @@ public class ThemeServiceImpl implements ThemeService {
                     .map(SettingUtils::settingDefinedDefaultValueMap)
                     .flatMap(data -> updateConfigMapData(configMapName, data));
             });
+    }
+
+    @Override
+    public Mono<Theme> fetchActivatedTheme() {
+        return fetchSystemSetting().mapNotNull(SystemSetting.Theme::getActive)
+            .flatMap(name -> client.fetch(Theme.class, name));
+    }
+
+    @Override
+    public Mono<SystemSetting.Theme> fetchSystemSetting() {
+        return systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class);
     }
 
     private Mono<ConfigMap> updateConfigMapData(String configMapName, Map<String, String> data) {
@@ -428,4 +451,41 @@ public class ThemeServiceImpl implements ThemeService {
                 && (this.name == null || this.name.equals(unstructured.getMetadata().getName()));
         }
     }
+
+    private static void updateTheme(Theme existing, Theme updating) {
+        var existingSpec = existing.getSpec();
+        var updatingSpec = updating.getSpec();
+        // merge spec
+        existingSpec.setAuthor(updatingSpec.getAuthor());
+        existingSpec.setCustomTemplates(updatingSpec.getCustomTemplates());
+        existingSpec.setDescription(updatingSpec.getDescription());
+        existingSpec.setDisplayName(updatingSpec.getDisplayName());
+        existingSpec.setHomepage(updatingSpec.getHomepage());
+        existingSpec.setIssues(updatingSpec.getIssues());
+        existingSpec.setLicense(updatingSpec.getLicense());
+        existingSpec.setLogo(updatingSpec.getLogo());
+        existingSpec.setRepo(updatingSpec.getRepo());
+        existingSpec.setSettingName(updatingSpec.getSettingName());
+        existingSpec.setVersion(updatingSpec.getVersion());
+        existingSpec.setRequires(updatingSpec.getRequires());
+        // Do not overwrite configMapName to avoid data loss
+
+        var existingMeta = existing.getMetadata();
+        var updatingMeta = updating.getMetadata();
+        // merge labels
+        if (updatingMeta.getLabels() != null) {
+            if (existingMeta.getLabels() == null) {
+                existingMeta.setLabels(new HashMap<>());
+            }
+            existingMeta.getLabels().putAll(updatingMeta.getLabels());
+        }
+        // merge annotations
+        if (updatingMeta.getAnnotations() != null) {
+            if (existingMeta.getAnnotations() == null) {
+                existingMeta.setAnnotations(new HashMap<>());
+            }
+            existingMeta.getAnnotations().putAll(updatingMeta.getAnnotations());
+        }
+    }
+
 }

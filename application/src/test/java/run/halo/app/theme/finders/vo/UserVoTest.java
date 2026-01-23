@@ -3,7 +3,6 @@ package run.halo.app.theme.finders.vo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
-import java.util.List;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -37,12 +36,6 @@ class UserVoTest {
         user.getSpec().setTwoFactorAuthEnabled(false);
 
         user.setStatus(new User.UserStatus());
-        user.getStatus().setLastLoginAt(Instant.parse("2022-01-02T00:00:00.00Z"));
-        User.LoginHistory loginHistory = new User.LoginHistory();
-        loginHistory.setLoginAt(Instant.parse("2022-01-02T00:00:00.00Z"));
-        loginHistory.setReason("login reason");
-        loginHistory.setUserAgent("user agent");
-        user.getStatus().setLoginHistories(List.of(loginHistory));
 
         UserVo userVo = UserVo.from(user);
         JSONAssert.assertEquals("""
@@ -64,7 +57,6 @@ class UserVoTest {
                         "loginHistoryLimit": 5
                     },
                     "status": {
-                        "loginHistories": []
                     }
                 }
                 """,

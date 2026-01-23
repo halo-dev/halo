@@ -20,7 +20,7 @@ public interface IndexSpecs<E extends Extension> {
      *                                  the index spec is invalid
      */
     default <K extends Comparable<K>> void add(IndexSpec<E, K> indexSpec) {
-        add((ValueIndexSpec<E, K>) indexSpec);
+        add(indexSpec.normalize());
     }
 
     <K extends Comparable<K>> void add(ValueIndexSpec<E, K> indexSpec);

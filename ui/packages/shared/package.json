@@ -1,7 +1,7 @@
 {
-  "name": "@halo-dev/console-shared",
+  "name": "@halo-dev/ui-shared",
   "type": "module",
-  "version": "2.21.0",
+  "version": "2.22.1",
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
@@ -35,10 +35,15 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@halo-dev/api-client": "workspace:*"
+    "@halo-dev/api-client": "workspace:*",
+    "mitt": "^3.0.1"
   },
   "peerDependencies": {
-    "vue": "^3.5.16",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.x",
+    "vue-router": "^4.6.x"
+  },
+  "devDependencies": {
+    "dayjs": "^1.11.19",
+    "uuid": "^13.0.0"
   }
 }

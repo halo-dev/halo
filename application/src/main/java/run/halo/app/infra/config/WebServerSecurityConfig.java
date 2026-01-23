@@ -3,11 +3,8 @@ package run.halo.app.infra.config;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.session.autoconfigure.SessionProperties;
-import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,8 +21,6 @@ import org.springframework.security.web.server.context.WebSessionServerSecurityC
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
-import org.springframework.session.MapSession;
-import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.infra.AnonymousUserConst;
@@ -36,8 +31,6 @@ import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.impl.RsaKeyService;
 import run.halo.app.security.authorization.AuthorityUtils;
-import run.halo.app.security.session.InMemoryReactiveIndexedSessionRepository;
-import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 
 /**
  * Security configuration for WebFlux.
@@ -45,7 +38,6 @@ import run.halo.app.security.session.ReactiveIndexedSessionRepository;
  * @author johnniang
  */
 @Configuration
-@EnableSpringWebSession
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @RequiredArgsConstructor
@@ -114,17 +106,6 @@ public class WebServerSecurityConfig {
     @Bean
     ServerSecurityContextRepository securityContextRepository() {
         return new WebSessionServerSecurityContextRepository();
-    }
-
-    @Bean
-    public ReactiveIndexedSessionRepository<MapSession> reactiveSessionRepository(
-        SessionProperties sessionProperties,
-        ServerProperties serverProperties) {
-        var repository = new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
-        var timeout = sessionProperties.determineTimeout(
-            () -> serverProperties.getReactive().getSession().getTimeout());
-        repository.setDefaultMaxInactiveInterval(timeout);
-        return repository;
     }
 
     @Bean

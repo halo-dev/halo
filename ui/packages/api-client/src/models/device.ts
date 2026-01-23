@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { DeviceSpec } from './device-spec';
+import type { DeviceSpec } from './device-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { DeviceStatus } from './device-status';
+import type { DeviceStatus } from './device-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface Device
- */
 export interface Device {
-    /**
-     * 
-     * @type {string}
-     * @memberof Device
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Device
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Device
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {DeviceSpec}
-     * @memberof Device
-     */
     'spec': DeviceSpec;
-    /**
-     * 
-     * @type {DeviceStatus}
-     * @memberof Device
-     */
     'status': DeviceStatus;
 }
 

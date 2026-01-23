@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 
 withDefaults(
   defineProps<{

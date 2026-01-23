@@ -14,41 +14,11 @@
 
 
 
-/**
- * 
- * @export
- * @interface ExtensionPointSpec
- */
 export interface ExtensionPointSpec {
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointSpec
-     */
     'className': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointSpec
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointSpec
-     */
     'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointSpec
-     */
     'icon'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ExtensionPointSpec
-     */
     'type': ExtensionPointSpecTypeEnum;
 }
 

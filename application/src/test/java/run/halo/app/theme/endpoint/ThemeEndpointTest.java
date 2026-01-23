@@ -38,8 +38,7 @@ import run.halo.app.core.user.service.SettingConfigService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
-import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.theme.TemplateEngineManager;
 import run.halo.app.theme.service.ThemeService;
@@ -66,7 +65,7 @@ class ThemeEndpointTest {
     private ReactiveExtensionClient client;
 
     @Mock
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private SystemConfigFetcher environmentFetcher;
 
     @Mock
     private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
@@ -268,20 +267,16 @@ class ThemeEndpointTest {
 
     @Test
     void fetchActivatedTheme() {
-        when(environmentFetcher.fetch(eq(SystemSetting.Theme.GROUP), eq(SystemSetting.Theme.class)))
-            .thenReturn(Mono.fromSupplier(() -> {
-                SystemSetting.Theme theme = new SystemSetting.Theme();
-                theme.setActive("fake-activated");
-                return theme;
-            }));
-
-        when(client.fetch(eq(Theme.class), eq("fake-activated"))).thenReturn(Mono.empty());
+        var theme = new Theme();
+        theme.setMetadata(new Metadata());
+        theme.getMetadata().setName("fake-activated");
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(theme));
         webTestClient.get()
             .uri("/themes/-/activation")
             .exchange()
-            .expectStatus().isOk();
-
-        verify(client).fetch(eq(Theme.class), eq("fake-activated"));
+            .expectStatus().isOk()
+            .expectBody(Theme.class)
+            .isEqualTo(theme);
     }
 
     @Test

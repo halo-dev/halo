@@ -14,17 +14,7 @@
 
 
 
-/**
- * 
- * @export
- * @interface EmailVerifyRequest
- */
 export interface EmailVerifyRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof EmailVerifyRequest
-     */
     'email': string;
 }
 

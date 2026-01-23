@@ -2,13 +2,13 @@
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { roleLabels } from "@/constants/labels";
 import type { User } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation } from "@tanstack/vue-query";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useFetchRoles, useFetchRoleTemplates } from "../composables/use-role";
 import RolesView from "./RolesView.vue";
 
 const { t } = useI18n();
@@ -59,36 +59,15 @@ function onSubmit(data: { roles: string[] }) {
   mutate({ roles: data.roles });
 }
 
-const { data: allRoles } = useQuery({
-  queryKey: ["core:roles"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`!${roleLabels.TEMPLATE}`],
-    });
-    return data;
-  },
-});
-
-const { data: allRoleTemplates } = useQuery({
-  queryKey: ["core:role-templates"],
-  queryFn: async () => {
-    const { data } = await coreApiClient.role.listRole({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
-  },
-});
+const { data: allRoles } = useFetchRoles();
+const { data: allRoleTemplates } = useFetchRoleTemplates();
 
 const currentRoleTemplates = computed(() => {
   if (!selectedRoleNames.value.length) {
     return [];
   }
 
-  const selectedRoles = allRoles.value?.items.filter((role) =>
+  const selectedRoles = allRoles.value?.filter((role) =>
     selectedRoleNames.value.includes(role.metadata.name)
   );
 

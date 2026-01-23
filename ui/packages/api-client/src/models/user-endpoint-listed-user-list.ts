@@ -15,66 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListedUser } from './listed-user';
+import type { ListedUser } from './listed-user';
 
-/**
- * 
- * @export
- * @interface UserEndpointListedUserList
- */
 export interface UserEndpointListedUserList {
     /**
      * Indicates whether current page is the first page.
-     * @type {boolean}
-     * @memberof UserEndpointListedUserList
      */
     'first': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof UserEndpointListedUserList
      */
     'hasNext': boolean;
     /**
      * Indicates whether current page has previous page.
-     * @type {boolean}
-     * @memberof UserEndpointListedUserList
      */
     'hasPrevious': boolean;
     /**
      * A chunk of items.
-     * @type {Array<ListedUser>}
-     * @memberof UserEndpointListedUserList
      */
     'items': Array<ListedUser>;
     /**
      * Indicates whether current page is the last page.
-     * @type {boolean}
-     * @memberof UserEndpointListedUserList
      */
     'last': boolean;
     /**
      * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof UserEndpointListedUserList
      */
     'page': number;
     /**
      * Size of each page. If not set or equal to 0, it means no pagination.
-     * @type {number}
-     * @memberof UserEndpointListedUserList
      */
     'size': number;
     /**
      * Total elements.
-     * @type {number}
-     * @memberof UserEndpointListedUserList
      */
     'total': number;
     /**
      * Indicates total pages.
-     * @type {number}
-     * @memberof UserEndpointListedUserList
      */
     'totalPages': number;
 }

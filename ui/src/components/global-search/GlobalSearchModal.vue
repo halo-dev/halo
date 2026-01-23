@@ -1,6 +1,24 @@
 <script lang="ts" setup>
 import { useThemeStore } from "@console/stores/theme";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+  type Attachment,
+  type AttachmentV1alpha1ApiListAttachmentRequest,
+  type Category,
+  type CategoryV1alpha1ApiListCategoryRequest,
+  type Plugin,
+  type PluginV1alpha1ApiListPluginRequest,
+  type Post,
+  type PostV1alpha1ApiListPostRequest,
+  type SinglePage,
+  type SinglePageV1alpha1ApiListSinglePageRequest,
+  type Tag,
+  type TagV1alpha1ApiListTagRequest,
+  type User,
+  type UserV1alpha1ApiListUserRequest,
+} from "@halo-dev/api-client";
 import {
   IconBookRead,
   IconFolder,
@@ -11,7 +29,7 @@ import {
   IconUserSettings,
   VModal,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useEventListener } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { storeToRefs } from "pinia";
@@ -76,32 +94,39 @@ const handleBuildSearchIndex = () => {
   });
 
   if (utils.permission.has(["system:users:view"])) {
-    coreApiClient.user
-      .listUser({
+    paginate<UserV1alpha1ApiListUserRequest, User>(
+      (params) => coreApiClient.user.listUser(params),
+      {
         labelSelector: ["!halo.run/hidden-user"],
-      })
-      .then((response) => {
-        response.data.items.forEach((user) => {
-          fuse.add({
-            title: user.spec.displayName,
-            icon: {
-              component: markRaw(IconUserSettings),
+        size: 1000,
+      }
+    ).then((users) => {
+      for (const user of users) {
+        fuse.add({
+          title: user.spec.displayName,
+          icon: {
+            component: markRaw(IconUserSettings),
+          },
+          group: t("core.components.global_search.groups.user"),
+          route: {
+            name: "UserDetail",
+            params: {
+              name: user.metadata.name,
             },
-            group: t("core.components.global_search.groups.user"),
-            route: {
-              name: "UserDetail",
-              params: {
-                name: user.metadata.name,
-              },
-            },
-          });
+          },
         });
-      });
+      }
+    });
   }
 
   if (utils.permission.has(["system:plugins:view"])) {
-    coreApiClient.plugin.plugin.listPlugin().then((response) => {
-      response.data.items.forEach((plugin) => {
+    paginate<PluginV1alpha1ApiListPluginRequest, Plugin>(
+      (params) => coreApiClient.plugin.plugin.listPlugin(params),
+      {
+        size: 1000,
+      }
+    ).then((plugins) => {
+      for (const plugin of plugins) {
         fuse.add({
           title: plugin.spec.displayName as string,
           icon: {
@@ -115,13 +140,18 @@ const handleBuildSearchIndex = () => {
             },
           },
         });
-      });
+      }
     });
   }
 
   if (utils.permission.has(["system:posts:view"])) {
-    coreApiClient.content.post.listPost().then((response) => {
-      response.data.items.forEach((post) => {
+    paginate<PostV1alpha1ApiListPostRequest, Post>(
+      (params) => coreApiClient.content.post.listPost(params),
+      {
+        size: 1000,
+      }
+    ).then((posts) => {
+      for (const post of posts) {
         fuse.add({
           title: post.spec.title,
           icon: {
@@ -135,57 +165,66 @@ const handleBuildSearchIndex = () => {
             },
           },
         });
-      });
+      }
     });
 
-    coreApiClient.content.category
-      .listCategory({
+    paginate<CategoryV1alpha1ApiListCategoryRequest, Category>(
+      (params) => coreApiClient.content.category.listCategory(params),
+      {
+        size: 1000,
         sort: ["metadata.creationTimestamp,desc"],
-      })
-      .then((response) => {
-        response.data.items.forEach((category) => {
-          fuse.add({
-            title: category.spec.displayName,
-            icon: {
-              component: markRaw(IconBookRead),
+      }
+    ).then((categories) => {
+      for (const category of categories) {
+        fuse.add({
+          title: category.spec.displayName,
+          icon: {
+            component: markRaw(IconBookRead),
+          },
+          group: t("core.components.global_search.groups.category"),
+          route: {
+            name: "Categories",
+            query: {
+              name: category.metadata.name,
             },
-            group: t("core.components.global_search.groups.category"),
-            route: {
-              name: "Categories",
-              query: {
-                name: category.metadata.name,
-              },
-            },
-          });
+          },
         });
-      });
+      }
+    });
 
-    coreApiClient.content.tag
-      .listTag({
+    paginate<TagV1alpha1ApiListTagRequest, Tag>(
+      (params) => coreApiClient.content.tag.listTag(params),
+      {
+        size: 1000,
         sort: ["metadata.creationTimestamp,desc"],
-      })
-      .then((response) => {
-        response.data.items.forEach((tag) => {
-          fuse.add({
-            title: tag.spec.displayName,
-            icon: {
-              component: markRaw(IconBookRead),
+      }
+    ).then((tags) => {
+      for (const tag of tags) {
+        fuse.add({
+          title: tag.spec.displayName,
+          icon: {
+            component: markRaw(IconBookRead),
+          },
+          group: t("core.components.global_search.groups.tag"),
+          route: {
+            name: "Tags",
+            query: {
+              name: tag.metadata.name,
             },
-            group: t("core.components.global_search.groups.tag"),
-            route: {
-              name: "Tags",
-              query: {
-                name: tag.metadata.name,
-              },
-            },
-          });
+          },
         });
-      });
+      }
+    });
   }
 
   if (utils.permission.has(["system:singlepages:view"])) {
-    coreApiClient.content.singlePage.listSinglePage().then((response) => {
-      response.data.items.forEach((singlePage) => {
+    paginate<SinglePageV1alpha1ApiListSinglePageRequest, SinglePage>(
+      (params) => coreApiClient.content.singlePage.listSinglePage(params),
+      {
+        size: 1000,
+      }
+    ).then((singlePages) => {
+      for (const singlePage of singlePages) {
         fuse.add({
           title: singlePage.spec.title,
           icon: {
@@ -199,13 +238,18 @@ const handleBuildSearchIndex = () => {
             },
           },
         });
-      });
+      }
     });
   }
 
   if (utils.permission.has(["system:attachments:view"])) {
-    coreApiClient.storage.attachment.listAttachment().then((response) => {
-      response.data.items.forEach((attachment) => {
+    paginate<AttachmentV1alpha1ApiListAttachmentRequest, Attachment>(
+      (params) => coreApiClient.storage.attachment.listAttachment(params),
+      {
+        size: 1000,
+      }
+    ).then((attachments) => {
+      for (const attachment of attachments) {
         fuse.add({
           title: attachment.spec.displayName as string,
           icon: {
@@ -219,7 +263,7 @@ const handleBuildSearchIndex = () => {
             },
           },
         });
-      });
+      }
     });
   }
 

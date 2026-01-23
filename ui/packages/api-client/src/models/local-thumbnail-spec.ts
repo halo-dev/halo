@@ -14,47 +14,21 @@
 
 
 
-/**
- * 
- * @export
- * @interface LocalThumbnailSpec
- */
 export interface LocalThumbnailSpec {
     /**
      * Consider the compatibility of the system and migration, use unix-style relative paths  here.
-     * @type {string}
-     * @memberof LocalThumbnailSpec
      */
     'filePath': string;
     /**
      * A hash signature for the image uri.
-     * @type {string}
-     * @memberof LocalThumbnailSpec
      */
     'imageSignature': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalThumbnailSpec
-     */
     'imageUri': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalThumbnailSpec
-     */
     'size': LocalThumbnailSpecSizeEnum;
     /**
      * A hash signature for the thumbnail uri.
-     * @type {string}
-     * @memberof LocalThumbnailSpec
      */
     'thumbSignature': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalThumbnailSpec
-     */
     'thumbnailUri': string;
 }
 

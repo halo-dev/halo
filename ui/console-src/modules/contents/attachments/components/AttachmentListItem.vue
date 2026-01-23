@@ -13,7 +13,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import type { Ref } from "vue";
@@ -34,7 +34,7 @@ const props = withDefaults(
 
 const { attachment } = toRefs(props);
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 
 const emit = defineEmits<{
   (event: "select", attachment?: Attachment): void;
@@ -78,7 +78,7 @@ const handleDelete = () => {
   });
 };
 
-const { operationItems } = useOperationItemExtensionPoint<Attachment>(
+const { data: operationItems } = useOperationItemExtensionPoint<Attachment>(
   "attachment:list-item:operation:create",
   attachment,
   computed((): OperationItem<Attachment>[] => [
@@ -212,7 +212,7 @@ const { operationItems } = useOperationItemExtensionPoint<Attachment>(
     </template>
     <template #dropdownItems>
       <EntityDropdownItems
-        :dropdown-items="operationItems"
+        :dropdown-items="operationItems || []"
         :item="attachment"
       />
     </template>

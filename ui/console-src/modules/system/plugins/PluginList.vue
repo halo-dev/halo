@@ -2,7 +2,9 @@
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
+  paginate,
   type Plugin,
+  type PluginV1alpha1ConsoleApiListPluginsRequest,
 } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -20,7 +22,7 @@ import {
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
@@ -36,14 +38,7 @@ const pluginInstallationModalVisible = ref(false);
 
 const keyword = useRouteQuery<string>("keyword", "");
 
-const selectedEnabledValue = useRouteQuery<
-  string | undefined,
-  boolean | undefined
->("enabled", undefined, {
-  transform: (value) => {
-    return value ? value === "true" : undefined;
-  },
-});
+const selectedEnabledValue = useRouteQuery<string | undefined>("enabled");
 const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 const hasFilters = computed(() => {
@@ -55,22 +50,20 @@ function handleClearFilters() {
   selectedEnabledValue.value = undefined;
 }
 
-const total = ref(0);
-
-const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
+const { data, isLoading, isFetching, refetch } = useQuery({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
-    const { data } = await consoleApiClient.plugin.plugin.listPlugins({
-      page: 0,
-      size: 0,
-      keyword: keyword.value,
-      enabled: selectedEnabledValue.value,
-      sort: [selectedSortValue.value].filter(Boolean) as string[],
-    });
-
-    total.value = data.total;
-
-    return data.items;
+    return await paginate<PluginV1alpha1ConsoleApiListPluginsRequest, Plugin>(
+      (params) => consoleApiClient.plugin.plugin.listPlugins(params),
+      {
+        size: 1000,
+        keyword: keyword.value,
+        enabled: selectedEnabledValue.value
+          ? JSON.parse(selectedEnabledValue.value)
+          : undefined,
+        sort: [selectedSortValue.value].filter(Boolean) as string[],
+      }
+    );
   },
   keepPreviousData: true,
   refetchInterval: (data) => {
@@ -251,11 +244,11 @@ onMounted(() => {
                   },
                   {
                     label: t('core.plugin.filters.status.items.active'),
-                    value: true,
+                    value: 'true',
                   },
                   {
                     label: t('core.plugin.filters.status.items.inactive'),
-                    value: false,
+                    value: 'false',
                   },
                 ]"
               />
@@ -334,7 +327,11 @@ onMounted(() => {
       <template #footer>
         <div class="flex h-8 items-center">
           <span class="text-sm text-gray-500">
-            {{ $t("core.components.pagination.total_label", { total: total }) }}
+            {{
+              $t("core.components.pagination.total_label", {
+                total: data?.length,
+              })
+            }}
           </span>
         </div>
       </template>

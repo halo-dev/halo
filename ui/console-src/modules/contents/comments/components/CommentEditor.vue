@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { usePluginModuleStore } from "@/stores/plugin";
 import { VLoading } from "@halo-dev/components";
-import type { CommentEditorProvider } from "@halo-dev/console-shared";
+import type { CommentEditorProvider } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { markRaw } from "vue";
 import DefaultCommentEditor from "./DefaultCommentEditor.vue";

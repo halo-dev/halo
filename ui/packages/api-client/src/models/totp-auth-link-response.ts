@@ -14,23 +14,11 @@
 
 
 
-/**
- * 
- * @export
- * @interface TotpAuthLinkResponse
- */
 export interface TotpAuthLinkResponse {
     /**
      * QR Code with base64 encoded.
-     * @type {string}
-     * @memberof TotpAuthLinkResponse
      */
     'authLink'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TotpAuthLinkResponse
-     */
     'rawSecret'?: string;
 }
 

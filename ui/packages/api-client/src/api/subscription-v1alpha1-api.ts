@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 // @ts-ignore
-import { Subscription } from '../models';
+import type { Subscription } from '../models';
 // @ts-ignore
-import { SubscriptionList } from '../models';
+import type { SubscriptionList } from '../models';
 /**
  * SubscriptionV1alpha1Api - axios parameter creator
- * @export
  */
 export const SubscriptionV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const SubscriptionV1alpha1ApiAxiosParamCreator = function (configuration?
 
 /**
  * SubscriptionV1alpha1Api - functional programming interface
- * @export
  */
 export const SubscriptionV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SubscriptionV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const SubscriptionV1alpha1ApiFp = function(configuration?: Configuration)
 
 /**
  * SubscriptionV1alpha1Api - factory interface
- * @export
  */
 export const SubscriptionV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = SubscriptionV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const SubscriptionV1alpha1ApiFactory = function (configuration?: Configur
 
 /**
  * Request parameters for createSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiCreateSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiCreateSubscriptionRequest {
     /**
      * Fresh subscription
-     * @type {Subscription}
-     * @memberof SubscriptionV1alpha1ApiCreateSubscription
      */
     readonly subscription?: Subscription
 }
 
 /**
  * Request parameters for deleteSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiDeleteSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiDeleteSubscriptionRequest {
     /**
      * Name of subscription
-     * @type {string}
-     * @memberof SubscriptionV1alpha1ApiDeleteSubscription
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiGetSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiGetSubscriptionRequest {
     /**
      * Name of subscription
-     * @type {string}
-     * @memberof SubscriptionV1alpha1ApiGetSubscription
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiListSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiListSubscriptionRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof SubscriptionV1alpha1ApiListSubscription
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof SubscriptionV1alpha1ApiListSubscription
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof SubscriptionV1alpha1ApiListSubscription
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof SubscriptionV1alpha1ApiListSubscription
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof SubscriptionV1alpha1ApiListSubscription
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiPatchSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiPatchSubscriptionRequest {
     /**
      * Name of subscription
-     * @type {string}
-     * @memberof SubscriptionV1alpha1ApiPatchSubscription
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof SubscriptionV1alpha1ApiPatchSubscription
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateSubscription operation in SubscriptionV1alpha1Api.
- * @export
- * @interface SubscriptionV1alpha1ApiUpdateSubscriptionRequest
  */
 export interface SubscriptionV1alpha1ApiUpdateSubscriptionRequest {
     /**
      * Name of subscription
-     * @type {string}
-     * @memberof SubscriptionV1alpha1ApiUpdateSubscription
      */
     readonly name: string
 
     /**
      * Updated subscription
-     * @type {Subscription}
-     * @memberof SubscriptionV1alpha1ApiUpdateSubscription
      */
     readonly subscription?: Subscription
 }
 
 /**
  * SubscriptionV1alpha1Api - object-oriented interface
- * @export
- * @class SubscriptionV1alpha1Api
- * @extends {BaseAPI}
  */
 export class SubscriptionV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiCreateSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public createSubscription(requestParameters: SubscriptionV1alpha1ApiCreateSubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).createSubscription(requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiDeleteSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public deleteSubscription(requestParameters: SubscriptionV1alpha1ApiDeleteSubscriptionRequest, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).deleteSubscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiGetSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public getSubscription(requestParameters: SubscriptionV1alpha1ApiGetSubscriptionRequest, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).getSubscription(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiListSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public listSubscription(requestParameters: SubscriptionV1alpha1ApiListSubscriptionRequest = {}, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).listSubscription(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiPatchSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public patchSubscription(requestParameters: SubscriptionV1alpha1ApiPatchSubscriptionRequest, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).patchSubscription(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class SubscriptionV1alpha1Api extends BaseAPI {
      * @param {SubscriptionV1alpha1ApiUpdateSubscriptionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof SubscriptionV1alpha1Api
      */
     public updateSubscription(requestParameters: SubscriptionV1alpha1ApiUpdateSubscriptionRequest, options?: RawAxiosRequestConfig) {
         return SubscriptionV1alpha1ApiFp(this.configuration).updateSubscription(requestParameters.name, requestParameters.subscription, options).then((request) => request(this.axios, this.basePath));

@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { ucApiClient } from "@halo-dev/api-client";
+import {
+  paginate,
+  ucApiClient,
+  type Notification,
+  type NotificationV1alpha1UcApiListUserNotificationsRequest,
+} from "@halo-dev/api-client";
 import {
   Dialog,
   IconCheckboxCircle,
@@ -13,10 +18,10 @@ import {
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
-import { stores } from "@halo-dev/console-shared";
+import { stores } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import { chunk } from "lodash-es";
+import { chunk } from "es-toolkit";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -37,17 +42,22 @@ const {
 } = useQuery({
   queryKey: ["user-notifications", activeTab],
   queryFn: async () => {
-    const { data } =
-      await ucApiClient.notification.notification.listUserNotifications({
+    return await paginate<
+      NotificationV1alpha1UcApiListUserNotificationsRequest,
+      Notification
+    >(
+      (params) =>
+        ucApiClient.notification.notification.listUserNotifications(params),
+      {
         username: currentUser?.user.metadata.name as string,
         fieldSelector: [`spec.unread=${activeTab.value === "unread"}`],
-      });
-
-    return data;
+        size: 1000,
+      }
+    );
   },
   cacheTime: 0,
   refetchInterval(data) {
-    const hasDeletingNotifications = data?.items.some(
+    const hasDeletingNotifications = data?.some(
       (item) => item.metadata.deletionTimestamp !== undefined
     );
 
@@ -58,7 +68,7 @@ const {
 const selectedNotificationName = useRouteQuery<string | undefined>("name");
 
 const selectedNotification = computed(() => {
-  return notifications.value?.items.find(
+  return notifications.value?.find(
     (item) => item.metadata.name === selectedNotificationName.value
   );
 });
@@ -71,7 +81,7 @@ function handleDeleteNotifications() {
     cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.items.length === 0) {
+      if (!notifications.value || notifications.value.length === 0) {
         return;
       }
 
@@ -79,7 +89,7 @@ function handleDeleteNotifications() {
         throw new Error("Current user is not found");
       }
 
-      const notificationChunks = chunk(notifications.value.items, 5);
+      const notificationChunks = chunk(notifications.value, 5);
 
       for (const chunk of notificationChunks) {
         await Promise.all(
@@ -108,7 +118,7 @@ function handleMarkAllAsRead() {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      if (!notifications.value || notifications.value.items.length === 0) {
+      if (!notifications.value || notifications.value.length === 0) {
         return;
       }
 
@@ -116,7 +126,7 @@ function handleMarkAllAsRead() {
         throw new Error("Current user is not found");
       }
 
-      const names = notifications.value?.items.map(
+      const names = notifications.value?.map(
         (notification) => notification.metadata.name
       );
 
@@ -166,7 +176,7 @@ function handleMarkAllAsRead() {
               <button
                 v-if="activeTab === 'unread'"
                 class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                :disabled="!notifications?.items.length"
+                :disabled="!notifications?.length"
                 @click="handleMarkAllAsRead"
               >
                 <IconCheckboxCircle
@@ -175,7 +185,7 @@ function handleMarkAllAsRead() {
               </button>
               <button
                 class="group flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                :disabled="!notifications?.items.length"
+                :disabled="!notifications?.length"
                 @click="handleDeleteNotifications"
               >
                 <IconDeleteBin
@@ -191,11 +201,7 @@ function handleMarkAllAsRead() {
             defer
           >
             <VLoading v-if="isLoading" />
-            <Transition
-              v-else-if="!notifications?.items.length"
-              appear
-              name="fade"
-            >
+            <Transition v-else-if="!notifications?.length" appear name="fade">
               <VEmpty
                 :title="`${
                   activeTab === 'unread'
@@ -216,7 +222,7 @@ function handleMarkAllAsRead() {
                 role="list"
               >
                 <li
-                  v-for="notification in notifications?.items"
+                  v-for="notification in notifications"
                   :key="notification.metadata.name"
                   @click="selectedNotificationName = notification.metadata.name"
                 >

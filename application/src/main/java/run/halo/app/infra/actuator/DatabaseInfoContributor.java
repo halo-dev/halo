@@ -3,46 +3,59 @@ package run.halo.app.infra.actuator;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionMetadata;
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.ReactiveUtils;
 
+@Slf4j
 @Component
-public class DatabaseInfoContributor implements InfoContributor {
+class DatabaseInfoContributor implements InfoContributor, InitializingBean {
+
+    private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
     private static final String DATABASE_INFO_KEY = "database";
 
     private final ConnectionFactory connectionFactory;
+
+    @Nullable
+    private ConnectionMetadata connectionMetadata;
 
     public DatabaseInfoContributor(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
 
     @Override
-    public void contribute(Info.Builder builder) {
-        builder.withDetail(DATABASE_INFO_KEY, contributorMap());
-    }
-
-    public Map<String, Object> contributorMap() {
-        var map = new HashMap<String, Object>();
-        var connectionMetadata = getConnectionMetadata().block();
-        if (Objects.isNull(connectionMetadata)) {
-            return map;
+    public void afterPropertiesSet() throws Exception {
+        var connectionMetadata = Mono.usingWhen(
+                this.connectionFactory.create(),
+                connection -> Mono.just(connection.getMetadata()),
+                Connection::close
+            )
+            .blockOptional(BLOCKING_TIMEOUT)
+            .orElseThrow(() -> new IllegalStateException("Unable to get database metadata"));
+        if (log.isDebugEnabled()) {
+            log.debug("Database Metadata initialized: name={}, version={}",
+                connectionMetadata.getDatabaseProductName(),
+                connectionMetadata.getDatabaseVersion());
         }
-        map.put("name", connectionMetadata.getDatabaseProductName());
-        map.put("version", connectionMetadata.getDatabaseVersion());
-        return map;
+        this.connectionMetadata = connectionMetadata;
     }
 
-    private Mono<ConnectionMetadata> getConnectionMetadata() {
-        return Mono.usingWhen(this.connectionFactory.create(),
-            conn -> Mono.just(conn.getMetadata()),
-            Connection::close,
-            (conn, t) -> conn.close(),
-            Connection::close
-        );
+    @Override
+    public void contribute(Info.Builder builder) {
+        if (this.connectionMetadata != null) {
+            builder.withDetail(DATABASE_INFO_KEY, Map.of(
+                "name", this.connectionMetadata.getDatabaseProductName(),
+                "version", this.connectionMetadata.getDatabaseVersion()
+            ));
+        }
     }
+
 }

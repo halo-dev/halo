@@ -10,8 +10,9 @@ import {
   prefix,
   suffix,
   wrapper,
+  type FormKitInputs,
 } from "@formkit/inputs";
-import TagSelect from "./TagSelect.vue";
+import { defineAsyncComponent } from "vue";
 import { TagSelectSection } from "./sections";
 
 export const tagSelect: FormKitTypeDefinition = {
@@ -32,7 +33,16 @@ export const tagSelect: FormKitTypeDefinition = {
   type: "input",
   props: ["multiple"],
   library: {
-    TagSelect: TagSelect,
+    TagSelect: defineAsyncComponent(() => import("./TagSelect.vue")),
   },
   schemaMemoKey: "custom-tag-select",
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    tagSelect: {
+      type: "tagSelect";
+      value?: string | string[];
+    };
+  }
+}

@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { Group } from '../models';
+import type { Group } from '../models';
 // @ts-ignore
-import { GroupList } from '../models';
+import type { GroupList } from '../models';
 // @ts-ignore
-import { JsonPatchInner } from '../models';
+import type { JsonPatchInner } from '../models';
 /**
  * GroupV1alpha1Api - axios parameter creator
- * @export
  */
 export const GroupV1alpha1ApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -313,7 +312,6 @@ export const GroupV1alpha1ApiAxiosParamCreator = function (configuration?: Confi
 
 /**
  * GroupV1alpha1Api - functional programming interface
- * @export
  */
 export const GroupV1alpha1ApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = GroupV1alpha1ApiAxiosParamCreator(configuration)
@@ -401,7 +399,6 @@ export const GroupV1alpha1ApiFp = function(configuration?: Configuration) {
 
 /**
  * GroupV1alpha1Api - factory interface
- * @export
  */
 export const GroupV1alpha1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = GroupV1alpha1ApiFp(configuration)
@@ -465,135 +462,93 @@ export const GroupV1alpha1ApiFactory = function (configuration?: Configuration, 
 
 /**
  * Request parameters for createGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiCreateGroupRequest
  */
 export interface GroupV1alpha1ApiCreateGroupRequest {
     /**
      * Fresh group
-     * @type {Group}
-     * @memberof GroupV1alpha1ApiCreateGroup
      */
     readonly group?: Group
 }
 
 /**
  * Request parameters for deleteGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiDeleteGroupRequest
  */
 export interface GroupV1alpha1ApiDeleteGroupRequest {
     /**
      * Name of group
-     * @type {string}
-     * @memberof GroupV1alpha1ApiDeleteGroup
      */
     readonly name: string
 }
 
 /**
  * Request parameters for getGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiGetGroupRequest
  */
 export interface GroupV1alpha1ApiGetGroupRequest {
     /**
      * Name of group
-     * @type {string}
-     * @memberof GroupV1alpha1ApiGetGroup
      */
     readonly name: string
 }
 
 /**
  * Request parameters for listGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiListGroupRequest
  */
 export interface GroupV1alpha1ApiListGroupRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof GroupV1alpha1ApiListGroup
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof GroupV1alpha1ApiListGroup
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof GroupV1alpha1ApiListGroup
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof GroupV1alpha1ApiListGroup
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof GroupV1alpha1ApiListGroup
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for patchGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiPatchGroupRequest
  */
 export interface GroupV1alpha1ApiPatchGroupRequest {
     /**
      * Name of group
-     * @type {string}
-     * @memberof GroupV1alpha1ApiPatchGroup
      */
     readonly name: string
 
-    /**
-     * 
-     * @type {Array<JsonPatchInner>}
-     * @memberof GroupV1alpha1ApiPatchGroup
-     */
     readonly jsonPatchInner?: Array<JsonPatchInner>
 }
 
 /**
  * Request parameters for updateGroup operation in GroupV1alpha1Api.
- * @export
- * @interface GroupV1alpha1ApiUpdateGroupRequest
  */
 export interface GroupV1alpha1ApiUpdateGroupRequest {
     /**
      * Name of group
-     * @type {string}
-     * @memberof GroupV1alpha1ApiUpdateGroup
      */
     readonly name: string
 
     /**
      * Updated group
-     * @type {Group}
-     * @memberof GroupV1alpha1ApiUpdateGroup
      */
     readonly group?: Group
 }
 
 /**
  * GroupV1alpha1Api - object-oriented interface
- * @export
- * @class GroupV1alpha1Api
- * @extends {BaseAPI}
  */
 export class GroupV1alpha1Api extends BaseAPI {
     /**
@@ -601,7 +556,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiCreateGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public createGroup(requestParameters: GroupV1alpha1ApiCreateGroupRequest = {}, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).createGroup(requestParameters.group, options).then((request) => request(this.axios, this.basePath));
@@ -612,7 +566,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiDeleteGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public deleteGroup(requestParameters: GroupV1alpha1ApiDeleteGroupRequest, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).deleteGroup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -623,7 +576,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiGetGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public getGroup(requestParameters: GroupV1alpha1ApiGetGroupRequest, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).getGroup(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -634,7 +586,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiListGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public listGroup(requestParameters: GroupV1alpha1ApiListGroupRequest = {}, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).listGroup(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -645,7 +596,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiPatchGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public patchGroup(requestParameters: GroupV1alpha1ApiPatchGroupRequest, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).patchGroup(requestParameters.name, requestParameters.jsonPatchInner, options).then((request) => request(this.axios, this.basePath));
@@ -656,7 +606,6 @@ export class GroupV1alpha1Api extends BaseAPI {
      * @param {GroupV1alpha1ApiUpdateGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GroupV1alpha1Api
      */
     public updateGroup(requestParameters: GroupV1alpha1ApiUpdateGroupRequest, options?: RawAxiosRequestConfig) {
         return GroupV1alpha1ApiFp(this.configuration).updateGroup(requestParameters.name, requestParameters.group, options).then((request) => request(this.axios, this.basePath));

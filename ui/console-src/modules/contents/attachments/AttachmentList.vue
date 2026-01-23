@@ -1,15 +1,11 @@
 <script lang="ts" setup>
+import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import LazyImage from "@/components/image/LazyImage.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
-import LazyVideo from "@/components/video/LazyVideo.vue";
-import { isImage } from "@/utils/image";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
-  IconCheckboxFill,
   IconDatabase2Line,
   IconFolder,
   IconGrid,
@@ -34,10 +30,8 @@ import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
-import AttachmentError from "./components/AttachmentError.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";
-import AttachmentLoading from "./components/AttachmentLoading.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import { useAttachmentControl } from "./composables/use-attachment";
@@ -50,7 +44,7 @@ const policyVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 const { groups } = useFetchAttachmentGroup();
 
 const selectedGroup = useRouteQuery<string | undefined>("group");
@@ -323,8 +317,8 @@ watch(
                       </VButton>
                       <template #popper>
                         <VDropdownItem
-                          v-for="(group, index) in groups"
-                          :key="index"
+                          v-for="group in groups"
+                          :key="group.metadata.name"
                           @click="handleMove(group)"
                         >
                           {{ group.spec.displayName }}
@@ -496,95 +490,14 @@ watch(
                 class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
                 role="list"
               >
-                <VCard
+                <AttachmentGridListItem
                   v-for="attachment in attachments"
                   :key="attachment.metadata.name"
-                  :body-class="['!p-0']"
-                  :class="{
-                    'ring-1 ring-primary': isChecked(attachment),
-                    'ring-1 ring-red-600':
-                      attachment.metadata.deletionTimestamp,
-                  }"
-                  class="hover:shadow"
+                  :attachment="attachment"
+                  :is-selected="isChecked(attachment)"
                   @click="handleClickItem(attachment)"
-                >
-                  <div class="group relative bg-white">
-                    <div
-                      class="aspect-h-8 aspect-w-10 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
-                    >
-                      <LazyImage
-                        v-if="isImage(attachment.spec.mediaType)"
-                        :key="attachment.metadata.name"
-                        :alt="attachment.spec.displayName"
-                        :src="
-                          attachment.status?.thumbnails?.S ||
-                          attachment.status?.permalink
-                        "
-                        classes="pointer-events-none object-cover group-hover:opacity-75 transform-gpu"
-                      >
-                        <template #loading>
-                          <AttachmentLoading />
-                        </template>
-                        <template #error>
-                          <AttachmentError />
-                        </template>
-                      </LazyImage>
-                      <LazyVideo
-                        v-else-if="
-                          attachment?.spec.mediaType?.startsWith('video/')
-                        "
-                        :src="attachment.status?.permalink"
-                        classes="object-cover group-hover:opacity-75"
-                      >
-                        <template #loading>
-                          <AttachmentLoading />
-                        </template>
-                        <template #error>
-                          <AttachmentError />
-                        </template>
-                      </LazyVideo>
-                      <AttachmentFileTypeIcon
-                        v-else
-                        :file-name="attachment.spec.displayName"
-                      />
-                    </div>
-
-                    <p
-                      v-tooltip="attachment.spec.displayName"
-                      class="block cursor-pointer truncate px-2 py-1 text-center text-xs font-medium text-gray-700"
-                    >
-                      {{ attachment.spec.displayName }}
-                    </p>
-
-                    <div
-                      v-if="attachment.metadata.deletionTimestamp"
-                      class="absolute right-1 top-1 text-xs text-red-300"
-                    >
-                      {{ $t("core.common.status.deleting") }}...
-                    </div>
-
-                    <div
-                      v-if="!attachment.metadata.deletionTimestamp"
-                      v-permission="['system:attachments:manage']"
-                      :class="{
-                        '!flex': selectedAttachmentNames.has(
-                          attachment.metadata.name
-                        ),
-                      }"
-                      class="absolute left-0 top-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
-                    >
-                      <IconCheckboxFill
-                        :class="{
-                          '!text-primary': selectedAttachmentNames.has(
-                            attachment.metadata.name
-                          ),
-                        }"
-                        class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
-                        @click.stop="handleSelect(attachment)"
-                      />
-                    </div>
-                  </div>
-                </VCard>
+                  @select="handleSelect(attachment)"
+                />
               </div>
             </Transition>
             <Transition v-if="viewType === 'list'" appear name="fade">

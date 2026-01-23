@@ -16,33 +16,11 @@
 
 /**
  * Type used to describe custom template page.
- * @export
- * @interface TemplateDescriptor
  */
 export interface TemplateDescriptor {
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateDescriptor
-     */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateDescriptor
-     */
     'file': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateDescriptor
-     */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TemplateDescriptor
-     */
     'screenshot'?: string;
 }
 

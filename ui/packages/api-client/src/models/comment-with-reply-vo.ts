@@ -15,64 +15,32 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentSpec } from './comment-spec';
+import type { CommentSpec } from './comment-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStatsVo } from './comment-stats-vo';
+import type { CommentStatsVo } from './comment-stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStatus } from './comment-status';
+import type { CommentStatus } from './comment-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListResultReplyVo } from './list-result-reply-vo';
+import type { ListResultReplyVo } from './list-result-reply-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info';
+import type { OwnerInfo } from './owner-info';
 
 /**
  * A chunk of items.
- * @export
- * @interface CommentWithReplyVo
  */
 export interface CommentWithReplyVo {
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof CommentWithReplyVo
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {OwnerInfo}
-     * @memberof CommentWithReplyVo
-     */
     'owner': OwnerInfo;
-    /**
-     * 
-     * @type {ListResultReplyVo}
-     * @memberof CommentWithReplyVo
-     */
     'replies'?: ListResultReplyVo;
-    /**
-     * 
-     * @type {CommentSpec}
-     * @memberof CommentWithReplyVo
-     */
     'spec': CommentSpec;
-    /**
-     * 
-     * @type {CommentStatsVo}
-     * @memberof CommentWithReplyVo
-     */
     'stats': CommentStatsVo;
-    /**
-     * 
-     * @type {CommentStatus}
-     * @memberof CommentWithReplyVo
-     */
     'status'?: CommentStatus;
 }
 

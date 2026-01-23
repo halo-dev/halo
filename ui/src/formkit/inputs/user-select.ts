@@ -1,5 +1,11 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type { FormKitInputs } from "@formkit/inputs";
+import {
+  consoleApiClient,
+  paginate,
+  type ListedUser,
+  type UserV1alpha1ConsoleApiListUsersRequest,
+} from "@halo-dev/api-client";
 import { select } from "./select";
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
@@ -16,7 +22,7 @@ const search = async ({ page, size, keyword }) => {
     options: data.items?.map((user) => {
       return {
         value: user.user.metadata.name,
-        label: user.user.spec.displayName,
+        label: `${user.user.spec.displayName}(${user.user.metadata.name})`,
       };
     }),
     total: data.total,
@@ -30,11 +36,15 @@ const findOptionsByValues = async (values: string[]) => {
     return [];
   }
 
-  const { data } = await consoleApiClient.user.listUsers({
+  const users = await paginate<
+    UserV1alpha1ConsoleApiListUsersRequest,
+    ListedUser
+  >((params) => consoleApiClient.user.listUsers(params), {
     fieldSelector: [`metadata.name=(${values.join(",")})`],
+    size: 1000,
   });
 
-  return data.items?.map((user) => {
+  return users.map((user) => {
     return {
       value: user.user.metadata.name,
       label: user.user.spec.displayName,
@@ -61,3 +71,12 @@ export const userSelect: FormKitTypeDefinition = {
   forceTypeProp: "select",
   features: [optionsHandler],
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    userSelect: {
+      type: "userSelect";
+      value?: string;
+    };
+  }
+}

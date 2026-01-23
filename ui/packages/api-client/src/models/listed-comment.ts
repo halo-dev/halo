@@ -15,46 +15,24 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Comment } from './comment';
+import type { Comment } from './comment';
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStats } from './comment-stats';
+import type { CommentStats } from './comment-stats';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Extension } from './extension';
+import type { Extension } from './extension';
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info';
+import type { OwnerInfo } from './owner-info';
 
 /**
  * A chunk of items.
- * @export
- * @interface ListedComment
  */
 export interface ListedComment {
-    /**
-     * 
-     * @type {Comment}
-     * @memberof ListedComment
-     */
     'comment': Comment;
-    /**
-     * 
-     * @type {OwnerInfo}
-     * @memberof ListedComment
-     */
     'owner': OwnerInfo;
-    /**
-     * 
-     * @type {CommentStats}
-     * @memberof ListedComment
-     */
     'stats': CommentStats;
-    /**
-     * 
-     * @type {Extension}
-     * @memberof ListedComment
-     */
     'subject'?: Extension;
 }
 

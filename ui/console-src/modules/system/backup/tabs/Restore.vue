@@ -14,7 +14,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";

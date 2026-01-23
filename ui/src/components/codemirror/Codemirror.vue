@@ -1,41 +1,17 @@
 <script lang="ts" setup>
-import { css } from "@codemirror/lang-css";
-import { html } from "@codemirror/lang-html";
-import { javascript } from "@codemirror/lang-javascript";
-import { json } from "@codemirror/lang-json";
-import { LanguageSupport, StreamLanguage } from "@codemirror/language";
-import { yaml } from "@codemirror/legacy-modes/mode/yaml";
-import type { EditorStateConfig } from "@codemirror/state";
+import type { LanguageSupport } from "@codemirror/language";
 import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { onBeforeUnmount, onMounted, shallowRef, watch } from "vue";
+import { presetLanguages, type CodemirrorProps } from "./supports";
 
-const presetLanguages = {
-  yaml: StreamLanguage.define(yaml),
-  html: html(),
-  javascript: javascript({
-    jsx: true,
-    typescript: true,
-  }),
-  css: css(),
-  json: json(),
-};
-
-const props = withDefaults(
-  defineProps<{
-    modelValue?: string;
-    height?: string;
-    language: keyof typeof presetLanguages | LanguageSupport;
-    extensions?: EditorStateConfig["extensions"];
-  }>(),
-  {
-    modelValue: "",
-    height: "auto",
-    language: "yaml",
-    extensions: () => [],
-  }
-);
+const props = withDefaults(defineProps<CodemirrorProps>(), {
+  modelValue: "",
+  height: "auto",
+  language: "yaml",
+  extensions: () => [],
+});
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
@@ -47,6 +23,7 @@ const cmState = shallowRef<EditorState>();
 const cmView = shallowRef<EditorView>();
 
 const themeCompartment = new Compartment();
+const languageCompartment = new Compartment();
 
 const createCustomTheme = (height: string) => {
   return EditorView.theme({
@@ -58,16 +35,11 @@ const createCustomTheme = (height: string) => {
 };
 
 const createCmEditor = () => {
-  const language =
-    typeof props.language === "string"
-      ? presetLanguages[props.language]
-      : props.language;
-
   let extensions = [
     basicSetup,
     EditorView.lineWrapping,
     themeCompartment.of(createCustomTheme(props.height)),
-    language,
+    languageCompartment.of([]),
     EditorView.updateListener.of((viewUpdate) => {
       if (viewUpdate.docChanged) {
         const doc = viewUpdate.state.doc.toString();
@@ -90,44 +62,77 @@ const createCmEditor = () => {
     state: cmState.value,
     parent: wrapper.value,
   });
+
+  loadLanguage();
 };
+
+async function loadLanguage() {
+  let language: LanguageSupport;
+
+  if (!props.language) {
+    return;
+  }
+
+  if (typeof props.language === "string") {
+    const loader = presetLanguages[props.language];
+    if (!loader) {
+      throw new Error(`Language ${props.language} not found`);
+    }
+    language = await loader();
+  } else {
+    language = props.language;
+  }
+
+  cmView.value?.dispatch({
+    effects: languageCompartment.reconfigure(language),
+  });
+}
 
 onMounted(() => {
   createCmEditor();
-
-  // Update the codemirror editor doc when the model value changes.
-  watch(
-    () => props.modelValue,
-    (newValue) => {
-      if (newValue !== cmView.value?.state.doc.toString()) {
-        cmView.value?.dispatch({
-          changes: {
-            from: 0,
-            to: cmView.value?.state.doc.length,
-            insert: newValue,
-          },
-        });
-      }
-    }
-  );
-
-  watch(
-    () => props.height,
-    (newHeight) => {
-      if (cmView.value) {
-        cmView.value.dispatch({
-          effects: themeCompartment.reconfigure(createCustomTheme(newHeight)),
-        });
-      }
-    }
-  );
 });
+
+// Update the codemirror editor doc when the model value changes.
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (!cmView.value) {
+      return;
+    }
+
+    if (newValue !== cmView.value.state.doc.toString()) {
+      cmView.value.dispatch({
+        changes: {
+          from: 0,
+          to: cmView.value.state.doc.length,
+          insert: newValue,
+        },
+      });
+    }
+  }
+);
+
+watch(
+  () => props.height,
+  (newHeight) => {
+    if (cmView.value) {
+      cmView.value.dispatch({
+        effects: themeCompartment.reconfigure(createCustomTheme(newHeight)),
+      });
+    }
+  }
+);
+
+watch(
+  () => props.language,
+  () => {
+    loadLanguage();
+  }
+);
 
 // Destroy codemirror editor when component unmounts
 onBeforeUnmount(() => {
-  if (cmView.value) {
-    cmView.value.destroy();
-  }
+  cmView.value?.destroy();
 });
 </script>
 <template>

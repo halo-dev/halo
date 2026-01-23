@@ -15,7 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.infra.AnonymousUserConst;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting.Theme;
 import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.ThemeRootGetter;
@@ -29,7 +29,7 @@ import run.halo.app.security.authorization.AuthorityUtils;
 @AllArgsConstructor
 public class ThemeResolver {
 
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
 
     private final ThemeRootGetter themeRoot;
     private final RoleService roleService;

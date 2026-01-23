@@ -15,61 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition';
+import type { Condition } from './condition';
 
-/**
- * 
- * @export
- * @interface PluginStatus
- */
 export interface PluginStatus {
-    /**
-     * 
-     * @type {Array<Condition>}
-     * @memberof PluginStatus
-     */
     'conditions'?: Array<Condition>;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'entry'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'lastProbeState'?: PluginStatusLastProbeStateEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'lastStartTime'?: string;
     /**
      * Load location of the plugin, often a path.
-     * @type {string}
-     * @memberof PluginStatus
      */
     'loadLocation'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'logo'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'phase'?: PluginStatusPhaseEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof PluginStatus
-     */
     'stylesheet'?: string;
 }
 

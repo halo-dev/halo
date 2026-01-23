@@ -10,8 +10,9 @@ import {
   prefix,
   suffix,
   wrapper,
+  type FormKitInputs,
 } from "@formkit/inputs";
-import CategorySelect from "./CategorySelect.vue";
+import { defineAsyncComponent } from "vue";
 import { CategorySelectSection } from "./sections";
 
 export const categorySelect: FormKitTypeDefinition = {
@@ -32,7 +33,16 @@ export const categorySelect: FormKitTypeDefinition = {
   type: "input",
   props: ["multiple"],
   library: {
-    CategorySelect: CategorySelect,
+    CategorySelect: defineAsyncComponent(() => import("./CategorySelect.vue")),
   },
   schemaMemoKey: "custom-category-select",
 };
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    categorySelect: {
+      type: "categorySelect";
+      value?: string | string[];
+    };
+  }
+}

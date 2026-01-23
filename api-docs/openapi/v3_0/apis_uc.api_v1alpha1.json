@@ -826,6 +826,41 @@
         ]
       }
     },
+    "/apis/uc.api.halo.run/v1alpha1/annotationsettings": {
+      "get": {
+        "description": "List available AnnotationSettings for the given targetRef. The available AnnotationSettings are determined by the currently activated theme and started plugins.",
+        "operationId": "listAvailableAnnotationSettings",
+        "parameters": [
+          {
+            "description": "The targetRef of the AnnotationSetting. e.g.: \u0027content.halo.run/Post",
+            "in": "query",
+            "name": "targetRef",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnotationSetting"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AnnotationSettingV1AlphaUc"
+        ]
+      }
+    },
     "/apis/uc.api.halo.run/v1alpha1/user-preferences/{group}": {
       "get": {
         "description": "Get my preference by group.",
@@ -1333,7 +1368,8 @@
         ]
       },
       "post": {
-        "description": "Create attachment for the given post.",
+        "deprecated": true,
+        "description": "Create attachment for the given post. Deprecated in favor of /attachments/-/upload.",
         "operationId": "CreateAttachmentForPost",
         "parameters": [
           {
@@ -1374,16 +1410,15 @@
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
       "post": {
         "description": "Upload attachment to user center storage.",
-        "operationId": "UploadUcAttachment",
+        "operationId": "UploadAttachmentForUc",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UcUploadRequest"
+                "$ref": "#/components/schemas/UploadForm"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "default": {
@@ -1404,7 +1439,8 @@
     },
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
-        "description": "Upload attachment from the given URL.",
+        "deprecated": true,
+        "description": "Upload attachment from the given URL.\nDeprecated in favor of /attachments/-/upload.",
         "operationId": "ExternalTransferAttachment_1",
         "parameters": [
           {
@@ -1468,6 +1504,49 @@
           },
           "value": {
             "description": "Value can be any JSON value"
+          }
+        }
+      },
+      "AnnotationSetting": {
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/AnnotationSettingSpec"
+          }
+        }
+      },
+      "AnnotationSettingSpec": {
+        "required": [
+          "formSchema",
+          "targetRef"
+        ],
+        "type": "object",
+        "properties": {
+          "formSchema": {
+            "minLength": 1,
+            "type": "array",
+            "items": {
+              "minLength": 1,
+              "type": "object"
+            }
+          },
+          "targetRef": {
+            "$ref": "#/components/schemas/GroupKind"
           }
         }
       },
@@ -1882,6 +1961,20 @@
           }
         }
       },
+      "GroupKind": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "is group name of Extension."
+          },
+          "kind": {
+            "type": "string",
+            "description": "is kind name of Extension."
+          }
+        },
+        "description": "GroupKind contains group and kind data only."
+      },
       "JsonNode": {
         "type": "object"
       },
@@ -2245,9 +2338,6 @@
           }
         }
       },
-      "Part": {
-        "type": "object"
-      },
       "PasswordRequest": {
         "required": [
           "password"
@@ -2470,12 +2560,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },
@@ -2606,6 +2696,8 @@
       },
       "Ref": {
         "required": [
+          "group",
+          "kind",
           "name"
         ],
         "type": "object",
@@ -2927,38 +3019,24 @@
           }
         }
       },
-      "UcUploadRequest": {
-        "required": [
-          "file"
-        ],
+      "UploadForm": {
         "type": "object",
         "properties": {
           "file": {
             "type": "string",
+            "description": "The file to upload. If not provided, the url will be used.",
             "format": "binary"
           },
-          "formData": {
-            "type": "object",
-            "properties": {
-              "all": {
-                "type": "object",
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/Part"
-                },
-                "writeOnly": true
-              },
-              "empty": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/Part"
-              }
-            }
+          "filename": {
+            "type": "string",
+            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+          },
+          "url": {
+            "type": "string",
+            "description": "The url to upload from. If not provided, the file will be used."
           }
-        }
+        },
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
       },
       "UserConnection": {
         "required": [

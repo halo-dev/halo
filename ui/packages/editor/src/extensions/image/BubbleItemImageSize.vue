@@ -1,106 +1,144 @@
 <script setup lang="ts">
-import {
-  BlockActionButton,
-  BlockActionInput,
-  BlockActionSeparator,
-} from "@/components";
+import Input from "@/components/base/Input.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { computed, type Component } from "vue";
+import { findChildren } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
+import { VDropdown } from "@halo-dev/components";
+import { computed } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
-import Image from "./index";
+import { ExtensionImage } from "./index";
 
-const props = defineProps<{
-  editor: Editor;
-  isActive?: ({ editor }: { editor: Editor }) => boolean;
-  visible?: ({ editor }: { editor: Editor }) => boolean;
-  icon?: Component;
-  title?: string;
-  action?: ({ editor }: { editor: Editor }) => void;
-}>();
+const props = defineProps<BubbleItemComponentProps>();
 
 const width = computed({
   get: () => {
-    return props.editor.getAttributes(Image.name).width;
+    return props.editor.getAttributes(ExtensionImage.name).width;
   },
-  set: (value: string) => {
-    handleSetSize(value, height.value);
+  set: (width: string) => {
+    handleSetSize({ width, height: height.value });
   },
 });
 
 const height = computed({
   get: () => {
-    return props.editor.getAttributes(Image.name).height;
+    return props.editor.getAttributes(ExtensionImage.name).height;
   },
-  set: (value: string) => {
-    handleSetSize(width.value, value);
+  set: (height: string) => {
+    handleSetSize({ width: width.value, height });
   },
 });
 
-function handleSetSize(width?: string, height?: string) {
+function handleSetSize(size: { width?: string; height?: string }) {
+  let figureWidth = size.width;
+  if (!size.width) {
+    const { state } = props.editor;
+    const { selection } = state;
+    const imageNodePosList = findChildren(
+      selection.$from.node(),
+      (node) => node.type.name === ExtensionImage.name
+    );
+    if (imageNodePosList.length === 0) {
+      return;
+    }
+    const imageNodePos = imageNodePosList[0];
+    if (imageNodePos && imageNodePos.node.type.name === ExtensionImage.name) {
+      const pos = selection.$from.pos + imageNodePos.pos;
+      const nodeDOM = props.editor.view.nodeDOM(pos) as HTMLElement;
+      const imageNodeDOM = nodeDOM.querySelector("img");
+      if (imageNodeDOM && imageNodeDOM.naturalWidth) {
+        figureWidth = `${imageNodeDOM.naturalWidth}px`;
+      }
+    }
+  }
   props.editor
     .chain()
-    .updateAttributes(Image.name, { width, height })
+    .updateAttributes(ExtensionImage.name, size)
+    .updateFigureContainerWidth(figureWidth)
     .setNodeSelection(props.editor.state.selection.from)
     .focus()
     .run();
 }
+
+const presetSizes = [
+  {
+    width: "25%",
+    height: "auto",
+    icon: MdiImageSizeSelectSmall,
+    title: i18n.global.t("editor.extensions.image.small_size"),
+  },
+  {
+    width: "50%",
+    height: "auto",
+    icon: MdiImageSizeSelectLarge,
+    title: i18n.global.t("editor.extensions.image.medium_size"),
+  },
+  {
+    width: "100%",
+    height: "auto",
+    icon: MdiImageSizeSelectActual,
+    title: i18n.global.t("editor.extensions.image.large_size"),
+  },
+  {
+    width: undefined,
+    height: undefined,
+    icon: MdiBackupRestore,
+    title: i18n.global.t("editor.extensions.image.restore_size"),
+  },
+];
 </script>
 
 <template>
-  <BlockActionInput
-    v-model.lazy.trim="width"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
-  />
-
-  <BlockActionInput
-    v-model.lazy.trim="height"
-    :tooltip="i18n.global.t('editor.common.tooltip.custom_height_input')"
-  />
-
-  <BlockActionSeparator />
-
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.small_size')"
-    :selected="editor.getAttributes(Image.name).width === '25%'"
-    @click="handleSetSize('25%', 'auto')"
+  <VDropdown
+    v-if="visible?.({ editor })"
+    class="inline-flex"
+    :auto-hide="true"
+    :distance="10"
   >
-    <template #icon>
-      <MdiImageSizeSelectSmall />
-    </template>
-  </BlockActionButton>
+    <BubbleButton
+      :title="i18n.global.t('editor.extensions.image.resize')"
+      show-more-indicator
+    >
+      <template #icon>
+        <MdiImageSizeSelectSmall />
+      </template>
+    </BubbleButton>
+    <template #popper>
+      <div class="flex w-56 flex-col gap-3">
+        <div class="flex flex-col items-center gap-3">
+          <Input
+            v-model="width"
+            :label="i18n.global.t('editor.common.width')"
+            :tooltip="i18n.global.t('editor.common.tooltip.custom_width_input')"
+          />
+          <Input
+            v-model="height"
+            :label="i18n.global.t('editor.common.height')"
+            :tooltip="
+              i18n.global.t('editor.common.tooltip.custom_height_input')
+            "
+          />
+        </div>
 
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.medium_size')"
-    :selected="editor.getAttributes(Image.name).width === '50%'"
-    @click="handleSetSize('50%', 'auto')"
-  >
-    <template #icon>
-      <MdiImageSizeSelectLarge />
+        <div class="flex items-center gap-1 rounded-md bg-gray-100 p-1">
+          <button
+            v-for="item in presetSizes"
+            :key="item.width"
+            v-tooltip="item.title"
+            class="inline-flex flex-1 items-center justify-center rounded px-2 py-1.5 text-gray-600 transition-all hover:text-gray-900"
+            :class="{
+              'bg-white text-gray-900':
+                item.width === width && item.height === height,
+            }"
+            @click="handleSetSize({ width: item.width, height: item.height })"
+          >
+            <component :is="item.icon" />
+          </button>
+        </div>
+      </div>
     </template>
-  </BlockActionButton>
-
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.large_size')"
-    :selected="editor.getAttributes(Image.name).width === '100%'"
-    @click="handleSetSize('100%', '100%')"
-  >
-    <template #icon>
-      <MdiImageSizeSelectActual />
-    </template>
-  </BlockActionButton>
-
-  <BlockActionButton
-    :tooltip="i18n.global.t('editor.extensions.image.restore_size')"
-    @click="handleSetSize(undefined, undefined)"
-  >
-    <template #icon>
-      <MdiBackupRestore />
-    </template>
-  </BlockActionButton>
-
-  <BlockActionSeparator />
+  </VDropdown>
 </template>

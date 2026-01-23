@@ -20,16 +20,15 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { ListedPostVo } from '../models';
+import type { ListedPostVo } from '../models';
 // @ts-ignore
-import { TagVo } from '../models';
+import type { TagVo } from '../models';
 // @ts-ignore
-import { TagVoList } from '../models';
+import type { TagVoList } from '../models';
 /**
  * TagV1alpha1PublicApi - axios parameter creator
- * @export
  */
 export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -207,7 +206,6 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
 
 /**
  * TagV1alpha1PublicApi - functional programming interface
- * @export
  */
 export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TagV1alpha1PublicApiAxiosParamCreator(configuration)
@@ -262,7 +260,6 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
 
 /**
  * TagV1alpha1PublicApi - factory interface
- * @export
  */
 export const TagV1alpha1PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TagV1alpha1PublicApiFp(configuration)
@@ -299,114 +296,81 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
 
 /**
  * Request parameters for queryPostsByTagName operation in TagV1alpha1PublicApi.
- * @export
- * @interface TagV1alpha1PublicApiQueryPostsByTagNameRequest
  */
 export interface TagV1alpha1PublicApiQueryPostsByTagNameRequest {
     /**
      * Tag name
-     * @type {string}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly name: string
 
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryPostsByTagName
      */
     readonly sort?: Array<string>
 }
 
 /**
  * Request parameters for queryTagByName operation in TagV1alpha1PublicApi.
- * @export
- * @interface TagV1alpha1PublicApiQueryTagByNameRequest
  */
 export interface TagV1alpha1PublicApiQueryTagByNameRequest {
     /**
      * Tag name
-     * @type {string}
-     * @memberof TagV1alpha1PublicApiQueryTagByName
      */
     readonly name: string
 }
 
 /**
  * Request parameters for queryTags operation in TagV1alpha1PublicApi.
- * @export
- * @interface TagV1alpha1PublicApiQueryTagsRequest
  */
 export interface TagV1alpha1PublicApiQueryTagsRequest {
     /**
      * Page number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1PublicApiQueryTags
      */
     readonly page?: number
 
     /**
      * Size number. Default is 0.
-     * @type {number}
-     * @memberof TagV1alpha1PublicApiQueryTags
      */
     readonly size?: number
 
     /**
      * Label selector. e.g.: hidden!&#x3D;true
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryTags
      */
     readonly labelSelector?: Array<string>
 
     /**
      * Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryTags
      */
     readonly fieldSelector?: Array<string>
 
     /**
      * Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-     * @type {Array<string>}
-     * @memberof TagV1alpha1PublicApiQueryTags
      */
     readonly sort?: Array<string>
 }
 
 /**
  * TagV1alpha1PublicApi - object-oriented interface
- * @export
- * @class TagV1alpha1PublicApi
- * @extends {BaseAPI}
  */
 export class TagV1alpha1PublicApi extends BaseAPI {
     /**
@@ -414,7 +378,6 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @param {TagV1alpha1PublicApiQueryPostsByTagNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1PublicApi
      */
     public queryPostsByTagName(requestParameters: TagV1alpha1PublicApiQueryPostsByTagNameRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1PublicApiFp(this.configuration).queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));
@@ -425,7 +388,6 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @param {TagV1alpha1PublicApiQueryTagByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1PublicApi
      */
     public queryTagByName(requestParameters: TagV1alpha1PublicApiQueryTagByNameRequest, options?: RawAxiosRequestConfig) {
         return TagV1alpha1PublicApiFp(this.configuration).queryTagByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -436,7 +398,6 @@ export class TagV1alpha1PublicApi extends BaseAPI {
      * @param {TagV1alpha1PublicApiQueryTagsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TagV1alpha1PublicApi
      */
     public queryTags(requestParameters: TagV1alpha1PublicApiQueryTagsRequest = {}, options?: RawAxiosRequestConfig) {
         return TagV1alpha1PublicApiFp(this.configuration).queryTags(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(this.axios, this.basePath));

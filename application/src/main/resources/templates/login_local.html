@@ -1,25 +1,4 @@
 <div th:remove="tag" th:fragment="form">
-    <script src="/webjars/jsencrypt/3.3.2/bin/jsencrypt.min.js" defer></script>
-    <script th:inline="javascript" type="text/javascript">
-        const publicKey = /*[[${publicKey}]]*/ "";
-
-        // Encrypt function
-        function encryptPassword(password) {
-            const encrypt = new JSEncrypt();
-            encrypt.setPublicKey(publicKey);
-            return encrypt.encrypt(password);
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const loginForm = document.getElementById("login-form");
-            loginForm.addEventListener("submit", function (event) {
-                const plainPasswordInput = document.getElementById("plainPassword");
-                const passwordInput = document.getElementById("password");
-                passwordInput.value = encryptPassword(plainPasswordInput.value);
-            });
-        });
-    </script>
-
     <input type="hidden" name="password" id="password" />
 
     <div class="form-item">

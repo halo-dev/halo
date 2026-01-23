@@ -6,8 +6,6 @@ import type {
   PMNode,
   Range,
   ResolvedPos,
-  Selection,
-  Slice,
 } from "@/tiptap";
 import type {
   arrow,
@@ -21,17 +19,21 @@ import type {
   VirtualElement,
 } from "@floating-ui/dom";
 import type { Component } from "vue";
+
 export interface ToolbarItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    isActive: boolean;
-    disabled?: boolean;
-    icon?: Component;
-    title?: string;
-    action?: () => void;
-  };
+  props: Omit<ToolbarItemComponentProps, "children"> & Record<string, unknown>;
+  children?: ToolbarItemType[];
+}
+
+export interface ToolbarItemComponentProps {
+  editor: Editor;
+  isActive: boolean;
+  disabled?: boolean;
+  icon?: Component;
+  title?: string;
+  action?: () => void;
   children?: ToolbarItemType[];
 }
 
@@ -70,6 +72,73 @@ export interface BubbleMenuOptions {
   scrollTarget?: HTMLElement | Window;
 }
 
+export interface DragButtonItemProps {
+  extendsKey?: string;
+  priority?: number;
+  title?:
+    | string
+    | (({
+        editor,
+        node,
+        pos,
+      }: {
+        editor: Editor;
+        node: PMNode | null;
+        pos: number;
+      }) => string);
+  icon?: Component;
+  key?: string;
+  action?: ({
+    editor,
+    node,
+    pos,
+    close,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+    close: () => void;
+  }) => Component | boolean | void | Promise<Component | boolean | void>;
+  iconStyle?: string;
+  class?: string;
+  visible?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  isActive?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  disabled?: ({
+    editor,
+    node,
+    pos,
+  }: {
+    editor: Editor;
+    node: PMNode | null;
+    pos: number;
+  }) => boolean;
+  keyboard?: string;
+  component?: Component;
+  [key: string]: unknown;
+}
+export interface DragButtonType extends DragButtonItemProps {
+  children?: {
+    component?: Component;
+    items?: DragButtonItemProps[];
+  };
+}
+
 export interface BubbleMenuProps {
   pluginKey?: string | PluginKey;
   editor?: Editor;
@@ -92,30 +161,36 @@ export interface NodeBubbleMenuType extends BubbleMenuProps {
   items?: BubbleItemType[];
   extendsKey?: string | PluginKey;
 }
+
 export interface BubbleItemType {
   priority: number;
   component?: Component;
   key?: string;
-  props?: {
-    isActive?: ({ editor }: { editor: Editor }) => boolean;
-    visible?: ({ editor }: { editor: Editor }) => boolean;
-    icon?: Component;
-    iconStyle?: string;
-    title?: string;
-    action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
-  } & Record<string, unknown>;
+  props?: Omit<BubbleItemComponentProps, "editor"> & Record<string, unknown>;
+}
+
+export interface BubbleItemComponentProps {
+  editor: Editor;
+  isActive?: ({ editor }: { editor: Editor }) => boolean;
+  visible?: ({ editor }: { editor: Editor }) => boolean;
+  icon?: Component;
+  iconStyle?: string;
+  title?: string;
+  action?: ({ editor }: { editor: Editor }) => Component | boolean | void;
 }
 
 export interface ToolboxItemType {
   priority: number;
   component: Component;
-  props: {
-    editor: Editor;
-    icon?: Component;
-    title?: string;
-    description?: string;
-    action?: () => void;
-  };
+  props: ToolboxItemComponentProps & Record<string, unknown>;
+}
+
+export interface ToolboxItemComponentProps {
+  editor: Editor;
+  icon?: Component;
+  title?: string;
+  description?: string;
+  action?: () => void;
 }
 
 export interface ExtensionOptions {
@@ -135,11 +210,11 @@ export interface ExtensionOptions {
     editor: Editor;
   }) => ToolboxItemType | ToolboxItemType[];
 
-  getDraggable?: ({
+  getDraggableMenuItems?: ({
     editor,
   }: {
     editor: Editor;
-  }) => DraggableItemType | boolean;
+  }) => DragButtonType | DragButtonType[];
 }
 
 export interface CommandMenuItemType {
@@ -159,31 +234,4 @@ export interface DragSelectionNodeType {
     x?: number;
     y?: number;
   };
-}
-
-export interface DraggableItemType {
-  getRenderContainer?: ({
-    dom,
-    view,
-  }: {
-    dom: HTMLElement;
-    view: EditorView;
-  }) => DragSelectionNodeType;
-  handleDrop?: ({
-    view,
-    event,
-    slice,
-    insertPos,
-    node,
-    selection,
-  }: {
-    view: EditorView;
-    event: DragEvent;
-    slice: Slice;
-    insertPos: number;
-    node: PMNode;
-    selection: Selection;
-  }) => boolean | void;
-  // allow drag-and-drop query propagation downward
-  allowPropagationDownward?: boolean;
 }

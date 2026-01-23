@@ -15,49 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { BackupSpec } from './backup-spec';
+import type { BackupSpec } from './backup-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import { BackupStatus } from './backup-status';
+import type { BackupStatus } from './backup-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata';
+import type { Metadata } from './metadata';
 
-/**
- * 
- * @export
- * @interface Backup
- */
 export interface Backup {
-    /**
-     * 
-     * @type {string}
-     * @memberof Backup
-     */
     'apiVersion': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Backup
-     */
     'kind': string;
-    /**
-     * 
-     * @type {Metadata}
-     * @memberof Backup
-     */
     'metadata': Metadata;
-    /**
-     * 
-     * @type {BackupSpec}
-     * @memberof Backup
-     */
     'spec'?: BackupSpec;
-    /**
-     * 
-     * @type {BackupStatus}
-     * @memberof Backup
-     */
     'status'?: BackupStatus;
 }
 

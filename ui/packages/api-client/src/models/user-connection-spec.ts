@@ -14,34 +14,21 @@
 
 
 
-/**
- * 
- * @export
- * @interface UserConnectionSpec
- */
 export interface UserConnectionSpec {
     /**
      * The unique identifier for the user\'s connection to the OAuth provider.  for example, the user\'s GitHub id.
-     * @type {string}
-     * @memberof UserConnectionSpec
      */
     'providerUserId': string;
     /**
      * The name of the OAuth provider (e.g. Google, Facebook, Twitter).
-     * @type {string}
-     * @memberof UserConnectionSpec
      */
     'registrationId': string;
     /**
      * The time when the user connection was last updated.
-     * @type {string}
-     * @memberof UserConnectionSpec
      */
     'updatedAt'?: string;
     /**
      * The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection.
-     * @type {string}
-     * @memberof UserConnectionSpec
      */
     'username': string;
 }

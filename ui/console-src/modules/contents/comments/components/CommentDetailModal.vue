@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import HasPermission from "@/components/permission/HasPermission.vue";
 import {
   consoleApiClient,
   coreApiClient,
@@ -15,7 +14,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserAgent } from "@uc/modules/profile/tabs/composables/use-user-agent";
 import { computed, ref, useTemplateRef } from "vue";

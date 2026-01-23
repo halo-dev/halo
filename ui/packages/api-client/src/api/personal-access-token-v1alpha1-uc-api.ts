@@ -20,12 +20,11 @@ import globalAxios from 'axios';
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import { PersonalAccessToken } from '../models';
+import type { PersonalAccessToken } from '../models';
 /**
  * PersonalAccessTokenV1alpha1UcApi - axios parameter creator
- * @export
  */
 export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -278,7 +277,6 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
 
 /**
  * PersonalAccessTokenV1alpha1UcApi - functional programming interface
- * @export
  */
 export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonalAccessTokenV1alpha1UcApiAxiosParamCreator(configuration)
@@ -359,7 +357,6 @@ export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Confi
 
 /**
  * PersonalAccessTokenV1alpha1UcApi - factory interface
- * @export
  */
 export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PersonalAccessTokenV1alpha1UcApiFp(configuration)
@@ -422,79 +419,41 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
 
 /**
  * Request parameters for deletePat operation in PersonalAccessTokenV1alpha1UcApi.
- * @export
- * @interface PersonalAccessTokenV1alpha1UcApiDeletePatRequest
  */
 export interface PersonalAccessTokenV1alpha1UcApiDeletePatRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1UcApiDeletePat
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for generatePat operation in PersonalAccessTokenV1alpha1UcApi.
- * @export
- * @interface PersonalAccessTokenV1alpha1UcApiGeneratePatRequest
  */
 export interface PersonalAccessTokenV1alpha1UcApiGeneratePatRequest {
-    /**
-     * 
-     * @type {PersonalAccessToken}
-     * @memberof PersonalAccessTokenV1alpha1UcApiGeneratePat
-     */
     readonly personalAccessToken: PersonalAccessToken
 }
 
 /**
  * Request parameters for obtainPat operation in PersonalAccessTokenV1alpha1UcApi.
- * @export
- * @interface PersonalAccessTokenV1alpha1UcApiObtainPatRequest
  */
 export interface PersonalAccessTokenV1alpha1UcApiObtainPatRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1UcApiObtainPat
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for restorePat operation in PersonalAccessTokenV1alpha1UcApi.
- * @export
- * @interface PersonalAccessTokenV1alpha1UcApiRestorePatRequest
  */
 export interface PersonalAccessTokenV1alpha1UcApiRestorePatRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1UcApiRestorePat
-     */
     readonly name: string
 }
 
 /**
  * Request parameters for revokePat operation in PersonalAccessTokenV1alpha1UcApi.
- * @export
- * @interface PersonalAccessTokenV1alpha1UcApiRevokePatRequest
  */
 export interface PersonalAccessTokenV1alpha1UcApiRevokePatRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonalAccessTokenV1alpha1UcApiRevokePat
-     */
     readonly name: string
 }
 
 /**
  * PersonalAccessTokenV1alpha1UcApi - object-oriented interface
- * @export
- * @class PersonalAccessTokenV1alpha1UcApi
- * @extends {BaseAPI}
  */
 export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
     /**
@@ -502,7 +461,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1UcApiDeletePatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public deletePat(requestParameters: PersonalAccessTokenV1alpha1UcApiDeletePatRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).deletePat(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -513,7 +471,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1UcApiGeneratePatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public generatePat(requestParameters: PersonalAccessTokenV1alpha1UcApiGeneratePatRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).generatePat(requestParameters.personalAccessToken, options).then((request) => request(this.axios, this.basePath));
@@ -524,7 +481,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1UcApiObtainPatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public obtainPat(requestParameters: PersonalAccessTokenV1alpha1UcApiObtainPatRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).obtainPat(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -534,7 +490,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * Obtain PAT list.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public obtainPats(options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).obtainPats(options).then((request) => request(this.axios, this.basePath));
@@ -545,7 +500,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1UcApiRestorePatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public restorePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRestorePatRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).restorePat(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
@@ -556,7 +510,6 @@ export class PersonalAccessTokenV1alpha1UcApi extends BaseAPI {
      * @param {PersonalAccessTokenV1alpha1UcApiRevokePatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof PersonalAccessTokenV1alpha1UcApi
      */
     public revokePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRevokePatRequest, options?: RawAxiosRequestConfig) {
         return PersonalAccessTokenV1alpha1UcApiFp(this.configuration).revokePat(requestParameters.name, options).then((request) => request(this.axios, this.basePath));

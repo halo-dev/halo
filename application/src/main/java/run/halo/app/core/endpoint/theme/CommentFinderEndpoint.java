@@ -47,7 +47,7 @@ import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
@@ -68,7 +68,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final CommentPublicQueryService commentPublicQueryService;
     private final CommentService commentService;
     private final ReplyService replyService;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final SystemConfigFetcher environmentFetcher;
     private final RateLimiterRegistry rateLimiterRegistry;
 
     @Override

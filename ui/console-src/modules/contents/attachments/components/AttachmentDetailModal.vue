@@ -1,7 +1,6 @@
 <script lang="ts" setup>
+import AttachmentImagePreview from "@/components/attachment/AttachmentImagePreview.vue";
 import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
-import LazyImage from "@/components/image/LazyImage.vue";
-import HasPermission from "@/components/permission/HasPermission.vue";
 import { isImage } from "@/utils/image";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -13,11 +12,10 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref, toRefs, useTemplateRef } from "vue";
-import AttachmentThumbnailList from "./AttachmentThumbnailList.vue";
 import DisplayNameEditForm from "./DisplayNameEditForm.vue";
 
 const props = withDefaults(
@@ -100,7 +98,7 @@ const showDisplayNameForm = ref(false);
         display_name: attachment?.spec.displayName || '',
       })
     "
-    :width="1000"
+    :width="1200"
     :mount-to-body="mountToBody"
     :layer-closable="true"
     height="calc(100vh - 20px)"
@@ -117,35 +115,10 @@ const showDisplayNameForm = ref(false);
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.preview')"
           >
-            <a
+            <AttachmentImagePreview
               v-if="isImage(attachment?.spec.mediaType)"
-              :href="attachment?.status?.permalink"
-              target="_blank"
-            >
-              <LazyImage
-                v-tooltip="{
-                  content: attachment?.status?.permalink,
-                  placement: 'bottom',
-                }"
-                :alt="attachment?.spec.displayName"
-                :src="
-                  attachment?.status?.thumbnails?.M ||
-                  attachment?.status?.permalink
-                "
-                classes="max-w-full cursor-pointer rounded"
-              >
-                <template #loading>
-                  <span class="text-gray-400">
-                    {{ $t("core.common.status.loading") }}...
-                  </span>
-                </template>
-                <template #error>
-                  <span class="text-red-400">
-                    {{ $t("core.common.status.loading_error") }}
-                  </span>
-                </template>
-              </LazyImage>
-            </a>
+              :attachment="attachment"
+            />
             <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
               <video
                 :src="attachment.status?.permalink"
@@ -220,15 +193,6 @@ const showDisplayNameForm = ref(false);
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
             <AttachmentPermalinkList :attachment="attachment" />
-          </VDescriptionItem>
-          <VDescriptionItem
-            v-if="
-              isImage(attachment?.spec.mediaType) &&
-              !!attachment?.status?.thumbnails
-            "
-            :label="$t('core.attachment.detail_modal.fields.thumbnails')"
-          >
-            <AttachmentThumbnailList :attachment="attachment" />
           </VDescriptionItem>
         </VDescription>
       </div>

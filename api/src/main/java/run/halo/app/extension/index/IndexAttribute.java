@@ -37,4 +37,11 @@ public interface IndexAttribute<E extends Extension, K extends Comparable<K>> {
      */
     Set<K> getValues(E e);
 
+    /**
+     * Indicates whether this attribute is single-valued.
+     *
+     * @return true if single-valued, false otherwise
+     */
+    boolean singleValue();
+
 }

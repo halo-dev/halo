@@ -12,7 +12,7 @@ import {
   VStatusDot,
   VTag,
 } from "@halo-dev/components";
-import { utils, type OperationItem } from "@halo-dev/console-shared";
+import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -78,7 +78,7 @@ const handleCreateTheme = async () => {
   }
 };
 
-const { operationItems } = useOperationItemExtensionPoint<Theme>(
+const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
   "theme:list-item:operation:create",
   theme,
   computed((): OperationItem<Theme>[] => [

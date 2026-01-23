@@ -6,7 +6,7 @@ import {
   VSpace,
   VStatusDot,
 } from "@halo-dev/components";
-import { utils } from "@halo-dev/console-shared";
+import { utils } from "@halo-dev/ui-shared";
 import prettyBytes from "pretty-bytes";
 import { computed, toRefs } from "vue";
 import { useFetchAttachmentPolicy } from "../../../composables/use-attachment-policy";
@@ -21,7 +21,7 @@ const props = withDefaults(
 
 const { attachment } = toRefs(props);
 
-const { policies } = useFetchAttachmentPolicy();
+const { data: policies } = useFetchAttachmentPolicy();
 
 const emit = defineEmits<{
   (event: "select", attachment?: Attachment): void;
