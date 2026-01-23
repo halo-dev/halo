@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { consoleApiClient } from "@halo-dev/api-client";
-import { Toast, VLoading } from "@halo-dev/components";
+import {
+  IconInformation,
+  Toast,
+  VDropdown,
+  VLoading,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
@@ -38,20 +43,9 @@ const { data: snapshot, isLoading } = useQuery({
         snapshotName: names.value[1],
       });
 
-    const oldContent = document.createElement("div");
-    oldContent.innerHTML = oldSnapshot.content || "";
-    const newContent = document.createElement("div");
-    newContent.innerHTML = newSnapshot.content || "";
-
-    const diff = visualDomDiff(oldContent, newContent);
-
-    const diffContent = document.createElement("div");
-    diffContent.append(diff.cloneNode(true));
-
     return {
-      oldContent: oldSnapshot.content,
-      newContent: newSnapshot.content,
-      diffContent: diffContent.innerHTML,
+      old: oldSnapshot,
+      new: newSnapshot,
     };
   },
   onError(err) {
@@ -61,10 +55,33 @@ const { data: snapshot, isLoading } = useQuery({
   },
   enabled: computed(() => !!postName.value && !!names.value?.length),
 });
+
+const diffContent = computed(() => {
+  if (!snapshot.value) {
+    return null;
+  }
+  const oldContent = document.createElement("div");
+  oldContent.innerHTML = snapshot.value.old.content || "";
+  const newContent = document.createElement("div");
+  newContent.innerHTML = snapshot.value.new.content || "";
+
+  const diffDocument = visualDomDiff(oldContent, newContent);
+
+  const diffNode = document.createElement("div");
+  diffNode.append(diffDocument.cloneNode(true));
+
+  const html = diffNode.innerHTML;
+
+  oldContent.remove();
+  newContent.remove();
+  diffNode.remove();
+
+  return html;
+});
 </script>
 <template>
   <div class="flex h-full flex-col">
-    <div class="flex-none border-b p-3">对比模式</div>
+    <div class="flex-none border-b px-4 py-3 font-semibold">对比模式</div>
 
     <div v-if="names?.length !== 2" class="flex justify-center py-10">
       <span class="text-gray-600">请选择两个版本进行对比</span>
@@ -74,7 +91,7 @@ const { data: snapshot, isLoading } = useQuery({
 
     <div
       v-else
-      class="grid h-full min-h-0 flex-1 shrink grid-cols-1 md:grid-cols-3"
+      class="grid h-full min-h-0 flex-1 shrink grid-cols-1 divide-x md:grid-cols-3"
     >
       <OverlayScrollbarsComponent
         element="div"
@@ -82,9 +99,26 @@ const { data: snapshot, isLoading } = useQuery({
         class="h-full w-full"
         defer
       >
+        <div class="sticky top-0 border-b bg-white px-4 py-3">
+          前一个版本（旧）
+        </div>
         <div
           class="snapshot-content markdown-body"
-          v-html="snapshot?.oldContent"
+          v-html="snapshot?.old.content"
+        ></div>
+      </OverlayScrollbarsComponent>
+      <OverlayScrollbarsComponent
+        element="div"
+        :options="{ scrollbars: { autoHide: 'scroll' } }"
+        class="h-full w-full"
+        defer
+      >
+        <div class="sticky top-0 border-b bg-white px-4 py-3">
+          所选第一个版本（新）
+        </div>
+        <div
+          class="snapshot-content markdown-body"
+          v-html="snapshot?.new.content"
         ></div>
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
@@ -94,20 +128,29 @@ const { data: snapshot, isLoading } = useQuery({
         defer
       >
         <div
-          class="snapshot-content markdown-body"
-          v-html="snapshot?.newContent"
-        ></div>
-      </OverlayScrollbarsComponent>
-      <OverlayScrollbarsComponent
-        element="div"
-        :options="{ scrollbars: { autoHide: 'scroll' } }"
-        class="h-full w-full"
-        defer
-      >
-        <div
-          class="snapshot-content markdown-body"
-          v-html="snapshot?.diffContent"
-        ></div>
+          class="sticky top-0 flex items-center gap-2 border-b bg-white px-4 py-3"
+        >
+          <span> 差异 </span>
+          <VDropdown :triggers="['hover']">
+            <IconInformation class="size-4" />
+            <template #popper>
+              <div class="w-52">
+                <ul class="flex flex-col gap-2">
+                  <li class="rounded bg-[#ffe6e6] px-1 py-0.5 line-through">
+                    该行代表被删除
+                  </li>
+                  <li class="rounded bg-[#e6ffe6] px-1 py-0.5">
+                    该行代表被添加
+                  </li>
+                  <li class="rounded bg-[#e6f2ff] px-1 py-0.5">
+                    该行代表被修改
+                  </li>
+                </ul>
+              </div>
+            </template>
+          </VDropdown>
+        </div>
+        <div class="snapshot-content markdown-body" v-html="diffContent"></div>
       </OverlayScrollbarsComponent>
     </div>
   </div>
@@ -173,8 +216,13 @@ const { data: snapshot, isLoading } = useQuery({
     display: initial;
   }
 
+  div > :first-child {
+    margin-top: 0 !important;
+  }
+
   .vdd-removed {
     background-color: #ffe6e6;
+    text-decoration: line-through;
   }
 
   .vdd-added {
