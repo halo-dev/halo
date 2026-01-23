@@ -8,26 +8,26 @@ import { computed, toRefs } from "vue";
 const props = withDefaults(
   defineProps<{
     postName?: string;
-    snapshotName?: string;
+    names?: string[];
   }>(),
   {
     postName: undefined,
-    snapshotName: undefined,
+    names: undefined,
   }
 );
 
-const { postName, snapshotName } = toRefs(props);
+const { postName, names } = toRefs(props);
 
 const { data: snapshot, isLoading } = useQuery({
-  queryKey: ["post-snapshot-by-name", postName, snapshotName],
+  queryKey: ["post-snapshot-by-name", postName, names],
   queryFn: async () => {
-    if (!postName.value || !snapshotName.value) {
-      throw new Error("postName and snapshotName are required");
+    if (!postName.value || !names.value?.length) {
+      throw new Error("postName and names are required");
     }
 
     const { data } = await consoleApiClient.content.post.fetchPostContent({
       name: postName.value,
-      snapshotName: snapshotName.value,
+      snapshotName: names.value[0],
     });
     return data;
   },
@@ -36,7 +36,7 @@ const { data: snapshot, isLoading } = useQuery({
       Toast.error(err.message);
     }
   },
-  enabled: computed(() => !!postName.value && !!snapshotName.value),
+  enabled: computed(() => !!postName.value && !!names.value?.length),
 });
 </script>
 <template>

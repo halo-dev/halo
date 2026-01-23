@@ -17,6 +17,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
+import SnapshotDiffContent from "./components/SnapshotDiffContent.vue";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -52,22 +53,72 @@ const { data: snapshots, isLoading } = useQuery({
   enabled: computed(() => !!postName.value),
 });
 
-const selectedSnapshotName = useRouteQuery<string | undefined>("snapshot-name");
+const selectedNames = useRouteQuery<string[] | undefined>("snapshot-names");
+const diffModeQuery = useRouteQuery<string | undefined>("diff-mode");
+
+const diffMode = computed(() => diffModeQuery.value === "true");
+
+function handleToggleDiffMode() {
+  if (diffMode.value) {
+    selectedNames.value = [selectedNames.value?.[0]].filter(
+      Boolean
+    ) as string[];
+  }
+  diffModeQuery.value = !diffMode.value ? "true" : undefined;
+}
+
+function handleSelectSnapshot(snapshotName: string) {
+  if (!diffMode.value) {
+    selectedNames.value = [snapshotName];
+    return;
+  }
+
+  // Diff mode
+  if (selectedNames.value?.includes(snapshotName)) {
+    selectedNames.value = selectedNames.value?.filter(
+      (name) => name !== snapshotName
+    );
+    return;
+  }
+
+  if (selectedNames.value?.length === 2) {
+    selectedNames.value = [snapshotName];
+    return;
+  }
+
+  selectedNames.value = [...(selectedNames.value || []), snapshotName];
+
+  selectedNames.value = selectedNames.value?.sort((a, b) => {
+    const aIndex = snapshots.value?.findIndex(
+      (snapshot) => snapshot.metadata.name === a
+    );
+    const bIndex = snapshots.value?.findIndex(
+      (snapshot) => snapshot.metadata.name === b
+    );
+    return (aIndex || 0) - (bIndex || 0);
+  });
+}
 
 watch(
   () => snapshots.value,
   (value) => {
-    if (value && !selectedSnapshotName.value) {
-      selectedSnapshotName.value = value[0].metadata.name;
+    if (!value) {
+      return;
+    }
+
+    if (!selectedNames.value?.length) {
+      selectedNames.value = [value[0].metadata.name];
     }
 
     // Reset selectedSnapshotName if the selected snapshot is deleted
     if (
-      !value?.some(
-        (snapshot) => snapshot.metadata.name === selectedSnapshotName.value
+      !value.some((snapshot) =>
+        selectedNames.value?.includes(snapshot.metadata.name)
       )
     ) {
-      selectedSnapshotName.value = value?.[0].metadata.name;
+      selectedNames.value = [value?.[0].metadata.name].filter(
+        Boolean
+      ) as string[];
     }
   },
   {
@@ -120,8 +171,11 @@ function handleCleanup() {
       <IconHistoryLine />
     </template>
     <template #actions>
-      <VButton size="sm" @click="$router.back()">
+      <VButton size="sm" ghost @click="$router.back()">
         {{ $t("core.common.buttons.back") }}
+      </VButton>
+      <VButton size="sm" @click="handleToggleDiffMode">
+        {{ diffMode ? "关闭对比模式" : "开启对比模式" }}
       </VButton>
       <VButton size="sm" type="danger" @click="handleCleanup">
         {{ $t("core.post_snapshots.operations.cleanup.button") }}
@@ -153,12 +207,12 @@ function handleCleanup() {
                 <li
                   v-for="snapshot in snapshots"
                   :key="snapshot.metadata.name"
-                  @click="selectedSnapshotName = snapshot.metadata.name"
+                  @click="handleSelectSnapshot(snapshot.metadata.name)"
                 >
                   <SnapshotListItem
                     :snapshot="snapshot"
                     :post="post"
-                    :selected-snapshot-name="selectedSnapshotName"
+                    :selected-names="selectedNames"
                   />
                 </li>
               </ul>
@@ -169,8 +223,14 @@ function handleCleanup() {
           class="col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-9 xl:col-span-10"
         >
           <SnapshotContent
+            v-if="!diffMode"
             :post-name="postName"
-            :snapshot-name="selectedSnapshotName"
+            :names="selectedNames"
+          />
+          <SnapshotDiffContent
+            v-else
+            :post-name="postName"
+            :names="selectedNames"
           />
         </div>
       </div>

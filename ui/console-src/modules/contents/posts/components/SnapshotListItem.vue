@@ -14,11 +14,11 @@ const props = withDefaults(
   defineProps<{
     post?: Post;
     snapshot: ListedSnapshotDto;
-    selectedSnapshotName?: string;
+    selectedNames?: string[];
   }>(),
   {
     post: undefined,
-    selectedSnapshotName: undefined,
+    selectedNames: undefined,
   }
 );
 
@@ -64,7 +64,7 @@ function handleDelete() {
 }
 
 const isSelected = computed(() => {
-  return props.selectedSnapshotName === props.snapshot.metadata.name;
+  return props.selectedNames?.includes(props.snapshot.metadata.name);
 });
 
 const isReleased = computed(() => {
