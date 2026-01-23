@@ -25,12 +25,12 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
-    public Flux<Extensions> listByNamePrefix(String prefix) {
+    public Flux<ExtensionStore> listByNamePrefix(String prefix) {
         return repository.findAllByNameStartingWith(prefix);
     }
 
     @Override
-    public Mono<Page<Extensions>> listByNamePrefix(String prefix, Pageable pageable) {
+    public Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable) {
         return this.repository.findAllByNameStartingWith(prefix, pageable)
             .collectList()
             .zipWith(this.repository.countByNameStartingWith(prefix))
@@ -38,7 +38,7 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
-    public Flux<Extensions> listBy(String prefix, String nameCursor, int limit) {
+    public Flux<ExtensionStore> listBy(String prefix, String nameCursor, int limit) {
         var page = PageRequest.ofSize(limit).withSort(Sort.Direction.ASC, "name");
         if (StringUtils.isBlank(nameCursor)) {
             return this.repository.findAllByNameStartingWith(prefix, page);
@@ -55,32 +55,32 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     }
 
     @Override
-    public Flux<Extensions> listByNames(List<String> names) {
-        ToIntFunction<Extensions> comparator =
+    public Flux<ExtensionStore> listByNames(List<String> names) {
+        ToIntFunction<ExtensionStore> comparator =
             store -> names.indexOf(store.getName());
         return repository.findByNameIn(names)
             .sort(Comparator.comparingInt(comparator));
     }
 
     @Override
-    public Mono<Extensions> fetchByName(String name) {
+    public Mono<ExtensionStore> fetchByName(String name) {
         return repository.findById(name);
     }
 
     @Override
-    public Mono<Extensions> create(String name, byte[] data) {
-        return repository.save(new Extensions(name, data))
+    public Mono<ExtensionStore> create(String name, byte[] data) {
+        return repository.save(new ExtensionStore(name, data))
             .onErrorMap(DuplicateKeyException.class,
                 t -> new DuplicateNameException("Duplicate name detected.", t));
     }
 
     @Override
-    public Mono<Extensions> update(String name, Long version, byte[] data) {
-        return repository.save(new Extensions(name, data, version));
+    public Mono<ExtensionStore> update(String name, Long version, byte[] data) {
+        return repository.save(new ExtensionStore(name, data, version));
     }
 
     @Override
-    public Mono<Extensions> delete(String name, Long version) {
+    public Mono<ExtensionStore> delete(String name, Long version) {
         return repository.findById(name)
             .flatMap(extensionStore -> {
                 // reset the version

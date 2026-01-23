@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.index.IndexEngine;
-import run.halo.app.extension.store.Extensions;
+import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -91,12 +91,12 @@ class ReactiveExtensionClientTest {
         return fake;
     }
 
-    Extensions createExtensionStore(String name) {
+    ExtensionStore createExtensionStore(String name) {
         return createExtensionStore(name, null);
     }
 
-    Extensions createExtensionStore(String name, Long version) {
-        var extensionStore = new Extensions();
+    ExtensionStore createExtensionStore(String name, Long version) {
+        var extensionStore = new ExtensionStore();
         extensionStore.setName(name);
         extensionStore.setVersion(version);
         extensionStore.setData("fake data".getBytes());

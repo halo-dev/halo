@@ -23,7 +23,7 @@ import reactor.core.Exceptions;
 import run.halo.app.extension.event.SchemeRemovedEvent;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.store.Extensions;
+import run.halo.app.extension.store.ExtensionStore;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -59,7 +59,7 @@ class JSONExtensionConverter implements ExtensionConverter {
     }
 
     @Override
-    public <E extends Extension> Extensions convertTo(E extension) {
+    public <E extends Extension> ExtensionStore convertTo(E extension) {
         var gvk = extension.groupVersionKind();
         var scheme = schemeManager.get(gvk);
 
@@ -84,7 +84,7 @@ class JSONExtensionConverter implements ExtensionConverter {
             var version = extension.getMetadata().getVersion();
             var storeName = buildStoreName(scheme, extension.getMetadata().getName());
             var data = jsonMapper.writeValueAsBytes(convertedExtension);
-            return new Extensions(storeName, data, version);
+            return new ExtensionStore(storeName, data, version);
         } catch (IOException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
         } catch (ResolutionException e) {
@@ -93,10 +93,10 @@ class JSONExtensionConverter implements ExtensionConverter {
     }
 
     @Override
-    public <E extends Extension> E convertFrom(Class<E> type, Extensions extensions) {
+    public <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore) {
         try {
-            var extension = jsonMapper.readValue(extensions.getData(), type);
-            extension.getMetadata().setVersion(extensions.getVersion());
+            var extension = jsonMapper.readValue(extensionStore.getData(), type);
+            extension.getMetadata().setVersion(extensionStore.getVersion());
             return extension;
         } catch (JacksonException e) {
             throw new ExtensionConvertException("Failed to convert Extension from store", e);

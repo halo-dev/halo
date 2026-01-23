@@ -16,7 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
-class ReactiveExtensionsClientImplTest {
+class ReactiveExtensionStoreClientImplTest {
 
     @Mock
     ExtensionStoreRepository repository;
@@ -27,8 +27,8 @@ class ReactiveExtensionsClientImplTest {
     @Test
     void listByNamePrefix() {
         var expectedExtensions = List.of(
-            new Extensions("/registry/posts/hello-world", "this is post".getBytes(), 1L),
-            new Extensions("/registry/posts/hello-halo", "this is post".getBytes(), 1L)
+            new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L),
+            new ExtensionStore("/registry/posts/hello-halo", "this is post".getBytes(), 1L)
         );
 
         when(repository.findAllByNameStartingWith("/registry/posts"))
@@ -41,7 +41,7 @@ class ReactiveExtensionsClientImplTest {
     @Test
     void fetchByName() {
         var expectedExtension =
-            new Extensions("/registry/posts/hello-world", "this is post".getBytes(), 1L);
+            new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L);
 
         when(repository.findById("/registry/posts/hello-halo"))
             .thenReturn(Mono.just(expectedExtension));
@@ -54,7 +54,7 @@ class ReactiveExtensionsClientImplTest {
     @Test
     void create() {
         var expectedExtension =
-            new Extensions("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
         when(repository.save(any()))
             .thenReturn(Mono.just(expectedExtension));
@@ -69,7 +69,7 @@ class ReactiveExtensionsClientImplTest {
     @Test
     void update() {
         var expectedExtension =
-            new Extensions("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
         when(repository.save(any())).thenReturn(Mono.just(expectedExtension));
 
@@ -90,7 +90,7 @@ class ReactiveExtensionsClientImplTest {
     @Test
     void shouldDeleteSuccessfully() {
         var expectedExtension =
-            new Extensions("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
         when(repository.findById(anyString())).thenReturn(Mono.just(expectedExtension));
         when(repository.delete(any())).thenReturn(Mono.empty());

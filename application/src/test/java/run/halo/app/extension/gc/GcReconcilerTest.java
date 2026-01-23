@@ -27,7 +27,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.index.IndexEngine;
-import run.halo.app.extension.store.Extensions;
+import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @ExtendWith(MockitoExtension.class)
@@ -108,7 +108,7 @@ class GcReconcilerTest {
         when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
             .thenReturn(Optional.of(fake));
 
-        Extensions store = new Extensions();
+        ExtensionStore store = new ExtensionStore();
         store.setName("fake-store-name");
         store.setVersion(1L);
 

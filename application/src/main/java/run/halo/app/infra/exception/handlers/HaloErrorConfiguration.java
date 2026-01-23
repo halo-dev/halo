@@ -2,7 +2,6 @@ package run.halo.app.infra.exception.handlers;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.boot.webflux.autoconfigure.error.ErrorWebFluxAutoConfiguration;
 import org.springframework.boot.webflux.error.ErrorAttributes;
 import org.springframework.boot.webflux.error.ErrorWebExceptionHandler;
@@ -40,12 +39,11 @@ public class HaloErrorConfiguration {
         WebProperties webProperties,
         ObjectProvider<ViewResolver> viewResolvers,
         ServerCodecConfigurer serverCodecConfigurer,
-        ApplicationContext applicationContext,
-        ServerProperties serverProperties) {
+        ApplicationContext applicationContext) {
         var exceptionHandler = new HaloErrorWebExceptionHandler(
             errorAttributes,
             webProperties.getResources(),
-            serverProperties.getError(),
+            webProperties.getError(),
             applicationContext);
         exceptionHandler.setViewResolvers(viewResolvers.orderedStream().toList());
         exceptionHandler.setMessageWriters(serverCodecConfigurer.getWriters());

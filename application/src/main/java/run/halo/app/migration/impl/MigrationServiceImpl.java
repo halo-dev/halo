@@ -52,7 +52,6 @@ import run.halo.app.extension.ExtensionStoreUtil;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
-import run.halo.app.extension.store.Extensions;
 import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -256,9 +255,9 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         if (Files.notExists(extensionsPath)) {
             return Mono.error(new ServerWebInputException("Extensions data file not found."));
         }
-        var reader = objectMapper.readerFor(Extensions.class);
+        var reader = objectMapper.readerFor(ExtensionStore.class);
         var total = new AtomicInteger(0);
-        return Mono.<Void, MappingIterator<Extensions>>using(
+        return Mono.<Void, MappingIterator<ExtensionStore>>using(
                 () -> reader.readValues(extensionsPath.toFile()),
                 itr -> Flux.fromIterable(() -> itr)
                     // reset version
@@ -330,7 +329,7 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         var excludes = new AtomicInteger(0);
         return Mono.fromCallable(() -> Files.createFile(baseDir.resolve("extensions.data")))
             .flatMap(extensionsPath -> Mono.using(
-                () -> objectMapper.writerFor(Extensions.class)
+                () -> objectMapper.writerFor(ExtensionStore.class)
                     .writeValuesAsArray(extensionsPath.toFile()),
                 seqWriter -> fetchAllExtensionStores(BATCH_SIZE)
                     .doOnNext(stores ->

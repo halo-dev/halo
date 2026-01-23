@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
  * @author johnniang
  */
 @Repository
-public interface ExtensionStoreRepository extends R2dbcRepository<Extensions, String> {
+public interface ExtensionStoreRepository extends R2dbcRepository<ExtensionStore, String> {
 
     /**
      * Finds all ExtensionStore by name prefix.
@@ -21,9 +21,9 @@ public interface ExtensionStoreRepository extends R2dbcRepository<Extensions, St
      * @param prefix is the prefix of name.
      * @return all ExtensionStores which names starts with the given prefix.
      */
-    Flux<Extensions> findAllByNameStartingWith(String prefix);
+    Flux<ExtensionStore> findAllByNameStartingWith(String prefix);
 
-    Flux<Extensions> findAllByNameStartingWith(String prefix, Pageable pageable);
+    Flux<ExtensionStore> findAllByNameStartingWith(String prefix, Pageable pageable);
 
     Mono<Long> countByNameStartingWith(String prefix);
 
@@ -34,9 +34,9 @@ public interface ExtensionStoreRepository extends R2dbcRepository<Extensions, St
      * @param names names to find
      * @return a flux of extension stores
      */
-    Flux<Extensions> findByNameIn(List<String> names);
+    Flux<ExtensionStore> findByNameIn(List<String> names);
 
-    Flux<Extensions> findAllByNameStartingWithAndNameGreaterThan(
+    Flux<ExtensionStore> findAllByNameStartingWithAndNameGreaterThan(
         String prefix, String nameCursor, Pageable pageable);
 
 }

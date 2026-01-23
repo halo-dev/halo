@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ExtensionsUtilTest {
+class ExtensionStoreUtilTest {
 
     Scheme scheme;
 

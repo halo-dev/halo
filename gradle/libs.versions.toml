@@ -26,7 +26,7 @@ guava = 'com.google.guava:guava:33.5.0-jre'
 java-diff-utils = 'io.github.java-diff-utils:java-diff-utils:4.16'
 jsoup = 'org.jsoup:jsoup:1.22.1'
 json-patch = 'com.github.java-json-tools:json-patch:1.13'
-springdoc-openapi = 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.15'
+springdoc-openapi = 'org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.1'
 openapi-schema-validator = 'org.openapi4j:openapi-schema-validator:1.0.7'
 bouncycastle-bcpkix = 'org.bouncycastle:bcpkix-jdk18on:1.83'
 twofactor-auth = 'com.j256.two-factor-auth:two-factor-auth:1.3'
@@ -40,7 +40,7 @@ apache = ['apache-commons-lang3', 'apache-tika-core']
 therapi = ['therapi-runtime-javadoc', 'therapi-runtime-javadoc-scribe']
 
 [plugins]
-spring-boot = 'org.springframework.boot:4.0.0-RC1'
+spring-boot = 'org.springframework.boot:4.0.2'
 spring-dependency-management = 'io.spring.dependency-management:1.1.7'
 git-properties = 'com.gorylenko.gradle-git-properties:2.5.2'
 undercouch-download = 'de.undercouch.download:5.6.0'

@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.core.extension.Role;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
-import run.halo.app.extension.store.Extensions;
+import run.halo.app.extension.store.ExtensionStore;
 import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +79,7 @@ class JsonExtensionConverterTest {
     void convertFrom() {
         var fake = createFakeExtension("fake", 20L);
 
-        var store = new Extensions();
+        var store = new ExtensionStore();
         store.setName("/registry/fake.halo.run/fakes/fake");
         store.setVersion(20L);
         store.setData(objectMapper.writeValueAsBytes(fake));
@@ -90,7 +90,7 @@ class JsonExtensionConverterTest {
 
     @Test
     void shouldThrowConvertExceptionWhenDataIsInvalid() {
-        var store = new Extensions();
+        var store = new ExtensionStore();
         store.setName("/registry/fake.halo.run/fakes/fake");
         store.setVersion(20L);
         store.setData("{".getBytes());

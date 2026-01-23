@@ -13,8 +13,8 @@ import run.halo.app.extension.Scheme;
 import run.halo.app.extension.event.SchemeAddedEvent;
 import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.index.IndicesInitializer;
+import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreClient;
-import run.halo.app.extension.store.Extensions;
 
 @Component
 @Slf4j
@@ -48,7 +48,7 @@ class DefaultIndicesInitializer implements IndicesInitializer {
     public <E extends Extension> void doInitialize(Scheme scheme) {
         var type = (Class<E>) scheme.type();
         var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
-        List<Extensions> extensions;
+        List<ExtensionStore> extensions;
         String nameCursor = null;
         log.info("Start to initialize indices for type: {}, prefix: {}", type.getName(), prefix);
         var watch = new StopWatch("Initialize indices for " + type.getName());
