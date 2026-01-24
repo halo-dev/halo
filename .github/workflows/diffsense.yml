@@ -1,0 +1,54 @@
+name: DiffSense MR Audit
+
+on:
+  pull_request:
+
+jobs:
+  diffsense:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Halo 已被 checkout 到当前目录
+      - name: Checkout Halo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 必须，否则 git diff 拿不到 base
+
+      # 2️⃣ 把 DiffSense 工具 clone 到旁边
+      - name: Checkout DiffSense
+        run: |
+          git clone https://github.com/GoldenSupremeSaltedFish/DiffSense.git diffsense
+
+      # 3️⃣ 安装依赖（只装 DiffSense 需要的）
+      - name: Install deps
+        run: |
+          pip install PyYAML PyGithub python-gitlab requests
+
+      # 4️⃣ 生成 diff
+      - name: Generate diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD > changes.diff
+
+      # 5️⃣ 跑分析器
+      - name: Run DiffSense
+        run: |
+          # ⚠️ 注意：这里假设远程仓库结构与本地一致，入口在 diffsense/main.py
+          # 如果远程仓库结构不同，请调整下面的路径
+          python diffsense/diffsense/main.py changes.diff > report.json
+
+      # 6️⃣ 根据结果阻断 MR
+      - name: Fail if elevated
+        run: |
+          python - << 'EOF'
+          import json, sys
+          try:
+              r = json.load(open("report.json"))
+              if r["review_level"] == "elevated":
+                  print("❌ DiffSense blocked this MR")
+                  sys.exit(1)
+              print("✅ DiffSense passed")
+          except Exception as e:
+              print(f"❌ Error parsing report: {e}")
+              # 如果报告生成失败，也可以选择 fail 或者 pass，这里选择 fail 以便排查
+              sys.exit(1)
+          EOF
