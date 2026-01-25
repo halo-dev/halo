@@ -28,7 +28,12 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public Mono<Counter> getByName(String counterName) {
-        return client.fetch(Counter.class, counterName);
+        lock.lock();
+        try {
+            return client.fetch(Counter.class, counterName);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
