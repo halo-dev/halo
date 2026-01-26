@@ -1,42 +1,40 @@
 <script setup lang="ts">
-import { consoleApiClient } from "@halo-dev/api-client";
+import { type ContentWrapper } from "@halo-dev/api-client";
 import { Toast, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs } from "vue";
+import { SNAPSHOT_QUERY_KEY } from "./query-keys";
 
 const props = withDefaults(
   defineProps<{
-    postName?: string;
-    names?: string[];
+    cacheKey: string;
+    name: string;
+    snapshotNames?: string[];
+    getApi: (snapshotName: string) => Promise<ContentWrapper>;
   }>(),
   {
-    postName: undefined,
-    names: undefined,
+    snapshotNames: () => [],
   }
 );
 
-const { postName, names } = toRefs(props);
+const { name, snapshotNames, cacheKey } = toRefs(props);
 
 const { data: snapshot, isLoading } = useQuery({
-  queryKey: ["post-snapshot-by-name", postName, names],
+  queryKey: SNAPSHOT_QUERY_KEY(cacheKey, name, snapshotNames),
   queryFn: async () => {
-    if (!postName.value || !names.value?.length) {
-      throw new Error("postName and names are required");
+    if (!snapshotNames.value?.length) {
+      throw new Error("Please select a snapshot");
     }
 
-    const { data } = await consoleApiClient.content.post.fetchPostContent({
-      name: postName.value,
-      snapshotName: names.value[0],
-    });
-    return data;
+    return await props.getApi(snapshotNames.value[0]);
   },
   onError(err) {
     if (err instanceof Error) {
       Toast.error(err.message);
     }
   },
-  enabled: computed(() => !!postName.value && !!names.value?.length),
+  enabled: computed(() => !!name.value && !!snapshotNames.value?.length),
 });
 </script>
 <template>

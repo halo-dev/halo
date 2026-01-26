@@ -1,64 +1,64 @@
 <script setup lang="ts">
-import type { ListedSnapshotDto, SinglePage } from "@halo-dev/api-client";
-import { consoleApiClient } from "@halo-dev/api-client";
+import type { ListedSnapshotDto } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VStatusDot, VTag } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
-import { computed } from "vue";
+import { computed, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { SNAPSHOTS_QUERY_KEY } from "./query-keys";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
-    singlePage?: SinglePage;
     snapshot: ListedSnapshotDto;
-    selectedSnapshotName?: string;
+    selectedSnapshotNames?: string[];
+    cacheKey: string;
+    name: string;
+    releaseSnapshot?: string;
+    baseSnapshot?: string;
+    headSnapshot?: string;
+    deleteApi: (snapshotName: string) => Promise<void>;
+    revertApi: (snapshotName: string) => Promise<void>;
   }>(),
   {
-    singlePage: undefined,
-    selectedSnapshotName: undefined,
+    selectedSnapshotNames: undefined,
+    releaseSnapshot: undefined,
+    baseSnapshot: undefined,
+    headSnapshot: undefined,
   }
 );
 
+const { cacheKey, name } = toRefs(props);
+
 async function handleRestore() {
   Dialog.warning({
-    title: t("core.page_snapshots.operations.revert.title"),
-    description: t("core.page_snapshots.operations.revert.description"),
+    title: t("core.snapshots.operations.revert.title"),
+    description: t("core.snapshots.operations.revert.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
-      await consoleApiClient.content.singlePage.revertToSpecifiedSnapshotForSinglePage(
-        {
-          name: props.singlePage?.metadata.name as string,
-          revertSnapshotForSingleParam: {
-            snapshotName: props.snapshot.metadata.name,
-          },
-        }
-      );
+      await props.revertApi(props.snapshot.metadata.name);
       await queryClient.invalidateQueries({
-        queryKey: ["singlePage-snapshots-by-singlePage-name"],
+        queryKey: SNAPSHOTS_QUERY_KEY(cacheKey, name),
       });
-      Toast.success(t("core.page_snapshots.operations.revert.toast_success"));
+      Toast.success(t("core.snapshots.operations.revert.toast_success"));
     },
   });
 }
 
 function handleDelete() {
   Dialog.warning({
-    title: t("core.page_snapshots.operations.delete.title"),
-    description: t("core.page_snapshots.operations.delete.description"),
+    title: t("core.snapshots.operations.delete.title"),
+    description: t("core.snapshots.operations.delete.description"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
     async onConfirm() {
-      await consoleApiClient.content.singlePage.deleteSinglePageContent({
-        name: props.singlePage?.metadata.name as string,
-        snapshotName: props.snapshot.metadata.name,
-      });
+      await props.deleteApi(props.snapshot.metadata.name);
       await queryClient.invalidateQueries({
-        queryKey: ["singlePage-snapshots-by-singlePage-name"],
+        queryKey: SNAPSHOTS_QUERY_KEY(cacheKey, name),
       });
       Toast.success(t("core.common.toast.delete_success"));
     },
@@ -66,25 +66,22 @@ function handleDelete() {
 }
 
 const isSelected = computed(() => {
-  return props.selectedSnapshotName === props.snapshot.metadata.name;
+  return props.selectedSnapshotNames?.includes(props.snapshot.metadata.name);
 });
 
 const isReleased = computed(() => {
-  return (
-    props.singlePage?.spec.releaseSnapshot === props.snapshot.metadata.name
-  );
+  return props.releaseSnapshot === props.snapshot.metadata.name;
 });
 
 const isHead = computed(() => {
-  const { headSnapshot, releaseSnapshot } = props.singlePage?.spec || {};
   return (
-    headSnapshot !== releaseSnapshot &&
-    headSnapshot === props.snapshot.metadata.name
+    props.headSnapshot !== props.releaseSnapshot &&
+    props.headSnapshot === props.snapshot.metadata.name
   );
 });
 
 const isBase = computed(() => {
-  return props.singlePage?.spec.baseSnapshot === props.snapshot.metadata.name;
+  return props.baseSnapshot === props.snapshot.metadata.name;
 });
 </script>
 <template>
@@ -107,13 +104,13 @@ const isBase = computed(() => {
       </div>
       <div class="inline-flex flex-none items-center space-x-3">
         <VTag v-if="isReleased" theme="primary">
-          {{ $t("core.page_snapshots.status.released") }}
+          {{ $t("core.snapshots.status.released") }}
         </VTag>
         <VTag v-if="isHead">
-          {{ $t("core.page_snapshots.status.draft") }}
+          {{ $t("core.snapshots.status.draft") }}
         </VTag>
         <VTag v-if="isBase">
-          {{ $t("core.page_snapshots.status.base") }}
+          {{ $t("core.snapshots.status.base") }}
         </VTag>
         <VStatusDot
           v-if="snapshot.metadata.deletionTimestamp"
@@ -132,7 +129,7 @@ const isBase = computed(() => {
         class="hidden flex-none space-x-2 group-hover:block"
       >
         <VButton v-if="!isHead" size="xs" @click="handleRestore()">
-          {{ $t("core.page_snapshots.operations.revert.button") }}
+          {{ $t("core.snapshots.operations.revert.button") }}
         </VButton>
         <VButton v-if="!isBase" size="xs" type="danger" @click="handleDelete">
           {{ $t("core.common.buttons.delete") }}

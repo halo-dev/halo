@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { consoleApiClient } from "@halo-dev/api-client";
+import { type ContentWrapper } from "@halo-dev/api-client";
 import {
   IconInformation,
   Toast,
@@ -11,38 +11,32 @@ import { useLocalStorage } from "@vueuse/core";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
 import { computed, nextTick, toRefs, useTemplateRef, watch } from "vue";
+import { SNAPSHOT_DIFF_QUERY_KEY } from "./query-keys";
 
 const props = withDefaults(
   defineProps<{
-    postName?: string;
-    names?: string[];
+    cacheKey: string;
+    name: string;
+    snapshotNames?: string[];
+    getApi: (snapshotName: string) => Promise<ContentWrapper>;
   }>(),
   {
-    postName: undefined,
-    names: undefined,
+    snapshotNames: () => [],
   }
 );
 
-const { postName, names } = toRefs(props);
+const { name, snapshotNames, cacheKey } = toRefs(props);
 
 const { data: snapshot, isLoading } = useQuery({
-  queryKey: ["post-snapshot-diff-by-name", postName, names],
+  queryKey: SNAPSHOT_DIFF_QUERY_KEY(cacheKey, name, snapshotNames),
   queryFn: async () => {
-    if (!postName.value || names.value?.length !== 2) {
-      throw new Error("Please select two versions to compare");
+    if (snapshotNames.value?.length !== 2) {
+      throw new Error("Please select two snapshots to compare");
     }
 
-    const { data: newSnapshot } =
-      await consoleApiClient.content.post.fetchPostContent({
-        name: postName.value,
-        snapshotName: names.value[0],
-      });
+    const newSnapshot = await props.getApi(snapshotNames.value[0]);
 
-    const { data: oldSnapshot } =
-      await consoleApiClient.content.post.fetchPostContent({
-        name: postName.value,
-        snapshotName: names.value[1],
-      });
+    const oldSnapshot = await props.getApi(snapshotNames.value[1]);
 
     return {
       old: oldSnapshot,
@@ -54,7 +48,7 @@ const { data: snapshot, isLoading } = useQuery({
       Toast.error(err.message);
     }
   },
-  enabled: computed(() => !!postName.value && !!names.value?.length),
+  enabled: computed(() => !!name.value && !!snapshotNames.value?.length),
 });
 
 const diffContent = computed(() => {
@@ -214,7 +208,7 @@ const handleDiffScroll = () => {
       </div>
     </div>
 
-    <div v-if="names?.length !== 2" class="flex justify-center py-10">
+    <div v-if="snapshotNames?.length !== 2" class="flex justify-center py-10">
       <span class="text-gray-600">请选择两个版本进行对比</span>
     </div>
 
