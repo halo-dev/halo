@@ -190,7 +190,7 @@ function handleCleanup() {
     >
       <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
-          class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-3 xl:col-span-2"
+          class="relative col-span-12 h-full overflow-auto sm:col-span-3 xl:col-span-2"
         >
           <OverlayScrollbarsComponent
             element="div"
@@ -220,7 +220,7 @@ function handleCleanup() {
           </OverlayScrollbarsComponent>
         </div>
         <div
-          class="col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-9 xl:col-span-10"
+          class="col-span-12 h-full overflow-auto sm:col-span-9 xl:col-span-10"
         >
           <SnapshotContent
             v-if="!diffMode"

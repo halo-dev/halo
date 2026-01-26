@@ -7,6 +7,7 @@ import {
   VLoading,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useLocalStorage } from "@vueuse/core";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
 import { computed, toRefs } from "vue";
@@ -80,10 +81,23 @@ const diffContent = computed(() => {
 
   return html;
 });
+
+const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
 </script>
 <template>
   <div class="flex h-full flex-col">
-    <div class="flex-none border-b px-4 py-3 font-semibold">对比模式</div>
+    <div class="flex flex-none items-center justify-between border-b px-4 py-3">
+      <div class="font-semibold">对比模式</div>
+      <FormKit
+        v-model="onlyDiff"
+        type="checkbox"
+        label="只显示差异"
+        :classes="{
+          outer: '!py-0',
+          wrapper: '!mb-0',
+        }"
+      ></FormKit>
+    </div>
 
     <div v-if="names?.length !== 2" class="flex justify-center py-10">
       <span class="text-gray-600">请选择两个版本进行对比</span>
@@ -93,9 +107,14 @@ const diffContent = computed(() => {
 
     <div
       v-else
-      class="grid h-full min-h-0 flex-1 shrink grid-cols-1 divide-x md:grid-cols-3"
+      class="grid h-full min-h-0 flex-1 shrink grid-cols-1 divide-x"
+      :class="{
+        'grid-cols-1': onlyDiff,
+        'md:grid-cols-3': !onlyDiff,
+      }"
     >
       <OverlayScrollbarsComponent
+        v-if="!onlyDiff"
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
@@ -110,6 +129,7 @@ const diffContent = computed(() => {
         ></div>
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
+        v-if="!onlyDiff"
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
