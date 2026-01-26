@@ -186,7 +186,11 @@ function handleCleanup() {
         {{ $t("core.common.buttons.back") }}
       </VButton>
       <VButton size="sm" @click="handleToggleDiffMode">
-        {{ diffMode ? "关闭对比模式" : "开启对比模式" }}
+        {{
+          diffMode
+            ? $t("core.snapshots.diff_mode.toggle.disable")
+            : $t("core.snapshots.diff_mode.toggle.enable")
+        }}
       </VButton>
       <VButton size="sm" type="danger" @click="handleCleanup">
         {{ $t("core.snapshots.operations.cleanup.button") }}

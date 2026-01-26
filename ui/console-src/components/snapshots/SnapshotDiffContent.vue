@@ -184,12 +184,14 @@ const handleDiffScroll = () => {
 <template>
   <div class="flex h-full flex-col">
     <div class="flex flex-none items-center justify-between border-b px-4 py-3">
-      <div class="font-semibold">对比模式</div>
+      <div class="font-semibold">
+        {{ $t("core.snapshots.diff_mode.title") }}
+      </div>
       <div class="flex items-center gap-4">
         <FormKit
           v-model="onlyDiff"
           type="checkbox"
-          label="只显示差异"
+          :label="$t('core.snapshots.diff_mode.show_diff_only')"
           :classes="{
             outer: '!py-0',
             wrapper: '!mb-0',
@@ -198,7 +200,7 @@ const handleDiffScroll = () => {
         <FormKit
           v-model="enableSyncScroll"
           type="checkbox"
-          label="同步滚动"
+          :label="$t('core.snapshots.diff_mode.sync_scroll')"
           :disabled="onlyDiff"
           :classes="{
             outer: '!py-0',
@@ -209,7 +211,9 @@ const handleDiffScroll = () => {
     </div>
 
     <div v-if="snapshotNames?.length !== 2" class="flex justify-center py-10">
-      <span class="text-gray-600">请选择两个版本进行对比</span>
+      <span class="text-gray-600">
+        {{ $t("core.snapshots.diff_mode.select_two_tip") }}
+      </span>
     </div>
 
     <VLoading v-else-if="isLoading" />
@@ -231,7 +235,7 @@ const handleDiffScroll = () => {
         defer
       >
         <div class="sticky top-0 border-b bg-white px-4 py-3">
-          前一个版本（旧）
+          {{ $t("core.snapshots.diff_mode.old_version") }}
         </div>
         <div
           class="snapshot-content markdown-body"
@@ -247,7 +251,7 @@ const handleDiffScroll = () => {
         defer
       >
         <div class="sticky top-0 border-b bg-white px-4 py-3">
-          所选第一个版本（新）
+          {{ $t("core.snapshots.diff_mode.new_version") }}
         </div>
         <div
           class="snapshot-content markdown-body"
@@ -264,20 +268,20 @@ const handleDiffScroll = () => {
         <div
           class="sticky top-0 flex items-center gap-2 border-b bg-white px-4 py-3"
         >
-          <span> 差异 </span>
+          <span>{{ $t("core.snapshots.diff_mode.diff") }}</span>
           <VDropdown :triggers="['hover']">
             <IconInformation class="size-4" />
             <template #popper>
               <div class="w-52">
                 <ul class="flex flex-col gap-2">
                   <li class="rounded bg-[#ffe6e6] px-1 py-0.5 line-through">
-                    该行代表被删除
+                    {{ $t("core.snapshots.diff_mode.legend.removed") }}
                   </li>
                   <li class="rounded bg-[#e6ffe6] px-1 py-0.5">
-                    该行代表被添加
+                    {{ $t("core.snapshots.diff_mode.legend.added") }}
                   </li>
                   <li class="rounded bg-[#e6f2ff] px-1 py-0.5">
-                    该行代表被修改
+                    {{ $t("core.snapshots.diff_mode.legend.modified") }}
                   </li>
                 </ul>
               </div>
