@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
-import { computed, toRefs } from "vue";
+import { computed, nextTick, toRefs, useTemplateRef, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -83,20 +83,135 @@ const diffContent = computed(() => {
 });
 
 const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
+const enableSyncScroll = useLocalStorage("snapshot-diff-sync-scroll", true);
+
+const oldScrollRef =
+  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
+    "oldScrollRef"
+  );
+const newScrollRef =
+  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
+    "newScrollRef"
+  );
+const diffScrollRef =
+  useTemplateRef<InstanceType<typeof OverlayScrollbarsComponent>>(
+    "diffScrollRef"
+  );
+
+let isSyncing = false;
+
+const syncScroll = (
+  sourceRef: typeof oldScrollRef,
+  targetRefs: (typeof oldScrollRef)[]
+) => {
+  if (isSyncing || !enableSyncScroll.value || onlyDiff.value) return;
+
+  const sourceInstance = sourceRef.value?.osInstance();
+  if (!sourceInstance) return;
+
+  const sourceViewport = sourceInstance.elements().viewport;
+  const scrollTop = sourceViewport.scrollTop;
+  const scrollHeight = sourceViewport.scrollHeight;
+  const clientHeight = sourceViewport.clientHeight;
+
+  if (scrollHeight <= clientHeight) return;
+
+  const scrollPercentage = scrollTop / (scrollHeight - clientHeight);
+
+  isSyncing = true;
+
+  targetRefs.forEach((targetRef) => {
+    const targetInstance = targetRef.value?.osInstance();
+    if (!targetInstance) return;
+
+    const targetViewport = targetInstance.elements().viewport;
+    const targetScrollHeight = targetViewport.scrollHeight;
+    const targetClientHeight = targetViewport.clientHeight;
+
+    if (targetScrollHeight <= targetClientHeight) return;
+
+    const targetScrollTop =
+      scrollPercentage * (targetScrollHeight - targetClientHeight);
+    targetViewport.scrollTop = targetScrollTop;
+  });
+
+  setTimeout(() => {
+    isSyncing = false;
+  }, 10);
+};
+
+watch([oldScrollRef, newScrollRef, diffScrollRef, onlyDiff, snapshot], () => {
+  nextTick(() => {
+    setTimeout(() => {
+      const oldInstance = oldScrollRef.value?.osInstance();
+      const newInstance = newScrollRef.value?.osInstance();
+      const diffInstance = diffScrollRef.value?.osInstance();
+
+      if (oldInstance) {
+        const viewport = oldInstance.elements().viewport;
+        viewport.removeEventListener("scroll", handleOldScroll);
+        viewport.addEventListener("scroll", handleOldScroll);
+      }
+
+      if (newInstance) {
+        const viewport = newInstance.elements().viewport;
+        viewport.removeEventListener("scroll", handleNewScroll);
+        viewport.addEventListener("scroll", handleNewScroll);
+      }
+
+      if (diffInstance) {
+        const viewport = diffInstance.elements().viewport;
+        viewport.removeEventListener("scroll", handleDiffScroll);
+        viewport.addEventListener("scroll", handleDiffScroll);
+      }
+    }, 100);
+  });
+});
+
+const handleOldScroll = () => {
+  const targets = onlyDiff.value
+    ? [diffScrollRef]
+    : [newScrollRef, diffScrollRef];
+  syncScroll(oldScrollRef, targets);
+};
+
+const handleNewScroll = () => {
+  const targets = onlyDiff.value
+    ? [diffScrollRef]
+    : [oldScrollRef, diffScrollRef];
+  syncScroll(newScrollRef, targets);
+};
+
+const handleDiffScroll = () => {
+  const targets = onlyDiff.value ? [] : [oldScrollRef, newScrollRef];
+  syncScroll(diffScrollRef, targets);
+};
 </script>
 <template>
   <div class="flex h-full flex-col">
     <div class="flex flex-none items-center justify-between border-b px-4 py-3">
       <div class="font-semibold">对比模式</div>
-      <FormKit
-        v-model="onlyDiff"
-        type="checkbox"
-        label="只显示差异"
-        :classes="{
-          outer: '!py-0',
-          wrapper: '!mb-0',
-        }"
-      ></FormKit>
+      <div class="flex items-center gap-4">
+        <FormKit
+          v-model="onlyDiff"
+          type="checkbox"
+          label="只显示差异"
+          :classes="{
+            outer: '!py-0',
+            wrapper: '!mb-0',
+          }"
+        ></FormKit>
+        <FormKit
+          v-model="enableSyncScroll"
+          type="checkbox"
+          label="同步滚动"
+          :disabled="onlyDiff"
+          :classes="{
+            outer: '!py-0',
+            wrapper: '!mb-0',
+          }"
+        ></FormKit>
+      </div>
     </div>
 
     <div v-if="names?.length !== 2" class="flex justify-center py-10">
@@ -115,6 +230,7 @@ const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
     >
       <OverlayScrollbarsComponent
         v-if="!onlyDiff"
+        ref="oldScrollRef"
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
@@ -130,6 +246,7 @@ const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
         v-if="!onlyDiff"
+        ref="newScrollRef"
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
@@ -144,6 +261,7 @@ const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
         ></div>
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
+        ref="diffScrollRef"
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
         class="h-full w-full"
