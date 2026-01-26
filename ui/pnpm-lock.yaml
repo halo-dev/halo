@@ -622,10 +622,10 @@ importers:
         specifier: workspace:*
         version: link:../api-client
       '@rsbuild/core':
-        specifier: ^1.0.0
+        specifier: ^1.0.0 || ^2.0.0
         version: 1.3.22
       '@rsbuild/plugin-vue':
-        specifier: ^1.0.0
+        specifier: ^1.0.0 || ^2.0.0
         version: 1.0.7(@rsbuild/core@1.3.22)(@vue/compiler-sfc@3.5.24)(vue@3.5.24(typescript@5.9.3))
       '@vitejs/plugin-vue':
         specifier: ^5.0.0 || ^6.0.0
@@ -634,7 +634,7 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1
       vite:
-        specifier: ^5.0.0 || ^6.0.0 || ^7.0.0
+        specifier: ^6.0.0 || ^7.0.0 || ^8.0.0
         version: 7.2.6(@types/node@22.19.1)(jiti@2.6.1)(less@4.2.0)(lightningcss@1.30.2)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.1)
     devDependencies:
       '@types/js-yaml':
