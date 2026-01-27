@@ -348,7 +348,9 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                             bodyBuilder = bodyBuilder.lastModified(lastModified);
                         } catch (IOException e) {
                             if (e instanceof FileNotFoundException) {
-                                return Mono.error(new NoResourceFoundException("bundle.js"));
+                                return Mono.error(
+                                    new NoResourceFoundException(request.uri(), "bundle.js")
+                                );
                             }
                             return Mono.error(e);
                         }
@@ -374,7 +376,9 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         bodyBuilder = bodyBuilder.lastModified(lastModified);
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) {
-                            return Mono.error(new NoResourceFoundException("bundle.css"));
+                            return Mono.error(
+                                new NoResourceFoundException(request.uri(), "bundle.css")
+                            );
                         }
                         return Mono.error(e);
                     }

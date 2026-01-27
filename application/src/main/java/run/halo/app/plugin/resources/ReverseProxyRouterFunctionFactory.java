@@ -89,7 +89,7 @@ public class ReverseProxyRouterFunctionFactory {
                 request -> {
                     var resource = loadResourceByFileRule(pluginName, rule, request);
                     if (!resource.exists()) {
-                        return Mono.error(new NoResourceFoundException(routePath));
+                        return Mono.error(new NoResourceFoundException(request.uri(), routePath));
                     }
                     if (!useLastModified) {
                         return ServerResponse.ok()
@@ -101,7 +101,9 @@ public class ReverseProxyRouterFunctionFactory {
                         lastModified = Instant.ofEpochMilli(resource.lastModified());
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) {
-                            return Mono.error(new NoResourceFoundException(routePath));
+                            return Mono.error(
+                                new NoResourceFoundException(request.uri(), routePath)
+                            );
                         }
                         return Mono.error(e);
                     }

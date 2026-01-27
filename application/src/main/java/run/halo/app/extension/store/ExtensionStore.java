@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author johnniang
  */
 @Data
-@Table(name = "extensions")
+@Table(name = "EXTENSIONS")
 public class ExtensionStore {
 
     /**

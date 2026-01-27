@@ -13,9 +13,13 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.backoff.FixedBackOff;
+import reactor.core.Exceptions;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
@@ -53,11 +57,10 @@ public class ThemeReconciler implements Reconciler<Request> {
     private final SystemVersionSupplier systemVersionSupplier;
     private final TemplateEngineManager templateEngineManager;
 
-    private final RetryTemplate retryTemplate = RetryTemplate.builder()
-        .maxAttempts(20)
-        .fixedBackoff(300)
-        .retryOn(IllegalStateException.class)
-        .build();
+    private final RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
+        .backOff(new FixedBackOff(300, 20))
+        .predicate(IllegalStateException.class::isInstance)
+        .build());
 
     @Override
     public Result reconcile(Request request) {
@@ -144,12 +147,16 @@ public class ThemeReconciler implements Reconciler<Request> {
         var settingName = theme.getSpec().getSettingName();
         if (StringUtils.isNotBlank(settingName)) {
             client.fetch(Setting.class, settingName).ifPresent(client::delete);
-            retryTemplate.execute(callback -> {
-                client.fetch(Setting.class, settingName).ifPresent(setting -> {
-                    throw new IllegalStateException("Waiting for setting to be deleted.");
+            try {
+                retryTemplate.execute(() -> {
+                    client.fetch(Setting.class, settingName).ifPresent(setting -> {
+                        throw new IllegalStateException("Waiting for setting to be deleted.");
+                    });
+                    return null;
                 });
-                return null;
-            });
+            } catch (RetryException e) {
+                throw Exceptions.propagate(e);
+            }
         }
         // delete annotation setting
         deleteAnnotationSettings(theme.getMetadata().getName());
@@ -163,13 +170,17 @@ public class ThemeReconciler implements Reconciler<Request> {
             client.delete(annotationSetting);
         }
 
-        retryTemplate.execute(callback -> {
-            var annotationSettings = listAnnotationSettingsByThemeName(themeName);
-            if (annotationSettings.isEmpty()) {
-                return null;
-            }
-            throw new IllegalStateException("Waiting for annotation settings to be deleted.");
-        });
+        try {
+            retryTemplate.execute(() -> {
+                var annotationSettings = listAnnotationSettingsByThemeName(themeName);
+                if (annotationSettings.isEmpty()) {
+                    return null;
+                }
+                throw new IllegalStateException("Waiting for annotation settings to be deleted.");
+            });
+        } catch (RetryException e) {
+            throw Exceptions.propagate(e);
+        }
     }
 
     private List<AnnotationSetting> listAnnotationSettingsByThemeName(String themeName) {
