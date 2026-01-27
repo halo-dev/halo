@@ -94,6 +94,12 @@ spec:
           label: "附件存储组"
           value: ""
           help: 用于指定在文章编辑器中上传的默认附件存储分组（已过时，请使用附件配置中的管理端附件配置）
+        - $formkit: textarea
+          name: trustedImageDomains
+          label: "信任的图片域名"
+          value: ""
+          help: "设置信任的图片域名白名单，多个域名用英文逗号分隔，例如: cdn.example.com, images.mysite.com。来自这些域名的图片在粘贴时不会提示上传到附件库"
+          auto-height: true
     - group: seo
       label: SEO 设置
       formSchema:

@@ -153,13 +153,14 @@ export function containsFileClipboardIdentifier(types: readonly string[]) {
 
 export async function batchUploadExternalLink(
   editor: Editor,
-  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[],
+  trustedDomains: string[] = []
 ) {
   const chunks = chunk(nodes, 5);
 
   for (const chunkNodes of chunks) {
     await Promise.all(
-      chunkNodes.map((node) => uploadExternalLink(editor, node))
+      chunkNodes.map((node) => uploadExternalLink(editor, node, trustedDomains))
     );
   }
 }
@@ -171,12 +172,13 @@ export async function uploadExternalLink(
     pos: number;
     index: number;
     parent: PMNode | null;
-  }
+  },
+  trustedDomains: string[] = []
 ) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
 
-  if (!isExternalAsset(src)) {
+  if (!isExternalAsset(src, trustedDomains)) {
     return;
   }
 
@@ -201,7 +203,7 @@ export async function uploadExternalLink(
   }
 }
 
-export function isExternalAsset(src: string) {
+export function isExternalAsset(src: string, trustedDomains: string[] = []) {
   if (!src) {
     return false;
   }
@@ -218,6 +220,31 @@ export function isExternalAsset(src: string) {
   const currentOrigin = window.location.origin;
   if (src.startsWith(currentOrigin)) {
     return false;
+  }
+
+  // Check against trusted domains whitelist
+  if (
+    trustedDomains.length > 0 &&
+    (src.startsWith("http://") || src.startsWith("https://"))
+  ) {
+    try {
+      const url = new URL(src);
+      const hostname = url.hostname;
+      // Check if hostname exactly matches or is a subdomain of any trusted domain
+      const isTrusted = trustedDomains.some((domain) => {
+        const normalizedDomain = domain.trim();
+        return (
+          hostname === normalizedDomain ||
+          hostname.endsWith(`.${normalizedDomain}`)
+        );
+      });
+      if (isTrusted) {
+        return false;
+      }
+    } catch (e) {
+      // Invalid URL, continue to external check
+      console.warn("Failed to parse URL for trusted domain check:", src, e);
+    }
   }
 
   return src.startsWith("http://") || src.startsWith("https://");
