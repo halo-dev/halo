@@ -50,17 +50,6 @@ export default definePlugin({
           },
         },
         {
-          path: "snapshots",
-          name: "PostSnapshots",
-          component: () => import("./PostSnapshots.vue"),
-          meta: {
-            title: "core.post_snapshots.title",
-            searchable: false,
-            hideFooter: true,
-            permissions: ["system:posts:manage"],
-          },
-        },
-        {
           path: "categories",
           component: BlankLayout,
           children: [
@@ -93,6 +82,17 @@ export default definePlugin({
           ],
         },
       ],
+    },
+    {
+      path: "/posts/snapshots",
+      name: "PostSnapshots",
+      component: () => import("./PostSnapshots.vue"),
+      meta: {
+        title: "core.post_snapshots.title",
+        searchable: false,
+        hideFooter: true,
+        permissions: ["system:posts:manage"],
+      },
     },
   ],
 });
