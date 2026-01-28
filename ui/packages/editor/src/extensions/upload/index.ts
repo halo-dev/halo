@@ -6,10 +6,54 @@ import {
   handleFileEvent,
   isExternalAsset,
 } from "@/utils/upload";
+import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
+
+// Cache for trusted domains to avoid repeated API calls
+let trustedDomainsCache: string[] = [];
+let lastFetchTime = 0;
+const CACHE_DURATION = 60000; // 1 minute
+
+async function getTrustedDomains(): Promise<string[]> {
+  const now = Date.now();
+
+  // Return cached value if still valid
+  if (now - lastFetchTime < CACHE_DURATION && trustedDomainsCache.length >= 0) {
+    return trustedDomainsCache;
+  }
+
+  try {
+    const { data } =
+      await consoleApiClient.configMap.system.getSystemConfigByGroup({
+        group: "post",
+      });
+
+    const trustedImageDomains = (data as Record<string, unknown>)
+      ?.trustedImageDomains as string;
+
+    if (trustedImageDomains) {
+      // Split by comma and trim whitespace
+      trustedDomainsCache = trustedImageDomains
+        .split(",")
+        .map((domain) => domain.trim())
+        .filter((domain) => domain.length > 0);
+    } else {
+      trustedDomainsCache = [];
+    }
+
+    lastFetchTime = now;
+    return trustedDomainsCache;
+  } catch (error) {
+    console.warn(
+      "Failed to fetch trusted domains from system settings:",
+      error
+    );
+    return [];
+  }
+}
 
 export const ExtensionUpload = Extension.create({
   name: "upload",
@@ -30,24 +74,31 @@ export const ExtensionUpload = Extension.create({
               return false;
             }
 
-            const externalNodes = getAllExternalNodes(slice);
-            if (externalNodes.length > 0) {
-              Dialog.info({
-                title: i18n.global.t("editor.common.text.tip"),
-                description: i18n.global.t(
-                  "editor.extensions.upload.operations.transfer_in_batch.description"
-                ),
-                confirmText: i18n.global.t("editor.common.button.confirm"),
-                cancelText: i18n.global.t("editor.common.button.cancel"),
-                async onConfirm() {
-                  await batchUploadExternalLink(editor, externalNodes);
+            // Fetch trusted domains and check for external nodes
+            getTrustedDomains().then((trustedDomains) => {
+              const externalNodes = getAllExternalNodes(slice, trustedDomains);
+              if (externalNodes.length > 0) {
+                Dialog.info({
+                  title: i18n.global.t("editor.common.text.tip"),
+                  description: i18n.global.t(
+                    "editor.extensions.upload.operations.transfer_in_batch.description"
+                  ),
+                  confirmText: i18n.global.t("editor.common.button.confirm"),
+                  cancelText: i18n.global.t("editor.common.button.cancel"),
+                  async onConfirm() {
+                    await batchUploadExternalLink(
+                      editor,
+                      externalNodes,
+                      trustedDomains
+                    );
 
-                  Toast.success(
-                    i18n.global.t("editor.common.toast.save_success")
-                  );
-                },
-              });
-            }
+                    Toast.success(
+                      i18n.global.t("editor.common.toast.save_success")
+                    );
+                  },
+                });
+              }
+            });
 
             const types = event.clipboardData.types;
             if (!containsFileClipboardIdentifier(types)) {
@@ -143,7 +194,8 @@ function isExcelPasted(clipboardData: ClipboardEvent["clipboardData"]) {
 }
 
 export function getAllExternalNodes(
-  slice: Slice
+  slice: Slice,
+  trustedDomains: string[] = []
 ): { node: PMNode; pos: number; index: number; parent: PMNode | null }[] {
   const externalNodes: {
     node: PMNode;
@@ -157,7 +209,7 @@ export function getAllExternalNodes(
         node.type.name
       )
     ) {
-      if (isExternalAsset(node.attrs.src)) {
+      if (isExternalAsset(node.attrs.src, trustedDomains)) {
         externalNodes.push({
           node,
           pos,
