@@ -2,6 +2,7 @@ package run.halo.app.security;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.User.UserSpec;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 @Slf4j
@@ -64,6 +66,7 @@ public class DefaultSuperAdminInitializer implements SuperAdminInitializer {
     User createAdmin(String username, String password, String email) {
         var metadata = new Metadata();
         metadata.setName(username);
+        metadata.setFinalizers(Set.of(MetadataUtil.SYSTEM_FINALIZER));
 
         var spec = new UserSpec();
         spec.setDisplayName("Administrator");
