@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
-import org.springframework.boot.autoconfigure.session.SessionProperties;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.session.autoconfigure.SessionProperties;
 import org.springframework.boot.test.context.runner.ReactiveWebApplicationContextRunner;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.session.ReactiveFindByIndexNameSessionRepository;
 import run.halo.app.security.session.ReactiveIndexedSessionRepository;
 

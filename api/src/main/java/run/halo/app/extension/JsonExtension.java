@@ -28,6 +28,7 @@ import java.util.Set;
  */
 @JsonSerialize(using = JsonExtension.ObjectNodeExtensionSerializer.class)
 @JsonDeserialize(using = JsonExtension.ObjectNodeExtensionDeSerializer.class)
+@Deprecated(forRemoval = true, since = "2.23.0")
 public class JsonExtension implements Extension {
 
     private final ObjectMapper objectMapper;

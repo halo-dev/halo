@@ -3,12 +3,11 @@ package run.halo.app.core.endpoint.uc;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.HashMap;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
@@ -29,6 +28,8 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * User preference endpoint for UC (User Center).
@@ -38,20 +39,17 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * @since 2.21.0
  */
 @Component
+@RequiredArgsConstructor
 class UcUserPreferenceEndpoint implements CustomEndpoint {
 
     private static final String PREFERENCE_PREFIX = "user-preferences-";
+    private final ObjectMapper objectMapper;
 
     private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
     private final ReactiveExtensionClient client;
 
-    private final ObjectMapper mapper;
-
-    UcUserPreferenceEndpoint(ReactiveExtensionClient client, ObjectMapper mapper) {
-        this.client = client;
-        this.mapper = mapper;
-    }
+    private final JsonMapper mapper;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -144,13 +142,13 @@ class UcUserPreferenceEndpoint implements CustomEndpoint {
             .mapNotNull(ConfigMap::getData)
             .mapNotNull(data -> data.get(group))
             .flatMap(json -> Mono.fromCallable(() -> mapper.readTree(json)))
-            .defaultIfEmpty(NullNode.getInstance())
+            .switchIfEmpty(Mono.fromSupplier(mapper::nullNode))
             .flatMap(jsonNode -> ServerResponse.ok().bodyValue(jsonNode));
     }
 
     private Mono<Authentication> authenticated() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
+            .mapNotNull(SecurityContext::getAuthentication)
             .filter(trustResolver::isAuthenticated)
             .switchIfEmpty(Mono.error(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
                 "Anonymous user is not allowed to access user preference."

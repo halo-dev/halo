@@ -57,10 +57,19 @@ public class ThemeReconciler implements Reconciler<Request> {
     private final SystemVersionSupplier systemVersionSupplier;
     private final TemplateEngineManager templateEngineManager;
 
-    private final RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
+    private RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
         .backOff(new FixedBackOff(300, 20))
         .predicate(IllegalStateException.class::isInstance)
         .build());
+
+    /**
+     * Set retry template. Only for testing purpose.
+     *
+     * @param retryTemplate the retry template
+     */
+    void setRetryTemplate(RetryTemplate retryTemplate) {
+        this.retryTemplate = retryTemplate;
+    }
 
     @Override
     public Result reconcile(Request request) {

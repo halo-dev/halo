@@ -29,7 +29,9 @@ public class HaloConfiguration {
                 v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
             );
             builder.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-            builder.addModule(new JacksonAdapterModule(objectMapperProvider));
+            builder.addModule(
+                new JacksonAdapterModule(objectMapperProvider::getIfAvailable)
+            );
         };
     }
 

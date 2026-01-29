@@ -1,6 +1,7 @@
 package run.halo.app.core.endpoint.uc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.never;
@@ -11,11 +12,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +28,10 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @ExtendWith(MockitoExtension.class)
 class UcUserPreferenceEndpointTest {
@@ -45,7 +45,7 @@ class UcUserPreferenceEndpointTest {
     ReactiveExtensionClient client;
 
     @Spy
-    ObjectMapper mapper = JsonMapper.builder().build();
+    JsonMapper mapper = JsonMapper.shared();
 
     @BeforeEach
     void setUp() {
@@ -87,7 +87,9 @@ class UcUserPreferenceEndpointTest {
             .expectStatus()
             .isOk()
             .expectBody(JsonNode.class)
-            .isEqualTo(NullNode.getInstance());
+            .value(n -> {
+                assertInstanceOf(NullNode.class, n);
+            });
     }
 
     @Test
@@ -110,7 +112,7 @@ class UcUserPreferenceEndpointTest {
             .expectStatus()
             .isOk()
             .expectBody(ObjectNode.class)
-            .value(node -> assertEquals("value", node.get("key").asText()));
+            .value(node -> assertEquals("value", node.get("key").asString()));
     }
 
     @Test

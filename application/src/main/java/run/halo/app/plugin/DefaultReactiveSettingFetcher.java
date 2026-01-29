@@ -4,6 +4,7 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.time.Duration;
 import java.util.Map;
@@ -15,12 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeansException;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionMatcher;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
@@ -48,6 +47,8 @@ class DefaultReactiveSettingFetcher
 
     private final JsonMapper mapper = JsonMapper.builder().build();
 
+    private final ObjectMapper v2Mapper = JsonUtils.mapper();
+
     private final ReactiveExtensionClient client;
 
     private final Mono<ConfigMap> configMapCache;
@@ -63,9 +64,9 @@ class DefaultReactiveSettingFetcher
 
     private final String configMapName;
 
-    public DefaultReactiveSettingFetcher(PluginContext pluginContext,
-        ReactiveExtensionClient client, ExtensionClient blockingClient,
-        CacheManager cacheManager) {
+    public DefaultReactiveSettingFetcher(
+        PluginContext pluginContext, ReactiveExtensionClient client
+    ) {
         this.client = client;
         this.pluginName = pluginContext.getName();
         this.configMapName = pluginContext.getConfigMapName();
@@ -86,9 +87,7 @@ class DefaultReactiveSettingFetcher
     @Override
     public Mono<JsonNode> get(String group) {
         return getValues().mapNotNull(m -> m.get(group))
-            .switchIfEmpty(
-                Mono.error(new IllegalArgumentException("Group [" + group + "] does not exist."))
-            );
+            .switchIfEmpty(Mono.fromSupplier(v2Mapper::createObjectNode));
     }
 
     @Override
@@ -147,10 +146,10 @@ class DefaultReactiveSettingFetcher
 
     private JsonNode toJackson2JsonNode(String json) {
         if (StringUtils.isBlank(json)) {
-            return JsonNodeFactory.instance.missingNode();
+            return v2Mapper.missingNode();
         }
         try {
-            return JsonUtils.DEFAULT_JSON_MAPPER.readTree(json);
+            return v2Mapper.readTree(json);
         } catch (JsonProcessingException e) {
             // ignore
             log.error("Failed to parse plugin [{}] config json: [{}]", pluginName, json, e);

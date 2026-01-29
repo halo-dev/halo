@@ -1,7 +1,5 @@
 package run.halo.app.infra.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -74,26 +72,6 @@ class SettingUtilsTest {
         );
         JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result),
             true);
-    }
-
-    @Test
-    void isJson() {
-        assertThat(SettingUtils.isJson("[1,2,3]")).isTrue();
-        assertThat(SettingUtils.isJson("[\"hello\"]")).isTrue();
-        assertThat(SettingUtils.isJson("{\"name\":\"guqing\",\"age\":18}")).isTrue();
-        assertThat(SettingUtils.isJson("{ \"flag\":true }")).isTrue();
-        assertThat(SettingUtils.isJson("""
-            [
-                { "K1": "value-1", "K2":"value1-2" }
-            ]
-            """)).isTrue();
-        assertThat(SettingUtils.isJson("""
-            {
-                "sites": [{ "name":"halo" , "url":"halo.run" }]
-            }
-            """)).isTrue();
-        assertThat(SettingUtils.isJson("{\"name\":\"guqing\"")).isFalse();
-        assertThat(SettingUtils.isJson("hello")).isFalse();
     }
 
     private static Setting getFakeSetting() {

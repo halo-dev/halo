@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -22,6 +23,7 @@ import run.halo.app.extension.router.ExtensionRouterFunctionFactory.PatchHandler
  *
  * @author johnniang
  */
+@Slf4j
 public class ExtensionPatchHandler implements PatchHandler {
 
     private static final MediaType JSON_PATCH_MEDIA_TYPE =

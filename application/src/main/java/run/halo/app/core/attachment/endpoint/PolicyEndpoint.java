@@ -5,11 +5,10 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.HashMap;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -28,22 +27,18 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
+@RequiredArgsConstructor
 class PolicyEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     private final ReactiveTransactionManager txManager;
-
-    PolicyEndpoint(ReactiveExtensionClient client, ObjectMapper mapper,
-        ReactiveTransactionManager txManager) {
-        this.client = client;
-        this.mapper = mapper;
-        this.txManager = txManager;
-    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
