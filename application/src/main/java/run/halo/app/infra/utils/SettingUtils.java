@@ -1,19 +1,16 @@
 package run.halo.app.infra.utils;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.experimental.UtilityClass;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -23,9 +20,20 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler.Result;
 import run.halo.app.extension.controller.RequeueException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
-@UtilityClass
-public class SettingUtils {
+public enum SettingUtils {
+    ;
+
+    private static final JsonMapper MAPPER = JsonMapper.builder()
+        .changeDefaultPropertyInclusion(v ->
+            v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
+        )
+        .build();
+
     private static final String VALUE_FIELD = "value";
     private static final String NAME_FIELD = "name";
 
@@ -45,16 +53,16 @@ public class SettingUtils {
         for (Setting.SettingForm form : forms) {
             String group = form.getGroup();
             Map<String, JsonNode> groupValue = form.getFormSchema().stream()
-                .map(o -> JsonUtils.DEFAULT_JSON_MAPPER.convertValue(o, JsonNode.class))
+                .map(o -> MAPPER.convertValue(o, JsonNode.class))
                 .filter(jsonNode -> jsonNode.isObject() && jsonNode.has(NAME_FIELD)
                     && jsonNode.has(VALUE_FIELD))
                 .map(jsonNode -> {
-                    String name = jsonNode.get(NAME_FIELD).asText();
+                    String name = jsonNode.get(NAME_FIELD).asString();
                     JsonNode value = jsonNode.get(VALUE_FIELD);
                     return Map.entry(name, value);
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            data.put(group, JsonUtils.objectToJson(groupValue));
+            data.put(group, MAPPER.writeValueAsString(groupValue));
         }
         return data;
     }
@@ -77,13 +85,14 @@ public class SettingUtils {
                 final var source = SettingUtils.settingDefinedDefaultValueMap(setting);
                 client.fetch(ConfigMap.class, configMapName)
                     .ifPresentOrElse(configMap -> {
-                        Map<String, String> modified = defaultIfNull(configMap.getData(), Map.of());
-                        final var oldData = JsonUtils.deepCopy(modified);
+                        Map<String, String> modified =
+                            Objects.requireNonNullElse(configMap.getData(), Map.of());
+                        var copy = new HashMap<>(modified);
 
-                        Map<String, String> merged = SettingUtils.mergePatch(modified, source);
+                        var merged = SettingUtils.mergePatch(modified, source);
                         configMap.setData(merged);
 
-                        if (!Objects.equals(oldData, configMap.getData())) {
+                        if (!Objects.equals(copy, configMap.getData())) {
                             client.update(configMap);
                         }
                     }, () -> {
@@ -120,14 +129,14 @@ public class SettingUtils {
      */
     public static Map<String, String> mergePatch(Map<String, String> modified,
         Map<String, String> source) {
-        JsonNode modifiedJson = mapToJsonNode(modified);
+        var modifiedJson = mapToJsonNode(modified);
         // original
-        JsonNode sourceJson = mapToJsonNode(source);
+        var sourceJson = mapToJsonNode(source);
         try {
             // patch
-            JsonMergePatch jsonMergePatch = JsonMergePatch.fromJson(modifiedJson);
+            var jsonMergePatch = JsonMergePatch.fromJson(modifiedJson);
             // apply patch to original
-            JsonNode patchedNode = jsonMergePatch.apply(sourceJson);
+            var patchedNode = jsonMergePatch.apply(sourceJson);
             return jsonNodeToStringMap(patchedNode);
         } catch (JsonPatchException e) {
             throw new JsonParseException(e);
@@ -142,9 +151,9 @@ public class SettingUtils {
      */
     public static ObjectNode settingConfigToJson(ConfigMap configMap) {
         if (configMap.getData() == null) {
-            return JsonNodeFactory.instance.objectNode();
+            return MAPPER.createObjectNode();
         }
-        return mapToJsonNode(configMap.getData());
+        return mapToObjectNode(configMap.getData());
     }
 
     /**
@@ -157,24 +166,55 @@ public class SettingUtils {
         return jsonNodeToStringMap(node);
     }
 
-    ObjectNode mapToJsonNode(Map<String, String> map) {
-        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+    /**
+     * Convert {@code Map<String, String>} to
+     * {@link com.fasterxml.jackson.databind.node.ObjectNode}.
+     *
+     * @param map source map
+     * @return ObjectNode
+     */
+    private static com.fasterxml.jackson.databind.node.ObjectNode mapToJsonNode(
+        Map<String, String> map) {
+        var objectNode = JsonUtils.mapper().createObjectNode();
         map.forEach((k, v) -> {
-            if (isJson(v)) {
-                JsonNode value = JsonUtils.jsonToObject(v, JsonNode.class);
-                objectNode.set(k, value);
+            if (v == null) {
+                objectNode.putNull(k);
                 return;
             }
-            objectNode.put(k, v);
+            try {
+                var value = JsonUtils.mapper().readTree(v);
+                objectNode.set(k, value);
+            } catch (JsonProcessingException ignored) {
+                // ignore exception and put as text
+                objectNode.put(k, v);
+            }
         });
         return objectNode;
     }
 
-    Map<String, String> jsonNodeToStringMap(JsonNode node) {
+    private static ObjectNode mapToObjectNode(Map<String, String> map) {
+        var objectNode = MAPPER.createObjectNode();
+        map.forEach((k, v) -> {
+            if (v == null) {
+                objectNode.putNull(k);
+                return;
+            }
+            try {
+                var value = MAPPER.readTree(v);
+                objectNode.set(k, value);
+            } catch (JacksonException ignored) {
+                // ignore exception and put as text
+                objectNode.put(k, v);
+            }
+        });
+        return objectNode;
+    }
+
+    private static Map<String, String> jsonNodeToStringMap(
+        com.fasterxml.jackson.databind.JsonNode node
+    ) {
         Map<String, String> stringMap = new LinkedHashMap<>();
-        node.fields().forEachRemaining(entry -> {
-            String k = entry.getKey();
-            JsonNode v = entry.getValue();
+        node.forEachEntry((k, v) -> {
             if (v == null || v.isNull() || v.isMissingNode()) {
                 stringMap.put(k, null);
                 return;
@@ -184,7 +224,7 @@ public class SettingUtils {
                 return;
             }
             if (v.isContainerNode()) {
-                stringMap.put(k, JsonUtils.objectToJson(v));
+                stringMap.put(k, v.toString());
                 return;
             }
             stringMap.put(k, v.asText());
@@ -192,12 +232,24 @@ public class SettingUtils {
         return stringMap;
     }
 
-    boolean isJson(String jsonString) {
-        try {
-            JsonUtils.DEFAULT_JSON_MAPPER.readTree(jsonString);
-            return true;
-        } catch (JacksonException e) {
-            return false;
-        }
+    private static Map<String, String> jsonNodeToStringMap(JsonNode node) {
+        Map<String, String> stringMap = new LinkedHashMap<>();
+        node.forEachEntry((k, v) -> {
+            if (v == null || v.isNull() || v.isMissingNode()) {
+                stringMap.put(k, null);
+                return;
+            }
+            if (v.isString()) {
+                stringMap.put(k, v.asString());
+                return;
+            }
+            if (v.isContainer()) {
+                stringMap.put(k, v.toString());
+                return;
+            }
+            stringMap.put(k, v.asString());
+        });
+        return stringMap;
     }
+
 }

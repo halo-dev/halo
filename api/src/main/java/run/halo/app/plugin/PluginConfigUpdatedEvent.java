@@ -19,14 +19,45 @@ import run.halo.app.extension.ConfigMap;
  */
 @Getter
 public class PluginConfigUpdatedEvent extends ApplicationEvent {
+
+    /**
+     * Old configuration data.
+     *
+     * @deprecated Use {@link #oldSettingValues} and {@link #newSettingValues} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.23.0")
     private final Map<String, JsonNode> oldConfig;
+
+    /**
+     * New configuration data.
+     *
+     * @deprecated Use {@link #oldSettingValues} and {@link #newSettingValues} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.23.0")
     private final Map<String, JsonNode> newConfig;
 
+    /**
+     * Old setting values.
+     */
+    private final Map<String, tools.jackson.databind.JsonNode> oldSettingValues;
+
+    /**
+     * New setting values.
+     */
+    private final Map<String, tools.jackson.databind.JsonNode> newSettingValues;
+
     @Builder
-    public PluginConfigUpdatedEvent(Object source, Map<String, JsonNode> oldConfig,
-        Map<String, JsonNode> newConfig) {
+    public PluginConfigUpdatedEvent(
+        Object source,
+        Map<String, JsonNode> oldConfig,
+        Map<String, JsonNode> newConfig,
+        Map<String, tools.jackson.databind.JsonNode> oldSettingValues,
+        Map<String, tools.jackson.databind.JsonNode> newSettingValues
+    ) {
         super(source);
         this.oldConfig = oldConfig;
         this.newConfig = newConfig;
+        this.oldSettingValues = oldSettingValues;
+        this.newSettingValues = newSettingValues;
     }
 }

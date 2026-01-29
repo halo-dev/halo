@@ -19,9 +19,9 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonParseException;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SystemConfigUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +30,8 @@ class DefaultSystemConfigFetcher
     implements SystemConfigFetcher, ApplicationListener<SystemConfigChangedEvent> {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
+
+    private final JsonMapper mapper;
 
     private final ReactiveExtensionClient extensionClient;
 
@@ -68,7 +70,7 @@ class DefaultSystemConfigFetcher
                 if (conversionService.canConvert(String.class, type)) {
                     return conversionService.convert(stringValue, type);
                 }
-                return JsonUtils.jsonToObject(stringValue, type);
+                return mapper.readValue(stringValue, type);
             });
     }
 

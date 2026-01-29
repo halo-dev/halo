@@ -12,7 +12,7 @@ public enum WebSocketUtils {
         var upgradeConnection = headers.getConnection().stream().map(String::toLowerCase)
             .anyMatch(conn -> Objects.equals(conn, "upgrade"));
 
-        return headers.containsKey(HttpHeaders.UPGRADE)
+        return headers.containsHeader(HttpHeaders.UPGRADE)
             && upgradeConnection
             && "websocket".equalsIgnoreCase(headers.getUpgrade());
     }

@@ -7,8 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +27,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith(MockitoExtension.class)
 class PolicyEndpointTest {
@@ -37,7 +36,7 @@ class PolicyEndpointTest {
     ReactiveExtensionClient client;
 
     @Spy
-    ObjectMapper mapper = JsonMapper.builder().build();
+    JsonMapper jsonMapper = JsonMapper.shared();
 
     @Mock
     ReactiveTransactionManager txManager;
