@@ -2,7 +2,6 @@ import { Dialog, Toast } from "@halo-dev/components";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
-  batchUploadExternalLink,
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
@@ -125,25 +124,18 @@ export const ExtensionUpload = Extension.create({
                 await filterNodesNotInAttachmentLibrary(externalNodes);
 
               if (nodesToPrompt.length > 0) {
-                Dialog.info({
-                  title: i18n.global.t("editor.common.text.tip"),
-                  description: i18n.global.t(
-                    "editor.extensions.upload.operations.transfer_in_batch.description"
-                  ),
-                  confirmText: i18n.global.t("editor.common.button.confirm"),
-                  cancelText: i18n.global.t("editor.common.button.cancel"),
-                  async onConfirm() {
-                    await batchUploadExternalLink(
-                      editor,
-                      nodesToPrompt,
-                      trustedDomains
-                    );
-
-                    Toast.success(
-                      i18n.global.t("editor.common.toast.save_success")
-                    );
-                  },
-                });
+                // Non-blocking notification for external links
+                const count = nodesToPrompt.length;
+                const message =
+                  count === 1
+                    ? i18n.global.t(
+                        "editor.extensions.upload.external_link_detected_singular"
+                      )
+                    : i18n.global.t(
+                        "editor.extensions.upload.external_link_detected_plural",
+                        { count }
+                      );
+                Toast.info(message, { duration: 5000 });
               }
             });
 
