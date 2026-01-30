@@ -36,7 +36,45 @@ declare module "@/tiptap" {
 export type ExtensionGalleryImageItem = {
   src: string;
   aspectRatio: number;
+  alt?: string;
+  caption?: string;
 };
+
+export const MAX_GALLERY_CAPTION_LENGTH = 500;
+export const DEFAULT_GALLERY_GROUP_SIZE = 3;
+export const DEFAULT_GALLERY_GAP = 0;
+const GALLERY_CAPTION_NODE_TYPE = "gallery-caption";
+const GALLERY_IMAGE_WRAPPER_NODE_TYPE = "gallery-image-wrapper";
+const GALLERY_IMAGE_CAPTION_NODE_TYPE = "gallery-image-caption";
+
+/**
+ * Creates a normalized gallery image item.
+ */
+export function createGalleryImageItem(
+  src: string,
+  overrides: Partial<ExtensionGalleryImageItem> = {}
+): ExtensionGalleryImageItem {
+  return {
+    src,
+    aspectRatio: 0,
+    alt: "",
+    caption: "",
+    ...overrides,
+  };
+}
+
+function clampCaption(value?: string) {
+  return (value || "").slice(0, MAX_GALLERY_CAPTION_LENGTH);
+}
+
+function isUnsafeUrl(url: string) {
+  const normalized = url.trim().toLowerCase();
+  return normalized.startsWith("javascript:");
+}
+
+function normalizeUrl(url: string) {
+  return url.trim();
+}
 
 export const GALLERY_BUBBLE_MENU_KEY = new PluginKey("galleryBubbleMenu");
 
@@ -74,18 +112,75 @@ export const ExtensionGallery = Node.create<
       images: {
         default: [],
         parseHTML: (element) => {
-          return Array.from(element.querySelectorAll("img")).map((img) => {
-            return {
-              src: img.getAttribute("src") || "",
-              aspectRatio: Number(img.getAttribute("data-aspect-ratio")) || 0,
-            };
-          });
+          const wrappers = Array.from(
+            element.querySelectorAll(
+              `div[data-type="${GALLERY_IMAGE_WRAPPER_NODE_TYPE}"]`
+            )
+          );
+
+          if (wrappers.length > 0) {
+            return wrappers
+              .map((wrapper) => {
+                const img = wrapper.querySelector("img");
+                if (!img) {
+                  return null;
+                }
+                const src = normalizeUrl(img.getAttribute("src") || "");
+                if (!src || isUnsafeUrl(src)) {
+                  return null;
+                }
+                const ratioFromImage = Number(
+                  img.getAttribute("data-aspect-ratio")
+                );
+                const ratioFromWrapper = Number(
+                  wrapper.getAttribute("data-aspect-ratio")
+                );
+                // 支持新的 figcaption 和旧的 span 结构
+                const captionEl =
+                  wrapper.querySelector("figcaption") ||
+                  wrapper.querySelector(
+                    `[data-type="${GALLERY_IMAGE_CAPTION_NODE_TYPE}"]`
+                  );
+                const caption = clampCaption(captionEl?.textContent || "");
+                return createGalleryImageItem(src, {
+                  alt: img.getAttribute("alt") || "",
+                  caption,
+                  aspectRatio: ratioFromImage || ratioFromWrapper || 0,
+                });
+              })
+              .filter(Boolean) as ExtensionGalleryImageItem[];
+          }
+
+          return Array.from(element.querySelectorAll("img"))
+            .map((img) => {
+              const src = normalizeUrl(img.getAttribute("src") || "");
+              if (!src || isUnsafeUrl(src)) {
+                return null;
+              }
+              const ratioFromImage = Number(
+                img.getAttribute("data-aspect-ratio")
+              );
+              const ratioFromWrapper = Number(
+                img
+                  .closest("[data-aspect-ratio]")
+                  ?.getAttribute("data-aspect-ratio")
+              );
+              return createGalleryImageItem(src, {
+                alt: img.getAttribute("alt") || "",
+                caption: clampCaption(img.getAttribute("data-caption") || ""),
+                aspectRatio: ratioFromImage || ratioFromWrapper || 0,
+              });
+            })
+            .filter(Boolean) as ExtensionGalleryImageItem[];
         },
       },
       groupSize: {
-        default: 3,
+        default: DEFAULT_GALLERY_GROUP_SIZE,
         parseHTML: (element) => {
-          return Number(element.getAttribute("data-group-size")) || 3;
+          return (
+            Number(element.getAttribute("data-group-size")) ||
+            DEFAULT_GALLERY_GROUP_SIZE
+          );
         },
       },
       layout: {
@@ -102,6 +197,18 @@ export const ExtensionGallery = Node.create<
             return 0;
           }
           return gap;
+        },
+      },
+      caption: {
+        default: "",
+        parseHTML: (element) => {
+          const captionEl = element.querySelector(
+            `[data-type="${GALLERY_CAPTION_NODE_TYPE}"]`
+          );
+          if (captionEl) {
+            return clampCaption(captionEl.textContent || "");
+          }
+          return clampCaption(element.getAttribute("data-caption") || "");
         },
       },
       file: {
@@ -126,9 +233,13 @@ export const ExtensionGallery = Node.create<
 
   renderHTML({ node }) {
     const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
-    const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
+    const groupSize =
+      node.attrs.groupSize ||
+      this.options?.groupSize ||
+      DEFAULT_GALLERY_GROUP_SIZE;
     const layout = node.attrs.layout || "auto";
-    const gap = node.attrs.gap || this.options?.gap || 0;
+    const gap = node.attrs.gap || this.options?.gap || DEFAULT_GALLERY_GAP;
+    const caption = clampCaption(node.attrs.caption || "");
     const imageGroups: ExtensionGalleryImageItem[][] = images.reduce(
       (
         acc: ExtensionGalleryImageItem[][],
@@ -150,21 +261,44 @@ export const ExtensionGallery = Node.create<
           style: `display: flex; flex-direction: row; justify-content: center; gap: ${gap}px;`,
         },
         ...items.map((image: ExtensionGalleryImageItem) => {
+          const imageCaption = clampCaption(image.caption || "");
+          const captionElement = imageCaption
+            ? [
+                "figcaption",
+                {
+                  "data-type": GALLERY_IMAGE_CAPTION_NODE_TYPE,
+                  style:
+                    "margin-top: 0.25rem; text-align: center; font-size: 0.875rem; color: #6b7280;",
+                },
+                imageCaption,
+              ]
+            : [
+                "span",
+                {
+                  "data-type": GALLERY_IMAGE_CAPTION_NODE_TYPE,
+                  style: "display: none;",
+                },
+                "",
+              ];
           return [
-            "div",
+            "figure",
             {
-              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
+              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%; display: flex; flex-direction: column; margin: 0;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
               "data-aspect-ratio": image.aspectRatio.toString(),
+              "data-type": GALLERY_IMAGE_WRAPPER_NODE_TYPE,
             },
             [
               "img",
               {
                 src: image.src,
+                alt: image.alt || "",
                 "data-type": "gallery-image",
+                "data-aspect-ratio": image.aspectRatio.toString(),
                 style:
                   "width: 100%; height: 100%; margin: 0; object-fit: cover;",
               },
             ],
+            captionElement,
           ];
         }),
       ]
@@ -182,6 +316,11 @@ export const ExtensionGallery = Node.create<
         "div",
         { style: `display: grid; gap: ${gap}px;` },
         ...imageGroupElements,
+      ],
+      [
+        "div",
+        { "data-type": GALLERY_CAPTION_NODE_TYPE, style: "display: none;" },
+        caption,
       ],
     ];
   },
