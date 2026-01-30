@@ -114,6 +114,8 @@
   "editor.extensions.upload.operations.transfer.button": "Guardar localmente",
   "editor.extensions.upload.operations.transfer.tooltip": "Este recurso se detecta como recurso externo. Haz clic en este botón para guardarlo en la biblioteca de adjuntos.",
   "editor.extensions.upload.operations.transfer_in_batch.description": "Enlace externo detectado. ¿Deseas cargarlo automáticamente a la biblioteca de adjuntos?",
+  "editor.extensions.upload.external_link_detected_singular": "Enlace externo detectado en el contenido pegado",
+  "editor.extensions.upload.external_link_detected_plural": "{count} enlaces externos detectados en el contenido pegado",
   "editor.extensions.font_size.title": "Tamaño de fuente",
   "editor.components.color_picker.more_color": "Más",
   "editor.common.alt": "Texto alternativo",
