@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -28,12 +29,16 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.retry.RetryException;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
@@ -72,6 +77,13 @@ class ThemeReconcilerTest {
     @Mock
     private TemplateEngineManager templateEngineManager;
 
+    @Spy
+    RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
+        .maxRetries(1)
+        .delay(Duration.ZERO)
+        .predicate(IllegalStateException.class::isInstance)
+        .build());
+
     @InjectMocks
     ThemeReconciler themeReconciler;
 
@@ -80,13 +92,14 @@ class ThemeReconcilerTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        themeReconciler.setRetryTemplate(retryTemplate);
         defaultTheme = ResourceUtils.getFile("classpath:themes/default");
         lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
         lenient().when(templateEngineManager.clearCache(any())).thenReturn(Mono.empty());
     }
 
     @Test
-    void reconcileDelete() throws IOException {
+    void reconcileDelete() throws IOException, RetryException {
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         Files.createDirectory(testWorkDir);
         when(themeRoot.get()).thenReturn(testWorkDir);
@@ -184,28 +197,17 @@ class ThemeReconcilerTest {
 
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
 
-        var themeReconciler = new ThemeReconciler(
-            extensionClient, themeRoot, systemVersionSupplier, templateEngineManager
-        );
-
-        final int[] retryFlags = {0};
-        when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
-            .thenAnswer((Answer<Optional<Setting>>) invocation -> {
-                retryFlags[0]++;
-                // retry 2 times
-                if (retryFlags[0] < 2) {
-                    return Optional.of(new Setting());
-                }
-                throw new RetryException("retry exception.");
-            });
+        when(extensionClient.fetch(Setting.class, "theme-test-setting"))
+            .thenReturn(Optional.of(new Setting()));
 
         String settingName = theme.getSpec().getSettingName();
         assertThatThrownBy(
             () -> themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName())))
-            .isInstanceOf(RetryException.class)
-            .hasMessage("retry exception.");
-
-        verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(settingName));
+            .satisfies(t -> {
+                var e = Exceptions.unwrap(t);
+                assertThat(e).isInstanceOf(RetryException.class);
+            });
+        verify(extensionClient, times(3)).fetch(eq(Setting.class), eq(settingName));
     }
 
     @Test

@@ -71,6 +71,7 @@ public interface ReactiveExtensionClient {
 
     <E extends Extension> Mono<E> get(Class<E> type, String name);
 
+    @Deprecated(forRemoval = true, since = "2.23.0")
     Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name);
 
     /**

@@ -228,8 +228,7 @@ class PluginEndpointTest {
 
         @BeforeEach
         void setUp() {
-            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-                .build();
+            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
         }
 
         @Test

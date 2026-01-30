@@ -9,7 +9,6 @@ import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URI;
@@ -53,6 +52,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 import run.halo.app.theme.service.ThemeService;
 import run.halo.app.theme.service.ThemeUtils;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Endpoint for managing themes.

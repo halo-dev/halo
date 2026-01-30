@@ -1,9 +1,10 @@
 package run.halo.app.infra.config;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.session.SessionProperties;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.session.autoconfigure.SessionProperties;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.ReactiveFindByIndexNameSessionRepository;
@@ -47,8 +48,8 @@ class SessionConfiguration<S extends Session> {
         ) {
             var repository =
                 new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
-            var timeout = sessionProperties.determineTimeout(
-                () -> serverProperties.getReactive().getSession().getTimeout());
+            var timeout = Optional.ofNullable(sessionProperties.getTimeout())
+                .orElseGet(() -> serverProperties.getReactive().getSession().getTimeout());
             repository.setDefaultMaxInactiveInterval(timeout);
             return repository;
         }
