@@ -4,9 +4,8 @@ import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { Toast, VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { computed, ref } from "vue";
-import LucideCaptions from "~icons/lucide/captions";
-import CaptionEditor from "./CaptionEditor.vue";
+import { computed, nextTick, ref } from "vue";
+import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
 import {
   createGalleryImageItem,
   DEFAULT_GALLERY_GROUP_SIZE,
@@ -14,6 +13,9 @@ import {
   type ExtensionGalleryImageItem,
 } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
+
+// 图片 caption 输入框引用
+const imageCaptionInputRefs = ref<Record<number, HTMLInputElement | null>>({});
 
 const props = defineProps<NodeViewProps>();
 
@@ -65,6 +67,13 @@ function openImageCaptionEditor(index: number) {
   handleSetFocus();
   editingImageIndex.value = index;
   editingImageCaption.value = images.value[index]?.caption || "";
+  // 等待 DOM 更新后聚焦输入框
+  nextTick(() => {
+    const input = imageCaptionInputRefs.value[index];
+    if (input) {
+      input.focus();
+    }
+  });
 }
 
 function closeImageCaptionEditor() {
@@ -85,11 +94,26 @@ function saveImageCaption() {
   }
   newImages[index] = {
     ...oldImage,
-    caption: editingImageCaption.value.trim().slice(0, MAX_GALLERY_CAPTION_LENGTH),
+    caption: editingImageCaption.value
+      .trim()
+      .slice(0, MAX_GALLERY_CAPTION_LENGTH),
   };
   images.value = newImages;
-  handleSetFocus();
   closeImageCaptionEditor();
+}
+
+function handleImageCaptionBlur() {
+  saveImageCaption();
+}
+
+function handleImageCaptionKeydown(event: KeyboardEvent) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    saveImageCaption();
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    closeImageCaptionEditor();
+  }
 }
 
 const groupSize = computed(() => {
@@ -107,39 +131,6 @@ const layout = computed(() => {
 const gap = computed(() => {
   return props.node?.attrs.gap;
 });
-
-const galleryCaption = computed({
-  get: () => {
-    return (props.node?.attrs.caption as string) || "";
-  },
-  set: (value: string) => {
-    props.updateAttributes({
-      caption: value.slice(0, MAX_GALLERY_CAPTION_LENGTH),
-    });
-  },
-});
-
-const editingGalleryCaption = ref(false);
-const editingGalleryCaptionValue = ref("");
-
-function openGalleryCaptionEditor() {
-  handleSetFocus();
-  editingGalleryCaption.value = true;
-  editingGalleryCaptionValue.value = galleryCaption.value || "";
-}
-
-function closeGalleryCaptionEditor() {
-  editingGalleryCaption.value = false;
-  editingGalleryCaptionValue.value = "";
-}
-
-function saveGalleryCaption() {
-  galleryCaption.value = editingGalleryCaptionValue.value
-    .trim()
-    .slice(0, MAX_GALLERY_CAPTION_LENGTH);
-  handleSetFocus();
-  closeGalleryCaptionEditor();
-}
 
 const groups = computed(() => {
   return images.value.reduce(
@@ -280,113 +271,119 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
         <div
           v-for="(image, imgIndex) in group"
           :key="groupIndex * groupSize + imgIndex"
-          draggable="true"
-          class="group/image relative cursor-grab transition-all active:cursor-grabbing"
+          class="group/image flex flex-col"
           :class="{
             'aspect-1': layout === 'square',
           }"
           :style="{
             flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
           }"
-          @dragstart="
-            handleDragStart(groupIndex * groupSize + imgIndex, $event)
-          "
-          @dragend="handleDragEnd($event)"
-          @dragover="handleDragOver($event)"
-          @dragenter="
-            handleDragEnter(groupIndex * groupSize + imgIndex, $event)
-          "
-          @dragleave="handleDragLeave($event)"
-          @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
         >
-          <img
-            :src="image.src"
-            :alt="image.alt || ''"
-            class="pointer-events-none block size-full object-cover"
-            @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
-            @error="handleImageError"
-          />
+          <!-- 图片容器 -->
           <div
-            class="pointer-events-none invisible absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100"
+            class="relative cursor-grab transition-all active:cursor-grabbing"
+            draggable="true"
+            @dragstart="
+              handleDragStart(groupIndex * groupSize + imgIndex, $event)
+            "
+            @dragend="handleDragEnd($event)"
+            @dragover="handleDragOver($event)"
+            @dragenter="
+              handleDragEnter(groupIndex * groupSize + imgIndex, $event)
+            "
+            @dragleave="handleDragLeave($event)"
+            @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
           >
-            <div class="flex flex-row-reverse gap-1">
-              <button
-                v-tooltip="
-                  i18n.global.t(
-                    'editor.extensions.upload.operations.remove.button'
-                  )
-                "
-                :aria-label="i18n.global.t('editor.common.button.delete')"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
-                type="button"
-                @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
-              >
-                <MingcuteDelete2Line class="size-4" />
-              </button>
-              <button
-                v-tooltip="i18n.global.t('editor.extensions.image.edit_caption')"
-                :aria-label="i18n.global.t('editor.extensions.image.edit_caption')"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
-                type="button"
-                @click.stop="
-                  openImageCaptionEditor(groupIndex * groupSize + imgIndex)
-                "
-              >
-                <LucideCaptions class="size-4" />
-              </button>
-            </div>
-            <div
-              v-if="image.caption"
-              class="pointer-events-none mt-1 line-clamp-2 rounded bg-black/30 px-1 py-0.5 text-xs text-white"
-            >
-              {{ image.caption }}
-            </div>
-          </div>
-
-          <div
-            v-if="editingImageIndex === groupIndex * groupSize + imgIndex"
-            class="pointer-events-auto absolute inset-x-1 bottom-1 z-10 rounded-md bg-white/95 p-2 shadow ring-1 ring-gray-200"
-            @click.stop
-          >
-            <CaptionEditor
-              v-model="editingImageCaption"
-              :max-length="MAX_GALLERY_CAPTION_LENGTH"
-              :placeholder="
-                i18n.global.t('editor.extensions.figure_caption.empty_placeholder')
-              "
-              :confirm-text="i18n.global.t('editor.common.button.confirm')"
-              :cancel-text="i18n.global.t('editor.common.button.cancel')"
-              @confirm="saveImageCaption"
-              @cancel="closeImageCaptionEditor"
+            <img
+              :src="image.src"
+              :alt="image.alt || ''"
+              class="pointer-events-none block size-full object-cover"
+              @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
+              @error="handleImageError"
             />
+            <!-- 悬停操作按钮 -->
+            <div
+              class="pointer-events-none invisible absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100"
+            >
+              <div class="flex flex-row-reverse gap-1">
+                <button
+                  v-tooltip="
+                    i18n.global.t(
+                      'editor.extensions.upload.operations.remove.button'
+                    )
+                  "
+                  :aria-label="i18n.global.t('editor.common.button.delete')"
+                  class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                  type="button"
+                  @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
+                >
+                  <MingcuteDelete2Line class="size-4" />
+                </button>
+                <button
+                  v-tooltip="
+                    i18n.global.t('editor.extensions.image.edit_caption')
+                  "
+                  :aria-label="
+                    i18n.global.t('editor.extensions.image.edit_caption')
+                  "
+                  class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                  type="button"
+                  @click.stop="
+                    openImageCaptionEditor(groupIndex * groupSize + imgIndex)
+                  "
+                >
+                  <MingcuteBookmarkEditLine class="size-4" />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <div
-      v-if="selected || galleryCaption"
-      class="mt-1 px-1 text-center text-sm text-gray-500"
-      @click.stop="openGalleryCaptionEditor"
-    >
-      <template v-if="!editingGalleryCaption">
-        <span v-if="galleryCaption">{{ galleryCaption }}</span>
-        <span v-else class="cursor-text text-gray-400">
-          {{ i18n.global.t("editor.extensions.figure_caption.empty_placeholder") }}
-        </span>
-      </template>
-      <div v-else class="mx-auto max-w-lg" @click.stop>
-        <CaptionEditor
-          v-model="editingGalleryCaptionValue"
-          :max-length="MAX_GALLERY_CAPTION_LENGTH"
-          :placeholder="
-            i18n.global.t('editor.extensions.figure_caption.empty_placeholder')
-          "
-          :confirm-text="i18n.global.t('editor.common.button.confirm')"
-          :cancel-text="i18n.global.t('editor.common.button.cancel')"
-          @confirm="saveGalleryCaption"
-          @cancel="closeGalleryCaptionEditor"
-        />
+          <!-- 图片描述文本 - 内联编辑，样式与单张图片 figcaption 一致 -->
+          <!-- 只有已有 caption 或正在编辑该图片时才显示 -->
+          <figcaption
+            v-if="
+              image.caption ||
+              editingImageIndex === groupIndex * groupSize + imgIndex
+            "
+            class="gallery-image-caption mt-1 text-center text-sm text-gray-500"
+            :data-empty="
+              !image.caption &&
+              editingImageIndex !== groupIndex * groupSize + imgIndex
+                ? 'true'
+                : undefined
+            "
+            :data-placeholder="
+              i18n.global.t(
+                'editor.extensions.figure_caption.empty_placeholder'
+              )
+            "
+            @click.stop="
+              openImageCaptionEditor(groupIndex * groupSize + imgIndex)
+            "
+          >
+            <input
+              v-if="editingImageIndex === groupIndex * groupSize + imgIndex"
+              :ref="
+                (el) =>
+                  (imageCaptionInputRefs[groupIndex * groupSize + imgIndex] =
+                    el as HTMLInputElement)
+              "
+              v-model="editingImageCaption"
+              type="text"
+              class="w-full bg-transparent text-center text-sm text-gray-500 outline-none"
+              :placeholder="
+                i18n.global.t(
+                  'editor.extensions.figure_caption.empty_placeholder'
+                )
+              "
+              :maxlength="MAX_GALLERY_CAPTION_LENGTH"
+              @blur="handleImageCaptionBlur"
+              @keydown="handleImageCaptionKeydown"
+              @click.stop
+            />
+            <span v-else class="cursor-text">{{ image.caption }}</span>
+          </figcaption>
+        </div>
       </div>
     </div>
 
@@ -398,3 +395,16 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
     />
   </node-view-wrapper>
 </template>
+
+<style scoped>
+/* 图片 caption 样式 - 与单张图片 figcaption 保持一致 */
+.gallery-image-caption[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.gallery-image-caption[data-empty="true"] > span {
+  display: none;
+}
+</style>

@@ -129,11 +129,18 @@ export const ExtensionGallery = Node.create<
                 if (!src || isUnsafeUrl(src)) {
                   return null;
                 }
-                const ratioFromImage = Number(img.getAttribute("data-aspect-ratio"));
-                const ratioFromWrapper = Number(wrapper.getAttribute("data-aspect-ratio"));
-                const captionEl = wrapper.querySelector(
-                  `[data-type="${GALLERY_IMAGE_CAPTION_NODE_TYPE}"]`
+                const ratioFromImage = Number(
+                  img.getAttribute("data-aspect-ratio")
                 );
+                const ratioFromWrapper = Number(
+                  wrapper.getAttribute("data-aspect-ratio")
+                );
+                // 支持新的 figcaption 和旧的 span 结构
+                const captionEl =
+                  wrapper.querySelector("figcaption") ||
+                  wrapper.querySelector(
+                    `[data-type="${GALLERY_IMAGE_CAPTION_NODE_TYPE}"]`
+                  );
                 const caption = clampCaption(captionEl?.textContent || "");
                 return createGalleryImageItem(src, {
                   alt: img.getAttribute("alt") || "",
@@ -150,7 +157,9 @@ export const ExtensionGallery = Node.create<
               if (!src || isUnsafeUrl(src)) {
                 return null;
               }
-              const ratioFromImage = Number(img.getAttribute("data-aspect-ratio"));
+              const ratioFromImage = Number(
+                img.getAttribute("data-aspect-ratio")
+              );
               const ratioFromWrapper = Number(
                 img
                   .closest("[data-aspect-ratio]")
@@ -253,10 +262,28 @@ export const ExtensionGallery = Node.create<
         },
         ...items.map((image: ExtensionGalleryImageItem) => {
           const imageCaption = clampCaption(image.caption || "");
+          const captionElement = imageCaption
+            ? [
+                "figcaption",
+                {
+                  "data-type": GALLERY_IMAGE_CAPTION_NODE_TYPE,
+                  style:
+                    "margin-top: 0.25rem; text-align: center; font-size: 0.875rem; color: #6b7280;",
+                },
+                imageCaption,
+              ]
+            : [
+                "span",
+                {
+                  "data-type": GALLERY_IMAGE_CAPTION_NODE_TYPE,
+                  style: "display: none;",
+                },
+                "",
+              ];
           return [
-            "div",
+            "figure",
             {
-              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
+              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%; display: flex; flex-direction: column; margin: 0;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
               "data-aspect-ratio": image.aspectRatio.toString(),
               "data-type": GALLERY_IMAGE_WRAPPER_NODE_TYPE,
             },
@@ -271,14 +298,7 @@ export const ExtensionGallery = Node.create<
                   "width: 100%; height: 100%; margin: 0; object-fit: cover;",
               },
             ],
-            [
-              "span",
-              {
-                "data-type": GALLERY_IMAGE_CAPTION_NODE_TYPE,
-                style: "display: none;",
-              },
-              imageCaption,
-            ],
+            captionElement,
           ];
         }),
       ]
