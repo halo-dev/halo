@@ -1,58 +1,17 @@
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
+import { ActionNotificationManager } from "@/utils/action-notification-manager";
 import {
+  batchUploadExternalLink,
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
 } from "@/utils/upload";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
-
-// Cache for trusted domains to avoid repeated API calls
-let trustedDomainsCache: string[] = [];
-let lastFetchTime = 0;
-const CACHE_DURATION = 60000; // 1 minute
-
-async function getTrustedDomains(): Promise<string[]> {
-  const now = Date.now();
-
-  // Return cached value if still valid
-  if (now - lastFetchTime < CACHE_DURATION) {
-    return trustedDomainsCache;
-  }
-
-  try {
-    const { data } =
-      await consoleApiClient.configMap.system.getSystemConfigByGroup({
-        group: "post",
-      });
-
-    const trustedImageDomains = (data as Record<string, unknown>)
-      ?.trustedImageDomains as string;
-
-    if (trustedImageDomains) {
-      // Split by comma and trim whitespace
-      trustedDomainsCache = trustedImageDomains
-        .split(",")
-        .map((domain) => domain.trim())
-        .filter((domain) => domain.length > 0);
-    } else {
-      trustedDomainsCache = [];
-    }
-
-    lastFetchTime = now;
-    return trustedDomainsCache;
-  } catch (error) {
-    console.warn(
-      "Failed to fetch trusted domains from system settings:",
-      error
-    );
-    return [];
-  }
-}
 
 async function filterNodesNotInAttachmentLibrary(
   nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
@@ -112,9 +71,9 @@ export const ExtensionUpload = Extension.create({
               return false;
             }
 
-            // Fetch trusted domains and check for external nodes
-            getTrustedDomains().then(async (trustedDomains) => {
-              const externalNodes = getAllExternalNodes(slice, trustedDomains);
+            // Check for external nodes that need to be uploaded
+            (async () => {
+              const externalNodes = getAllExternalNodes(slice);
               if (externalNodes.length === 0) {
                 return;
               }
@@ -124,20 +83,60 @@ export const ExtensionUpload = Extension.create({
                 await filterNodesNotInAttachmentLibrary(externalNodes);
 
               if (nodesToPrompt.length > 0) {
-                // Non-blocking notification for external links
+                // Show non-blocking notification with action buttons
                 const count = nodesToPrompt.length;
+                const title = i18n.global.t(
+                  "editor.extensions.upload.external_link_notification_title"
+                );
                 const message =
                   count === 1
                     ? i18n.global.t(
-                        "editor.extensions.upload.external_link_detected_singular"
+                        "editor.extensions.upload.external_link_notification_singular"
                       )
                     : i18n.global.t(
-                        "editor.extensions.upload.external_link_detected_plural",
+                        "editor.extensions.upload.external_link_notification_plural",
                         { count }
                       );
-                Toast.info(message, { duration: 5000 });
+
+                ActionNotificationManager.show({
+                  type: "info",
+                  title,
+                  message,
+                  closable: true,
+                  actions: [
+                    {
+                      label: i18n.global.t("editor.common.button.cancel"),
+                      type: "default",
+                      onClick: () => {
+                        // Just close the notification
+                      },
+                    },
+                    {
+                      label: i18n.global.t(
+                        "editor.extensions.upload.upload_to_library"
+                      ),
+                      type: "primary",
+                      onClick: async () => {
+                        try {
+                          await batchUploadExternalLink(editor, nodesToPrompt);
+                          Toast.success(
+                            i18n.global.t("editor.common.toast.save_success")
+                          );
+                        } catch (error) {
+                          Toast.error(
+                            i18n.global.t("editor.common.toast.save_failed_msg")
+                          );
+                          console.error(
+                            "Failed to upload external links:",
+                            error
+                          );
+                        }
+                      },
+                    },
+                  ],
+                });
               }
-            });
+            })();
 
             const types = event.clipboardData.types;
             if (!containsFileClipboardIdentifier(types)) {
@@ -233,8 +232,7 @@ function isExcelPasted(clipboardData: ClipboardEvent["clipboardData"]) {
 }
 
 export function getAllExternalNodes(
-  slice: Slice,
-  trustedDomains: string[] = []
+  slice: Slice
 ): { node: PMNode; pos: number; index: number; parent: PMNode | null }[] {
   const externalNodes: {
     node: PMNode;
@@ -248,7 +246,7 @@ export function getAllExternalNodes(
         node.type.name
       )
     ) {
-      if (isExternalAsset(node.attrs.src, trustedDomains)) {
+      if (isExternalAsset(node.attrs.src)) {
         externalNodes.push({
           node,
           pos,
