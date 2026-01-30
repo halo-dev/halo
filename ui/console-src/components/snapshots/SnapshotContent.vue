@@ -1,43 +1,40 @@
 <script setup lang="ts">
-import { consoleApiClient } from "@halo-dev/api-client";
+import { type ContentWrapper } from "@halo-dev/api-client";
 import { Toast, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs } from "vue";
+import { SNAPSHOT_QUERY_KEY } from "./query-keys";
 
 const props = withDefaults(
   defineProps<{
-    singlePageName?: string;
-    snapshotName?: string;
+    cacheKey: string;
+    name: string;
+    snapshotNames?: string[];
+    getApi: (snapshotName: string) => Promise<ContentWrapper>;
   }>(),
   {
-    singlePageName: undefined,
-    snapshotName: undefined,
+    snapshotNames: () => [],
   }
 );
 
-const { singlePageName, snapshotName } = toRefs(props);
+const { name, snapshotNames, cacheKey } = toRefs(props);
 
 const { data: snapshot, isLoading } = useQuery({
-  queryKey: ["singlePage-snapshot-by-name", singlePageName, snapshotName],
+  queryKey: SNAPSHOT_QUERY_KEY(cacheKey, name, snapshotNames),
   queryFn: async () => {
-    if (!singlePageName.value || !snapshotName.value) {
-      throw new Error("singlePageName and snapshotName are required");
+    if (!snapshotNames.value?.length) {
+      throw new Error("Please select a snapshot");
     }
 
-    const { data } =
-      await consoleApiClient.content.singlePage.fetchSinglePageContent({
-        name: singlePageName.value,
-        snapshotName: snapshotName.value,
-      });
-    return data;
+    return await props.getApi(snapshotNames.value[0]);
   },
   onError(err) {
     if (err instanceof Error) {
       Toast.error(err.message);
     }
   },
-  enabled: computed(() => !!singlePageName.value && !!snapshotName.value),
+  enabled: computed(() => !!name.value && !!snapshotNames.value?.length),
 });
 </script>
 <template>
@@ -69,6 +66,7 @@ const { data: snapshot, isLoading } = useQuery({
     margin: 0;
 
     code {
+      color: #ccc;
       background: none;
       font-size: 0.8rem;
       padding: 0 !important;
