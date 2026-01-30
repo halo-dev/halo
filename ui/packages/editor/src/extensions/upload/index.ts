@@ -6,7 +6,7 @@ import {
   handleFileEvent,
   isExternalAsset,
 } from "@/utils/upload";
-import { consoleApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
@@ -21,7 +21,7 @@ async function getTrustedDomains(): Promise<string[]> {
   const now = Date.now();
 
   // Return cached value if still valid
-  if (now - lastFetchTime < CACHE_DURATION && trustedDomainsCache.length >= 0) {
+  if (now - lastFetchTime < CACHE_DURATION) {
     return trustedDomainsCache;
   }
 
@@ -55,6 +55,45 @@ async function getTrustedDomains(): Promise<string[]> {
   }
 }
 
+async function filterNodesNotInAttachmentLibrary(
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+) {
+  const srcList = Array.from(
+    new Set(
+      nodes
+        .map((item) => item.node.attrs?.src as string | undefined)
+        .filter(Boolean)
+    )
+  );
+
+  if (srcList.length === 0) {
+    return nodes;
+  }
+
+  const results = await Promise.all(
+    srcList.map(async (src) => {
+      try {
+        const { data } = await coreApiClient.storage.attachment.listAttachment({
+          // API page is 1-based; 0 means "no pagination"
+          page: 1,
+          size: 1,
+          fieldSelector: [`status.permalink=${src}`],
+        });
+        return [src, data.total > 0] as const;
+      } catch {
+        // If we can't check, treat it as not found and keep original behavior.
+        return [src, false] as const;
+      }
+    })
+  );
+
+  const existingSrcSet = new Set(
+    results.filter(([, exists]) => exists).map(([src]) => src)
+  );
+
+  return nodes.filter((item) => !existingSrcSet.has(item.node.attrs?.src));
+}
+
 export const ExtensionUpload = Extension.create({
   name: "upload",
 
@@ -75,9 +114,17 @@ export const ExtensionUpload = Extension.create({
             }
 
             // Fetch trusted domains and check for external nodes
-            getTrustedDomains().then((trustedDomains) => {
+            getTrustedDomains().then(async (trustedDomains) => {
               const externalNodes = getAllExternalNodes(slice, trustedDomains);
-              if (externalNodes.length > 0) {
+              if (externalNodes.length === 0) {
+                return;
+              }
+
+              // If pasted URLs already exist as attachment permalinks, skip prompting.
+              const nodesToPrompt =
+                await filterNodesNotInAttachmentLibrary(externalNodes);
+
+              if (nodesToPrompt.length > 0) {
                 Dialog.info({
                   title: i18n.global.t("editor.common.text.tip"),
                   description: i18n.global.t(
@@ -88,7 +135,7 @@ export const ExtensionUpload = Extension.create({
                   async onConfirm() {
                     await batchUploadExternalLink(
                       editor,
-                      externalNodes,
+                      nodesToPrompt,
                       trustedDomains
                     );
 
