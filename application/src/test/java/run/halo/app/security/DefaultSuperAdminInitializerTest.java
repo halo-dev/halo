@@ -9,9 +9,6 @@ import run.halo.app.extension.MetadataUtil;
 
 /**
  * Tests for {@link DefaultSuperAdminInitializer}.
- *
- * @author guqing
- * @since 2.20.0
  */
 class DefaultSuperAdminInitializerTest {
 
