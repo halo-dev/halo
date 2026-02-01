@@ -70,6 +70,13 @@ spec:
           min: 1
           max: 100
           validation: required
+        - $formkit: number
+          label: "作者页文章显示条数"
+          name: authorPageSize
+          value: 10
+          min: 1
+          max: 100
+          validation: required
         - $formkit: select
           label: "别名生成策略"
           name: slugGenerationStrategy

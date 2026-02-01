@@ -90,7 +90,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request, String name) {
         String path = request.path();
         int pageNum = pageNumInPathVariable(request);
-        return configuredPageSize(environmentFetcher, SystemSetting.Post::getPostPageSize)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getAuthorPageSize)
             .flatMap(pageSize -> postFinder.listByOwner(pageNum, pageSize, name))
             .doOnNext(list -> {
                 list.getItems().forEach(listedPostVo -> {
