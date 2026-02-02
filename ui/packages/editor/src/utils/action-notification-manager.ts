@@ -56,34 +56,38 @@ function createActionNotification(
   wrapper.style.pointerEvents = "auto";
   wrapper.id = id;
 
-  const vnode = createVNode(ActionNotification, {
-    ...props,
-    onClose: () => {
-      close();
-      props.onClose?.();
-    },
-  });
-
-  // Add actions slot if actions are provided
+  // Prepare slots
+  const slots: Record<string, () => VNode[]> = {};
   if (props.actions && props.actions.length > 0) {
-    vnode.children = {
-      actions: () =>
-        props.actions!.map((action) =>
-          h(
-            VButton,
-            {
-              size: "sm",
-              type: action.type || "default",
-              onClick: async () => {
-                await action.onClick();
-                // Don't auto-close on action click - let the action handler decide
-              },
+    slots.actions = () =>
+      props.actions!.map((action) =>
+        h(
+          VButton,
+          {
+            size: "sm",
+            type: action.type || "default",
+            onClick: async () => {
+              await action.onClick();
+              // Don't auto-close on action click - let the action handler decide
             },
-            () => action.label
-          )
-        ),
-    };
+          },
+          () => action.label
+        )
+      );
   }
+
+  // Create vnode with slots
+  const vnode = createVNode(
+    ActionNotification,
+    {
+      ...props,
+      onClose: () => {
+        close();
+        props.onClose?.();
+      },
+    },
+    slots
+  );
 
   render(vnode, wrapper);
   container.appendChild(wrapper);
