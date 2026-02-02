@@ -3,6 +3,7 @@ import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
+import { isNil } from "es-toolkit";
 import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { onMounted, ref, toRaw, watch } from "vue";
@@ -124,12 +125,12 @@ const parseItemLabel = async (
       } as FormattedItemLabel;
     }
     const renderedValue = await renderItemLabelValue(node, value);
+    renderedValue.value = isNil(renderedValue.value)
+      ? value
+      : renderedValue.value;
     return {
       type: itemLabel.type,
-      value:
-        renderedValue.value !== undefined
-          ? String(renderedValue.value)
-          : String(value ?? ""),
+      value: renderedValue.value,
       ...renderedValue,
     } as FormattedItemLabel;
   }
