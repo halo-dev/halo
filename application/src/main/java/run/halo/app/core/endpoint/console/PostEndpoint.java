@@ -18,7 +18,6 @@ import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -364,9 +363,11 @@ public class PostEndpoint implements CustomEndpoint {
                         || schedulePublish.test(post);
                 })
                 .switchIfEmpty(Mono.error(
-                    () -> new RetryException("Retry to check post publish status"))))
+                    () -> new IllegalStateException("Retry to check post publish status"))
+                ))
             .retryWhen(Retry.backoff(maxAttemptsWaitForPublish, Duration.ofMillis(100))
-                .filter(t -> t instanceof RetryException));
+                .filter(IllegalStateException.class::isInstance)
+            );
     }
 
     private Mono<ServerResponse> unpublishPost(ServerRequest request) {

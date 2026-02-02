@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -38,8 +38,9 @@ import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 
-@SpringBootTest(properties = "halo.console.location=classpath:/console/", webEnvironment =
-    SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    properties = "halo.console.location=classpath:/console/",
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
     WebFluxConfigTest.WebSocketSupportTest.TestWebSocketConfiguration.class,
     WebFluxConfigTest.ServerWebExchangeContextFilterTest.TestConfig.class,

@@ -1,12 +1,19 @@
 package run.halo.app.infra.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.hash.Hashing;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.extension.ConfigMap;
 
 /**
@@ -15,10 +22,13 @@ import run.halo.app.extension.ConfigMap;
  * @author johnniang
  * @since 2.22.0
  */
+@Slf4j
 public enum SystemConfigUtils {
     ;
 
     private static final ObjectMapper mapper = JsonUtils.mapper();
+
+    private static final String DATA_SNAPSHOT_ANNO = "halo.run/data-snapshot";
 
     /**
      * Merge two configuration maps containing JSON strings.
@@ -103,5 +113,69 @@ public enum SystemConfigUtils {
             }
         });
         return mainObject;
+    }
+
+    /**
+     * Populate checksum annotation in the ConfigMap.
+     *
+     * @param configMap the ConfigMap to populate checksum for
+     * @return true if the checksum was updated, false otherwise
+     */
+    public static boolean populateChecksum(ConfigMap configMap) {
+        var toHash = Optional.ofNullable(configMap.getData())
+            .map(Objects::toString)
+            .orElse("");
+        var checksum = Hashing.sha256().hashString(toHash, StandardCharsets.UTF_8)
+            .toString();
+        var metadata = configMap.getMetadata();
+        var notChanged = Optional.ofNullable(metadata.getAnnotations())
+            .map(annotations -> annotations.get(Constant.CHECKSUM_CONFIG_ANNO))
+            .stream()
+            .anyMatch(existingChecksum -> Objects.equals(checksum, existingChecksum));
+        if (notChanged) {
+            log.debug("ConfigMap '{}' has not changed.", configMap.getMetadata().getName());
+            return false;
+        }
+        log.debug("ConfigMap '{}' has changed, updating checksum {}.",
+            configMap.getMetadata().getName(), checksum);
+        if (metadata.getAnnotations() == null) {
+            metadata.setAnnotations(new HashMap<>());
+        }
+        metadata.getAnnotations().put(Constant.CHECKSUM_CONFIG_ANNO, checksum);
+        return true;
+    }
+
+    /**
+     * Update data snapshot annotation in the ConfigMap.
+     *
+     * @param configMap the ConfigMap
+     */
+    public static void updateDataSnapshot(ConfigMap configMap) {
+        Optional.ofNullable(configMap.getData())
+            .map(JsonUtils::objectToJson)
+            .ifPresent(dataJson -> {
+                var metadata = configMap.getMetadata();
+                if (metadata.getAnnotations() == null) {
+                    metadata.setAnnotations(new HashMap<>());
+                }
+                metadata.getAnnotations().put(DATA_SNAPSHOT_ANNO, dataJson);
+            });
+    }
+
+    /**
+     * Get data snapshot from ConfigMap annotations.
+     *
+     * @param configMap the ConfigMap
+     * @return the data snapshot
+     */
+    public static Map<String, String> getDataSnapshot(ConfigMap configMap) {
+        return Optional.ofNullable(configMap.getMetadata().getAnnotations())
+            .map(annotations -> annotations.get(DATA_SNAPSHOT_ANNO))
+            .map(dataJson -> JsonUtils.jsonToObject(
+                dataJson,
+                new TypeReference<Map<String, String>>() {
+                }
+            ))
+            .orElse(Map.of());
     }
 }

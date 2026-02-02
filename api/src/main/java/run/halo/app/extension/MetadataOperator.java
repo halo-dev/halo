@@ -16,6 +16,7 @@ import java.util.Set;
  * @author johnniang
  */
 @JsonDeserialize(as = Metadata.class)
+@tools.jackson.databind.annotation.JsonDeserialize(as = Metadata.class)
 @Schema(implementation = Metadata.class)
 public interface MetadataOperator {
 

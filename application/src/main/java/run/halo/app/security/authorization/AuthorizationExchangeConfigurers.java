@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
@@ -65,7 +66,7 @@ class AuthorizationExchangeConfigurers {
             .pathMatchers("/challenges/**")
             .access((authentication, context) ->
                 authentication.map(TwoFactorAuthentication.class::isInstance)
-                    .map(AuthorizationDecision::new)
+                    .<AuthorizationResult>map(AuthorizationDecision::new)
                     .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
             )
             .pathMatchers(
@@ -77,7 +78,7 @@ class AuthorizationExchangeConfigurers {
             .pathMatchers("/logout")
             .access((authentication, context) ->
                 authentication.map(a -> !authenticationTrustResolver.isAnonymous(a))
-                    .map(AuthorizationDecision::new)
+                    .<AuthorizationResult>map(AuthorizationDecision::new)
                     .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
             )
         );
@@ -104,7 +105,7 @@ class AuthorizationExchangeConfigurers {
                 // we only need to check the authentication is authenticated
                 // because we treat anonymous user as authenticated
                 authentication.map(Authentication::isAuthenticated)
-                    .map(AuthorizationDecision::new)
+                    .<AuthorizationResult>map(AuthorizationDecision::new)
                     .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
             )
         );

@@ -14,12 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Tests for {@link DefaultSystemConfigFetcher}.
@@ -35,6 +37,9 @@ class DefaultSystemConfigFetcherTest {
 
     @Mock
     ConversionService conversionService;
+
+    @Spy
+    JsonMapper mapper = JsonMapper.shared();
 
     @InjectMocks
     DefaultSystemConfigFetcher systemConfigFetcher;

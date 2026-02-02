@@ -15,7 +15,7 @@ import run.halo.app.infra.utils.ReactiveUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class DefaultSettingFetcher extends SettingFetcher {
+class DefaultSettingFetcher implements SettingFetcher {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private final ReactiveSettingFetcher delegateFetcher;
 
@@ -36,6 +36,11 @@ public class DefaultSettingFetcher extends SettingFetcher {
         return Objects.requireNonNull(delegateFetcher.get(group).block(BLOCKING_TIMEOUT));
     }
 
+    @Override
+    public tools.jackson.databind.JsonNode getSettingValue(String group) {
+        return delegateFetcher.getSettingValue(group).block(BLOCKING_TIMEOUT);
+    }
+
     /**
      * Get values from {@link ConfigMap}.
      *
@@ -45,5 +50,10 @@ public class DefaultSettingFetcher extends SettingFetcher {
     @Override
     public Map<String, JsonNode> getValues() {
         return Objects.requireNonNull(delegateFetcher.getValues().block(BLOCKING_TIMEOUT));
+    }
+
+    @Override
+    public Map<String, tools.jackson.databind.JsonNode> getSettingValues() {
+        return delegateFetcher.getSettingValues().block(BLOCKING_TIMEOUT);
     }
 }

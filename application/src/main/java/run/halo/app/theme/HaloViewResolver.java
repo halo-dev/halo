@@ -8,8 +8,8 @@ import java.util.Optional;
 import org.attoparser.ParseException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
+import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
@@ -57,24 +57,18 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
         setViewClass(HaloView.class);
         var map = PropertyMapper.get();
         map.from(thymeleafProperties::getEncoding)
-            .whenNonNull()
             .to(this::setDefaultCharset);
         map.from(thymeleafProperties::getExcludedViewNames)
-            .whenNonNull()
             .to(this::setExcludedViewNames);
         map.from(thymeleafProperties::getViewNames)
-            .whenNonNull()
             .to(this::setViewNames);
 
         var reactive = thymeleafProperties.getReactive();
         map.from(reactive::getMediaTypes)
-            .whenNonNull()
             .to(this::setSupportedMediaTypes);
         map.from(reactive::getFullModeViewNames)
-            .whenNonNull()
             .to(this::setFullModeViewNames);
         map.from(reactive::getChunkedModeViewNames)
-            .whenNonNull()
             .to(this::setChunkedModeViewNames);
         map.from(reactive::getMaxChunkSize)
             .asInt(DataSize::toBytes)

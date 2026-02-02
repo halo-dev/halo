@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.NonNull;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -70,10 +69,11 @@ class PluginBeforeStopSyncListener {
                 if (log.isDebugEnabled()) {
                     log.debug("Wait for {}/{} deleted", gvk, name);
                 }
-                return Mono.error(new RetryException("Wait for extension deleted"));
+                return Mono.error(new IllegalStateException("Wait for extension deleted"));
             })
             .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                .filter(RetryException.class::isInstance))
+                .filter(IllegalStateException.class::isInstance)
+            )
             .then()
             .doOnSuccess(v -> {
                 if (log.isDebugEnabled()) {

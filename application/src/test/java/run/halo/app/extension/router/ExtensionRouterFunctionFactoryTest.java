@@ -25,7 +25,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.HttpMessageReader;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -44,6 +45,8 @@ import run.halo.app.extension.router.ExtensionRouterFunctionFactory.CreateHandle
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.GetHandler;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.ListHandler;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.UpdateHandler;
+import run.halo.app.infra.config.JacksonAdapterModule;
+import tools.jackson.databind.json.JsonMapper;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionRouterFunctionFactoryTest {
@@ -61,7 +64,25 @@ class ExtensionRouterFunctionFactoryTest {
 
     @BeforeEach
     void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(factory.create()).build();
+        var mapper = JsonMapper.builder()
+            .addModule(new JacksonAdapterModule(
+                () -> com.fasterxml.jackson.databind.json.JsonMapper.builder().build())
+            )
+            .build();
+        webClient = WebTestClient.bindToRouterFunction(factory.create())
+            .handlerStrategies(HandlerStrategies.builder()
+                .codecs(c -> {
+                    c.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(mapper));
+                    c.defaultCodecs().jacksonJsonDecoder(new JacksonJsonDecoder(mapper));
+                })
+                .build()
+            )
+            .configureClient()
+            .codecs(c -> {
+                c.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(mapper));
+                c.defaultCodecs().jacksonJsonDecoder(new JacksonJsonDecoder(mapper));
+            })
+            .build();
     }
 
     @Nested
@@ -104,7 +125,7 @@ class ExtensionRouterFunctionFactoryTest {
             var metadata = new Metadata();
             metadata.setName("my-fake");
             fake.setMetadata(metadata);
-            var mapper = Jackson2ObjectMapperBuilder.json().build();
+            var mapper = com.fasterxml.jackson.databind.json.JsonMapper.builder().build();
             var jsonExt = mapper.convertValue(fake, JsonExtension.class);
 
             when(client.getJsonExtension(scheme.groupVersionKind(), "my-fake"))
@@ -135,7 +156,6 @@ class ExtensionRouterFunctionFactoryTest {
             }));
         }
     }
-
 
     @Test
     void shouldCreateSuccessfully() {
