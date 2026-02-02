@@ -98,7 +98,7 @@ export const ExtensionUpload = Extension.create({
                         { count }
                       );
 
-                ActionNotificationManager.show({
+                const notification = ActionNotificationManager.show({
                   type: "info",
                   title,
                   message,
@@ -108,7 +108,7 @@ export const ExtensionUpload = Extension.create({
                       label: i18n.global.t("editor.common.button.cancel"),
                       type: "default",
                       onClick: () => {
-                        // Just close the notification
+                        notification.close();
                       },
                     },
                     {
@@ -119,12 +119,13 @@ export const ExtensionUpload = Extension.create({
                       onClick: async () => {
                         try {
                           await batchUploadExternalLink(editor, nodesToPrompt);
+                          notification.close();
                           Toast.success(
                             i18n.global.t("editor.common.toast.save_success")
                           );
                         } catch (error) {
                           Toast.error(
-                            i18n.global.t("editor.common.toast.save_failed_msg")
+                            i18n.global.t("editor.extensions.upload.error")
                           );
                           console.error(
                             "Failed to upload external links:",
