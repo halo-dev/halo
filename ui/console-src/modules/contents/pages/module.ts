@@ -47,18 +47,18 @@ export default definePlugin({
             permissions: ["system:singlepages:manage"],
           },
         },
-        {
-          path: "snapshots",
-          name: "SinglePageSnapshots",
-          component: () => import("./SinglePageSnapshots.vue"),
-          meta: {
-            title: "core.page_snapshots.title",
-            searchable: false,
-            hideFooter: true,
-            permissions: ["system:singlepages:manage"],
-          },
-        },
       ],
+    },
+    {
+      path: "/single-pages/snapshots",
+      name: "SinglePageSnapshots",
+      component: () => import("./SinglePageSnapshots.vue"),
+      meta: {
+        title: "core.page_snapshots.title",
+        searchable: false,
+        hideFooter: true,
+        permissions: ["system:singlepages:manage"],
+      },
     },
   ],
 });
