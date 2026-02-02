@@ -144,6 +144,7 @@ public class SystemSetting {
         Integer archivePageSize;
         Integer categoryPageSize;
         Integer tagPageSize;
+        Integer authorPageSize;
         Boolean review;
         String slugGenerationStrategy;
 

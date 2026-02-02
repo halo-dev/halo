@@ -34,6 +34,7 @@ data:
       "archivePageSize": 10,
       "categoryPageSize": 10,
       "tagPageSize": 10,
+      "authorPageSize": 10,
       "slugGenerationStrategy": "generateByTitle",
       "attachmentPolicyName": "default-policy"
     }

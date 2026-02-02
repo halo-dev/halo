@@ -1,4 +1,5 @@
 import type { FormKitNode } from "@formkit/core";
+import { isNil } from "es-toolkit";
 import { renderCategorySelectLabelValue } from "./category-select";
 import { renderCheckboxLabelValue } from "./checkbox";
 import { renderIconifyLabelValue } from "./iconify";
@@ -17,9 +18,7 @@ const defaultRenderer: LabelValueRenderer = ({
 }: {
   value: unknown;
 }): LabelValueResult => {
-  return {
-    value: String(value),
-  };
+  return isNil(value) ? { value: "" } : { value: String(value) };
 };
 
 /**
