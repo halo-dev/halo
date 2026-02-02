@@ -157,10 +157,10 @@ export function useAllPostTagsQuery() {
       );
     },
     refetchInterval(data) {
-      const abnormalTags = data?.filter(
+      const hasAbnormalTag = data?.some(
         (tag) => !!tag.metadata.deletionTimestamp || !tag.status?.permalink
       );
-      return abnormalTags?.length ? 1000 : false;
+      return hasAbnormalTag ? 1000 : false;
     },
   });
 }
