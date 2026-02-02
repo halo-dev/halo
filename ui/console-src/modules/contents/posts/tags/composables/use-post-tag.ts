@@ -1,5 +1,12 @@
-import type { Tag } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import type {
+  Tag,
+  TagV1alpha1ConsoleApiListPostTagsRequest,
+} from "@halo-dev/api-client";
+import {
+  consoleApiClient,
+  coreApiClient,
+  paginate,
+} from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, type QueryObserverResult } from "@tanstack/vue-query";
 import { ref, watch, type Ref } from "vue";
@@ -135,4 +142,25 @@ export function usePostTag(filterOptions?: {
     handleDelete,
     handleDeleteInBatch,
   };
+}
+
+export function useAllPostTagsQuery() {
+  return useQuery({
+    queryKey: ["core:post-tags:all"],
+    queryFn: async () => {
+      return await paginate<TagV1alpha1ConsoleApiListPostTagsRequest, Tag>(
+        (params) => consoleApiClient.content.tag.listPostTags(params),
+        {
+          sort: ["metadata.creationTimestamp,desc"],
+          size: 1000,
+        }
+      );
+    },
+    refetchInterval(data) {
+      const abnormalTags = data?.filter(
+        (tag) => !!tag.metadata.deletionTimestamp || !tag.status?.permalink
+      );
+      return abnormalTags?.length ? 1000 : false;
+    },
+  });
 }

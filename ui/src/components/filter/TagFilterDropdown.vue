@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { setFocus } from "@/formkit/utils/focus";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
-import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
+import { useAllPostTagsQuery } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { Tag } from "@halo-dev/api-client";
 import {
   IconArrowDown,
@@ -27,7 +27,7 @@ const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
 }>();
 
-const { tags } = usePostTag();
+const { data: tags } = useAllPostTagsQuery();
 
 const dropdown = ref();
 
