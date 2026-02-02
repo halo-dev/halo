@@ -11,6 +11,18 @@ data:
       "avatarPolicy": "default-policy",
       "ucAttachmentPolicy": "default-policy"
     }
+  attachment: |
+    {
+      "console": {
+        "policyName": "default-policy"
+      },
+      "uc": {
+        "policyName": "default-policy"
+      },
+      "avatar": {
+        "policyName": "default-policy"
+      }
+    }
   theme: |
     {
       "active": "theme-earth"
