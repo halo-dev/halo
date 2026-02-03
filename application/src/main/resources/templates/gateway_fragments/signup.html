@@ -123,6 +123,18 @@
     <script th:inline="javascript">
         document.addEventListener("DOMContentLoaded", function () {
             setupPasswordConfirmation("password", "confirmPassword");
+
+            const form = document.getElementById("signup-form");
+            form.addEventListener("submit", function () {
+                const usernameInput = document.getElementById("username");
+                const displayNameInput = document.getElementById("displayName");
+                if (usernameInput) {
+                    usernameInput.value = usernameInput.value.trim();
+                }
+                if (displayNameInput) {
+                    displayNameInput.value = displayNameInput.value.trim();
+                }
+            });
         });
     </script>
 
