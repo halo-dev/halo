@@ -431,11 +431,11 @@ public class UserServiceImpl implements UserService {
     }
     private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
         Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
-        return !protectedLowerSet.contains(username.toLowerCase());
+        return !protectedLowerSet.contains(username.trim().toLowerCase());
     }
 
     private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
         Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
-        return !protectedLowerSet.contains(displayName.toLowerCase());
+        return !protectedLowerSet.contains(displayName.trim().toLowerCase());
     }
 }

@@ -847,6 +847,6 @@ public class UserEndpoint implements CustomEndpoint {
             .filter(n -> !n.isEmpty())
             .map(String::toLowerCase)
             .collect(Collectors.toUnmodifiableSet());
-        return !protectedLowerSet.contains(displayName.toLowerCase());
+        return !protectedLowerSet.contains(displayName.trim().toLowerCase());
     }
 }
