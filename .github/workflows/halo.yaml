@@ -32,7 +32,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Check Halo
-        run: ./gradlew check
+        run: ./gradlew clean check --configuration-cache --configuration-cache-problems=warn
       - name: Upload coverage reports to Codecov
         if: github.repository == 'halo-dev/halo'
         uses: codecov/codecov-action@v4
@@ -54,7 +54,7 @@ jobs:
           version=${version#v}
           sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
       - name: Build Halo
-        run: ./gradlew clean && ./gradlew downloadPluginPresets && ./gradlew build -x check
+        run: ./gradlew clean downloadPluginPresets build -x check --configuration-cache --configuration-cache-problems=warn
       - name: Upload Artifacts
         if: github.repository == 'halo-dev/halo'
         uses: actions/upload-artifact@v4

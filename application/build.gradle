@@ -127,8 +127,9 @@ tasks.register('copyUiDist', Copy) {
     mustRunAfter ':ui:doBuild'
 }
 
-tasks.named('processResources', ProcessResources) {
+tasks.named('classes') {
     dependsOn tasks.named('copyUiDist')
+    mustRunAfter tasks.named('downloadPluginPresets')
 }
 
 tasks.named('build') {
