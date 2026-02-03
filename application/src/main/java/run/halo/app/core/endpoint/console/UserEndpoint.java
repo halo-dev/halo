@@ -522,17 +522,22 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(user -> {
                     var newDisplayName = user.getSpec().getDisplayName();
                     var oldDisplayName = currentUser.getSpec().getDisplayName();
-                    if (!Objects.equals(oldDisplayName, newDisplayName)) {
-                        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
-                            .filter(setting -> isDisplayNameAllowed(setting, newDisplayName))
-                            .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
-                                "The display name is restricted.",
-                                "problemDetail.user.displayName.restricted",
-                                new Object[] {newDisplayName}
-                            )))
-                            .thenReturn(user);
-                    }
-                    return Mono.just(user);
+                    return Mono.just(user)
+                        .filterWhen(u -> {
+
+                            if (Objects.equals(oldDisplayName, newDisplayName)) {
+                                return Mono.just(true);
+                            }
+
+                            return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                                .map(setting -> isDisplayNameAllowed(setting, newDisplayName))
+                                .defaultIfEmpty(false);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RestrictedNameException(
+                            "The display name is restricted.",
+                            "problemDetail.user.displayName.restricted",
+                            new Object[] {newDisplayName}
+                        ))));
                 })
                 .map(user -> {
                     Map<String, String> oldAnnotations =
@@ -833,7 +838,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
-        String protectedUsernamesStr = setting.getProtectedNames();
+        String protectedUsernamesStr = setting.getProtectedUsernames();
         if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
             return true;
         }

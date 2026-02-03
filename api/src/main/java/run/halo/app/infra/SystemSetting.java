@@ -134,7 +134,7 @@ public class SystemSetting {
         @Deprecated(since = "2.22.0")
         String ucAttachmentPolicy;
 
-        String protectedNames;
+        String protectedUsernames;
     }
 
     @Data
