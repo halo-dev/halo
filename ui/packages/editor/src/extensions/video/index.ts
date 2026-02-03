@@ -55,6 +55,7 @@ export type ExtensionVideoOptions = ExtensionOptions & {
     file: File,
     options?: AxiosRequestConfig
   ) => Promise<Attachment>;
+  uploadFromUrl?: (url: string) => Promise<Attachment>;
 };
 
 export const ExtensionVideo = Node.create<ExtensionVideoOptions>({

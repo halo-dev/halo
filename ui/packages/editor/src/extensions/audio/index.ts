@@ -46,6 +46,7 @@ export interface ExtensionAudioOptions extends ExtensionOptions {
     file: File,
     options?: AxiosRequestConfig
   ) => Promise<Attachment>;
+  uploadFromUrl?: (url: string) => Promise<Attachment>;
 }
 
 export const ExtensionAudio = Node.create<ExtensionAudioOptions>({

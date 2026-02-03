@@ -6,6 +6,7 @@ import {
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
+  type UploadFromUrlFn,
 } from "@/utils/upload";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
@@ -52,11 +53,22 @@ async function filterNodesNotInAttachmentLibrary(
   return nodes.filter((item) => !existingSrcSet.has(item.node.attrs?.src));
 }
 
-export const ExtensionUpload = Extension.create({
+export interface ExtensionUploadOptions {
+  uploadFromUrl?: UploadFromUrlFn;
+}
+
+export const ExtensionUpload = Extension.create<ExtensionUploadOptions>({
   name: "upload",
+
+  addOptions() {
+    return {
+      uploadFromUrl: undefined,
+    };
+  },
 
   addProseMirrorPlugins() {
     const { editor }: { editor: Editor } = this;
+    const uploadFromUrl = this.options.uploadFromUrl;
 
     return [
       new Plugin({
@@ -118,7 +130,11 @@ export const ExtensionUpload = Extension.create({
                       type: "primary",
                       onClick: async () => {
                         try {
-                          await batchUploadExternalLink(editor, nodesToPrompt);
+                          await batchUploadExternalLink(
+                            editor,
+                            nodesToPrompt,
+                            uploadFromUrl
+                          );
                           notification.close();
                           Toast.success(
                             i18n.global.t("editor.common.toast.save_success")

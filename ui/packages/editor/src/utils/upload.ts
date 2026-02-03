@@ -151,15 +151,26 @@ export function containsFileClipboardIdentifier(types: readonly string[]) {
   return types.some((type) => fileTypes.includes(type.toLowerCase()));
 }
 
+export type UploadFromUrlFn = (url: string) => Promise<Attachment>;
+
 export async function batchUploadExternalLink(
   editor: Editor,
-  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[],
+  uploadFromUrl?: UploadFromUrlFn
 ) {
+  const uploadFn =
+    uploadFromUrl ??
+    (async (url: string) => {
+      const { data } =
+        await ucApiClient.storage.attachment.uploadAttachmentForUc({ url });
+      return data;
+    });
+
   const chunks = chunk(nodes, 5);
 
   for (const chunkNodes of chunks) {
     await Promise.all(
-      chunkNodes.map((node) => uploadExternalLink(editor, node))
+      chunkNodes.map((node) => uploadExternalLink(editor, node, uploadFn))
     );
   }
 }
@@ -171,7 +182,8 @@ export async function uploadExternalLink(
     pos: number;
     index: number;
     parent: PMNode | null;
-  }
+  },
+  uploadFromUrl?: UploadFromUrlFn
 ) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
@@ -180,12 +192,16 @@ export async function uploadExternalLink(
     return;
   }
 
+  const uploadFn =
+    uploadFromUrl ??
+    (async (url: string) => {
+      const { data } =
+        await ucApiClient.storage.attachment.uploadAttachmentForUc({ url });
+      return data;
+    });
+
   try {
-    const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
-      {
-        url: src,
-      }
-    );
+    const data = await uploadFn(src);
 
     const url = data.status?.permalink;
     const name = data.spec.displayName;
@@ -198,6 +214,7 @@ export async function uploadExternalLink(
     editor.view.dispatch(tr);
   } catch (error) {
     console.error("Failed to upload external link:", error);
+    throw error;
   }
 }
 
