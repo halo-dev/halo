@@ -46,19 +46,19 @@ function handleImageLoad(event: Event, index: number) {
   }
 }
 
-const groupSize = computed(() => {
+const groupSize = computed<number>(() => {
   return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
 });
 
-const layout = computed(() => {
+const layout = computed<string>(() => {
   return props.node?.attrs.layout || "auto";
 });
 
-const gap = computed(() => {
+const gap = computed<number>(() => {
   return props.node?.attrs.gap;
 });
 
-const groups = computed(() => {
+const groups = computed<ExtensionGalleryImageItem[][]>(() => {
   return images.value.reduce(
     (
       acc: ExtensionGalleryImageItem[][],
