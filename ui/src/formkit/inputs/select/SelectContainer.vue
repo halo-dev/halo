@@ -6,7 +6,6 @@ import {
 } from "@halo-dev/components";
 import {
   computed,
-  defineEmits,
   nextTick,
   onMounted,
   onUnmounted,
