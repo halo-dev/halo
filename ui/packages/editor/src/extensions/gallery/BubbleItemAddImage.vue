@@ -6,7 +6,7 @@ import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { ref } from "vue";
-import type { ExtensionGalleryImageItem } from ".";
+import { createGalleryImageItem, type ExtensionGalleryImageItem } from ".";
 import {
   getCurrentGalleryImages,
   updateGalleryImages,
@@ -41,10 +41,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       if (!url) {
         return;
       }
-      return {
-        src: url,
-        aspectRatio: 0,
-      };
+      return createGalleryImageItem(url);
     })
     .filter(Boolean) as ExtensionGalleryImageItem[];
   updateGalleryImages(props.editor, [...currentImages, ...newImages]);

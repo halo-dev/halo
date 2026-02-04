@@ -1,9 +1,15 @@
 import type { Editor } from "@/tiptap";
+import { i18n } from "@/locales";
 import type { Attachment } from "@halo-dev/api-client";
+import { Toast } from "@halo-dev/components";
 import { useFileDialog } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { computed, onScopeDispose, ref } from "vue";
 import { uploadFile } from "../../utils/upload";
-import { ExtensionGallery, type ExtensionGalleryImageItem } from "./index";
+import {
+  createGalleryImageItem,
+  ExtensionGallery,
+  type ExtensionGalleryImageItem,
+} from "./index";
 
 export function getCurrentGalleryImages(
   editor: Editor
@@ -29,7 +35,13 @@ export function updateGalleryImages(
 }
 
 export function useUploadGalleryImage(editor: Editor) {
-  const controller = ref<AbortController>();
+  const UPLOAD_PROGRESS_BUCKET_SIZE = 25;
+  const controllers = ref<AbortController[]>([]);
+
+  onScopeDispose(() => {
+    controllers.value.forEach((c) => c.abort());
+    controllers.value = [];
+  });
 
   const { open: openFileDialog, onChange } = useFileDialog({
     accept: "image/*",
@@ -68,26 +80,51 @@ export function useUploadGalleryImage(editor: Editor) {
     if (!uploadImage.value) {
       return;
     }
-    controller.value = new AbortController();
+
+    let lastReportedProgress = -1;
+    const reportProgress = (progress: number) => {
+      if (!Number.isFinite(progress) || progress <= 0 || progress >= 100) {
+        return;
+      }
+      const bucket =
+        Math.floor(progress / UPLOAD_PROGRESS_BUCKET_SIZE) *
+        UPLOAD_PROGRESS_BUCKET_SIZE;
+      if (bucket > lastReportedProgress) {
+        lastReportedProgress = bucket;
+        Toast.info(
+          `${i18n.global.t("editor.extensions.upload.loading")} ${file.name} (${bucket}%)`
+        );
+      }
+    };
+
+    Toast.info(`${i18n.global.t("editor.extensions.upload.loading")} ${file.name}`, {
+      duration: 6000,
+    });
+
+    const controller = new AbortController();
+    controllers.value = [...controllers.value, controller];
     uploadFile(file, uploadImage.value, {
-      controller: controller.value,
-      onUploadProgress: () => {},
+      controller,
+      onUploadProgress: reportProgress,
 
       onFinish: (attachment?: Attachment) => {
+        controllers.value = controllers.value.filter((c) => c !== controller);
         if (attachment) {
           editor.commands.updateAttributes(ExtensionGallery.name, {
             images: [
               ...getCurrentGalleryImages(editor),
-              {
-                src: attachment.status?.permalink,
-                aspectRatio: 0,
-              },
+              createGalleryImageItem(attachment.status?.permalink || ""),
             ],
           });
         }
       },
 
-      onError: () => {},
+      onError: (error: Error) => {
+        controllers.value = controllers.value.filter((c) => c !== controller);
+        Toast.error(
+          `${i18n.global.t("editor.extensions.upload.error")} - ${error.message}`
+        );
+      },
     });
   };
 

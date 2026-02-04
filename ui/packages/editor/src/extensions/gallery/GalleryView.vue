@@ -2,11 +2,20 @@
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
-import { VButton, VSpace } from "@halo-dev/components";
+import { Toast, VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { computed, ref } from "vue";
-import type { ExtensionGalleryImageItem } from "./index";
+import { computed, nextTick, ref } from "vue";
+import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
+import {
+  createGalleryImageItem,
+  DEFAULT_GALLERY_GROUP_SIZE,
+  MAX_GALLERY_CAPTION_LENGTH,
+  type ExtensionGalleryImageItem,
+} from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
+
+// 图片 caption 输入框引用
+const imageCaptionInputRefs = ref<Record<number, HTMLInputElement | null>>({});
 
 const props = defineProps<NodeViewProps>();
 
@@ -39,15 +48,80 @@ function handleImageLoad(event: Event, index: number) {
     const ratio = img.naturalWidth / img.naturalHeight;
     const newImages = [...images.value];
     newImages[index] = {
+      ...newImages[index],
       src: img.src,
       aspectRatio: ratio,
     };
-    images.value = [...newImages];
+    images.value = newImages;
+  }
+}
+
+function handleImageError() {
+  Toast.error(i18n.global.t("editor.extensions.image.image_load_error"));
+}
+
+const editingImageIndex = ref<number | null>(null);
+const editingImageCaption = ref("");
+
+function openImageCaptionEditor(index: number) {
+  handleSetFocus();
+  editingImageIndex.value = index;
+  editingImageCaption.value = images.value[index]?.caption || "";
+  // 等待 DOM 更新后聚焦输入框
+  nextTick(() => {
+    const input = imageCaptionInputRefs.value[index];
+    if (input) {
+      input.focus();
+    }
+  });
+}
+
+function closeImageCaptionEditor() {
+  editingImageIndex.value = null;
+  editingImageCaption.value = "";
+}
+
+function saveImageCaption() {
+  if (editingImageIndex.value === null) {
+    return;
+  }
+  const index = editingImageIndex.value;
+  const newImages = [...images.value];
+  const oldImage = newImages[index];
+  if (!oldImage) {
+    closeImageCaptionEditor();
+    return;
+  }
+  newImages[index] = {
+    ...oldImage,
+    caption: editingImageCaption.value
+      .trim()
+      .slice(0, MAX_GALLERY_CAPTION_LENGTH),
+  };
+  images.value = newImages;
+  closeImageCaptionEditor();
+}
+
+function handleImageCaptionBlur() {
+  saveImageCaption();
+}
+
+function handleImageCaptionKeydown(event: KeyboardEvent) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    saveImageCaption();
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    closeImageCaptionEditor();
   }
 }
 
 const groupSize = computed(() => {
-  return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
+  return (
+    props.node?.attrs.groupSize ||
+    props.extension.options?.groupSize ||
+    DEFAULT_GALLERY_GROUP_SIZE
+  );
 });
 
 const layout = computed(() => {
@@ -141,10 +215,7 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
       if (!url) {
         return;
       }
-      return {
-        src: url,
-        aspectRatio: 0,
-      };
+      return createGalleryImageItem(url);
     })
     .filter(Boolean) as ExtensionGalleryImageItem[];
   images.value = [...images.value, ...newImages];
@@ -200,53 +271,122 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
         <div
           v-for="(image, imgIndex) in group"
           :key="groupIndex * groupSize + imgIndex"
-          draggable="true"
-          class="group/image relative cursor-grab transition-all active:cursor-grabbing"
+          class="group/image flex flex-col"
           :class="{
             'aspect-1': layout === 'square',
           }"
           :style="{
             flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
           }"
-          @dragstart="
-            handleDragStart(groupIndex * groupSize + imgIndex, $event)
-          "
-          @dragend="handleDragEnd($event)"
-          @dragover="handleDragOver($event)"
-          @dragenter="
-            handleDragEnter(groupIndex * groupSize + imgIndex, $event)
-          "
-          @dragleave="handleDragLeave($event)"
-          @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
         >
-          <img
-            :src="image.src"
-            :alt="`Gallery image ${groupIndex * groupSize + imgIndex + 1}`"
-            class="pointer-events-none block size-full object-cover"
-            @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
-          />
+          <!-- 图片容器 -->
           <div
-            class="pointer-events-none invisible absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100"
+            class="relative cursor-grab transition-all active:cursor-grabbing"
+            draggable="true"
+            @dragstart="
+              handleDragStart(groupIndex * groupSize + imgIndex, $event)
+            "
+            @dragend="handleDragEnd($event)"
+            @dragover="handleDragOver($event)"
+            @dragenter="
+              handleDragEnter(groupIndex * groupSize + imgIndex, $event)
+            "
+            @dragleave="handleDragLeave($event)"
+            @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
           >
-            <div class="flex flex-row-reverse">
-              <button
-                v-tooltip="
-                  i18n.global.t(
-                    'editor.extensions.upload.operations.remove.button'
-                  )
-                "
-                aria-label="Delete"
-                class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
-                type="button"
-                @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
-              >
-                <MingcuteDelete2Line class="size-4" />
-              </button>
+            <img
+              :src="image.src"
+              :alt="image.alt || ''"
+              class="pointer-events-none block size-full object-cover"
+              @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
+              @error="handleImageError"
+            />
+            <!-- 悬停操作按钮 -->
+            <div
+              class="pointer-events-none invisible absolute inset-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-1 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100"
+            >
+              <div class="flex flex-row-reverse gap-1">
+                <button
+                  v-tooltip="
+                    i18n.global.t(
+                      'editor.extensions.upload.operations.remove.button'
+                    )
+                  "
+                  :aria-label="i18n.global.t('editor.common.button.delete')"
+                  class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                  type="button"
+                  @click.stop="removeImage(groupIndex * groupSize + imgIndex)"
+                >
+                  <MingcuteDelete2Line class="size-4" />
+                </button>
+                <button
+                  v-tooltip="
+                    i18n.global.t('editor.extensions.image.edit_caption')
+                  "
+                  :aria-label="
+                    i18n.global.t('editor.extensions.image.edit_caption')
+                  "
+                  class="text-grey-900 group pointer-events-auto relative flex size-8 cursor-pointer items-center justify-center rounded-md bg-white/90 transition-all hover:bg-white hover:text-black active:!bg-white/80"
+                  type="button"
+                  @click.stop="
+                    openImageCaptionEditor(groupIndex * groupSize + imgIndex)
+                  "
+                >
+                  <MingcuteBookmarkEditLine class="size-4" />
+                </button>
+              </div>
             </div>
           </div>
+
+          <!-- 图片描述文本 - 内联编辑，样式与单张图片 figcaption 一致 -->
+          <!-- 只有已有 caption 或正在编辑该图片时才显示 -->
+          <figcaption
+            v-if="
+              image.caption ||
+              editingImageIndex === groupIndex * groupSize + imgIndex
+            "
+            class="gallery-image-caption mt-1 text-center text-sm text-gray-500"
+            :data-empty="
+              !image.caption &&
+              editingImageIndex !== groupIndex * groupSize + imgIndex
+                ? 'true'
+                : undefined
+            "
+            :data-placeholder="
+              i18n.global.t(
+                'editor.extensions.figure_caption.empty_placeholder'
+              )
+            "
+            @click.stop="
+              openImageCaptionEditor(groupIndex * groupSize + imgIndex)
+            "
+          >
+            <input
+              v-if="editingImageIndex === groupIndex * groupSize + imgIndex"
+              :ref="
+                (el) =>
+                  (imageCaptionInputRefs[groupIndex * groupSize + imgIndex] =
+                    el as HTMLInputElement)
+              "
+              v-model="editingImageCaption"
+              type="text"
+              class="w-full bg-transparent text-center text-sm text-gray-500 outline-none"
+              :placeholder="
+                i18n.global.t(
+                  'editor.extensions.figure_caption.empty_placeholder'
+                )
+              "
+              :maxlength="MAX_GALLERY_CAPTION_LENGTH"
+              @blur="handleImageCaptionBlur"
+              @keydown="handleImageCaptionKeydown"
+              @click.stop
+            />
+            <span v-else class="cursor-text">{{ image.caption }}</span>
+          </figcaption>
         </div>
       </div>
     </div>
+
     <AttachmentSelectorModal
       v-if="attachmentSelectorModalVisible"
       :accepts="['image/*']"
@@ -255,3 +395,16 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
     />
   </node-view-wrapper>
 </template>
+
+<style scoped>
+/* 图片 caption 样式 - 与单张图片 figcaption 保持一致 */
+.gallery-image-caption[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.gallery-image-caption[data-empty="true"] > span {
+  display: none;
+}
+</style>
