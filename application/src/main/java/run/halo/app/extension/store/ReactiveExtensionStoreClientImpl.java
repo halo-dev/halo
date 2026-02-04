@@ -2,7 +2,9 @@ package run.halo.app.extension.store;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.ToIntFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.DuplicateNameException;
@@ -56,10 +59,15 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
 
     @Override
     public Flux<ExtensionStore> listByNames(List<String> names) {
-        ToIntFunction<ExtensionStore> comparator =
-            store -> names.indexOf(store.getName());
+        if (CollectionUtils.isEmpty(names)) {
+            return Flux.empty();
+        }
+        // Keep the order of names efficiently
+        var orderMap = IntStream.range(0, names.size())
+            .boxed()
+            .collect(Collectors.toMap(names::get, Function.identity(), (a, b) -> a));
         return repository.findByNameIn(names)
-            .sort(Comparator.comparingInt(comparator));
+            .sort(Comparator.comparingInt(es -> orderMap.get(es.getName())));
     }
 
     @Override
