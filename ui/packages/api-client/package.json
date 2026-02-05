@@ -48,7 +48,7 @@
     "qs": "^6.14.0"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.25.0",
+    "@openapitools/openapi-generator-cli": "^2.28.1",
     "@types/qs": "^6.14.0",
     "rimraf": "^5.0.10"
   },
