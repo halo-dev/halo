@@ -429,6 +429,7 @@ public class UserServiceImpl implements UserService {
             .map(String::toLowerCase)
             .collect(Collectors.toUnmodifiableSet());
     }
+
     private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
         Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
         return !protectedLowerSet.contains(username.trim().toLowerCase());

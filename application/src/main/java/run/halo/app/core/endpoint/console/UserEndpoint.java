@@ -524,12 +524,11 @@ public class UserEndpoint implements CustomEndpoint {
                     var oldDisplayName = currentUser.getSpec().getDisplayName();
                     return Mono.just(user)
                         .filterWhen(u -> {
-
                             if (Objects.equals(oldDisplayName, newDisplayName)) {
                                 return Mono.just(true);
                             }
-
-                            return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                            return environmentFetcher.fetch(SystemSetting.User.GROUP,
+                                    SystemSetting.User.class)
                                 .map(setting -> isDisplayNameAllowed(setting, newDisplayName))
                                 .defaultIfEmpty(false);
                         })
