@@ -178,7 +178,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(ObjectNode.class))))
+                            .schema(schemaBuilder().implementation(Object.class))))
                     .response(responseBuilder()
                         .responseCode(String.valueOf(NO_CONTENT.value()))
                         .implementation(Void.class))
@@ -251,8 +251,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .required(true)
                         .implementation(String.class)
                     )
-                    .response(responseBuilder()
-                        .implementation(ObjectNode.class))
+                    .response(responseBuilder().implementation(Object.class))
             )
             .build();
     }

@@ -177,7 +177,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(ObjectNode.class))))
+                            .schema(schemaBuilder().implementation(Object.class))))
                     .response(responseBuilder()
                         .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
                         .implementation(Void.class))
@@ -261,7 +261,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         .implementation(String.class)
                     )
                     .response(responseBuilder()
-                        .implementation(ObjectNode.class))
+                        .implementation(Object.class))
             )
             .GET("plugins/-/bundle.js", this::fetchJsBundle,
                 builder -> builder.operationId("fetchJsBundle")
