@@ -5,6 +5,8 @@
 2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request.
 3. 请确保你已经添加并运行了适当的测试。
 3. Ensure you have added or ran the appropriate tests for your PR.
+4. 如果你的 PR 使用了 LLM 生成代码，请在 PR 中添加相应的说明，我们不反对使用 LLM 辅助开发，但希望你能够先对生成的代码进行审查。
+5. If your PR uses LLM generated code, please add a corresponding description in the PR, we do not oppose using LLM to assist development, but we hope you can review the generated code first.
 -->
 
 #### What type of PR is this?
