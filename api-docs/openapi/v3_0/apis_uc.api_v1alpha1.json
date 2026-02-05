@@ -881,7 +881,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/JsonNode"
+                  "type": "object"
                 }
               }
             },
@@ -910,7 +910,7 @@
           "content": {
             "*/*": {
               "schema": {
-                "$ref": "#/components/schemas/JsonNode"
+                "type": "object"
               }
             }
           },
@@ -1975,9 +1975,6 @@
         },
         "description": "GroupKind contains group and kind data only."
       },
-      "JsonNode": {
-        "type": "object"
-      },
       "JsonPatch": {
         "minItems": 1,
         "uniqueItems": true,
@@ -2560,12 +2557,12 @@
           },
           "visible": {
             "type": "string",
+            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
-            ],
-            "default": "PUBLIC"
+            ]
           }
         }
       },

@@ -47,7 +47,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
                         .description("Notifier name")
                         .required(true)
                     )
-                    .response(responseBuilder().implementation(ObjectNode.class))
+                    .response(responseBuilder().implementation(Object.class))
             )
             .POST("/notifiers/{name}/receiver-config", this::saveReceiverConfig,
                 builder -> builder.operationId("SaveReceiverConfig")
@@ -63,8 +63,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(ObjectNode.class))
+                            .schema(Builder.schemaBuilder().implementation(Object.class))
                         )
                     )
                     .response(responseBuilder().implementation(Void.class))
