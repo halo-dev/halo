@@ -64,7 +64,7 @@ class PolicyEndpoint implements CustomEndpoint {
                         .required(true)
                         .implementation(String.class)
                     )
-                    .response(responseBuilder().implementation(JsonNode.class))
+                    .response(responseBuilder().implementation(Object.class))
             )
             .PUT(
                 "/policies/{name}/configs/{group}",
@@ -88,7 +88,7 @@ class PolicyEndpoint implements CustomEndpoint {
                         .implementation(String.class)
                     )
                     .requestBody(
-                        requestBodyBuilder().required(true).implementation(JsonNode.class))
+                        requestBodyBuilder().required(true).implementation(Object.class))
                     .response(
                         responseBuilder().responseCode(String.valueOf(NO_CONTENT.value()))
                     )

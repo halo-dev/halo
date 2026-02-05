@@ -3,7 +3,6 @@ package run.halo.app.core.endpoint.uc;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.HashMap;
 import java.util.Objects;
@@ -43,7 +42,6 @@ import tools.jackson.databind.json.JsonMapper;
 class UcUserPreferenceEndpoint implements CustomEndpoint {
 
     private static final String PREFERENCE_PREFIX = "user-preferences-";
-    private final ObjectMapper objectMapper;
 
     private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
@@ -68,9 +66,7 @@ class UcUserPreferenceEndpoint implements CustomEndpoint {
                         .implementation(String.class)
                         .required(true)
                     )
-                    .response(responseBuilder()
-                        .implementation(JsonNode.class)
-                    )
+                    .response(responseBuilder().implementation(Object.class))
             )
             .PUT(
                 "/user-preferences/{group}",
@@ -87,7 +83,7 @@ class UcUserPreferenceEndpoint implements CustomEndpoint {
                     )
                     .requestBody(Builder.requestBodyBuilder()
                         .required(true)
-                        .implementation(JsonNode.class))
+                        .implementation(Object.class))
                     .response(responseBuilder()
                         .description("No content, preference updated successfully.")
                         .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
