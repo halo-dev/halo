@@ -13,13 +13,34 @@ export interface FileProps {
 }
 
 /**
+ * Creates an editor node from a file.
+ *
+ * @param editor - Editor instance
+ * @param file - File to be uploaded
+ * @returns - Editor node
+ */
+export const createEditorNodeFormFile = (editor: Editor, file: File) => {
+  if (file.type.startsWith("image/")) {
+    return uploadImage(editor, file);
+  }
+
+  if (file.type.startsWith("video/")) {
+    return uploadVideo(editor, file);
+  }
+
+  if (file.type.startsWith("audio/")) {
+    return uploadAudio(editor, file);
+  }
+};
+
+/**
  * Handles file events, determining if the file is an image and triggering the appropriate upload process.
  *
  * @param {FileProps} { file, editor } - File and editor instances
  * @returns {boolean} - True if a file is handled, otherwise false
  */
-export const handleFileEvent = ({ file, editor }: FileProps) => {
-  if (!file) {
+export const handleFileEvent = (editor: Editor, files: File[]) => {
+  if (!files.length) {
     return false;
   }
 
@@ -32,61 +53,54 @@ export const handleFileEvent = ({ file, editor }: FileProps) => {
     return false;
   }
 
-  if (file.type.startsWith("image/")) {
-    uploadImage({ file, editor });
-    return true;
-  }
+  const nodes = files
+    .map((file) => createEditorNodeFormFile(editor, file))
+    .filter((node) => node !== undefined);
 
-  if (file.type.startsWith("video/")) {
-    uploadVideo({ file, editor });
-    return true;
+  if (nodes.length) {
+    const tr = editor.view.state.tr;
+    tr.insert(editor.view.state.selection.from, nodes);
+    editor.view.dispatch(tr);
   }
-
-  if (file.type.startsWith("audio/")) {
-    uploadAudio({ file, editor });
-    return true;
-  }
-
-  return true;
 };
 
 /**
  * Uploads an image file and inserts it into the editor.
  *
- * @param {FileProps} { file, editor } - File to be uploaded and the editor instance
+ * @param editor - Editor instance
+ * @param file - File to be uploaded
  */
-export const uploadImage = ({ file, editor }: FileProps) => {
-  const { view } = editor;
-  const node = view.props.state.schema.nodes[ExtensionImage.name].create({
+export const uploadImage = (editor: Editor, file: File) => {
+  const { state } = editor;
+  return state.schema.nodes[ExtensionImage.name].create({
     file: file,
   });
-  editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
 };
 
 /**
  * Uploads a video file and inserts it into the editor.
  *
- * @param {FileProps} { file, editor } - File to be uploaded and the editor instance
+ * @param editor - Editor instance
+ * @param file - File to be uploaded
  */
-export const uploadVideo = ({ file, editor }: FileProps) => {
-  const { view } = editor;
-  const node = view.props.state.schema.nodes[ExtensionVideo.name].create({
+export const uploadVideo = (editor: Editor, file: File) => {
+  const { state } = editor;
+  return state.schema.nodes[ExtensionVideo.name].create({
     file: file,
   });
-  editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
 };
 
 /**
  * Uploads an audio file and inserts it into the editor.
  *
- * @param {FileProps} { file, editor } - File to be uploaded and the editor instance
+ * @param editor - Editor instance
+ * @param file - File to be uploaded
  */
-export const uploadAudio = ({ file, editor }: FileProps) => {
-  const { view } = editor;
-  const node = view.props.state.schema.nodes[ExtensionAudio.name].create({
+export const uploadAudio = (editor: Editor, file: File) => {
+  const { state } = editor;
+  return state.schema.nodes[ExtensionAudio.name].create({
     file: file,
   });
-  editor.view.dispatch(editor.view.state.tr.replaceSelectionWith(node));
 };
 
 export interface UploadFetchResponse {

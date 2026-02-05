@@ -63,9 +63,7 @@ export const ExtensionUpload = Extension.create({
 
             if (files.length) {
               event.preventDefault();
-              files.forEach((file) => {
-                handleFileEvent({ editor, file });
-              });
+              handleFileEvent(editor, files);
               return true;
             }
 
@@ -90,13 +88,11 @@ export const ExtensionUpload = Extension.create({
             const files = Array.from(event.dataTransfer.files) as File[];
             if (files.length) {
               event.preventDefault();
-              files.forEach((file: File) => {
-                // TODO: For drag-and-drop uploaded files,
-                // perhaps it is necessary to determine the
-                // current position of the drag-and-drop
-                // instead of inserting them directly at the cursor.
-                handleFileEvent({ editor, file });
-              });
+              // TODO: For drag-and-drop uploaded files,
+              // perhaps it is necessary to determine the
+              // current position of the drag-and-drop
+              // instead of inserting them directly at the cursor.
+              handleFileEvent(editor, files);
               return true;
             }
 
