@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.mapping.R2dbcMappingContext;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class R2dbcConfiguration {
 
     /**
@@ -22,10 +22,14 @@ class R2dbcConfiguration {
      * <a href="https://github.com/spring-projects/spring-data-relational/issues/1993">this issue
      * </a> for more details.
      *
+     * <p>
+     * Use static method to ensure that the BeanPostProcessor is registered before any
+     * R2dbcMappingContext beans are initialized.
+     *
      * @return the bean post processor
      */
     @Bean
-    BeanPostProcessor r2dbcMappingContextQuoteModifier() {
+    static BeanPostProcessor r2dbcMappingContextQuoteModifier() {
         return new BeanPostProcessor() {
             @Override
             public Object postProcessBeforeInitialization(Object bean, String beanName)
