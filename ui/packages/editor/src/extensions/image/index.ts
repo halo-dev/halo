@@ -5,6 +5,7 @@ import { i18n } from "@/locales";
 import {
   findChildren,
   findParentNode,
+  findParentNodeClosestToPos,
   isActive,
   mergeAttributes,
   Plugin,
@@ -25,6 +26,7 @@ import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
+import MingcuteCopy3Fill from "~icons/mingcute/copy-3-fill";
 import MingcuteEdit4Line from "~icons/mingcute/edit-4-line";
 import MingcuteLink2Line from "~icons/mingcute/link-2-line";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
@@ -314,6 +316,60 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                   return !isEmpty(
                     editor.getAttributes(ExtensionImage.name).src
                   );
+                },
+              },
+            },
+            {
+              priority: 25,
+              props: {
+                icon: markRaw(MingcuteCopy3Fill),
+                title: i18n.global.t("editor.extensions.image.copy_width"),
+                action: () => {
+                  const { selection } = editor.state;
+                  const { $from } = selection;
+
+                  const imageHTMLElement = editor.view.nodeDOM(
+                    $from.pos
+                  ) as HTMLElement;
+                  const imageNode = imageHTMLElement.querySelector("img");
+                  const imageNaturalWidth = imageNode?.naturalWidth
+                    ? `${imageNode.naturalWidth}px`
+                    : undefined;
+                  const width =
+                    editor.getAttributes(ExtensionImage.name).width ||
+                    imageNaturalWidth;
+
+                  const tr = editor.state.tr;
+                  editor.state.doc.descendants((node, pos, parent) => {
+                    if (node.type.name === ExtensionImage.name) {
+                      tr.setNodeAttribute(pos, "width", width);
+
+                      if (parent?.type.name === ExtensionFigure.name) {
+                        const $pos = editor.state.doc.resolve(pos);
+                        const figurePos = findParentNodeClosestToPos(
+                          $pos,
+                          (node) => node.type.name === ExtensionFigure.name
+                        );
+                        if (figurePos) {
+                          // TODO: image should not update figureCaption's width every time, it should be optimized in figure
+                          const figureCaptionPos = findChildren(
+                            figurePos.node,
+                            (node) =>
+                              node.type.name === ExtensionFigureCaption.name
+                          )[0];
+                          if (figureCaptionPos) {
+                            tr.setNodeAttribute(
+                              figurePos.pos + figureCaptionPos.pos + 1,
+                              "width",
+                              width
+                            );
+                          }
+                        }
+                      }
+                    }
+                  });
+
+                  editor.view.dispatch(tr);
                 },
               },
             },

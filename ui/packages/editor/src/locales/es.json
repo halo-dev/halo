@@ -58,6 +58,7 @@
   "editor.extensions.image.large_size": "Tamaño grande",
   "editor.extensions.image.restore_size": "Restaurar tamaño original",
   "editor.extensions.image.edit_link": "Editar enlace",
+  "editor.extensions.image.copy_width": "Aplicar ancho a todo el texto",
   "editor.extensions.image.edit_alt": "Editar texto alternativo",
   "editor.extensions.image.edit_href": "Editar el hipervínculo de la imagen",
   "editor.extensions.image.edit_caption": "Descripción de la imagen",

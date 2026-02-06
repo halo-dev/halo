@@ -58,6 +58,7 @@
   "editor.extensions.image.large_size": "Large size",
   "editor.extensions.image.restore_size": "Restore original size",
   "editor.extensions.image.edit_link": "Edit link",
+  "editor.extensions.image.copy_width": "Apply width to all text",
   "editor.extensions.image.edit_alt": "Edit alt",
   "editor.extensions.image.edit_href": "Edit the image hyperlink",
   "editor.extensions.image.edit_caption": "Image description",
