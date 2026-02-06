@@ -325,19 +325,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 icon: markRaw(MingcuteCopy3Fill),
                 title: i18n.global.t("editor.extensions.image.copy_width"),
                 action: () => {
-                  const { selection } = editor.state;
-                  const { $from } = selection;
-
-                  const imageHTMLElement = editor.view.nodeDOM(
-                    $from.pos
-                  ) as HTMLElement;
-                  const imageNode = imageHTMLElement.querySelector("img");
-                  const imageNaturalWidth = imageNode?.naturalWidth
-                    ? `${imageNode.naturalWidth}px`
-                    : undefined;
-                  const width =
-                    editor.getAttributes(ExtensionImage.name).width ||
-                    imageNaturalWidth;
+                  const width = editor.getAttributes(ExtensionImage.name).width;
 
                   const tr = editor.state.tr;
                   editor.state.doc.descendants((node, pos, parent) => {
@@ -358,10 +346,20 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                               node.type.name === ExtensionFigureCaption.name
                           )[0];
                           if (figureCaptionPos) {
+                            const imageHTMLElement = editor.view.nodeDOM(
+                              $pos.pos
+                            ) as HTMLElement;
+                            const imageNode =
+                              imageHTMLElement.querySelector("img");
+                            const imageNaturalWidth = width
+                              ? width
+                              : imageNode?.naturalWidth
+                                ? `${imageNode.naturalWidth}px`
+                                : undefined;
                             tr.setNodeAttribute(
                               figurePos.pos + figureCaptionPos.pos + 1,
                               "width",
-                              width
+                              imageNaturalWidth
                             );
                           }
                         }
