@@ -265,7 +265,17 @@ public class UserServiceImpl implements UserService {
                 "The registration is not allowed by the administrator."
             )))
             .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
-            .switchIfEmpty(Mono.error(RestrictedNameException::new))
+            .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
+                "The username is restricted.",
+                "problemDetail.user.username.restricted",
+                new Object[] {signUpData.getUsername()}
+            )))
+            .filter(setting -> isDisplayNameAllowed(setting, signUpData.getDisplayName()))
+            .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
+                "The display name is restricted.",
+                "problemDetail.user.displayName.restricted",
+                new Object[] {signUpData.getDisplayName()}
+            )))
             .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                 "The default role is not configured by the administrator."
@@ -408,16 +418,25 @@ public class UserServiceImpl implements UserService {
         eventPublisher.publishEvent(new PasswordChangedEvent(this, username));
     }
 
-    private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
+    private Set<String> getProtectedUsernamesSet(SystemSetting.User setting) {
         String protectedUsernamesStr = setting.getProtectedUsernames();
         if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
-            return true;
+            return Set.of();
         }
-        Set<String> protectedLowerSet = Arrays.stream(protectedUsernamesStr.split(","))
+        return Arrays.stream(protectedUsernamesStr.split(","))
             .map(String::trim)
             .filter(n -> !n.isEmpty())
             .map(String::toLowerCase)
             .collect(Collectors.toUnmodifiableSet());
-        return !protectedLowerSet.contains(username.toLowerCase());
+    }
+
+    private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
+        Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
+        return !protectedLowerSet.contains(username.trim().toLowerCase());
+    }
+
+    private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
+        Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
+        return !protectedLowerSet.contains(displayName.trim().toLowerCase());
     }
 }

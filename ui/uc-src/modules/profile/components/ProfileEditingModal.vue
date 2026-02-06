@@ -45,6 +45,11 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
+    if (formState.value.spec.displayName) {
+      formState.value.spec.displayName =
+        formState.value.spec.displayName.trim();
+    }
+
     await consoleApiClient.user.updateCurrentUser({
       user: formState.value,
     });

@@ -547,6 +547,7 @@ class UserServiceImplTest {
             SignUpData signUpData = new SignUpData();
             signUpData.setUsername(name);
             signUpData.setPassword(password);
+            signUpData.setDisplayName(name);
             return signUpData;
         }
     }
