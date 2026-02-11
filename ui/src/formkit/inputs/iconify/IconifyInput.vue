@@ -98,7 +98,6 @@ const editFormId = `icon-edit-form-${utils.id.uuid()}`;
 
 <template>
   <div class="group/iconify-input inline-flex items-center gap-2">
-    {{ sizing }}
     <VDropdown
       ref="dropdown"
       class="inline-flex"
