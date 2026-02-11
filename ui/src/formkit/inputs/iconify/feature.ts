@@ -10,5 +10,9 @@ export default function iconifyFeature(node: FormKitNode): void {
     node.props.format = node.props.format ?? "svg";
     node.props.popperPlacement = node.props.popperPlacement ?? "auto";
     node.props.valueOnly = undefine(node.props.valueOnly);
+    node.props.sizing = {
+      enabled: false,
+      ...node.props.sizing,
+    };
   });
 }
