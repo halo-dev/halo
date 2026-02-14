@@ -50,6 +50,7 @@ export type ExtensionImageOptions = ExtensionOptions &
       file: File,
       options?: AxiosRequestConfig
     ) => Promise<Attachment>;
+    uploadFromUrl?: (url: string) => Promise<Attachment>;
   };
 
 export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
@@ -239,6 +240,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
     return {
       ...this.parent?.(),
       uploadImage: undefined,
+      uploadFromUrl: undefined,
       getToolboxItems({ editor }: { editor: Editor }) {
         return [
           {

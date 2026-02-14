@@ -5,6 +5,7 @@
   ],
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
+    "predev": "pnpm --filter @halo-dev/richtext-editor run build",
     "dev": "run-p dev:console dev:uc",
     "dev:uc": "vite --host --config ./vite.uc.config.ts",
     "dev:console": "vite --host --config ./vite.config.ts",

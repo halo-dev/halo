@@ -74,6 +74,7 @@ const props = withDefaults(
       file: File,
       options?: AxiosRequestConfig
     ) => Promise<Attachment>;
+    uploadFromUrl?: (url: string) => Promise<Attachment>;
   }>(),
   {
     title: "",
@@ -81,6 +82,7 @@ const props = withDefaults(
     content: "",
     cover: undefined,
     uploadImage: undefined,
+    uploadFromUrl: undefined,
   }
 );
 
@@ -256,6 +258,7 @@ onMounted(async () => {
       ExtensionsKit.configure({
         image: {
           uploadImage: props.uploadImage,
+          uploadFromUrl: props.uploadFromUrl,
         },
         gallery: {
           uploadImage: props.uploadImage,
@@ -265,6 +268,9 @@ onMounted(async () => {
         },
         audio: {
           uploadAudio: props.uploadImage,
+        },
+        upload: {
+          uploadFromUrl: props.uploadFromUrl,
         },
         placeholder: {
           placeholder: t(

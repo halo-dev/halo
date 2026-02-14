@@ -274,7 +274,11 @@ watch([src, resizeHandleRef], () => {
 });
 
 const { isExternalAsset, transferring, handleTransfer } =
-  useExternalAssetsTransfer(src, handleSetExternalLink);
+  useExternalAssetsTransfer(
+    src,
+    handleSetExternalLink,
+    props.extension?.options?.uploadFromUrl
+  );
 
 const isPercentageWidth = computed(() => {
   return props.node?.attrs.width?.includes("%");
