@@ -6,3 +6,9 @@ export interface IconifyValue {
   width?: string;
   color?: string;
 }
+
+export type IconifySizing = {
+  enabled?: boolean;
+  default?: string;
+  presets?: string[];
+};
