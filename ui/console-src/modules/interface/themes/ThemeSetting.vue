@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import BackToTop from "@/components/back-to-top/BackToTop.vue";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Setting, Theme } from "@halo-dev/api-client";
@@ -100,5 +101,7 @@ await suspense();
         {{ $t("core.common.buttons.save") }}
       </VButton>
     </StickyBlock>
+
+    <BackToTop />
   </div>
 </template>
