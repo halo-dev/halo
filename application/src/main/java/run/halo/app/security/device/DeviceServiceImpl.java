@@ -7,6 +7,7 @@ import static run.halo.app.security.authentication.rememberme.PersistentTokenBas
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -174,9 +175,9 @@ public class DeviceServiceImpl implements DeviceService {
                     device.setMetadata(new Metadata());
                     device.getMetadata().setName(generateDeviceId());
 
-                    var userAgent =
-                        exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_AGENT);
-                    var deviceInfo = DeviceInfo.parse(userAgent);
+                    var headers = exchange.getRequest().getHeaders();
+                    var userAgent = headers.getFirst(HttpHeaders.USER_AGENT);
+                    var deviceInfo = DeviceInfo.parse(userAgent, headers);
                     device.setSpec(new Device.Spec()
                         .setUserAgent(userAgent)
                         .setPrincipalName(authentication.getName())
@@ -226,12 +227,37 @@ public class DeviceServiceImpl implements DeviceService {
             Pattern.compile("OpenHarmony (\\d+\\.\\d+(\\.\\d+)?)")
         };
 
-        public static DeviceInfo parse(String userAgent) {
+        static final Map<String, String> WINDOWS_VERSION_MAP = Map.of(
+            "10.0", "10",
+            "6.3", "8.1",
+            "6.2", "8",
+            "6.1", "7",
+            "6.0", "Vista",
+            "5.2", "XP",
+            "5.1", "XP",
+            "5.0", "2000"
+        );
+
+        /**
+         * Parse user agent string to extract device info.
+         * Accepts optional HTTP headers to leverage Client Hints for more accurate
+         * OS detection (e.g., distinguishing Windows 10 from Windows 11).
+         *
+         * @param userAgent the User-Agent string
+         * @param headers optional HTTP headers for Client Hints support, may be null
+         * @return parsed device info containing browser and OS information
+         */
+        public static DeviceInfo parse(String userAgent,
+            org.springframework.http.HttpHeaders headers) {
             return new DeviceInfo(concat(parseBrowser(userAgent).name(),
                 parseBrowser(userAgent).version()),
-                concat(parseOperatingSystem(userAgent).name(),
-                    parseOperatingSystem(userAgent).version())
+                concat(parseOperatingSystem(userAgent, headers).name(),
+                    parseOperatingSystem(userAgent, headers).version())
             );
+        }
+
+        public static DeviceInfo parse(String userAgent) {
+            return parse(userAgent, null);
         }
 
         private static Pair parseBrowser(String userAgent) {
@@ -254,13 +280,41 @@ public class DeviceServiceImpl implements DeviceService {
         record Pair(String name, String version) {
         }
 
-        private static Pair parseOperatingSystem(String userAgent) {
+        private static Pair parseOperatingSystem(String userAgent,
+            org.springframework.http.HttpHeaders headers) {
             Matcher matcher = OS_REGEX.matcher(userAgent);
             var osName = UNKNOWN;
             if (matcher.find()) {
                 osName = matcher.group(1);
             }
             var osVersion = parseOsVersion(userAgent);
+
+            // Convert Windows NT version to friendly name
+            if ("Windows NT".equals(osName) && StringUtils.isNotBlank(osVersion)) {
+                String friendlyVersion = WINDOWS_VERSION_MAP.getOrDefault(osVersion, osVersion);
+
+                // Use Client Hints to distinguish Windows 11 from Windows 10
+                // Windows 11 reports as "Windows NT 10.0" in User-Agent, same as Windows 10.
+                // Sec-CH-UA-Platform-Version with major version >= 13 indicates Windows 11.
+                if ("10".equals(friendlyVersion) && headers != null) {
+                    String platformVersion =
+                        headers.getFirst("Sec-CH-UA-Platform-Version");
+                    if (StringUtils.isNotBlank(platformVersion)) {
+                        try {
+                            String majorVersion =
+                                platformVersion.replace("\"", "").split("\\.")[0];
+                            if (Integer.parseInt(majorVersion) >= 13) {
+                                friendlyVersion = "11";
+                            }
+                        } catch (NumberFormatException ignored) {
+                            // Fall back to Windows 10 if parsing fails
+                        }
+                    }
+                }
+                osName = "Windows";
+                osVersion = friendlyVersion;
+            }
+
             return new Pair(osName, osVersion);
         }
 
