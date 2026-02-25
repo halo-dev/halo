@@ -259,6 +259,7 @@ onMounted(() => {
                 )
               "
               type="menuItemSelect"
+              :clearable="true"
               :menu-items="menu.spec.menuItems || []"
             />
 
