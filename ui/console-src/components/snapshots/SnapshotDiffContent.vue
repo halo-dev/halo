@@ -8,6 +8,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
+import DOMPurify from "dompurify";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
 import { computed, nextTick, toRefs, useTemplateRef, watch } from "vue";
@@ -51,14 +52,26 @@ const { data: snapshot, isLoading } = useQuery({
   enabled: computed(() => !!name.value && !!snapshotNames.value?.length),
 });
 
+// Sanitized content for old snapshot
+const sanitizedOldContent = computed(() => {
+  return DOMPurify.sanitize(snapshot.value?.old.content || "");
+});
+
+// Sanitized content for new snapshot
+const sanitizedNewContent = computed(() => {
+  return DOMPurify.sanitize(snapshot.value?.new.content || "");
+});
+
 const diffContent = computed(() => {
   if (!snapshot.value) {
     return null;
   }
   const oldContent = document.createElement("div");
-  oldContent.innerHTML = snapshot.value.old.content || "";
+  // Sanitize HTML before setting innerHTML to prevent XSS
+  oldContent.innerHTML = sanitizedOldContent.value;
   const newContent = document.createElement("div");
-  newContent.innerHTML = snapshot.value.new.content || "";
+  // Sanitize HTML before setting innerHTML to prevent XSS
+  newContent.innerHTML = sanitizedNewContent.value;
 
   const diffDocument = visualDomDiff(oldContent, newContent, {
     skipModified: true,
@@ -68,12 +81,14 @@ const diffContent = computed(() => {
   diffNode.append(diffDocument.cloneNode(true));
 
   const html = diffNode.innerHTML;
+  // Sanitize the final diff HTML as well
+  const sanitizedHtml = DOMPurify.sanitize(html);
 
   oldContent.remove();
   newContent.remove();
   diffNode.remove();
 
-  return html;
+  return sanitizedHtml;
 });
 
 const onlyDiff = useLocalStorage("snapshot-diff-only-diff", false);
@@ -239,7 +254,7 @@ const handleDiffScroll = () => {
         </div>
         <div
           class="snapshot-content markdown-body"
-          v-html="snapshot?.old.content"
+          v-html="sanitizedOldContent"
         ></div>
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
@@ -255,7 +270,7 @@ const handleDiffScroll = () => {
         </div>
         <div
           class="snapshot-content markdown-body"
-          v-html="snapshot?.new.content"
+          v-html="sanitizedNewContent"
         ></div>
       </OverlayScrollbarsComponent>
       <OverlayScrollbarsComponent
