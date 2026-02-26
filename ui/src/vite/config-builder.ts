@@ -74,17 +74,13 @@ export function createViteConfig(options: Options) {
         output: {
           codeSplitting: {
             groups: [
-              "es-toolkit",
-              "vue-grid-layout",
-              "transliteration",
-              "colorjs.io",
-              "overlayscrollbars",
-              "overlayscrollbars-vue",
-              "@he-tree/vue",
-            ].map((name) => ({
-              name: "vendor",
-              test: name,
-            })),
+              {
+                name: "vendor",
+                test: /node_modules/,
+                entriesAware: true,
+                entriesAwareMergeThreshold: 28000, // bytes
+              },
+            ],
           },
         },
       },
