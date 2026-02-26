@@ -1,4 +1,7 @@
-import type { FormKitTypeDefinition } from "@formkit/core";
+import type {
+  FormKitFrameworkContext,
+  FormKitTypeDefinition,
+} from "@formkit/core";
 
 import {
   help,
@@ -64,6 +67,12 @@ declare module "@formkit/inputs" {
         type: ArrayItemLabelType;
         label: string;
       }[];
+    };
+  }
+
+  export interface FormKitInputSlots<Props extends FormKitInputs<Props>> {
+    array: {
+      default: FormKitFrameworkContext<Record<string, unknown>>;
     };
   }
 }
