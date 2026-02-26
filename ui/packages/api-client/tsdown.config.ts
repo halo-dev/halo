@@ -16,6 +16,7 @@ const sharedConfig: UserConfig = {
   dts: {
     tsgo: true,
   },
+  inlineOnly: false,
 };
 
 export default defineConfig([
