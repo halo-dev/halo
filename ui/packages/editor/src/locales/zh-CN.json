@@ -58,6 +58,7 @@
   "editor.extensions.image.large_size": "大尺寸",
   "editor.extensions.image.restore_size": "恢复原始尺寸",
   "editor.extensions.image.edit_link": "修改链接",
+  "editor.extensions.image.copy_width": "将宽度应用至全文",
   "editor.extensions.image.edit_alt": "修改图片的替代文本（alt 属性）",
   "editor.extensions.image.edit_href": "修改图片跳转链接",
   "editor.extensions.image.edit_caption": "图片描述文本",

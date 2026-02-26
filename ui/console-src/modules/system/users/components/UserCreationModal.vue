@@ -41,6 +41,13 @@ const handleCreateUser = async () => {
   try {
     isSubmitting.value = true;
 
+    if (formState.value.name) {
+      formState.value.name = formState.value.name.trim();
+    }
+    if (formState.value.displayName) {
+      formState.value.displayName = formState.value.displayName.trim();
+    }
+
     await consoleApiClient.user.createUser({
       createUserRequest: formState.value,
     });

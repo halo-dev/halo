@@ -47,6 +47,11 @@ const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
 
+    if (formState.value.spec.displayName) {
+      formState.value.spec.displayName =
+        formState.value.spec.displayName.trim();
+    }
+
     await coreApiClient.user.updateUser({
       name: formState.value.metadata.name,
       user: formState.value,
