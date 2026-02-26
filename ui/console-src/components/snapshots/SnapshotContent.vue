@@ -2,6 +2,7 @@
 import { type ContentWrapper } from "@halo-dev/api-client";
 import { Toast, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import DOMPurify from "dompurify";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs } from "vue";
 import { SNAPSHOT_QUERY_KEY } from "./query-keys";
@@ -36,6 +37,10 @@ const { data: snapshot, isLoading } = useQuery({
   },
   enabled: computed(() => !!name.value && !!snapshotNames.value?.length),
 });
+
+const sanitizedContent = computed(() => {
+  return DOMPurify.sanitize(snapshot.value?.content || "");
+});
 </script>
 <template>
   <OverlayScrollbarsComponent
@@ -48,7 +53,7 @@ const { data: snapshot, isLoading } = useQuery({
     <div
       v-else
       class="snapshot-content markdown-body h-full w-full p-4"
-      v-html="snapshot?.content"
+      v-html="sanitizedContent"
     ></div>
   </OverlayScrollbarsComponent>
 </template>
