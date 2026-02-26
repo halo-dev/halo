@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { useLocalStorage } from "@vueuse/core";
-import sanitize from "sanitize-html";
+import DOMPurify from "dompurify";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { visualDomDiff } from "visual-dom-diff";
 import { computed, nextTick, toRefs, useTemplateRef, watch } from "vue";
@@ -54,12 +54,12 @@ const { data: snapshot, isLoading } = useQuery({
 
 // Sanitized content for old snapshot
 const sanitizedOldContent = computed(() => {
-  return sanitize(snapshot.value?.old.content || "");
+  return DOMPurify.sanitize(snapshot.value?.old.content || "");
 });
 
 // Sanitized content for new snapshot
 const sanitizedNewContent = computed(() => {
-  return sanitize(snapshot.value?.new.content || "");
+  return DOMPurify.sanitize(snapshot.value?.new.content || "");
 });
 
 const diffContent = computed(() => {
@@ -82,7 +82,7 @@ const diffContent = computed(() => {
 
   const html = diffNode.innerHTML;
   // Sanitize the final diff HTML as well
-  const sanitizedHtml = sanitize(html);
+  const sanitizedHtml = DOMPurify.sanitize(html);
 
   oldContent.remove();
   newContent.remove();
