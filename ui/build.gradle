@@ -17,6 +17,12 @@ idea {
   }
 }
 
+pnpmInstall {
+  nodeModulesOutputFilter {
+    exclude('**')
+  }
+}
+
 tasks.named('clean') {
   dependsOn tasks.named('doClean')
 }
