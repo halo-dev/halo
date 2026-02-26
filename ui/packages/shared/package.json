@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
+    "@halo-dev/richtext-editor": "workspace:*",
     "mitt": "^3.0.1"
   },
   "peerDependencies": {
