@@ -5,4 +5,7 @@ export type LabelValueResult = { value?: unknown } & Record<string, unknown>;
 export type LabelValueRenderer = (params: {
   node: FormKitNode<unknown>;
   value: unknown;
-}) => Promise<LabelValueResult> | LabelValueResult;
+}) =>
+  | Promise<LabelValueResult | LabelValueResult[]>
+  | LabelValueResult
+  | LabelValueResult[];
