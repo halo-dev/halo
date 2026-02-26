@@ -26,6 +26,7 @@ class CsrfConfigurer implements SecurityConfigurer {
             new NegatedServerWebExchangeMatcher(pathMatchers(
                 "/api/**",
                 "/apis/**",
+                "/membercard/**",
                 "/actuator/**",
                 "/system/setup"
             )),
