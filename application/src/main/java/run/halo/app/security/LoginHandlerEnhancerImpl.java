@@ -38,13 +38,15 @@ public class LoginHandlerEnhancerImpl implements LoginHandlerEnhancer {
     @Override
     public Mono<Void> onLoginSuccess(ServerWebExchange exchange,
         Authentication successfulAuthentication) {
-        return Mono.when(
-            rememberMeServices.loginSuccess(exchange, successfulAuthentication),
-            deviceService.loginSuccess(exchange, successfulAuthentication),
-            rememberMeRequestCache.removeRememberMe(exchange),
-            oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication),
-            userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName())
-        );
+        // rememberMeServices.loginSuccess must run first to set the REMEMBER_ME_SERIES_REQUEST_NAME
+        // attribute on the exchange before deviceService.loginSuccess reads it.
+        return rememberMeServices.loginSuccess(exchange, successfulAuthentication)
+            .then(Mono.when(
+                deviceService.loginSuccess(exchange, successfulAuthentication),
+                rememberMeRequestCache.removeRememberMe(exchange),
+                oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication),
+                userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName())
+            ));
     }
 
     @Override
