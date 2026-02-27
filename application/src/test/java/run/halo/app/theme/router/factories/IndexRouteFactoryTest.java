@@ -38,5 +38,15 @@ class IndexRouteFactoryTest extends RouteFactoryTestSuite {
             .uri("/page/1")
             .exchange()
             .expectStatus().isOk();
+
+        webTestClient.get()
+            .uri("/page/abc")
+            .exchange()
+            .expectStatus().isNotFound();
+
+        webTestClient.get()
+            .uri("/page/2f")
+            .exchange()
+            .expectStatus().isNotFound();
     }
 }
