@@ -38,7 +38,7 @@ export default function useCommentsFetch(
         .filter(Boolean) as string[];
 
       const defaultSort = [
-        "status.hasNewReply,desc",
+        "status.lastReplyTime,desc",
         "metadata.creationTimestamp,desc",
       ];
 
