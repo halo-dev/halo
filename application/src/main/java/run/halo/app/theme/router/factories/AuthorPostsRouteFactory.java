@@ -55,7 +55,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
         return RouterFunctions
-            .route(GET("/authors/{name}").or(GET("/authors/{name}/page/{page}"))
+            .route(GET("/authors/{name}").or(GET("/authors/{name}/page/{page:\\d+}"))
                 .and(accept(MediaType.TEXT_HTML)), handlerFunction());
     }
 
