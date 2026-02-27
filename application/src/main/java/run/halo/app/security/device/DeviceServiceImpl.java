@@ -129,7 +129,15 @@ public class DeviceServiceImpl implements DeviceService {
                         existingDevice.getSpec().setLastAuthenticatedTime(Instant.now());
                         return existingDevice;
                     })
-                    .flatMap(this::removeRememberMeToken);
+                    .flatMap(this::removeRememberMeToken)
+                    .map(device -> {
+                        var newSeriesId =
+                            exchange.<String>getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME);
+                        if (StringUtils.isNotBlank(newSeriesId)) {
+                            device.getSpec().setRememberMeSeriesId(newSeriesId);
+                        }
+                        return device;
+                    });
             });
     }
 
