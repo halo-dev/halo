@@ -5,7 +5,9 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
 import static run.halo.app.extension.index.query.Queries.notEqual;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -163,15 +165,18 @@ public class PostFinderImpl implements PostFinder {
             .map(map -> JsonUtils.mapToObject(map, PostQuery.class))
             .orElseGet(PostQuery::new);
         if (StringUtils.isNotBlank(query.getCategoryName())) {
-            return listChildrenCategories(query.getCategoryName())
+            String categoryName = query.getCategoryName();
+            return listChildrenCategories(categoryName)
                 .map(category -> category.getMetadata().getName())
                 .collectList()
-                .map(categoryNames -> ListOptions.builder(query.toListOptions())
-                    .andQuery(in("spec.categories", categoryNames))
-                    .build()
-                )
-                .flatMap(
-                    listOptions -> postPublicQueryService.list(listOptions, query.toPageRequest()));
+                .flatMap(categoryNames -> {
+                    var listOptions = ListOptions.builder(query.toListOptions())
+                        .andQuery(in("spec.categories", categoryNames))
+                        .build();
+                    return postPublicQueryService.list(listOptions, query.toPageRequest())
+                        .doOnNext(list -> list.forEach(
+                            postVo -> sortCategoriesByFilter(postVo, categoryName, categoryNames)));
+                });
         }
         return postPublicQueryService.list(query.toListOptions(), query.toPageRequest());
     }
@@ -198,7 +203,9 @@ public class PostFinderImpl implements PostFinder {
                 var listOptions = new ListOptions();
                 var fieldQuery = in("spec.categories", categoryNames);
                 listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-                return postPublicQueryService.list(listOptions, getPageRequest(page, size));
+                return postPublicQueryService.list(listOptions, getPageRequest(page, size))
+                    .doOnNext(list -> list.forEach(
+                        postVo -> sortCategoriesByFilter(postVo, categoryName, categoryNames)));
             });
     }
 
@@ -291,6 +298,40 @@ public class PostFinderImpl implements PostFinder {
                     postArchives);
             })
             .defaultIfEmpty(ListResult.emptyResult());
+    }
+
+    private static void sortCategoriesByFilter(ListedPostVo postVo, String queriedCategoryName,
+        List<String> matchedCategoryNames) {
+        var categories = postVo.getCategories();
+        if (categories.size() <= 1) {
+            return;
+        }
+        var matchedSet = new HashSet<>(matchedCategoryNames);
+        var reordered = new ArrayList<>(categories);
+        reordered.sort((a, b) -> {
+            String nameA = a.getMetadata().getName();
+            String nameB = b.getMetadata().getName();
+            // Exact queried category comes first
+            boolean aExact = queriedCategoryName.equals(nameA);
+            boolean bExact = queriedCategoryName.equals(nameB);
+            if (aExact && !bExact) {
+                return -1;
+            }
+            if (!aExact && bExact) {
+                return 1;
+            }
+            // Then matched (child) categories
+            boolean aMatch = matchedSet.contains(nameA);
+            boolean bMatch = matchedSet.contains(nameB);
+            if (aMatch && !bMatch) {
+                return -1;
+            }
+            if (!aMatch && bMatch) {
+                return 1;
+            }
+            return 0;
+        });
+        postVo.setCategories(reordered);
     }
 
     @Override
