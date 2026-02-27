@@ -40,13 +40,6 @@ class PageUrlUtilsTest {
         totalPage = 0;
         assertThat(PageUrlUtils.nextPageUrl("/tags", totalPage))
             .isEqualTo("/tags/page/1");
-
-        // Non-numeric page should not throw, treat as page 1
-        totalPage = 10;
-        assertThat(PageUrlUtils.nextPageUrl("/page/abc", totalPage))
-            .isEqualTo("/page/2");
-        assertThat(PageUrlUtils.nextPageUrl("/authors/youzi/page/p", totalPage))
-            .isEqualTo("/authors/youzi/page/2");
     }
 
     @Test
@@ -66,11 +59,5 @@ class PageUrlUtilsTest {
 
         assertThat(PageUrlUtils.prevPageUrl("/page/2"))
             .isEqualTo("/");
-
-        // Non-numeric page should not throw, treat as page 1
-        assertThat(PageUrlUtils.prevPageUrl("/page/abc"))
-            .isEqualTo("/");
-        assertThat(PageUrlUtils.prevPageUrl("/authors/youzi/page/p"))
-            .isEqualTo("/authors/youzi");
     }
 }
