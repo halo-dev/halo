@@ -37,11 +37,16 @@ export default function useCommentsFetch(
         })
         .filter(Boolean) as string[];
 
+      const defaultSort = [
+        "status.hasNewReply,desc",
+        "metadata.creationTimestamp,desc",
+      ];
+
       const { data } = await consoleApiClient.content.comment.listComments({
         fieldSelector,
         page: page.value,
         size: size.value,
-        sort: [sort.value].filter(Boolean) as string[],
+        sort: sort.value ? [sort.value] : defaultSort,
         keyword: keyword.value,
         ownerName: user.value,
         ownerKind: user.value ? "User" : undefined,
