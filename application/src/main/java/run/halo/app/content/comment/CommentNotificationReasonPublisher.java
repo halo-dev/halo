@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -87,6 +89,30 @@ public class CommentNotificationReasonPublisher {
         return Ref.groupKindEquals(comment.getSpec().getSubjectRef(), PAGE_GVK);
     }
 
+    /**
+     * Comment content converter, convert relative links to absolute links.
+     */
+    @Component
+    @RequiredArgsConstructor
+    static class CommentContentConverter {
+        private final ExternalLinkProcessor externalLinkProcessor;
+
+        /**
+         * Convert relative links to absolute links.
+         *
+         * @param content the content to convert
+         * @return the converted content
+         */
+        public String convertRelativeLinks(String content) {
+            Document parse = Jsoup.parse(content);
+            parse.select("img").forEach(element -> {
+                var src = element.attr("src");
+                element.attr("src",  externalLinkProcessor.processLink(src));
+            });
+            return parse.body().html();
+        }
+    }
+
     @Component
     @RequiredArgsConstructor
     static class NewCommentOnPostReasonPublisher {
@@ -94,6 +120,7 @@ public class CommentNotificationReasonPublisher {
         private final ExtensionClient client;
         private final NotificationReasonEmitter notificationReasonEmitter;
         private final ExternalLinkProcessor externalLinkProcessor;
+        private final CommentContentConverter commentContentConverter;
 
         public void publishReasonBy(Comment comment) {
             Ref subjectRef = comment.getSpec().getSubjectRef();
@@ -120,7 +147,8 @@ public class CommentNotificationReasonPublisher {
                         .postTitle(post.getSpec().getTitle())
                         .postUrl(postUrl)
                         .commenter(owner.getDisplayName())
-                        .content(comment.getSpec().getContent())
+                        .content(commentContentConverter.convertRelativeLinks(
+                            comment.getSpec().getContent()))
                         .commentName(comment.getMetadata().getName())
                         .build();
                     builder.attributes(ReasonDataConverter.toAttributeMap(attributes))
@@ -159,6 +187,7 @@ public class CommentNotificationReasonPublisher {
         private final ExtensionClient client;
         private final NotificationReasonEmitter notificationReasonEmitter;
         private final ExternalLinkProcessor externalLinkProcessor;
+        private final CommentContentConverter commentContentConverter;
 
         public void publishReasonBy(Comment comment) {
             Ref subjectRef = comment.getSpec().getSubjectRef();
@@ -188,7 +217,8 @@ public class CommentNotificationReasonPublisher {
                         .pageTitle(singlePage.getSpec().getTitle())
                         .pageUrl(pageUrl)
                         .commenter(defaultIfBlank(owner.getDisplayName(), owner.getName()))
-                        .content(comment.getSpec().getContent())
+                        .content(commentContentConverter.convertRelativeLinks(
+                            comment.getSpec().getContent()))
                         .commentName(comment.getMetadata().getName())
                         .build();
                     builder.attributes(ReasonDataConverter.toAttributeMap(attributes))
@@ -236,6 +266,7 @@ public class CommentNotificationReasonPublisher {
         private final ExtensionClient client;
         private final NotificationReasonEmitter notificationReasonEmitter;
         private final ExtensionGetter extensionGetter;
+        private final CommentContentConverter commentContentConverter;
 
         public void publishReasonBy(Reply reply, Comment comment) {
             boolean isQuoteReply = StringUtils.isNotBlank(reply.getSpec().getQuoteReply());
@@ -267,7 +298,8 @@ public class CommentNotificationReasonPublisher {
                 .orElse(comment.getSpec().getContent());
 
             var quoteReplyContent = quoteReplyOptional
-                .map(quoteReply -> quoteReply.getSpec().getContent())
+                .map(quoteReply -> commentContentConverter
+                    .convertRelativeLinks(quoteReply.getSpec().getContent()))
                 .orElse(null);
             var replyOwner = reply.getSpec().getOwner();
 
@@ -276,12 +308,14 @@ public class CommentNotificationReasonPublisher {
                 .orElseGet(() -> comment.getSpec().getOwner());
 
             var reasonAttributesBuilder = NewReplyReasonData.builder()
-                .commentContent(comment.getSpec().getContent())
+                .commentContent(
+                    commentContentConverter.convertRelativeLinks(comment.getSpec().getContent())
+                )
                 .isQuoteReply(isQuoteReply)
                 .quoteContent(quoteReplyContent)
                 .commentName(comment.getMetadata().getName())
                 .replier(defaultIfBlank(replyOwner.getDisplayName(), replyOwner.getName()))
-                .content(reply.getSpec().getContent())
+                .content(commentContentConverter.convertRelativeLinks(reply.getSpec().getContent()))
                 .replyName(reply.getMetadata().getName())
                 .replyOwner(identityFrom(replyOwner).name())
                 .repliedOwner(identityFrom(repliedOwner).name());

@@ -7,7 +7,15 @@ defineProps<{
 <template>
   <div
     class="comment-content markdown-body whitespace-pre-wrap rounded-lg !bg-transparent !text-sm !text-gray-900"
-    v-html="sanitizeHtml(content)"
+    v-html="
+      sanitizeHtml(content, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+        allowedAttributes: {
+          ...sanitizeHtml.defaults.allowedAttributes,
+          code: ['class'],
+        },
+      })
+    "
   ></div>
 </template>
 
