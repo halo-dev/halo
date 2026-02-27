@@ -479,6 +479,18 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   return data;
 }
 
+// Upload from external URL (for pasted external links)
+async function handleUploadFromUrl(url: string) {
+  if (!utils.permission.has(["uc:attachments:manage"])) {
+    throw new Error("Permission denied");
+  }
+
+  const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc({
+    url,
+  });
+  return data;
+}
+
 // Keep session alive
 useSessionKeepAlive();
 </script>
@@ -540,6 +552,7 @@ useSessionKeepAlive();
       v-model:title="formState.spec.title"
       v-model:cover="formState.spec.cover"
       :upload-image="handleUploadImage"
+      :upload-from-url="handleUploadFromUrl"
       class="h-full"
       @update="handleSetContentCache"
     />

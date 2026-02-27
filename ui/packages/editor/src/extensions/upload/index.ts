@@ -1,21 +1,74 @@
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
+import { ActionNotificationManager } from "@/utils/action-notification-manager";
 import {
   batchUploadExternalLink,
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
+  type UploadFromUrlFn,
 } from "@/utils/upload";
-import { Dialog, Toast } from "@halo-dev/components";
+import { coreApiClient } from "@halo-dev/api-client";
+import { Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
 
-export const ExtensionUpload = Extension.create({
+async function filterNodesNotInAttachmentLibrary(
+  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+) {
+  const srcList = Array.from(
+    new Set(
+      nodes
+        .map((item) => item.node.attrs?.src as string | undefined)
+        .filter(Boolean)
+    )
+  );
+
+  if (srcList.length === 0) {
+    return nodes;
+  }
+
+  const results = await Promise.all(
+    srcList.map(async (src) => {
+      try {
+        const { data } = await coreApiClient.storage.attachment.listAttachment({
+          // API page is 1-based; 0 means "no pagination"
+          page: 1,
+          size: 1,
+          fieldSelector: [`status.permalink=${src}`],
+        });
+        return [src, data.total > 0] as const;
+      } catch {
+        // If we can't check, treat it as not found and keep original behavior.
+        return [src, false] as const;
+      }
+    })
+  );
+
+  const existingSrcSet = new Set(
+    results.filter(([, exists]) => exists).map(([src]) => src)
+  );
+
+  return nodes.filter((item) => !existingSrcSet.has(item.node.attrs?.src));
+}
+
+export interface ExtensionUploadOptions {
+  uploadFromUrl?: UploadFromUrlFn;
+}
+
+export const ExtensionUpload = Extension.create<ExtensionUploadOptions>({
   name: "upload",
+
+  addOptions() {
+    return {
+      uploadFromUrl: undefined,
+    };
+  },
 
   addProseMirrorPlugins() {
     const { editor }: { editor: Editor } = this;
+    const uploadFromUrl = this.options.uploadFromUrl;
 
     return [
       new Plugin({
@@ -30,24 +83,77 @@ export const ExtensionUpload = Extension.create({
               return false;
             }
 
-            const externalNodes = getAllExternalNodes(slice);
-            if (externalNodes.length > 0) {
-              Dialog.info({
-                title: i18n.global.t("editor.common.text.tip"),
-                description: i18n.global.t(
-                  "editor.extensions.upload.operations.transfer_in_batch.description"
-                ),
-                confirmText: i18n.global.t("editor.common.button.confirm"),
-                cancelText: i18n.global.t("editor.common.button.cancel"),
-                async onConfirm() {
-                  await batchUploadExternalLink(editor, externalNodes);
+            // Check for external nodes that need to be uploaded
+            (async () => {
+              const externalNodes = getAllExternalNodes(slice);
+              if (externalNodes.length === 0) {
+                return;
+              }
 
-                  Toast.success(
-                    i18n.global.t("editor.common.toast.save_success")
-                  );
-                },
-              });
-            }
+              // If pasted URLs already exist as attachment permalinks, skip prompting.
+              const nodesToPrompt =
+                await filterNodesNotInAttachmentLibrary(externalNodes);
+
+              if (nodesToPrompt.length > 0) {
+                // Show non-blocking notification with action buttons
+                const count = nodesToPrompt.length;
+                const title = i18n.global.t(
+                  "editor.extensions.upload.external_link_notification_title"
+                );
+                const message =
+                  count === 1
+                    ? i18n.global.t(
+                        "editor.extensions.upload.external_link_notification_singular"
+                      )
+                    : i18n.global.t(
+                        "editor.extensions.upload.external_link_notification_plural",
+                        { count }
+                      );
+
+                const notification = ActionNotificationManager.show({
+                  type: "info",
+                  title,
+                  message,
+                  closable: true,
+                  actions: [
+                    {
+                      label: i18n.global.t("editor.common.button.cancel"),
+                      type: "default",
+                      onClick: () => {
+                        notification.close();
+                      },
+                    },
+                    {
+                      label: i18n.global.t(
+                        "editor.extensions.upload.upload_to_library"
+                      ),
+                      type: "primary",
+                      onClick: async () => {
+                        try {
+                          await batchUploadExternalLink(
+                            editor,
+                            nodesToPrompt,
+                            uploadFromUrl
+                          );
+                          notification.close();
+                          Toast.success(
+                            i18n.global.t("editor.common.toast.save_success")
+                          );
+                        } catch (error) {
+                          Toast.error(
+                            i18n.global.t("editor.extensions.upload.error")
+                          );
+                          console.error(
+                            "Failed to upload external links:",
+                            error
+                          );
+                        }
+                      },
+                    },
+                  ],
+                });
+              }
+            })();
 
             const types = event.clipboardData.types;
             if (!containsFileClipboardIdentifier(types)) {

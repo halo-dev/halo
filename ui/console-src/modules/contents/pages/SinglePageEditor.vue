@@ -425,6 +425,19 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
     );
   return data;
 }
+
+// Upload from external URL (for pasted external links)
+async function handleUploadFromUrl(url: string) {
+  if (!utils.permission.has(["system:attachments:manage"])) {
+    throw new Error("Permission denied");
+  }
+
+  const { data } =
+    await consoleApiClient.storage.attachment.uploadAttachmentForConsole({
+      url,
+    });
+  return data;
+}
 </script>
 
 <template>
@@ -521,6 +534,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
       v-model:title="formState.page.spec.title"
       v-model:cover="formState.page.spec.cover"
       :upload-image="handleUploadImage"
+      :upload-from-url="handleUploadFromUrl"
       class="h-full"
       @update="handleSetContentCache"
     />
