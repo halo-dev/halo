@@ -101,6 +101,9 @@ public class PageUrlUtils {
     }
 
     private static int parseInt(String pageStr) {
+        if (!NumberUtils.isParsable(pageStr)) {
+            throw new IllegalArgumentException("Page number must be a number");
+        }
         return NumberUtils.toInt(pageStr, 1);
     }
 }
