@@ -16,9 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.CategoryService;
 import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -28,6 +31,7 @@ import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
@@ -62,6 +66,9 @@ class PostFinderImplTest {
 
     @Mock
     private PostPublicQueryService publicQueryService;
+
+    @Mock
+    private CategoryService categoryService;
 
     @InjectMocks
     private PostFinderImpl postFinder;
@@ -183,6 +190,73 @@ class PostFinderImplTest {
         postStatus.setExcerpt("hello world!");
         post.setStatus(postStatus);
         return post;
+    }
+
+    @Nested
+    class ListByCategoryTest {
+
+        @Test
+        void listByCategory_shouldPrioritizeQueriedCategory() {
+            // Post has two categories: "cat2" first, then "cat1"
+            Post post = post(1);
+            post.getSpec().setCategories(List.of("cat2", "cat1"));
+
+            var cat1Vo = categoryVo("cat1");
+            var cat2Vo = categoryVo("cat2");
+            // categories returned in the "wrong" order: cat2 before cat1
+            var postVo = ListedPostVo.from(post);
+            postVo.setCategories(List.of(cat2Vo, cat1Vo));
+
+            var listResult = new ListResult<>(1, 10, 1, List.of(postVo));
+
+            when(categoryService.listChildren("cat1"))
+                .thenReturn(Flux.just(category("cat1")));
+            when(publicQueryService.list(any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(listResult));
+
+            var result = postFinder.listByCategory(1, 10, "cat1").block();
+            assertThat(result).isNotNull();
+            assertThat(result.getItems()).hasSize(1);
+            // "cat1" (the queried category) should now be first
+            assertThat(result.getItems().get(0).getCategories().get(0)
+                .getMetadata().getName()).isEqualTo("cat1");
+        }
+
+        @Test
+        void listByCategory_singleCategory_noReorder() {
+            Post post = post(1);
+            post.getSpec().setCategories(List.of("cat1"));
+
+            var cat1Vo = categoryVo("cat1");
+            var postVo = ListedPostVo.from(post);
+            postVo.setCategories(List.of(cat1Vo));
+
+            var listResult = new ListResult<>(1, 10, 1, List.of(postVo));
+
+            when(categoryService.listChildren("cat1"))
+                .thenReturn(Flux.just(category("cat1")));
+            when(publicQueryService.list(any(), any(PageRequest.class)))
+                .thenReturn(Mono.just(listResult));
+
+            var result = postFinder.listByCategory(1, 10, "cat1").block();
+            assertThat(result).isNotNull();
+            assertThat(result.getItems().get(0).getCategories()).hasSize(1);
+            assertThat(result.getItems().get(0).getCategories().get(0)
+                .getMetadata().getName()).isEqualTo("cat1");
+        }
+
+        private Category category(String name) {
+            var category = new Category();
+            var metadata = new Metadata();
+            metadata.setName(name);
+            category.setMetadata(metadata);
+            return category;
+        }
+
+        private CategoryVo categoryVo(String name) {
+            var category = category(name);
+            return CategoryVo.from(category);
+        }
     }
 
     @Nested
