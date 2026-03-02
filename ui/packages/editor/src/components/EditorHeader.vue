@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { type AnyExtension, VueEditor } from "@/tiptap";
-import type { ToolbarItemType, ToolboxItemType } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import MingcuteAddCircleFill from "~icons/mingcute/add-circle-fill";
+import { type AnyExtension, VueEditor } from "@/tiptap";
+import type { ToolbarItemType, ToolboxItemType } from "@/types";
 
 const props = defineProps({
   editor: {

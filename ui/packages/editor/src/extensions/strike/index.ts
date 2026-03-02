@@ -1,10 +1,10 @@
+import TiptapStrike, { type StrikeOptions } from "@tiptap/extension-strike";
+import { markRaw } from "vue";
+import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import TiptapStrike, { type StrikeOptions } from "@tiptap/extension-strike";
-import { markRaw } from "vue";
-import MingcuteStrikethroughLine from "~icons/mingcute/strikethrough-line";
 
 export type ExtensionStrikeOptions = ExtensionOptions & Partial<StrikeOptions>;
 

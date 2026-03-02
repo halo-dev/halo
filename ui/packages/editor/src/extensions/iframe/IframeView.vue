@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { NodeViewProps } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
-import { computed } from "vue";
 
 const props = defineProps<NodeViewProps>();
 

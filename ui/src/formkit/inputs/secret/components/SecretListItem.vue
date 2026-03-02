@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { secretAnnotations } from "@/constants/annotations";
 import { coreApiClient, type Secret } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import {
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { secretAnnotations } from "@/constants/annotations";
 import { Q_KEY } from "../composables/use-secrets-fetch";
 import type { RequiredKey } from "../types";
 import SecretEditModal from "./SecretEditModal.vue";

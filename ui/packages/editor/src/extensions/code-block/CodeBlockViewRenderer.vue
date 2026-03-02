@@ -1,15 +1,15 @@
 <script lang="ts" setup>
+import { useTimeout } from "@vueuse/core";
+import { computed } from "vue";
+import MingcuteCheckCircleLine from "~icons/mingcute/check-circle-line";
+import MingcuteCopyLine from "~icons/mingcute/copy-line";
+import MingcuteRightSmallFill from "~icons/mingcute/right-small-fill";
 import { i18n } from "@/locales";
 import {
   NodeViewContent,
   NodeViewWrapper,
   type NodeViewProps,
 } from "@/tiptap/vue-3";
-import { useTimeout } from "@vueuse/core";
-import { computed } from "vue";
-import MingcuteCheckCircleLine from "~icons/mingcute/check-circle-line";
-import MingcuteCopyLine from "~icons/mingcute/copy-line";
-import MingcuteRightSmallFill from "~icons/mingcute/right-small-fill";
 import CodeBlockSelect from "./CodeBlockSelect.vue";
 
 const props = defineProps<NodeViewProps>();

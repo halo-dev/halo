@@ -1,9 +1,9 @@
 <script lang="ts" setup>
+import MingcuteCloseLine from "~icons/mingcute/close-line";
 import { ToolbarItem } from "@/components";
 import ColorPickerDropdown from "@/components/common/ColorPickerDropdown.vue";
 import { i18n } from "@/locales";
 import type { ToolbarItemComponentProps } from "@/types";
-import MingcuteCloseLine from "~icons/mingcute/close-line";
 import { ExtensionHighlight } from ".";
 
 const props = defineProps<ToolbarItemComponentProps>();

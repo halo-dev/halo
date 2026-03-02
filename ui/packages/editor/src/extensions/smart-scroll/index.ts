@@ -1,5 +1,5 @@
-import { EditorView, Extension } from "@/tiptap";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { EditorView, Extension } from "@/tiptap";
 
 export interface SmartScrollOptions {
   /**

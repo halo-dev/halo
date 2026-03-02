@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePluginModuleStore } from "@/stores/plugin";
 import type { Theme } from "@halo-dev/api-client";
 import { VButton, VLoading, VModal, VTabbar } from "@halo-dev/components";
 import { utils, type ThemeListTab } from "@halo-dev/ui-shared";
@@ -17,6 +16,7 @@ import {
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { t } = useI18n();
 

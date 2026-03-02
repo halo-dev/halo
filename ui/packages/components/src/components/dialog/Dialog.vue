@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { DialogProps, DialogType } from "@/components/dialog/types";
 import { markRaw, ref, type Component, type Raw } from "vue";
+import type { DialogProps, DialogType } from "@/components/dialog/types";
 import {
   IconCheckboxCircle,
   IconClose,

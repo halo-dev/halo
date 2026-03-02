@@ -23,9 +23,9 @@ import type { DashboardWidgetQuickActionItem } from "@halo-dev/ui-shared";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, markRaw, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { useDashboardQuickActionExtensionPoint } from "./composables/use-dashboard-extension-point";
 import QuickActionItem from "./QuickActionItem.vue";
 import ThemePreviewItem from "./ThemePreviewItem.vue";
-import { useDashboardQuickActionExtensionPoint } from "./composables/use-dashboard-extension-point";
 
 const props = defineProps<{
   editMode?: boolean;

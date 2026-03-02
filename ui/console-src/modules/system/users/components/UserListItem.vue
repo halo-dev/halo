@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { rbacAnnotations } from "@/constants/annotations";
 import { coreApiClient, type ListedUser } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -18,6 +17,7 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
 import { useUserEnableDisable } from "../composables/use-user";
 import GrantPermissionModal from "./GrantPermissionModal.vue";
 import UserEditingModal from "./UserEditingModal.vue";

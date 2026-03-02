@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
-import { computed } from "vue";
 import { ExtensionIframe } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();

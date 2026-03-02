@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import PostContributorList from "@/components/user/PostContributorList.vue";
 import type { ListedSinglePage } from "@halo-dev/api-client";
 import { VEntityField } from "@halo-dev/components";
+import PostContributorList from "@/components/user/PostContributorList.vue";
 
 withDefaults(
   defineProps<{

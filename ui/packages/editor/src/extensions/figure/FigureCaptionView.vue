@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { computed, ref, watch } from "vue";
 import type { NodeViewProps } from "@/tiptap/vue-3";
 import { NodeViewContent, NodeViewWrapper } from "@/tiptap/vue-3";
-import { computed, ref, watch } from "vue";
 
 const props = defineProps<NodeViewProps>();
 

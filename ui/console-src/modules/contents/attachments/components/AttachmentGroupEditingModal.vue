@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import { setFocus } from "@/formkit/utils/focus";
 import type {
   Group,
   GroupV1alpha1ApiListGroupRequest,
@@ -10,6 +8,8 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{

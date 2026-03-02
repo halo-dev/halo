@@ -1,10 +1,10 @@
+import { utils } from "@halo-dev/ui-shared";
 import {
   getExtensionField,
   type AnyConfig,
   type AnyExtension,
   type Extensions,
 } from "@/tiptap";
-import { utils } from "@halo-dev/ui-shared";
 
 export const filterDuplicateExtensions = (
   extensions: Extensions | undefined

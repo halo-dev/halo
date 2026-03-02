@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
-import type { ProblemDetail } from "@/setup/setupApiClient";
-import { createHTMLContentModal } from "@/utils/modal";
 import { Toast } from "@halo-dev/components";
 import type { Restrictions } from "@uppy/core";
 import Uppy, { type SuccessResponse } from "@uppy/core";
-import "@uppy/core/dist/style.css";
-import "@uppy/dashboard/dist/style.css";
 import ImageEditor from "@uppy/image-editor";
-import "@uppy/image-editor/dist/style.min.css";
 import en_US from "@uppy/locales/lib/en_US";
 import zh_CN from "@uppy/locales/lib/zh_CN";
+import "@uppy/core/dist/style.css";
+import "@uppy/dashboard/dist/style.css";
 import zh_TW from "@uppy/locales/lib/zh_TW";
+import "@uppy/image-editor/dist/style.min.css";
 import { Dashboard } from "@uppy/vue";
 import XHRUpload from "@uppy/xhr-upload";
 import objectHash from "object-hash";
 import { computed, h, onUnmounted, watchEffect } from "vue";
+import { i18n } from "@/locales";
+import type { ProblemDetail } from "@/setup/setupApiClient";
+import { createHTMLContentModal } from "@/utils/modal";
 
 const props = withDefaults(
   defineProps<{

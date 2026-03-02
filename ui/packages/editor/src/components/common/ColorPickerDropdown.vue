@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
 import type { Payload } from "@ckpack/vue-color";
 import { Sketch } from "@ckpack/vue-color";
 import { VDropdown } from "@halo-dev/components";
 import tailwindcssColors from "tailwindcss/colors";
 import MingcutePaletteLine from "~icons/mingcute/palette-line";
 import MingcuteRightLine from "~icons/mingcute/right-line";
+import { i18n } from "@/locales";
 
 interface Color {
   color: string;

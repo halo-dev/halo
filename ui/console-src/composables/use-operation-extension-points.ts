@@ -1,7 +1,7 @@
-import { usePluginModuleStore } from "@/stores/plugin";
 import type { OperationItem } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, toValue, type ComputedRef, type Ref } from "vue";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 export function useOperationItemExtensionPoint<T>(
   extensionPointName: string,

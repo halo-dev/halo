@@ -1,3 +1,4 @@
+import { Dialog, Toast } from "@halo-dev/components";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
@@ -6,7 +7,6 @@ import {
   handleFileEvent,
   isExternalAsset,
 } from "@/utils/upload";
-import { Dialog, Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";

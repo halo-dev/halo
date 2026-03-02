@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { contentAnnotations } from "@/constants/annotations";
 import type { Content, Post } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
@@ -8,6 +6,8 @@ import { utils } from "@halo-dev/ui-shared";
 import { useMutation } from "@tanstack/vue-query";
 import { nextTick, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { contentAnnotations } from "@/constants/annotations";
 import { usePostPublishMutate } from "../composables/use-post-publish-mutate";
 import type { PostFormState } from "../types";
 import PostSettingForm from "./PostSettingForm.vue";

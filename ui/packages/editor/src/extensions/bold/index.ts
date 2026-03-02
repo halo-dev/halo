@@ -1,10 +1,10 @@
+import TiptapBold, { type BoldOptions } from "@tiptap/extension-bold";
+import { markRaw } from "vue";
+import MingcuteBoldLine from "~icons/mingcute/bold-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import TiptapBold, { type BoldOptions } from "@tiptap/extension-bold";
-import { markRaw } from "vue";
-import MingcuteBoldLine from "~icons/mingcute/bold-line";
 
 export type ExtensionBoldOptions = Partial<BoldOptions> & ExtensionOptions;
 

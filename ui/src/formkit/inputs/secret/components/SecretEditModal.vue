@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { secretAnnotations } from "@/constants/annotations";
 import { coreApiClient, type Secret } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { secretAnnotations } from "@/constants/annotations";
 import { Q_KEY } from "../composables/use-secrets-fetch";
 import type { RequiredKey, SecretFormState } from "../types";
 import SecretForm from "./SecretForm.vue";

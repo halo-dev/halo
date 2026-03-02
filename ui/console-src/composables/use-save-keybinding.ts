@@ -1,7 +1,7 @@
-import { isMac } from "@/utils/device";
 import { useEventListener } from "@vueuse/core";
 import { useDebounceFn } from "@vueuse/shared";
 import { nextTick } from "vue";
+import { isMac } from "@/utils/device";
 
 export function useSaveKeybinding(fn: () => void) {
   const debouncedFn = useDebounceFn(() => {

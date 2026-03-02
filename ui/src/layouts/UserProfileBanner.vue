@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
 import {
   Dialog,
   IconAccountCircleLine,
@@ -16,6 +14,8 @@ import { stores } from "@halo-dev/ui-shared";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 
 const props = defineProps<{
   platform?: "console" | "uc";

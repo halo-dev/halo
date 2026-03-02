@@ -1,7 +1,7 @@
-import type { Editor } from "@/tiptap";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFileDialog } from "@vueuse/core";
 import { computed, ref } from "vue";
+import type { Editor } from "@/tiptap";
 import { uploadFile } from "../../utils/upload";
 import { ExtensionGallery, type ExtensionGalleryImageItem } from "./index";
 

@@ -1,5 +1,5 @@
-import { i18n } from "@/locales";
 import { type FormKitNode } from "@formkit/core";
+import { i18n } from "@/locales";
 
 function buildVerifyFormValue(node: FormKitNode) {
   if (!node.parent) return {};

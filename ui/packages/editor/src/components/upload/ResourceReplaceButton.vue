@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
 import type { Attachment } from "@halo-dev/api-client";
 import { Toast, VButton, VDropdown, VDropdownItem } from "@halo-dev/components";
 import {
@@ -10,6 +9,7 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { ref } from "vue";
+import { i18n } from "@/locales";
 import Input from "../base/Input.vue";
 
 const props = defineProps<{

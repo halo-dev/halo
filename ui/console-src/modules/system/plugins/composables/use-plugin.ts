@@ -1,4 +1,3 @@
-import { usePluginModuleStore } from "@/stores/plugin";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -13,6 +12,7 @@ import { useRouteQuery } from "@vueuse/router";
 import type { ComputedRef, Ref } from "vue";
 import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;

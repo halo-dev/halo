@@ -1,9 +1,4 @@
 <script lang="ts" setup>
-import MenuLoading from "@/components/menu/MenuLoading.vue";
-import { RoutesMenu } from "@/components/menu/RoutesMenu";
-import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
-import MobileMenu from "@/layouts/MobileMenu.vue";
-import UserProfileBanner from "@/layouts/UserProfileBanner.vue";
 import { coreMenuGroups } from "@console/router/constant";
 import {
   useOverlayScrollbars,
@@ -13,6 +8,11 @@ import { defineStore } from "pinia";
 import { onMounted, reactive, ref } from "vue";
 import { RouterView, useRoute } from "vue-router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+import MenuLoading from "@/components/menu/MenuLoading.vue";
+import { RoutesMenu } from "@/components/menu/RoutesMenu";
+import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
+import MobileMenu from "@/layouts/MobileMenu.vue";
+import UserProfileBanner from "@/layouts/UserProfileBanner.vue";
 
 const route = useRoute();
 

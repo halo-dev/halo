@@ -1,13 +1,13 @@
-import { ToolbarItem, ToolbarSubItem } from "@/components";
-import { i18n } from "@/locales";
-import { type Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import {
   FontSize as TiptapFontSize,
   type FontSizeOptions,
 } from "@tiptap/extension-text-style";
 import { markRaw } from "vue";
 import MingcuteFontSizeLine from "~icons/mingcute/font-size-line";
+import { ToolbarItem, ToolbarSubItem } from "@/components";
+import { i18n } from "@/locales";
+import { type Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionFontSizeOptions = Partial<FontSizeOptions> &
   ExtensionOptions;

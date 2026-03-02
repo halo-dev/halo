@@ -1,12 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconCheckboxCircle,
-  IconClose,
-  IconErrorWarning,
-  IconForbidLine,
-  IconInformation,
-} from "@/icons/icons";
-import {
   markRaw,
   onMounted,
   ref,
@@ -14,6 +7,13 @@ import {
   type Component,
   type Raw,
 } from "vue";
+import {
+  IconCheckboxCircle,
+  IconClose,
+  IconErrorWarning,
+  IconForbidLine,
+  IconInformation,
+} from "@/icons/icons";
 import type { ToastType } from "./types";
 
 const props = withDefaults(

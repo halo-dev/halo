@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { secretAnnotations } from "@/constants/annotations";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -14,6 +13,7 @@ import { computed, ref, type PropType } from "vue";
 import { useI18n } from "vue-i18n";
 import MingcuteFileSecurityLine from "~icons/mingcute/file-security-line";
 import RiEditBoxLine from "~icons/ri/edit-box-line";
+import { secretAnnotations } from "@/constants/annotations";
 import SecretCreationModal from "./components/SecretCreationModal.vue";
 import SecretEditModal from "./components/SecretEditModal.vue";
 import SecretListModal from "./components/SecretListModal.vue";

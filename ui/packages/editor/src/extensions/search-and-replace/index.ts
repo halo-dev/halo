@@ -1,10 +1,10 @@
+import { h, markRaw, render } from "vue";
+import MingcuteListSearchLine from "~icons/mingcute/list-search-line";
 import { ToolbarItem } from "@/components";
 import { i18n } from "@/locales";
 import { EditorState } from "@/tiptap/pm";
 import { Editor, Extension } from "@/tiptap/vue-3";
 import type { ExtensionOptions } from "@/types";
-import { h, markRaw, render } from "vue";
-import MingcuteListSearchLine from "~icons/mingcute/list-search-line";
 import SearchAndReplaceVue from "./SearchAndReplace.vue";
 import {
   SearchAndReplacePlugin,

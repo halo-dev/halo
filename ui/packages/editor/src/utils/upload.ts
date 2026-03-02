@@ -1,11 +1,11 @@
-import { ExtensionAudio } from "@/extensions/audio";
-import { ExtensionImage } from "@/extensions/image";
-import { ExtensionVideo } from "@/extensions/video";
-import { Editor, PMNode } from "@/tiptap";
 import { ucApiClient, type Attachment } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "es-toolkit";
+import { ExtensionAudio } from "@/extensions/audio";
+import { ExtensionImage } from "@/extensions/image";
+import { ExtensionVideo } from "@/extensions/video";
+import { Editor, PMNode } from "@/tiptap";
 
 export interface FileProps {
   file: File;

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { singlePageLabels } from "@/constants/labels";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import { coreApiClient } from "@halo-dev/api-client";
 import { IconPages } from "@halo-dev/components";
 import NumberFlow from "@number-flow/vue";
 import { useQuery } from "@tanstack/vue-query";
+import { singlePageLabels } from "@/constants/labels";
 
 defineProps<{
   config: {

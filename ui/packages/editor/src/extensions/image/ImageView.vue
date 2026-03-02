@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { IconImageAddLine, VButton } from "@halo-dev/components";
+import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { EditorLinkObtain } from "@/components";
 import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
@@ -9,9 +12,6 @@ import {
   type NodeViewProps,
 } from "@/tiptap";
 import { fileToBase64 } from "@/utils/upload";
-import { IconImageAddLine, VButton } from "@halo-dev/components";
-import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { ExtensionFigure } from "../figure";
 import { ExtensionImage } from "./index";
 

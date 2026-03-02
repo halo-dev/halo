@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePluginModuleStore } from "@/stores/plugin";
 import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
 import type {
   AttachmentLike,
@@ -14,6 +13,7 @@ import {
   useTemplateRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 
 const { t } = useI18n();

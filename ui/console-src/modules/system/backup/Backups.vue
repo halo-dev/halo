@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { usePluginModuleStore } from "@/stores/plugin";
 import {
   IconAddCircle,
   IconServerLine,
@@ -13,6 +12,7 @@ import type { BackupTab } from "@halo-dev/ui-shared";
 import { useRouteQuery } from "@vueuse/router";
 import { defineAsyncComponent, onMounted, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { useBackup } from "./composables/use-backup";
 
 const { t } = useI18n();

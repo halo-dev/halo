@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
   VButton,
@@ -11,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
 import RiShieldKeyholeLine from "~icons/ri/shield-keyhole-line";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import TotpConfigureModal from "./TotpConfigureModal.vue";
 import TotpDeletionModal from "./TotpDeletionModal.vue";
 import TwoFactorDisableModal from "./TwoFactorDisableModal.vue";

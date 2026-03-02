@@ -1,11 +1,11 @@
-import { ExtensionTextStyle } from "@/extensions/text-style";
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import type { ColorOptions } from "@tiptap/extension-color";
 import TiptapColor from "@tiptap/extension-color";
 import { markRaw } from "vue";
 import MingcuteTextColorLine from "~icons/mingcute/text-color-line";
+import { ExtensionTextStyle } from "@/extensions/text-style";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import ColorToolbarItem from "./ColorToolbarItem.vue";
 
 export type ExtensionColorOptions = Partial<ColorOptions> & ExtensionOptions;

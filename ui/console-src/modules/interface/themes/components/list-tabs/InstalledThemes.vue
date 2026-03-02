@@ -14,8 +14,8 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { inject, ref, type Ref } from "vue";
-import ThemeListItem from "../ThemeListItem.vue";
 import ThemePreviewModal from "../preview/ThemePreviewModal.vue";
+import ThemeListItem from "../ThemeListItem.vue";
 
 const themeStore = useThemeStore();
 

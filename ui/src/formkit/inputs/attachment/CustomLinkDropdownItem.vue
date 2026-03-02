@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { setFocus } from "@/formkit/utils/focus";
 import { VButton, VDropdown, VDropdownItem } from "@halo-dev/components";
 import { useTemplateRef } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 defineProps<{
   url?: string;

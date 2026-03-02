@@ -1,3 +1,22 @@
+import {
+  createColGroup,
+  Table as TiptapTable,
+  type TableOptions,
+} from "@tiptap/extension-table";
+import { markRaw } from "vue";
+import FluentTableColumnTopBottom24Regular from "~icons/fluent/table-column-top-bottom-24-regular";
+import MdiTable from "~icons/mdi/table";
+import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after";
+import MdiTableColumnPlusBefore from "~icons/mdi/table-column-plus-before";
+import MdiTableColumnRemove from "~icons/mdi/table-column-remove";
+import MdiTableHeadersEye from "~icons/mdi/table-headers-eye";
+import MdiTableMergeCells from "~icons/mdi/table-merge-cells";
+import MdiTablePlus from "~icons/mdi/table-plus";
+import MdiTableRemove from "~icons/mdi/table-remove";
+import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after";
+import MdiTableRowPlusBefore from "~icons/mdi/table-row-plus-before";
+import MdiTableRowRemove from "~icons/mdi/table-row-remove";
+import MdiTableSplitCell from "~icons/mdi/table-split-cell";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import { i18n } from "@/locales";
@@ -20,25 +39,6 @@ import {
   type ViewMutationRecord,
 } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
-import {
-  createColGroup,
-  Table as TiptapTable,
-  type TableOptions,
-} from "@tiptap/extension-table";
-import { markRaw } from "vue";
-import FluentTableColumnTopBottom24Regular from "~icons/fluent/table-column-top-bottom-24-regular";
-import MdiTable from "~icons/mdi/table";
-import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after";
-import MdiTableColumnPlusBefore from "~icons/mdi/table-column-plus-before";
-import MdiTableColumnRemove from "~icons/mdi/table-column-remove";
-import MdiTableHeadersEye from "~icons/mdi/table-headers-eye";
-import MdiTableMergeCells from "~icons/mdi/table-merge-cells";
-import MdiTablePlus from "~icons/mdi/table-plus";
-import MdiTableRemove from "~icons/mdi/table-remove";
-import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after";
-import MdiTableRowPlusBefore from "~icons/mdi/table-row-plus-before";
-import MdiTableRowRemove from "~icons/mdi/table-row-remove";
-import MdiTableSplitCell from "~icons/mdi/table-split-cell";
 import TableCell from "./table-cell";
 import TableHeader from "./table-header";
 import TableRow from "./table-row";

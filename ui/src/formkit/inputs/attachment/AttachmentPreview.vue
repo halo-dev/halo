@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import LazyVideo from "@/components/video/LazyVideo.vue";
-import { isImage } from "@/utils/image";
 import { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import mime from "mime/lite";
 import { computed } from "vue";
+import LazyVideo from "@/components/video/LazyVideo.vue";
+import { isImage } from "@/utils/image";
 
 const props = defineProps<{
   url: string;

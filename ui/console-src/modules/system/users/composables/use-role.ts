@@ -1,4 +1,3 @@
-import { roleLabels } from "@/constants/labels";
 import {
   coreApiClient,
   paginate,
@@ -6,6 +5,7 @@ import {
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
+import { roleLabels } from "@/constants/labels";
 
 export function useFetchRoles() {
   return useQuery({

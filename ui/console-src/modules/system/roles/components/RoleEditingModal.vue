@@ -1,15 +1,15 @@
 <script lang="ts" setup>
+import type { Role } from "@halo-dev/api-client";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { cloneDeep } from "es-toolkit";
+import { onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels } from "@/constants/labels";
 import { setFocus } from "@/formkit/utils/focus";
 import { resolveDeepDependencies } from "@/utils/role";
-import type { Role } from "@halo-dev/api-client";
-import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { cloneDeep } from "es-toolkit";
-import { onMounted, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
 import { useFetchRoleTemplates } from "../../users/composables/use-role";
 
 const { t } = useI18n();

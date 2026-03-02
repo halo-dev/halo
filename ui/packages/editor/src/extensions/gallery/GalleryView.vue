@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
-import { i18n } from "@/locales";
-import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
+import { i18n } from "@/locales";
+import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 

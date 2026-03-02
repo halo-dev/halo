@@ -1,4 +1,3 @@
-import { setupProcessBarGuard } from "@/router/process-bar";
 import routesConfig from "@uc/router/routes.config";
 import {
   createRouter,
@@ -6,6 +5,7 @@ import {
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
+import { setupProcessBarGuard } from "@/router/process-bar";
 import { setupAuthCheckGuard } from "./guards/auth-check";
 import { setupPermissionGuard } from "./guards/permission";
 

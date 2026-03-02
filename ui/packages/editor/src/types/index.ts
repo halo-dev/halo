@@ -1,13 +1,4 @@
 import type {
-  Editor,
-  EditorState,
-  EditorView,
-  PluginKey,
-  PMNode,
-  Range,
-  ResolvedPos,
-} from "@/tiptap";
-import type {
   arrow,
   autoPlacement,
   flip,
@@ -19,6 +10,15 @@ import type {
   VirtualElement,
 } from "@floating-ui/dom";
 import type { Component } from "vue";
+import type {
+  Editor,
+  EditorState,
+  EditorView,
+  PluginKey,
+  PMNode,
+  Range,
+  ResolvedPos,
+} from "@/tiptap";
 
 export interface ToolbarItemType {
   priority: number;

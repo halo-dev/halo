@@ -17,10 +17,10 @@ import { useRouteQuery } from "@vueuse/router";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, toRefs, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { SNAPSHOTS_QUERY_KEY } from "./query-keys";
 import SnapshotContent from "./SnapshotContent.vue";
 import SnapshotDiffContent from "./SnapshotDiffContent.vue";
 import SnapshotListItem from "./SnapshotListItem.vue";
-import { SNAPSHOTS_QUERY_KEY } from "./query-keys";
 
 const props = defineProps<{
   title: string;

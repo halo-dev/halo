@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { uploadFile } from "@/utils/upload";
 import type { Attachment } from "@halo-dev/api-client";
 import { VButton, VDropdown, VSpace } from "@halo-dev/components";
 import {
@@ -12,6 +9,9 @@ import {
 import { useFileDialog } from "@vueuse/core";
 import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import { uploadFile } from "@/utils/upload";
 import Input from "../base/Input.vue";
 
 const props = withDefaults(

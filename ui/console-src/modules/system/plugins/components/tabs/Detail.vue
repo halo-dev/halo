@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
-import { pluginLabels, roleLabels } from "@/constants/labels";
 import {
   PluginStatusPhaseEnum,
   coreApiClient,
@@ -20,6 +18,8 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
+import { rbacAnnotations } from "@/constants/annotations";
+import { pluginLabels, roleLabels } from "@/constants/labels";
 import { usePluginLifeCycle } from "../../composables/use-plugin";
 import PluginConditionsModal from "../PluginConditionsModal.vue";
 

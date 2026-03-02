@@ -3,26 +3,34 @@
   "version": "2.22.0",
   "description": "",
   "keywords": [
+    "@halo-dev/components",
     "halo",
     "halo-components",
-    "halo-dev",
-    "@halo-dev/components"
+    "halo-dev"
   ],
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/components#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halo-dev/halo.git",
-    "directory": "ui/packages/components"
   },
   "license": "MIT",
   "author": {
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "ui/packages/components"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "main": "./dist/index.iife.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,14 +38,6 @@
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/index.iife.js",
-  "jsdelivr": "./dist/index.iife.js",
-  "unpkg": "./dist/index.iife.js",
-  "module": "./dist/index.es.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "vite build",
     "build-storybook": "storybook build",

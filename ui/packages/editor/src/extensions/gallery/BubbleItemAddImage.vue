@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { VDropdown } from "@halo-dev/components";
+import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
+import { ref } from "vue";
 import DropdownItem from "@/components/base/DropdownItem.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import { VDropdown } from "@halo-dev/components";
-import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
-import { ref } from "vue";
 import type { ExtensionGalleryImageItem } from ".";
 import {
   getCurrentGalleryImages,

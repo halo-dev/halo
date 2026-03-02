@@ -2,9 +2,9 @@
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import { IconSettings, VButton } from "@halo-dev/components";
 import { nextTick, onMounted, onUnmounted, ref } from "vue";
-import StackWidgetConfigModal from "./StackWidgetConfigModal.vue";
 import IndexIndicator from "./components/IndexIndicator.vue";
 import WidgetViewItem from "./components/WidgetViewItem.vue";
+import StackWidgetConfigModal from "./StackWidgetConfigModal.vue";
 import type { StackWidgetConfig } from "./types";
 
 const props = defineProps<{

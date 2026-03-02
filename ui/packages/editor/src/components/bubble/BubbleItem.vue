@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { Editor } from "@/tiptap";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { ref, type Component } from "vue";
+import type { Editor } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import BubbleButton from "./BubbleButton.vue";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {

@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { setFocus } from "@/formkit/utils/focus";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { reset, submitForm, type FormKitNode } from "@formkit/core";
@@ -19,6 +16,9 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type {
   ListedComment,
@@ -32,6 +31,7 @@ import { utils, type OperationItem } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, markRaw, provide, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useCommentLastReadTimeMutate } from "../composables/use-comment-last-readtime-mutate";
 import { useContentProviderExtensionPoint } from "../composables/use-content-provider-extension-point";
 import { useSubjectRef } from "../composables/use-subject-ref";

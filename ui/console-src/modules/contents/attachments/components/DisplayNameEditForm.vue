@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { setFocus } from "@/formkit/utils/focus";
 import { coreApiClient, type Attachment } from "@halo-dev/api-client";
 import { Toast, VButton, VSpace } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { setFocus } from "@/formkit/utils/focus";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

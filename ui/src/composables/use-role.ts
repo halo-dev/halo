@@ -1,10 +1,10 @@
-import { rbacAnnotations } from "@/constants/annotations";
-import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import { computed, ref, type ComputedRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
+import { resolveDeepDependencies } from "@/utils/role";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;

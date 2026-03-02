@@ -1,11 +1,11 @@
-import { i18n } from "@/locales";
-import type { DragButtonType } from "@/types";
-import { copySelectionToClipboard, deleteNode } from "@/utils";
 import { isActive } from "@tiptap/core";
 import { markRaw } from "vue";
 import MdiContentCut from "~icons/mdi/content-cut";
 import MingcuteCopyLine from "~icons/mingcute/copy-line";
 import MingcuteRefresh2Line from "~icons/mingcute/refresh-2-line";
+import { i18n } from "@/locales";
+import type { DragButtonType } from "@/types";
+import { copySelectionToClipboard, deleteNode } from "@/utils";
 import BlockActionHorizontalSeparator from "../block/BlockActionHorizontalSeparator.vue";
 import MingcuteDelete2Line from "../icon/MingcuteDelete2Line.vue";
 

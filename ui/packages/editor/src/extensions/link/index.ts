@@ -1,5 +1,5 @@
-import type { ExtensionOptions } from "@/types";
 import TiptapLink, { type LinkOptions } from "@tiptap/extension-link";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionLinkOptions = ExtensionOptions & Partial<LinkOptions>;
 

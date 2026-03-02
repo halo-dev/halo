@@ -1,10 +1,10 @@
+import { markRaw } from "vue";
+import MingcuteEraserLine from "~icons/mingcute/eraser-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import { markRaw } from "vue";
-import MingcuteEraserLine from "~icons/mingcute/eraser-line";
 
 export type ExtensionClearFormatOptions = ExtensionOptions;
 

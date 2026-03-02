@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
 import type { DetailedUser } from "@halo-dev/api-client";
 import {
   IconInformation,
@@ -10,6 +9,7 @@ import {
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
+import { rbacAnnotations } from "@/constants/annotations";
 
 withDefaults(defineProps<{ user?: DetailedUser }>(), {
   user: undefined,

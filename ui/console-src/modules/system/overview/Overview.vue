@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import { useThemeStore } from "@console/stores/theme";
 import type {
   Plugin,
@@ -26,6 +25,7 @@ import axios from "axios";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import H2WarningAlert from "@/components/alerts/H2WarningAlert.vue";
 import ExternalUrlItem from "./components/ExternalUrlItem.vue";
 
 const { t } = useI18n();

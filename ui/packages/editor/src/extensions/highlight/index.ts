@@ -1,10 +1,10 @@
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import type { HighlightOptions } from "@tiptap/extension-highlight";
 import TiptapHighlight from "@tiptap/extension-highlight";
 import { markRaw } from "vue";
 import MingcuteMarkPenLine from "~icons/mingcute/mark-pen-line";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import HighlightToolbarItem from "./HighlightToolbarItem.vue";
 
 export type ExtensionHighlightOptions = ExtensionOptions &
