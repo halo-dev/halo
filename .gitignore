@@ -89,7 +89,6 @@ lerna-debug.log*
 
 ### Frontend
 dist
-histoire-dist
 coverage
 *.local
 
