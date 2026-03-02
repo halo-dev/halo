@@ -3,8 +3,8 @@ import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import { isNil } from "es-toolkit";
-import { cloneDeepWith, get, toArray } from "es-toolkit/compat";
+import { isNil, isNotNil } from "es-toolkit";
+import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { onMounted, ref, toRaw, watch } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
@@ -95,7 +95,7 @@ onMounted(async () => {
 
 type FormattedItemLabel =
   | {
-      type: "text" | "image" | "color";
+      type: Exclude<ArrayItemLabelType, "iconify">;
       value: string;
     }
   | {
@@ -108,7 +108,7 @@ type FormattedItemLabel =
 const parseItemLabel = async (
   itemLabel: ArrayItemLabel,
   item: Record<string, unknown>
-): Promise<FormattedItemLabel | FormattedItemLabel[] | undefined> => {
+): Promise<FormattedItemLabel[] | undefined> => {
   if (!itemLabel.label) {
     return;
   }
@@ -119,20 +119,24 @@ const parseItemLabel = async (
     const node = hiddenChildrenFormKit.value?.at(path);
 
     if (!node) {
-      return {
-        type: itemLabel.type,
-        value: String(value ?? ""),
-      } as FormattedItemLabel;
+      return [
+        {
+          type: itemLabel.type,
+          value: String(value ?? ""),
+        } as FormattedItemLabel,
+      ];
     }
     const renderedValue = await renderItemLabelValue(node, value);
     const castRenderedValueArray = Array.isArray(renderedValue)
       ? renderedValue
       : [renderedValue];
     if (castRenderedValueArray.length === 0) {
-      return {
-        type: itemLabel.type,
-        value: String(value ?? ""),
-      } as FormattedItemLabel;
+      return [
+        {
+          type: itemLabel.type,
+          value: String(value ?? ""),
+        } as FormattedItemLabel,
+      ];
     }
     return castRenderedValueArray.map((renderedValue) => {
       return {
@@ -155,12 +159,11 @@ const formatItemLabel = async (
   });
   const itemLabels = props.node.props.itemLabels ?? defaultItemLabel;
   if (itemLabels.length > 0) {
-    const results = (
-      await Promise.all(itemLabels.map((label) => parseItemLabel(label, item)))
-    ).flatMap(toArray);
-    return results.filter(
-      (itemLabel): itemLabel is FormattedItemLabel => !!itemLabel?.value
-    );
+    const results = await Promise.all<FormattedItemLabel[][]>(
+      itemLabels.map((label: ArrayItemLabel) => parseItemLabel(label, item))
+    ).then((results) => results.flat());
+
+    return results.filter(isNotNil);
   }
   return [];
 };
