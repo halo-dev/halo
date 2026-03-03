@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { pluginLabels } from "@/constants/labels";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
@@ -28,6 +24,10 @@ import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { pluginLabels } from "@/constants/labels";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import LogoField from "./entity-fields/LogoField.vue";

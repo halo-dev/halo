@@ -1,3 +1,10 @@
+import { markRaw } from "vue";
+import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
+import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
+import MdiWeb from "~icons/mdi/web";
+import MdiWebSync from "~icons/mdi/web-sync";
+import MingcuteLinkLine from "~icons/mingcute/link-line";
+import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import { BlockActionSeparator } from "@/components";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
@@ -17,13 +24,6 @@ import {
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
-import { markRaw } from "vue";
-import MdiBorderAllVariant from "~icons/mdi/border-all-variant";
-import MdiBorderNoneVariant from "~icons/mdi/border-none-variant";
-import MdiWeb from "~icons/mdi/web";
-import MdiWebSync from "~icons/mdi/web-sync";
-import MingcuteLinkLine from "~icons/mingcute/link-line";
-import MingcuteShare3Line from "~icons/mingcute/share-3-line";
 import BubbleItemIframeAlign from "./BubbleItemIframeAlign.vue";
 import BubbleIframeLink from "./BubbleItemIframeLink.vue";
 import BubbleIframeSize from "./BubbleItemIframeSize.vue";

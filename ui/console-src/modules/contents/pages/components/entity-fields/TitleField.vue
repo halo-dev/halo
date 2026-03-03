@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { singlePageLabels } from "@/constants/labels";
 import type { ListedSinglePage } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -9,6 +8,7 @@ import {
 } from "@halo-dev/components";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { singlePageLabels } from "@/constants/labels";
 
 const props = withDefaults(
   defineProps<{

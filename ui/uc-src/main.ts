@@ -1,16 +1,16 @@
+import { stores } from "@halo-dev/ui-shared";
+import modules from "@uc/modules";
+import router from "@uc/router";
+import { createPinia } from "pinia";
+import "@/setup/setupStyles";
+import { createApp } from "vue";
 import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
 import { setupComponents } from "@/setup/setupComponents";
 import { setupCoreModules, setupPluginModules } from "@/setup/setupModules";
-import "@/setup/setupStyles";
+import "core-js/es/object/has-own";
 import { setupUserPermissions } from "@/setup/setupUserPermissions";
 import { setupVueQuery } from "@/setup/setupVueQuery";
-import { stores } from "@halo-dev/ui-shared";
-import modules from "@uc/modules";
-import router from "@uc/router";
-import "core-js/es/object/has-own";
-import { createPinia } from "pinia";
-import { createApp } from "vue";
 import App from "./App.vue";
 
 const app = createApp(App);

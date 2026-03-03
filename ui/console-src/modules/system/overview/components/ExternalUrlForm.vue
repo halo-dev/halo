@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { setFocus } from "@/formkit/utils/focus";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VButton, VLoading, VSpace } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
@@ -8,6 +7,7 @@ import axios from "axios";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { setFocus } from "@/formkit/utils/focus";
 
 const BASIC_GROUP = "basic";
 

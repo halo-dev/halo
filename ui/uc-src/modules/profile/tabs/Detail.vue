@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
 import {
   IconShieldUser,
   VAlert,
@@ -13,6 +12,7 @@ import { stores, utils } from "@halo-dev/ui-shared";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import RiVerifiedBadgeLine from "~icons/ri/verified-badge-line";
+import { rbacAnnotations } from "@/constants/annotations";
 import EmailVerifyModal from "../components/EmailVerifyModal.vue";
 
 const { currentUser } = storeToRefs(stores.currentUser());

@@ -1,13 +1,12 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
-import { i18n } from "@/locales";
-import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { Editor, Extension } from "@tiptap/core";
 import { markRaw } from "vue";
 import MingcuteListCheck3Line from "~icons/mingcute/list-check-3-line";
 import MingcuteListCheckLine from "~icons/mingcute/list-check-line";
 import MingcuteListOrderedLine from "~icons/mingcute/list-ordered-line";
-
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { i18n } from "@/locales";
+import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { ExtensionBulletList } from "../bullet-list";
 import { ExtensionOrderedList } from "../ordered-list";
 import { ExtensionTaskList } from "../task-list";

@@ -1,11 +1,4 @@
 <script lang="ts" setup>
-import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
-import { useAutoSaveContent } from "@/composables/use-auto-save-content";
-import { useContentCache } from "@/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
-import { contentAnnotations } from "@/constants/annotations";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
@@ -40,6 +33,13 @@ import {
 } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentCache } from "@/composables/use-content-cache";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { contentAnnotations } from "@/constants/annotations";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
 

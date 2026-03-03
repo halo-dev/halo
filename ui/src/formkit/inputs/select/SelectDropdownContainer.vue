@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
 import { VEmpty, VLoading } from "@halo-dev/components";
 import { useTimeout } from "@vueuse/shared";
 import { computed, watch } from "vue";
+import { i18n } from "@/locales";
 import SelectOption from "./SelectOption.vue";
 
 const props = defineProps<{

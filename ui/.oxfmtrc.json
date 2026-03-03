@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortTailwindcss": {},
+  "sortImports": {
+    "newlinesBetween": false
+  },
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "sortPackageJson": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "insertFinalNewline": true,
+  "ignorePatterns": [
+    "packages/api-client/src",
+    "docs",
+    "**/dist/**",
+    "build/**",
+    "storybook-static",
+    ".idea"
+  ]
+}

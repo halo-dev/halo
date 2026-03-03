@@ -11,8 +11,8 @@ import {
   suffix,
   wrapper,
 } from "@formkit/inputs";
-import SelectMain from "./SelectMain.vue";
 import { SelectSection } from "./sections/index";
+import SelectMain from "./SelectMain.vue";
 
 /**
  * Custom Select component.

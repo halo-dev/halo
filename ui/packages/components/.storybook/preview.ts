@@ -1,5 +1,4 @@
 import type { Preview } from "@storybook/vue3-vite";
-
 import "overlayscrollbars/overlayscrollbars.css";
 import "../src/styles/tailwind.css";
 

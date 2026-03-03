@@ -1,5 +1,3 @@
-import type { Editor, Range } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import {
   ListItem,
   OrderedList as TiptapOrderedList,
@@ -7,6 +5,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListOrderedLine from "~icons/mingcute/list-ordered-line";
+import type { Editor, Range } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionOrderedListOptions = Partial<OrderedListOptions> &
   ExtensionOptions;

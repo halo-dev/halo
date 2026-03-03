@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -29,6 +27,8 @@ import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import AttachmentListItem from "./components/AttachmentListItem.vue";

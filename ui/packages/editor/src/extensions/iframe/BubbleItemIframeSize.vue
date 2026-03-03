@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import Input from "@/components/base/Input.vue";
-import BubbleButton from "@/components/bubble/BubbleButton.vue";
-import { i18n } from "@/locales";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { computed } from "vue";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
 import MingcuteCellphoneLine from "~icons/mingcute/cellphone-line";
 import MingcuteImacLine from "~icons/mingcute/imac-line";
 import MingcutePadLine from "~icons/mingcute/pad-line";
+import Input from "@/components/base/Input.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
+import { i18n } from "@/locales";
+import type { BubbleItemComponentProps } from "@/types";
 import { ExtensionIframe } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();

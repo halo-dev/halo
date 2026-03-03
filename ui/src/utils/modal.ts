@@ -1,6 +1,6 @@
-import { i18n } from "@/locales";
 import { VButton, VModal } from "@halo-dev/components";
 import { type Component, createApp, h } from "vue";
+import { i18n } from "@/locales";
 
 interface ModalOptions {
   uniqueId?: string;

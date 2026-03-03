@@ -1,11 +1,11 @@
-import { i18n } from "@/locales";
-import { usePluginModuleStore } from "@/stores/plugin";
-import { loadStyle } from "@/utils/load-style";
 import { Toast } from "@halo-dev/components";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/ui-shared";
 import { useScriptTag } from "@vueuse/core";
 import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
+import { i18n } from "@/locales";
+import { usePluginModuleStore } from "@/stores/plugin";
+import { loadStyle } from "@/utils/load-style";
 
 export type Platform = "console" | "uc";
 

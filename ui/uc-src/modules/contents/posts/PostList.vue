@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { postLabels } from "@/constants/labels";
 import { ucApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -17,6 +16,7 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { computed, watch } from "vue";
+import { postLabels } from "@/constants/labels";
 import PostListItem from "./components/PostListItem.vue";
 
 const page = useRouteQuery<number>("page", 1, {

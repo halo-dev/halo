@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import DropdownItem from "@/components/base/DropdownItem.vue";
-import BubbleButton from "@/components/bubble/BubbleButton.vue";
-import { i18n } from "@/locales";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { isActive } from "@tiptap/core";
 import { computed } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
 import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
+import { i18n } from "@/locales";
+import type { BubbleItemComponentProps } from "@/types";
 import { ExtensionFigure, ExtensionImage } from "..";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {

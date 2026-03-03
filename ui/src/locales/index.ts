@@ -1,7 +1,7 @@
-import { getCookie } from "@/utils/cookie";
 import { utils } from "@halo-dev/ui-shared";
 import type { App } from "vue";
 import { createI18n } from "vue-i18n";
+import { getCookie } from "@/utils/cookie";
 
 interface LocaleConfig {
   code: string[];

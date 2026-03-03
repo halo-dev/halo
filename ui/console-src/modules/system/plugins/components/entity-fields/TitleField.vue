@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { pluginLabels } from "@/constants/labels";
 import { type Plugin } from "@halo-dev/api-client";
 import { VEntityField, VTag } from "@halo-dev/components";
+import { pluginLabels } from "@/constants/labels";
 
 withDefaults(
   defineProps<{

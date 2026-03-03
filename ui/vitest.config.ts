@@ -1,6 +1,6 @@
-import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import path from "node:path";
 import { fileURLToPath, URL } from "node:url";
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import type { Plugin } from "vite";
 import { configDefaults, defineConfig } from "vitest/config";
 import { sharedPlugins } from "./src/vite/config-builder";

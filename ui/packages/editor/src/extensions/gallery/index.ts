@@ -1,3 +1,8 @@
+import type { Attachment } from "@halo-dev/api-client";
+import type { AxiosRequestConfig } from "axios";
+import { markRaw } from "vue";
+import MdiImagePlus from "~icons/mdi/image-plus";
+import MingcutePhotoAlbumLine from "~icons/mingcute/photo-album-line";
 import { BlockActionSeparator } from "@/components";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
@@ -13,17 +18,12 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
-import type { Attachment } from "@halo-dev/api-client";
-import type { AxiosRequestConfig } from "axios";
-import { markRaw } from "vue";
-import MdiImagePlus from "~icons/mdi/image-plus";
-import MingcutePhotoAlbumLine from "~icons/mingcute/photo-album-line";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGap from "./BubbleItemGap.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
-import GalleryView from "./GalleryView.vue";
 import { ExtensionGalleryBubble } from "./gallery-bubble";
+import GalleryView from "./GalleryView.vue";
 
 declare module "@/tiptap" {
   interface Commands<ReturnType> {

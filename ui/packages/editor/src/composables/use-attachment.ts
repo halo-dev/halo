@@ -1,8 +1,8 @@
-import { i18n } from "@/locales";
 import { ucApiClient } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";
 import { stores, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref, type Ref } from "vue";
+import { i18n } from "@/locales";
 
 export function useExternalAssetsTransfer(
   src: Ref<string | undefined>,

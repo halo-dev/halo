@@ -1,10 +1,4 @@
 <script lang="ts" setup>
-import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
-import { useAutoSaveContent } from "@/composables/use-auto-save-content";
-import { useContentCache } from "@/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
-import { contentAnnotations } from "@/constants/annotations";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import useSlugify from "@console/composables/use-slugify";
 import type { Content, Post, Snapshot } from "@halo-dev/api-client";
@@ -41,6 +35,12 @@ import {
 } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentCache } from "@/composables/use-content-cache";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { contentAnnotations } from "@/constants/annotations";
 import PostCreationModal from "./components/PostCreationModal.vue";
 import PostSettingEditModal from "./components/PostSettingEditModal.vue";
 

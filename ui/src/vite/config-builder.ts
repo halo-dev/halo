@@ -1,8 +1,8 @@
-import Vue from "@vitejs/plugin-vue";
-import VueJsx from "@vitejs/plugin-vue-jsx";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import Vue from "@vitejs/plugin-vue";
+import VueJsx from "@vitejs/plugin-vue-jsx";
 import GzipPlugin from "rollup-plugin-gzip";
 import Icons from "unplugin-icons/vite";
 import { defineConfig, type Plugin } from "vite";

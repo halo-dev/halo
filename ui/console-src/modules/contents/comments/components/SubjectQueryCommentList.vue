@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import {
   IconRefreshLine,
   VButton,
@@ -10,6 +9,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { computed, ref, toRefs, watch } from "vue";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import useCommentsFetch from "../composables/use-comments-fetch";
 import CommentListItem from "./CommentListItem.vue";
 

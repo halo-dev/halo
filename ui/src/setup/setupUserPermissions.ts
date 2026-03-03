@@ -1,7 +1,7 @@
-import { useRoleStore } from "@/stores/role";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import type { App, DirectiveBinding } from "vue";
+import { useRoleStore } from "@/stores/role";
 
 export async function setupUserPermissions(app: App) {
   const { data: currentPermissions } =

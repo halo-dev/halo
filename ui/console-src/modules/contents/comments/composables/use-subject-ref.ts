@@ -1,4 +1,3 @@
-import { usePluginModuleStore } from "@/stores/plugin";
 import type {
   Extension,
   ListedComment,
@@ -11,6 +10,7 @@ import type {
 } from "@halo-dev/ui-shared";
 import { computed, onMounted, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 export function useSubjectRef(comment: ListedComment) {
   const { t } = useI18n();

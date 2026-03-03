@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { attachmentPolicyLabels } from "@/constants/labels";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import {
   IconAddCircle,
@@ -9,6 +8,7 @@ import {
   VModal,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import {
   useFetchAttachmentPolicy,

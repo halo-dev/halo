@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { ListedComment, ListedReply } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import CommentEditor from "./CommentEditor.vue";
 
 const { t } = useI18n();

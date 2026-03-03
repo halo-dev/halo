@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import type { Backup } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -18,6 +17,7 @@ import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, markRaw, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();

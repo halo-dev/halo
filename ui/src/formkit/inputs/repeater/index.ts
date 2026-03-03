@@ -1,6 +1,4 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
-
-import { i18n } from "@/locales";
 import {
   $if,
   fieldset,
@@ -20,6 +18,7 @@ import {
   IconArrowUpCircleLine,
   IconCloseCircle,
 } from "@halo-dev/components";
+import { i18n } from "@/locales";
 import AddButton from "./AddButton.vue";
 import { repeats } from "./features/repeats";
 import {

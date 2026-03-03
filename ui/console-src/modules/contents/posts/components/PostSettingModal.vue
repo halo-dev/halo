@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { postLabels } from "@/constants/labels";
 import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { submitForm, type FormKitNode } from "@formkit/core";
@@ -17,6 +15,8 @@ import { FormType, utils } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { postLabels } from "@/constants/labels";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
 
 const props = withDefaults(

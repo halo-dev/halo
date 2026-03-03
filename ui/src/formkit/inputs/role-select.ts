@@ -1,5 +1,3 @@
-import { rbacAnnotations } from "@/constants/annotations";
-import { roleLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
@@ -8,6 +6,8 @@ import {
   type Role,
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
+import { roleLabels } from "@/constants/labels";
 import { select } from "./select";
 
 function optionsHandler(node: FormKitNode) {

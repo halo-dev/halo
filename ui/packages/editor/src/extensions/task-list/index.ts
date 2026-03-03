@@ -1,5 +1,3 @@
-import type { Editor, Range } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import {
   TaskItem,
   TaskList as TiptapTaskList,
@@ -7,6 +5,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListCheck3Line from "~icons/mingcute/list-check-3-line";
+import type { Editor, Range } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionTaskListOptions = Partial<TaskListOptions> &
   ExtensionOptions;

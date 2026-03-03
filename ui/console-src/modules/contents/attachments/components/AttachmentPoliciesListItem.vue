@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { SYSTEM_PROTECTION } from "@/constants/finalizers";
-import { attachmentPolicyLabels } from "@/constants/labels";
 import {
   consoleApiClient,
   coreApiClient,
@@ -20,6 +18,8 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { SYSTEM_PROTECTION } from "@/constants/finalizers";
+import { attachmentPolicyLabels } from "@/constants/labels";
 import { useFetchAttachmentPolicyTemplate } from "../composables/use-attachment-policy";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 

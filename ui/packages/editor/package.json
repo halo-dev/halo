@@ -6,14 +6,22 @@
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
+  "license": "GPL-3.0",
+  "author": "@halo-dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
     "directory": "ui/packages/editor"
   },
-  "license": "GPL-3.0",
-  "author": "@halo-dev",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "main": "./dist/index.iife.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,14 +29,6 @@
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/index.iife.js",
-  "jsdelivr": "./dist/index.iife.js",
-  "unpkg": "./dist/index.iife.js",
-  "module": "./dist/index.es.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch --mode development",

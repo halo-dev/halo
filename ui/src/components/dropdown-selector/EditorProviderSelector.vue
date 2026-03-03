@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import {
   IconExchange,
   VAvatar,
@@ -7,6 +6,7 @@ import {
   VDropdownItem,
 } from "@halo-dev/components";
 import type { EditorProvider } from "@halo-dev/ui-shared";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 
 withDefaults(
   defineProps<{

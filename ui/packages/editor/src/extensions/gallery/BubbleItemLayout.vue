@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { VDropdown } from "@halo-dev/components";
+import { computed, ref } from "vue";
+import MingcuteLayout10Line from "~icons/mingcute/layout-10-line";
+import MingcuteLayoutGridLine from "~icons/mingcute/layout-grid-line";
 import { BlockActionSeparator } from "@/components";
 import DropdownItem from "@/components/base/DropdownItem.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import { VDropdown } from "@halo-dev/components";
-import { computed, ref } from "vue";
-import MingcuteLayout10Line from "~icons/mingcute/layout-10-line";
-import MingcuteLayoutGridLine from "~icons/mingcute/layout-grid-line";
 import { ExtensionGallery } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();

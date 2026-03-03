@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { ToolbarItemComponentProps } from "@/types";
 import { vTooltip } from "@halo-dev/components";
 import MingcuteDownSmallFill from "~icons/mingcute/down-small-fill";
+import type { ToolbarItemComponentProps } from "@/types";
 
 defineProps<ToolbarItemComponentProps>();
 </script>

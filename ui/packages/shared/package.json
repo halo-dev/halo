@@ -1,6 +1,5 @@
 {
   "name": "@halo-dev/ui-shared",
-  "type": "module",
   "version": "2.22.1",
   "description": "",
   "keywords": [],
@@ -8,26 +7,27 @@
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halo-dev/halo.git",
-    "directory": "ui/packages/shared"
-  },
   "license": "MIT",
   "author": {
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "ui/packages/shared"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -39,12 +39,12 @@
     "@halo-dev/richtext-editor": "workspace:*",
     "mitt": "^3.0.1"
   },
-  "peerDependencies": {
-    "vue": "^3.5.x",
-    "vue-router": "^5.0.x"
-  },
   "devDependencies": {
     "dayjs": "^1.11.19",
     "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.x",
+    "vue-router": "^5.0.x"
   }
 }

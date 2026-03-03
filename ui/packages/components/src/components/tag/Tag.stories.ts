@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { VTag } from ".";
 
 const meta: Meta<typeof VTag> = {

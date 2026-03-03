@@ -1,12 +1,12 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import TiptapSubscript, {
   type SubscriptExtensionOptions,
 } from "@tiptap/extension-subscript";
 import { markRaw } from "vue";
 import PhTextSubscript from "~icons/ph/text-subscript";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionSubscriptOptions = Partial<SubscriptExtensionOptions> &
   ExtensionOptions;

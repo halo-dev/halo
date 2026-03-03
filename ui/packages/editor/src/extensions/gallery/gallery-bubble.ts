@@ -1,10 +1,10 @@
-import { i18n } from "@/locales";
-import { Extension } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import type { Attachment } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImagePlus from "~icons/mdi/image-plus";
+import { i18n } from "@/locales";
+import { Extension } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import { GALLERY_BUBBLE_MENU_KEY } from ".";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 

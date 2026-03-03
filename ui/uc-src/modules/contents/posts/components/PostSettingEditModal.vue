@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import type { Post } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { usePostUpdateMutate } from "@uc/modules/contents/posts/composables/use-post-update-mutate";
 import { nextTick, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import type { PostFormState } from "../types";
 import PostSettingForm from "./PostSettingForm.vue";
 

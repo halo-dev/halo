@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { BubbleItemComponentProps } from "@/types";
 import { computed } from "vue";
+import type { BubbleItemComponentProps } from "@/types";
 
 const props = defineProps<BubbleItemComponentProps>();
 

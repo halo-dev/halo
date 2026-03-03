@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { isImage } from "@/utils/image";
 import AttachmentError from "@console/modules/contents/attachments/components/AttachmentError.vue";
 import AttachmentLoading from "@console/modules/contents/attachments/components/AttachmentLoading.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import { IconCheckboxFill } from "@halo-dev/components";
 import { UseImage } from "@vueuse/components";
+import { isImage } from "@/utils/image";
 import LazyVideo from "../video/LazyVideo.vue";
 
 withDefaults(

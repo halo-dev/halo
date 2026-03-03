@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { postLabels } from "@/constants/labels";
 import type { ListedPost } from "@halo-dev/api-client";
 import { IconTimerLine, VEntityField } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
+import { postLabels } from "@/constants/labels";
 
 withDefaults(
   defineProps<{

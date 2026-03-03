@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
-import { usePluginModuleStore } from "@/stores/plugin";
 import {
   VButton,
   VDropdown,
@@ -19,6 +17,8 @@ import {
   shallowRef,
 } from "vue";
 import { useI18n } from "vue-i18n";
+import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
 import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import ProfileEditingModal from "./components/ProfileEditingModal.vue";
 

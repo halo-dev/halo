@@ -3,8 +3,8 @@ import { VLoading } from "@halo-dev/components";
 import { vScroll } from "@vueuse/components";
 import { useEventListener, type UseScrollReturn } from "@vueuse/core";
 import { computed, ref, watch } from "vue";
-import SelectOptionItem from "./SelectOptionItem.vue";
 import { isFalse } from "./isFalse";
+import SelectOptionItem from "./SelectOptionItem.vue";
 
 const props = defineProps<{
   options: Array<Record<string, unknown> & { label: string; value: string }>;

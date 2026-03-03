@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { VDropdown, VDropdownDivider, VDropdownItem } from ".";
 import { VButton } from "../button";
 

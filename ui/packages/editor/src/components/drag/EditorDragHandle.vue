@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import { offset } from "@floating-ui/dom";
+import { VDropdown, vTooltip } from "@halo-dev/components";
+import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
+import { sortBy } from "es-toolkit";
+import { computed, ref, shallowRef, type PropType } from "vue";
+import MaterialSymbolsAddRounded from "~icons/material-symbols/add-rounded";
+import MaterialSymbolsDragIndicator from "~icons/material-symbols/drag-indicator";
 import { i18n } from "@/locales";
 import {
   Editor,
@@ -13,15 +20,8 @@ import type {
   ExtensionOptions,
 } from "@/types";
 import { isBlockEmpty } from "@/utils";
-import { offset } from "@floating-ui/dom";
-import { VDropdown, vTooltip } from "@halo-dev/components";
-import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
-import { sortBy } from "es-toolkit";
-import { computed, ref, shallowRef, type PropType } from "vue";
-import MaterialSymbolsAddRounded from "~icons/material-symbols/add-rounded";
-import MaterialSymbolsDragIndicator from "~icons/material-symbols/drag-indicator";
-import EditorDragMenu from "./EditorDragMenu.vue";
 import defaultDragItems from "./default-drag";
+import EditorDragMenu from "./EditorDragMenu.vue";
 
 const { editor } = defineProps({
   editor: {

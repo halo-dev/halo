@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
-import { usePluginModuleStore } from "@/stores/plugin";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -28,6 +26,8 @@ import {
 } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import UserAvatar from "@/components/user-avatar/UserAvatar.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";

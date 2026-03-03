@@ -1,4 +1,3 @@
-import { postLabels } from "@/constants/labels";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
@@ -7,6 +6,7 @@ import {
   type ListedPost,
   type PostV1alpha1ConsoleApiListPostsRequest,
 } from "@halo-dev/api-client";
+import { postLabels } from "@/constants/labels";
 import { select } from "./select";
 
 async function search({ page, size, keyword }) {

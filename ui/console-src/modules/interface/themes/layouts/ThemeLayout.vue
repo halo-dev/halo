@@ -34,8 +34,8 @@ import {
 } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
-import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
+import ThemeListModal from "../components/ThemeListModal.vue";
 import { useThemeLifeCycle } from "../composables/use-theme";
 
 const { t } = useI18n();

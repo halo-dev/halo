@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { setFocus } from "@/formkit/utils/focus";
 import {
   consoleApiClient,
   coreApiClient,
@@ -16,6 +15,7 @@ import {
 import { useQuery } from "@tanstack/vue-query";
 import { refDebounced } from "@vueuse/shared";
 import { ref, toRefs } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{

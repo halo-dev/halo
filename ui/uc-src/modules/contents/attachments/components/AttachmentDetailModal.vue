@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import AttachmentImagePreview from "@/components/attachment/AttachmentImagePreview.vue";
-import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
-import { isImage } from "@/utils/image";
 import { type Attachment } from "@halo-dev/api-client";
 import {
   VButton,
@@ -13,6 +10,9 @@ import {
 import { utils } from "@halo-dev/ui-shared";
 import prettyBytes from "pretty-bytes";
 import { useTemplateRef } from "vue";
+import AttachmentImagePreview from "@/components/attachment/AttachmentImagePreview.vue";
+import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
+import { isImage } from "@/utils/image";
 
 withDefaults(
   defineProps<{

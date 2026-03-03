@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import { singlePageLabels } from "@/constants/labels";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -25,6 +23,8 @@ import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { singlePageLabels } from "@/constants/labels";
 import SinglePageListItem from "./components/SinglePageListItem.vue";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 

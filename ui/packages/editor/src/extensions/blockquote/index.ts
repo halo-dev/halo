@@ -1,11 +1,11 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import type { BlockquoteOptions } from "@tiptap/extension-blockquote";
 import TiptapBlockquote from "@tiptap/extension-blockquote";
 import { markRaw } from "vue";
 import MingcuteBlockquoteLine from "~icons/mingcute/blockquote-line";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionBlockquoteOptions = Partial<BlockquoteOptions> &
   ExtensionOptions;

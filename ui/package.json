@@ -1,8 +1,8 @@
 {
-  "type": "module",
   "workspaces": [
     "packages/*"
   ],
+  "type": "module",
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
     "dev": "run-p dev:console dev:uc",
@@ -18,29 +18,11 @@
     "test:unit:ui": "vitest --watch --ui",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
-    "prettier": "prettier . --write --ignore-path ../.gitignore --ignore-path ./.prettierignore",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck:packages": "pnpm --parallel -r run typecheck",
     "test:unit:packages": "pnpm --parallel -r run test:unit",
     "publish:packages": "pnpm -r publish --access public --no-git-checks"
-  },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown",
-    "*.{ts,mts,tsx,vue}": [
-      "eslint --fix --max-warnings=0 --no-warn-ignored"
-    ]
-  },
-  "browserslist": [
-    "defaults"
-  ],
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-organize-imports",
-      "prettier-plugin-tailwindcss"
-    ],
-    "trailingComma": "es5"
-  },
-  "resolutions": {
-    "axios": "^1.12.2"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.6.0",
@@ -97,6 +79,7 @@
     "core-js": "^3.43.0",
     "cropperjs": "^1.5.13",
     "crypto-js": "^4.2.0",
+    "dompurify": "^3.2.2",
     "emoji-mart": "^5.6.0",
     "es-toolkit": "^1.41.0",
     "fuse.js": "^7.1.0",
@@ -110,7 +93,6 @@
     "pinia": "^3.0.4",
     "pretty-bytes": "^6.0.0",
     "qrcode": "^1.5.3",
-    "dompurify": "^3.2.2",
     "sanitize-html": "^2.17.0",
     "short-unique-id": "^5.0.2",
     "transliteration": "^2.3.5",
@@ -132,11 +114,11 @@
     "@tailwindcss/forms": "^0.5.10",
     "@tsconfig/node22": "^22.0.5",
     "@types/crypto-js": "^4.2.2",
+    "@types/dompurify": "^3.0.5",
     "@types/jsdom": "^27.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.19.1",
     "@types/nprogress": "^0.2.3",
-    "@types/dompurify": "^3.0.5",
     "@types/object-hash": "^3.0.6",
     "@types/sanitize-html": "^2.16.0",
     "@types/ua-parser-js": "^0.7.39",
@@ -159,11 +141,9 @@
     "jsdom": "^27.2.0",
     "lint-staged": "^16.2.7",
     "npm-run-all": "^4.1.5",
+    "oxfmt": "^0.36.0",
     "postcss": "^8.5.6",
     "postcss-viewport-height-correction": "^1.1.1",
-    "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-tailwindcss": "^0.7.1",
     "rollup-plugin-gzip": "^4.1.1",
     "sass-embedded": "^1.93.3",
     "tailwindcss": "^3.4.17",
@@ -179,6 +159,18 @@
     "vitest": "^4.0.13",
     "vue-tsc": "^3.2.4"
   },
+  "resolutions": {
+    "axios": "^1.12.2"
+  },
+  "lint-staged": {
+    "**/*": "oxfmt --no-error-on-unmatched-pattern",
+    "*.{ts,mts,tsx,vue}": [
+      "eslint --fix --max-warnings=0 --no-warn-ignored"
+    ]
+  },
+  "browserslist": [
+    "defaults"
+  ],
   "packageManager": "pnpm@10.12.4",
   "pnpm": {
     "overrides": {

@@ -1,3 +1,4 @@
+import { ListItem } from "@tiptap/extension-list";
 import {
   Editor,
   Extension,
@@ -9,7 +10,6 @@ import {
 import { TextSelection, Transaction } from "@/tiptap/pm";
 import type { ExtensionOptions } from "@/types";
 import { isListActive } from "@/utils/is-list-active";
-import { ListItem } from "@tiptap/extension-list";
 import { ExtensionColumns } from "../columns";
 import { ExtensionTable } from "../table";
 

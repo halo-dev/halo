@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { VPagination } from ".";
 
 const meta: Meta<typeof VPagination> = {

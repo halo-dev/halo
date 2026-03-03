@@ -1,3 +1,6 @@
+import { VTooltipComponent } from "@halo-dev/components";
+import { h, render } from "vue";
+import MdiPlus from "~icons/mdi/plus";
 import { i18n } from "@/locales";
 import {
   addRowAfter,
@@ -7,9 +10,6 @@ import {
   PluginKey,
 } from "@/tiptap/pm";
 import { mergeAttributes, Node } from "@/tiptap/vue-3";
-import { VTooltipComponent } from "@halo-dev/components";
-import { h, render } from "vue";
-import MdiPlus from "~icons/mdi/plus";
 import {
   getCellsInColumn,
   isRowSelected,

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
 import type { ListedUser, User } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -25,6 +24,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
 import UserCreationModal from "./components/UserCreationModal.vue";
 import UserListItem from "./components/UserListItem.vue";
 import { useFetchRoles } from "./composables/use-role";

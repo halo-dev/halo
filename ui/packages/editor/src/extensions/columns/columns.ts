@@ -1,3 +1,8 @@
+import { markRaw } from "vue";
+import MingcuteColumns2Line from "~icons/mingcute/columns-2-line";
+import RiDeleteColumn from "~icons/ri/delete-column";
+import RiInsertColumnLeft from "~icons/ri/insert-column-left";
+import RiInsertColumnRight from "~icons/ri/insert-column-right";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
@@ -19,11 +24,6 @@ import {
 } from "@/tiptap/pm";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
-import { markRaw } from "vue";
-import MingcuteColumns2Line from "~icons/mingcute/columns-2-line";
-import RiDeleteColumn from "~icons/ri/delete-column";
-import RiInsertColumnLeft from "~icons/ri/insert-column-left";
-import RiInsertColumnRight from "~icons/ri/insert-column-right";
 import { ExtensionColumn } from "./column";
 
 declare module "@/tiptap" {

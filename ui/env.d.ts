@@ -4,9 +4,7 @@
 export {};
 
 import type { CoreMenuGroupId } from "@halo-dev/ui-shared";
-
 import "vue-router";
-
 import "axios";
 
 declare module "*.vue" {

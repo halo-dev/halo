@@ -5,19 +5,19 @@
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
+  "license": "GPL-3.0",
+  "author": "@halo-dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
     "directory": "ui/packages/ui-plugin-bundler-kit"
   },
-  "license": "GPL-3.0",
-  "author": "@halo-dev",
   "type": "module",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
   },
-  "types": "./dist/index.d.mts",
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",

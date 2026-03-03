@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
-import { IconArrowLeft, IconArrowRight } from "@/icons/icons";
 import { ref } from "vue";
+import { IconArrowLeft, IconArrowRight } from "@/icons/icons";
 import { VModal } from ".";
 import { VButton } from "../button";
 import { VSpace } from "../space";
