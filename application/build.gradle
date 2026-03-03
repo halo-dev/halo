@@ -157,8 +157,8 @@ tasks.register('downloadPluginPresets', Download) {
 
             // Currently, plugin-app-store is not open source, so we need to download it from the official website.
             // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-            // https://www.halo.run/store/apps/app-VYJbF
-            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-sxwnhxer/assets/app-release-sxwnhxer-pulnw51x'    : 'appstore.jar',
+            // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
+            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err'    : 'appstore.jar',
     ]
     src presetPluginUrls.keySet()
     dest layout.buildDirectory.dir('resources/main/presets/plugins')
