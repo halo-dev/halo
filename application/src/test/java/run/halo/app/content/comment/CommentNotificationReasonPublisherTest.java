@@ -34,6 +34,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.ExternalLinkProcessor;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.ReasonPayload;
 import run.halo.app.notification.UserIdentity;
@@ -134,8 +135,133 @@ class CommentNotificationReasonPublisherTest {
         assertThat(reasonPublisher.isPageComment(comment)).isTrue();
     }
 
+    @Nested
+    @ExtendWith(MockitoExtension.class)
+    class CommentContentConverterTest {
+        @Mock
+        ExternalUrlSupplier externalUrlSupplier;
+
+        @Mock
+        ExternalLinkProcessor externalLinkProcessor;
+
+        @InjectMocks
+        CommentNotificationReasonPublisher.CommentContentConverter commentContentConverter;
+
+        @Test
+        void shouldConvertRelativeImageLinksToAbsolute() {
+            var content =
+                "<p>Test content <img src=\"/upload/image.jpg\" alt=\"Test image\" /></p>";
+            
+            when(externalLinkProcessor.processLink("/upload/image.jpg"))
+                .thenReturn("https://example.com/upload/image.jpg");
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("https://example.com/upload/image.jpg");
+            assertThat(result).contains("Test content");
+            verify(externalLinkProcessor).processLink("/upload/image.jpg");
+        }
+
+        @Test
+        void shouldHandleRelativeImageLinksWithoutLeadingSlash() {
+            var content = "<p><img src=\"upload/image.jpg\" /></p>";
+            
+            when(externalLinkProcessor.processLink("upload/image.jpg"))
+                .thenReturn("https://example.com/upload/image.jpg");
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("https://example.com/upload/image.jpg");
+            verify(externalLinkProcessor).processLink("upload/image.jpg");
+        }
+
+        @Test
+        void shouldNotConvertAbsoluteImageLinks() {
+            var content = "<p><img src=\"https://cdn.example.com/image.jpg\" /></p>";
+            
+            when(externalLinkProcessor.processLink("https://cdn.example.com/image.jpg"))
+                .thenReturn("https://cdn.example.com/image.jpg");
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("https://cdn.example.com/image.jpg");
+            verify(externalLinkProcessor).processLink("https://cdn.example.com/image.jpg");
+        }
+
+        @Test
+        void shouldHandleMultipleImages() {
+            var content = "<p>"
+                + "<img src=\"/img1.jpg\" />"
+                + "<img src=\"/img2.jpg\" />"
+                + "<img src=\"https://example.com/img3.jpg\" />"
+                + "</p>";
+            
+            when(externalLinkProcessor.processLink("/img1.jpg"))
+                .thenReturn("https://example.com/img1.jpg");
+            when(externalLinkProcessor.processLink("/img2.jpg"))
+                .thenReturn("https://example.com/img2.jpg");
+            when(externalLinkProcessor.processLink("https://example.com/img3.jpg"))
+                .thenReturn("https://example.com/img3.jpg");
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("https://example.com/img1.jpg");
+            assertThat(result).contains("https://example.com/img2.jpg");
+            assertThat(result).contains("https://example.com/img3.jpg");
+            verify(externalLinkProcessor).processLink("/img1.jpg");
+            verify(externalLinkProcessor).processLink("/img2.jpg");
+            verify(externalLinkProcessor).processLink("https://example.com/img3.jpg");
+        }
+
+        @Test
+        void shouldHandleContentWithoutImages() {
+            var content = "<p>This is a comment content without images</p>";
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("This is a comment content without images");
+            assertThat(result).doesNotContain("img");
+        }
+
+        @Test
+        void shouldHandleEmptyContent() {
+            var content = "";
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldHandleComplexHtmlContent() {
+            var content = """
+                <div>
+                    <h1>Title</h1>
+                    <p>Paragraph content</p>
+                    <img src="/images/photo1.png" alt="Photo 1" />
+                    <p>More text</p>
+                    <img src="assets/photo2.jpg" />
+                </div>
+                """;
+            
+            when(externalLinkProcessor.processLink("/images/photo1.png"))
+                .thenReturn("https://example.com/images/photo1.png");
+            when(externalLinkProcessor.processLink("assets/photo2.jpg"))
+                .thenReturn("https://example.com/assets/photo2.jpg");
+
+            var result = commentContentConverter.convertRelativeLinks(content);
+
+            assertThat(result).contains("https://example.com/images/photo1.png");
+            assertThat(result).contains("https://example.com/assets/photo2.jpg");
+            assertThat(result).contains("Title");
+            assertThat(result).contains("Paragraph content");
+            verify(externalLinkProcessor).processLink("/images/photo1.png");
+            verify(externalLinkProcessor).processLink("assets/photo2.jpg");
+        }
+    }
 
     @Nested
+    @ExtendWith(MockitoExtension.class)
     class NewCommentOnPostReasonPublisherTest {
         @Mock
         ExtensionClient client;
@@ -148,6 +274,9 @@ class CommentNotificationReasonPublisherTest {
 
         @Mock
         ExternalLinkProcessor externalLinkProcessor;
+
+        @Mock
+        CommentNotificationReasonPublisher.CommentContentConverter commentContentConverter;
 
         @InjectMocks
         CommentNotificationReasonPublisher.NewCommentOnPostReasonPublisher
@@ -170,6 +299,9 @@ class CommentNotificationReasonPublisherTest {
 
             when(client.fetch(eq(Post.class), eq(metadata.getName())))
                 .thenReturn(Optional.of(post));
+
+            when(commentContentConverter.convertRelativeLinks(eq("fake-comment-content")))
+                .thenReturn("fake-comment-content");
 
             when(emitter.emit(eq("new-comment-on-post"), any()))
                 .thenReturn(Mono.empty());
@@ -242,6 +374,7 @@ class CommentNotificationReasonPublisherTest {
     }
 
     @Nested
+    @ExtendWith(MockitoExtension.class)
     class NewCommentOnPageReasonPublisherTest {
         @Mock
         ExtensionClient client;
@@ -251,6 +384,9 @@ class CommentNotificationReasonPublisherTest {
 
         @Mock
         ExternalLinkProcessor externalLinkProcessor;
+
+        @Mock
+        CommentNotificationReasonPublisher.CommentContentConverter commentContentConverter;
 
         @InjectMocks
         CommentNotificationReasonPublisher.NewCommentOnPageReasonPublisher
@@ -275,6 +411,9 @@ class CommentNotificationReasonPublisherTest {
 
             when(client.fetch(eq(SinglePage.class), eq(metadata.getName())))
                 .thenReturn(Optional.of(page));
+
+            when(commentContentConverter.convertRelativeLinks(eq("fake-comment-content")))
+                .thenReturn("fake-comment-content");
 
             when(emitter.emit(eq("new-comment-on-single-page"), any()))
                 .thenReturn(Mono.empty());
@@ -347,6 +486,7 @@ class CommentNotificationReasonPublisherTest {
     }
 
     @Nested
+    @ExtendWith(MockitoExtension.class)
     class NewReplyReasonPublisherTest {
 
         @Mock
@@ -357,6 +497,9 @@ class CommentNotificationReasonPublisherTest {
 
         @Mock
         ExtensionGetter extensionGetter;
+
+        @Mock
+        CommentNotificationReasonPublisher.CommentContentConverter commentContentConverter;
 
         @InjectMocks
         CommentNotificationReasonPublisher.NewReplyReasonPublisher newReplyReasonPublisher;
@@ -380,6 +523,13 @@ class CommentNotificationReasonPublisherTest {
 
             doReturn(false).when(spyNewReplyReasonPublisher)
                 .doNotEmitReason(any(), any(), any());
+            
+            // Mock commentContentConverter for all content conversions
+            when(commentContentConverter.convertRelativeLinks(eq("fake-comment-content")))
+                .thenReturn("fake-comment-content");
+            when(commentContentConverter.convertRelativeLinks(eq("fake-reply-content")))
+                .thenReturn("fake-reply-content");
+            
             when(notificationReasonEmitter.emit(any(), any()))
                 .thenReturn(Mono.empty());
 
