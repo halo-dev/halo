@@ -2,8 +2,11 @@ import { defineConfig, type UserConfig } from "tsdown";
 
 const sharedConfig: UserConfig = {
   entry: ["./entry/index.ts"],
-  external: ["axios"],
-  noExternal: ["qs"],
+  deps: {
+    neverBundle: ["axios"],
+    alwaysBundle: ["qs"],
+    onlyAllowBundle: false,
+  },
   outputOptions: {
     globals: {
       axios: "axios",
@@ -16,7 +19,6 @@ const sharedConfig: UserConfig = {
   dts: {
     tsgo: true,
   },
-  inlineOnly: false,
 };
 
 export default defineConfig([

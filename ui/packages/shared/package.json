@@ -46,5 +46,10 @@
   "peerDependencies": {
     "vue": "^3.5.x",
     "vue-router": "^5.0.x"
+  },
+  "inlinedDependencies": {
+    "mitt": "3.0.1",
+    "dayjs": "1.11.19",
+    "uuid": "13.0.0"
   }
 }
