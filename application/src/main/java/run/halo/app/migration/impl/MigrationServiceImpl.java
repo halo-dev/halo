@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,10 +31,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -105,7 +101,7 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         .withLocale(Locale.getDefault())
         .withZone(ZoneId.systemDefault());
 
-    private final Scheduler scheduler = Schedulers.boundedElastic();
+    private final Scheduler scheduler = Schedulers.newBoundedElastic(10, 1_00, "migration-worker");
 
     DateTimeFormatter getDateTimeFormatter() {
         return dateTimeFormatter;
@@ -289,53 +285,41 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
 
     private Mono<Void> packageBackup(Path baseDir, Backup backup) {
         return Mono.fromCallable(
-                () -> {
-                    var backupsFolder = getBackupsRoot();
-                    Files.createDirectories(backupsFolder);
-                    return backupsFolder;
-                })
-            .<Void>handle((backupsFolder, sink) -> {
+            () -> {
+                var backupsFolder = getBackupsRoot();
+                Files.createDirectories(backupsFolder);
                 var backupName = backup.getMetadata().getName();
                 var startTimestamp = backup.getStatus().getStartTimestamp();
                 var timePart = this.dateTimeFormatter.format(startTimestamp);
                 var backupFile = backupsFolder.resolve(timePart + '-' + backupName + ".zip");
-                try {
-                    FileUtils.zip(baseDir, backupFile);
-                    backup.getStatus().setFilename(backupFile.getFileName().toString());
-                    backup.getStatus().setSize(Files.size(backupFile));
-                    sink.complete();
-                } catch (IOException e) {
-                    sink.error(e);
-                }
-            })
-            .subscribeOn(scheduler);
+                FileUtils.zip(baseDir, backupFile);
+                backup.getStatus().setFilename(backupFile.getFileName().toString());
+                backup.getStatus().setSize(Files.size(backupFile));
+                return backupsFolder;
+            }
+        ).subscribeOn(scheduler).then();
     }
 
     private Mono<Void> backupWorkDir(Path baseDir) {
-        return Mono.fromCallable(() -> Files.createDirectory(baseDir.resolve("workdir")))
-            .<Void>handle((workdirPath, sink) -> {
-                try {
-                    copyRecursively(haloProperties.getWorkDir(), workdirPath, excludes);
-                    sink.complete();
-                } catch (IOException e) {
-                    sink.error(e);
-                }
-            })
-            .subscribeOn(scheduler);
+        return Mono.fromCallable(() -> {
+            var workdirPath = Files.createDirectory(baseDir.resolve("workdir"));
+            copyRecursively(haloProperties.getWorkDir(), workdirPath, excludes);
+            return workdirPath;
+        }).subscribeOn(scheduler).then();
     }
 
     private Mono<Void> backupExtensions(Path baseDir) {
         var total = new AtomicInteger(0);
         var excludes = new AtomicInteger(0);
         return Mono.fromCallable(() -> Files.createFile(baseDir.resolve("extensions.data")))
-            .flatMap(extensionsPath -> Mono.using(
-                () -> objectMapper.writerFor(ExtensionStore.class)
-                    .writeValuesAsArray(extensionsPath.toFile()),
-                seqWriter -> fetchAllExtensionStores(BATCH_SIZE)
-                    .doOnNext(stores ->
-                        log.info("Fetched {} extension stores for backup.", stores.size())
+            .subscribeOn(scheduler)
+            .flatMap(extensionsPath -> Mono.usingWhen(
+                Mono.fromCallable(
+                        () -> objectMapper.writerFor(ExtensionStore.class)
+                            .writeValuesAsArray(extensionsPath.toFile())
                     )
-                    .flatMap(Flux::fromIterable)
+                    .subscribeOn(scheduler),
+                seqWriter -> fetchAllExtensionStores(BATCH_SIZE)
                     .filter(extensionStore -> {
                         if (isInBlocklist(extensionStore)) {
                             excludes.incrementAndGet();
@@ -343,9 +327,12 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                         }
                         return true;
                     })
-                    .flatMap(store -> Mono.fromCallable(() -> {
-                        total.incrementAndGet();
-                        seqWriter.write(store);
+                    .buffer(100)
+                    .publishOn(scheduler)
+                    .concatMap(stores -> Mono.fromCallable(() -> {
+                        total.addAndGet(stores.size());
+                        seqWriter.writeAll(stores);
+                        log.debug("Backed up {} extension stores so far...", total.get());
                         return null;
                     }))
                     .then()
@@ -355,37 +342,22 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                             {} record(s) excluded.""",
                         total.get(), excludes.get()
                     )),
-                FileUtils::closeQuietly)
-            )
-            .subscribeOn(scheduler);
+                seqWriter -> Mono.fromCallable(() -> {
+                    seqWriter.flush();
+                    FileUtils.closeQuietly(seqWriter);
+                    return null;
+                }).subscribeOn(scheduler)
+            ));
     }
 
-    Flux<List<ExtensionStore>> fetchAllExtensionStores(int batchSize) {
+    private Flux<ExtensionStore> fetchAllExtensionStores(int batchSize) {
         var txDefinition = new DefaultTransactionDefinition(TransactionDefinition.withDefaults());
         txDefinition.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         txDefinition.setReadOnly(true);
         var tx = TransactionalOperator.create(txManager, txDefinition);
-        var sort = Sort.by("name").ascending();
         return entityTemplate.select(ExtensionStore.class)
-            .matching(Query.empty()
-                .limit(batchSize)
-                .sort(sort)
-            )
+            .withFetchSize(batchSize)
             .all()
-            .collectList()
-            .expand(stores -> {
-                if (stores.isEmpty() || stores.size() < batchSize) {
-                    return Mono.empty();
-                }
-                var nameCursor = stores.getLast().getName();
-                var q = Query.query(Criteria.where("name").greaterThan(nameCursor))
-                    .limit(batchSize)
-                    .sort(sort);
-                return entityTemplate.select(ExtensionStore.class)
-                    .matching(q)
-                    .all()
-                    .collectList();
-            })
             .as(tx::transactional);
     }
 
