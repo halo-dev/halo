@@ -20,5 +20,7 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - run: ./gradlew pnpmInstall
+      - name: Regenerate api-client
+        run: cd ui && pnpm run api-client:gen
       - name: Publish to NPM
         run: cd ui && pnpm run publish:packages
