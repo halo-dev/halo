@@ -248,7 +248,7 @@ watch(
                   {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.common.buttons.recovery") }}
+                  {{ $t("core.common.buttons.restore") }}
                 </VButton>
               </VSpace>
             </div>
@@ -396,7 +396,7 @@ watch(
                 {{ $t("core.common.buttons.delete_permanently") }}
               </VDropdownItem>
               <VDropdownItem @click="handleRecovery(singlePage.page)">
-                {{ $t("core.common.buttons.recovery") }}
+                {{ $t("core.common.buttons.restore") }}
               </VDropdownItem>
             </template>
           </VEntity>
