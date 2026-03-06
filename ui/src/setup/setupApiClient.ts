@@ -70,9 +70,9 @@ export function setupApiClient() {
       // Catch error requests where the response is text/html,
       // which usually comes from a reverse proxy or WAF
 
-      const contentType = error.response?.headers["content-type"];
+      const contentType = error.response?.headers?.["content-type"];
 
-      if (contentType.toLowerCase().includes("text/html")) {
+      if (contentType?.toLowerCase().includes("text/html")) {
         createHTMLContentModal({
           uniqueId: objectHash(error.response?.data || ""),
           title: error.response?.status.toString(),
