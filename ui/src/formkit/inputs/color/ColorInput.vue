@@ -36,15 +36,16 @@ function formatPayload(color: Payload) {
 
 function formatColorByUnpredictableValue(value: string) {
   const color = new TinyColor(value);
+  debugger;
   switch (format.value) {
     case "rgb":
       return color.toRgbString();
     case "hex8":
-      return color.toHex8();
+      return color.toHex8String();
     case "hsl":
       return color.toHslString();
     default:
-      return color.toHex();
+      return color.toHexString();
   }
 }
 
