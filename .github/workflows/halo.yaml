@@ -36,6 +36,8 @@ jobs:
         with:
           filters: |
             api-client:
+              - 'application/src/**'
+              - 'api/src/**'
               - 'api-docs/openapi/**'
               - 'ui/packages/api-client/**'
 
@@ -49,13 +51,15 @@ jobs:
         uses: ./.github/actions/setup-env
       - name: Install UI dependencies
         run: ./gradlew pnpmInstall
+      - name: Regenerate OpenAPI docs
+        run: ./gradlew generateOpenApiDocs --no-configuration-cache
       - name: Regenerate api-client
         run: cd ui && pnpm run api-client:gen
-      - name: Verify api-client generated code is in sync
+      - name: Verify OpenAPI docs and api-client are in sync
         run: |
-          if ! git diff --exit-code -- ui/packages/api-client/src; then
-            echo "::error::api-client generated code is out of sync with api-docs/openapi. Run 'pnpm run api-client:gen' in the ui directory and commit the changes under ui/packages/api-client/src."
-            git diff --stat ui/packages/api-client/src
+          if ! git diff --exit-code -- api-docs/openapi ui/packages/api-client/src; then
+            echo "::error::OpenAPI docs or api-client generated code is out of sync with the current API. Run './gradlew generateOpenApiDocs --no-configuration-cache' and 'cd ui && pnpm run api-client:gen', then commit the changes under api-docs/openapi and ui/packages/api-client/src."
+            git diff --stat api-docs/openapi ui/packages/api-client/src
             exit 1
           fi
 
