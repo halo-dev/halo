@@ -30,7 +30,8 @@ public abstract class AbstractCommentService {
         // Allow <code> tag's class attribute, for syntax highlighting
         .addAttributes("code", "class")
         // Allow <a> tag's target attribute
-        .addAttributes("a", "target");
+        .addAttributes("a", "target")
+        .preserveRelativeLinks(true);
 
     protected Mono<User> fetchCurrentUser() {
         return ReactiveSecurityContextHolder.getContext()
