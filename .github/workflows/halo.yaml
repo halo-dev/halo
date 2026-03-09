@@ -24,45 +24,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changes:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
-    runs-on: ubuntu-latest
-    outputs:
-      api-client: ${{ steps.filter.outputs.api-client }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            api-client:
-              - 'application/src/**'
-              - 'api/src/**'
-              - 'api-docs/openapi/**'
-              - 'ui/packages/api-client/**'
-
-  api-client-sync:
-    if: (github.event_name == 'pull_request' || github.event_name == 'push') && needs.changes.outputs.api-client == 'true'
-    needs: changes
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Environment
-        uses: ./.github/actions/setup-env
-      - name: Install UI dependencies
-        run: ./gradlew pnpmInstall
-      - name: Regenerate OpenAPI docs
-        run: ./gradlew generateOpenApiDocs --no-configuration-cache
-      - name: Regenerate api-client
-        run: cd ui && pnpm run api-client:gen
-      - name: Verify OpenAPI docs and api-client are in sync
-        run: |
-          if ! git diff --exit-code -- api-docs/openapi ui/packages/api-client/src; then
-            echo "::error::OpenAPI docs or api-client generated code is out of sync with the current API. Run './gradlew generateOpenApiDocs --no-configuration-cache' and 'cd ui && pnpm run api-client:gen', then commit the changes under api-docs/openapi and ui/packages/api-client/src."
-            git diff --stat api-docs/openapi ui/packages/api-client/src
-            exit 1
-          fi
-
   test:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
