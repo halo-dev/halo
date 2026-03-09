@@ -36,7 +36,6 @@ function formatPayload(color: Payload) {
 
 function formatColorByUnpredictableValue(value: string) {
   const color = new TinyColor(value);
-  debugger;
   switch (format.value) {
     case "rgb":
       return color.toRgbString();
