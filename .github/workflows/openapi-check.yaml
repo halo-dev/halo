@@ -1,0 +1,46 @@
+name: OpenAPI Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-*
+    paths:
+      - 'application/src/**'
+      - 'api/src/**'
+      - 'api-docs/openapi/**'
+      - 'ui/packages/api-client/**'
+  push:
+    branches:
+      - main
+      - release-*
+    paths:
+      - 'application/src/**'
+      - 'api/src/**'
+      - 'api-docs/openapi/**'
+      - 'ui/packages/api-client/**'
+
+concurrency:
+  group: ${{github.workflow}} - ${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  openapi-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+      - name: Install UI dependencies
+        run: ./gradlew pnpmInstall
+      - name: Regenerate OpenAPI docs
+        run: ./gradlew generateOpenApiDocs --no-configuration-cache
+      - name: Regenerate api-client
+        run: cd ui && pnpm run api-client:gen
+      - name: Verify OpenAPI docs and api-client are in sync
+        run: |
+          if ! git diff --exit-code -- api-docs/openapi ui/packages/api-client/src; then
+            echo "::error::OpenAPI docs or api-client generated code is out of sync with the current API. Run './gradlew generateOpenApiDocs --no-configuration-cache' and 'cd ui && pnpm run api-client:gen', then commit the changes under api-docs/openapi and ui/packages/api-client/src."
+            git diff --stat api-docs/openapi ui/packages/api-client/src
+            exit 1
+          fi

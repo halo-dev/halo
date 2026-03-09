@@ -5,56 +5,104 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
+import org.springframework.data.support.ReactivePageableExecutionUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.DuplicateNameException;
 
 @Component
+@RequiredArgsConstructor
 public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreClient {
+
+    private static final int DEFAULT_FETCH_SIZE = 100;
 
     private final ExtensionStoreRepository repository;
 
-    public ReactiveExtensionStoreClientImpl(ExtensionStoreRepository repository) {
-        this.repository = repository;
+    private final R2dbcEntityOperations entityOperations;
+
+    private int fetchSize = DEFAULT_FETCH_SIZE;
+
+    void setFetchSize(int fetchSize) {
+        Assert.isTrue(fetchSize >= 0, "fetchSize must be greater than or equal to 0");
+        this.fetchSize = fetchSize;
     }
 
     @Override
     public Flux<ExtensionStore> listByNamePrefix(String prefix) {
-        return repository.findAllByNameStartingWith(prefix);
+        Assert.hasText(prefix, "Prefix must not be blank");
+
+        prefix = Strings.CS.appendIfMissing(prefix, "/");
+        return entityOperations.select(ExtensionStore.class)
+            .withFetchSize(fetchSize)
+            .matching(Query.query(
+                        Criteria.where("name").like(prefix + "%")
+                    )
+                    .sort(Sort.by(Sort.Direction.ASC, "name"))
+            )
+            .all();
     }
 
     @Override
     public Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable) {
-        return this.repository.findAllByNameStartingWith(prefix, pageable)
-            .collectList()
-            .zipWith(this.repository.countByNameStartingWith(prefix))
-            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
-    }
+        Assert.hasText(prefix, "Prefix must not be blank");
 
-    @Override
-    public Flux<ExtensionStore> listBy(String prefix, String nameCursor, int limit) {
-        var page = PageRequest.ofSize(limit).withSort(Sort.Direction.ASC, "name");
-        if (StringUtils.isBlank(nameCursor)) {
-            return this.repository.findAllByNameStartingWith(prefix, page);
-        }
-        var cursor = StringUtils.prependIfMissing(nameCursor, prefix);
-        return this.repository.findAllByNameStartingWithAndNameGreaterThan(
-            prefix, cursor, page
+        var q = Query.query(
+            Criteria.where("name").like(prefix + "%")
+        ).sort(Sort.by(Sort.Direction.ASC, "name"));
+        var getItems = entityOperations.select(ExtensionStore.class)
+            .matching(q.with(pageable))
+            .all()
+            .collectList();
+        var getCount = entityOperations.select(ExtensionStore.class)
+            .matching(q)
+            .count();
+        return getItems.flatMap(
+            items -> ReactivePageableExecutionUtils.getPage(items, pageable, getCount)
         );
     }
 
     @Override
+    public Flux<ExtensionStore> listBy(String prefix, @Nullable String nameCursor, int limit) {
+        Assert.hasText(prefix, "Prefix must not be blank");
+        Assert.isTrue(limit > 0, "Limit must be greater than 0");
+
+        prefix = Strings.CS.appendIfMissing(prefix, "/");
+        var criteria = Criteria.where("name").like(prefix + "%");
+        if (StringUtils.isNotBlank(nameCursor)) {
+            nameCursor = Strings.CS.prependIfMissing(nameCursor, prefix);
+            criteria = criteria.and(Criteria.where("name").greaterThan(nameCursor));
+        }
+        var q = Query.query(criteria).sort(Sort.by(Sort.Direction.ASC, "name"));
+        return entityOperations.select(ExtensionStore.class)
+            .matching(q.limit(limit))
+            .all();
+    }
+
+    @Override
     public Mono<Long> countByNamePrefix(String prefix) {
-        return this.repository.countByNameStartingWith(prefix);
+        Assert.hasText(prefix, "Prefix must not be blank");
+
+        var q = Query.query(
+                Criteria.where("name").like(prefix + "%")
+            )
+            .sort(Sort.by(Sort.Direction.ASC, "name"));
+        return entityOperations.select(ExtensionStore.class)
+            .matching(q)
+            .count();
     }
 
     @Override

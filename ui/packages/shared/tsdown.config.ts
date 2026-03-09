@@ -4,8 +4,11 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: ["./src/index.ts"],
   format: ["esm", "iife"],
-  external: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
-  noExternal: ["mitt"],
+  deps: {
+    neverBundle: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
+    alwaysBundle: ["mitt"],
+    onlyAllowBundle: false,
+  },
   outputOptions: {
     globals: {
       vue: "Vue",
@@ -25,5 +28,4 @@ export default defineConfig({
   dts: {
     tsgo: true,
   },
-  inlineOnly: false,
 });
