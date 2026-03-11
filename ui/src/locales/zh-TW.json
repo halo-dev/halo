@@ -1228,5 +1228,7 @@
   "core.formkit.secret.includes_keys": "包含字段：{keys}",
   "core.formkit.secret.no_fields": "沒有字段",
   "core.formkit.secret.required_keys_tip": "當前表單項所需的密鈅字段包括：",
-  "core.dashboard.widgets.presets.upvotes_stats.title": "點讚"
+  "core.dashboard.widgets.presets.upvotes_stats.title": "點讚",
+  "core.plugin.detail.operations.copy_error_message.button": "複製錯誤訊息",
+  "core.plugin.detail.operations.copy_error_message.copied": "已複製"
 }

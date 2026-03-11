@@ -597,6 +597,8 @@
   "core.plugin.detail.fields.load_location": "Storage Location",
   "core.plugin.detail.fields.issues": "Issues feedback",
   "core.plugin.detail.fields.creation_time": "Installation Time",
+  "core.plugin.detail.operations.copy_error_message.button": "Copy error message",
+  "core.plugin.detail.operations.copy_error_message.copied": "Copied",
   "core.plugin.detail.operations.view_conditions.button": "View recent status",
   "core.plugin.loader.toast.entry_load_failed": "Failed to load plugin entry file",
   "core.plugin.loader.toast.style_load_failed": "Failed to load plugin stylesheet file",

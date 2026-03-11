@@ -1228,5 +1228,7 @@
   "core.formkit.secret.includes_keys": "Incluye campos: {keys}",
   "core.formkit.secret.no_fields": "No hay campos",
   "core.formkit.secret.required_keys_tip": "Los campos requeridos para el elemento del formulario actual incluyen:",
-  "core.dashboard.widgets.presets.upvotes_stats.title": "Me gusta"
+  "core.dashboard.widgets.presets.upvotes_stats.title": "Me gusta",
+  "core.plugin.detail.operations.copy_error_message.button": "Copiar mensaje de error",
+  "core.plugin.detail.operations.copy_error_message.copied": "Copiado"
 }
