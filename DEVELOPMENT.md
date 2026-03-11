@@ -170,11 +170,131 @@ rm -rf ~/.halo2
 - [开发者论坛](https://bbs.halo.run)
 - [插件开发指南](https://docs.halo.run/developer-guide/plugin/prepare)
 
+## Docker 开发环境
+
+使用 Docker 可以快速搭建开发环境，无需本地安装依赖。
+
+### 使用 docker-compose
+
+```yaml
+# docker-compose.dev.yaml
+version: '3.8'
+services:
+  halo:
+    build: .
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./application/build/libs:/app/libs
+      - halo_data:/root/.halo2
+
+volumes:
+  halo_data:
+```
+
+启动：
+```bash
+docker-compose -f docker-compose.dev.yaml up -d --build
+```
+
+### 本地 PostgreSQL
+
+```bash
+# 启动 PostgreSQL
+docker run -d --name halo-postgres \
+  -e POSTGRES_PASSWORD=halo \
+  -e POSTGRES_USER=halo \
+  -e POSTGRES_DB=halo \
+  -p 5432:5432 \
+  postgres:15
+```
+
+## 性能分析
+
+### 后端性能
+
+使用 Spring Boot Actuator:
+
+```bash
+./gradlew bootRun --args="--management.endpoints.web.exposure.include=*"
+```
+
+访问:
+- `/actuator/metrics` - 性能指标
+- `/actuator/heapdump` - 堆转储
+- `/actuator/threaddump` - 线程 dump
+
+### 前端性能
+
+使用 Vue DevTools Performance 面板：
+
+```bash
+cd ui
+pnpm build --report  # 生成构建报告
+```
+
+## 测试
+
+### 运行单元测试
+
+```bash
+./gradlew test
+```
+
+### 运行集成测试
+
+```bash
+./gradlew integrationTest
+```
+
+### 运行 E2E 测试
+
+```bash
+cd e2e
+pnpm install
+pnpm test
+```
+
+### 生成测试覆盖率报告
+
+```bash
+./gradlew test jacocoTestReport
+# 报告位置: build/reports/jacoco/test/html/index.html
+```
+
+## 贡献代码
+
+### 提交信息规范
+
+```bash
+# Good examples
+git commit -m "fix: resolve comment submission 404 error"
+git commit -m "feat(post): add markdown support for posts"
+git commit -m "docs: update API documentation"
+git commit -m "refactor(console): improve theme settings UI"
+
+# Bad examples ❌
+git commit -m "fix bug"
+git commit -m "update"
+git commit -m "asdf"
+```
+
+### 代码审查清单
+
+- [ ] 代码符合项目规范
+- [ ] 添加了必要的单元测试
+- [ ] 更新了相关文档
+- [ ] 所有测试通过
+- [ ] 没有引入新的警告
+
 ## 获取帮助
 
 - GitHub Issues: https://github.com/halo-dev/halo/issues
 - 社区论坛: https://bbs.halo.run
 - Telegram: https://t.me/halo_dev
+- Discord: https://discord.gg/halo
 
 ---
 
