@@ -604,6 +604,8 @@
   "core.plugin.detail.fields.load_location": "存储位置",
   "core.plugin.detail.fields.issues": "问题反馈",
   "core.plugin.detail.fields.creation_time": "安装时间",
+  "core.plugin.detail.operations.copy_error_message.button": "复制错误信息",
+  "core.plugin.detail.operations.copy_error_message.copied": "已复制",
   "core.plugin.detail.operations.view_conditions.button": "查看最近状态",
   "core.plugin.loader.toast.entry_load_failed": "加载插件入口文件失败",
   "core.plugin.loader.toast.style_load_failed": "加载插件样式文件失败",
