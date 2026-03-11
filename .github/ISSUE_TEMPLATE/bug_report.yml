@@ -1,0 +1,128 @@
+name: Bug Report
+description: Report a bug to help us improve
+title: "[Bug]: "
+labels: ["type/bug", "status/needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你花时间提交这个bug报告！请填写以下信息帮助我们快速定位问题。
+        
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: 请清晰描述你遇到的问题
+      placeholder: "当我执行...时，发生了..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: 请提供复现步骤
+      placeholder: |
+        1. 进入 '...'
+        2. 点击 '...'
+        3. 滚动到 '...'
+        4. 看到错误
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+      
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: 你期望发生什么？
+      placeholder: "我期望..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: 实际发生了什么？
+      placeholder: "实际上..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: 请复制粘贴相关的日志输出
+      render: shell
+      
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: 如果适用，添加截图帮助解释问题
+      
+  - type: input
+    id: halo-version
+    attributes:
+      label: Halo Version
+      description: 你使用的 Halo 版本
+      placeholder: "例如: 2.22.0"
+    validations:
+      required: true
+      
+  - type: input
+    id: java-version
+    attributes:
+      label: Java Version
+      description: 你使用的 Java 版本
+      placeholder: "例如: OpenJDK 17.0.2"
+      
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: 你的操作系统
+      placeholder: "例如: Ubuntu 22.04 / macOS 13 / Windows 11"
+      
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      description: 你使用的数据库
+      options:
+        - H2 (默认)
+        - PostgreSQL
+        - MySQL
+        - MariaDB
+    validations:
+      required: true
+      
+  - type: input
+    id: db-version
+    attributes:
+      label: Database Version
+      description: 数据库版本
+      placeholder: "例如: PostgreSQL 15.2"
+      
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: 添加任何其他关于问题的上下文
+      
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: 我已经搜索了现有的 issues，确认这不是重复的
+          required: true
+        - label: 我已经阅读了文档，确认这不是使用方式问题
+          required: false
+        - label: 我愿意提交一个 Pull Request 来修复这个问题
+          required: false

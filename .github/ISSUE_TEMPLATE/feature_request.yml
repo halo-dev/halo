@@ -1,0 +1,70 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature]: "
+labels: ["type/feature", "status/needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你提出功能建议！请填写以下信息帮助我们评估。
+        
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: 简明扼要地描述你想要的功能
+      placeholder: "我想让 Halo 能够..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: |
+        这个功能要解决什么问题？
+        如果是改进现有功能，请说明当前的问题。
+      placeholder: "因为目前..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: |
+        你希望如何实现这个功能？
+        请描述你期望的行为或API设计。
+      placeholder: "可以通过..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: 你考虑过其他方案吗？为什么没有选择？
+      placeholder: "我也考虑过..."
+      
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: |
+        添加任何其他上下文，如：
+        - 相关的 issue
+        - 屏幕截图/草图
+        - 适用的场景描述
+      
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: 我已经搜索了现有的 issues 和 PRs，确认这不是重复的
+          required: true
+        - label: 我愿意帮助实现这个功能
+          required: false
+        - label: 我愿意帮助测试这个功能
+          required: false
