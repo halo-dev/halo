@@ -6,7 +6,7 @@ import { utils } from "@halo-dev/ui-shared";
 import { isNil, isNotNil } from "es-toolkit";
 import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
-import { onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import MingcuteDotsLine from "~icons/mingcute/dots-line";
 import type { ArrayItemLabel, ArrayItemLabelType } from ".";
@@ -89,6 +89,9 @@ onMounted(async () => {
   const node = props.node;
   node._c.sync = true;
   arrayFeature(node);
+  // Defer so the hidden group has rendered with hiddenGroupSyntheticValue
+  // and conditional children (e.g. article group) exist in the node tree
+  await nextTick();
   hiddenChildrenFormKit.value = getNode(formKitChildrenId);
   await updateFormattedLabels();
 });
@@ -172,6 +175,31 @@ const itemValue = ref<Record<string, unknown>>({});
 const currentEditIndex = ref<number>(-1);
 
 const formattedItemLabels = ref<Map<string, FormattedItemLabel[]>>(new Map());
+
+const hiddenGroupSyntheticValue = computed(() => {
+  const itemLabels = props.node.props.itemLabels ?? [];
+  const value: Record<string, unknown> = {};
+  let firstSegment: string | null = null;
+  for (const itemLabel of itemLabels) {
+    const label = itemLabel?.label;
+    if (typeof label !== "string" || !label.startsWith("$value.")) {
+      continue;
+    }
+    const path = label.split("$value.")[1];
+    if (!path) continue;
+    const segment = path.split(".")[0];
+    if (segment && !(segment in value)) {
+      value[segment] = {};
+      if (firstSegment === null) {
+        firstSegment = segment;
+      }
+    }
+  }
+  if (firstSegment !== null) {
+    value.type = firstSegment;
+  }
+  return value;
+});
 
 const updateFormattedLabels = async () => {
   const newLabelsMap = new Map();
@@ -308,7 +336,13 @@ const handleRemoveItem = (index: number) => {
     </VButton>
   </div>
 
-  <FormKit v-show="false" :id="formKitChildrenId" type="group" ignore="true">
+  <FormKit
+    v-show="false"
+    :id="formKitChildrenId"
+    type="group"
+    ignore="true"
+    :model-value="hiddenGroupSyntheticValue"
+  >
     <component :is="node.context?.slots.default" />
   </FormKit>
 
