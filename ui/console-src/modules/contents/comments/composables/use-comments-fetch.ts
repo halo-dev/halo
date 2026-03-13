@@ -38,8 +38,8 @@ export default function useCommentsFetch(
         .filter(Boolean) as string[];
 
       const defaultSort = [
-        "status.lastReplyTime,desc",
         "metadata.creationTimestamp,desc",
+        "status.lastReplyTime,desc",
       ];
 
       const { data } = await consoleApiClient.content.comment.listComments({
