@@ -518,6 +518,8 @@
   "core.menu.menu_item_empty.message": "You can try to refresh or create a new menu item.",
   "core.menu.operations.set_primary.button": "Set as primary menu",
   "core.menu.operations.set_primary.toast_success": "Setting successful",
+  "core.menu.operations.clone.title": "Confirm you want to clone this menu?",
+  "core.menu.operations.clone.description": "This operation will generate a menu identical to the target menu.",
   "core.menu.operations.delete_menu.title": "Delete menu",
   "core.menu.operations.delete_menu.description": "All menu items under this menu will be deleted at the same time, and this operation cannot be undone.",
   "core.menu.operations.delete_menu_item.title": "Delete menu item",

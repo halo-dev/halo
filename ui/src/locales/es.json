@@ -472,6 +472,8 @@
   "core.menu.menu_item_empty.message": "Puedes intentar actualizar o crear un nuevo elemento de menú.",
   "core.menu.operations.set_primary.button": "Establecer como menú principal",
   "core.menu.operations.set_primary.toast_success": "Configuración exitosa",
+  "core.menu.operations.clone.title": "¿Estás seguro de que quieres clonar este menú?",
+  "core.menu.operations.clone.description": "Esta operación generará un menú idéntico al menú de destino.",
   "core.menu.operations.delete_menu.title": "¿Estás seguro de que deseas eliminar este menú?",
   "core.menu.operations.delete_menu.description": "Todos los elementos de menú de este menú se eliminarán al mismo tiempo y esta operación no se puede deshacer.",
   "core.menu.operations.delete_menu_item.title": "¿Estás seguro de que deseas eliminar este elemento de menú?",
