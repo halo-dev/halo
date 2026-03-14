@@ -111,6 +111,7 @@ export const setupLibraryExternal = (isProduction: boolean) => {
           src: `/${target.dest}/${target.rename}`,
           type: "text/javascript",
           "vite-ignore": true,
+          ...(!isProduction ? { crossorigin: "" } : {}),
         },
       };
     })

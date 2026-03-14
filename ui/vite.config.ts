@@ -8,6 +8,9 @@ import Icons from "unplugin-icons/vite";
 import { defineConfig } from "vite";
 import { setupLibraryExternal } from "./src/vite/library-external";
 
+const DEV_SERVER_PORT = 3000;
+const DEV_SERVER_ORIGIN = `http://localhost:${DEV_SERVER_PORT}`;
+
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
   return {
@@ -31,6 +34,17 @@ export default defineConfig(({ mode }) => {
         include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
       ...setupLibraryExternal(isProduction),
+      !isProduction && {
+        name: "vite-dev-absolute-urls",
+        transformIndexHtml: {
+          order: "post" as const,
+          handler: (html: string) =>
+            html.replace(
+              / (src|href)="(\/.+?)"/g,
+              ` $1="${DEV_SERVER_ORIGIN}$2"`
+            ),
+        },
+      },
     ],
     resolve: {
       alias: {
@@ -40,7 +54,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      port: 3000,
+      port: DEV_SERVER_PORT,
       fs: {
         strict: isProduction,
       },
