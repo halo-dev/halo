@@ -186,6 +186,8 @@
   "core.post_tag.editing_modal.fields.color.help": "Se requiere adaptación del tema para ser compatible",
   "core.post_tag.editing_modal.fields.cover.label": "Portada",
   "core.post_tag.editing_modal.fields.cover.help": "Se requiere adaptación del tema para ser compatible",
+  "core.post_tag.editing_modal.fields.description.label": "Descripción",
+  "core.post_tag.editing_modal.fields.description.help": "Se requiere adaptación del tema para ser compatible",
   "core.post_category.title": "Categorías de publicación",
   "core.post_category.header.title": "{count} Categorías",
   "core.post_category.empty.title": "No hay categorías actualmente.",

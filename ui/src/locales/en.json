@@ -205,6 +205,8 @@
   "core.post_tag.editing_modal.fields.color.help": "Theme adaptation is required to support",
   "core.post_tag.editing_modal.fields.cover.label": "Cover",
   "core.post_tag.editing_modal.fields.cover.help": "Theme adaptation is required to support",
+  "core.post_tag.editing_modal.fields.description.label": "Description",
+  "core.post_tag.editing_modal.fields.description.help": "The description will be automatically added to the page's meta description tag for SEO; other display purposes require theme adaptation",
   "core.post_category.title": "Post categories",
   "core.post_category.header.title": "{count} Categories",
   "core.post_category.empty.title": "There are no categories currently.",

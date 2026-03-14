@@ -213,6 +213,8 @@
   "core.post_tag.editing_modal.fields.color.help": "需要主题适配以支持",
   "core.post_tag.editing_modal.fields.cover.label": "封面图",
   "core.post_tag.editing_modal.fields.cover.help": "需要主题适配以支持",
+  "core.post_tag.editing_modal.fields.description.label": "Description",
+  "core.post_tag.editing_modal.fields.description.help": "The description will be automatically added to the page's meta description tag for SEO; other display purposes require theme adaptation",
   "core.post_category.title": "文章分类",
   "core.post_category.header.title": "{count} 个分类",
   "core.post_category.empty.title": "当前没有分类",

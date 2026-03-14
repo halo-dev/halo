@@ -44,6 +44,8 @@ public class Tag extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
+        private String description;
+
         /**
          * Color regex explanation.
          * <pre>
