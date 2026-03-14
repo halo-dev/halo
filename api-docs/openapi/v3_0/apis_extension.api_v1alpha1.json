@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "Halo",
     "version": "2.23.0-SNAPSHOT"
@@ -9501,11 +9501,6 @@
   "components": {
     "schemas": {
       "AddOperation": {
-        "required": [
-          "op",
-          "path",
-          "value"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -9515,24 +9510,22 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "AnnotationSetting": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -9546,21 +9539,15 @@
           "spec": {
             "$ref": "#/components/schemas/AnnotationSettingSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "AnnotationSettingList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -9587,54 +9574,57 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "AnnotationSettingSpec": {
-        "required": [
-          "formSchema",
-          "targetRef"
-        ],
-        "type": "object",
         "properties": {
           "formSchema": {
-            "minLength": 1,
             "type": "array",
             "items": {
-              "minLength": 1,
-              "type": "object"
-            }
+              "type": "object",
+              "minLength": 1
+            },
+            "minLength": 1
           },
           "targetRef": {
             "$ref": "#/components/schemas/GroupKind"
           }
-        }
+        },
+        "required": [
+          "formSchema",
+          "targetRef"
+        ]
       },
       "Attachment": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -9651,21 +9641,15 @@
           "status": {
             "$ref": "#/components/schemas/AttachmentStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "AttachmentList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -9692,28 +9676,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "AttachmentSpec": {
-        "type": "object",
         "properties": {
           "displayName": {
             "type": "string",
@@ -9736,24 +9730,23 @@
             "description": "Policy name"
           },
           "size": {
-            "minimum": 0,
             "type": "integer",
+            "format": "int64",
             "description": "Size of attachment. Unit is Byte",
-            "format": "int64"
+            "minimum": 0
           },
           "tags": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Tags of attachment",
             "items": {
               "type": "string",
               "description": "Tag name"
-            }
+            },
+            "uniqueItems": true
           }
         }
       },
       "AttachmentStatus": {
-        "type": "object",
         "properties": {
           "permalink": {
             "type": "string",
@@ -9768,13 +9761,7 @@
         }
       },
       "AuthProvider": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "Auth provider extension.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -9789,21 +9776,14 @@
             "$ref": "#/components/schemas/AuthProviderSpec"
           }
         },
-        "description": "Auth provider extension."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "AuthProviderList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -9830,33 +9810,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "AuthProviderSpec": {
-        "required": [
-          "authType",
-          "authenticationUrl",
-          "displayName"
-        ],
-        "type": "object",
         "properties": {
           "authType": {
             "type": "string",
@@ -9904,30 +9889,28 @@
           "website": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "authType",
+          "authenticationUrl",
+          "displayName"
+        ]
       },
       "Author": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "website": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "name"
+        ]
       },
       "Backup": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -9944,21 +9927,14 @@
           "status": {
             "$ref": "#/components/schemas/BackupStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "BackupList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -9985,28 +9961,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "BackupSpec": {
-        "type": "object",
         "properties": {
           "expiresAt": {
             "type": "string",
@@ -10019,7 +10005,6 @@
         }
       },
       "BackupStatus": {
-        "type": "object",
         "properties": {
           "completionTimestamp": {
             "type": "string",
@@ -10046,8 +10031,8 @@
           },
           "size": {
             "type": "integer",
-            "description": "Size of backup file. Data unit: byte",
-            "format": "int64"
+            "format": "int64",
+            "description": "Size of backup file. Data unit: byte"
           },
           "startTimestamp": {
             "type": "string",
@@ -10056,13 +10041,6 @@
         }
       },
       "Category": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10079,21 +10057,15 @@
           "status": {
             "$ref": "#/components/schemas/CategoryStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "CategoryList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10120,33 +10092,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "CategorySpec": {
-        "required": [
-          "displayName",
-          "priority",
-          "slug"
-        ],
-        "type": "object",
         "properties": {
           "children": {
             "type": "array",
@@ -10161,17 +10138,17 @@
             "type": "string"
           },
           "displayName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "hideFromList": {
             "type": "boolean",
             "description": "\u003cp\u003eWhether to hide the category from the category list.\u003c/p\u003e\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will\n not be displayed in the category list, but it can still be accessed by permalink.\u003c/p\u003e\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only\n allows to be set to true on the first level(root node) of categories.\u003c/p\u003e"
           },
           "postTemplate": {
-            "maxLength": 255,
             "type": "string",
-            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e"
+            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e",
+            "maxLength": 255
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
@@ -10183,41 +10160,38 @@
             "default": 0
           },
           "slug": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "template": {
-            "maxLength": 255,
-            "type": "string"
+            "type": "string",
+            "maxLength": 255
           }
-        }
+        },
+        "required": [
+          "displayName",
+          "priority",
+          "slug"
+        ]
       },
       "CategoryStatus": {
-        "type": "object",
         "properties": {
           "permalink": {
             "type": "string"
           },
           "postCount": {
             "type": "integer",
-            "description": "包括当前和其下所有层级的文章数量 (depth\u003dmax).",
-            "format": "int32"
+            "format": "int32",
+            "description": "包括当前和其下所有层级的文章数量 (depth\u003dmax)."
           },
           "visiblePostCount": {
             "type": "integer",
-            "description": "包括当前和其下所有层级的已发布且公开的文章数量 (depth\u003dmax).",
-            "format": "int32"
+            "format": "int32",
+            "description": "包括当前和其下所有层级的已发布且公开的文章数量 (depth\u003dmax)."
           }
         }
       },
       "Comment": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10234,21 +10208,15 @@
           "status": {
             "$ref": "#/components/schemas/CommentStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "CommentList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10275,32 +10243,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "CommentOwner": {
-        "required": [
-          "kind",
-          "name"
-        ],
-        "type": "object",
         "properties": {
           "annotations": {
             "type": "object",
@@ -10312,28 +10286,20 @@
             "type": "string"
           },
           "kind": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "maxLength": 64,
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
           }
-        }
+        },
+        "required": [
+          "kind",
+          "name"
+        ]
       },
       "CommentSpec": {
-        "required": [
-          "allowNotification",
-          "approved",
-          "content",
-          "hidden",
-          "owner",
-          "priority",
-          "raw",
-          "subjectRef",
-          "top"
-        ],
-        "type": "object",
         "properties": {
           "allowNotification": {
             "type": "boolean",
@@ -10348,13 +10314,13 @@
             "format": "date-time"
           },
           "content": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "creationTime": {
             "type": "string",
-            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e."
           },
           "hidden": {
             "type": "boolean",
@@ -10376,8 +10342,8 @@
             "default": 0
           },
           "raw": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
@@ -10389,10 +10355,20 @@
           "userAgent": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "allowNotification",
+          "approved",
+          "content",
+          "hidden",
+          "owner",
+          "priority",
+          "raw",
+          "subjectRef",
+          "top"
+        ]
       },
       "CommentStatus": {
-        "type": "object",
         "properties": {
           "hasNewReply": {
             "type": "boolean"
@@ -10420,28 +10396,23 @@
         }
       },
       "Condition": {
-        "required": [
-          "lastTransitionTime",
-          "status",
-          "type"
-        ],
-        "type": "object",
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列.",
         "properties": {
           "lastTransitionTime": {
             "type": "string",
-            "description": "Last time the condition transitioned from one status to another.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last time the condition transitioned from one status to another."
           },
           "message": {
-            "maxLength": 32768,
             "type": "string",
-            "description": "Human-readable message indicating details about last transition.\n This may be an empty string."
+            "description": "Human-readable message indicating details about last transition.\n This may be an empty string.",
+            "maxLength": 32768
           },
           "reason": {
-            "maxLength": 1024,
-            "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
             "type": "string",
-            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition."
+            "description": "Unique, one-word, CamelCase reason for the condition\u0027s last transition.",
+            "maxLength": 1024,
+            "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
           },
           "status": {
             "type": "string",
@@ -10453,21 +10424,20 @@
             ]
           },
           "type": {
-            "maxLength": 316,
-            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
             "type": "string",
-            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316."
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316.",
+            "maxLength": 316,
+            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
           }
         },
-        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列."
+        "required": [
+          "lastTransitionTime",
+          "status",
+          "type"
+        ]
       },
       "ConfigMap": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003eConfigMap holds configuration data to consume.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10485,21 +10455,13 @@
             "$ref": "#/components/schemas/Metadata"
           }
         },
-        "description": "\u003cp\u003eConfigMap holds configuration data to consume.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "ConfigMapList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10526,51 +10488,56 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ConfigMapRef": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "name"
+        ]
       },
       "CopyOperation": {
-        "required": [
-          "op",
-          "from",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "from": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "op": {
             "type": "string",
@@ -10579,20 +10546,20 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
+        },
+        "required": [
+          "op",
+          "from",
+          "path"
+        ]
       },
       "Counter": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "A counter for number of requests by extension resource name.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10624,21 +10591,13 @@
             "format": "int32"
           }
         },
-        "description": "A counter for number of requests by extension resource name."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "CounterList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10665,28 +10624,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "CustomTemplates": {
-        "type": "object",
         "properties": {
           "category": {
             "type": "array",
@@ -10709,14 +10678,6 @@
         }
       },
       "Device": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec",
-          "status"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10733,21 +10694,16 @@
           "status": {
             "$ref": "#/components/schemas/DeviceStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ]
       },
       "DeviceList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10774,37 +10730,42 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "DeviceSpec": {
-        "required": [
-          "ipAddress",
-          "principalName",
-          "sessionId"
-        ],
-        "type": "object",
         "properties": {
           "ipAddress": {
-            "maxLength": 129,
-            "type": "string"
+            "type": "string",
+            "maxLength": 129
           },
           "lastAccessedTime": {
             "type": "string",
@@ -10815,24 +10776,28 @@
             "format": "date-time"
           },
           "principalName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "rememberMeSeriesId": {
             "type": "string"
           },
           "sessionId": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "userAgent": {
-            "maxLength": 500,
-            "type": "string"
+            "type": "string",
+            "maxLength": 500
           }
-        }
+        },
+        "required": [
+          "ipAddress",
+          "principalName",
+          "sessionId"
+        ]
       },
       "DeviceStatus": {
-        "type": "object",
         "properties": {
           "browser": {
             "type": "string"
@@ -10843,10 +10808,6 @@
         }
       },
       "Excerpt": {
-        "required": [
-          "autoGenerate"
-        ],
-        "type": "object",
         "properties": {
           "autoGenerate": {
             "type": "boolean",
@@ -10855,16 +10816,13 @@
           "raw": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "autoGenerate"
+        ]
       },
       "ExtensionDefinition": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "Extension definition.\n An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure,\n enumeration, or protocol type without needing to subclass it.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10879,21 +10837,14 @@
             "$ref": "#/components/schemas/ExtensionSpec"
           }
         },
-        "description": "Extension definition.\n An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure,\n enumeration, or protocol type without needing to subclass it."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "ExtensionDefinitionList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -10920,34 +10871,39 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ExtensionPointDefinition": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "Extension point definition.\n An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for the\n dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where\n additional functionality can be added through the use of plugins or extensions.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -10962,21 +10918,14 @@
             "$ref": "#/components/schemas/ExtensionPointSpec"
           }
         },
-        "description": "Extension point definition.\n An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for the\n dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where\n additional functionality can be added through the use of plugins or extensions."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "ExtensionPointDefinitionList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11003,33 +10952,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ExtensionPointSpec": {
-        "required": [
-          "className",
-          "displayName",
-          "type"
-        ],
-        "type": "object",
         "properties": {
           "className": {
             "type": "string"
@@ -11050,15 +11004,14 @@
               "MULTI_INSTANCE"
             ]
           }
-        }
-      },
-      "ExtensionSpec": {
+        },
         "required": [
           "className",
           "displayName",
-          "extensionPointName"
-        ],
-        "type": "object",
+          "type"
+        ]
+      },
+      "ExtensionSpec": {
         "properties": {
           "className": {
             "type": "string"
@@ -11075,10 +11028,14 @@
           "icon": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "className",
+          "displayName",
+          "extensionPointName"
+        ]
       },
       "FileReverseProxyProvider": {
-        "type": "object",
         "properties": {
           "directory": {
             "type": "string"
@@ -11089,13 +11046,6 @@
         }
       },
       "Group": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11112,10 +11062,16 @@
           "status": {
             "$ref": "#/components/schemas/GroupStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "GroupKind": {
-        "type": "object",
+        "description": "GroupKind contains group and kind data only.",
         "properties": {
           "group": {
             "type": "string",
@@ -11125,22 +11081,9 @@
             "type": "string",
             "description": "is kind name of Extension."
           }
-        },
-        "description": "GroupKind contains group and kind data only."
+        }
       },
       "GroupList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11167,60 +11110,65 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "GroupSpec": {
-        "required": [
-          "displayName"
-        ],
-        "type": "object",
         "properties": {
           "displayName": {
             "type": "string",
             "description": "Display name of group"
           }
-        }
+        },
+        "required": [
+          "displayName"
+        ]
       },
       "GroupStatus": {
-        "type": "object",
         "properties": {
           "totalAttachments": {
-            "minimum": 0,
             "type": "integer",
+            "format": "int64",
             "description": "Total of attachments under the current group",
-            "format": "int64"
+            "minimum": 0
           },
           "updateTimestamp": {
             "type": "string",
-            "description": "Update timestamp of the group",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Update timestamp of the group"
           }
         }
       },
       "InterestReason": {
-        "required": [
-          "reasonType",
-          "subject"
-        ],
-        "type": "object",
+        "description": "The reason to be interested in",
         "properties": {
           "expression": {
             "type": "string",
@@ -11234,33 +11182,33 @@
             "$ref": "#/components/schemas/InterestReasonSubject"
           }
         },
-        "description": "The reason to be interested in"
+        "required": [
+          "reasonType",
+          "subject"
+        ]
       },
       "InterestReasonSubject": {
-        "required": [
-          "apiVersion",
-          "kind"
-        ],
-        "type": "object",
+        "description": "The subject name of reason type to be interested in",
         "properties": {
           "apiVersion": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "kind": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
             "type": "string",
             "description": "if name is not specified, it presents all subjects of the specified reason type and custom resources"
           }
         },
-        "description": "The subject name of reason type to be interested in"
+        "required": [
+          "apiVersion",
+          "kind"
+        ]
       },
       "JsonPatch": {
-        "minItems": 1,
-        "uniqueItems": true,
         "type": "array",
         "description": "JSON schema for JSONPatch operations",
         "items": {
@@ -11284,10 +11232,12 @@
               "$ref": "#/components/schemas/CopyOperation"
             }
           ]
-        }
+        },
+        "minItems": 1,
+        "uniqueItems": true
       },
       "License": {
-        "type": "object",
+        "description": "Common data objects for license.",
         "properties": {
           "name": {
             "type": "string"
@@ -11295,18 +11245,9 @@
           "url": {
             "type": "string"
           }
-        },
-        "description": "Common data objects for license."
+        }
       },
       "LocalThumbnail": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec",
-          "status"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11323,21 +11264,16 @@
           "status": {
             "$ref": "#/components/schemas/LocalThumbnailStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ]
       },
       "LocalThumbnailList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11364,49 +11300,51 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "LocalThumbnailSpec": {
-        "required": [
-          "filePath",
-          "imageSignature",
-          "imageUri",
-          "size",
-          "thumbSignature",
-          "thumbnailUri"
-        ],
-        "type": "object",
         "properties": {
           "filePath": {
             "type": "string",
             "description": "Consider the compatibility of the system and migration, use unix-style relative paths\n here."
           },
           "imageSignature": {
-            "minLength": 1,
             "type": "string",
-            "description": "A hash signature for the image uri."
+            "description": "A hash signature for the image uri.",
+            "minLength": 1
           },
           "imageUri": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "size": {
             "type": "string",
@@ -11418,18 +11356,25 @@
             ]
           },
           "thumbSignature": {
-            "minLength": 1,
             "type": "string",
-            "description": "A hash signature for the thumbnail uri."
+            "description": "A hash signature for the thumbnail uri.",
+            "minLength": 1
           },
           "thumbnailUri": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "filePath",
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbSignature",
+          "thumbnailUri"
+        ]
       },
       "LocalThumbnailStatus": {
-        "type": "object",
         "properties": {
           "phase": {
             "type": "string",
@@ -11442,13 +11387,6 @@
         }
       },
       "Menu": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11462,16 +11400,15 @@
           "spec": {
             "$ref": "#/components/schemas/MenuSpec"
           }
-        }
-      },
-      "MenuItem": {
+        },
         "required": [
           "apiVersion",
           "kind",
           "metadata",
           "spec"
-        ],
-        "type": "object",
+        ]
+      },
+      "MenuItem": {
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11488,21 +11425,15 @@
           "status": {
             "$ref": "#/components/schemas/MenuItemStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "MenuItemList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11529,37 +11460,48 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "MenuItemSpec": {
-        "type": "object",
+        "description": "The spec of menu item.",
         "properties": {
           "children": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Children of this menu item",
             "items": {
               "type": "string",
               "description": "The name of menu item child"
-            }
+            },
+            "uniqueItems": true
           },
           "displayName": {
             "type": "string",
@@ -11571,8 +11513,8 @@
           },
           "priority": {
             "type": "integer",
-            "description": "The priority is for ordering.",
-            "format": "int32"
+            "format": "int32",
+            "description": "The priority is for ordering."
           },
           "target": {
             "type": "string",
@@ -11587,11 +11529,10 @@
           "targetRef": {
             "$ref": "#/components/schemas/Ref"
           }
-        },
-        "description": "The spec of menu item."
+        }
       },
       "MenuItemStatus": {
-        "type": "object",
+        "description": "The status of menu item.",
         "properties": {
           "displayName": {
             "type": "string",
@@ -11601,22 +11542,9 @@
             "type": "string",
             "description": "Calculated href of manu item."
           }
-        },
-        "description": "The status of menu item."
+        }
       },
       "MenuList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11643,53 +11571,60 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "MenuSpec": {
-        "required": [
-          "displayName"
-        ],
-        "type": "object",
+        "description": "The spec of menu.",
         "properties": {
           "displayName": {
             "type": "string",
             "description": "The display name of the menu."
           },
           "menuItems": {
-            "uniqueItems": true,
             "type": "array",
             "description": "Menu items of this menu.",
             "items": {
               "type": "string",
               "description": "Name of menu item."
-            }
+            },
+            "uniqueItems": true
           }
         },
-        "description": "The spec of menu."
+        "required": [
+          "displayName"
+        ]
       },
       "Metadata": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
+        "description": "Metadata of Extension.",
         "properties": {
           "annotations": {
             "type": "object",
@@ -11700,24 +11635,20 @@
           },
           "creationTimestamp": {
             "type": "string",
-            "description": "Creation timestamp of the Extension.",
             "format": "date-time",
-            "nullable": true
+            "description": "Creation timestamp of the Extension."
           },
           "deletionTimestamp": {
             "type": "string",
-            "description": "Deletion timestamp of the Extension.",
             "format": "date-time",
-            "nullable": true
+            "description": "Deletion timestamp of the Extension."
           },
           "finalizers": {
-            "uniqueItems": true,
             "type": "array",
-            "nullable": true,
             "items": {
-              "type": "string",
-              "nullable": true
-            }
+              "type": "string"
+            },
+            "uniqueItems": true
           },
           "generateName": {
             "type": "string",
@@ -11736,26 +11667,22 @@
           },
           "version": {
             "type": "integer",
-            "description": "Current version of the Extension. It will be bumped up every update.",
             "format": "int64",
-            "nullable": true
+            "description": "Current version of the Extension. It will be bumped up every update."
           }
         },
-        "description": "Metadata of Extension."
+        "required": [
+          "name"
+        ]
       },
       "MoveOperation": {
-        "required": [
-          "op",
-          "from",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "from": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "op": {
             "type": "string",
@@ -11764,20 +11691,20 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
+        },
+        "required": [
+          "op",
+          "from",
+          "path"
+        ]
       },
       "Notification": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003e{@link Notification Notification} is a custom extension that used to store notification information for\n inner use, it\u0027s on-site notification.\u003c/p\u003e\n\n \u003cp\u003eSupports the following operations:\u003c/p\u003e\n \u003cul\u003e\n    \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\u003c/li\u003e\n    \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\u003c/li\u003e\n    \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\u003c/li\u003e\n \u003c/ul\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11792,21 +11719,13 @@
             "$ref": "#/components/schemas/NotificationSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Notification Notification} is a custom extension that used to store notification information for\n inner use, it\u0027s on-site notification.\u003c/p\u003e\n\n \u003cp\u003eSupports the following operations:\u003c/p\u003e\n \u003cul\u003e\n    \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\u003c/li\u003e\n    \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\u003c/li\u003e\n    \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\u003c/li\u003e\n \u003c/ul\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "NotificationList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11833,35 +11752,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "NotificationSpec": {
-        "required": [
-          "htmlContent",
-          "rawContent",
-          "reason",
-          "recipient",
-          "title"
-        ],
-        "type": "object",
         "properties": {
           "htmlContent": {
             "type": "string"
@@ -11874,31 +11796,33 @@
             "type": "string"
           },
           "reason": {
-            "minLength": 1,
             "type": "string",
-            "description": "The name of reason"
+            "description": "The name of reason",
+            "minLength": 1
           },
           "recipient": {
-            "minLength": 1,
             "type": "string",
-            "description": "The name of user"
+            "description": "The name of user",
+            "minLength": 1
           },
           "title": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "unread": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "htmlContent",
+          "rawContent",
+          "reason",
+          "recipient",
+          "title"
+        ]
       },
       "NotificationTemplate": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003e{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\u003c/p\u003e\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\u003c/p\u003e\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,\n if multiple templates are matched, the best match will be selected. This is useful when you\n want to override the default template.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -11913,21 +11837,13 @@
             "$ref": "#/components/schemas/NotificationTemplateSpec"
           }
         },
-        "description": "\u003cp\u003e{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\u003c/p\u003e\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\u003c/p\u003e\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,\n if multiple templates are matched, the best match will be selected. This is useful when you\n want to override the default template.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "NotificationTemplateList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -11954,28 +11870,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "NotificationTemplateSpec": {
-        "type": "object",
         "properties": {
           "reasonSelector": {
             "$ref": "#/components/schemas/ReasonSelector"
@@ -11986,12 +11912,7 @@
         }
       },
       "NotifierDescriptor": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003e{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\u003c/p\u003e\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to\n let the user know what the notifier is and what it can do in the UI and also let the\n \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the notifier and prepare the notifier\u0027s settings.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12006,21 +11927,13 @@
             "$ref": "#/components/schemas/NotifierDescriptorSpec"
           }
         },
-        "description": "\u003cp\u003e{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\u003c/p\u003e\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to\n let the user know what the notifier is and what it can do in the UI and also let the\n \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the notifier and prepare the notifier\u0027s settings.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "NotifierDescriptorList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12047,43 +11960,49 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "NotifierDescriptorSpec": {
-        "required": [
-          "displayName",
-          "notifierExtName"
-        ],
-        "type": "object",
         "properties": {
           "description": {
             "type": "string"
           },
           "displayName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "notifierExtName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "receiverSettingRef": {
             "$ref": "#/components/schemas/NotifierSettingRef"
@@ -12091,14 +12010,13 @@
           "senderSettingRef": {
             "$ref": "#/components/schemas/NotifierSettingRef"
           }
-        }
+        },
+        "required": [
+          "displayName",
+          "notifierExtName"
+        ]
       },
       "NotifierSettingRef": {
-        "required": [
-          "group",
-          "name"
-        ],
-        "type": "object",
         "properties": {
           "group": {
             "type": "string"
@@ -12106,15 +12024,13 @@
           "name": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "group",
+          "name"
+        ]
       },
       "PatSpec": {
-        "required": [
-          "name",
-          "tokenId",
-          "username"
-        ],
-        "type": "object",
         "properties": {
           "description": {
             "type": "string"
@@ -12155,15 +12071,14 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "name",
+          "tokenId",
+          "username"
+        ]
       },
       "PersonalAccessToken": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12177,21 +12092,14 @@
           "spec": {
             "$ref": "#/components/schemas/PatSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "PersonalAccessTokenList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12218,34 +12126,39 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "Plugin": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "A custom resource for Plugin.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12263,36 +12176,28 @@
             "$ref": "#/components/schemas/PluginStatus"
           }
         },
-        "description": "A custom resource for Plugin."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "PluginAuthor": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
         "properties": {
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "website": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "name"
+        ]
       },
       "PluginList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12319,31 +12224,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "PluginSpec": {
-        "required": [
-          "version"
-        ],
-        "type": "object",
         "properties": {
           "author": {
             "$ref": "#/components/schemas/PluginAuthor"
@@ -12392,24 +12304,26 @@
             "type": "string"
           },
           "version": {
-            "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
             "type": "string",
-            "description": "plugin version."
+            "description": "plugin version.",
+            "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
           }
-        }
+        },
+        "required": [
+          "version"
+        ]
       },
       "PluginStatus": {
-        "type": "object",
         "properties": {
           "conditions": {
             "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            },
             "properties": {
               "empty": {
                 "type": "boolean"
               }
-            },
-            "items": {
-              "$ref": "#/components/schemas/Condition"
             }
           },
           "entry": {
@@ -12433,8 +12347,8 @@
           },
           "loadLocation": {
             "type": "string",
-            "description": "Load location of the plugin, often a path.",
-            "format": "uri"
+            "format": "uri",
+            "description": "Load location of the plugin, often a path."
           },
           "logo": {
             "type": "string"
@@ -12460,13 +12374,6 @@
         }
       },
       "Policy": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12480,21 +12387,15 @@
           "spec": {
             "$ref": "#/components/schemas/PolicySpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "PolicyList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12521,28 +12422,39 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "PolicyRule": {
-        "type": "object",
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information\n about whom the rule applies to or which namespace the rule applies to.",
         "properties": {
           "apiGroups": {
             "type": "array",
@@ -12579,15 +12491,9 @@
               "type": "string"
             }
           }
-        },
-        "description": "PolicyRule holds information that describes a policy rule, but does not contain information\n about whom the rule applies to or which namespace the rule applies to."
+        }
       },
       "PolicySpec": {
-        "required": [
-          "displayName",
-          "templateName"
-        ],
-        "type": "object",
         "properties": {
           "configMapName": {
             "type": "string",
@@ -12601,15 +12507,13 @@
             "type": "string",
             "description": "Reference name of PolicyTemplate"
           }
-        }
+        },
+        "required": [
+          "displayName",
+          "templateName"
+        ]
       },
       "PolicyTemplate": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12623,21 +12527,14 @@
           "spec": {
             "$ref": "#/components/schemas/PolicyTemplateSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "PolicyTemplateList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12664,31 +12561,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "PolicyTemplateSpec": {
-        "required": [
-          "settingName"
-        ],
-        "type": "object",
         "properties": {
           "displayName": {
             "type": "string"
@@ -12696,16 +12600,13 @@
           "settingName": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "settingName"
+        ]
       },
       "Post": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003ePost extension.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12723,21 +12624,14 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "\u003cp\u003ePost extension.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "PostList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -12764,39 +12658,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "PostSpec": {
-        "required": [
-          "allowComment",
-          "deleted",
-          "excerpt",
-          "pinned",
-          "priority",
-          "publish",
-          "slug",
-          "title",
-          "visible"
-        ],
-        "type": "object",
         "properties": {
           "allowComment": {
             "type": "boolean",
@@ -12858,8 +12751,8 @@
             "description": "文章引用到的已发布的内容，用于主题端显示."
           },
           "slug": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "tags": {
             "type": "array",
@@ -12871,8 +12764,8 @@
             "type": "string"
           },
           "title": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "visible": {
             "type": "string",
@@ -12883,10 +12776,20 @@
               "PRIVATE"
             ]
           }
-        }
+        },
+        "required": [
+          "allowComment",
+          "deleted",
+          "excerpt",
+          "pinned",
+          "priority",
+          "publish",
+          "slug",
+          "title",
+          "visible"
+        ]
       },
       "PostStatus": {
-        "type": "object",
         "properties": {
           "commentsCount": {
             "type": "integer",
@@ -12894,13 +12797,13 @@
           },
           "conditions": {
             "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            },
             "properties": {
               "empty": {
                 "type": "boolean"
               }
-            },
-            "items": {
-              "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
@@ -12936,12 +12839,7 @@
         }
       },
       "Reason": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003e{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents\n an instance of a {@link ReasonType ReasonType}.\u003c/p\u003e\n \u003cp\u003eIt can be understood as an event that triggers a notification.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -12956,30 +12854,22 @@
             "$ref": "#/components/schemas/ReasonSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents\n an instance of a {@link ReasonType ReasonType}.\u003c/p\u003e\n \u003cp\u003eIt can be understood as an event that triggers a notification.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "ReasonAttributes": {
         "type": "object",
+        "description": "Attributes used to transfer data",
         "properties": {
           "empty": {
             "type": "boolean"
           }
-        },
-        "description": "Attributes used to transfer data"
+        }
       },
       "ReasonList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13006,75 +12896,78 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ReasonProperty": {
-        "required": [
-          "name",
-          "type"
-        ],
-        "type": "object",
         "properties": {
           "description": {
             "type": "string"
           },
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "optional": {
             "type": "boolean",
             "default": false
           },
           "type": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
       },
       "ReasonSelector": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "default": "default",
+            "minLength": 1
+          },
+          "reasonType": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "required": [
           "language",
           "reasonType"
-        ],
-        "type": "object",
-        "properties": {
-          "language": {
-            "minLength": 1,
-            "type": "string",
-            "default": "default"
-          },
-          "reasonType": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
+        ]
       },
       "ReasonSpec": {
-        "required": [
-          "author",
-          "reasonType",
-          "subject"
-        ],
-        "type": "object",
         "properties": {
           "attributes": {
             "$ref": "#/components/schemas/ReasonAttributes"
@@ -13088,16 +12981,14 @@
           "subject": {
             "$ref": "#/components/schemas/ReasonSubject"
           }
-        }
+        },
+        "required": [
+          "author",
+          "reasonType",
+          "subject"
+        ]
       },
       "ReasonSubject": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "name",
-          "title"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13114,15 +13005,16 @@
           "url": {
             "type": "string"
           }
-        }
-      },
-      "ReasonType": {
+        },
         "required": [
           "apiVersion",
           "kind",
-          "metadata"
-        ],
-        "type": "object",
+          "name",
+          "title"
+        ]
+      },
+      "ReasonType": {
+        "description": "\u003cp\u003e{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\u003c/p\u003e\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13137,21 +13029,13 @@
             "$ref": "#/components/schemas/ReasonTypeSpec"
           }
         },
-        "description": "\u003cp\u003e{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\u003c/p\u003e\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "ReasonTypeList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13178,40 +13062,46 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ReasonTypeSpec": {
-        "required": [
-          "description",
-          "displayName"
-        ],
-        "type": "object",
         "properties": {
           "description": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "displayName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "properties": {
             "type": "array",
@@ -13219,15 +13109,14 @@
               "$ref": "#/components/schemas/ReasonProperty"
             }
           }
-        }
+        },
+        "required": [
+          "description",
+          "displayName"
+        ]
       },
       "Ref": {
-        "required": [
-          "group",
-          "kind",
-          "name"
-        ],
-        "type": "object",
+        "description": "Extension reference object. The name is mandatory",
         "properties": {
           "group": {
             "type": "string",
@@ -13246,16 +13135,13 @@
             "description": "Extension version"
           }
         },
-        "description": "Extension reference object. The name is mandatory"
+        "required": [
+          "group",
+          "kind",
+          "name"
+        ]
       },
       "RememberMeToken": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13269,21 +13155,15 @@
           "spec": {
             "$ref": "#/components/schemas/RememberMeTokenSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "RememberMeTokenList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13310,57 +13190,63 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "RememberMeTokenSpec": {
-        "required": [
-          "series",
-          "tokenValue",
-          "username"
-        ],
-        "type": "object",
         "properties": {
           "lastUsed": {
             "type": "string",
             "format": "date-time"
           },
           "series": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "tokenValue": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "username": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "series",
+          "tokenValue",
+          "username"
+        ]
       },
       "RemoveOperation": {
-        "required": [
-          "op",
-          "path"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -13370,19 +13256,18 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           }
-        }
-      },
-      "ReplaceOperation": {
+        },
         "required": [
           "op",
-          "path",
-          "value"
-        ],
+          "path"
+        ]
+      },
+      "ReplaceOperation": {
         "type": "object",
         "properties": {
           "op": {
@@ -13392,25 +13277,22 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "Reply": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec",
-          "status"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13427,21 +13309,16 @@
           "status": {
             "$ref": "#/components/schemas/ReplyStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec",
+          "status"
+        ]
       },
       "ReplyList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13468,39 +13345,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ReplySpec": {
-        "required": [
-          "allowNotification",
-          "approved",
-          "commentName",
-          "content",
-          "hidden",
-          "owner",
-          "priority",
-          "raw",
-          "top"
-        ],
-        "type": "object",
         "properties": {
           "allowNotification": {
             "type": "boolean",
@@ -13515,17 +13391,17 @@
             "format": "date-time"
           },
           "commentName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "content": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "creationTime": {
             "type": "string",
-            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e."
           },
           "hidden": {
             "type": "boolean",
@@ -13546,8 +13422,8 @@
             "type": "string"
           },
           "raw": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "top": {
             "type": "boolean",
@@ -13556,10 +13432,20 @@
           "userAgent": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "allowNotification",
+          "approved",
+          "commentName",
+          "content",
+          "hidden",
+          "owner",
+          "priority",
+          "raw",
+          "top"
+        ]
       },
       "ReplyStatus": {
-        "type": "object",
         "properties": {
           "observedVersion": {
             "type": "integer",
@@ -13568,12 +13454,7 @@
         }
       },
       "ReverseProxy": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003eThe reverse proxy custom resource is used to configure a path to proxy it to a directory or\n file.\u003c/p\u003e\n \u003cp\u003eHTTP proxy may be added in the future.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13591,21 +13472,13 @@
             }
           }
         },
-        "description": "\u003cp\u003eThe reverse proxy custom resource is used to configure a path to proxy it to a directory or\n file.\u003c/p\u003e\n \u003cp\u003eHTTP proxy may be added in the future.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "ReverseProxyList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13632,28 +13505,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ReverseProxyRule": {
-        "type": "object",
         "properties": {
           "file": {
             "$ref": "#/components/schemas/FileReverseProxyProvider"
@@ -13664,13 +13547,6 @@
         }
       },
       "Role": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "rules"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13687,15 +13563,16 @@
               "$ref": "#/components/schemas/PolicyRule"
             }
           }
-        }
-      },
-      "RoleBinding": {
+        },
         "required": [
           "apiVersion",
           "kind",
-          "metadata"
-        ],
-        "type": "object",
+          "metadata",
+          "rules"
+        ]
+      },
+      "RoleBinding": {
+        "description": "RoleBinding references a role, but does not contain it.\n It can reference a Role in the global.\n It adds who information via Subjects.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13707,7 +13584,8 @@
             "$ref": "#/components/schemas/Metadata"
           },
           "roleRef": {
-            "$ref": "#/components/schemas/RoleRef"
+            "$ref": "#/components/schemas/RoleRef",
+            "description": "RoleRef can reference a Role in the current namespace or a ClusterRole in the global\n namespace.\n If the RoleRef cannot be resolved, the Authorizer must return an error."
           },
           "subjects": {
             "type": "array",
@@ -13717,21 +13595,13 @@
             }
           }
         },
-        "description": "RoleBinding references a role, but does not contain it.\n It can reference a Role in the global.\n It adds who information via Subjects."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "RoleBindingList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13758,27 +13628,25 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
-      },
-      "RoleList": {
+        },
         "required": [
           "first",
           "hasNext",
@@ -13789,8 +13657,9 @@
           "size",
           "total",
           "totalPages"
-        ],
-        "type": "object",
+        ]
+      },
+      "RoleList": {
         "properties": {
           "first": {
             "type": "boolean",
@@ -13817,28 +13686,39 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "RoleRef": {
-        "type": "object",
+        "description": "RoleRef contains information that points to the role being used.",
         "properties": {
           "apiGroup": {
             "type": "string",
@@ -13852,16 +13732,10 @@
             "type": "string",
             "description": "Name is the name of resource being referenced."
           }
-        },
-        "description": "RoleRef contains information that points to the role being used."
+        }
       },
       "Secret": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "Secret is a small piece of sensitive data which should be kept secret, such as a password,\n a token, or a key.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13892,21 +13766,13 @@
             "description": "Used to facilitate programmatic handling of secret data.\n More info:\n \u003ca href\u003d\"https://kubernetes.io/docs/concepts/configuration/secret/#secret-types\"\u003esecret-types\u003c/a\u003e"
           }
         },
-        "description": "Secret is a small piece of sensitive data which should be kept secret, such as a password,\n a token, or a key."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "SecretList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -13933,34 +13799,39 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "Setting": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "{@link Setting Setting} is a custom extension to generate forms based on configuration.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -13975,15 +13846,15 @@
             "$ref": "#/components/schemas/SettingSpec"
           }
         },
-        "description": "{@link Setting Setting} is a custom extension to generate forms based on configuration."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "SettingForm": {
         "minLength": 1,
-        "required": [
-          "formSchema",
-          "group"
-        ],
-        "type": "object",
         "properties": {
           "formSchema": {
             "type": "array",
@@ -13997,21 +13868,13 @@
           "label": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "formSchema",
+          "group"
+        ]
       },
       "SettingList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14038,66 +13901,69 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "SettingRef": {
+        "properties": {
+          "group": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "required": [
           "group",
           "name"
-        ],
-        "type": "object",
-        "properties": {
-          "group": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          }
-        }
+        ]
       },
       "SettingSpec": {
-        "required": [
-          "forms"
-        ],
-        "type": "object",
         "properties": {
           "forms": {
-            "minLength": 1,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SettingForm"
-            }
+            },
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "forms"
+        ]
       },
       "SinglePage": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003eSingle page extension.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14115,21 +13981,14 @@
             "$ref": "#/components/schemas/SinglePageStatus"
           }
         },
-        "description": "\u003cp\u003eSingle page extension.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "SinglePageList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14156,39 +14015,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "SinglePageSpec": {
-        "required": [
-          "allowComment",
-          "deleted",
-          "excerpt",
-          "pinned",
-          "priority",
-          "publish",
-          "slug",
-          "title",
-          "visible"
-        ],
-        "type": "object",
         "properties": {
           "allowComment": {
             "type": "boolean",
@@ -14244,15 +14102,15 @@
             "description": "引用到的已发布的内容，用于主题端显示."
           },
           "slug": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "template": {
             "type": "string"
           },
           "title": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "visible": {
             "type": "string",
@@ -14263,10 +14121,20 @@
               "PRIVATE"
             ]
           }
-        }
+        },
+        "required": [
+          "allowComment",
+          "deleted",
+          "excerpt",
+          "pinned",
+          "priority",
+          "publish",
+          "slug",
+          "title",
+          "visible"
+        ]
       },
       "SinglePageStatus": {
-        "type": "object",
         "properties": {
           "commentsCount": {
             "type": "integer",
@@ -14274,13 +14142,13 @@
           },
           "conditions": {
             "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            },
             "properties": {
               "empty": {
                 "type": "boolean"
               }
-            },
-            "items": {
-              "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
@@ -14316,30 +14184,24 @@
         }
       },
       "SnapShotSpec": {
-        "required": [
-          "owner",
-          "rawType",
-          "subjectRef"
-        ],
-        "type": "object",
         "properties": {
           "contentPatch": {
             "type": "string"
           },
           "contributors": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "uniqueItems": true
           },
           "lastModifyTime": {
             "type": "string",
             "format": "date-time"
           },
           "owner": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "parentSnapshotName": {
             "type": "string"
@@ -14348,24 +14210,22 @@
             "type": "string"
           },
           "rawType": {
-            "maxLength": 50,
-            "minLength": 1,
             "type": "string",
-            "description": "such as: markdown | html | json | asciidoc | latex."
+            "description": "such as: markdown | html | json | asciidoc | latex.",
+            "maxLength": 50,
+            "minLength": 1
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
           }
-        }
+        },
+        "required": [
+          "owner",
+          "rawType",
+          "subjectRef"
+        ]
       },
       "Snapshot": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14379,21 +14239,15 @@
           "spec": {
             "$ref": "#/components/schemas/SnapShotSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "SnapshotList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14420,28 +14274,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "Subject": {
-        "type": "object",
         "properties": {
           "apiGroup": {
             "type": "string",
@@ -14458,12 +14322,7 @@
         }
       },
       "Subscription": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003e{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a\n certain {@link Reason Reason} is triggered.\u003c/p\u003e\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to\n subscribe to.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14478,21 +14337,13 @@
             "$ref": "#/components/schemas/SubscriptionSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a\n certain {@link Reason Reason} is triggered.\u003c/p\u003e\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to\n subscribe to.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata"
+        ]
       },
       "SubscriptionList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14519,33 +14370,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "SubscriptionSpec": {
-        "required": [
-          "reason",
-          "subscriber",
-          "unsubscribeToken"
-        ],
-        "type": "object",
         "properties": {
           "disabled": {
             "type": "boolean",
@@ -14561,29 +14417,26 @@
             "type": "string",
             "description": "The token to unsubscribe"
           }
-        }
+        },
+        "required": [
+          "reason",
+          "subscriber",
+          "unsubscribeToken"
+        ]
       },
       "SubscriptionSubscriber": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
+        "description": "The subscriber to be notified",
         "properties": {
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
-        "description": "The subscriber to be notified"
+        "required": [
+          "name"
+        ]
       },
       "Tag": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14600,21 +14453,15 @@
           "status": {
             "$ref": "#/components/schemas/TagStatus"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "TagList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14641,53 +14488,65 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "TagSpec": {
-        "required": [
-          "displayName",
-          "slug"
-        ],
-        "type": "object",
         "properties": {
           "color": {
-            "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
+            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e",
+            "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
           },
           "cover": {
             "type": "string"
           },
-          "displayName": {
-            "minLength": 1,
+          "description": {
             "type": "string"
           },
+          "displayName": {
+            "type": "string",
+            "minLength": 1
+          },
           "slug": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "displayName",
+          "slug"
+        ]
       },
       "TagStatus": {
-        "type": "object",
         "properties": {
           "observedVersion": {
             "type": "integer",
@@ -14707,10 +14566,6 @@
         }
       },
       "TemplateContent": {
-        "required": [
-          "title"
-        ],
-        "type": "object",
         "properties": {
           "htmlBody": {
             "type": "string"
@@ -14719,41 +14574,38 @@
             "type": "string"
           },
           "title": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "title"
+        ]
       },
       "TemplateDescriptor": {
-        "required": [
-          "file",
-          "name"
-        ],
-        "type": "object",
+        "description": "Type used to describe custom template page.",
         "properties": {
           "description": {
             "type": "string"
           },
           "file": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "screenshot": {
             "type": "string"
           }
         },
-        "description": "Type used to describe custom template page."
+        "required": [
+          "file",
+          "name"
+        ]
       },
       "TestOperation": {
-        "required": [
-          "op",
-          "path",
-          "value"
-        ],
         "type": "object",
         "properties": {
           "op": {
@@ -14763,24 +14615,23 @@
             ]
           },
           "path": {
-            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$",
             "type": "string",
             "description": "A JSON Pointer path pointing to the location to move/copy from.",
-            "example": "/a/b/c"
+            "example": "/a/b/c",
+            "pattern": "^(/[^/~]*(~[01][^/~]*)*)*$"
           },
           "value": {
             "description": "Value can be any JSON value"
           }
-        }
+        },
+        "required": [
+          "op",
+          "path",
+          "value"
+        ]
       },
       "Theme": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "\u003cp\u003eTheme extension.\u003c/p\u003e",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14798,21 +14649,14 @@
             "$ref": "#/components/schemas/ThemeStatus"
           }
         },
-        "description": "\u003cp\u003eTheme extension.\u003c/p\u003e"
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "ThemeList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -14839,32 +14683,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ThemeSpec": {
-        "required": [
-          "author",
-          "displayName"
-        ],
-        "type": "object",
         "properties": {
           "author": {
             "$ref": "#/components/schemas/Author"
@@ -14879,8 +14729,8 @@
             "type": "string"
           },
           "displayName": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "homepage": {
             "type": "string"
@@ -14909,20 +14759,23 @@
           "version": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "author",
+          "displayName"
+        ]
       },
       "ThemeStatus": {
-        "type": "object",
         "properties": {
           "conditions": {
             "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Condition"
+            },
             "properties": {
               "empty": {
                 "type": "boolean"
               }
-            },
-            "items": {
-              "$ref": "#/components/schemas/Condition"
             }
           },
           "location": {
@@ -14939,13 +14792,6 @@
         }
       },
       "Thumbnail": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -14959,21 +14805,15 @@
           "spec": {
             "$ref": "#/components/schemas/ThumbnailSpec"
           }
-        }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "ThumbnailList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -15000,42 +14840,46 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "ThumbnailSpec": {
-        "required": [
-          "imageSignature",
-          "imageUri",
-          "size",
-          "thumbnailUri"
-        ],
-        "type": "object",
         "properties": {
           "imageSignature": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "imageUri": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "size": {
             "type": "string",
@@ -15047,19 +14891,19 @@
             ]
           },
           "thumbnailUri": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
-        }
+        },
+        "required": [
+          "imageSignature",
+          "imageUri",
+          "size",
+          "thumbnailUri"
+        ]
       },
       "User": {
-        "required": [
-          "apiVersion",
-          "kind",
-          "metadata",
-          "spec"
-        ],
-        "type": "object",
+        "description": "The extension represents user details of Halo.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -15077,16 +14921,15 @@
             "$ref": "#/components/schemas/UserStatus"
           }
         },
-        "description": "The extension represents user details of Halo."
-      },
-      "UserConnection": {
         "required": [
           "apiVersion",
           "kind",
           "metadata",
           "spec"
-        ],
-        "type": "object",
+        ]
+      },
+      "UserConnection": {
+        "description": "User connection extension.",
         "properties": {
           "apiVersion": {
             "type": "string"
@@ -15101,21 +14944,14 @@
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
         },
-        "description": "User connection extension."
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ]
       },
       "UserConnectionList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -15142,33 +14978,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "UserConnectionSpec": {
-        "required": [
-          "providerUserId",
-          "registrationId",
-          "username"
-        ],
-        "type": "object",
         "properties": {
           "providerUserId": {
             "type": "string",
@@ -15180,28 +15021,21 @@
           },
           "updatedAt": {
             "type": "string",
-            "description": "The time when the user connection was last updated.",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "The time when the user connection was last updated."
           },
           "username": {
             "type": "string",
             "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
-        }
+        },
+        "required": [
+          "providerUserId",
+          "registrationId",
+          "username"
+        ]
       },
       "UserList": {
-        "required": [
-          "first",
-          "hasNext",
-          "hasPrevious",
-          "items",
-          "last",
-          "page",
-          "size",
-          "total",
-          "totalPages"
-        ],
-        "type": "object",
         "properties": {
           "first": {
             "type": "boolean",
@@ -15228,32 +15062,38 @@
           },
           "page": {
             "type": "integer",
-            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Page number, starts from 1. If not set or equal to 0, it means no pagination."
           },
           "size": {
             "type": "integer",
-            "description": "Size of each page. If not set or equal to 0, it means no pagination.",
-            "format": "int32"
+            "format": "int32",
+            "description": "Size of each page. If not set or equal to 0, it means no pagination."
           },
           "total": {
             "type": "integer",
-            "description": "Total elements.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Total elements."
           },
           "totalPages": {
             "type": "integer",
-            "description": "Indicates total pages.",
-            "format": "int64"
+            "format": "int64",
+            "description": "Indicates total pages."
           }
-        }
+        },
+        "required": [
+          "first",
+          "hasNext",
+          "hasPrevious",
+          "items",
+          "last",
+          "page",
+          "size",
+          "total",
+          "totalPages"
+        ]
       },
       "UserSpec": {
-        "required": [
-          "displayName",
-          "email"
-        ],
-        "type": "object",
         "properties": {
           "avatar": {
             "type": "string"
@@ -15293,10 +15133,13 @@
           "twoFactorAuthEnabled": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "displayName",
+          "email"
+        ]
       },
       "UserStatus": {
-        "type": "object",
         "properties": {
           "permalink": {
             "type": "string"
