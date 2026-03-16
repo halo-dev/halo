@@ -45,6 +45,9 @@ export function createViteConfig(options: Options) {
 
   return defineConfig({
     base,
+    experimental: {
+      bundledDev: true,
+    },
     plugins: [
       ...sharedPlugins,
       ...setupLibraryExternal(isProduction, base, entryFile),
