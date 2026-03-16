@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     experimental: {
-      bundledDev: true,
+      bundledDev: !isTest,
     },
     plugins: [
       Vue(),
@@ -37,7 +37,6 @@ export default defineConfig(({ mode }) => {
         include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
       ...(!isTest ? setupLibraryExternal(isProduction) : []),
-
       !isProduction && {
         name: "vite-dev-absolute-urls",
         transformIndexHtml: {
