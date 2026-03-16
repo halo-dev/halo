@@ -12,10 +12,12 @@ import {
   VButton,
   VDescription,
   VDescriptionItem,
+  VSpace,
   VSwitch,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
+import { useClipboard } from "@vueuse/core";
 import type { Ref } from "vue";
 import { computed, inject, ref } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -88,6 +90,10 @@ const errorAlertVisible = computed(() => {
 const lastCondition = computed(() => {
   return plugin?.value?.status?.conditions?.[0];
 });
+
+const { copy, copied } = useClipboard({
+  legacy: true,
+});
 </script>
 
 <template>
@@ -122,9 +128,22 @@ const lastCondition = computed(() => {
           </div>
         </template>
         <template #actions>
-          <VButton size="sm" @click="conditionsModalVisible = true">
-            {{ $t("core.plugin.detail.operations.view_conditions.button") }}
-          </VButton>
+          <VSpace>
+            <VButton size="sm" @click="conditionsModalVisible = true">
+              {{ $t("core.plugin.detail.operations.view_conditions.button") }}
+            </VButton>
+            <VButton size="sm" @click="copy(lastCondition.message || '')">
+              {{
+                copied
+                  ? $t(
+                      "core.plugin.detail.operations.copy_error_message.copied"
+                    )
+                  : $t(
+                      "core.plugin.detail.operations.copy_error_message.button"
+                    )
+              }}
+            </VButton>
+          </VSpace>
         </template>
       </VAlert>
     </div>

@@ -32,8 +32,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.core.ReactiveSelectOperation.ReactiveSelect;
-import org.springframework.data.r2dbc.core.ReactiveSelectOperation.TerminatingSelect;
-import org.springframework.data.relational.core.query.Query;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation.SelectWithQuery;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
 import org.springframework.transaction.ReactiveTransaction;
 import reactor.core.publisher.Flux;
@@ -74,7 +73,7 @@ class MigrationServiceImplTest {
     ReactiveSelect<ExtensionStore> reactiveSelect;
 
     @Mock
-    TerminatingSelect<ExtensionStore> terminatingSelect;
+    SelectWithQuery<ExtensionStore> selectWithQuery;
 
     @TempDir
     Path tempDir;
@@ -90,10 +89,11 @@ class MigrationServiceImplTest {
         when(txManager.commit(tx)).thenReturn(Mono.empty());
 
         when(entityTemplate.select(ExtensionStore.class)).thenReturn(reactiveSelect);
-        when(reactiveSelect.matching(any(Query.class))).thenReturn(terminatingSelect);
-        when(terminatingSelect.all())
+        when(reactiveSelect.withFetchSize(100)).thenReturn(selectWithQuery);
+        when(selectWithQuery.all())
             .thenReturn(Flux.fromIterable(extensionStores))
             .thenReturn(Flux.empty());
+
         when(haloProperties.getWorkDir()).thenReturn(tempDir);
         when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
         var startTimestamp = Instant.now();

@@ -1,8 +1,9 @@
 {
   "recommendations": [
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
-    "vue.volar"
+    "oxc.oxc-vscode",
+    "vue.volar",
+    "bradlc.vscode-tailwindcss"
   ]
 }

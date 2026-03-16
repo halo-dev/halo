@@ -40,11 +40,11 @@ function formatColorByUnpredictableValue(value: string) {
     case "rgb":
       return color.toRgbString();
     case "hex8":
-      return color.toHex8();
+      return color.toHex8String();
     case "hsl":
       return color.toHslString();
     default:
-      return color.toHex();
+      return color.toHexString();
   }
 }
 
