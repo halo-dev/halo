@@ -15,11 +15,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
   return {
     plugins: [
-      Vue({
-        script: {
-          defineModel: true,
-        },
-      }),
+      Vue(),
       VueJsx(),
       Gzip(),
       Icons({
@@ -60,9 +56,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      outDir: path.resolve(__dirname, "build/dist"),
+      outDir: path.resolve(__dirname, "build/dist/ui"),
       emptyOutDir: true,
-      assetsDir: "ui/assets",
+      assetsDir: "ui-assets",
       rolldownOptions: {
         input: {
           console: resolve(import.meta.dirname, "console.html"),

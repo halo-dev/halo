@@ -94,7 +94,7 @@ export const setupLibraryExternal = (isProduction: boolean) => {
   ].map((target) => {
     return {
       ...target,
-      dest: `ui/assets/${target.dest}`,
+      dest: `ui-assets/${target.dest}`,
       rename: `${target.rename.replace(
         "[hash]",
         computeLibraryHash(target.src)
