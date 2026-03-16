@@ -44,10 +44,10 @@ import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.infra.SecureRequestMappingHandlerAdapter;
-import run.halo.app.infra.ui.ProxyFilter;
-import run.halo.app.infra.ui.WebSocketRequestPredicate;
 import run.halo.app.infra.properties.AttachmentProperties;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.ui.ProxyFilter;
+import run.halo.app.infra.ui.WebSocketRequestPredicate;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
 import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -218,7 +218,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
             );
     }
 
-
+    /**
+     * Order of this filter is higher than
+     * {@link LocaleChangeWebFilter} to allow change locale in dev
+     * mode.
+     * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
+     * obtain the locale
+     */
     @ConditionalOnProperty(name = "halo.ui.proxy.enabled", havingValue = "true")
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 2)
