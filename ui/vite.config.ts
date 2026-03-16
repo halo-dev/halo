@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || Boolean(process.env.VITEST);
 
   return {
+    experimental: {
+      bundledDev: true,
+    },
     plugins: [
       Vue(),
       VueJsx(),
