@@ -1,6 +1,6 @@
-package run.halo.app.infra.console;
+package run.halo.app.infra.ui;
 
-import static run.halo.app.infra.console.WebSocketUtils.isWebSocketUpgrade;
+import static run.halo.app.infra.ui.WebSocketUtils.isWebSocketUpgrade;
 
 import org.springframework.web.reactive.function.server.RequestPredicate;
 import org.springframework.web.reactive.function.server.ServerRequest;

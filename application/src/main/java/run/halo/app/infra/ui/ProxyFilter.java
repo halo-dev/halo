@@ -1,9 +1,10 @@
-package run.halo.app.infra.console;
+package run.halo.app.infra.ui;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -21,34 +22,29 @@ public class ProxyFilter implements WebFilter {
 
     private final ProxyProperties proxyProperties;
 
-    private final ServerWebExchangeMatcher consoleMatcher;
+    private final ServerWebExchangeMatcher requestMatcher;
 
     private final WebClient webClient;
 
-    public ProxyFilter(String pattern, ProxyProperties proxyProperties) {
+    public ProxyFilter(ProxyProperties proxyProperties, String... patterns) {
         this.proxyProperties = proxyProperties;
-        var consoleMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, pattern);
-        consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
+        var requestMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, patterns);
+        requestMatcher = new AndServerWebExchangeMatcher(requestMatcher,
             new NegatedServerWebExchangeMatcher(new WebSocketServerWebExchangeMatcher()));
-        this.consoleMatcher = consoleMatcher;
+        this.requestMatcher = requestMatcher;
         this.webClient = WebClient.create(proxyProperties.getEndpoint().toString());
-        log.debug("Initialized ProxyFilter to proxy {} to endpoint {}", pattern,
+        log.debug("Initialized ProxyFilter to proxy {} to endpoint {}",
+            java.util.Arrays.toString(patterns),
             proxyProperties.getEndpoint());
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return consoleMatcher.matches(exchange)
+        return requestMatcher.matches(exchange)
             .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+            .filter(matchResult -> isHtmlRequest(exchange))
             .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
-            .map(matchResult -> {
-                var request = exchange.getRequest();
-                return UriComponentsBuilder.fromUriString(
-                        request.getPath().pathWithinApplication().value())
-                    .queryParams(request.getQueryParams())
-                    .build()
-                    .toUriString();
-            })
+            .map(matchResult -> getProxyUri(exchange))
             .doOnNext(uri -> {
                 if (log.isTraceEnabled()) {
                     log.trace("Proxy {} to {}", uri, proxyProperties.getEndpoint());
@@ -76,5 +72,32 @@ public class ProxyFilter implements WebFilter {
                     var body = clientResponse.bodyToFlux(DataBuffer.class);
                     return response.writeWith(body);
                 }));
+    }
+
+    private boolean isHtmlRequest(ServerWebExchange exchange) {
+        var acceptHeaders = exchange.getRequest().getHeaders().getAccept();
+        if (acceptHeaders.isEmpty()) {
+            return true;
+        }
+        return acceptHeaders.stream()
+            .anyMatch(mediaType -> mediaType.isCompatibleWith(MediaType.TEXT_HTML));
+    }
+
+    private String getProxyUri(ServerWebExchange exchange) {
+        var requestPath = exchange.getRequest().getPath().pathWithinApplication().value();
+        return UriComponentsBuilder.fromUriString(getUiEntryPath(requestPath))
+            .queryParams(exchange.getRequest().getQueryParams())
+            .build()
+            .toUriString();
+    }
+
+    private String getUiEntryPath(String requestPath) {
+        if (requestPath.startsWith("/console")) {
+            return "/console";
+        }
+        if (requestPath.startsWith("/uc")) {
+            return "/uc";
+        }
+        return requestPath;
     }
 }

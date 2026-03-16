@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => {
       outDir: path.resolve(__dirname, "build/dist/ui"),
       emptyOutDir: true,
       assetsDir: "ui-assets",
+      minify: false,
       rolldownOptions: {
         input: {
           console: resolve(import.meta.dirname, "console.html"),

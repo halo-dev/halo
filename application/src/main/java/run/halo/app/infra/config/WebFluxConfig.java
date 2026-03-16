@@ -44,8 +44,8 @@ import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.infra.SecureRequestMappingHandlerAdapter;
-import run.halo.app.infra.console.ProxyFilter;
-import run.halo.app.infra.console.WebSocketRequestPredicate;
+import run.halo.app.infra.ui.ProxyFilter;
+import run.halo.app.infra.ui.WebSocketRequestPredicate;
 import run.halo.app.infra.properties.AttachmentProperties;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
@@ -125,31 +125,29 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    RouterFunction<ServerResponse> consoleEndpoints() {
-        var consolePredicate = path("/console/**").and(path("/console/assets/**").negate())
+    RouterFunction<ServerResponse> uiPageEndpoints() {
+        var consolePagePredicate = path("/console/**")
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
 
-        var ucPredicate = path("/uc/**").and(path("/uc/assets/**").negate())
+        var ucPagePredicate = path("/uc/**")
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
 
-        var consoleIndexHtml =
-            applicationContext.getResource(haloProp.getConsole().getLocation() + "index.html");
+        var consolePageHtml = applicationContext.getResource("classpath:/ui/console.html");
 
-        var ucIndexHtml =
-            applicationContext.getResource(haloProp.getUc().getLocation() + "index.html");
+        var ucPageHtml = applicationContext.getResource("classpath:/ui/uc.html");
 
         return RouterFunctions.route()
-            .GET(consolePredicate,
+            .GET(consolePagePredicate,
                 request -> ServerResponse.ok()
                     .cacheControl(CacheControl.noStore())
-                    .bodyValue(consoleIndexHtml)
+                    .bodyValue(consolePageHtml)
             )
-            .GET(ucPredicate,
+            .GET(ucPagePredicate,
                 request -> ServerResponse.ok()
                     .cacheControl(CacheControl.noStore())
-                    .bodyValue(ucIndexHtml)
+                    .bodyValue(ucPageHtml)
             )
             .build();
     }
@@ -172,18 +170,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .setUseLastModified(useLastModified)
             .setCacheControl(cacheControl);
 
-        // For console assets
-        registry.addResourceHandler("/console/assets/**")
-            .addResourceLocations(haloProp.getConsole().getLocation() + "assets/")
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
-
-        // For uc assets
-        registry.addResourceHandler("/uc/assets/**")
-            .addResourceLocations(haloProp.getUc().getLocation() + "assets/")
+        registry.addResourceHandler("/ui-assets/**")
+            .addResourceLocations("classpath:/ui/ui-assets/")
             .setCacheControl(cacheControl)
             .setUseLastModified(useLastModified)
             .resourceChain(true)
@@ -231,26 +219,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
 
-    @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "halo.ui.proxy.enabled", havingValue = "true")
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 2)
-    ProxyFilter consoleProxyFilter() {
-        return new ProxyFilter("/console/**", haloProp.getConsole().getProxy());
-    }
-
-
-    /**
-     * Order of this filter is higher than
-     * {@link LocaleChangeWebFilter} to allow change locale in dev
-     * mode.
-     * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
-     * obtain the locale
-     */
-    @ConditionalOnProperty(name = "halo.uc.proxy.enabled", havingValue = "true")
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
-    ProxyFilter ucProxyFilter() {
-        return new ProxyFilter("/uc/**", haloProp.getUc().getProxy());
+    ProxyFilter uiProxyFilter() {
+        return new ProxyFilter(haloProp.getUi().getProxy(), "/console/**", "/uc/**");
     }
 
     /**
