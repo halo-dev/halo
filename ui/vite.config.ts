@@ -1,11 +1,13 @@
 import fs from "node:fs";
 import path, { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import VueI18n from "@intlify/unplugin-vue-i18n/vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import Gzip from "rollup-plugin-gzip";
 import Icons from "unplugin-icons/vite";
 import { defineConfig } from "vite";
+import { configDefaults } from "vitest/config";
 import { setupLibraryExternal } from "./src/vite/library-external";
 
 const DEV_SERVER_PORT = 3000;
@@ -13,6 +15,8 @@ const DEV_SERVER_ORIGIN = `http://localhost:${DEV_SERVER_PORT}`;
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
+  const isTest = mode === "test" || Boolean(process.env.VITEST);
+
   return {
     plugins: [
       Vue(),
@@ -29,7 +33,8 @@ export default defineConfig(({ mode }) => {
       VueI18n({
         include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
-      ...setupLibraryExternal(isProduction),
+      ...(!isTest ? setupLibraryExternal(isProduction) : []),
+
       !isProduction && {
         name: "vite-dev-absolute-urls",
         transformIndexHtml: {
@@ -77,6 +82,22 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+    },
+    test: {
+      environment: "jsdom",
+      include: ["**/*.spec.ts"],
+      root: fileURLToPath(new URL("./", import.meta.url)),
+      exclude: [
+        ...configDefaults.exclude,
+        "./packages/**/*.ts",
+        "node_modules",
+        "dist",
+        ".idea",
+        ".git",
+        ".cache",
+      ],
+      reporters: "html",
+      outputFile: "build/test-result/index.html",
     },
   };
 });

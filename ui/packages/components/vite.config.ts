@@ -5,11 +5,9 @@ import VueJsx from "@vitejs/plugin-vue-jsx";
 import Icons from "unplugin-icons/vite";
 import { defineConfig, type Plugin } from "vite";
 import Dts from "vite-plugin-dts";
+import { configDefaults } from "vitest/config";
 
 export default defineConfig({
-  experimental: {
-    enableNativePlugin: true,
-  },
   plugins: [
     Vue(),
     VueJsx(),
@@ -58,5 +56,10 @@ export default defineConfig({
       },
     },
     sourcemap: true,
+  },
+  test: {
+    environment: "jsdom",
+    exclude: [...configDefaults.exclude],
+    root: fileURLToPath(new URL("./", import.meta.url)),
   },
 });

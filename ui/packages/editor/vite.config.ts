@@ -10,9 +10,6 @@ export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";
 
   return defineConfig({
-    experimental: {
-      enableNativePlugin: true,
-    },
     plugins: [
       Vue(),
       Icons({
