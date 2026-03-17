@@ -9,9 +9,9 @@ import Icons from "unplugin-icons/vite";
 import { defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
 import { setupLibraryExternal } from "./src/vite/library-external";
+import { devPlugin } from "./src/vite/plugin-dev";
 
 const DEV_SERVER_PORT = 3000;
-const DEV_SERVER_ORIGIN = `http://localhost:${DEV_SERVER_PORT}`;
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
@@ -37,17 +37,7 @@ export default defineConfig(({ mode }) => {
         include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
       ...(!isTest ? setupLibraryExternal(isProduction) : []),
-      !isProduction && {
-        name: "vite-dev-absolute-urls",
-        transformIndexHtml: {
-          order: "post" as const,
-          handler: (html: string) =>
-            html.replace(
-              / (src|href)="(\/.+?)"/g,
-              ` $1="${DEV_SERVER_ORIGIN}$2"`
-            ),
-        },
-      },
+      devPlugin({ port: DEV_SERVER_PORT }),
     ],
     resolve: {
       alias: {
