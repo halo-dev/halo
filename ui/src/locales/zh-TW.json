@@ -205,6 +205,8 @@
   "core.post_tag.editing_modal.fields.color.help": "需要主題適配以支持",
   "core.post_tag.editing_modal.fields.cover.label": "封面圖",
   "core.post_tag.editing_modal.fields.cover.help": "需要主題適配以支持",
+  "core.post_tag.editing_modal.fields.description.label": "描述",
+  "core.post_tag.editing_modal.fields.description.help": "描述會自動添加到頁面用於 SEO 的描述標籤中，其他顯示用途需要主題適配",
   "core.post_category.title": "文章分類",
   "core.post_category.header.title": "{count} 個分類",
   "core.post_category.empty.title": "當前沒有分類",

@@ -20,6 +20,7 @@ export interface TagSpec {
      */
     'color'?: string;
     'cover'?: string;
+    'description'?: string;
     'displayName': string;
     'slug': string;
 }

@@ -41,6 +41,7 @@ const formState = ref<Tag>({
   spec: {
     displayName: "",
     slug: "",
+    description: "",
     cover: "",
   },
   apiVersion: "content.halo.run/v1alpha1",
@@ -252,6 +253,18 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.description"
+              name="description"
+              :help="$t('core.post_tag.editing_modal.fields.description.help')"
+              :label="
+                $t('core.post_tag.editing_modal.fields.description.label')
+              "
+              type="textarea"
+              auto-height
+              :max-auto-height="200"
+              validation="length:0,200"
             ></FormKit>
           </div>
         </div>
