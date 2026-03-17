@@ -15,7 +15,7 @@ const DEV_SERVER_PORT = 3000;
 
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production";
-  const isTest = mode === "test" || Boolean(process.env.VITEST);
+  const isTest = mode === "test";
 
   return {
     experimental: {
@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
       VueI18n({
         include: [path.resolve(__dirname, "./src/locales/*.json")],
       }),
-      ...(!isTest ? setupLibraryExternal(isProduction) : []),
+      setupLibraryExternal(mode),
       devPlugin({ port: DEV_SERVER_PORT }),
     ],
     resolve: {

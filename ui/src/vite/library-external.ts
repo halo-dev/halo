@@ -11,10 +11,17 @@ import {
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
  *
- * @param {boolean} isProduction - boolean
+ * @param {string} mode
  * @returns An array of plugins
  */
-export const setupLibraryExternal = (isProduction: boolean) => {
+export const setupLibraryExternal = (mode: string) => {
+  // Vitest mode doesn't need to setup library external.
+  if (mode === "test") {
+    return [];
+  }
+
+  const isProduction = mode === "production";
+
   const staticTargets: Target[] = [
     {
       src: `./node_modules/vue/dist/vue.global${
@@ -97,7 +104,7 @@ export const setupLibraryExternal = (isProduction: boolean) => {
       dest: `ui-assets/${target.dest}`,
       rename: `${target.rename.replace(
         "[hash]",
-        computeLibraryHash(target.src)
+        computeLibraryHash(target.src),
       )}`,
     };
   });
