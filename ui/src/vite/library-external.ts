@@ -104,7 +104,7 @@ export const setupLibraryExternal = (mode: string) => {
       dest: `ui-assets/${target.dest}`,
       rename: `${target.rename.replace(
         "[hash]",
-        computeLibraryHash(target.src),
+        computeLibraryHash(target.src)
       )}`,
     };
   });
