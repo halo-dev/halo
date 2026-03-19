@@ -3,9 +3,9 @@ import { fileURLToPath, URL } from "node:url";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import Icons from "unplugin-icons/vite";
-import { defineConfig, type Plugin } from "vite";
 import Dts from "vite-plugin-dts";
-import { configDefaults } from "vitest/config";
+import { defineConfig, type Plugin } from "vite-plus";
+import { configDefaults } from "vite-plus";
 
 export default defineConfig({
   plugins: [

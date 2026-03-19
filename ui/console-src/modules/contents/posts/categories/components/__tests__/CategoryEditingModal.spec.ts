@@ -2,7 +2,7 @@ import messages from "@intlify/unplugin-vue-i18n/messages";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import { createI18n } from "vue-i18n";
 import CategoryEditingModal from "../CategoryEditingModal.vue";
 

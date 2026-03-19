@@ -1,5 +1,4 @@
-/// <reference types="vite/client" />
-/// <reference types="histoire" />
+/// <reference types="vite-plus/client" />
 /// <reference types="unplugin-icons/types/vue" />
 
 declare module "*.vue" {

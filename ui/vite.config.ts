@@ -6,8 +6,8 @@ import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import Gzip from "rollup-plugin-gzip";
 import Icons from "unplugin-icons/vite";
-import { defineConfig } from "vite";
-import { configDefaults } from "vitest/config";
+import { defineConfig } from "vite-plus";
+import { configDefaults } from "vite-plus";
 import { setupLibraryExternal } from "./src/vite/library-external";
 import { devPlugin } from "./src/vite/plugin-dev";
 
