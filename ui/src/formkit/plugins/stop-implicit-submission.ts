@@ -1,7 +1,6 @@
-import router from "@console/router";
 import type { FormKitNode } from "@formkit/core";
 import { onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, type Router } from "vue-router";
 function handleKeydown(e: KeyboardEvent) {
   if (
     e.key == "Enter" &&
@@ -32,6 +31,7 @@ const implicitSubmissionType = [
 ];
 
 const FormKeydownEventControllerMap = new Map<string, AbortController>();
+let routeCleanupRegistered = false;
 
 const clearFormKeydownEventByPath = (fullPath: string) => {
   if (FormKeydownEventControllerMap.size) {
@@ -71,11 +71,15 @@ const inputPreventFn = (node: FormKitNode) => {
   }
 };
 
-// 进入下一个页面，清除上一个页面的事件。
-// 可以做个测试后面。https://segmentfault.com/q/1010000042671015
-// map里面的key是path，这里传fullPath，当有多级路由的时候避免清掉上一级的事件。
-router.beforeEach(({ fullPath }) => {
-  clearFormKeydownEventByPath(fullPath);
-});
+export function setupStopImplicitSubmission(router: Router) {
+  if (routeCleanupRegistered) {
+    return;
+  }
+
+  router.beforeEach(({ fullPath }) => {
+    clearFormKeydownEventByPath(fullPath);
+  });
+  routeCleanupRegistered = true;
+}
 
 export default inputPreventFn;

@@ -40,7 +40,7 @@
 │   ├── App.vue
 │   └── main.ts
 ├── env.d.ts
-├── index.html
+├── console.html
 ├── package.json
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
@@ -51,11 +51,40 @@
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── tsconfig.vitest.json
-├── vite.config.ts                      # Console 的 Vite 配置，使用 `--config` 指定
-├── vite.uc.config.ts                   # User Center 的 Vite 配置，使用 `--config` 指定
-└── vitest.config.ts
+├── uc.html
+└── vite.config.ts                      # Console 和 User Center 共用的 Vite 配置
 ```
 
-可以注意到 Console 和 User Center 仅仅只是使用了目录和 Vite 配置进行区分，本质上还是同一个项目，启动 Dev Server 的时候会同时启动两个 Vite 服务，路径分别为 `/console` 和 `/uc`。
+可以注意到 Console 和 User Center 仅仅只是使用源码目录和多页面入口进行区分，本质上还是同一个项目。
 
-同时，在构建时，会将 Console 和 User Center 两部分分别构建为两个独立的项目，构建后的文件会分别放在后端的 `application/src/main/resources/console` 和 `application/src/main/resources/uc` 目录下，最终通过 Halo 本身进行托管。
+## 开发环境访问方式
+
+开发环境下只启动一个 Vite Dev Server，默认端口为 `3000`。
+
+开发时应通过后端访问：
+
+- `http://localhost:8090/console`
+- `http://localhost:8090/uc`
+
+这是因为后端在开发环境中会根据 `application/src/main/resources/application-dev.yaml` 中的 `halo.ui.proxy.*` 配置，将 `/console/**` 和 `/uc/**` 的 HTML 页面请求代理到 `http://localhost:3000/`。
+
+不能直接使用 `http://localhost:3000/console` 或 `http://localhost:3000/uc` 访问页面，因为前端运行后发起的后端 API 请求会产生跨域问题。
+
+需要注意的是，开发环境下后端只代理页面入口，不代理静态资源路径。页面中的脚本和样式资源仍然由 Vite Dev Server 直接提供，但页面入口本身应始终从 Halo 后端地址进入。
+
+## 构建产物
+
+构建时，Console 和 User Center 会通过多页面模式生成到同一个产物目录：
+
+```bash
+build/dist/ui
+├── console.html
+├── uc.html
+└── ui-assets/
+```
+
+随后后端构建过程会将这些文件复制到应用资源目录，生产环境中的访问方式为：
+
+- `/console/**` 返回 `ui/console.html`
+- `/uc/**` 返回 `ui/uc.html`
+- `/ui-assets/**` 提供前端静态资源

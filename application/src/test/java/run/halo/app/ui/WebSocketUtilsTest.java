@@ -1,4 +1,4 @@
-package run.halo.app.console;
+package run.halo.app.ui;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import run.halo.app.infra.console.WebSocketUtils;
+import run.halo.app.infra.ui.WebSocketUtils;
 
 class WebSocketUtilsTest {
 

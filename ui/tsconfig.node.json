@@ -6,8 +6,7 @@
     "vitest.config.*",
     "eslint.config.ts",
     "tailwind.config.ts",
-    "src/vite/library-external.ts",
-    "src/vite/config-builder.ts"
+    "src/vite/*.ts"
   ],
   "compilerOptions": {
     "composite": true,
