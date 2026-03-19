@@ -59,10 +59,6 @@ public class HaloProperties implements Validator {
 
     @Valid
     @NestedConfigurationProperty
-    private final UcProperties uc = new UcProperties();
-
-    @Valid
-    @NestedConfigurationProperty
     private final ThemeProperties theme = new ThemeProperties();
 
     @Valid
