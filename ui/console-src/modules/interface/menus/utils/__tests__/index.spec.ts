@@ -1,5 +1,5 @@
 import type { MenuItem } from "@halo-dev/api-client";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import type { MenuTreeItem } from "../index";
 import {
   buildMenuItemsTree,

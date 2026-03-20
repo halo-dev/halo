@@ -1,4 +1,4 @@
-import type { Plugin } from "vite";
+import type { Plugin } from "vite-plus";
 
 export function devPlugin({ port }: { port: number }): Plugin {
   const DEV_SERVER_ORIGIN = `http://localhost:${port}`;

@@ -1,11 +1,12 @@
-import { defineConfig, type UserConfig } from "tsdown";
+import { defineConfig } from "vite-plus";
+import { UserConfig } from "vite-plus/pack";
 
 const sharedConfig: UserConfig = {
   entry: ["./entry/index.ts"],
   deps: {
     neverBundle: ["axios"],
     alwaysBundle: ["qs"],
-    onlyAllowBundle: false,
+    onlyBundle: false,
   },
   outputOptions: {
     globals: {
@@ -21,14 +22,16 @@ const sharedConfig: UserConfig = {
   },
 };
 
-export default defineConfig([
-  {
-    ...sharedConfig,
-    format: "esm",
-  },
-  {
-    ...sharedConfig,
-    format: "iife",
-    minify: true,
-  },
-]);
+export default defineConfig({
+  pack: [
+    {
+      ...sharedConfig,
+      format: "esm",
+    },
+    {
+      ...sharedConfig,
+      format: "iife",
+      minify: true,
+    },
+  ],
+});

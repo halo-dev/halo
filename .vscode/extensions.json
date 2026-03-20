@@ -4,6 +4,7 @@
     "editorconfig.editorconfig",
     "oxc.oxc-vscode",
     "vue.volar",
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "VoidZero.vite-plus-extension-pack"
   ]
 }
