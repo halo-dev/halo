@@ -8,7 +8,7 @@ export default defineConfig({
     deps: {
       neverBundle: ["vue", "vue-router", "pinia", "@halo-dev/api-client"],
       alwaysBundle: ["mitt"],
-      onlyAllowBundle: false,
+      onlyBundle: false,
     },
     outputOptions: {
       globals: {
