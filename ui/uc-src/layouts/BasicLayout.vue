@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { coreMenuGroups } from "@console/router/constant";
+import { coreMenuGroups } from "@uc/router/constant";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,

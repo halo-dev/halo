@@ -7,6 +7,7 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.isNull;
 import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
+import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,6 +28,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
@@ -80,12 +82,16 @@ public class TagPostRouteFactory implements RouteFactory {
                             )
                         )
                     ));
+                Map<String, Object> model = new HashMap<>();
+                model.put("name", tagVo.getMetadata().getName());
+                model.put("posts", postList);
+                model.put("tag", tagVo);
+                model.put(
+                    Constant.META_DESCRIPTION_VARIABLE_NAME,
+                    tagVo.getSpec().getDescription()
+                );
                 return ServerResponse.ok()
-                    .render(DefaultTemplateEnum.TAG.getValue(),
-                        Map.of("name", tagVo.getMetadata().getName(),
-                            "posts", postList,
-                            "tag", tagVo)
-                    );
+                    .render(DefaultTemplateEnum.TAG.getValue(), model);
             });
     }
 

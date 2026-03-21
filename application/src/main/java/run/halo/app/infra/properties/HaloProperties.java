@@ -55,11 +55,7 @@ public class HaloProperties implements Validator {
 
     @Valid
     @NestedConfigurationProperty
-    private final ConsoleProperties console = new ConsoleProperties();
-
-    @Valid
-    @NestedConfigurationProperty
-    private final UcProperties uc = new UcProperties();
+    private final UiProperties ui = new UiProperties();
 
     @Valid
     @NestedConfigurationProperty

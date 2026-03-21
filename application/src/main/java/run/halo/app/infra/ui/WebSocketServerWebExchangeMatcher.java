@@ -1,8 +1,8 @@
-package run.halo.app.infra.console;
+package run.halo.app.infra.ui;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.match;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher.MatchResult.notMatch;
-import static run.halo.app.infra.console.WebSocketUtils.isWebSocketUpgrade;
+import static run.halo.app.infra.ui.WebSocketUtils.isWebSocketUpgrade;
 
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.server.ServerWebExchange;
