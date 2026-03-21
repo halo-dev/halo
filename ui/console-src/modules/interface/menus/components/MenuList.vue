@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type {
   Menu,
+  MenuItem,
+  MenuItemV1alpha1ApiListMenuItemRequest,
   MenuV1alpha1ApiListMenuRequest,
 } from "@halo-dev/api-client";
 import {
@@ -100,26 +102,75 @@ const handleCloneMenu = async (menu: Menu) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        const newMenuItemNames: string[] = [];
+        let newMenuItemNames: string[] = [];
 
         if (menu.spec.menuItems?.length) {
-          const originalItems = await Promise.all(
-            menu.spec.menuItems.map((name) =>
-              coreApiClient.menuItem.getMenuItem({ name })
-            )
-          );
+          const menuItemNames = menu.spec.menuItems.filter(Boolean);
 
-          const createNewItemPromises = originalItems.map((originalItem) => {
-            const newItem = cloneDeep(originalItem.data);
-            newItem.metadata.name = "";
-            newItem.metadata.generateName = "menuitem-";
-            return coreApiClient.menuItem.createMenuItem({ menuItem: newItem });
+          const originalItems = await paginate<
+            MenuItemV1alpha1ApiListMenuItemRequest,
+            MenuItem
+          >((params) => coreApiClient.menuItem.listMenuItem(params), {
+            fieldSelector: [`name=(${menuItemNames.join(",")})`],
+            size: 1000,
           });
 
-          const newItems = await Promise.all(createNewItemPromises);
-          newMenuItemNames.push(
-            ...newItems.map((item) => item.data.metadata.name)
-          );
+          const oldToNewNameMap = new Map<string, string>();
+
+          const createNewItemPromises = originalItems.map((originalItem) => {
+            const newItem = cloneDeep(originalItem);
+            newItem.metadata.name = "";
+            newItem.metadata.generateName = "menuitem-";
+            if (newItem.spec.children) {
+              newItem.spec.children = [];
+            }
+            return coreApiClient.menuItem
+              .createMenuItem({ menuItem: newItem })
+              .then((res) => {
+                oldToNewNameMap.set(
+                  originalItem.metadata.name,
+                  res.data.metadata.name
+                );
+                return res.data;
+              });
+          });
+
+          await Promise.all(createNewItemPromises);
+
+          const patchPromises: Promise<unknown>[] = [];
+          for (const originalItem of originalItems) {
+            if (
+              originalItem.spec.children &&
+              originalItem.spec.children.length > 0
+            ) {
+              const newChildren = originalItem.spec.children
+                .map((childName) => oldToNewNameMap.get(childName))
+                .filter(Boolean) as string[];
+
+              if (newChildren.length > 0) {
+                const newName = oldToNewNameMap.get(originalItem.metadata.name);
+                if (newName) {
+                  patchPromises.push(
+                    coreApiClient.menuItem.patchMenuItem({
+                      name: newName,
+                      jsonPatchInner: [
+                        {
+                          op: "replace",
+                          path: "/spec/children",
+                          value: newChildren,
+                        },
+                      ],
+                    })
+                  );
+                }
+              }
+            }
+          }
+          await Promise.all(patchPromises);
+
+          newMenuItemNames = menu.spec.menuItems
+            .map((name) => oldToNewNameMap.get(name))
+            .filter(Boolean) as string[];
         }
 
         const newMenu = cloneDeep(menu);
