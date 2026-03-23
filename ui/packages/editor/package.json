@@ -30,8 +30,8 @@
     "./dist/style.css": "./dist/style.css"
   },
   "scripts": {
-    "build": "vite build",
-    "dev": "vite build --watch --mode development",
+    "build": "vp build",
+    "dev": "vp build --watch --mode development",
     "prepublishOnly": "pnpm run build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
