@@ -1,12 +1,12 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import type { HtmlTagDescriptor, Plugin } from "vite";
 import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
 import {
   viteStaticCopy as ViteStaticCopy,
   type Target,
 } from "vite-plugin-static-copy";
+import type { HtmlTagDescriptor, Plugin } from "vite-plus";
 
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
