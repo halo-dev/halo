@@ -32,6 +32,7 @@ import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.TagVo;
 import run.halo.app.theme.router.PageUrlUtils;
@@ -86,6 +87,7 @@ public class TagPostRouteFactory implements RouteFactory {
                 model.put("name", tagVo.getMetadata().getName());
                 model.put("posts", postList);
                 model.put("tag", tagVo);
+                model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.TAG.getValue());
                 model.put(
                     Constant.META_DESCRIPTION_VARIABLE_NAME,
                     tagVo.getSpec().getDescription()
