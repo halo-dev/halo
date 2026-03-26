@@ -1,4 +1,4 @@
-<img width="1441" height="356" alt="image" src="https://github.com/user-attachments/assets/0b80f7ba-83af-4b83-a26c-f940695140eb" /><p align="center">
+<p align="center">
     <a href="https://www.halo.run" target="_blank" rel="noopener noreferrer">
         <img width="100" src="https://www.halo.run/logo" alt="Halo logo" />
     </a>
