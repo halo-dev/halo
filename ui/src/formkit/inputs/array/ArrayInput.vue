@@ -42,7 +42,7 @@ const nodeProps = ref<Partial<FormKitProps<ArrayProps>>>(props.node.props);
 type FnType = (index: number) => Record<string, unknown>;
 
 function createValue(num: number, fn: FnType): ArrayValue {
-  return new Array(num).fill("").map((_, index) => fn(index));
+  return Array.from({ length: num }, (_, index) => fn(index));
 }
 
 function arrayFeature(node: FormKitNode<ArrayValue>) {
@@ -138,13 +138,15 @@ const parseItemLabel = async (
         } as FormattedItemLabel,
       ];
     }
-    return castRenderedValueArray.map((renderedValue) => {
-      return {
-        type: itemLabel.type,
-        value: isNil(renderedValue.value) ? value : renderedValue.value,
-        ...renderedValue,
-      } as FormattedItemLabel;
-    });
+    return castRenderedValueArray
+      .map((renderedValue) => {
+        return {
+          type: itemLabel.type,
+          value: isNil(renderedValue.value) ? value : renderedValue.value,
+          ...renderedValue,
+        } as FormattedItemLabel;
+      })
+      .filter((item) => isNotNil(item.value));
   }
 };
 
