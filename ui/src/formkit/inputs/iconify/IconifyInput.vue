@@ -94,6 +94,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
 }
 
 const editFormId = `icon-edit-form-${utils.id.uuid()}`;
+const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
 </script>
 
 <template>
@@ -136,12 +137,14 @@ const editFormId = `icon-edit-form-${utils.id.uuid()}`;
         <IconifyPicker @select="onSelect" />
       </template>
     </VDropdown>
-    <div class="inline-flex items-center gap-1.5">
+    <div ref="editFormContainer" class="inline-flex items-center gap-1.5">
       <!-- @vue-ignore -->
       <VDropdown
         ref="editFormDropdown"
         class="inline-flex"
         :dispose-timeout="null"
+        :auto-hide="false"
+        :container="editFormContainer"
       >
         <template #default="{ shown }">
           <button
