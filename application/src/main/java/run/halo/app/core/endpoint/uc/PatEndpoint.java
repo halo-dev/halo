@@ -1,4 +1,4 @@
-package run.halo.app.security.authentication.pat;
+package run.halo.app.core.endpoint.uc;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.core.user.service.UserScopedPatHandler;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.security.PersonalAccessToken;
 

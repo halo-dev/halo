@@ -4,6 +4,7 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.server.resource.web.server.authentication.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfWebFilter;
 import org.springframework.security.web.server.csrf.XorServerCsrfTokenRequestAttributeHandler;
@@ -13,7 +14,6 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.authentication.SecurityConfigurer;
-import run.halo.app.security.authentication.pat.PatAuthenticationConverter;
 
 @Component
 @Order(0)
@@ -29,7 +29,7 @@ class CsrfConfigurer implements SecurityConfigurer {
                 "/actuator/**",
                 "/system/setup"
             )),
-            new NegatedServerWebExchangeMatcher(patAuthMatcher())
+            new NegatedServerWebExchangeMatcher(tokenAuthMatcher())
         );
         http.csrf(csrfSpec -> csrfSpec
             .csrfTokenRepository(new CookieServerCsrfTokenRepository())
@@ -37,9 +37,9 @@ class CsrfConfigurer implements SecurityConfigurer {
             .requireCsrfProtectionMatcher(csrfMatcher));
     }
 
-    private static ServerWebExchangeMatcher patAuthMatcher() {
-        var patConverter = new PatAuthenticationConverter();
-        return exchange -> patConverter.convert(exchange)
+    private static ServerWebExchangeMatcher tokenAuthMatcher() {
+        var bearerTokenConverter = new ServerBearerTokenAuthenticationConverter();
+        return exchange -> bearerTokenConverter.convert(exchange)
             .flatMap(a -> ServerWebExchangeMatcher.MatchResult.match())
             .switchIfEmpty(Mono.defer(ServerWebExchangeMatcher.MatchResult::notMatch));
     }
