@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {BackupSpec} from './backup-spec';
+import type { BackupSpec } from './backup-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {BackupStatus} from './backup-status';
+import type { BackupStatus } from './backup-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 export interface Backup {
     'apiVersion': string;

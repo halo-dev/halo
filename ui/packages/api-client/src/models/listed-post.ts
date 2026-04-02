@@ -15,19 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Category} from './category';
+import type { Category } from './category';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Contributor} from './contributor';
+import type { Contributor } from './contributor';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Post} from './post';
+import type { Post } from './post';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Stats} from './stats';
+import type { Stats } from './stats';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Tag} from './tag';
+import type { Tag } from './tag';
 
 /**
  * A chunk of items.

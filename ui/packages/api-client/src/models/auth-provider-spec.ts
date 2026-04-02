@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ConfigMapRef} from './config-map-ref';
+import type { ConfigMapRef } from './config-map-ref';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {SettingRef} from './setting-ref';
+import type { SettingRef } from './setting-ref';
 
 export interface AuthProviderSpec {
     /**

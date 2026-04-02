@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {MenuItemVo} from './menu-item-vo';
+import type { MenuItemVo } from './menu-item-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {MenuSpec} from './menu-spec';
+import type { MenuSpec } from './menu-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link Menu Menu}.

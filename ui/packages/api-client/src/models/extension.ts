@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * Extension is an interface which represents an Extension. It contains setters and getters of  GroupVersionKind and Metadata.

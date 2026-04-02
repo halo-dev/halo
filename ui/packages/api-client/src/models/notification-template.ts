@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {NotificationTemplateSpec} from './notification-template-spec';
+import type { NotificationTemplateSpec } from './notification-template-spec';
 
 /**
  * <p>{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.</p>  <p>It describes the notification template\'s name, description, and the template content.</p>  <p>{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,  if multiple templates are matched, the best match will be selected. This is useful when you  want to override the default template.</p>

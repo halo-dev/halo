@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ExtensionSpec} from './extension-spec';
+import type { ExtensionSpec } from './extension-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * Extension definition.  An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about  an extension. An extension is a way to add new functionality to an existing class, structure,  enumeration, or protocol type without needing to subclass it.

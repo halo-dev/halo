@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ListedReply} from './listed-reply';
+import type { ListedReply } from './listed-reply';
 
 export interface ListedReplyList {
     /**

@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Comment} from './comment';
+import type { Comment } from './comment';
 
 export interface CommentList {
     /**

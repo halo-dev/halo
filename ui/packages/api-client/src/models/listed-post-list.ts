@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ListedPost} from './listed-post';
+import type { ListedPost } from './listed-post';
 
 export interface ListedPostList {
     /**

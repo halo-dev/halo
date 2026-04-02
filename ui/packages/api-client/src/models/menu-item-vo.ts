@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {MenuItemSpec} from './menu-item-spec';
+import type { MenuItemSpec } from './menu-item-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {MenuItemStatus} from './menu-item-status';
+import type { MenuItemStatus } from './menu-item-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link MenuItem MenuItem}.

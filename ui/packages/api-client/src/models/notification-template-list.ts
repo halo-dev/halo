@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {NotificationTemplate} from './notification-template';
+import type { NotificationTemplate } from './notification-template';
 
 export interface NotificationTemplateList {
     /**

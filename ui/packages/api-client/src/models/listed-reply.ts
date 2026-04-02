@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentStats} from './comment-stats';
+import type { CommentStats } from './comment-stats';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {OwnerInfo} from './owner-info';
+import type { OwnerInfo } from './owner-info';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Reply} from './reply';
+import type { Reply } from './reply';
 
 /**
  * A chunk of items.

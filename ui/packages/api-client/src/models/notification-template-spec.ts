@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ReasonSelector} from './reason-selector';
+import type { ReasonSelector } from './reason-selector';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {TemplateContent} from './template-content';
+import type { TemplateContent } from './template-content';
 
 export interface NotificationTemplateSpec {
     'reasonSelector'?: ReasonSelector;

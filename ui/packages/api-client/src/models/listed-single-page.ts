@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Contributor} from './contributor';
+import type { Contributor } from './contributor';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {SinglePage} from './single-page';
+import type { SinglePage } from './single-page';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Stats} from './stats';
+import type { Stats } from './stats';
 
 /**
  * A chunk of items.

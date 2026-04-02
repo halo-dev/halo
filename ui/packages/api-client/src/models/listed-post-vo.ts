@@ -15,25 +15,25 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CategoryVo} from './category-vo';
+import type { CategoryVo } from './category-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ContributorVo} from './contributor-vo';
+import type { ContributorVo } from './contributor-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {PostSpec} from './post-spec';
+import type { PostSpec } from './post-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {PostStatus} from './post-status';
+import type { PostStatus } from './post-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {StatsVo} from './stats-vo';
+import type { StatsVo } from './stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {TagVo} from './tag-vo';
+import type { TagVo } from './tag-vo';
 
 /**
  * A value object for {@link Post Post}.

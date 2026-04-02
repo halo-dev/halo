@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ReplyVo} from './reply-vo';
+import type { ReplyVo } from './reply-vo';
 
 export interface ListResultReplyVo {
     /**

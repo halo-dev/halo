@@ -15,22 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentSpec} from './comment-spec';
+import type { CommentSpec } from './comment-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentStatsVo} from './comment-stats-vo';
+import type { CommentStatsVo } from './comment-stats-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentStatus} from './comment-status';
+import type { CommentStatus } from './comment-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ListResultReplyVo} from './list-result-reply-vo';
+import type { ListResultReplyVo } from './list-result-reply-vo';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {OwnerInfo} from './owner-info';
+import type { OwnerInfo } from './owner-info';
 
 /**
  * A chunk of items.

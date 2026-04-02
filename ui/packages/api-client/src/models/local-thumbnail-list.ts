@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {LocalThumbnail} from './local-thumbnail';
+import type { LocalThumbnail } from './local-thumbnail';
 
 export interface LocalThumbnailList {
     /**

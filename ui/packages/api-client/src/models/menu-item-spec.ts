@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Ref} from './ref';
+import type { Ref } from './ref';
 
 export interface MenuItemSpec {
     /**

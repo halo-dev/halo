@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentEmailOwner} from './comment-email-owner';
+import type { CommentEmailOwner } from './comment-email-owner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Ref} from './ref';
+import type { Ref } from './ref';
 
 /**
  * Request parameter object for {@link Comment Comment}.

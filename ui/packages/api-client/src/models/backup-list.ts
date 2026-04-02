@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Backup} from './backup';
+import type { Backup } from './backup';
 
 export interface BackupList {
     /**

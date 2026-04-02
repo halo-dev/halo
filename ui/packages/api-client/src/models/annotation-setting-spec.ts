@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {GroupKind} from './group-kind';
+import type { GroupKind } from './group-kind';
 
 export interface AnnotationSettingSpec {
     'formSchema': Array<object>;

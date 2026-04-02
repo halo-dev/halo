@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {InterestReasonSubject} from './interest-reason-subject';
+import type { InterestReasonSubject } from './interest-reason-subject';
 
 /**
  * The reason to be interested in

@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ExtensionDefinition} from './extension-definition';
+import type { ExtensionDefinition } from './extension-definition';
 
 export interface ExtensionDefinitionList {
     /**

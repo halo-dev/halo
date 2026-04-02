@@ -15,16 +15,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Comment} from './comment';
+import type { Comment } from './comment';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentStats} from './comment-stats';
+import type { CommentStats } from './comment-stats';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Extension} from './extension';
+import type { Extension } from './extension';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {OwnerInfo} from './owner-info';
+import type { OwnerInfo } from './owner-info';
 
 /**
  * A chunk of items.

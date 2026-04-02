@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {GroupSpec} from './group-spec';
+import type { GroupSpec } from './group-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {GroupStatus} from './group-status';
+import type { GroupStatus } from './group-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 export interface Group {
     'apiVersion': string;

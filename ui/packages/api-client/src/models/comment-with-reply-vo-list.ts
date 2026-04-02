@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentWithReplyVo} from './comment-with-reply-vo';
+import type { CommentWithReplyVo } from './comment-with-reply-vo';
 
 export interface CommentWithReplyVoList {
     /**

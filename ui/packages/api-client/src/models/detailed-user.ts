@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Role} from './role';
+import type { Role } from './role';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {User} from './user';
+import type { User } from './user';
 
 export interface DetailedUser {
     'roles': Array<Role>;

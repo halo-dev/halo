@@ -12,10 +12,10 @@
  * Do not edit the class manually.
  */
 
-import type {Configuration} from "./configuration";
-import type {RequestArgs} from "./base";
-import {RequiredError} from "./base";
-import type {AxiosInstance, AxiosResponse} from 'axios';
+import type { Configuration } from "./configuration";
+import type { RequestArgs } from "./base";
+import type { AxiosInstance, AxiosResponse } from 'axios';
+import { RequiredError } from "./base";
 
 export const DUMMY_BASE_URL = 'https://example.com'
 

@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {AttachmentSpec} from './attachment-spec';
+import type { AttachmentSpec } from './attachment-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {AttachmentStatus} from './attachment-status';
+import type { AttachmentStatus } from './attachment-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 export interface Attachment {
     'apiVersion': string;

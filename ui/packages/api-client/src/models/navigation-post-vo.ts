@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ListedPostVo} from './listed-post-vo';
+import type { ListedPostVo } from './listed-post-vo';
 
 /**
  * Post navigation vo to hold previous and next item.

@@ -15,22 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {AddOperation} from './add-operation';
+import type { AddOperation } from './add-operation';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CopyOperation} from './copy-operation';
+import type { CopyOperation } from './copy-operation';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {MoveOperation} from './move-operation';
+import type { MoveOperation } from './move-operation';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {RemoveOperation} from './remove-operation';
+import type { RemoveOperation } from './remove-operation';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ReplaceOperation} from './replace-operation';
+import type { ReplaceOperation } from './replace-operation';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {TestOperation} from './test-operation';
+import type { TestOperation } from './test-operation';
 
 /**
  * @type JsonPatchInner

@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Notification} from './notification';
+import type { Notification } from './notification';
 
 export interface NotificationList {
     /**

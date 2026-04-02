@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {CommentOwner} from './comment-owner';
+import type { CommentOwner } from './comment-owner';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Ref} from './ref';
+import type { Ref } from './ref';
 
 export interface CommentSpec {
     'allowNotification': boolean;

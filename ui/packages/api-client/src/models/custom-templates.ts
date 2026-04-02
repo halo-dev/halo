@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {TemplateDescriptor} from './template-descriptor';
+import type { TemplateDescriptor } from './template-descriptor';
 
 export interface CustomTemplates {
     'category'?: Array<TemplateDescriptor>;

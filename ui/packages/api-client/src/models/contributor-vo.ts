@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 /**
  * A value object for {@link run.halo.app.core.extension.User run.halo.app.core.extension.User}.

@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ExtensionPointDefinition} from './extension-point-definition';
+import type { ExtensionPointDefinition } from './extension-point-definition';
 
 export interface ExtensionPointDefinitionList {
     /**

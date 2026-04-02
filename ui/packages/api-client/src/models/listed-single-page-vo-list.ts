@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {ListedSinglePageVo} from './listed-single-page-vo';
+import type { ListedSinglePageVo } from './listed-single-page-vo';
 
 export interface ListedSinglePageVoList {
     /**

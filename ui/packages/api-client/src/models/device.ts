@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {DeviceSpec} from './device-spec';
+import type { DeviceSpec } from './device-spec';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {DeviceStatus} from './device-status';
+import type { DeviceStatus } from './device-status';
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Metadata} from './metadata';
+import type { Metadata } from './metadata';
 
 export interface Device {
     'apiVersion': string;

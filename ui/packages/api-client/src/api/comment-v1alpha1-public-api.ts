@@ -13,42 +13,28 @@
  */
 
 
-import type {Configuration} from '../configuration';
-import type {AxiosInstance, AxiosPromise, RawAxiosRequestConfig} from 'axios';
+import type { Configuration } from '../configuration';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import {
-  assertParamExists,
-  createRequestFunction,
-  DUMMY_BASE_URL,
-  serializeDataIfNeeded,
-  setApiKeyToObject,
-  setBasicAuthToObject,
-  setBearerAuthToObject,
-  setOAuthToObject,
-  setSearchParams,
-  toPathString
-} from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
-import {BASE_PATH, BaseAPI, COLLECTION_FORMATS, operationServerMap, type RequestArgs, RequiredError} from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { Comment } from '../models';
 // @ts-ignore
+import type { CommentRequest } from '../models';
 // @ts-ignore
+import type { CommentVoList } from '../models';
 // @ts-ignore
+import type { CommentWithReplyVoList } from '../models';
 // @ts-ignore
+import type { Reply } from '../models';
 // @ts-ignore
+import type { ReplyRequest } from '../models';
 // @ts-ignore
-import type {
-  Comment,
-  CommentRequest,
-  CommentVoList,
-  CommentWithReplyVoList,
-  Reply,
-  ReplyRequest,
-  ReplyVoList
-} from '../models';
-
+import type { ReplyVoList } from '../models';
 /**
  * CommentV1alpha1PublicApi - axios parameter creator
  */

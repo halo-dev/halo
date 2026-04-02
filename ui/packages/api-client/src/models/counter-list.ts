@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type {Counter} from './counter';
+import type { Counter } from './counter';
 
 export interface CounterList {
     /**
