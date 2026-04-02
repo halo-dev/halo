@@ -95,7 +95,7 @@ public class SinglePage extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
-        @Schema(requiredMode = REQUIRED, defaultValue = "PUBLIC")
+        @Schema(requiredMode = REQUIRED)
         private Post.VisibleEnum visible;
 
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
