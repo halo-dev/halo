@@ -139,7 +139,7 @@ public class Post extends AbstractExtension {
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "PUBLIC")
+        @Schema(requiredMode = RequiredMode.REQUIRED)
         private VisibleEnum visible;
 
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "0")
