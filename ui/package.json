@@ -158,7 +158,7 @@
     "axios": "^1.12.2"
   },
   "lint-staged": {
-    "**/*": "vp fmt --check",
+    "**/*": "vp fmt --no-error-on-unmatched-pattern",
     "*.{ts,mts,tsx,vue}": [
       "eslint --fix --max-warnings=0 --no-warn-ignored"
     ]

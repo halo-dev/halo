@@ -5,12 +5,12 @@
     "vitest.config.*",
     "eslint.config.ts",
     "tailwind.config.ts",
-    "src/vite/*.ts",
+    "src/vite/*.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["node"],
-  },
+    "types": ["node"]
+  }
 }
