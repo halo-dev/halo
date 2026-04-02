@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useUnsavedChangesGuard } from "@console/composables/use-unsaved-changes-guard";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Setting, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -6,16 +7,17 @@ import { Toast, VButton } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { set } from "es-toolkit/compat";
-import type { Ref } from "vue";
-import { computed, inject, ref, toRaw } from "vue";
+import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import BackToTop from "@/components/back-to-top/BackToTop.vue";
 import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
+const route = useRoute();
 
-const group = inject<Ref<string>>("activeTab", ref(""));
+const group = computed(() => (route.params.group as string) || "");
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
@@ -38,6 +40,8 @@ const { data: configMapData, suspense } = useQuery({
 const currentConfigMapGroupData = computed(() => {
   return configMapData.value?.[group.value];
 });
+
+const { markSaved } = useUnsavedChangesGuard(group);
 
 const formSchema = computed(() => {
   if (!setting.value) {
@@ -62,6 +66,7 @@ const handleSaveConfigMap = async (data: object) => {
     name: selectedTheme?.value?.metadata.name,
     body: set(cloneDeep(configMapData.value) || {}, group.value, data),
   });
+  markSaved(data);
 
   Toast.success(t("core.common.toast.save_success"));
 
@@ -77,6 +82,7 @@ await suspense();
     <FormKit
       v-if="group && formSchema && currentConfigMapGroupData"
       :id="group"
+      :key="group"
       :value="currentConfigMapGroupData || {}"
       :name="group"
       :preserve="true"
