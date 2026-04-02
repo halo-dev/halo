@@ -1,4 +1,4 @@
-package run.halo.app.security.authentication.pat;
+package run.halo.app.core.user.service;
 
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
