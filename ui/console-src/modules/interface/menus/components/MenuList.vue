@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type {
   Menu,
+  MenuItem,
+  MenuItemV1alpha1ApiListMenuItemRequest,
   MenuV1alpha1ApiListMenuRequest,
 } from "@halo-dev/api-client";
 import {
@@ -25,6 +27,7 @@ import {
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import MenuEditingModal from "./MenuEditingModal.vue";
@@ -87,6 +90,104 @@ const menuQuery = useRouteQuery("menu");
 const handleSelect = (menu: Menu) => {
   emit("update:selectedMenu", menu);
   menuQuery.value = menu.metadata.name;
+};
+
+const handleCloneMenu = async (menu: Menu) => {
+  Dialog.info({
+    title: t("core.menu.operations.clone.title"),
+    description: t("core.menu.operations.clone.description", {
+      name: menu.spec.displayName,
+    }),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      try {
+        let newMenuItemNames: string[] = [];
+
+        if (menu.spec.menuItems?.length) {
+          const menuItemNames = menu.spec.menuItems.filter(Boolean);
+
+          const originalItems = await paginate<
+            MenuItemV1alpha1ApiListMenuItemRequest,
+            MenuItem
+          >((params) => coreApiClient.menuItem.listMenuItem(params), {
+            fieldSelector: [`name=(${menuItemNames.join(",")})`],
+            size: 1000,
+          });
+
+          const oldToNewNameMap = new Map<string, string>();
+
+          const createNewItemPromises = originalItems.map((originalItem) => {
+            const newItem = cloneDeep(originalItem);
+            newItem.metadata.name = "";
+            newItem.metadata.generateName = "menuitem-";
+            if (newItem.spec.children) {
+              newItem.spec.children = [];
+            }
+            return coreApiClient.menuItem
+              .createMenuItem({ menuItem: newItem })
+              .then((res) => {
+                oldToNewNameMap.set(
+                  originalItem.metadata.name,
+                  res.data.metadata.name
+                );
+                return res.data;
+              });
+          });
+
+          await Promise.all(createNewItemPromises);
+
+          const patchPromises: Promise<unknown>[] = [];
+          for (const originalItem of originalItems) {
+            if (
+              originalItem.spec.children &&
+              originalItem.spec.children.length > 0
+            ) {
+              const newChildren = originalItem.spec.children
+                .map((childName) => oldToNewNameMap.get(childName))
+                .filter(Boolean) as string[];
+
+              if (newChildren.length > 0) {
+                const newName = oldToNewNameMap.get(originalItem.metadata.name);
+                if (newName) {
+                  patchPromises.push(
+                    coreApiClient.menuItem.patchMenuItem({
+                      name: newName,
+                      jsonPatchInner: [
+                        {
+                          op: "replace",
+                          path: "/spec/children",
+                          value: newChildren,
+                        },
+                      ],
+                    })
+                  );
+                }
+              }
+            }
+          }
+          await Promise.all(patchPromises);
+
+          newMenuItemNames = menu.spec.menuItems
+            .map((name) => oldToNewNameMap.get(name))
+            .filter(Boolean) as string[];
+        }
+
+        const newMenu = cloneDeep(menu);
+        newMenu.metadata.name = "";
+        newMenu.metadata.generateName = "menu-";
+        newMenu.spec.menuItems = newMenuItemNames;
+
+        await coreApiClient.menu.createMenu({ menu: newMenu });
+
+        Toast.success(t("core.common.toast.copy_success"));
+        await refetch();
+      } catch (e) {
+        console.error("Failed to clone menu", e);
+        Toast.error((e as Error).message);
+      }
+    },
+  });
 };
 
 const handleDeleteMenu = async (menu: Menu) => {
@@ -241,6 +342,9 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
             </VDropdownItem>
             <VDropdownItem @click="handleOpenEditingModal(menu)">
               {{ $t("core.common.buttons.edit") }}
+            </VDropdownItem>
+            <VDropdownItem @click="handleCloneMenu(menu)">
+              {{ $t("core.common.buttons.copy") }}
             </VDropdownItem>
             <VDropdownItem
               :disabled="primaryMenuName === menu.metadata.name"
