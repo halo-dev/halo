@@ -67,7 +67,8 @@ public class AuthorPostsRouteFactory implements RouteFactory {
                     if (hasPostManageRole) {
                         return ServerResponse.ok()
                             .render(DefaultTemplateEnum.AUTHOR.getValue(),
-                                Map.of("author", getByName(name),
+                                Map.of("name", name,
+                                    "author", getByName(name),
                                     "posts", postList(request, name),
                                     ModelConst.TEMPLATE_ID, DefaultTemplateEnum.AUTHOR.getValue()
                                 )
