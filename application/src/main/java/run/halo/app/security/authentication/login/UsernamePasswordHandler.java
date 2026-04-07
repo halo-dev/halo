@@ -73,15 +73,15 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                         .defaultIfEmpty(new LinkedMultiValueMap<>())
                         .flatMap(formData -> {
                             var username = formData.getFirst("username");
-                            String error = "error";
+                            String errorParam = "error";
                             if (exception instanceof DisabledException) {
-                                error = "error=account-disabled";
+                                errorParam = "error=account-disabled";
                             } else if (exception instanceof BadCredentialsException) {
-                                error = "error=invalid-credential";
+                                errorParam = "error=invalid-credential";
                             } else if (exception instanceof TooManyRequestsException) {
-                                error = "error=rate-limit-exceeded";
+                                errorParam = "error=rate-limit-exceeded";
                             }
-                            var locationStr = "/login?" + error + "&method=local";
+                            var locationStr = "/login?" + errorParam + "&method=local";
                             if (StringUtils.hasText(username)) {
                                 locationStr +=
                                     "&username=" + UriUtils.encodeQueryParam(username, UTF_8);
