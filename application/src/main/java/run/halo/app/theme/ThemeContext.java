@@ -21,4 +21,6 @@ public class ThemeContext {
     private Path path;
 
     private boolean active;
+
+    private String version;
 }
