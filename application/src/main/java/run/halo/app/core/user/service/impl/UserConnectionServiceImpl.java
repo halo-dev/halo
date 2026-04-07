@@ -21,7 +21,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.OAuth2UserAlreadyBoundException;
-import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class UserConnectionServiceImpl implements UserConnectionService {
@@ -31,6 +31,8 @@ public class UserConnectionServiceImpl implements UserConnectionService {
     private final ApplicationEventPublisher eventPublisher;
 
     private Clock clock = Clock.systemDefaultZone();
+
+    private JsonMapper mapper = JsonMapper.shared();
 
     public UserConnectionServiceImpl(ReactiveExtensionClient client,
         ApplicationEventPublisher eventPublisher) {
@@ -48,7 +50,7 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         String registrationId,
         OAuth2User oauth2User
     ) {
-        return getUserConnection(registrationId, username)
+        return getUserConnection(registrationId, oauth2User.getName())
             .flatMap(connection -> Mono.<UserConnection>error(
                 () -> new OAuth2UserAlreadyBoundException(connection))
             )
@@ -75,26 +77,21 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         return client.update(connection);
     }
 
-    private Mono<UserConnection> getUserConnection(String registrationId, String username) {
+    private Mono<UserConnection> getUserConnection(
+        String registrationId, String providerId
+    ) {
         var listOptions = ListOptions.builder()
-            .fieldQuery(and(
-                equal("spec.registrationId", registrationId),
-                equal("spec.username", username)
-            ))
+            .andQuery(equal("spec.registrationId", registrationId))
+            .andQuery(equal("spec.providerUserId", providerId))
             .build();
         return client.listAll(UserConnection.class, listOptions, defaultSort()).next();
     }
 
     @Override
-    public Mono<UserConnection> updateUserConnectionIfPresent(String registrationId,
-        OAuth2User oauth2User) {
-        var listOptions = ListOptions.builder()
-            .fieldQuery(and(
-                equal("spec.registrationId", registrationId),
-                equal("spec.providerUserId", oauth2User.getName())
-            ))
-            .build();
-        return client.listAll(UserConnection.class, listOptions, defaultSort()).next()
+    public Mono<UserConnection> updateUserConnectionIfPresent(
+        String registrationId, OAuth2User oauth2User
+    ) {
+        return getUserConnection(registrationId, oauth2User.getName())
             .flatMap(connection -> updateUserConnection(connection, oauth2User));
     }
 
@@ -119,7 +116,7 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         metadata.setAnnotations(annotations);
         annotations.put(
             "auth.halo.run/oauth2-user-info",
-            JsonUtils.objectToJson(oauth2User.getAttributes())
+            mapper.writeValueAsString(oauth2User.getAttributes())
         );
     }
 }
