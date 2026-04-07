@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.login;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
@@ -23,11 +22,9 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
@@ -73,6 +70,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                         .defaultIfEmpty(new LinkedMultiValueMap<>())
                         .flatMap(formData -> {
                             var username = formData.getFirst("username");
+                            var saveUsername = UsernameFormCache.save(exchange, username);
                             String errorParam = "error";
                             if (exception instanceof DisabledException) {
                                 errorParam = "error=account-disabled";
@@ -81,13 +79,10 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                             } else if (exception instanceof TooManyRequestsException) {
                                 errorParam = "error=rate-limit-exceeded";
                             }
-                            var locationStr = "/login?" + errorParam + "&method=local";
-                            if (StringUtils.hasText(username)) {
-                                locationStr +=
-                                    "&username=" + UriUtils.encodeQueryParam(username, UTF_8);
-                            }
-                            return redirectStrategy.sendRedirect(exchange,
-                                URI.create(locationStr));
+                            var location = URI.create("/login?" + errorParam + "&method=local");
+                            return saveUsername.then(
+                                redirectStrategy.sendRedirect(exchange, location)
+                            );
                         })
                     ).then(Mono.empty())
                 )
@@ -101,6 +96,8 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
             return rememberMeRequestCache.saveRememberMe(webFilterExchange.getExchange())
                 // Do not use RedirectServerAuthenticationSuccessHandler to redirect
                 // because it will use request cache to redirect
+                .then(UsernameFormCache.save(webFilterExchange.getExchange(),
+                    authentication.getName()))
                 .then(redirectStrategy.sendRedirect(webFilterExchange.getExchange(),
                     URI.create("/challenges/two-factor/totp"))
                 );
@@ -120,6 +117,7 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
 
         var exchange = webFilterExchange.getExchange();
         return loginHandlerEnhancer.onLoginSuccess(webFilterExchange.getExchange(), authentication)
+            .then(UsernameFormCache.save(exchange, authentication.getName()))
             .then(xhrMatcher.matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(

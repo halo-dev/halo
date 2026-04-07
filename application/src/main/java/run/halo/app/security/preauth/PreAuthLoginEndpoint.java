@@ -26,6 +26,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.authentication.CryptoService;
+import run.halo.app.security.authentication.login.UsernameFormCache;
 import run.halo.app.security.authentication.rememberme.RememberMeRequestCache;
 import run.halo.app.security.authentication.rememberme.WebSessionRememberMeRequestCache;
 
@@ -112,7 +113,8 @@ class PreAuthLoginEndpoint {
                         "fragmentTemplateName", fragmentTemplateName,
                         "socialAuthProviders", socialAuthProviders,
                         "formAuthProviders", formAuthProviders,
-                        "rememberMe", rememberMeRequestCache.isRememberMe(exchange)
+                        "rememberMe", rememberMeRequestCache.isRememberMe(exchange),
+                        "username", UsernameFormCache.load(exchange).defaultIfEmpty("")
                         // TODO Add more models here
                     ))
                 ));
