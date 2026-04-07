@@ -741,7 +741,7 @@
   "core.uc_profile.2fa.operations.enable.title": "启用两步验证",
   "core.uc_profile.2fa.operations.disable.title": "禁用两步验证",
   "core.uc_profile.2fa.operations.disable_totp.title": "停用 TOTP",
-  "core.uc_profile.2fa.password_validation_form.fields.password.label": "验证密碼",
+  "core.uc_profile.2fa.password_validation_form.fields.password.label": "驗證密碼",
   "core.uc_profile.2fa.password_validation_form.fields.password.help": "目前帳號的登入密碼",
   "core.uc_profile.2fa.password_validation_form.fields.totp_code.label": "驗證碼",
   "core.uc_profile.2fa.password_validation_form.fields.totp_code.help": "從驗證器應用程式取得的 6 位驗證碼",
