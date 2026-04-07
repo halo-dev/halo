@@ -20,7 +20,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.UserConnection;
@@ -72,13 +71,11 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         var allProvidersMono =
             client.listAll(AuthProvider.class, listOptions, ExtensionUtil.defaultSort())
                 .map(this::convertTo)
-                .collectList()
-                .subscribeOn(Schedulers.boundedElastic());
+                .collectList();
 
         var boundProvidersMono = listMyConnections()
             .map(connection -> connection.getSpec().getRegistrationId())
-            .collect(Collectors.toSet())
-            .subscribeOn(Schedulers.boundedElastic());
+            .collect(Collectors.toSet());
 
         return Mono.zip(allProvidersMono, boundProvidersMono, fetchProviderStates())
             .map(tuple3 -> {
@@ -152,8 +149,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         return getSystemConfigMap()
             .map(AuthProviderServiceImpl::getAuthProviderConfig)
             .map(SystemSetting.AuthProvider::getStates)
-            .defaultIfEmpty(List.of())
-            .subscribeOn(Schedulers.boundedElastic());
+            .defaultIfEmpty(List.of());
     }
 
     Flux<UserConnection> listMyConnections() {
