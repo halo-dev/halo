@@ -138,7 +138,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public Mono<Void> sendRegisterVerificationCode(String email) {
         Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
-        return sendVerificationNotification(email.toLowerCase(), email, "");
+        return sendVerificationNotification(email.toLowerCase(), email, null);
     }
 
     @Override
