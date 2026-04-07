@@ -82,14 +82,20 @@ class ThemeLinkBuilderTest {
     }
 
     @Test
-    void processAssetsLinkWithExistingVersionParam() {
-        // link that already has a v= parameter should not get another one appended
+    void processAssetsLinkWithExistingQueryParams() {
+        // link that already has any query parameter should not get ?v appended
         ThemeLinkBuilder themeLinkBuilder =
             new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
 
+        // already has v param
         String link = "/assets/css/style.css?v=custom";
         String processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?v=custom");
+
+        // has a different custom query param the theme itself added
+        link = "/assets/css/style.css?foo=bar";
+        processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?foo=bar");
     }
 
     @Test
