@@ -74,6 +74,7 @@ public class CategoryPostRouteFactory implements RouteFactory {
             return fetchBySlug(slug)
                 .flatMap(categoryVo -> {
                     Map<String, Object> model = new HashMap<>();
+                    model.put("name", categoryVo.getMetadata().getName());
                     model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORY.getValue());
                     model.put("posts",
                         postListByCategoryName(categoryVo.getMetadata().getName(), request));
