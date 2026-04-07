@@ -12,6 +12,7 @@ import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.security.authentication.CryptoService;
@@ -59,6 +61,10 @@ class LoginAuthenticationConverterTest {
         when(rateLimiterRegistry.rateLimiter("authentication-from-ip-unknown",
             "authentication"))
             .thenReturn(RateLimiter.ofDefaults("authentication"));
+
+        var session = mock(WebSession.class);
+        lenient().when(session.getAttributes()).thenReturn(new HashMap<>());
+        lenient().when(exchange.getSession()).thenReturn(Mono.just(session));
     }
 
     @Test

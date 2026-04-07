@@ -33,6 +33,10 @@ public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationC
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         return super.convert(exchange)
+            .flatMap(token -> {
+                var username = (String) token.getPrincipal();
+                return UsernameFormCache.save(exchange, username).thenReturn(token);
+            })
             // validate the password
             .<Authentication>flatMap(token -> {
                 if (token.getCredentials() == null) {
