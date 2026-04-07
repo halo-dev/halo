@@ -198,7 +198,16 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Secret.class);
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
-        schemeManager.register(MenuItem.class);
+        schemeManager.register(MenuItem.class, indexSpecs -> {
+            indexSpecs.add(
+                IndexSpecs.<MenuItem, String>single("spec.targetRef.name", String.class)
+                    .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
+                        .map(MenuItem.MenuItemSpec::getTargetRef)
+                        .map(run.halo.app.extension.Ref::getName)
+                        .orElse(null)
+                    )
+            );
+        });
         schemeManager.register(Post.class, indexSpecs -> {
             indexSpecs.add(IndexSpecs.<Post, String>single("spec.title", String.class)
                 .indexFunc(post -> Optional.ofNullable(post.getSpec())

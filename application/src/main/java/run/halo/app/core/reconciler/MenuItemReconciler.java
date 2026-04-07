@@ -1,6 +1,5 @@
 package run.halo.app.core.reconciler;
 
-import java.time.Duration;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -78,7 +77,7 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 status.setDisplayName(category.getSpec().getDisplayName());
                 updateStatus(menuItemName, status);
             });
-        return new Result(true, Duration.ofMinutes(1));
+        return Result.doNotRetry();
     }
 
     private Result handleTagRef(String menuItemName, MenuItemStatus status, Ref tagRef) {
@@ -88,7 +87,7 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 status.setDisplayName(tag.getSpec().getDisplayName());
                 updateStatus(menuItemName, status);
             });
-        return new Result(true, Duration.ofMinutes(1));
+        return Result.doNotRetry();
     }
 
     private Result handlePostRef(String menuItemName, MenuItemStatus status, Ref postRef) {
@@ -99,7 +98,7 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 status.setDisplayName(post.getSpec().getTitle());
                 updateStatus(menuItemName, status);
             });
-        return new Result(true, Duration.ofMinutes(1));
+        return Result.doNotRetry();
     }
 
     private Result handleSinglePageSpec(String menuItemName, MenuItemStatus status, Ref pageRef) {
@@ -111,7 +110,7 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 status.setDisplayName(page.getSpec().getTitle());
                 updateStatus(menuItemName, status);
             });
-        return new Result(true, Duration.ofMinutes(1));
+        return Result.doNotRetry();
     }
 
     private Result handleMenuSpec(String menuItemName, MenuItemStatus status, MenuItemSpec spec) {

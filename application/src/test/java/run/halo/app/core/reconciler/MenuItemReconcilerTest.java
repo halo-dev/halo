@@ -1,8 +1,6 @@
 package run.halo.app.core.reconciler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -10,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -54,8 +51,7 @@ class MenuItemReconcilerTest {
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
-            assertTrue(result.reEnqueue());
-            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            assertFalse(result.reEnqueue());
             verify(client).fetch(MenuItem.class, "fake-name");
             verify(client).fetch(Category.class, "fake-category");
             verify(client, never()).update(isA(MenuItem.class));
@@ -75,8 +71,7 @@ class MenuItemReconcilerTest {
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
-            assertTrue(result.reEnqueue());
-            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            assertFalse(result.reEnqueue());
             verify(client, times(2)).fetch(MenuItem.class, "fake-name");
             verify(client).fetch(Category.class, "fake-category");
             verify(client).<MenuItem>update(argThat(menuItem -> {
@@ -119,8 +114,7 @@ class MenuItemReconcilerTest {
                 .thenReturn(Optional.of(createSinglePage()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
-            assertTrue(result.reEnqueue());
-            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            assertFalse(result.reEnqueue());
             verify(client, times(2)).fetch(MenuItem.class, "fake-name");
             verify(client).fetch(SinglePage.class, "fake-page");
             verify(client).<MenuItem>update(argThat(menuItem -> {
