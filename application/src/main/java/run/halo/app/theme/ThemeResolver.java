@@ -48,7 +48,8 @@ public class ThemeResolver {
                     .map(activatedTheme -> StringUtils.equals(activatedTheme, themeName))
                     .defaultIfEmpty(false);
                 var versionMono = client.fetch(Theme.class, themeName)
-                    .map(theme -> theme.getSpec().getVersion())
+                    .mapNotNull(theme -> theme.getSpec() != null
+                        ? theme.getSpec().getVersion() : null)
                     .defaultIfEmpty("");
                 return Mono.zip(activeMono, versionMono)
                     .map(tuple -> builder.active(tuple.getT1()).version(tuple.getT2()))
@@ -75,7 +76,9 @@ public class ThemeResolver {
                     builder.name(themeName).path(path).active(active);
 
                     return client.fetch(Theme.class, themeName)
-                        .map(theme -> builder.version(theme.getSpec().getVersion()).build())
+                        .map(theme -> builder.version(
+                            theme.getSpec() != null ? theme.getSpec().getVersion() : null
+                        ).build())
                         .defaultIfEmpty(builder.build());
                 })
                 .doOnNext(themeContext ->
