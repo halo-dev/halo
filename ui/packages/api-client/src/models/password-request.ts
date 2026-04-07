@@ -16,5 +16,6 @@
 
 export interface PasswordRequest {
     'password': string;
+    'totpCode'?: string;
 }
 

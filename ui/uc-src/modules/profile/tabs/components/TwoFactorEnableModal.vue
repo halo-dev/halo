@@ -6,6 +6,10 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import PasswordValidationForm from "./PasswordValidationForm.vue";
 
+const props = defineProps<{
+  totpConfigured?: boolean;
+}>();
+
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
@@ -17,10 +21,17 @@ const modal = ref<InstanceType<typeof VModal> | null>(null);
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["enable-two-factor"],
-  mutationFn: async ({ password }: { password: string }) => {
+  mutationFn: async ({
+    password,
+    totpCode,
+  }: {
+    password: string;
+    totpCode?: string;
+  }) => {
     return await ucApiClient.security.twoFactor.enableTwoFactor({
       passwordRequest: {
         password: password,
+        totpCode: totpCode,
       },
     });
   },
@@ -31,8 +42,8 @@ const { mutate, isLoading } = useMutation({
   },
 });
 
-function onSubmit(password: string) {
-  mutate({ password });
+function onSubmit(data: { password: string; totpCode?: string }) {
+  mutate({ password: data.password, totpCode: data.totpCode });
 }
 </script>
 
@@ -44,7 +55,10 @@ function onSubmit(password: string) {
     :title="$t('core.uc_profile.2fa.operations.enable.title')"
     @close="emit('close')"
   >
-    <PasswordValidationForm @submit="onSubmit" />
+    <PasswordValidationForm
+      :totp-configured="props.totpConfigured"
+      @submit="onSubmit"
+    />
     <template #footer>
       <VSpace>
         <VButton

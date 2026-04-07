@@ -119,21 +119,25 @@ const totpDeletionModalVisible = ref(false);
   </Transition>
   <TotpConfigureModal
     v-if="totpConfigureModalVisible"
+    :totp-configured="settings?.totpConfigured"
     @close="totpConfigureModalVisible = false"
   />
 
   <TotpDeletionModal
     v-if="totpDeletionModalVisible"
+    :totp-configured="settings?.totpConfigured"
     @close="totpDeletionModalVisible = false"
   />
 
   <TwoFactorEnableModal
     v-if="twoFactorEnableModalVisible"
+    :totp-configured="settings?.totpConfigured"
     @close="twoFactorEnableModalVisible = false"
   />
 
   <TwoFactorDisableModal
     v-if="twoFactorDisableModalVisible"
+    :totp-configured="settings?.totpConfigured"
     @close="twoFactorDisableModalVisible = false"
   />
 </template>
