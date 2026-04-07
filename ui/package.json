@@ -184,7 +184,7 @@
       "vue-demi"
     ],
     "patchedDependencies": {
-      "@tiptap/extension-drag-handle@3.17.1": "patches/@tiptap__extension-drag-handle@3.17.1.patch"
+      "@tiptap/extension-drag-handle@3.22.2": "patches/@tiptap__extension-drag-handle@3.22.2.patch"
     }
   }
 }

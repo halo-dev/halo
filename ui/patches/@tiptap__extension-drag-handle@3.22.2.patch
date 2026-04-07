@@ -1,5 +1,5 @@
 diff --git a/dist/index.js b/dist/index.js
-index 6a2900a3013fdc9c970a2633d511c1beae6c6e12..762359036767e1e0c7637ceea92df41e9b3cd17f 100644
+index 066e4c8d30bfea266587dad460f42ae06def26ad..908545d0ee4e5d56500af2ed53726b9b56cf6c4f 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
@@ -16,7 +16,7 @@ index 6a2900a3013fdc9c970a2633d511c1beae6c6e12..762359036767e1e0c7637ceea92df41e
  
  // src/helpers/dragHandler.ts
  import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
-@@ -426,18 +420,10 @@ var getOuterNode = (doc, pos) => {
+@@ -528,18 +522,10 @@ var getOuterNode = (doc, pos) => {
  
  // src/drag-handle-plugin.ts
  var getRelativePos = (state, absolutePos) => {
@@ -37,7 +37,7 @@ index 6a2900a3013fdc9c970a2633d511c1beae6c6e12..762359036767e1e0c7637ceea92df41e
  };
  var getOuterDomNode = (view, domNode) => {
    let tmpDomNode = domNode;
-@@ -565,17 +551,10 @@ var DragHandlePlugin = ({
+@@ -664,17 +650,10 @@ var DragHandlePlugin = ({
              return value;
            }
            if (tr.docChanged && currentNodePos !== -1 && element) {

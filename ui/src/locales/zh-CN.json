@@ -528,6 +528,8 @@
   "core.menu.menu_item_empty.message": "你可以尝试刷新或者新建菜单项",
   "core.menu.operations.set_primary.button": "设置为主菜单",
   "core.menu.operations.set_primary.toast_success": "设置成功",
+  "core.menu.operations.clone.title": "确认要复制该菜单项？",
+  "core.menu.operations.clone.description": "该操作将会生成一个与目标菜单项相同的菜单",
   "core.menu.operations.delete_menu.title": "删除菜单",
   "core.menu.operations.delete_menu.description": "将同时删除该菜单下的所有菜单项，该操作不可恢复。",
   "core.menu.operations.delete_menu_item.title": "删除菜单项",

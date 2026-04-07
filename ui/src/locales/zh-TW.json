@@ -520,6 +520,8 @@
   "core.menu.menu_item_empty.message": "你可以嘗試刷新或者新建選單項",
   "core.menu.operations.set_primary.button": "設置為主選單",
   "core.menu.operations.set_primary.toast_success": "設置成功",
+  "core.menu.operations.clone.title": "確認要複製該選單項？",
+  "core.menu.operations.clone.description": "該操作將會生成一個與目標選單項相同的選單",
   "core.menu.operations.delete_menu.title": "刪除選單",
   "core.menu.operations.delete_menu.description": "將同時刪除該選單下的所有選單項，該操作不可恢復。",
   "core.menu.operations.delete_menu_item.title": "刪除選單項",
