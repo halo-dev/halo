@@ -82,6 +82,17 @@ class ThemeLinkBuilderTest {
     }
 
     @Test
+    void processAssetsLinkWithExistingVersionParam() {
+        // link that already has a v= parameter should not get another one appended
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
+
+        String link = "/assets/css/style.css?v=custom";
+        String processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?v=custom");
+    }
+
+    @Test
     void processNullLink() {
         ThemeLinkBuilder themeLinkBuilder =
             new ThemeLinkBuilder(getTheme(false), externalUrlSupplier);

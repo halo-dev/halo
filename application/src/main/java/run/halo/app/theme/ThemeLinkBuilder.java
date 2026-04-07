@@ -38,7 +38,9 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
 
         if (isAssetsRequest(link)) {
             var path = PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
-            if (StringUtils.isNotBlank(theme.getVersion())) {
+            var uriComponents = UriComponentsBuilder.fromUriString(path).build();
+            if (StringUtils.isNotBlank(theme.getVersion())
+                && uriComponents.getQueryParams().get("v") == null) {
                 return UriComponentsBuilder.fromUriString(path)
                     .queryParam("v", theme.getVersion())
                     .build().toString();
