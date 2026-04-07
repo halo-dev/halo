@@ -21,13 +21,15 @@ class ThemeContextTest {
             .name("testTheme")
             .path(path)
             .active(true)
+            .version("1.0.0")
             .build();
         var got = JsonUtils.objectToJson(testTheme);
         var expect = String.format("""
                 {
                     "name": "testTheme",
                     "path": "%s",
-                    "active": true
+                    "active": true,
+                    "version": "1.0.0"
                 }
                 """, path.toUri());
         JSONAssert.assertEquals(expect, got, false);

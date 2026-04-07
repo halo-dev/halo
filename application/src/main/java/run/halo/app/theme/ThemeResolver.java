@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Theme;
 import run.halo.app.core.user.service.RoleService;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.SystemConfigFetcher;
-import run.halo.app.infra.SystemSetting.Theme;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.security.authorization.AuthorityUtils;
@@ -33,26 +35,33 @@ public class ThemeResolver {
 
     private final ThemeRootGetter themeRoot;
     private final RoleService roleService;
+    private final ReactiveExtensionClient client;
 
     public Mono<ThemeContext> getThemeContext(String themeName) {
         Assert.hasText(themeName, "Theme name cannot be empty");
         var path = themeRoot.get().resolve(themeName);
         return Mono.just(ThemeContext.builder().name(themeName).path(path))
-            .flatMap(builder -> environmentFetcher.fetch(Theme.GROUP, Theme.class)
-                .mapNotNull(Theme::getActive)
-                .map(activatedTheme -> {
-                    boolean active = StringUtils.equals(activatedTheme, themeName);
-                    return builder.active(active);
-                })
-                .defaultIfEmpty(builder.active(false))
-            )
+            .flatMap(builder -> {
+                var activeMono = environmentFetcher.fetch(
+                        SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
+                    .mapNotNull(SystemSetting.Theme::getActive)
+                    .map(activatedTheme -> StringUtils.equals(activatedTheme, themeName))
+                    .defaultIfEmpty(false);
+                var versionMono = client.fetch(Theme.class, themeName)
+                    .mapNotNull(theme -> theme.getSpec() != null
+                        ? theme.getSpec().getVersion() : null)
+                    .defaultIfEmpty("");
+                return Mono.zip(activeMono, versionMono)
+                    .map(tuple -> builder.active(tuple.getT1()).version(tuple.getT2()))
+                    .defaultIfEmpty(builder.active(false));
+            })
             .map(ThemeContext.ThemeContextBuilder::build);
     }
 
     public Mono<ThemeContext> getTheme(ServerWebExchange exchange) {
         return fetchThemeFromExchange(exchange)
             .switchIfEmpty(Mono.defer(() -> fetchActivationState()
-                .map(themeState -> {
+                .flatMap(themeState -> {
                     var activatedTheme = themeState.activatedTheme();
                     var builder = ThemeContext.builder();
                     var themeName = exchange.getRequest().getQueryParams()
@@ -64,10 +73,13 @@ public class ThemeResolver {
 
                     boolean active = StringUtils.equals(activatedTheme, themeName);
                     var path = themeRoot.get().resolve(themeName);
-                    return builder.name(themeName)
-                        .path(path)
-                        .active(active)
-                        .build();
+                    builder.name(themeName).path(path).active(active);
+
+                    return client.fetch(Theme.class, themeName)
+                        .map(theme -> builder.version(
+                            theme.getSpec() != null ? theme.getSpec().getVersion() : null
+                        ).build())
+                        .defaultIfEmpty(builder.build());
                 })
                 .doOnNext(themeContext ->
                     exchange.getAttributes().put(ThemeContext.class.getName(), themeContext))
@@ -85,8 +97,9 @@ public class ThemeResolver {
     private Mono<ThemeActivationState> fetchActivationState() {
         var builder = ThemeActivationState.builder();
 
-        var activatedMono = environmentFetcher.fetch(Theme.GROUP, Theme.class)
-            .map(Theme::getActive)
+        var activatedMono = environmentFetcher.fetch(
+                SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
+            .map(SystemSetting.Theme::getActive)
             .switchIfEmpty(Mono.error(() -> new IllegalArgumentException("No theme activated")))
             .doOnNext(builder::activatedTheme);
 
