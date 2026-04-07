@@ -184,15 +184,48 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
             "Theme manifest kind must be Theme.");
         var newTheme = Unstructured.OBJECT_MAPPER.convertValue(themeManifest, Theme.class);
-        final Mono<Theme> createOrUpdateTheme;
         if (isUpgrade) {
-            createOrUpdateTheme = client.get(Theme.class, newTheme.getMetadata().getName())
-                .doOnNext(theme -> updateTheme(theme, newTheme))
-                .flatMap(client::update);
-        } else {
-            createOrUpdateTheme = client.create(newTheme);
+            // For upgrade: update Extension resources (e.g., Setting) BEFORE updating the Theme
+            // resource, so that when ThemeReconciler is triggered by the Theme update it reads
+            // the up-to-date Setting and correctly applies new default values to the ConfigMap.
+            return client.get(Theme.class, newTheme.getMetadata().getName())
+                .flatMap(existingTheme -> {
+                    updateTheme(existingTheme, newTheme);
+                    String systemVersion =
+                        systemVersionSupplier.get().toStableVersion().toString();
+                    String requires = existingTheme.getSpec().getRequires();
+                    if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+                        return Mono.error(new UnsatisfiedAttributeValueException(
+                            String.format("The theme requires a minimum system version of %s, "
+                                    + "but the current version is %s.",
+                                requires, systemVersion),
+                            "problemDetail.theme.version.unsatisfied.requires",
+                            new String[] {requires, systemVersion}));
+                    }
+                    var unstructureds =
+                        ThemeUtils.loadThemeResources(getThemePath(existingTheme));
+                    if (unstructureds.stream()
+                        .filter(hasSettingsYaml(existingTheme))
+                        .count() > 1) {
+                        return Mono.error(new IllegalStateException(
+                            "Theme must only have one settings.yaml or settings.yml."));
+                    }
+                    if (unstructureds.stream()
+                        .filter(hasConfigYaml(existingTheme))
+                        .count() > 1) {
+                        return Mono.error(new IllegalStateException(
+                            "Theme must only have one config.yaml or config.yml."));
+                    }
+                    return Flux.fromIterable(unstructureds)
+                        .filter(u -> ExtensionWhitelist.of(existingTheme).isAllowed(u))
+                        .doOnNext(u -> populateThemeNameLabel(u,
+                            existingTheme.getMetadata().getName()))
+                        .flatMap(this::createOrUpdate)
+                        .then()
+                        .then(Mono.defer(() -> client.update(existingTheme)));
+                });
         }
-        return createOrUpdateTheme
+        return client.create(newTheme)
             .doOnNext(theme -> {
                 String systemVersion = systemVersionSupplier.get().toStableVersion().toString();
                 String requires = theme.getSpec().getRequires();
@@ -223,12 +256,7 @@ public class ThemeServiceImpl implements ThemeService {
                     .filter(unstructured -> ExtensionWhitelist.of(theme).isAllowed(unstructured))
                     .doOnNext(unstructured ->
                         populateThemeNameLabel(unstructured, theme.getMetadata().getName()))
-                    .flatMap(unstructured -> {
-                        if (isUpgrade) {
-                            return createOrUpdate(unstructured);
-                        }
-                        return client.create(unstructured);
-                    })
+                    .flatMap(client::create)
                     .then()
                     .thenReturn(theme);
             });
@@ -266,19 +294,23 @@ public class ThemeServiceImpl implements ThemeService {
                 Unstructured unstructured = loadThemeManifest(themeManifestPath);
                 Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured,
                     Theme.class);
-                return client.fetch(Theme.class, name)
-                    .map(oldTheme -> {
-                        newTheme.getMetadata().setVersion(oldTheme.getMetadata().getVersion());
-                        return newTheme;
-                    })
-                    .flatMap(client::update);
-            }))
-            .flatMap(theme -> Flux.fromIterable(ThemeUtils.loadThemeResources(getThemePath(theme)))
-                .filter(unstructured -> ExtensionWhitelist.of(theme).isAllowed(unstructured))
-                .doOnNext(unstructured -> populateThemeNameLabel(unstructured, name))
-                .flatMap(this::createOrUpdate)
-                .then(Mono.just(theme))
-            );
+                // Update Extension resources (e.g., Setting) BEFORE updating the Theme resource,
+                // so that ThemeReconciler reads the up-to-date Setting when computing defaults.
+                var unstructureds = ThemeUtils.loadThemeResources(themePath);
+                return Flux.fromIterable(unstructureds)
+                    .filter(u -> ExtensionWhitelist.of(newTheme).isAllowed(u))
+                    .doOnNext(u -> populateThemeNameLabel(u, name))
+                    .flatMap(this::createOrUpdate)
+                    .then()
+                    .then(Mono.defer(() -> client.fetch(Theme.class, name)
+                        .map(oldTheme -> {
+                            newTheme.getMetadata().setVersion(
+                                oldTheme.getMetadata().getVersion());
+                            return newTheme;
+                        })
+                        .flatMap(client::update)
+                    ));
+            }));
     }
 
     private static void populateThemeNameLabel(Unstructured unstructured, String themeName) {

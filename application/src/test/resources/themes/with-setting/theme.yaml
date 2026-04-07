@@ -1,0 +1,12 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: default
+spec:
+  displayName: Default With Setting
+  author:
+    name: halo-dev
+    website: https://halo.run
+  version: 1.0.1
+  requires: "*"
+  settingName: default-setting

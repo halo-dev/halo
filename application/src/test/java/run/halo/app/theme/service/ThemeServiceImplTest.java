@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -169,6 +170,35 @@ class ThemeServiceImplTest {
 
             verify(client).fetch(Theme.class, "default");
             verify(client, never()).delete(oldTheme);
+        }
+
+        @Test
+        void shouldUpdateExtensionResourcesBeforeThemeOnUpgrade()
+            throws IOException, URISyntaxException {
+            // Verifies that when upgrading a theme that adds new Setting entries,
+            // Extension resources (Setting) are updated BEFORE the Theme resource.
+            // This ensures ThemeReconciler reads the up-to-date Setting when applying defaults.
+            var themeZipPath = prepareTheme("with-setting");
+
+            var oldTheme = createTheme();
+            when(client.fetch(Theme.class, "default")).thenReturn(Mono.just(oldTheme));
+            when(client.get(Theme.class, "default")).thenReturn(Mono.just(oldTheme));
+            when(client.update(oldTheme)).thenReturn(Mono.just(oldTheme));
+
+            // Setting does not exist yet (new setting added in upgraded theme)
+            when(client.fetch(eq(Setting.GVK), eq("default-setting")))
+                .thenReturn(Mono.empty());
+            when(client.create(any(Unstructured.class)))
+                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+            StepVerifier.create(themeService.upgrade("default", content(themeZipPath)))
+                .expectNextCount(1)
+                .verifyComplete();
+
+            // Verify Setting (Extension resource) was created BEFORE Theme was updated
+            var inOrder = inOrder(client);
+            inOrder.verify(client).create(any(Unstructured.class));
+            inOrder.verify(client).update(any(Theme.class));
         }
     }
 
@@ -401,6 +431,77 @@ class ThemeServiceImplTest {
                 }
             })
             .verifyComplete();
+    }
+
+    @Test
+    void shouldUpdateExtensionResourcesBeforeThemeOnReload() throws IOException {
+        // Verifies that when reloading a theme that has a new Setting, Extension resources
+        // are updated BEFORE the Theme resource, so that ThemeReconciler reads the up-to-date
+        // Setting when applying default values to the ConfigMap.
+        Theme theme = new Theme();
+        theme.setMetadata(new Metadata());
+        theme.getMetadata().setName("fake-theme");
+        theme.setSpec(new Theme.ThemeSpec());
+        theme.getSpec().setDisplayName("Hello");
+        theme.getSpec().setSettingName("fake-setting");
+        when(client.fetch(Theme.class, "fake-theme"))
+            .thenReturn(Mono.just(theme));
+        when(client.delete(any(Setting.class))).thenReturn(Mono.empty());
+        Setting setting = new Setting();
+        setting.setMetadata(new Metadata());
+        setting.setSpec(new Setting.SettingSpec());
+        setting.getSpec().setForms(List.of());
+        when(client.fetch(Setting.class, "fake-setting"))
+            .thenReturn(Mono.just(setting));
+
+        Path themeWorkDir = themeRoot.get().resolve(theme.getMetadata().getName());
+        if (!Files.exists(themeWorkDir)) {
+            Files.createDirectories(themeWorkDir);
+        }
+        Files.writeString(themeWorkDir.resolve("settings.yaml"), """
+            apiVersion: v1alpha1
+            kind: Setting
+            metadata:
+              name: fake-setting
+            spec:
+              forms:
+                - group: basic
+                  label: Basic
+                  formSchema:
+                    - $formkit: text
+                      name: email
+                      value: example@example.com
+            """);
+        Files.writeString(themeWorkDir.resolve("theme.yaml"), """
+            apiVersion: v1alpha1
+            kind: Theme
+            metadata:
+              name: fake-theme
+            spec:
+              displayName: Fake Theme
+              settingName: fake-setting
+            """);
+        when(client.update(any(Theme.class)))
+            .thenAnswer((Answer<Mono<Theme>>) invocation -> Mono.just(invocation.getArgument(0)));
+
+        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+
+        // Setting exists and needs to be updated (new fields added in reload)
+        when(client.fetch(eq(Setting.GVK), eq("fake-setting")))
+            .thenReturn(Mono.just(Unstructured.OBJECT_MAPPER.convertValue(setting,
+                Unstructured.class)));
+        when(client.update(any(Unstructured.class)))
+            .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        themeService.reloadTheme("fake-theme")
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete();
+
+        // Verify Setting (Extension resource) was updated BEFORE Theme was updated
+        var inOrder = inOrder(client);
+        inOrder.verify(client).update(any(Unstructured.class));
+        inOrder.verify(client).update(any(Theme.class));
     }
 
     @Test
