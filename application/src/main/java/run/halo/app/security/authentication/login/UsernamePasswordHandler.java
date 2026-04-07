@@ -1,5 +1,6 @@
 package run.halo.app.security.authentication.login;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
@@ -21,9 +22,12 @@ import org.springframework.security.web.server.authentication.RedirectServerAuth
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.LoginHandlerEnhancer;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
@@ -65,19 +69,27 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                 .matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(
-                    () -> {
-                        var location = URI.create("/login?error&method=local");
-                        if (exception instanceof DisabledException) {
-                            location = URI.create("/login?error=account-disabled&method=local");
-                        }
-                        if (exception instanceof BadCredentialsException) {
-                            location = URI.create("/login?error=invalid-credential&method=local");
-                        }
-                        if (exception instanceof TooManyRequestsException) {
-                            location = URI.create("/login?error=rate-limit-exceeded&method=local");
-                        }
-                        return redirectStrategy.sendRedirect(exchange, location);
-                    }).then(Mono.empty())
+                    () -> exchange.getFormData()
+                        .defaultIfEmpty(new LinkedMultiValueMap<>())
+                        .flatMap(formData -> {
+                            var username = formData.getFirst("username");
+                            String error = "error";
+                            if (exception instanceof DisabledException) {
+                                error = "error=account-disabled";
+                            } else if (exception instanceof BadCredentialsException) {
+                                error = "error=invalid-credential";
+                            } else if (exception instanceof TooManyRequestsException) {
+                                error = "error=rate-limit-exceeded";
+                            }
+                            var locationStr = "/login?" + error + "&method=local";
+                            if (StringUtils.hasText(username)) {
+                                locationStr +=
+                                    "&username=" + UriUtils.encodeQueryParam(username, UTF_8);
+                            }
+                            return redirectStrategy.sendRedirect(exchange,
+                                URI.create(locationStr));
+                        })
+                    ).then(Mono.empty())
                 )
                 .flatMap(matchResult -> handleAuthenticationException(exception, exchange)));
     }
