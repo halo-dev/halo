@@ -118,7 +118,7 @@ spec:
     htmlBody: |
       <div class="notification-content">
         <div class="head">
-          <p class="honorific" th:text="|${username} 你好：|"></p>
+          <p class="honorific" th:text="|${#strings.isEmpty(displayName) ? username : displayName} 你好：|"></p>
         </div>
         <div class="body">
           <p>使用下面的动态验证码（OTP）验证您的电子邮件地址。</p>
@@ -145,7 +145,7 @@ spec:
     htmlBody: |
       <div class="notification-content">
         <div class="head">
-          <p class="honorific" th:text="|${username} 你好：|"></p>
+          <p class="honorific" th:text="|${#strings.isEmpty(displayName) ? username : displayName} 你好：|"></p>
         </div>
         <div class="body">
           <p>你已经请求了重置密码，可以点击下面的链接来重置密码：</p>

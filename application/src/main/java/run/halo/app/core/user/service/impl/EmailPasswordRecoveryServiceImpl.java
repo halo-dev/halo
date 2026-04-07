@@ -63,7 +63,8 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
                 if (!user.getSpec().isEmailVerified()) {
                     return Mono.empty();
                 }
-                return sendResetPasswordNotification(username, email);
+                return sendResetPasswordNotification(username, email,
+                    user.getSpec().getDisplayName());
             });
     }
 
@@ -75,7 +76,8 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
         return userService.listByEmail(email)
             .filter(user -> user.getSpec().isEmailVerified())
             .next()
-            .flatMap(user -> sendResetPasswordNotification(user.getMetadata().getName(), email));
+            .flatMap(user -> sendResetPasswordNotification(user.getMetadata().getName(), email,
+                user.getSpec().getDisplayName()));
     }
 
     @Override
@@ -110,7 +112,8 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
-    private Mono<Void> sendResetPasswordNotification(String username, String email) {
+    private Mono<Void> sendResetPasswordNotification(String username, String email,
+        String displayName) {
         var token = generateToken();
         var tokenHash = hashToken(token);
         var expiresAt = clock.instant().plus(RESET_TOKEN_LIFE_TIME);
@@ -125,6 +128,7 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
                 var emitReasonMono = reasonEmitter.emit(RESET_PASSWORD_BY_EMAIL_REASON_TYPE,
                     builder -> builder.attribute("expirationAtMinutes", LINK_EXPIRATION_MINUTES)
                         .attribute("username", username)
+                        .attribute("displayName", displayName)
                         .attribute("link", link)
                         .author(UserIdentity.of(username))
                         .subject(Reason.Subject.builder()

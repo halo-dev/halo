@@ -78,7 +78,8 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance))
-            .flatMap(user -> sendVerificationNotification(username, email));
+            .flatMap(user -> sendVerificationNotification(username, email,
+                user.getSpec().getDisplayName()));
     }
 
     @Override
@@ -137,7 +138,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Override
     public Mono<Void> sendRegisterVerificationCode(String email) {
         Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
-        return sendVerificationNotification(email.toLowerCase(), email);
+        return sendVerificationNotification(email.toLowerCase(), email, "");
     }
 
     @Override
@@ -149,7 +150,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             .subscribeOn(Schedulers.boundedElastic());
     }
 
-    Mono<Void> sendVerificationNotification(String username, String email) {
+    Mono<Void> sendVerificationNotification(String username, String email, String displayName) {
         var code = emailVerificationManager.generateCode(username, email);
         if (log.isDebugEnabled()) {
             log.debug("Generated verification code for user '{}' and email '{}': {}",
@@ -161,6 +162,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             builder -> builder.attribute("code", code)
                 .attribute("expirationAtMinutes", CODE_EXPIRATION_MINUTES)
                 .attribute("username", username)
+                .attribute("displayName", displayName)
                 .author(UserIdentity.of(username))
                 .subject(Reason.Subject.builder()
                     .apiVersion(interestReasonSubject.getApiVersion())

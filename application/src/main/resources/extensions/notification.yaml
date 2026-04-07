@@ -179,6 +179,9 @@ spec:
     - name: username
       type: string
       description: "The username of the user."
+    - name: displayName
+      type: string
+      description: "The display name of the user."
     - name: code
       type: string
       description: "The verification code."
@@ -199,6 +202,9 @@ spec:
     - name: username
       type: string
       description: "The username of the user."
+    - name: displayName
+      type: string
+      description: "The display name of the user."
     - name: link
       type: string
       description: "The reset link."
