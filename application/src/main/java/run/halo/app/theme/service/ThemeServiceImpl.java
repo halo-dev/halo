@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -191,75 +192,61 @@ public class ThemeServiceImpl implements ThemeService {
             return client.get(Theme.class, newTheme.getMetadata().getName())
                 .flatMap(existingTheme -> {
                     updateTheme(existingTheme, newTheme);
-                    String systemVersion =
-                        systemVersionSupplier.get().toStableVersion().toString();
-                    String requires = existingTheme.getSpec().getRequires();
-                    if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-                        return Mono.error(new UnsatisfiedAttributeValueException(
-                            String.format("The theme requires a minimum system version of %s, "
-                                    + "but the current version is %s.",
-                                requires, systemVersion),
-                            "problemDetail.theme.version.unsatisfied.requires",
-                            new String[] {requires, systemVersion}));
-                    }
-                    var unstructureds =
-                        ThemeUtils.loadThemeResources(getThemePath(existingTheme));
-                    if (unstructureds.stream()
-                        .filter(hasSettingsYaml(existingTheme))
-                        .count() > 1) {
-                        return Mono.error(new IllegalStateException(
-                            "Theme must only have one settings.yaml or settings.yml."));
-                    }
-                    if (unstructureds.stream()
-                        .filter(hasConfigYaml(existingTheme))
-                        .count() > 1) {
-                        return Mono.error(new IllegalStateException(
-                            "Theme must only have one config.yaml or config.yml."));
-                    }
-                    return Flux.fromIterable(unstructureds)
-                        .filter(u -> ExtensionWhitelist.of(existingTheme).isAllowed(u))
-                        .doOnNext(u -> populateThemeNameLabel(u,
-                            existingTheme.getMetadata().getName()))
-                        .flatMap(this::createOrUpdate)
-                        .then()
+                    checkSystemVersionRequirement(existingTheme.getSpec().getRequires());
+                    return createOrUpdateThemeExtensions(existingTheme)
                         .then(Mono.defer(() -> client.update(existingTheme)));
                 });
         }
         return client.create(newTheme)
-            .doOnNext(theme -> {
-                String systemVersion = systemVersionSupplier.get().toStableVersion().toString();
-                String requires = theme.getSpec().getRequires();
-                if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-                    throw new UnsatisfiedAttributeValueException(
-                        String.format("The theme requires a minimum system version of %s, "
-                                + "but the current version is %s.",
-                            requires, systemVersion),
-                        "problemDetail.theme.version.unsatisfied.requires",
-                        new String[] {requires, systemVersion});
-                }
-            })
-            .flatMap(theme -> {
-                var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
-                if (unstructureds.stream()
-                    .filter(hasSettingsYaml(theme))
-                    .count() > 1) {
-                    return Mono.error(new IllegalStateException(
-                        "Theme must only have one settings.yaml or settings.yml."));
-                }
-                if (unstructureds.stream()
-                    .filter(hasConfigYaml(theme))
-                    .count() > 1) {
-                    return Mono.error(new IllegalStateException(
-                        "Theme must only have one config.yaml or config.yml."));
-                }
-                return Flux.fromIterable(unstructureds)
-                    .filter(unstructured -> ExtensionWhitelist.of(theme).isAllowed(unstructured))
-                    .doOnNext(unstructured ->
-                        populateThemeNameLabel(unstructured, theme.getMetadata().getName()))
-                    .flatMap(client::create)
-                    .then()
-                    .thenReturn(theme);
-            });
+            .doOnNext(theme -> checkSystemVersionRequirement(theme.getSpec().getRequires()))
+            .flatMap(theme -> createThemeExtensions(theme).thenReturn(theme));
+    }
+
+    private Mono<Void> createOrUpdateThemeExtensions(Theme theme) {
+        return loadAndValidateThemeResources(theme)
+            .flatMapMany(Flux::fromIterable)
+            .filter(u -> ExtensionWhitelist.of(theme).isAllowed(u))
+            .doOnNext(u -> populateThemeNameLabel(u, theme.getMetadata().getName()))
+            .flatMap(this::createOrUpdate)
+            .then();
+    }
+
+    private Mono<Void> createThemeExtensions(Theme theme) {
+        return loadAndValidateThemeResources(theme)
+            .flatMapMany(Flux::fromIterable)
+            .filter(u -> ExtensionWhitelist.of(theme).isAllowed(u))
+            .doOnNext(u -> populateThemeNameLabel(u, theme.getMetadata().getName()))
+            .flatMap(client::create)
+            .then();
+    }
+
+    private Mono<List<Unstructured>> loadAndValidateThemeResources(Theme theme) {
+        var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
+        if (unstructureds.stream()
+            .filter(hasSettingsYaml(theme))
+            .count() > 1) {
+            return Mono.error(new IllegalStateException(
+                "Theme must only have one settings.yaml or settings.yml."));
+        }
+        if (unstructureds.stream()
+            .filter(hasConfigYaml(theme))
+            .count() > 1) {
+            return Mono.error(new IllegalStateException(
+                "Theme must only have one config.yaml or config.yml."));
+        }
+        return Mono.just(unstructureds);
+    }
+
+    private void checkSystemVersionRequirement(String requires) {
+        String systemVersion = systemVersionSupplier.get().toStableVersion().toString();
+        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+            throw new UnsatisfiedAttributeValueException(
+                String.format("The theme requires a minimum system version of %s, "
+                        + "but the current version is %s.",
+                    requires, systemVersion),
+                "problemDetail.theme.version.unsatisfied.requires",
+                new String[] {requires, systemVersion});
+        }
     }
 
     private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
