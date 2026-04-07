@@ -17,5 +17,13 @@
     "build/**",
     "storybook-static",
     ".idea"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.html"],
+      "options": {
+        "printWidth": 120
+      }
+    }
   ]
 }

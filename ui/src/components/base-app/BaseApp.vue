@@ -18,7 +18,7 @@ useAppTitle();
 const { globalInfo } = storeToRefs(stores.globalInfo());
 
 // Favicon
-const defaultFavicon = "/console/favicon.ico";
+const defaultFavicon = "/ui-assets/favicon.ico";
 const favicon = computed(() => {
   return globalInfo.value?.favicon || defaultFavicon;
 });

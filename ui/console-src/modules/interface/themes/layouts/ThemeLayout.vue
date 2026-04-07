@@ -33,7 +33,12 @@ import {
   type Ref,
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import {
+  isNavigationFailure,
+  NavigationFailureType,
+  useRoute,
+  useRouter,
+} from "vue-router";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import { useThemeLifeCycle } from "../composables/use-theme";
@@ -117,11 +122,17 @@ const { data: setting } = useQuery<Setting>({
 
 provide<Ref<Setting | undefined>>("setting", setting);
 
-const handleTabChange = (id: string | number) => {
+const handleTabChange = async (id: string | number) => {
   const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
+    const navigationResult = await router.push(tab.route);
+    if (
+      isNavigationFailure(navigationResult, NavigationFailureType.aborted) ||
+      isNavigationFailure(navigationResult, NavigationFailureType.cancelled)
+    ) {
+      return;
+    }
     activeTab.value = tab.id;
-    router.push(tab.route);
   }
 };
 
@@ -137,7 +148,7 @@ const handleTriggerTabChange = () => {
       activeTab.value = tab.id;
       return;
     }
-    handleTabChange(tabs.value[0].id);
+    void handleTabChange(tabs.value[0].id);
     return;
   }
 
@@ -147,7 +158,7 @@ const handleTriggerTabChange = () => {
 
 const onSelectTheme = () => {
   tabs.value = cloneDeep(initialTabs);
-  handleTabChange(tabs.value[0].id);
+  void handleTabChange(tabs.value[0].id);
 };
 
 onMounted(() => {
@@ -239,7 +250,7 @@ onMounted(() => {
         <VCard :body-class="['!p-0', '!overflow-visible']">
           <template #header>
             <VTabbar
-              v-model:active-id="activeTab"
+              :active-id="activeTab"
               :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
               class="w-full !rounded-none"
               type="outline"
@@ -247,10 +258,7 @@ onMounted(() => {
             ></VTabbar>
           </template>
           <div class="rounded-b-base bg-white">
-            <RouterView
-              :key="`${selectedTheme?.metadata.name}-${activeTab}`"
-              v-slot="{ Component }"
-            >
+            <RouterView v-slot="{ Component }">
               <template v-if="Component">
                 <Suspense>
                   <component :is="Component"></component>

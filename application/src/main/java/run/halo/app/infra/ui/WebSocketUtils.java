@@ -1,4 +1,4 @@
-package run.halo.app.infra.console;
+package run.halo.app.infra.ui;
 
 import java.util.Objects;
 import org.springframework.http.HttpHeaders;

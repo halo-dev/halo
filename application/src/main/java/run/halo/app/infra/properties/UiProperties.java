@@ -5,9 +5,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @Data
-public class ConsoleProperties {
+public class UiProperties {
 
-    private String location = "classpath:/console/";
+    private String location = "classpath:/ui/";
 
     @Valid
     @NestedConfigurationProperty

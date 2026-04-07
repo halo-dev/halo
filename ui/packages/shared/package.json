@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/ui-shared",
-  "version": "2.23.0",
+  "version": "2.24.0",
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
@@ -29,8 +29,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false",
     "prepublishOnly": "pnpm run build"
   },
@@ -48,8 +48,8 @@
     "vue-router": "^5.0.x"
   },
   "inlinedDependencies": {
-    "mitt": "3.0.1",
     "dayjs": "1.11.19",
+    "mitt": "3.0.1",
     "uuid": "13.0.0"
   }
 }

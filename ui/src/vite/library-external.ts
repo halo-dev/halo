@@ -1,105 +1,107 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import type { HtmlTagDescriptor } from "vite";
 import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
-import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
 import {
   viteStaticCopy as ViteStaticCopy,
   type Target,
 } from "vite-plugin-static-copy";
+import type { HtmlTagDescriptor, Plugin } from "vite-plus";
 
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
  *
- * @param {boolean} isProduction - boolean
- * @param {string} baseUrl - The base url of the application.
+ * @param {string} mode
  * @returns An array of plugins
  */
-export const setupLibraryExternal = (
-  isProduction: boolean,
-  baseUrl: string,
-  entry: string
-) => {
+export const setupLibraryExternal = (mode: string) => {
+  // Vitest mode doesn't need to setup library external.
+  if (mode === "test") {
+    return [];
+  }
+
+  const isProduction = mode === "production";
+
   const staticTargets: Target[] = [
     {
       src: `./node_modules/vue/dist/vue.global${
         isProduction ? ".prod" : ""
       }.js`,
-      dest: "assets/vue",
+      dest: "vue",
       rename: `vue.[hash].js`,
     },
     {
       src: `./node_modules/vue-router/dist/vue-router.global${
         isProduction ? ".prod" : ""
       }.js`,
-      dest: "assets/vue-router",
+      dest: "vue-router",
       rename: `vue-router.[hash].js`,
     },
     {
       src: `./node_modules/pinia/dist/pinia.iife.prod.js`,
-      dest: "assets/pinia",
+      dest: "pinia",
       rename: `pinia.[hash].js`,
     },
     {
       src: "./node_modules/axios/dist/axios.min.js",
-      dest: "assets/axios",
+      dest: "axios",
       rename: `axios.[hash].js`,
     },
     {
       src: `./node_modules/vue-demi/lib/index.iife.js`,
-      dest: "assets/vue-demi",
+      dest: "vue-demi",
       rename: `vue-demi.[hash].js`,
     },
     {
       src: "./node_modules/@vueuse/shared/index.iife.min.js",
-      dest: "assets/vueuse",
+      dest: "vueuse",
       rename: `vueuse.shared.[hash].js`,
     },
     {
       src: "./node_modules/@vueuse/core/index.iife.min.js",
-      dest: "assets/vueuse",
+      dest: "vueuse",
       rename: `vueuse.core.[hash].js`,
     },
     {
       src: "./node_modules/@vueuse/components/index.iife.min.js",
-      dest: "assets/vueuse",
+      dest: "vueuse",
       rename: `vueuse.components.[hash].js`,
     },
     {
       src: "./node_modules/@vueuse/router/index.iife.min.js",
-      dest: "assets/vueuse",
+      dest: "vueuse",
       rename: `vueuse.router.[hash].js`,
     },
     {
       src: "./node_modules/@halo-dev/components/dist/index.iife.js",
-      dest: "assets/components",
+      dest: "components",
       rename: `components.[hash].js`,
     },
     {
       src: "./node_modules/@halo-dev/api-client/dist/index.iife.js",
-      dest: "assets/api-client",
+      dest: "api-client",
       rename: `api-client.[hash].js`,
     },
     {
       src: "./node_modules/@halo-dev/ui-shared/dist/index.iife.js",
-      dest: "assets/ui-shared",
+      dest: "ui-shared",
       rename: `ui-shared.[hash].js`,
     },
     // TODO: Remove this in the future, only for compatibility.
     {
       src: "./node_modules/@halo-dev/console-shared/index.js",
-      dest: "assets/console-shared",
+      dest: "console-shared",
       rename: `console-shared.[hash].js`,
     },
     {
       src: "./node_modules/@halo-dev/richtext-editor/dist/index.iife.js",
-      dest: "assets/editor",
+      dest: "editor",
       rename: `editor.[hash].js`,
     },
   ].map((target) => {
     return {
       ...target,
+      dest: `ui-assets/${target.dest}`,
       rename: `${target.rename.replace(
         "[hash]",
         computeLibraryHash(target.src)
@@ -113,9 +115,10 @@ export const setupLibraryExternal = (
         injectTo: "head",
         tag: "script",
         attrs: {
-          src: `${baseUrl}${target.dest}/${target.rename}`,
+          src: `/${target.dest}/${target.rename}`,
           type: "text/javascript",
           "vite-ignore": true,
+          ...(!isProduction ? { crossorigin: "" } : {}),
         },
       };
     })
@@ -139,17 +142,22 @@ export const setupLibraryExternal = (
     ViteStaticCopy({
       targets: staticTargets,
     }),
-    VitePluginHtml({
-      minify: false,
-      inject: {
-        tags: injectTags,
-        data: {
-          entry: entry,
-        },
-      },
-    }),
+    createInjectExternalTagsPlugin(injectTags),
   ];
 };
+
+function createInjectExternalTagsPlugin(tags: HtmlTagDescriptor[]): Plugin {
+  return {
+    name: "halo:inject-external-library-tags",
+    enforce: "pre",
+    transformIndexHtml: {
+      order: "pre",
+      handler() {
+        return tags;
+      },
+    },
+  };
+}
 
 function computeLibraryHash(file: string) {
   const content = fs.readFileSync(path.resolve(process.cwd(), file), "utf8");

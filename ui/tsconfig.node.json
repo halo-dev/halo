@@ -2,12 +2,10 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
     "vite.config.ts",
-    "vite.uc.config.ts",
     "vitest.config.*",
     "eslint.config.ts",
     "tailwind.config.ts",
-    "src/vite/library-external.ts",
-    "src/vite/config-builder.ts"
+    "src/vite/*.ts"
   ],
   "compilerOptions": {
     "composite": true,

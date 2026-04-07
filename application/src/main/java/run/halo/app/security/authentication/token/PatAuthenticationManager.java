@@ -1,6 +1,6 @@
-package run.halo.app.security.authentication.pat;
+package run.halo.app.security.authentication.token;
 
-import static org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder.withJwkSource;
+import static run.halo.app.security.PersonalAccessToken.PAT_TOKEN_PREFIX;
 import static run.halo.app.security.authorization.AuthorityUtils.ANONYMOUS_ROLE_NAME;
 import static run.halo.app.security.authorization.AuthorityUtils.AUTHENTICATED_ROLE_NAME;
 import static run.halo.app.security.authorization.AuthorityUtils.ROLE_PREFIX;
@@ -10,49 +10,40 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Objects;
+import org.apache.commons.lang3.Strings;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
-import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authorization.AuthorityUtils;
 
-class PatAuthenticationManager implements ReactiveAuthenticationManager {
+public class PatAuthenticationManager implements ReactiveAuthenticationManager {
 
     /**
      * Minimal duration gap of personal access token update.
      */
     private static final Duration MIN_UPDATE_GAP = Duration.ofMinutes(1);
 
-    private final JwtReactiveAuthenticationManager delegate;
+    private final ReactiveAuthenticationManager delegate;
 
     private final ReactiveExtensionClient client;
 
-    private final CryptoService cryptoService;
-
     private Clock clock;
 
-    public PatAuthenticationManager(ReactiveExtensionClient client, CryptoService cryptoService) {
+    public PatAuthenticationManager(ReactiveExtensionClient client,
+        ReactiveAuthenticationManager delegate) {
         this.client = client;
-        this.cryptoService = cryptoService;
-        this.delegate = getDelegate();
+        this.delegate = delegate;
         this.clock = Clock.systemDefaultZone();
-    }
-
-    private JwtReactiveAuthenticationManager getDelegate() {
-        var jwtDecoder = withJwkSource(signedJWT -> Flux.just(cryptoService.getJwk()))
-            .build();
-        return new JwtReactiveAuthenticationManager(jwtDecoder);
     }
 
     /**
@@ -66,7 +57,13 @@ class PatAuthenticationManager implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        return delegate.authenticate(authentication)
+        return Mono.justOrEmpty(authentication)
+            .cast(BearerTokenAuthenticationToken.class)
+            .map(t -> {
+                var token = Strings.CS.removeStart(t.getToken(), PAT_TOKEN_PREFIX);
+                return new BearerTokenAuthenticationToken(token);
+            })
+            .flatMap(delegate::authenticate)
             .cast(JwtAuthenticationToken.class)
             .flatMap(this::checkAndRebuild);
     }

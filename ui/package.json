@@ -6,21 +6,21 @@
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
     "predev": "pnpm --filter @halo-dev/richtext-editor run build",
-    "dev": "run-p dev:console dev:uc",
+    "dev": "vp dev --host",
+    "build": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp build",
     "dev:uc": "vite --host --config ./vite.uc.config.ts",
     "dev:console": "vite --host --config ./vite.config.ts",
-    "build": "vue-tsc --noEmit -p tsconfig.app.json --composite false && run-p build:console build:uc",
     "build:uc": "vite build --config ./vite.uc.config.ts",
     "build:console": "vite build --config ./vite.config.ts",
     "build:packages": "pnpm -r run build",
     "api-client:gen": "pnpm -C packages/api-client gen",
-    "test:unit": "vitest --run && pnpm run test:unit:packages",
-    "test:unit:watch": "vitest --watch",
-    "test:unit:ui": "vitest --watch --ui",
+    "test:unit": "vp test --run && pnpm run test:unit:packages",
+    "test:unit:watch": "vp test --watch",
+    "test:unit:ui": "vp test --watch --ui",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
+    "format": "vp fmt",
+    "format:check": "vp fmt --check",
     "typecheck:packages": "pnpm --parallel -r run typecheck",
     "test:unit:packages": "pnpm --parallel -r run test:unit",
     "publish:packages": "pnpm -r publish --access public --no-git-checks"
@@ -142,29 +142,28 @@
     "jsdom": "^27.2.0",
     "lint-staged": "^16.2.7",
     "npm-run-all": "^4.1.5",
-    "oxfmt": "^0.36.0",
     "postcss": "^8.5.6",
     "postcss-viewport-height-correction": "^1.1.1",
     "rollup-plugin-gzip": "^4.1.1",
     "sass-embedded": "^1.93.3",
     "tailwindcss": "^3.4.17",
     "tailwindcss-themer": "^4.1.1",
-    "tsdown": "^0.21.2",
     "typescript": "~5.9.3",
     "unplugin-icons": "^23.0.1",
-    "vite": "^8.0.0",
+    "vite": "catalog:",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-static-copy": "^3.2.0",
-    "vitest": "^4.1.0",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
     "vue-tsc": "^3.2.4"
   },
   "resolutions": {
     "axios": "^1.12.2"
   },
   "lint-staged": {
-    "**/*": "oxfmt --no-error-on-unmatched-pattern",
+    "**/*": "vp fmt --no-error-on-unmatched-pattern",
     "*.{ts,mts,tsx,vue}": [
       "eslint --fix --max-warnings=0 --no-warn-ignored"
     ]
@@ -190,7 +189,7 @@
       "vue-demi"
     ],
     "patchedDependencies": {
-      "@tiptap/extension-drag-handle@3.17.1": "patches/@tiptap__extension-drag-handle@3.17.1.patch"
+      "@tiptap/extension-drag-handle@3.22.2": "patches/@tiptap__extension-drag-handle@3.22.2.patch"
     }
   }
 }

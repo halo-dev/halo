@@ -1,4 +1,4 @@
-package run.halo.app.security.authentication.pat;
+package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.Comparators.compareCreationTimestamp;
 
@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.PatService;
+import run.halo.app.core.user.service.UserScopedPatHandler;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.security.PersonalAccessToken;

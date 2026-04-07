@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/api-client",
-  "version": "2.23.0",
+  "version": "2.24.0",
   "description": "API Client for Halo 2",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/api-client#readme",
   "bugs": {
@@ -40,7 +40,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "gen": "rimraf --glob './src/**' && openapi-generator-cli generate -i ../../../api-docs/openapi/v3_0/aggregated.json -g typescript-axios -c ./.openapi_config.yaml -o ./src --type-mappings='set=Array' --global-property apiDocs=false,modelDocs=false",
     "prepublishOnly": "pnpm run build"
   },
@@ -56,24 +56,24 @@
     "axios": "^1.12.*"
   },
   "inlinedDependencies": {
-    "es-errors": "1.3.0",
-    "object-inspect": "1.13.4",
-    "side-channel-list": "1.0.0",
-    "es-object-atoms": "1.1.1",
-    "math-intrinsics": "1.1.0",
-    "gopd": "1.2.0",
-    "es-define-property": "1.0.1",
-    "has-symbols": "1.1.0",
-    "get-proto": "1.0.1",
-    "function-bind": "1.1.2",
     "call-bind-apply-helpers": "1.0.2",
-    "dunder-proto": "1.0.1",
-    "hasown": "2.0.2",
-    "get-intrinsic": "1.3.0",
     "call-bound": "1.0.4",
-    "side-channel-map": "1.0.1",
-    "side-channel-weakmap": "1.0.2",
+    "dunder-proto": "1.0.1",
+    "es-define-property": "1.0.1",
+    "es-errors": "1.3.0",
+    "es-object-atoms": "1.1.1",
+    "function-bind": "1.1.2",
+    "get-intrinsic": "1.3.0",
+    "get-proto": "1.0.1",
+    "gopd": "1.2.0",
+    "has-symbols": "1.1.0",
+    "hasown": "2.0.2",
+    "math-intrinsics": "1.1.0",
+    "object-inspect": "1.13.4",
+    "qs": "6.14.0",
     "side-channel": "1.1.0",
-    "qs": "6.14.0"
+    "side-channel-list": "1.0.0",
+    "side-channel-map": "1.0.1",
+    "side-channel-weakmap": "1.0.2"
   }
 }

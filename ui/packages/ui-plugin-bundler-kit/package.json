@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/ui-plugin-bundler-kit",
-  "version": "2.23.0",
+  "version": "2.24.0",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/ui-plugin-bundler-kit#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
@@ -19,8 +19,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {

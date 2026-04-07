@@ -3,16 +3,13 @@ import { fileURLToPath, URL } from "node:url";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import Vue from "@vitejs/plugin-vue";
 import Icons from "unplugin-icons/vite";
-import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import { defineConfig } from "vite-plus";
 
 export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";
 
   return defineConfig({
-    experimental: {
-      enableNativePlugin: true,
-    },
     plugins: [
       Vue(),
       Icons({
