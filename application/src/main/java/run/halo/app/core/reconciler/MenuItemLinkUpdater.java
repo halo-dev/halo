@@ -1,6 +1,5 @@
 package run.halo.app.core.reconciler;
 
-import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
@@ -121,14 +120,18 @@ public class MenuItemLinkUpdater implements SmartLifecycle {
             return;
         }
 
+        var currentStatus = menuItem.getStatus();
+        if (currentStatus != null
+            && href.equals(currentStatus.getHref())
+            && displayName.equals(currentStatus.getDisplayName())) {
+            return;
+        }
+
         var newStatus = new MenuItemStatus();
         newStatus.setHref(href);
         newStatus.setDisplayName(displayName);
-
-        if (!Objects.deepEquals(menuItem.getStatus(), newStatus)) {
-            menuItem.setStatus(newStatus);
-            client.update(menuItem);
-        }
+        menuItem.setStatus(newStatus);
+        client.update(menuItem);
     }
 
     class LinkedResourceWatcher implements Watcher {
