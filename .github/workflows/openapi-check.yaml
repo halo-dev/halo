@@ -6,19 +6,19 @@ on:
       - main
       - release-*
     paths:
-      - 'application/src/**'
-      - 'api/src/**'
-      - 'api-docs/openapi/**'
-      - 'ui/packages/api-client/**'
+      - "application/src/**"
+      - "api/src/**"
+      - "api-docs/openapi/**"
+      - "ui/packages/api-client/**"
   push:
     branches:
       - main
       - release-*
     paths:
-      - 'application/src/**'
-      - 'api/src/**'
-      - 'api-docs/openapi/**'
-      - 'ui/packages/api-client/**'
+      - "application/src/**"
+      - "api/src/**"
+      - "api-docs/openapi/**"
+      - "ui/packages/api-client/**"
 
 concurrency:
   group: ${{github.workflow}} - ${{github.ref}}
@@ -28,7 +28,7 @@ jobs:
   openapi-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Install UI dependencies
