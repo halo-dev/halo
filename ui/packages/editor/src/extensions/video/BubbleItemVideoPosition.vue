@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VDropdown } from "@halo-dev/components";
-import { findParentNode } from "@tiptap/core";
 import { computed } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
@@ -8,8 +7,9 @@ import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
 import DropdownItem from "@/components/base/DropdownItem.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
+import { isActive } from "@/tiptap/core";
 import type { BubbleItemComponentProps } from "@/types";
-import { ExtensionVideo } from "..";
+import { ExtensionFigure } from "..";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
   visible: () => true,
@@ -35,8 +35,8 @@ const positionOptions = [
 
 const currentPosition = computed(() => {
   const positionAttribute = props.editor.getAttributes(
-    ExtensionVideo.name
-  ).position;
+    ExtensionFigure.name
+  ).alignItems;
 
   const positionOption = positionOptions.find(
     (option) => option.value === positionAttribute
@@ -48,16 +48,6 @@ const currentPosition = computed(() => {
 
   return positionOption;
 });
-
-const isActive = (blockPosition: string) => {
-  const videoParent = findParentNode(
-    (node) => node.type.name === ExtensionVideo.name
-  )(props.editor.state.selection);
-  if (!videoParent) {
-    return false;
-  }
-  return videoParent.node.attrs.alignItems === blockPosition;
-};
 
 const handleSetPosition = (position: string) => {
   return props.editor.chain().focus().setBlockPosition(position).run();
@@ -85,7 +75,11 @@ const handleSetPosition = (position: string) => {
           v-for="option in positionOptions"
           :key="option.value"
           v-close-popper
-          :is-active="isActive(option.value)"
+          :is-active="
+            isActive(editor.state, ExtensionFigure.name, {
+              alignItems: option.value,
+            })
+          "
           @click="handleSetPosition(option.value)"
         >
           <template #icon>

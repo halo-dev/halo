@@ -73,7 +73,7 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
+            .mapNotNull(SecurityContext::getAuthentication)
             .filter(authenticationTrustResolver::isAuthenticated)
             .doOnNext(
                 // cache the pre-authentication
@@ -81,26 +81,25 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
             )
             .then(chain.filter(exchange))
             .then(Mono.defer(() -> ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
+                .mapNotNull(SecurityContext::getAuthentication)
                 .filter(OAuth2AuthenticationToken.class::isInstance)
                 .cast(OAuth2AuthenticationToken.class)
                 .flatMap(oauth2Token -> {
                     var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
                     var oauth2User = oauth2Token.getPrincipal();
-                    // check the connection
                     return connectionService.updateUserConnectionIfPresent(
                             registrationId, oauth2User
                         )
-                        .switchIfEmpty(Mono.defer(() -> {
-                            var preAuthenticationObject = exchange.getAttribute(PRE_AUTHENTICATION);
-                            if (preAuthenticationObject instanceof Authentication preAuth
-                                && authenticationTrustResolver.isAuthenticated(preAuth)) {
-                                // check the authentication again
-                                // try to bind the user automatically
-                                return connectionService.createUserConnection(
+                        .switchIfEmpty(Mono.defer(
+                            () -> Mono.justOrEmpty(exchange.getAttribute(PRE_AUTHENTICATION))
+                                .filter(Authentication.class::isInstance)
+                                .cast(Authentication.class)
+                                .filter(authenticationTrustResolver::isAuthenticated)
+                                .flatMap(preAuth -> connectionService.createUserConnection(
                                     preAuth.getName(), registrationId, oauth2User
-                                );
-                            }
+                                )))
+                        )
+                        .switchIfEmpty(Mono.defer(() -> {
                             // save the OAuth2Authentication into session
                             return authenticationCache.saveToken(exchange, oauth2Token)
                                 .then(Mono.defer(() -> {
