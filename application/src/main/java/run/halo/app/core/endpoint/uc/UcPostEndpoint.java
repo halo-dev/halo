@@ -293,6 +293,9 @@ public class UcPostEndpoint implements CustomEndpoint {
                         post.setSpec(new Post.PostSpec());
                     }
                     post.getSpec().setOwner(username);
+                    // Disallow setting publish to true when creating a post.
+                    // Publishing must be done explicitly via the publish endpoint.
+                    post.getSpec().setPublish(false);
                 }))
             .map(post -> new PostRequest(post, ContentUpdateParam.from(getContent(post))))
             .flatMap(postService::draftPost);
