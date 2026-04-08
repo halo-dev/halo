@@ -19834,6 +19834,9 @@
           "password": {
             "minLength": 1,
             "type": "string"
+          },
+          "totpCode": {
+            "type": "string"
           }
         }
       },
@@ -23493,6 +23496,9 @@
         "type": "object",
         "properties": {
           "code": {
+            "type": "string"
+          },
+          "currentTotpCode": {
             "type": "string"
           },
           "password": {
