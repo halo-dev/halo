@@ -2,6 +2,7 @@ package run.halo.app.theme.finders;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +60,45 @@ class FinderRegistryTest {
         finderRegistry.putFinder(new FakeFinder());
         Map<String, Object> finders = finderRegistry.getFinders();
         assertThat(finders).hasSize(1);
+    }
+
+    @Test
+    void registerAndUnregisterPlugin() {
+        var pluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
+        var finder = new FakeFinder();
+        when(pluginContext.getBeansWithAnnotation(Finder.class))
+            .thenReturn(Map.of("fakeFinder", finder));
+
+        finderRegistry.register("plugin-a", pluginContext);
+        assertThat(finderRegistry.get("test")).isNotNull();
+
+        finderRegistry.unregister("plugin-a");
+        assertThat(finderRegistry.get("test")).isNull();
+    }
+
+    @Test
+    void reRegisterCleansStaleFinders() {
+        var pluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
+        var finder1 = new FakeFinder();
+        when(pluginContext.getBeansWithAnnotation(Finder.class))
+            .thenReturn(Map.of("fakeFinder", finder1));
+
+        // First registration (simulates a previous plugin start that registered finders)
+        finderRegistry.register("plugin-a", pluginContext);
+        assertThat(finderRegistry.get("test")).isEqualTo(finder1);
+
+        // Simulate stale state: unregister was never called (e.g., context closed without
+        // firing ContextClosedEvent due to a failed refresh after ContextRefreshedEvent)
+        // Now re-register with new finders (e.g., after plugin upgrade)
+        var newPluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
+        var finder2 = new FakeFinder();
+        when(newPluginContext.getBeansWithAnnotation(Finder.class))
+            .thenReturn(Map.of("fakeFinder", finder2));
+
+        // register should not throw "Finder with name 'test' is already registered"
+        finderRegistry.register("plugin-a", newPluginContext);
+        // The new finder should be registered
+        assertThat(finderRegistry.get("test")).isEqualTo(finder2);
     }
 
     @Finder("test")

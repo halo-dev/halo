@@ -61,13 +61,41 @@ class ThemeLinkBuilderTest {
 
         String link = "/assets/css/style.css";
         String processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css");
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?v=1.0.0");
 
         // preview theme
         getTheme(false);
         link = "/assets/js/main.js";
         processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/themes/test-theme/assets/js/main.js");
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/js/main.js?v=1.0.0");
+    }
+
+    @Test
+    void processAssetsLinkWithoutVersion() {
+        // theme without version
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getThemeWithoutVersion(true), externalUrlSupplier);
+
+        String link = "/assets/css/style.css";
+        String processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css");
+    }
+
+    @Test
+    void processAssetsLinkWithExistingQueryParams() {
+        // link that already has any query parameter should not get ?v appended
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
+
+        // already has v param
+        String link = "/assets/css/style.css?v=custom";
+        String processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?v=custom");
+
+        // has a different custom query param the theme itself added
+        link = "/assets/css/style.css?foo=bar";
+        processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css?foo=bar");
     }
 
     @Test
@@ -124,6 +152,15 @@ class ThemeLinkBuilderTest {
     }
 
     private ThemeContext getTheme(boolean isActive) {
+        return ThemeContext.builder()
+            .name("test-theme")
+            .path(Paths.get("/themes/test-theme"))
+            .active(isActive)
+            .version("1.0.0")
+            .build();
+    }
+
+    private ThemeContext getThemeWithoutVersion(boolean isActive) {
         return ThemeContext.builder()
             .name("test-theme")
             .path(Paths.get("/themes/test-theme"))
