@@ -53,31 +53,7 @@ class UcPostEndpointTest {
     class CreateMyPostTest {
 
         @Test
-        void shouldForcePublishFalseWhenCreatingPost() {
-            var createdPost = createPost("test-post", true);
-            when(postService.draftPost(any(PostRequest.class))).thenReturn(Mono.just(createdPost));
-
-            webClient.mutate()
-                .apply(mockUser("test-user"))
-                .build()
-                .post()
-                .uri("/posts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createPost("test-post", true))
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-            // Verify that spec.publish is forced to false regardless of the request body value
-            verify(postService).draftPost(assertArg(postRequest -> {
-                var spec = postRequest.post().getSpec();
-                assertThat(spec).isNotNull();
-                assertThat(spec.getPublish()).isFalse();
-            }));
-        }
-
-        @Test
-        void shouldForcePublishFalseEvenWhenPublishTrueIsInRequestBody() {
+        void shouldForcePublishFalseWhenPublishTrueIsInRequestBody() {
             var postWithPublishTrue = createPost("post-with-publish", true);
             when(postService.draftPost(any(PostRequest.class)))
                 .thenReturn(Mono.just(postWithPublishTrue));
@@ -93,8 +69,10 @@ class UcPostEndpointTest {
                 .expectStatus()
                 .isOk();
 
+            // Verify that spec.publish is forced to false even when request sends publish=true
             verify(postService).draftPost(assertArg(postRequest -> {
                 var spec = postRequest.post().getSpec();
+                assertThat(spec).isNotNull();
                 assertThat(spec.getPublish()).isFalse();
             }));
         }
