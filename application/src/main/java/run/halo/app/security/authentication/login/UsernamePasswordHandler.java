@@ -66,19 +66,18 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(Mono.defer(
                     () -> {
-                        String errorParam = "error";
+                        var location = URI.create("/login?error&method=local");
                         if (exception instanceof DisabledException) {
-                            errorParam = "error=account-disabled";
-                        } else if (exception instanceof BadCredentialsException) {
-                            errorParam = "error=invalid-credential";
-                        } else if (exception instanceof TooManyRequestsException) {
-                            errorParam = "error=rate-limit-exceeded";
+                            location = URI.create("/login?error=account-disabled&method=local");
                         }
-                        var locationStr = "/login?" + errorParam + "&method=local";
-                        return redirectStrategy.sendRedirect(exchange,
-                            URI.create(locationStr));
-                    })
-                    .then(Mono.empty())
+                        if (exception instanceof BadCredentialsException) {
+                            location = URI.create("/login?error=invalid-credential&method=local");
+                        }
+                        if (exception instanceof TooManyRequestsException) {
+                            location = URI.create("/login?error=rate-limit-exceeded&method=local");
+                        }
+                        return redirectStrategy.sendRedirect(exchange, location);
+                    }).then(Mono.empty())
                 )
                 .flatMap(matchResult -> handleAuthenticationException(exception, exchange)));
     }
