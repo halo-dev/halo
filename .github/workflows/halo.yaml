@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew clean check --configuration-cache --configuration-cache-problems=warn
       - name: Upload coverage reports to Codecov
         if: github.repository == 'halo-dev/halo'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
 
   build:
     runs-on: ubuntu-latest
@@ -141,7 +141,7 @@ jobs:
           name: halo-artifacts
           path: application/build/libs
       - name: Docker Build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           tags: ghcr.io/halo-dev/halo-dev:main
           push: false
