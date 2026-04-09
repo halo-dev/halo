@@ -60,19 +60,42 @@ const editorLinkObtain = ref();
 
 const handleSetExternalLink = (attachment?: AttachmentSimple) => {
   if (!attachment) return;
-  props.updateAttributes({
-    src: attachment.url,
-  });
+  if (props.node.attrs.file) {
+    // Called as part of upload completion — do not add to undo history so
+    // that a single Ctrl+Z undoes the entire paste rather than reverting
+    // individual upload steps (which would re-trigger uploads).
+    const pos = props.getPos();
+    if (pos !== undefined) {
+      const { tr } = props.editor.state;
+      tr.setNodeMarkup(pos, props.node.type, {
+        ...props.node.attrs,
+        src: attachment.url,
+      });
+      tr.setMeta("addToHistory", false);
+      props.editor.view.dispatch(tr);
+    }
+  } else {
+    props.updateAttributes({
+      src: attachment.url,
+    });
+  }
 };
 
 const resetUpload = () => {
   const { file } = props.node.attrs;
   if (file) {
-    props.updateAttributes({
-      width: undefined,
-      height: undefined,
-      file: undefined,
-    });
+    const pos = props.getPos();
+    if (pos !== undefined) {
+      const { tr } = props.editor.state;
+      tr.setNodeMarkup(pos, props.node.type, {
+        ...props.node.attrs,
+        width: undefined,
+        height: undefined,
+        file: null,
+      });
+      tr.setMeta("addToHistory", false);
+      props.editor.view.dispatch(tr);
+    }
   }
 };
 

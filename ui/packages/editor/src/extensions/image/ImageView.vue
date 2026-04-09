@@ -85,10 +85,27 @@ const handleUploadReady = async (file: File) => {
 
 const handleSetExternalLink = (attachment?: AttachmentSimple) => {
   if (!attachment) return;
-  props.updateAttributes({
-    src: attachment.url,
-    alt: attachment.alt,
-  });
+  if (props.node.attrs.file) {
+    // Called as part of upload completion — do not add to undo history so
+    // that a single Ctrl+Z undoes the entire paste rather than reverting
+    // individual upload steps (which would re-trigger uploads).
+    const pos = props.getPos();
+    if (pos !== undefined) {
+      const { tr } = props.editor.state;
+      tr.setNodeMarkup(pos, props.node.type, {
+        ...props.node.attrs,
+        src: attachment.url,
+        alt: attachment.alt,
+      });
+      tr.setMeta("addToHistory", false);
+      props.editor.view.dispatch(tr);
+    }
+  } else {
+    props.updateAttributes({
+      src: attachment.url,
+      alt: attachment.alt,
+    });
+  }
 };
 
 const handleUploadRetry = () => {
@@ -109,10 +126,17 @@ const resetUpload = () => {
 
   const { file } = props.node.attrs;
   if (file) {
-    props.updateAttributes({
-      width: undefined,
-      file: undefined,
-    });
+    const pos = props.getPos();
+    if (pos !== undefined) {
+      const { tr } = props.editor.state;
+      tr.setNodeMarkup(pos, props.node.type, {
+        ...props.node.attrs,
+        width: undefined,
+        file: null,
+      });
+      tr.setMeta("addToHistory", false);
+      props.editor.view.dispatch(tr);
+    }
   }
 };
 
