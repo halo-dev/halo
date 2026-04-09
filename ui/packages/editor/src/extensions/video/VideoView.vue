@@ -43,22 +43,26 @@ const initialization = computed(() => {
 
 const editorLinkObtain = ref();
 
+/**
+ * Dispatch an attribute update without recording it in undo history.
+ * Used for upload-completion updates so that Ctrl+Z undoes the entire
+ * paste in one step instead of reverting individual upload steps
+ * (which would re-trigger uploads).
+ */
+const updateAttrsWithoutHistory = (attrs: Record<string, unknown>) => {
+  const pos = props.getPos();
+  if (pos === undefined) return;
+  const { tr } = props.editor.state;
+  tr.setNodeMarkup(pos, props.node.type, { ...props.node.attrs, ...attrs });
+  tr.setMeta("addToHistory", false);
+  props.editor.view.dispatch(tr);
+};
+
 const handleSetExternalLink = (attachment?: AttachmentSimple) => {
   if (!attachment) return;
   if (props.node.attrs.file) {
-    // Called as part of upload completion — do not add to undo history so
-    // that a single Ctrl+Z undoes the entire paste rather than reverting
-    // individual upload steps (which would re-trigger uploads).
-    const pos = props.getPos();
-    if (pos !== undefined) {
-      const { tr } = props.editor.state;
-      tr.setNodeMarkup(pos, props.node.type, {
-        ...props.node.attrs,
-        src: attachment.url,
-      });
-      tr.setMeta("addToHistory", false);
-      props.editor.view.dispatch(tr);
-    }
+    // Called as part of upload completion — do not add to undo history.
+    updateAttrsWithoutHistory({ src: attachment.url });
   } else {
     props.updateAttributes({
       src: attachment.url,
@@ -67,20 +71,12 @@ const handleSetExternalLink = (attachment?: AttachmentSimple) => {
 };
 
 const resetUpload = () => {
-  const { file } = props.node.attrs;
-  if (file) {
-    const pos = props.getPos();
-    if (pos !== undefined) {
-      const { tr } = props.editor.state;
-      tr.setNodeMarkup(pos, props.node.type, {
-        ...props.node.attrs,
-        width: undefined,
-        height: undefined,
-        file: undefined,
-      });
-      tr.setMeta("addToHistory", false);
-      props.editor.view.dispatch(tr);
-    }
+  if (props.node.attrs.file) {
+    updateAttrsWithoutHistory({
+      width: undefined,
+      height: undefined,
+      file: undefined,
+    });
   }
 };
 
