@@ -8,10 +8,14 @@ import {
   type RoleV1alpha1ApiListRoleRequest,
 } from "@halo-dev/api-client";
 import {
+  IconMore,
   VAlert,
   VButton,
   VDescription,
   VDescriptionItem,
+  VDropdown,
+  VDropdownDivider,
+  VDropdownItem,
   VSpace,
   VSwitch,
 } from "@halo-dev/components";
@@ -24,9 +28,11 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { usePluginLifeCycle } from "../../composables/use-plugin";
 import PluginConditionsModal from "../PluginConditionsModal.vue";
+import PluginInstallationModal from "../PluginInstallationModal.vue";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
-const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
+const { changeStatus, changingStatus, reload, resetPluginConfig, uninstall } =
+  usePluginLifeCycle(plugin);
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -94,6 +100,8 @@ const lastCondition = computed(() => {
 const { copy, copied } = useClipboard({
   legacy: true,
 });
+
+const pluginUpgradeModalVisible = ref(false);
 </script>
 
 <template>
@@ -109,12 +117,81 @@ const { copy, copied } = useClipboard({
           {{ $t("core.plugin.detail.header.title") }}
         </h3>
       </div>
-      <div v-permission="['system:plugins:manage']">
+      <div
+        v-permission="['system:plugins:manage']"
+        class="flex items-center gap-2"
+      >
         <VSwitch
           :loading="changingStatus"
           :model-value="plugin?.spec.enabled"
           @change="changeStatus()"
         />
+        <VDropdown>
+          <VButton size="sm" ghost>
+            <IconMore />
+          </VButton>
+          <template #popper>
+            <VDropdownItem
+              v-if="
+                plugin?.metadata.labels?.[pluginLabels.SYSTEM_RESERVED] !==
+                'true'
+              "
+              @click="pluginUpgradeModalVisible = true"
+            >
+              {{ $t("core.common.buttons.upgrade") }}
+            </VDropdownItem>
+            <VDropdownDivider />
+
+            <VDropdown>
+              <VDropdownItem type="danger">
+                {{ $t("core.common.buttons.uninstall") }}
+              </VDropdownItem>
+              <template #popper>
+                <VDropdownItem
+                  type="danger"
+                  @click="
+                    uninstall({
+                      deleteExtensions: false,
+                      onSuccess: () => {
+                        $router.replace({
+                          name: 'Plugins',
+                        });
+                      },
+                    })
+                  "
+                >
+                  {{ $t("core.common.buttons.uninstall") }}
+                </VDropdownItem>
+                <VDropdownItem
+                  type="danger"
+                  @click="
+                    uninstall({
+                      deleteExtensions: true,
+                      onSuccess: () => {
+                        $router.replace({
+                          name: 'Plugins',
+                        });
+                      },
+                    })
+                  "
+                >
+                  {{
+                    $t(
+                      "core.plugin.operations.uninstall_and_delete_config.button"
+                    )
+                  }}
+                </VDropdownItem>
+              </template>
+            </VDropdown>
+
+            <VDropdownItem type="danger" @click="reload()">
+              {{ $t("core.plugin.operations.reload.button") }}
+            </VDropdownItem>
+            <VDropdownItem type="danger" @click="resetPluginConfig()">
+              {{ $t("core.plugin.operations.reset.button") }}
+            </VDropdownItem>
+          </template>
+        </VDropdown>
       </div>
     </div>
     <div
@@ -306,4 +383,13 @@ const { copy, copied } = useClipboard({
       </VDescription>
     </div>
   </div>
+
+  <PluginInstallationModal
+    v-if="
+      pluginUpgradeModalVisible &&
+      utils.permission.has(['system:plugins:manage'])
+    "
+    :plugin-to-upgrade="plugin"
+    @close="pluginUpgradeModalVisible = false"
+  />
 </template>

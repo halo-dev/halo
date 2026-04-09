@@ -576,6 +576,7 @@
   "core.plugin.operations.reload.button": "重載",
   "core.plugin.operations.reload.title": "重載插件",
   "core.plugin.operations.reload.description": "重載插件將重新載入插件程式碼，可能造成插件功能短時間中斷，是否繼續？",
+  "core.plugin.operations.reload.toast_success": "重載成功",
   "core.plugin.operations.reload_window.button": "需要重載頁面",
   "core.plugin.filters.status.items.active": "已啟用",
   "core.plugin.filters.status.items.inactive": "未啟用",
