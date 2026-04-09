@@ -21,6 +21,7 @@ interface usePluginLifeCycleReturn {
   changeStatus: () => void;
   changingStatus: Ref<boolean>;
   uninstall: (deleteExtensions?: boolean) => void;
+  reload: () => Promise<void>;
 }
 
 export function usePluginLifeCycle(
@@ -94,6 +95,19 @@ export function usePluginLifeCycle(
     retryDelay: 1000,
     onSuccess() {
       window.location.reload();
+    },
+  });
+
+  const { mutateAsync: reload } = useMutation({
+    mutationKey: ["core:plugins:reload", plugin],
+    mutationFn: async () => {
+      if (!plugin?.value) {
+        throw new Error("Plugin not found");
+      }
+
+      return await consoleApiClient.plugin.plugin.reloadPlugin({
+        name: plugin.value.metadata.name,
+      });
     },
   });
 
@@ -178,6 +192,7 @@ export function usePluginLifeCycle(
     getStatusMessage,
     changeStatus,
     changingStatus,
+    reload,
     uninstall,
   };
 }
