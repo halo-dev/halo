@@ -530,6 +530,7 @@
   "core.plugin.operations.reload.button": "Recargar",
   "core.plugin.operations.reload.title": "Recargar complemento",
   "core.plugin.operations.reload.description": "Recargar el complemento volverá a cargar su código y puede causar una interrupción breve de su funcionalidad. ¿Deseas continuar?",
+  "core.plugin.operations.reload.toast_success": "Recargado correctamente",
   "core.plugin.operations.reload_window.button": "Reinicio requerido",
   "core.plugin.filters.status.items.active": "Active",
   "core.plugin.filters.status.items.inactive": "Inactive",
