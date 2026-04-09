@@ -432,6 +432,7 @@ const showCancelPublishButton = computed(() => {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
+              v-if="utils.permission.has(['system:users:view'])"
               v-model="formState.spec.owner"
               :label="$t('core.post.settings.fields.owner.label')"
               type="userSelect"
