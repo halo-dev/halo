@@ -9,24 +9,12 @@ import { Dialog, Toast, VLoading } from "@halo-dev/components";
 import { utils, type PluginTab } from "@halo-dev/ui-shared";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import type { ComputedRef, Ref } from "vue";
+import type { Ref } from "vue";
 import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
 
-interface usePluginLifeCycleReturn {
-  isStarted: ComputedRef<boolean | undefined>;
-  getStatusDotState: () => string;
-  getStatusMessage: () => string | undefined;
-  changeStatus: () => void;
-  changingStatus: Ref<boolean>;
-  uninstall: (deleteExtensions?: boolean) => void;
-  reload: () => Promise<void>;
-}
-
-export function usePluginLifeCycle(
-  plugin?: Ref<Plugin | undefined>
-): usePluginLifeCycleReturn {
+export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
   const { t } = useI18n();
 
   const isStarted = computed(() => {

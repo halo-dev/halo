@@ -113,7 +113,7 @@ const { copy, copied } = useClipboard({
         <VSwitch
           :loading="changingStatus"
           :model-value="plugin?.spec.enabled"
-          @change="changeStatus"
+          @change="changeStatus()"
         />
       </div>
     </div>
