@@ -76,7 +76,7 @@ const resetUpload = () => {
         ...props.node.attrs,
         width: undefined,
         height: undefined,
-        file: null,
+        file: undefined,
       });
       tr.setMeta("addToHistory", false);
       props.editor.view.dispatch(tr);

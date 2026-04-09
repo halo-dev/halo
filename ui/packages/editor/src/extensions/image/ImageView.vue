@@ -132,7 +132,7 @@ const resetUpload = () => {
       tr.setNodeMarkup(pos, props.node.type, {
         ...props.node.attrs,
         width: undefined,
-        file: null,
+        file: undefined,
       });
       tr.setMeta("addToHistory", false);
       props.editor.view.dispatch(tr);
