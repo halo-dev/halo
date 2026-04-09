@@ -1,3 +1,4 @@
+import { utils } from "@halo-dev/ui-shared";
 import messages from "@intlify/unplugin-vue-i18n/messages";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { mount } from "@vue/test-utils";
@@ -12,6 +13,7 @@ describe("PostSettingModal", () => {
   });
 
   it("should render", () => {
+    utils.permission.setUserPermissions([]);
     const wrapper = mount(
       {
         components: {
