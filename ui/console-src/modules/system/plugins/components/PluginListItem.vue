@@ -20,6 +20,7 @@ import {
   type EntityFieldItem,
   type OperationItem,
 } from "@halo-dev/ui-shared";
+import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
@@ -37,6 +38,7 @@ import TitleField from "./entity-fields/TitleField.vue";
 
 const { t } = useI18n();
 const router = useRouter();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -50,7 +52,7 @@ const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
-const { getStatusDotState, getStatusMessage, uninstall } =
+const { getStatusDotState, getStatusMessage, uninstall, reload } =
   usePluginLifeCycle(plugin);
 
 const pluginUpgradeModalVisible = ref(false);
@@ -149,7 +151,31 @@ const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
       props: {
         type: "danger",
       },
-      label: t("core.common.buttons.reset"),
+      label: t("core.plugin.operations.reload.button"),
+      hidden: !plugin.value.spec.enabled,
+      action: () => {
+        Dialog.warning({
+          title: t("core.plugin.operations.reload.title"),
+          description: t("core.plugin.operations.reload.description"),
+          confirmType: "danger",
+          confirmText: t("core.common.buttons.confirm"),
+          cancelText: t("core.common.buttons.cancel"),
+          onConfirm: async () => {
+            await reload();
+            await queryClient.invalidateQueries({
+              queryKey: ["plugins"],
+            });
+          },
+        });
+      },
+    },
+    {
+      priority: 60,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.plugin.operations.reset.button"),
       action: () => {
         handleResetSettingConfig();
       },
