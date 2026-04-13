@@ -68,19 +68,11 @@ class AttachmentReconciler implements Reconciler<Request> {
                 )
                 .blockOptional(Duration.ofSeconds(10))
                 .orElse(null);
-            Result result = null;
-            if (thumbnails == null) {
-                log.warn("""
-                    Failed to get thumbnails for attachment: {}, \
-                    consider upgrading storage plugins""", request.name()
-                );
-                result = new Result(true, Duration.ofSeconds(10));
-            }
             attachment.getStatus().setThumbnails(thumbnails);
             log.debug("Set attachment thumbnails: {} for {}", thumbnails, request.name());
             client.update(attachment);
             this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
-            return result;
+            return Result.doNotRetry();
         }).orElse(null);
     }
 
