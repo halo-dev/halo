@@ -67,6 +67,7 @@ public class Attachment extends AbstractExtension {
             """)
         private String permalink;
 
+        @Nullable
         private Map<String, String> thumbnails;
     }
 }
