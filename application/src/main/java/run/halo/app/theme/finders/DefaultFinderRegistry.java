@@ -89,6 +89,10 @@ public class DefaultFinderRegistry implements FinderRegistry, InitializingBean {
 
     @Override
     public void register(String pluginId, ApplicationContext pluginContext) {
+        // Ensure any stale finders from this plugin are removed before registering new ones.
+        // This handles the case where a previous registration was not properly cleaned up
+        // (e.g., when a plugin context refresh partially succeeded and then failed).
+        unregister(pluginId);
         pluginContext.getBeansWithAnnotation(Finder.class)
             .forEach((beanName, finder) -> {
                 var finderName = getFinderName(finder);
