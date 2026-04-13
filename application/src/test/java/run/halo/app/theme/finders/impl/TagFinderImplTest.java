@@ -78,6 +78,26 @@ class TagFinderImplTest {
     }
 
     @Test
+    void getByNames() {
+        // tags sorted by default (descending creation timestamp): t3, t2, t1
+        var sortedTags = tags().stream()
+            .sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed())
+            .toList();
+        when(client.listAll(eq(Tag.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.fromIterable(sortedTags));
+
+        // request in a specific order that differs from natural sort: t1, t3, t2
+        var result = tagFinder.getByNames(List.of("t1", "t3", "t2"))
+            .collectList()
+            .block();
+        assertThat(result).hasSize(3);
+        assertThat(result.stream()
+            .map(vo -> vo.getMetadata().getName())
+            .toList())
+            .isEqualTo(List.of("t1", "t3", "t2"));
+    }
+
+    @Test
     void listAll() {
         when(client.listAll(eq(Tag.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(Flux.fromIterable(

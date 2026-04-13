@@ -50,11 +50,22 @@ public class TagFinderImpl implements TagFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
+        var nameList = names instanceof List ? (List<String>) names : List.copyOf(names);
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", names))
+            .andQuery(Queries.in("metadata.name", nameList))
             .build();
         return client.listAll(Tag.class, options, ExtensionUtil.defaultSort())
-            .map(TagVo::from);
+            .map(TagVo::from)
+            .collectList()
+            .flatMapMany(list -> {
+                list.sort(Comparator.comparingInt(
+                    vo -> {
+                        int index = nameList.indexOf(vo.getMetadata().getName());
+                        return index == -1 ? Integer.MAX_VALUE : index;
+                    }
+                ));
+                return Flux.fromIterable(list);
+            });
     }
 
     @Override

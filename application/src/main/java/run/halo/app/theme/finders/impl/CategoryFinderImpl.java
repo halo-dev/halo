@@ -61,11 +61,22 @@ public class CategoryFinderImpl implements CategoryFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
+        var nameList = names instanceof List ? (List<String>) names : List.copyOf(names);
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", names))
+            .andQuery(Queries.in("metadata.name", nameList))
             .build();
         return client.listAll(Category.class, options, ExtensionUtil.defaultSort())
-            .map(CategoryVo::from);
+            .map(CategoryVo::from)
+            .collectList()
+            .flatMapMany(list -> {
+                list.sort(Comparator.comparingInt(
+                    vo -> {
+                        int index = nameList.indexOf(vo.getMetadata().getName());
+                        return index == -1 ? Integer.MAX_VALUE : index;
+                    }
+                ));
+                return Flux.fromIterable(list);
+            });
     }
 
     static Sort defaultSort() {
