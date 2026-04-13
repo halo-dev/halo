@@ -1,7 +1,7 @@
 package run.halo.app.core.user.service.impl;
 
 import static run.halo.app.extension.ExtensionUtil.defaultSort;
-import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.ExtensionUtil.notDeleting;
 import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
@@ -50,7 +50,7 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         String registrationId,
         OAuth2User oauth2User
     ) {
-        return getUserConnection(registrationId, oauth2User.getName())
+        return getByProviderUserId(registrationId, oauth2User.getName())
             .flatMap(connection -> Mono.<UserConnection>error(
                 () -> new OAuth2UserAlreadyBoundException(connection))
             )
@@ -77,37 +77,45 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         return client.update(connection);
     }
 
-    private Mono<UserConnection> getUserConnection(
-        String registrationId, String providerId
-    ) {
-        var listOptions = ListOptions.builder()
-            .andQuery(equal("spec.registrationId", registrationId))
-            .andQuery(equal("spec.providerUserId", providerId))
-            .build();
-        return client.listAll(UserConnection.class, listOptions, defaultSort()).next();
-    }
-
     @Override
     public Mono<UserConnection> updateUserConnectionIfPresent(
         String registrationId, OAuth2User oauth2User
     ) {
-        return getUserConnection(registrationId, oauth2User.getName())
+        return getByProviderUserId(registrationId, oauth2User.getName())
             .flatMap(connection -> updateUserConnection(connection, oauth2User));
     }
 
     @Override
     public Flux<UserConnection> removeUserConnection(String registrationId, String username) {
-        var listOptions = ListOptions.builder()
-            .fieldQuery(and(
-                equal("spec.registrationId", registrationId),
-                equal("spec.username", username)
-            ))
-            .build();
-        return client.listAll(UserConnection.class, listOptions, defaultSort())
+        return listByUsername(registrationId, username)
             .flatMap(client::delete)
             .doOnNext(deleted ->
                 eventPublisher.publishEvent(new UserConnectionDisconnectedEvent(this, deleted))
             );
+    }
+
+    @Override
+    public Mono<UserConnection> getByProviderUserId(String registrationId, String providerUserId) {
+        var listOptions = ListOptions.builder()
+            .andQuery(equal("spec.registrationId", registrationId))
+            .andQuery(equal("spec.providerUserId", providerUserId))
+            .andQuery(notDeleting())
+            .build();
+        return client.listAll(UserConnection.class, listOptions, defaultSort()).next();
+    }
+
+    @Override
+    public Mono<Void> removeByProviderUserId(String registrationId, String providerUserId) {
+        return getByProviderUserId(registrationId, providerUserId).flatMap(client::delete).then();
+    }
+
+    private Flux<UserConnection> listByUsername(String registrationId, String username) {
+        var listOptions = ListOptions.builder()
+            .andQuery(equal("spec.registrationId", registrationId))
+            .andQuery(equal("spec.username", username))
+            .andQuery(notDeleting())
+            .build();
+        return client.listAll(UserConnection.class, listOptions, defaultSort());
     }
 
     private void updateUserInfo(MetadataOperator metadata, OAuth2User oauth2User) {

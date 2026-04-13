@@ -42,4 +42,22 @@ public interface UserConnectionService {
      */
     Flux<UserConnection> removeUserConnection(String registrationId, String username);
 
+
+    /**
+     * Find user connection by provider user id.
+     *
+     * @param registrationId registration id
+     * @param providerUserId provider user id such as openid
+     * @return matched user connection or empty
+     */
+    Mono<UserConnection> getByProviderUserId(String registrationId, String providerUserId);
+
+    /**
+     * Remove user connection by provider user id.
+     *
+     * @param registrationId the registration id
+     * @param providerUserId the provider user id
+     * @return empty mono
+     */
+    Mono<Void> removeByProviderUserId(String registrationId, String providerUserId);
 }
