@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
@@ -51,6 +52,10 @@ public class TagFinderImpl implements TagFinder {
             return Flux.empty();
         }
         var nameList = names instanceof List ? (List<String>) names : List.copyOf(names);
+        var nameIndexMap = new HashMap<String, Integer>(nameList.size());
+        for (int i = 0; i < nameList.size(); i++) {
+            nameIndexMap.put(nameList.get(i), i);
+        }
         var options = ListOptions.builder()
             .andQuery(Queries.in("metadata.name", nameList))
             .build();
@@ -59,10 +64,7 @@ public class TagFinderImpl implements TagFinder {
             .collectList()
             .flatMapMany(list -> {
                 list.sort(Comparator.comparingInt(
-                    vo -> {
-                        int index = nameList.indexOf(vo.getMetadata().getName());
-                        return index == -1 ? Integer.MAX_VALUE : index;
-                    }
+                    vo -> nameIndexMap.getOrDefault(vo.getMetadata().getName(), Integer.MAX_VALUE)
                 ));
                 return Flux.fromIterable(list);
             });
