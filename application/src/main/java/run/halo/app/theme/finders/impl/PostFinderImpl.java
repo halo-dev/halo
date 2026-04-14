@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
@@ -62,6 +64,8 @@ public class PostFinderImpl implements PostFinder {
     private final ReactiveQueryPostPredicateResolver postPredicateResolver;
 
     private final CategoryService categoryService;
+
+    private final Scheduler scheduler = Schedulers.boundedElastic();
 
     @Override
     public Mono<PostVo> getByName(String postName) {
@@ -337,7 +341,10 @@ public class PostFinderImpl implements PostFinder {
                     .concatMap(pageNum -> client.listBy(Post.class, listOptions,
                         PageRequestImpl.of(pageNum, 1)).flatMapIterable(ListResult::getItems));
             })
-            .flatMapSequential(postPublicQueryService::convertToListedVo));
+            .flatMapSequential(postPublicQueryService::convertToListedVo))
+            // Follow ThemeServiceImpl#installPresetTheme to keep this synchronous query chain
+            // off the event-loop thread.
+            .subscribeOn(scheduler);
     }
 
     static int pageNullSafe(Integer page) {
