@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JsonExtension is representation an extension using ObjectNode. This extension is preparing for
@@ -49,7 +50,7 @@ public class JsonExtension implements Extension {
     }
 
     @Override
-    public MetadataOperator getMetadata() {
+    public @Nullable MetadataOperator getMetadata() {
         var metadataNode = objectNode.get("metadata");
         if (metadataNode == null) {
             return null;
@@ -58,7 +59,7 @@ public class JsonExtension implements Extension {
     }
 
     @Override
-    public String getApiVersion() {
+    public @Nullable String getApiVersion() {
         var apiVersionNode = objectNode.get("apiVersion");
         return apiVersionNode == null ? null : apiVersionNode.asText();
     }

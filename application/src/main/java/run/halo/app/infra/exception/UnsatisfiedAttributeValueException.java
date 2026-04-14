@@ -1,7 +1,7 @@
 package run.halo.app.infra.exception;
 
 import jakarta.validation.constraints.Null;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.server.ServerWebInputException;
 
 /**

@@ -1,7 +1,6 @@
 package run.halo.app.content;
 
 import java.util.List;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
@@ -22,7 +21,7 @@ public interface PostService {
 
     Mono<Post> updatePost(PostRequest postRequest);
 
-    Mono<Post> updateBy(@NonNull Post post);
+    Mono<Post> updateBy(Post post);
 
     Mono<ContentWrapper> getHeadContent(String postName);
 

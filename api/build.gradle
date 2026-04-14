@@ -51,6 +51,9 @@ dependencies {
     api platform(project(':platform:application'))
     annotationProcessor platform(project(':platform:application'))
 
+    // jspecify
+    api 'org.jspecify:jspecify'
+
     api 'org.springframework.boot:spring-boot-starter-actuator'
     api 'org.springframework.boot:spring-boot-starter-mail'
     api 'org.springframework.boot:spring-boot-starter-thymeleaf'

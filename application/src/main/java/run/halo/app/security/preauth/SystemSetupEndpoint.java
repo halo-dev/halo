@@ -288,7 +288,7 @@ public class SystemSetupEndpoint {
         @Pattern(regexp = "^(zh-CN|zh-TW|en|es)$")
         private String language;
 
-        @NotNull
+
         @URL(regexp = "^(http|https).*")
         private String externalUrl;
     }

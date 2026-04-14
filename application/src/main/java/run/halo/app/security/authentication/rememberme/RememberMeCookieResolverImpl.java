@@ -2,9 +2,9 @@ package run.halo.app.security.authentication.rememberme;
 
 import java.time.Duration;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;

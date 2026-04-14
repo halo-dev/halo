@@ -11,10 +11,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.NotificationTemplate;
@@ -48,8 +47,7 @@ public class ReasonNotificationTemplateSelectorImpl implements ReasonNotificatio
             .mapNotNull(map -> lookupTemplateByLocale(locale, map));
     }
 
-    @Nullable
-    static NotificationTemplate lookupTemplateByLocale(Locale locale,
+    static @Nullable NotificationTemplate lookupTemplateByLocale(Locale locale,
         Map<String, Optional<NotificationTemplate>> map) {
         return LanguageUtils.computeLangFromLocale(locale).stream()
             // reverse order to ensure that the variant is the first element and the default
@@ -62,7 +60,6 @@ public class ReasonNotificationTemplateSelectorImpl implements ReasonNotificatio
             .orElse(null);
     }
 
-    @NonNull
     static Predicate<NotificationTemplate> matchReasonType(String reasonType) {
         return template -> template.getSpec().getReasonSelector().getReasonType()
             .equals(reasonType);

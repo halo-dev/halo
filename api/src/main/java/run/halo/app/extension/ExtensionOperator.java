@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.function.Predicate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -17,7 +18,7 @@ public interface ExtensionOperator {
 
     @Schema(requiredMode = REQUIRED)
     @JsonProperty("apiVersion")
-    default String getApiVersion() {
+    default @Nullable String getApiVersion() {
         final var gvk = getClass().getAnnotation(GVK.class);
         if (gvk == null) {
             // return null if having no GVK annotation
@@ -31,7 +32,7 @@ public interface ExtensionOperator {
 
     @Schema(requiredMode = REQUIRED)
     @JsonProperty("kind")
-    default String getKind() {
+    default @Nullable String getKind() {
         final var gvk = getClass().getAnnotation(GVK.class);
         if (gvk == null) {
             // return null if having no GVK annotation
@@ -42,7 +43,7 @@ public interface ExtensionOperator {
 
     @Schema(requiredMode = REQUIRED, implementation = Metadata.class)
     @JsonProperty("metadata")
-    MetadataOperator getMetadata();
+    @Nullable MetadataOperator getMetadata();
 
     void setApiVersion(String apiVersion);
 

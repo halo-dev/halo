@@ -23,7 +23,6 @@ import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.JacksonJsonDecoder;
 import org.springframework.http.codec.json.JacksonJsonEncoder;
-import org.springframework.lang.NonNull;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.filter.reactive.UrlHandlerFilter;
 import org.springframework.web.reactive.config.ResourceHandlerRegistration;
@@ -88,13 +87,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
         ViewResolutionResultHandler resultHandler) {
         return new ServerResponse.Context() {
             @Override
-            @NonNull
             public List<HttpMessageWriter<?>> messageWriters() {
                 return codec.getWriters();
             }
 
             @Override
-            @NonNull
             public List<ViewResolver> viewResolvers() {
                 return resultHandler.getViewResolvers();
             }

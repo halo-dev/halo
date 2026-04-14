@@ -1,6 +1,6 @@
 package run.halo.app.plugin;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.pf4j.Plugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,9 +16,9 @@ import run.halo.app.plugin.event.SpringPluginStoppingEvent;
  */
 class DefaultSpringPlugin extends Plugin implements SpringPlugin {
 
-    private ApplicationContext context;
+    private @Nullable ApplicationContext context;
 
-    private Plugin delegate;
+    private @Nullable Plugin delegate;
 
     private final PluginApplicationContextFactory contextFactory;
 
@@ -108,7 +108,6 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
     }
 
     @Override
-    @NonNull
     public ApplicationContext getApplicationContext() {
         if (context == null) {
             throw new IllegalStateException("""
@@ -120,7 +119,6 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
     }
 
     @Override
-    @NonNull
     public PluginContext getPluginContext() {
         return pluginContext;
     }

@@ -1,9 +1,9 @@
 package run.halo.app.extension.store;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

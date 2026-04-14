@@ -1,10 +1,10 @@
 package run.halo.app.plugin.resources;
 
+import org.jspecify.annotations.Nullable;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import run.halo.app.infra.utils.FileUtils;
@@ -26,9 +26,8 @@ public abstract class BundleResourceUtils {
      *
      * @return js bundle resource if exists, otherwise null
      */
-    @Nullable
-    public static Resource getJsBundleResource(PluginManager pluginManager, String pluginName,
-        String bundleName) {
+    public static @Nullable Resource getJsBundleResource(PluginManager pluginManager,
+        String pluginName, String bundleName) {
         Assert.hasText(pluginName, "The pluginName must not be blank");
         Assert.hasText(bundleName, "Bundle name must not be blank");
 
@@ -43,8 +42,7 @@ public abstract class BundleResourceUtils {
         return resource.exists() ? resource : null;
     }
 
-    @Nullable
-    public static DefaultResourceLoader getResourceLoader(PluginManager pluginManager,
+    public static @Nullable DefaultResourceLoader getResourceLoader(PluginManager pluginManager,
         String pluginName) {
         Assert.notNull(pluginManager, "Plugin manager must not be null");
         PluginWrapper plugin = pluginManager.getPlugin(pluginName);

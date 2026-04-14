@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -85,7 +84,7 @@ public class PersistentRememberMeTokenRepositoryImpl
     }
 
     @Override
-    public Mono<Void> removeToken(@NonNull String series) {
+    public Mono<Void> removeToken(String series) {
         return getTokenExtensionForSeries(series)
             .flatMap(client::delete)
             .then();

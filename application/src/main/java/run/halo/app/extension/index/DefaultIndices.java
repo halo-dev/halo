@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
 /**
@@ -132,7 +131,6 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     }
 
     @Override
-    @NonNull
     public <K extends Comparable<K>> Index<E, K> getIndex(String indexName) {
         ensureNotClosed();
         var index = (Index<E, K>) indexMap.get(indexName);

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -25,8 +24,7 @@ public class UserLocaleRequestAttributeWriteFilter implements WebFilter {
     private final SystemConfigFetcher environmentFetcher;
 
     @Override
-    @NonNull
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return environmentFetcher.getBasic()
             .map(SystemSetting.Basic::useSystemLocale)
             .doOnNext(localeOpt -> localeOpt

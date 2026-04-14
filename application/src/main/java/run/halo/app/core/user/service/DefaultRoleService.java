@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
@@ -237,7 +236,6 @@ public class DefaultRoleService implements RoleService {
         return client.listAll(Role.class, builder.build(), defaultSort());
     }
 
-    @NonNull
     private List<String> stringToList(String str) {
         if (StringUtils.isBlank(str)) {
             return Collections.emptyList();

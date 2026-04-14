@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.ApplicationContext;
@@ -19,8 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.CacheControl;
 import org.springframework.http.server.PathContainer;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -64,14 +63,13 @@ public class ReverseProxyRouterFunctionFactory {
      * @param pluginName plugin name(nullable if system)
      * @return A reverse proxy RouterFunction handle(nullable)
      */
-    @Nullable
-    public RouterFunction<ServerResponse> create(ReverseProxy reverseProxy, String pluginName) {
+    public @Nullable RouterFunction<ServerResponse> create(ReverseProxy reverseProxy,
+        String pluginName) {
         return createReverseProxyRouterFunction(reverseProxy, nullSafePluginName(pluginName));
     }
 
-    @Nullable
-    private RouterFunction<ServerResponse> createReverseProxyRouterFunction(
-        ReverseProxy reverseProxy, @NonNull String pluginName) {
+    private @Nullable RouterFunction<ServerResponse> createReverseProxyRouterFunction(
+        ReverseProxy reverseProxy, String pluginName) {
         Assert.notNull(reverseProxy, "The reverseProxy must not be null.");
         var rules = getReverseProxyRules(reverseProxy);
         var cacheProperties = webProperties.getResources().getCache();
@@ -147,7 +145,6 @@ public class ReverseProxyRouterFunctionFactory {
      * @param request client request
      * @return a Resource handle for the specified resource location by the plugin(never null);
      */
-    @NonNull
     private Resource loadResourceByFileRule(String pluginName, ReverseProxyRule rule,
         ServerRequest request) {
         Assert.notNull(rule.file(), "File rule must not be null.");

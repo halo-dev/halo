@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.spring6.templateresource.SpringResourceTemplateResource;
 import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;

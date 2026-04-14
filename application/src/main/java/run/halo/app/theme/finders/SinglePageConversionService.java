@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders;
 
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListOptions;
@@ -41,7 +40,7 @@ public interface SinglePageConversionService {
      * @return the converted single page vo
      * @see #getContent(String)
      */
-    Mono<SinglePageVo> convertToVo(@NonNull SinglePage singlePage);
+    Mono<SinglePageVo> convertToVo(SinglePage singlePage);
 
     /**
      * Gets content by given page name.

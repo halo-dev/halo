@@ -31,7 +31,6 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -221,7 +220,6 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         );
     }
 
-    @NonNull
     private String detectMimeType(InputStream inputStream, String name) {
         try {
             return FileTypeDetectUtils.detectMimeType(inputStream, name);

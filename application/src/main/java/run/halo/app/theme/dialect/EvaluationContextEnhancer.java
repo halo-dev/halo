@@ -17,7 +17,7 @@ import org.springframework.expression.TypedValue;
 import org.springframework.expression.spel.CompilablePropertyAccessor;
 import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.integration.json.JsonPropertyAccessor;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ITemplateEnd;
 import org.thymeleaf.model.ITemplateStart;

@@ -1,7 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
-
 record NoneCondition(String indexName) implements IndexCondition {
 
     @Override
@@ -9,7 +7,6 @@ record NoneCondition(String indexName) implements IndexCondition {
         return new AllCondition(indexName);
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "NONE " + indexName;

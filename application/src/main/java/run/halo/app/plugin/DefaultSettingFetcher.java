@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.utils.ReactiveUtils;
 
@@ -23,14 +22,12 @@ class DefaultSettingFetcher implements SettingFetcher {
         this.delegateFetcher = reactiveSettingFetcher;
     }
 
-    @NonNull
     @Override
     public <T> Optional<T> fetch(String group, Class<T> clazz) {
         return delegateFetcher.fetch(group, clazz)
             .blockOptional(BLOCKING_TIMEOUT);
     }
 
-    @NonNull
     @Override
     public JsonNode get(String group) {
         return Objects.requireNonNull(delegateFetcher.get(group).block(BLOCKING_TIMEOUT));
@@ -46,7 +43,6 @@ class DefaultSettingFetcher implements SettingFetcher {
      *
      * @return a unmodifiable map of values(non-null).
      */
-    @NonNull
     @Override
     public Map<String, JsonNode> getValues() {
         return Objects.requireNonNull(delegateFetcher.getValues().block(BLOCKING_TIMEOUT));

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.GroupVersion;

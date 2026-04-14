@@ -9,7 +9,6 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
@@ -76,7 +75,7 @@ public class Snapshot extends AbstractExtension {
      * @param snapshot must not be null.
      * @return true if the given snapshot is a base snapshot; false otherwise.
      */
-    public static boolean isBaseSnapshot(@NonNull Snapshot snapshot) {
+    public static boolean isBaseSnapshot(Snapshot snapshot) {
         var annotations = snapshot.getMetadata().getAnnotations();
         if (annotations == null) {
             return false;

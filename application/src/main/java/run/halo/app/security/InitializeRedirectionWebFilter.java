@@ -7,7 +7,6 @@ import java.util.Set;
 import lombok.Getter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
@@ -49,8 +48,7 @@ class InitializeRedirectionWebFilter implements WebFilter {
     }
 
     @Override
-    @NonNull
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return redirectMatcher.matches(exchange)
             .flatMap(matched -> {
                 if (!matched.isMatch()) {

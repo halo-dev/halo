@@ -3,7 +3,6 @@ package run.halo.app.theme;
 import lombok.Builder;
 import lombok.Data;
 import org.pf4j.ExtensionPoint;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 
@@ -27,7 +26,7 @@ public interface ReactivePostContentHandler extends ExtensionPoint {
      * @param postContent content to be handled
      * @return handled content
      */
-    Mono<PostContentContext> handle(@NonNull PostContentContext postContent);
+    Mono<PostContentContext> handle(PostContentContext postContent);
 
     @Data
     @Builder

@@ -200,8 +200,8 @@ public class SystemSetting {
 
     }
 
-    @Nullable
-    public static <T> T get(Map<String, String> data, String key, Class<T> type) {
+    @SuppressWarnings("removal")
+    public static <T> @Nullable T get(Map<String, String> data, String key, Class<T> type) {
         var valueString = data.get(key);
         if (valueString == null) {
             return null;

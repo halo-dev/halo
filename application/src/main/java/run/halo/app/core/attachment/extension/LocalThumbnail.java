@@ -6,9 +6,8 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.core.attachment.AttachmentRootGetter;
 import run.halo.app.core.attachment.ThumbnailSize;
 import run.halo.app.extension.AbstractExtension;
@@ -26,11 +25,10 @@ public class LocalThumbnail extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private Spec spec;
 
-    @Getter(onMethod_ = @NonNull)
     @Schema(requiredMode = NOT_REQUIRED)
     private Status status = new Status();
 
-    public void setStatus(Status status) {
+    public void setStatus(@Nullable Status status) {
         this.status = (status == null ? new Status() : status);
     }
 

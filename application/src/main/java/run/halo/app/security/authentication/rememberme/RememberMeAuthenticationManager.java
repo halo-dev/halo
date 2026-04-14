@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.rememberme;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
@@ -35,7 +34,7 @@ public class RememberMeAuthenticationManager implements ReactiveAuthenticationMa
     }
 
     @Override
-    public void setMessageSource(@NonNull MessageSource messageSource) {
+    public void setMessageSource(MessageSource messageSource) {
         this.messages = new MessageSourceAccessor(messageSource);
     }
 

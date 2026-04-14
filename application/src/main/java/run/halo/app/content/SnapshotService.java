@@ -1,7 +1,6 @@
 package run.halo.app.content;
 
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Snapshot;
 
@@ -11,12 +10,10 @@ public interface SnapshotService {
 
     Mono<Snapshot> getPatchedBy(String snapshotName, String baseSnapshotName);
 
-    Mono<Snapshot> patchAndCreate(@NonNull Snapshot snapshot,
-        @Nullable Snapshot baseSnapshot,
-        @NonNull Content content);
+    Mono<Snapshot> patchAndCreate(Snapshot snapshot,
+        @Nullable Snapshot baseSnapshot, Content content);
 
-    Mono<Snapshot> patchAndUpdate(@NonNull Snapshot snapshot,
-        @NonNull Snapshot baseSnapshot,
-        @NonNull Content content);
+    Mono<Snapshot> patchAndUpdate(Snapshot snapshot,
+        Snapshot baseSnapshot, Content content);
 
 }

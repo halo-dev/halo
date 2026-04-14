@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.core.extension.Setting;
@@ -43,7 +42,7 @@ public enum SettingUtils {
      * @param setting {@link Setting} extension
      * @return a map of setting default value
      */
-    @NonNull
+
     public static Map<String, String> settingDefinedDefaultValueMap(Setting setting) {
         List<Setting.SettingForm> forms = setting.getSpec().getForms();
         if (CollectionUtils.isEmpty(forms)) {

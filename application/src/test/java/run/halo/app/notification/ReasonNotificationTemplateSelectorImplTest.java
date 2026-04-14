@@ -11,7 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -99,7 +98,7 @@ class ReasonNotificationTemplateSelectorImplTest {
         assertThat(languageKeyFunc.apply(template)).isEqualTo("default");
     }
 
-    @NonNull
+
     private static NotificationTemplate createNotificationTemplate(String name) {
         var template = new NotificationTemplate();
         template.setMetadata(new Metadata());

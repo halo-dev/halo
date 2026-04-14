@@ -1,7 +1,6 @@
 package run.halo.app.infra.exception;
 
 import java.net.URI;
-import org.springframework.lang.NonNull;
 import org.springframework.web.server.ServerWebInputException;
 
 /**
@@ -17,7 +16,7 @@ public class ThemeAlreadyExistsException extends ServerWebInputException {
      *
      * @param themeName theme name must not be blank
      */
-    public ThemeAlreadyExistsException(@NonNull String themeName) {
+    public ThemeAlreadyExistsException(String themeName) {
         super("Theme already exists.", null, null, "problemDetail.theme.install.alreadyExists",
             new Object[] {themeName});
         setType(URI.create(Exceptions.THEME_ALREADY_EXISTS_TYPE));

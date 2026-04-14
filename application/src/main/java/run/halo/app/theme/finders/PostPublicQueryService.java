@@ -1,7 +1,6 @@
 package run.halo.app.theme.finders;
 
 import java.util.List;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
@@ -29,7 +28,7 @@ public interface PostPublicQueryService {
      * @param post post must not be null
      * @return listed post vo
      */
-    Mono<ListedPostVo> convertToListedVo(@NonNull Post post);
+    Mono<ListedPostVo> convertToListedVo(Post post);
 
     Mono<List<ListedPostVo>> convertToListedVos(List<Post> posts);
 

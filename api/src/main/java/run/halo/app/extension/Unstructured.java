@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueDeserializer;
@@ -77,7 +77,7 @@ public class Unstructured implements Extension {
     }
 
     @Override
-    public MetadataOperator getMetadata() {
+    public @Nullable MetadataOperator getMetadata() {
         return getNestedMap(data, "metadata")
             .map(UnstructuredMetadata::new)
             .orElse(null);
@@ -85,50 +85,49 @@ public class Unstructured implements Extension {
 
     static class UnstructuredMetadata implements MetadataOperator {
 
-        @NonNull
         private final Map<String, Object> metadata;
 
-        UnstructuredMetadata(@NonNull Map<String, Object> metadata) {
+        UnstructuredMetadata(Map<String, Object> metadata) {
             this.metadata = metadata;
         }
 
         @Override
-        public String getName() {
+        public @Nullable String getName() {
             return (String) getNestedValue(metadata, "name").orElse(null);
         }
 
         @Override
-        public String getGenerateName() {
+        public @Nullable String getGenerateName() {
             return (String) getNestedValue(metadata, "generateName").orElse(null);
         }
 
         @Override
-        public Map<String, String> getLabels() {
+        public @Nullable Map<String, String> getLabels() {
             return getNestedStringStringMap(metadata, "labels").orElse(null);
         }
 
         @Override
-        public Map<String, String> getAnnotations() {
+        public @Nullable Map<String, String> getAnnotations() {
             return getNestedStringStringMap(metadata, "annotations").orElse(null);
         }
 
         @Override
-        public Long getVersion() {
+        public @Nullable Long getVersion() {
             return getNestedLong(metadata, "version").orElse(null);
         }
 
         @Override
-        public Instant getCreationTimestamp() {
+        public @Nullable Instant getCreationTimestamp() {
             return getNestedInstant(metadata, "creationTimestamp").orElse(null);
         }
 
         @Override
-        public Instant getDeletionTimestamp() {
+        public @Nullable Instant getDeletionTimestamp() {
             return getNestedInstant(metadata, "deletionTimestamp").orElse(null);
         }
 
         @Override
-        public Set<String> getFinalizers() {
+        public @Nullable Set<String> getFinalizers() {
             return getNestedStringSet(metadata, "finalizers").orElse(null);
         }
 
@@ -173,7 +172,7 @@ public class Unstructured implements Extension {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
@@ -205,7 +204,7 @@ public class Unstructured implements Extension {
         data.put("metadata", metadataMap);
     }
 
-    public static Optional<Object> getNestedValue(Map map, String... fields) {
+    public static Optional<Object> getNestedValue(Map map, String @Nullable ... fields) {
         if (fields == null || fields.length == 0) {
             return Optional.of(map);
         }
@@ -221,11 +220,11 @@ public class Unstructured implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    public static Optional<List<String>> getNestedStringList(Map map, String... fields) {
+    public static Optional<List<String>> getNestedStringList(Map map, String @Nullable ... fields) {
         return getNestedValue(map, fields).map(value -> (List<String>) value);
     }
 
-    public static Optional<Set<String>> getNestedStringSet(Map map, String... fields) {
+    public static Optional<Set<String>> getNestedStringSet(Map map, String @Nullable ... fields) {
         return getNestedValue(map, fields).map(value -> {
             if (value instanceof Collection collection) {
                 return new LinkedHashSet<>(collection);
@@ -236,7 +235,7 @@ public class Unstructured implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    public static void setNestedValue(Map map, Object value, String... fields) {
+    public static void setNestedValue(Map map, Object value, String @Nullable ... fields) {
         if (fields == null || fields.length == 0) {
             // do nothing when no fields provided
             return;
@@ -327,7 +326,7 @@ public class Unstructured implements Extension {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

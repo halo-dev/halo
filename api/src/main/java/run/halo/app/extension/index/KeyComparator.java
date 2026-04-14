@@ -1,7 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.Comparator;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Deprecated(forRemoval = true, since = "2.22.0")
 class KeyComparator implements Comparator<String> {

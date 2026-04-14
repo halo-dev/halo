@@ -1,7 +1,6 @@
 package run.halo.app.extension.index;
 
 import java.io.Closeable;
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
 public interface Indices<E extends Extension> extends Closeable {
@@ -20,7 +19,6 @@ public interface Indices<E extends Extension> extends Closeable {
      * @return the index
      * @throws IllegalArgumentException if the index with the given name does not exist
      */
-    @NonNull
     <K extends Comparable<K>> Index<E, K> getIndex(String indexName);
 
 }

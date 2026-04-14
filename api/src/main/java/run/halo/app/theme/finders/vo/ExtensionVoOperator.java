@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders.vo;
 
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.MetadataOperator;
 
 /**
@@ -11,6 +10,5 @@ import run.halo.app.extension.MetadataOperator;
  */
 public interface ExtensionVoOperator {
 
-    @NonNull
     MetadataOperator getMetadata();
 }

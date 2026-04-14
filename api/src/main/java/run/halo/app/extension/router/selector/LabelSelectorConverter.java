@@ -4,16 +4,14 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.index.query.LabelCondition;
 import run.halo.app.extension.index.query.Queries;
 
 public class LabelSelectorConverter implements Converter<SelectorCriteria, LabelCondition> {
 
-    @NonNull
     @Override
-    public LabelCondition convert(@NonNull SelectorCriteria criteria) {
+    public LabelCondition convert(SelectorCriteria criteria) {
         switch (criteria.operator()) {
             case Equals -> {
                 return Queries.labelEqual(criteria.key(), getSingleValue(criteria));

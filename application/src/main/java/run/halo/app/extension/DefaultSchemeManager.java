@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.extension.event.SchemeAddedEvent;
@@ -51,7 +50,7 @@ public class DefaultSchemeManager implements SchemeManager {
     }
 
     @Override
-    public void unregister(@NonNull Scheme scheme) {
+    public void unregister(Scheme scheme) {
         if (schemes.contains(scheme)) {
             indexEngine.getIndicesManager().remove(scheme.type());
             schemes.remove(scheme);
@@ -60,7 +59,6 @@ public class DefaultSchemeManager implements SchemeManager {
     }
 
     @Override
-    @NonNull
     public List<Scheme> schemes() {
         return Collections.unmodifiableList(schemes);
     }

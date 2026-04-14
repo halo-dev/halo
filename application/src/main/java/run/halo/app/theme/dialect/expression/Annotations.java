@@ -1,8 +1,7 @@
 package run.halo.app.theme.dialect.expression;
 
 import java.util.Map;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 
 /**
@@ -22,8 +21,7 @@ public class Annotations {
      * @param key the key of annotation
      * @return annotation value if exists, otherwise null
      */
-    @Nullable
-    public String get(ExtensionVoOperator extension, String key) {
+    public @Nullable String get(ExtensionVoOperator extension, String key) {
         Map<String, String> annotations = extension.getMetadata().getAnnotations();
         if (annotations == null) {
             return null;
@@ -39,7 +37,6 @@ public class Annotations {
      * @param key the key of annotation
      * @return annotation value if exists, otherwise defaultValue
      */
-    @NonNull
     public String getOrDefault(ExtensionVoOperator extension, String key, String defaultValue) {
         Map<String, String> annotations = extension.getMetadata().getAnnotations();
         if (annotations == null) {

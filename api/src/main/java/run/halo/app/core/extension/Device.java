@@ -6,9 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -24,10 +23,9 @@ public class Device extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private Spec spec;
 
-    @Getter(onMethod_ = @NonNull)
     private Status status = new Status();
 
-    public void setStatus(Status status) {
+    public void setStatus(@Nullable Status status) {
         this.status = (status == null ? new Status() : status);
     }
 

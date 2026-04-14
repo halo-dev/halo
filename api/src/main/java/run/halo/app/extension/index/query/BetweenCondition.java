@@ -1,7 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
-
 record BetweenCondition(
     String indexName, Object fromKey, boolean fromInclusive, Object toKey, boolean toInclusive)
     implements IndexCondition {
@@ -11,7 +9,6 @@ record BetweenCondition(
         return new NotBetweenCondition(indexName, fromKey, !fromInclusive, toKey, !toInclusive);
     }
 
-    @NotNull
     @Override
     public String toString() {
         return indexName + " BETWEEN "

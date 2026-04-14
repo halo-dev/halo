@@ -15,7 +15,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -138,7 +137,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         }
 
         @Override
-        public int compareTo(@NonNull AuthProviderWithPriority o) {
+        public int compareTo(AuthProviderWithPriority o) {
             return Comparator.comparingInt(AuthProviderWithPriority::getPriority)
                 .thenComparing(AuthProviderWithPriority::getName)
                 .compare(this, o);
@@ -194,7 +193,6 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .get(AuthProvider.PRIVILEGED_LABEL));
     }
 
-    @NonNull
     private static SystemSetting.AuthProvider getAuthProviderConfig(ConfigMap configMap) {
         if (configMap.getData() == null) {
             configMap.setData(new HashMap<>());
