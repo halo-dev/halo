@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -62,23 +61,17 @@ public class CategoryFinderImpl implements CategoryFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
-        var nameList = names instanceof List ? (List<String>) names : List.copyOf(names);
-        var nameIndexMap = new HashMap<String, Integer>(nameList.size());
-        for (int i = 0; i < nameList.size(); i++) {
-            nameIndexMap.put(nameList.get(i), i);
-        }
+        var nameList = Optional.of(names)
+            .filter(List.class::isInstance)
+            .map(list -> (List<String>) list)
+            .orElseGet(() -> List.copyOf(names));
         var options = ListOptions.builder()
             .andQuery(Queries.in("metadata.name", nameList))
             .build();
-        return client.listAll(Category.class, options, ExtensionUtil.defaultSort())
+        return client.listAll(Category.class, options, Sort.unsorted())
             .map(CategoryVo::from)
-            .collectList()
-            .flatMapMany(list -> {
-                list.sort(Comparator.comparingInt(
-                    vo -> nameIndexMap.getOrDefault(vo.getMetadata().getName(), Integer.MAX_VALUE)
-                ));
-                return Flux.fromIterable(list);
-            });
+            // we assume the size of the list won't be too large
+            .sort(Comparator.comparingInt(c -> nameList.indexOf(c.getMetadata().getName())));
     }
 
     static Sort defaultSort() {

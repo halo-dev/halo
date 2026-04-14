@@ -2,8 +2,8 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Sort;
@@ -51,23 +51,17 @@ public class TagFinderImpl implements TagFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
-        var nameList = names instanceof List ? (List<String>) names : List.copyOf(names);
-        var nameIndexMap = new HashMap<String, Integer>(nameList.size());
-        for (int i = 0; i < nameList.size(); i++) {
-            nameIndexMap.put(nameList.get(i), i);
-        }
+        var nameList = Optional.of(names)
+            .filter(List.class::isInstance)
+            .map(list -> (List<String>) list)
+            .orElseGet(() -> List.copyOf(names));
         var options = ListOptions.builder()
             .andQuery(Queries.in("metadata.name", nameList))
             .build();
         return client.listAll(Tag.class, options, ExtensionUtil.defaultSort())
             .map(TagVo::from)
-            .collectList()
-            .flatMapMany(list -> {
-                list.sort(Comparator.comparingInt(
-                    vo -> nameIndexMap.getOrDefault(vo.getMetadata().getName(), Integer.MAX_VALUE)
-                ));
-                return Flux.fromIterable(list);
-            });
+            // we assume the size of the list won't be too large
+            .sort(Comparator.comparingInt(t -> nameList.indexOf(t.getMetadata().getName())));
     }
 
     @Override
