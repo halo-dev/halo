@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { useAppTitle } from "@/composables/use-title";
-import { i18n } from "@/locales";
 import type { FormKitConfig } from "@formkit/core";
 import { stores } from "@halo-dev/ui-shared";
 import { useFavicon } from "@vueuse/core";
@@ -12,13 +10,15 @@ import {
 import { storeToRefs } from "pinia";
 import { computed, inject, onMounted, provide, reactive } from "vue";
 import { RouterView } from "vue-router";
+import { useAppTitle } from "@/composables/use-title";
+import { i18n } from "@/locales";
 
 useAppTitle();
 
 const { globalInfo } = storeToRefs(stores.globalInfo());
 
 // Favicon
-const defaultFavicon = "/console/favicon.ico";
+const defaultFavicon = "/ui-assets/favicon.ico";
 const favicon = computed(() => {
   return globalInfo.value?.favicon || defaultFavicon;
 });

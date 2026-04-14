@@ -1,4 +1,3 @@
-import { setupProcessBarGuard } from "@/router/process-bar";
 import routesConfig from "@uc/router/routes.config";
 import {
   createRouter,
@@ -6,11 +5,13 @@ import {
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
+import { setupStopImplicitSubmission } from "@/formkit/plugins/stop-implicit-submission";
+import { setupProcessBarGuard } from "@/router/process-bar";
 import { setupAuthCheckGuard } from "./guards/auth-check";
 import { setupPermissionGuard } from "./guards/permission";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory("/uc/"),
   routes: routesConfig,
   scrollBehavior: (
     to: RouteLocationNormalized,
@@ -25,5 +26,6 @@ const router = createRouter({
 setupAuthCheckGuard(router);
 setupPermissionGuard(router);
 setupProcessBarGuard(router);
+setupStopImplicitSubmission(router);
 
 export default router;

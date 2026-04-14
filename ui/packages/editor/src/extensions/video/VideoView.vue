@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import { VButton } from "@halo-dev/components";
+import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
+import { computed, ref } from "vue";
+import MingcuteVideoLine from "~icons/mingcute/video-line";
 import { EditorLinkObtain } from "@/components";
 import { ResourceReplaceButton } from "@/components/upload";
 import { useExternalAssetsTransfer } from "@/composables/use-attachment";
@@ -8,10 +12,6 @@ import {
   NodeViewWrapper,
   type NodeViewProps,
 } from "@/tiptap";
-import { VButton } from "@halo-dev/components";
-import { utils, type AttachmentSimple } from "@halo-dev/ui-shared";
-import { computed, ref } from "vue";
-import MingcuteVideoLine from "~icons/mingcute/video-line";
 import { ExtensionFigure } from "../figure";
 
 const props = defineProps<NodeViewProps>();

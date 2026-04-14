@@ -1,19 +1,9 @@
 <script lang="ts" setup>
-import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { pluginLabels } from "@/constants/labels";
 import { useEntityFieldItemExtensionPoint } from "@console/composables/use-entity-extension-points";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";
 import PluginInstallationModal from "@console/modules/system/plugins/components/PluginInstallationModal.vue";
+import { PluginStatusPhaseEnum, type Plugin } from "@halo-dev/api-client";
 import {
-  PluginStatusPhaseEnum,
-  consoleApiClient,
-  type Plugin,
-} from "@halo-dev/api-client";
-import {
-  Dialog,
-  Toast,
   VDropdownDivider,
   VDropdownItem,
   VEntity,
@@ -28,6 +18,10 @@ import type { Ref } from "vue";
 import { computed, inject, markRaw, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { pluginLabels } from "@/constants/labels";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import LogoField from "./entity-fields/LogoField.vue";
@@ -50,35 +44,15 @@ const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
-const { getStatusDotState, getStatusMessage, uninstall } =
-  usePluginLifeCycle(plugin);
+const {
+  getStatusDotState,
+  getStatusMessage,
+  uninstall,
+  reload,
+  resetPluginConfig,
+} = usePluginLifeCycle(plugin);
 
 const pluginUpgradeModalVisible = ref(false);
-
-const handleResetSettingConfig = async () => {
-  Dialog.warning({
-    title: t("core.plugin.operations.reset.title"),
-    description: t("core.plugin.operations.reset.description"),
-    confirmType: "danger",
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    onConfirm: async () => {
-      try {
-        if (!plugin?.value) {
-          return;
-        }
-
-        await consoleApiClient.plugin.plugin.resetPluginConfig({
-          name: plugin.value.metadata.name as string,
-        });
-
-        Toast.success(t("core.plugin.operations.reset.toast_success"));
-      } catch (e) {
-        console.error("Failed to reset plugin setting config", e);
-      }
-    },
-  });
-};
 
 const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
   "plugin:list-item:operation:create",
@@ -127,7 +101,13 @@ const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
             type: "danger",
           },
           label: t("core.common.buttons.uninstall"),
-          action: () => uninstall(),
+          action: () =>
+            uninstall({
+              deleteExtensions: false,
+              onSuccess: () => {
+                window.location.reload();
+              },
+            }),
         },
         {
           priority: 20,
@@ -136,7 +116,13 @@ const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
             type: "danger",
           },
           label: t("core.plugin.operations.uninstall_and_delete_config.button"),
-          action: () => uninstall(true),
+          action: () =>
+            uninstall({
+              deleteExtensions: true,
+              onSuccess: () => {
+                window.location.reload();
+              },
+            }),
         },
       ],
       // System reserved plugins cannot be uninstalled
@@ -149,10 +135,18 @@ const { data: operationItems } = useOperationItemExtensionPoint<Plugin>(
       props: {
         type: "danger",
       },
-      label: t("core.common.buttons.reset"),
-      action: () => {
-        handleResetSettingConfig();
+      label: t("core.plugin.operations.reload.button"),
+      hidden: !plugin.value.spec.enabled,
+      action: reload,
+    },
+    {
+      priority: 60,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
       },
+      label: t("core.plugin.operations.reset.button"),
+      action: resetPluginConfig,
     },
   ])
 );

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { VCard } from ".";
 
 const meta: Meta<typeof VCard> = {

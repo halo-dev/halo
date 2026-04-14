@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
-import { attachmentPolicyLabels } from "@/constants/labels";
-import { matchMediaTypes } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
 import {
   IconArrowLeft,
@@ -26,6 +23,9 @@ import { useLocalStorage } from "@vueuse/core";
 import { throttle } from "es-toolkit/compat";
 import { computed, ref, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
+import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
+import { matchMediaTypes } from "@/utils/media-type";
 import { useAttachmentControl } from "../../composables/use-attachment";
 import { useFetchAttachmentPolicy } from "../../composables/use-attachment-policy";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";

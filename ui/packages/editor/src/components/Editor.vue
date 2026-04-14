@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { watch, type CSSProperties, type PropType } from "vue";
 import { i18n } from "@/locales";
 import { EditorContent, VueEditor } from "@/tiptap";
-import { watch, type CSSProperties, type PropType } from "vue";
 import EditorBubbleMenu from "./bubble/EditorBubbleMenu.vue";
 import EditorDragHandle from "./drag/EditorDragHandle.vue";
 import EditorHeader from "./EditorHeader.vue";

@@ -1,3 +1,5 @@
+import { computePosition, flip, shift } from "@floating-ui/dom";
+import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import {
   Extension,
   PluginKey,
@@ -8,8 +10,6 @@ import {
   type Range,
 } from "@/tiptap";
 import type { CommandMenuItemType } from "@/types";
-import { computePosition, flip, shift } from "@floating-ui/dom";
-import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import CommandsView from "./CommandsView.vue";
 
 export const ExtensionCommandsMenu = Extension.create({

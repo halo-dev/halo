@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { postLabels } from "@/constants/labels";
 import WidgetCard from "@console/modules/dashboard/components/WidgetCard.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -11,6 +10,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { postLabels } from "@/constants/labels";
 import PostListItem from "./components/PostListItem.vue";
 
 const { data, isLoading, isFetching, refetch } = useQuery<ListedPost[]>({

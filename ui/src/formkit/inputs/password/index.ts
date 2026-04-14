@@ -12,9 +12,8 @@ import {
   textInput,
   wrapper,
 } from "@formkit/inputs";
-import RevealButton from "./RevealButton.vue";
-
 import { createSection } from "@formkit/inputs";
+import RevealButton from "./RevealButton.vue";
 
 export const RevealButtonSuffix = createSection("RevealButtonSuffix", () => ({
   $cmp: "RevealButton",

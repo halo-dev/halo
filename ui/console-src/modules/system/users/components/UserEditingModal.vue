@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import type { User } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
@@ -8,6 +6,8 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { cloneDeep } from "es-toolkit";
 import { nextTick, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -46,6 +46,11 @@ const handleUpdateUser = async () => {
 
   try {
     isSubmitting.value = true;
+
+    if (formState.value.spec.displayName) {
+      formState.value.spec.displayName =
+        formState.value.spec.displayName.trim();
+    }
 
     await coreApiClient.user.updateUser({
       name: formState.value.metadata.name,

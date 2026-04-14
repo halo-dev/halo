@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
-import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
-import { postLabels } from "@/constants/labels";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
@@ -28,6 +24,10 @@ import { chunk } from "es-toolkit";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
+import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { postLabels } from "@/constants/labels";
 import PostBatchSettingModal from "./components/PostBatchSettingModal.vue";
 import PostListItem from "./components/PostListItem.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";

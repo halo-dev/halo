@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import { attachmentPolicyLabels } from "@/constants/labels";
-import { setFocus } from "@/formkit/utils/focus";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type {
   JsonPatchInner,
@@ -17,6 +14,9 @@ import { Toast, VButton, VLoading, VModal, VSpace } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, onMounted, ref, toRaw, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
+import { setFocus } from "@/formkit/utils/focus";
 
 const CONFIG_MAP_GROUP = "default";
 

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { setFocus } from "@/formkit/utils/focus";
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import type { Category } from "@halo-dev/api-client";
 import {
@@ -11,6 +10,7 @@ import {
 } from "@halo-dev/components";
 import Fuse from "fuse.js";
 import { computed, ref, watch } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{

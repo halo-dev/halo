@@ -1,10 +1,10 @@
-import { AppName } from "@/constants/app";
 import { stores } from "@halo-dev/ui-shared";
 import { useTitle } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { computed, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
+import { AppName } from "@/constants/app";
 
 export function useAppTitle(baseTitle?: Ref<string>) {
   const { globalInfo } = storeToRefs(stores.globalInfo());

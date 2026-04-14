@@ -46,7 +46,7 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
                         .description("Notifier name")
                         .required(true)
                     )
-                    .response(responseBuilder().implementation(ObjectNode.class))
+                    .response(responseBuilder().implementation(Object.class))
             )
             .POST("/notifiers/{name}/sender-config", this::saveSenderConfig,
                 builder -> builder.operationId("SaveSenderConfig")
@@ -62,8 +62,7 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(ObjectNode.class))
+                            .schema(Builder.schemaBuilder().implementation(Object.class))
                         )
                     )
                     .response(responseBuilder().implementation(Void.class))

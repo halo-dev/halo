@@ -34,12 +34,15 @@ const emit = defineEmits<{
 const slots = useSlots();
 
 const tabItems = computed(() => {
-  return slots.default?.().map(({ props: slotProps }) => {
-    return {
-      id: slotProps?.[props.idKey],
-      label: slotProps?.[props.labelKey],
-    };
-  });
+  return slots
+    .default?.()
+    .map(({ props: slotProps }) => {
+      return {
+        id: slotProps?.[props.idKey],
+        label: slotProps?.[props.labelKey],
+      };
+    })
+    .filter((item) => item.id !== undefined && item.label !== undefined);
 });
 
 const classes = computed(() => {

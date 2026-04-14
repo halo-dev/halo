@@ -1,3 +1,8 @@
+import TiptapParagraph, {
+  type ParagraphOptions,
+} from "@tiptap/extension-paragraph";
+import { markRaw } from "vue";
+import MingcuteLineHeightLine from "~icons/mingcute/line-height-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
 import { i18n } from "@/locales";
@@ -12,11 +17,6 @@ import {
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
 import { deleteNodeByPos } from "@/utils";
 import { isListActive } from "@/utils/is-list-active";
-import TiptapParagraph, {
-  type ParagraphOptions,
-} from "@tiptap/extension-paragraph";
-import { markRaw } from "vue";
-import MingcuteLineHeightLine from "~icons/mingcute/line-height-line";
 
 export type ExtensionParagraphOptions = ExtensionOptions &
   Partial<ParagraphOptions>;

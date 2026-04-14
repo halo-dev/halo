@@ -1,28 +1,36 @@
 {
   "name": "@halo-dev/components",
-  "version": "2.22.0",
+  "version": "2.24.0",
   "description": "",
   "keywords": [
+    "@halo-dev/components",
     "halo",
     "halo-components",
-    "halo-dev",
-    "@halo-dev/components"
+    "halo-dev"
   ],
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/components#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halo-dev/halo.git",
-    "directory": "ui/packages/components"
   },
   "license": "MIT",
   "author": {
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "ui/packages/components"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "main": "./dist/index.iife.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.iife.js",
+  "jsdelivr": "./dist/index.iife.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,23 +38,15 @@
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/index.iife.js",
-  "jsdelivr": "./dist/index.iife.js",
-  "unpkg": "./dist/index.iife.js",
-  "module": "./dist/index.es.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "vite build",
+    "build": "vp build",
     "build-storybook": "storybook build",
-    "dev": "vite build --watch",
+    "dev": "vp build --watch",
     "storybook": "storybook dev -p 6006",
-    "test:unit": "vitest --run",
-    "test:unit:coverage": "vitest run --coverage",
-    "test:unit:ui": "vitest --watch --ui",
-    "test:unit:watch": "vitest --watch",
+    "test:unit": "vp test --run",
+    "test:unit:coverage": "vp test run --coverage",
+    "test:unit:ui": "vp test --watch --ui",
+    "test:unit:watch": "vp test --watch",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "prepublishOnly": "pnpm run build"
   },
@@ -65,6 +65,6 @@
   },
   "peerDependencies": {
     "vue": "^3.5.x",
-    "vue-router": "^4.6.x"
+    "vue-router": "^5.0.x"
   }
 }

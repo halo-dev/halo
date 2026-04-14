@@ -1,13 +1,13 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
-import { i18n } from "@/locales";
-import { Extension, type Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import { markRaw } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignJustifyLine from "~icons/mingcute/align-justify-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
 import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
+import { i18n } from "@/locales";
+import { Extension, type Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 const inlineIconComponent = {
   left: MingcuteAlignLeftLine,

@@ -45,5 +45,15 @@ class AuthorPostsRouteFactoryTest extends RouteFactoryTestSuite {
             .uri("/authors/fake-user")
             .exchange()
             .expectStatus().isOk();
+
+        webClient.get()
+            .uri("/authors/fake-user/page/p")
+            .exchange()
+            .expectStatus().isNotFound();
+
+        webClient.get()
+            .uri("/authors/fake-user/page/abc")
+            .exchange()
+            .expectStatus().isNotFound();
     }
 }

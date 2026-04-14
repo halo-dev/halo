@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import { PASSWORD_REGEX } from "@/constants/regex";
-import { setFocus } from "@/formkit/utils/focus";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { PASSWORD_REGEX } from "@/constants/regex";
+import { setFocus } from "@/formkit/utils/focus";
 
 const emit = defineEmits<{
   (event: "close"): void;

@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
-import PostContributorList from "@/components/user/PostContributorList.vue";
-import { postLabels } from "@/constants/labels";
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { GetThumbnailByUriSizeEnum, ucApiClient } from "@halo-dev/api-client";
@@ -23,6 +20,9 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
+import PostContributorList from "@/components/user/PostContributorList.vue";
+import { postLabels } from "@/constants/labels";
 import { usePostPublishMutate } from "../composables/use-post-publish-mutate";
 
 const { t } = useI18n();

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 import Input from "@/components/base/Input.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import { computed } from "vue";
 import { ExtensionAudio } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();

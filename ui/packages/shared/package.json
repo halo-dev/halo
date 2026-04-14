@@ -1,49 +1,55 @@
 {
   "name": "@halo-dev/ui-shared",
-  "type": "module",
-  "version": "2.22.1",
+  "version": "2.24.0",
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/shared#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halo-dev/halo.git",
-    "directory": "ui/packages/shared"
-  },
   "license": "MIT",
   "author": {
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "ui/packages/shared"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
+    "@halo-dev/richtext-editor": "workspace:*",
     "mitt": "^3.0.1"
-  },
-  "peerDependencies": {
-    "vue": "^3.5.x",
-    "vue-router": "^4.6.x"
   },
   "devDependencies": {
     "dayjs": "^1.11.19",
     "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.x",
+    "vue-router": "^5.0.x"
+  },
+  "inlinedDependencies": {
+    "dayjs": "1.11.19",
+    "mitt": "3.0.1",
+    "uuid": "13.0.0"
   }
 }

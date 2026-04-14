@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
 import { createMessage, type FormKitFrameworkContext } from "@formkit/core";
 import { axiosInstance } from "@halo-dev/api-client";
 import {
@@ -10,6 +9,7 @@ import {
 } from "@halo-dev/components";
 import type { PropType } from "vue";
 import { nextTick, onMounted, ref } from "vue";
+import { i18n } from "@/locales";
 
 const props = defineProps({
   context: {

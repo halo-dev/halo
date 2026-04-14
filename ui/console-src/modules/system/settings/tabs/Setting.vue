@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
-import { setLanguage } from "@/locales";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type { Setting } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
@@ -9,6 +7,8 @@ import { stores } from "@halo-dev/ui-shared";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, ref, toRaw, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
+import { setLanguage } from "@/locales";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

@@ -15,7 +15,9 @@ import org.springframework.util.Assert;
  * @author guqing
  * @see JavaTimeModule
  * @since 2.0.0
+ * @deprecated Use {@link tools.jackson.databind.json.JsonMapper} directly instead.
  */
+@Deprecated(forRemoval = true, since = "2.23.0")
 public class JsonUtils {
     public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
 

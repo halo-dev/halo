@@ -19,7 +19,7 @@ on:
     types:
       - published
 
-concurrency: 
+concurrency:
   group: ${{github.workflow}} - ${{github.ref}}
   cancel-in-progress: true
 
@@ -28,21 +28,21 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Check Halo
-        run: ./gradlew check
+        run: ./gradlew clean check --configuration-cache --configuration-cache-problems=warn
       - name: Upload coverage reports to Codecov
         if: github.repository == 'halo-dev/halo'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
 
   build:
     runs-on: ubuntu-latest
     if: always() && (needs.test.result == 'skipped' || needs.test.result == 'success')
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Reset version of Halo
@@ -54,10 +54,10 @@ jobs:
           version=${version#v}
           sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
       - name: Build Halo
-        run: ./gradlew clean && ./gradlew downloadPluginPresets && ./gradlew build -x check
+        run: ./gradlew clean downloadPluginPresets build -x check --configuration-cache --configuration-cache-problems=warn
       - name: Upload Artifacts
         if: github.repository == 'halo-dev/halo'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: halo-artifacts
           path: application/build/libs
@@ -68,9 +68,9 @@ jobs:
     if: always() && needs.build.result == 'success' && github.event_name == 'release'
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: halo-artifacts
           path: application/build/libs
@@ -85,7 +85,7 @@ jobs:
     if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Environment
         uses: ./.github/actions/setup-env
       - name: Reset version of Halo
@@ -104,17 +104,16 @@ jobs:
           F2C_TOKEN: ${{ secrets.F2C_REGISTRY_TOKEN }}
           GHCR_USERNAME: ${{ github.repository_owner }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run:
-          ./gradlew publishToAllRegistries -Prelease=${{ github.event_name == 'release' && 'true' || 'false' }}
+        run: ./gradlew publishToAllRegistries -Prelease=${{ github.event_name == 'release' && 'true' || 'false' }}
 
   docker-build-and-push:
     if: always() && needs.build.result == 'success' && (github.event_name == 'push' || github.event_name == 'release')
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: halo-artifacts
           path: application/build/libs
@@ -135,14 +134,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: halo-artifacts
           path: application/build/libs
       - name: Docker Build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           tags: ghcr.io/halo-dev/halo-dev:main
           push: false

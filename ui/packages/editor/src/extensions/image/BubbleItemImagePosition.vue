@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import DropdownItem from "@/components/base/DropdownItem.vue";
-import BubbleButton from "@/components/bubble/BubbleButton.vue";
-import { i18n } from "@/locales";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
-import { isActive } from "@tiptap/core";
 import { computed } from "vue";
 import MingcuteAlignCenterLine from "~icons/mingcute/align-center-line";
 import MingcuteAlignLeftLine from "~icons/mingcute/align-left-line";
 import MingcuteAlignRightLine from "~icons/mingcute/align-right-line";
-import { ExtensionFigure, ExtensionImage } from "..";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
+import { i18n } from "@/locales";
+import { isActive } from "@/tiptap/core";
+import type { BubbleItemComponentProps } from "@/types";
+import { ExtensionFigure } from "..";
 
 const props = withDefaults(defineProps<BubbleItemComponentProps>(), {
   visible: () => true,
@@ -35,8 +35,8 @@ const positionOptions = [
 
 const currentPosition = computed(() => {
   const positionAttribute = props.editor.getAttributes(
-    ExtensionImage.name
-  ).position;
+    ExtensionFigure.name
+  ).alignItems;
 
   const positionOption = positionOptions.find(
     (option) => option.value === positionAttribute
@@ -76,7 +76,7 @@ const handleSetPosition = (blockPosition: string) => {
           :key="option.value"
           v-close-popper
           :is-active="
-            isActive(props.editor.state, ExtensionFigure.name, {
+            isActive(editor.state, ExtensionFigure.name, {
               alignItems: option.value,
             })
           "

@@ -1,5 +1,4 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
-
 import {
   disablesChildren,
   fieldset,

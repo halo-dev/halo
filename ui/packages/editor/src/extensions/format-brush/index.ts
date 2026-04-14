@@ -1,9 +1,9 @@
+import { markRaw } from "vue";
+import MingcuteBrush3Line from "~icons/mingcute/brush-3-line";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
-import { markRaw } from "vue";
-import MingcuteBrush3Line from "~icons/mingcute/brush-3-line";
 import { getMarksByFirstTextNode, setMarks } from "./util";
 
 declare module "@/tiptap" {

@@ -1,3 +1,6 @@
+import TiptapCodeBlock from "@tiptap/extension-code-block";
+import { markRaw } from "vue";
+import MingcuteBracesLine from "~icons/mingcute/braces-line";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolboxItem from "@/components/toolbox/ToolboxItem.vue";
@@ -21,9 +24,6 @@ import {
 } from "@/tiptap/pm";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
-import TiptapCodeBlock from "@tiptap/extension-code-block";
-import { markRaw } from "vue";
-import MingcuteBracesLine from "~icons/mingcute/braces-line";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
 
 declare module "@/tiptap" {

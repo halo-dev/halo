@@ -17,7 +17,7 @@ import {
 } from "vue";
 import RiCodeSSlashLine from "~icons/ri/code-s-slash-line";
 import IconifyPicker from "./IconifyPicker.vue";
-import type { IconifyFormat, IconifyValue } from "./types";
+import type { IconifyFormat, IconifySizing, IconifyValue } from "./types";
 
 const props = defineProps({
   context: {
@@ -28,6 +28,8 @@ const props = defineProps({
 
 const format = computed(() => props.context.format as IconifyFormat);
 const valueOnly = computed(() => props.context.valueOnly as boolean);
+const sizing = computed(() => props.context.sizing as IconifySizing);
+
 const currentIconifyValue = computed(() => {
   const value = props.context._value;
 
@@ -44,6 +46,7 @@ const currentIconifyValue = computed(() => {
 });
 
 provide<Ref<IconifyFormat>>("format", format);
+provide<Ref<IconifySizing>>("sizing", sizing);
 
 provide<Ref<IconifyValue | undefined>>(
   "currentIconifyValue",
@@ -91,6 +94,7 @@ function onEditFormSubmit({ value: iconValue }: { value: string }) {
 }
 
 const editFormId = `icon-edit-form-${utils.id.uuid()}`;
+const editFormContainer = useTemplateRef<HTMLElement>("editFormContainer");
 </script>
 
 <template>
@@ -133,12 +137,14 @@ const editFormId = `icon-edit-form-${utils.id.uuid()}`;
         <IconifyPicker @select="onSelect" />
       </template>
     </VDropdown>
-    <div class="inline-flex items-center gap-1.5">
+    <div ref="editFormContainer" class="inline-flex items-center gap-1.5">
       <!-- @vue-ignore -->
       <VDropdown
         ref="editFormDropdown"
         class="inline-flex"
         :dispose-timeout="null"
+        :auto-hide="false"
+        :container="editFormContainer"
       >
         <template #default="{ shown }">
           <button

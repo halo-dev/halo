@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { Dialog, VDialog } from ".";
 import { VButton } from "../button";
 

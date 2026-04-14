@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import { onMounted, onUnmounted, type PropType, ref } from "vue";
 import type { PMNode, VueEditor } from "@/tiptap";
 import type { DragButtonType } from "@/types";
 import { matchShortcut } from "@/utils/keyboard";
-import { onMounted, onUnmounted, type PropType, ref } from "vue";
 import EditorDragButtonItem from "./EditorDragButtonItem.vue";
 
 const props = defineProps({

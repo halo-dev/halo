@@ -47,9 +47,6 @@ checkstyle {
 repositories {
     mavenCentral()
 
-    maven { url = 'https://repo.spring.io/milestone' }
-    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
-
     flatDir {
         dir layout.projectDirectory.dir('libs')
     }
@@ -101,6 +98,7 @@ dependencies {
     annotationProcessor "org.springframework:spring-context-indexer"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-webtestclient'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
 
@@ -126,8 +124,9 @@ tasks.register('copyUiDist', Copy) {
     mustRunAfter ':ui:doBuild'
 }
 
-tasks.named('processResources', ProcessResources) {
+tasks.named('classes') {
     dependsOn tasks.named('copyUiDist')
+    mustRunAfter tasks.named('downloadPluginPresets')
 }
 
 tasks.named('build') {
@@ -158,8 +157,8 @@ tasks.register('downloadPluginPresets', Download) {
 
             // Currently, plugin-app-store is not open source, so we need to download it from the official website.
             // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-            // https://www.halo.run/store/apps/app-VYJbF
-            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-sxwnhxer/assets/app-release-sxwnhxer-pulnw51x'    : 'appstore.jar',
+            // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
+            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err'    : 'appstore.jar',
     ]
     src presetPluginUrls.keySet()
     dest layout.buildDirectory.dir('resources/main/presets/plugins')

@@ -1,68 +1,133 @@
-> 欢迎你参与 Halo 的开发，下面是参与代码贡献的指南，以供参考。
+# Contributing Guide
 
-### 代码贡献步骤
+Thank you for your interest in contributing to Halo.
 
-#### 0. 提交 issue
+This document explains the recommended workflow for submitting high-quality contributions, including code, tests, and documentation updates.
 
-任何新功能或者功能改进建议都先提交 issue 讨论一下再进行开发，bug 修复可以直接提交 pull request。
+## Before You Start
 
-#### 1. Fork 此仓库
+- For new features or major behavior changes, please open an issue first so we can align on scope and design.
+- For clear bug fixes, you can submit a pull request directly.
+- If your report is not about the core project itself (for example, deployment questions), please use Discussions instead of Issues.
 
-点击右上角的 `fork` 按钮即可。
+## Development Environment
 
-#### 2. Clone 仓库到本地
+This repository mainly contains:
 
-```bash
-git clone https://github.com/{YOUR_USERNAME}/halo
+- Backend and platform modules built with Gradle.
+- Frontend code in `ui`, managed with `pnpm` workspaces.
 
-git submodule init
+### Prerequisites
 
-git submodule update
-```
+- Git
+- JDK (version compatible with the project build)
+- Node.js and `pnpm` (see `ui/package.json` for the current package manager)
+- Docker / Docker Compose (required for e2e scenarios)
 
-#### 3. 创建新的开发分支
+## Contribution Workflow
 
-```bash
-git checkout -b {BRANCH_NAME}
-```
+### 1. Fork and Clone
 
-#### 4. 提交代码
-
-```bash
-git push origin {BRANCH_NAME}
-```
-
-#### 5. 提交 pull request
-
-回到自己的仓库页面，选择 `New pull request` 按钮，创建 `Pull request` 到原仓库的 `main` 分支。
-
-然后等待我们 Review 即可，如有 `Change Request`，再本地修改之后再次提交即可。
-
-#### 6. 更新主仓库代码到自己的仓库
+Fork this repository, then clone your fork:
 
 ```bash
-git remote add upstream git@github.com:halo-dev/halo.git
-
-git pull upstream main
-
-git push
+git clone https://github.com/{YOUR_USERNAME}/{REPOSITORY}.git
+cd {REPOSITORY}
 ```
 
-### E2E
-
-Please consider adding some [e2e test cases](e2e/README.md) to make sure the APIs work as expected.
-
-### 开发规范
-
-请参考 [https://docs.halo.run/developer-guide/core/code-style](https://docs.halo.run/developer-guide/core/code-style)，请确保所有代码格式化之后再提交。
-
-### Usage of Cherry Pick Script
-
-We can use the cherry pick script to cherry-pick commits in pull request as follows:
+### 2. Add Upstream Remote
 
 ```bash
-GITHUB_USER={your_github_user} hack/cherry_pick_pull.sh upstream/{target_branch} {pull_request_number}
+git remote add upstream https://github.com/halo-dev/halo.git
+git fetch upstream
 ```
 
-> This script is from <https://github.com/kubernetes/kubernetes/blob/master/hack/cherry_pick_pull.sh>.
+### 3. Create a Branch
 
+Use a focused branch name that reflects your change:
+
+```bash
+git checkout -b feat/short-description
+```
+
+### 4. Implement and Validate
+
+Run relevant checks before opening a PR.
+
+Backend and general checks:
+
+```bash
+./gradlew clean check
+```
+
+Frontend checks (in `ui`):
+
+```bash
+cd ui
+pnpm install
+pnpm build:packages
+pnpm lint
+pnpm typecheck
+pnpm test:unit
+```
+
+### 5. Commit and Push
+
+```bash
+git push origin <your-branch>
+```
+
+### 6. Open a Pull Request
+
+Open a PR from your branch to `main` and fill out the PR template carefully:
+
+- Describe what changed and why.
+- Link related issues (for example, `Fixes #123`).
+- Add release note content or `NONE` when no user-facing change is introduced.
+- Add proper `/kind` labels as requested in the template.
+
+## AI-Assisted Contribution Policy
+
+AI-assisted development is not prohibited, including code generation and refactoring support.
+
+However, you are fully responsible for any code in your PR.
+
+If you used AI tools, please follow these rules:
+
+- Review all AI-generated content before submission.
+- Verify correctness, security, performance, and maintainability.
+- Ensure generated code follows project conventions and architecture.
+- Remove low-quality or redundant generated code.
+- Mention AI assistance in your PR description when AI materially contributed to the final changes.
+
+In short: AI assistance is allowed, but unreviewed AI output is not acceptable.
+
+## Testing Expectations
+
+- Add or update tests whenever you change behavior.
+- If you add or modify APIs, please include corresponding e2e test cases.
+- See `e2e/README.md` for e2e workflow and local execution details.
+
+## Coding Standards
+
+- Follow the project coding style guide: <https://docs.halo.run/developer-guide/core/code-style>
+- Keep changes focused and avoid unrelated refactors in the same PR.
+- Run formatters and linters before pushing.
+
+## Keep Your Fork Updated
+
+Before starting new work, sync your branch with upstream:
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```
+
+## Need Help?
+
+- Open an issue for confirmed bugs and feature proposals.
+- Use Discussions for general questions and usage/deployment topics.
+
+Thanks again for helping improve Halo.

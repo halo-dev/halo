@@ -28,6 +28,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,6 +90,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.Attachment.UploadOptions;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.exception.RestrictedNameException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -517,6 +519,25 @@ public class UserEndpoint implements CustomEndpoint {
                 )
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Username didn't match.")))
+                .flatMap(user -> {
+                    var newDisplayName = user.getSpec().getDisplayName();
+                    var oldDisplayName = currentUser.getSpec().getDisplayName();
+                    return Mono.just(user)
+                        .filterWhen(u -> {
+                            if (Objects.equals(oldDisplayName, newDisplayName)) {
+                                return Mono.just(true);
+                            }
+                            return environmentFetcher.fetch(SystemSetting.User.GROUP,
+                                    SystemSetting.User.class)
+                                .map(setting -> isDisplayNameAllowed(setting, newDisplayName))
+                                .defaultIfEmpty(false);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RestrictedNameException(
+                            "The display name is restricted.",
+                            "problemDetail.user.displayName.restricted",
+                            new Object[] {newDisplayName}
+                        ))));
+                })
                 .map(user -> {
                     Map<String, String> oldAnnotations =
                         MetadataUtil.nullSafeAnnotations(currentUser);
@@ -813,5 +834,18 @@ public class UserEndpoint implements CustomEndpoint {
         Assert.notNull(items, "items must not be null");
         return new ListResult<>(listResult.getPage(), listResult.getSize(),
             listResult.getTotal(), items);
+    }
+
+    private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
+        String protectedUsernamesStr = setting.getProtectedUsernames();
+        if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
+            return true;
+        }
+        Set<String> protectedLowerSet = Arrays.stream(protectedUsernamesStr.split(","))
+            .map(String::trim)
+            .filter(n -> !n.isEmpty())
+            .map(String::toLowerCase)
+            .collect(Collectors.toUnmodifiableSet());
+        return !protectedLowerSet.contains(displayName.trim().toLowerCase());
     }
 }

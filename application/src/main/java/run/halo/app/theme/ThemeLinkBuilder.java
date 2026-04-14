@@ -37,7 +37,15 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
         }
 
         if (isAssetsRequest(link)) {
-            return PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
+            var path = PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
+            var uriComponents = UriComponentsBuilder.fromUriString(path).build();
+            if (StringUtils.isNotBlank(theme.getVersion())
+                && uriComponents.getQueryParams().isEmpty()) {
+                return UriComponentsBuilder.fromUriString(path)
+                    .queryParam("v", theme.getVersion())
+                    .build().toString();
+            }
+            return path;
         }
 
         // not assets link

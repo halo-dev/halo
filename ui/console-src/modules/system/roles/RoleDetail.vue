@@ -1,9 +1,4 @@
 <script lang="ts" setup>
-import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
-import { rbacAnnotations } from "@/constants/annotations";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { pluginLabels, roleLabels } from "@/constants/labels";
-import { resolveDeepDependencies } from "@/utils/role";
 import type { Role } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -22,6 +17,11 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
+import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
+import { rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { resolveDeepDependencies } from "@/utils/role";
 import { useFetchRoleTemplates } from "../users/composables/use-role";
 
 const route = useRoute();

@@ -49,8 +49,8 @@ public class IndexRouteFactory implements RouteFactory {
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
         return RouterFunctions
-            .route(GET("/").or(GET("/page/{page}")
-                .or(GET("/index")).or(GET("/index/page/{page}"))
+            .route(GET("/").or(GET("/page/{page:\\d+}")
+                .or(GET("/index")).or(GET("/index/page/{page:\\d+}"))
                 .and(accept(MediaType.TEXT_HTML))), handlerFunction());
     }
 

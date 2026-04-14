@@ -228,8 +228,7 @@ interface DashboardWidgetQuickActionBaseItem {
  * A quick action item that uses a custom component for rendering.
  * Provides maximum flexibility for complex action UI.
  */
-interface DashboardWidgetQuickActionComponentItem
-  extends DashboardWidgetQuickActionBaseItem {
+interface DashboardWidgetQuickActionComponentItem extends DashboardWidgetQuickActionBaseItem {
   /**
    * Custom Vue component for rendering the quick action.
    * When provided, standard properties (icon, title, action) are optional.
@@ -256,8 +255,7 @@ interface DashboardWidgetQuickActionComponentItem
  * A standard quick action item with icon, title, and action handler.
  * Uses the default rendering style for consistency.
  */
-interface DashboardWidgetQuickActionStandardItem
-  extends DashboardWidgetQuickActionBaseItem {
+interface DashboardWidgetQuickActionStandardItem extends DashboardWidgetQuickActionBaseItem {
   /**
    * Cannot provide a custom component for standard items.
    */
@@ -282,8 +280,7 @@ interface DashboardWidgetQuickActionStandardItem
 /**
  * A quick action item that navigates to a route when triggered.
  */
-interface DashboardWidgetQuickActionRouteItem
-  extends DashboardWidgetQuickActionBaseItem {
+interface DashboardWidgetQuickActionRouteItem extends DashboardWidgetQuickActionBaseItem {
   /**
    * Cannot provide a custom component for route items.
    */

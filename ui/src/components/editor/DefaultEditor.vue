@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { i18n } from "@/locales";
-import { usePluginModuleStore } from "@/stores/plugin";
 import {
   GetThumbnailByUriSizeEnum,
   type Attachment,
@@ -61,6 +59,8 @@ import LucideHeading6 from "~icons/lucide/heading-6";
 import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 import MingcuteLayoutRightLine from "~icons/mingcute/layout-right-line";
 import MingcuteUnfoldVerticalLine from "~icons/mingcute/unfold-vertical-line";
+import { i18n } from "@/locales";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { t } = useI18n();
 

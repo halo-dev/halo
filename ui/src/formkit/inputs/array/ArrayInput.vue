@@ -3,6 +3,7 @@ import { getNode, type FormKitNode, type FormKitProps } from "@formkit/core";
 import { undefine } from "@formkit/utils";
 import { IconClose, VButton } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
+import { isNil, isNotNil } from "es-toolkit";
 import { cloneDeepWith, get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { onMounted, ref, toRaw, watch } from "vue";
@@ -41,7 +42,7 @@ const nodeProps = ref<Partial<FormKitProps<ArrayProps>>>(props.node.props);
 type FnType = (index: number) => Record<string, unknown>;
 
 function createValue(num: number, fn: FnType): ArrayValue {
-  return new Array(num).fill("").map((_, index) => fn(index));
+  return Array.from({ length: num }, (_, index) => fn(index));
 }
 
 function arrayFeature(node: FormKitNode<ArrayValue>) {
@@ -94,7 +95,7 @@ onMounted(async () => {
 
 type FormattedItemLabel =
   | {
-      type: "text" | "image" | "color";
+      type: Exclude<ArrayItemLabelType, "iconify">;
       value: string;
     }
   | {
@@ -107,7 +108,7 @@ type FormattedItemLabel =
 const parseItemLabel = async (
   itemLabel: ArrayItemLabel,
   item: Record<string, unknown>
-): Promise<FormattedItemLabel | undefined> => {
+): Promise<FormattedItemLabel[] | undefined> => {
   if (!itemLabel.label) {
     return;
   }
@@ -118,20 +119,34 @@ const parseItemLabel = async (
     const node = hiddenChildrenFormKit.value?.at(path);
 
     if (!node) {
-      return {
-        type: itemLabel.type,
-        value: String(value ?? ""),
-      } as FormattedItemLabel;
+      return [
+        {
+          type: itemLabel.type,
+          value: String(value ?? ""),
+        } as FormattedItemLabel,
+      ];
     }
     const renderedValue = await renderItemLabelValue(node, value);
-    return {
-      type: itemLabel.type,
-      value:
-        renderedValue.value !== undefined
-          ? String(renderedValue.value)
-          : String(value ?? ""),
-      ...renderedValue,
-    } as FormattedItemLabel;
+    const castRenderedValueArray = Array.isArray(renderedValue)
+      ? renderedValue
+      : [renderedValue];
+    if (castRenderedValueArray.length === 0) {
+      return [
+        {
+          type: itemLabel.type,
+          value: String(value ?? ""),
+        } as FormattedItemLabel,
+      ];
+    }
+    return castRenderedValueArray
+      .map((renderedValue) => {
+        return {
+          type: itemLabel.type,
+          value: isNil(renderedValue.value) ? value : renderedValue.value,
+          ...renderedValue,
+        } as FormattedItemLabel;
+      })
+      .filter((item) => isNotNil(item.value));
   }
 };
 
@@ -146,14 +161,11 @@ const formatItemLabel = async (
   });
   const itemLabels = props.node.props.itemLabels ?? defaultItemLabel;
   if (itemLabels.length > 0) {
-    const results = await Promise.all(
-      itemLabels.map((itemLabel: ArrayItemLabel) => {
-        return parseItemLabel(itemLabel, item);
-      })
-    );
-    return results.filter(
-      (itemLabel): itemLabel is FormattedItemLabel => !!itemLabel?.value
-    );
+    const results = await Promise.all<FormattedItemLabel[][]>(
+      itemLabels.map((label: ArrayItemLabel) => parseItemLabel(label, item))
+    ).then((results) => results.flat());
+
+    return results.filter(isNotNil);
   }
   return [];
 };

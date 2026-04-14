@@ -1,3 +1,4 @@
+import { Dialog, Toast } from "@halo-dev/components";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
@@ -6,7 +7,6 @@ import {
   handleFileEvent,
   isExternalAsset,
 } from "@/utils/upload";
-import { Dialog, Toast } from "@halo-dev/components";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
@@ -63,9 +63,7 @@ export const ExtensionUpload = Extension.create({
 
             if (files.length) {
               event.preventDefault();
-              files.forEach((file) => {
-                handleFileEvent({ editor, file });
-              });
+              handleFileEvent(editor, files);
               return true;
             }
 
@@ -90,13 +88,11 @@ export const ExtensionUpload = Extension.create({
             const files = Array.from(event.dataTransfer.files) as File[];
             if (files.length) {
               event.preventDefault();
-              files.forEach((file: File) => {
-                // TODO: For drag-and-drop uploaded files,
-                // perhaps it is necessary to determine the
-                // current position of the drag-and-drop
-                // instead of inserting them directly at the cursor.
-                handleFileEvent({ editor, file });
-              });
+              // TODO: For drag-and-drop uploaded files,
+              // perhaps it is necessary to determine the
+              // current position of the drag-and-drop
+              // instead of inserting them directly at the cursor.
+              handleFileEvent(editor, files);
               return true;
             }
 

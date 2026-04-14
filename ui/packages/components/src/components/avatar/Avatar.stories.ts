@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-
 import { VAvatar } from ".";
 
 const meta: Meta<typeof VAvatar> = {

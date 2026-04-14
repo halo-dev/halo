@@ -1,5 +1,3 @@
-import type { Editor, Range } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import {
   ListItem,
   BulletList as TiptapBulletList,
@@ -7,6 +5,8 @@ import {
 } from "@tiptap/extension-list";
 import { markRaw } from "vue";
 import MingcuteListCheckLine from "~icons/mingcute/list-check-line";
+import type { Editor, Range } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionBulletListOptions = Partial<BulletListOptions> &
   ExtensionOptions;

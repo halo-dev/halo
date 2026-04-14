@@ -2,8 +2,8 @@
 import { VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { ref } from "vue";
-import Icons from "./Icons.vue";
 import { iconifyClient } from "./api";
+import Icons from "./Icons.vue";
 import type { IconifyValue } from "./types";
 
 const emit = defineEmits<{

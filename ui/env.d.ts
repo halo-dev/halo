@@ -1,12 +1,10 @@
-/// <reference types="vite/client" />
+/// <reference types="vite-plus/client" />
 /// <reference types="unplugin-icons/types/vue" />
 
 export {};
 
 import type { CoreMenuGroupId } from "@halo-dev/ui-shared";
-
 import "vue-router";
-
 import "axios";
 
 declare module "*.vue" {

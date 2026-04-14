@@ -1,3 +1,12 @@
+import TiptapHeading, { type HeadingOptions } from "@tiptap/extension-heading";
+import { markRaw } from "vue";
+import LucideHeading1 from "~icons/lucide/heading-1";
+import LucideHeading2 from "~icons/lucide/heading-2";
+import LucideHeading3 from "~icons/lucide/heading-3";
+import LucideHeading4 from "~icons/lucide/heading-4";
+import LucideHeading5 from "~icons/lucide/heading-5";
+import LucideHeading6 from "~icons/lucide/heading-6";
+import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
 import { CONVERT_TO_KEY } from "@/components/drag/default-drag";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import ToolbarSubItem from "@/components/toolbar/ToolbarSubItem.vue";
@@ -13,15 +22,6 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { generateAnchorId } from "@/utils";
-import TiptapHeading, { type HeadingOptions } from "@tiptap/extension-heading";
-import { markRaw } from "vue";
-import LucideHeading1 from "~icons/lucide/heading-1";
-import LucideHeading2 from "~icons/lucide/heading-2";
-import LucideHeading3 from "~icons/lucide/heading-3";
-import LucideHeading4 from "~icons/lucide/heading-4";
-import LucideHeading5 from "~icons/lucide/heading-5";
-import LucideHeading6 from "~icons/lucide/heading-6";
-import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
 
 export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
 

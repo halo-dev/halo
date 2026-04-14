@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import { setFocus } from "@/formkit/utils/focus";
 import type { User } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
@@ -8,6 +6,8 @@ import { stores } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { setFocus } from "@/formkit/utils/focus";
 import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();
@@ -44,6 +44,11 @@ onMounted(() => {
 const handleUpdateUser = async () => {
   try {
     isSubmitting.value = true;
+
+    if (formState.value.spec.displayName) {
+      formState.value.spec.displayName =
+        formState.value.spec.displayName.trim();
+    }
 
     await consoleApiClient.user.updateCurrentUser({
       user: formState.value,

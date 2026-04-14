@@ -2,17 +2,15 @@
 // core libs
 import type { CreateUserRequest } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { useQueryClient } from "@tanstack/vue-query";
 import { onMounted, ref } from "vue";
-
+import { useI18n } from "vue-i18n";
 // components
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
-
 // hooks
 import { PASSWORD_REGEX } from "@/constants/regex";
 import { setFocus } from "@/formkit/utils/focus";
-import { useQueryClient } from "@tanstack/vue-query";
-import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -40,6 +38,13 @@ onMounted(() => {
 const handleCreateUser = async () => {
   try {
     isSubmitting.value = true;
+
+    if (formState.value.name) {
+      formState.value.name = formState.value.name.trim();
+    }
+    if (formState.value.displayName) {
+      formState.value.displayName = formState.value.displayName.trim();
+    }
 
     await consoleApiClient.user.createUser({
       createUserRequest: formState.value,

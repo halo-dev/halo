@@ -5,12 +5,12 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxRegistrations;
+import org.springframework.boot.webflux.autoconfigure.WebFluxRegistrations;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.filter.reactive.UrlHandlerFilter;
@@ -44,43 +44,31 @@ import run.halo.app.core.endpoint.WebSocketHandlerMapping;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.infra.SecureRequestMappingHandlerAdapter;
-import run.halo.app.infra.console.ProxyFilter;
-import run.halo.app.infra.console.WebSocketRequestPredicate;
 import run.halo.app.infra.properties.AttachmentProperties;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.ui.ProxyFilter;
+import run.halo.app.infra.ui.WebSocketRequestPredicate;
 import run.halo.app.infra.webfilter.AdditionalWebFilterChainProxy;
 import run.halo.app.infra.webfilter.LocaleChangeWebFilter;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.UserLocaleRequestAttributeWriteFilter;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebFluxConfig implements WebFluxConfigurer {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     private final HaloProperties haloProp;
 
-    private final WebProperties.Resources resourceProperties;
+    private final WebProperties webProperties;
 
     private final ApplicationContext applicationContext;
 
     private final LocalThumbnailService localThumbnailService;
 
     private final AttachmentRootGetter attachmentRootGetter;
-
-    public WebFluxConfig(ObjectMapper objectMapper,
-        HaloProperties haloProp,
-        WebProperties webProperties,
-        ApplicationContext applicationContext,
-        LocalThumbnailService localThumbnailService,
-        AttachmentRootGetter attachmentRootGetter) {
-        this.objectMapper = objectMapper;
-        this.haloProp = haloProp;
-        this.resourceProperties = webProperties.getResources();
-        this.applicationContext = applicationContext;
-        this.localThumbnailService = localThumbnailService;
-        this.attachmentRootGetter = attachmentRootGetter;
-    }
 
     @Bean
     WebFluxRegistrations webFluxRegistrations() {
@@ -118,8 +106,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
         // we need to customize the Jackson2Json[Decoder][Encoder] here to serialize and
         // deserialize special types, e.g.: Instant, LocalDateTime. So we use ObjectMapper
         // created by outside.
-        configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
-        configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
+        configurer.defaultCodecs().jacksonJsonDecoder(new JacksonJsonDecoder(jsonMapper));
+        configurer.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(jsonMapper));
     }
 
     @Bean
@@ -137,31 +125,29 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    RouterFunction<ServerResponse> consoleEndpoints() {
-        var consolePredicate = path("/console/**").and(path("/console/assets/**").negate())
+    RouterFunction<ServerResponse> uiPageEndpoints() {
+        var consolePagePredicate = path("/console/**")
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
 
-        var ucPredicate = path("/uc/**").and(path("/uc/assets/**").negate())
+        var ucPagePredicate = path("/uc/**")
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
 
-        var consoleIndexHtml =
-            applicationContext.getResource(haloProp.getConsole().getLocation() + "index.html");
+        var consolePageHtml = applicationContext.getResource("classpath:/ui/console.html");
 
-        var ucIndexHtml =
-            applicationContext.getResource(haloProp.getUc().getLocation() + "index.html");
+        var ucPageHtml = applicationContext.getResource("classpath:/ui/uc.html");
 
         return RouterFunctions.route()
-            .GET(consolePredicate,
+            .GET(consolePagePredicate,
                 request -> ServerResponse.ok()
                     .cacheControl(CacheControl.noStore())
-                    .bodyValue(consoleIndexHtml)
+                    .bodyValue(consolePageHtml)
             )
-            .GET(ucPredicate,
+            .GET(ucPagePredicate,
                 request -> ServerResponse.ok()
                     .cacheControl(CacheControl.noStore())
-                    .bodyValue(ucIndexHtml)
+                    .bodyValue(ucPageHtml)
             )
             .build();
     }
@@ -169,6 +155,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = attachmentRootGetter.get();
+        var resourceProperties = webProperties.getResources();
         var cacheControl = resourceProperties.getCache()
             .getCachecontrol()
             .toHttpCacheControl();
@@ -183,18 +170,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .setUseLastModified(useLastModified)
             .setCacheControl(cacheControl);
 
-        // For console assets
-        registry.addResourceHandler("/console/assets/**")
-            .addResourceLocations(haloProp.getConsole().getLocation() + "assets/")
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
-
-        // For uc assets
-        registry.addResourceHandler("/uc/assets/**")
-            .addResourceLocations(haloProp.getUc().getLocation() + "assets/")
+        registry.addResourceHandler("/ui-assets/**")
+            .addResourceLocations("classpath:/ui/ui-assets/")
             .setCacheControl(cacheControl)
             .setUseLastModified(useLastModified)
             .resourceChain(true)
@@ -241,15 +218,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
             );
     }
 
-
-    @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
-    ProxyFilter consoleProxyFilter() {
-        return new ProxyFilter("/console/**", haloProp.getConsole().getProxy());
-    }
-
-
     /**
      * Order of this filter is higher than
      * {@link LocaleChangeWebFilter} to allow change locale in dev
@@ -257,11 +225,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
      * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
      * obtain the locale
      */
-    @ConditionalOnProperty(name = "halo.uc.proxy.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "halo.ui.proxy.enabled", havingValue = "true")
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 2)
-    ProxyFilter ucProxyFilter() {
-        return new ProxyFilter("/uc/**", haloProp.getUc().getProxy());
+    ProxyFilter uiProxyFilter() {
+        return new ProxyFilter(haloProp.getUi().getProxy(), "/console/**", "/uc/**");
     }
 
     /**

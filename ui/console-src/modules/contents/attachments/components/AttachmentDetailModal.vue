@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import AttachmentImagePreview from "@/components/attachment/AttachmentImagePreview.vue";
-import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
-import { isImage } from "@/utils/image";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
   IconRiPencilFill,
@@ -16,6 +13,9 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { computed, ref, toRefs, useTemplateRef } from "vue";
+import AttachmentImagePreview from "@/components/attachment/AttachmentImagePreview.vue";
+import AttachmentPermalinkList from "@/components/attachment/AttachmentPermalinkList.vue";
+import { isImage } from "@/utils/image";
 import DisplayNameEditForm from "./DisplayNameEditForm.vue";
 
 const props = withDefaults(

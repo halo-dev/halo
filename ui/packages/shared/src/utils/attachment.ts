@@ -1,5 +1,5 @@
-import type { AttachmentLike, AttachmentSimple } from "@/plugin";
 import type { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
+import type { AttachmentLike, AttachmentSimple } from "@/plugin";
 
 /**
  * Mapping of thumbnail size enums to their corresponding widths in pixels

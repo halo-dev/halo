@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,6 +23,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.lang.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * Unstructured is a generic Extension, which wraps ObjectNode to maintain the Extension data, like
@@ -33,6 +36,12 @@ import org.springframework.lang.NonNull;
  */
 @JsonSerialize(using = Unstructured.UnstructuredSerializer.class)
 @JsonDeserialize(using = Unstructured.UnstructuredDeserializer.class)
+@tools.jackson.databind.annotation.JsonSerialize(
+    using = Unstructured.UnstructuredValueSerializer.class
+)
+@tools.jackson.databind.annotation.JsonDeserialize(
+    using = Unstructured.UnstructuredValueDeserializer.class
+)
 @SuppressWarnings("rawtypes")
 public class Unstructured implements Extension {
 
@@ -54,7 +63,7 @@ public class Unstructured implements Extension {
     }
 
     public Map getData() {
-        return Collections.unmodifiableMap(data);
+        return data;
     }
 
     @Override
@@ -280,6 +289,31 @@ public class Unstructured implements Extension {
             gen.writeObject(value.data);
         }
 
+    }
+
+    static class UnstructuredValueSerializer extends ValueSerializer<Unstructured> {
+
+        @Override
+        public void serialize(
+            Unstructured value, tools.jackson.core.JsonGenerator gen, SerializationContext ctxt)
+            throws JacksonException {
+            gen.writePOJO(value.data);
+        }
+
+        @Override
+        public Class<?> handledType() {
+            return Unstructured.class;
+        }
+    }
+
+    static class UnstructuredValueDeserializer extends ValueDeserializer<Unstructured> {
+
+        @Override
+        public Unstructured deserialize(tools.jackson.core.JsonParser p,
+            tools.jackson.databind.DeserializationContext ctxt) throws JacksonException {
+            var map = p.readValueAs(Map.class);
+            return new Unstructured(map);
+        }
     }
 
     public static class UnstructuredDeserializer extends JsonDeserializer<Unstructured> {

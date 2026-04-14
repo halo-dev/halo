@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import DropdownItem from "@/components/base/DropdownItem.vue";
-import BubbleButton from "@/components/bubble/BubbleButton.vue";
-import { i18n } from "@/locales";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { computed } from "vue";
 import LucideHeading1 from "~icons/lucide/heading-1";
@@ -12,6 +8,10 @@ import LucideHeading4 from "~icons/lucide/heading-4";
 import LucideHeading5 from "~icons/lucide/heading-5";
 import LucideHeading6 from "~icons/lucide/heading-6";
 import MingcuteParagraphLine from "~icons/mingcute/paragraph-line";
+import DropdownItem from "@/components/base/DropdownItem.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
+import { i18n } from "@/locales";
+import type { BubbleItemComponentProps } from "@/types";
 import { ExtensionHeading } from "../heading";
 import { ExtensionParagraph } from "../paragraph";
 

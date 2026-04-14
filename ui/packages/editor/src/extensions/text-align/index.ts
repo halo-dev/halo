@@ -1,7 +1,7 @@
-import type { ExtensionOptions } from "@/types";
 import TiptapTextAlign, {
   type TextAlignOptions,
 } from "@tiptap/extension-text-align";
+import type { ExtensionOptions } from "@/types";
 
 export type ExtensionTextAlignOptions = ExtensionOptions &
   Partial<TextAlignOptions>;

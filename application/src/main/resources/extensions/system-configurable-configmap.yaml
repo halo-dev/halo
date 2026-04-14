@@ -11,6 +11,18 @@ data:
       "avatarPolicy": "default-policy",
       "ucAttachmentPolicy": "default-policy"
     }
+  attachment: |
+    {
+      "console": {
+        "policyName": "default-policy"
+      },
+      "uc": {
+        "policyName": "default-policy"
+      },
+      "avatar": {
+        "policyName": "default-policy"
+      }
+    }
   theme: |
     {
       "active": "theme-earth"
@@ -34,6 +46,7 @@ data:
       "archivePageSize": 10,
       "categoryPageSize": 10,
       "tagPageSize": 10,
+      "authorPageSize": 10,
       "slugGenerationStrategy": "generateByTitle",
       "attachmentPolicyName": "default-policy"
     }

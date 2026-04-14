@@ -1,6 +1,6 @@
+import fs from "node:fs";
 import type { Plugin as HaloPlugin } from "@halo-dev/api-client";
 import yaml from "js-yaml";
-import fs from "node:fs";
 
 export function getHaloPluginManifest(manifestPath: string) {
   const manifest = yaml.load(

@@ -1,5 +1,5 @@
-import { Editor, generateJSON, type Content } from "@/tiptap";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
+import { Editor, generateJSON, type Content } from "@/tiptap";
 
 export function convertToMediaContents(
   editor: Editor,

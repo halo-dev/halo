@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import Input from "@/components/base/Input.vue";
-import { i18n } from "@/locales";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown, vTooltip } from "@halo-dev/components";
 import { TextSelection } from "@tiptap/pm/state";
 import { test } from "linkifyjs";
 import { computed } from "vue";
 import MingcuteLinkLine from "~icons/mingcute/link-line";
+import Input from "@/components/base/Input.vue";
+import { i18n } from "@/locales";
+import type { BubbleItemComponentProps } from "@/types";
 import { ExtensionLink } from ".";
 
 const props = defineProps<BubbleItemComponentProps>();

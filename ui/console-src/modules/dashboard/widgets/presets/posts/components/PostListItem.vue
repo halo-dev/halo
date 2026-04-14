@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { postLabels } from "@/constants/labels";
 import type { ListedPost } from "@halo-dev/api-client";
 import {
   IconExternalLinkLine,
@@ -11,6 +10,7 @@ import {
 import { utils } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { postLabels } from "@/constants/labels";
 
 const { t } = useI18n();
 

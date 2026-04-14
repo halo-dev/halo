@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { setFocus } from "@/formkit/utils/focus";
 import useSlugify from "@console/composables/use-slugify";
 import { reset, submitForm, type FormKitNode } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
@@ -19,6 +16,9 @@ import { FormType } from "@halo-dev/ui-shared";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -41,6 +41,7 @@ const formState = ref<Tag>({
   spec: {
     displayName: "",
     slug: "",
+    description: "",
     cover: "",
   },
   apiVersion: "content.halo.run/v1alpha1",
@@ -252,6 +253,18 @@ async function slugUniqueValidation(node: FormKitNode) {
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.description"
+              name="description"
+              :help="$t('core.post_tag.editing_modal.fields.description.help')"
+              :label="
+                $t('core.post_tag.editing_modal.fields.description.label')
+              "
+              type="textarea"
+              auto-height
+              :max-auto-height="200"
+              validation="length:0,200"
             ></FormKit>
           </div>
         </div>

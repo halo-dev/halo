@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import Input from "@/components/base/Input.vue";
-import BubbleButton from "@/components/bubble/BubbleButton.vue";
-import { i18n } from "@/locales";
-import { findChildren } from "@/tiptap";
-import type { BubbleItemComponentProps } from "@/types";
 import { VDropdown } from "@halo-dev/components";
 import { computed } from "vue";
 import MdiBackupRestore from "~icons/mdi/backup-restore";
 import MdiImageSizeSelectActual from "~icons/mdi/image-size-select-actual";
 import MdiImageSizeSelectLarge from "~icons/mdi/image-size-select-large";
 import MdiImageSizeSelectSmall from "~icons/mdi/image-size-select-small";
+import Input from "@/components/base/Input.vue";
+import BubbleButton from "@/components/bubble/BubbleButton.vue";
+import { i18n } from "@/locales";
+import { findChildren } from "@/tiptap";
+import type { BubbleItemComponentProps } from "@/types";
 import { ExtensionImage } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();

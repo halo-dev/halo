@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import { useThemeStore } from "@console/stores/theme";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import type {
@@ -31,6 +30,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, onMounted, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 
 const props = withDefaults(

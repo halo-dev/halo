@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { roleLabels } from "@/constants/labels";
-import { resolveDeepDependencies } from "@/utils/role";
 import type {
   Role,
   RoleV1alpha1ApiListRoleRequest,
@@ -29,6 +25,10 @@ import { useQuery } from "@tanstack/vue-query";
 import Fuse from "fuse.js";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { roleLabels } from "@/constants/labels";
+import { resolveDeepDependencies } from "@/utils/role";
 import { useFetchRoleTemplates } from "../users/composables/use-role";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 

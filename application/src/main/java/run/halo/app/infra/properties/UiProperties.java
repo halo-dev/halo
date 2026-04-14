@@ -1,0 +1,16 @@
+package run.halo.app.infra.properties;
+
+import jakarta.validation.Valid;
+import lombok.Data;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+
+@Data
+public class UiProperties {
+
+    private String location = "classpath:/ui/";
+
+    @Valid
+    @NestedConfigurationProperty
+    private ProxyProperties proxy = new ProxyProperties();
+
+}

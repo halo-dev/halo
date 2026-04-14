@@ -1,4 +1,3 @@
-import { usePluginModuleStore } from "@/stores/plugin";
 import {
   PluginStatusPhaseEnum,
   consoleApiClient,
@@ -8,25 +7,16 @@ import {
 } from "@halo-dev/api-client";
 import { Dialog, Toast, VLoading } from "@halo-dev/components";
 import { utils, type PluginTab } from "@halo-dev/ui-shared";
-import { useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
-import type { ComputedRef, Ref } from "vue";
+import type { Ref } from "vue";
 import { computed, defineAsyncComponent, ref, shallowRef } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore } from "@/stores/plugin";
 
-interface usePluginLifeCycleReturn {
-  isStarted: ComputedRef<boolean | undefined>;
-  getStatusDotState: () => string;
-  getStatusMessage: () => string | undefined;
-  changeStatus: () => void;
-  changingStatus: Ref<boolean>;
-  uninstall: (deleteExtensions?: boolean) => void;
-}
-
-export function usePluginLifeCycle(
-  plugin?: Ref<Plugin | undefined>
-): usePluginLifeCycleReturn {
+export function usePluginLifeCycle(plugin?: Ref<Plugin | undefined>) {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
 
   const isStarted = computed(() => {
     return (
@@ -97,7 +87,63 @@ export function usePluginLifeCycle(
     },
   });
 
-  const uninstall = (deleteExtensions?: boolean) => {
+  function reload() {
+    Dialog.warning({
+      title: t("core.plugin.operations.reload.title"),
+      description: t("core.plugin.operations.reload.description"),
+      confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm: async () => {
+        if (!plugin?.value) {
+          return;
+        }
+
+        await consoleApiClient.plugin.plugin.reloadPlugin({
+          name: plugin.value.metadata.name,
+        });
+
+        Toast.success(t("core.plugin.operations.reload.toast_success"));
+
+        await queryClient.invalidateQueries({
+          queryKey: ["plugins"],
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["plugin", plugin.value.metadata.name],
+        });
+      },
+    });
+  }
+
+  function resetPluginConfig() {
+    Dialog.warning({
+      title: t("core.plugin.operations.reset.title"),
+      description: t("core.plugin.operations.reset.description"),
+      confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm: async () => {
+        if (!plugin?.value) {
+          return;
+        }
+
+        await consoleApiClient.plugin.plugin.resetPluginConfig({
+          name: plugin.value.metadata.name,
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: ["core:plugin:configMap:data"],
+        });
+
+        Toast.success(t("core.plugin.operations.reset.toast_success"));
+      },
+    });
+  }
+
+  const uninstall = ({
+    deleteExtensions,
+    onSuccess,
+  }: { deleteExtensions?: boolean; onSuccess?: () => void } = {}) => {
     if (!plugin?.value) return;
 
     const { enabled } = plugin.value.spec;
@@ -123,51 +169,47 @@ export function usePluginLifeCycle(
       onConfirm: async () => {
         if (!plugin.value) return;
 
-        try {
-          await consoleApiClient.plugin.plugin.changePluginRunningState({
-            name: plugin.value.metadata.name,
-            pluginRunningStateRequest: {
-              enable: false,
-            },
-          });
+        await consoleApiClient.plugin.plugin.changePluginRunningState({
+          name: plugin.value.metadata.name,
+          pluginRunningStateRequest: {
+            enable: false,
+          },
+        });
 
-          await coreApiClient.plugin.plugin.deletePlugin({
-            name: plugin.value.metadata.name,
-          });
+        await coreApiClient.plugin.plugin.deletePlugin({
+          name: plugin.value.metadata.name,
+        });
 
-          // delete plugin setting and configMap
-          if (deleteExtensions) {
-            const { settingName, configMapName } = plugin.value.spec;
+        // delete plugin setting and configMap
+        if (deleteExtensions) {
+          const { settingName, configMapName } = plugin.value.spec;
 
-            if (settingName) {
-              await coreApiClient.setting.deleteSetting(
-                {
-                  name: settingName,
-                },
-                {
-                  mute: true,
-                }
-              );
-            }
-
-            if (configMapName) {
-              await coreApiClient.configMap.deleteConfigMap(
-                {
-                  name: configMapName,
-                },
-                {
-                  mute: true,
-                }
-              );
-            }
+          if (settingName) {
+            await coreApiClient.setting.deleteSetting(
+              {
+                name: settingName,
+              },
+              {
+                mute: true,
+              }
+            );
           }
 
-          Toast.success(t("core.common.toast.uninstall_success"));
-        } catch (e) {
-          console.error("Failed to uninstall plugin", e);
-        } finally {
-          window.location.reload();
+          if (configMapName) {
+            await coreApiClient.configMap.deleteConfigMap(
+              {
+                name: configMapName,
+              },
+              {
+                mute: true,
+              }
+            );
+          }
         }
+
+        Toast.success(t("core.common.toast.uninstall_success"));
+
+        onSuccess?.();
       },
     });
   };
@@ -178,7 +220,9 @@ export function usePluginLifeCycle(
     getStatusMessage,
     changeStatus,
     changingStatus,
+    reload,
     uninstall,
+    resetPluginConfig,
   };
 }
 

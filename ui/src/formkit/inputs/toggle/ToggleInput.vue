@@ -87,7 +87,7 @@ const gap = computed(() => {
     <div
       v-for="option in options"
       :key="String(option.value)"
-      class="group flex cursor-pointer flex-col items-center justify-center gap-2"
+      class="group/item flex cursor-pointer flex-col items-center justify-center gap-2"
       @click="handleSelect(option.value)"
     >
       <div
@@ -95,7 +95,7 @@ const gap = computed(() => {
         :class="[
           isSelected(option.value)
             ? 'border-primary shadow-md'
-            : 'border-transparent group-hover:border-gray-300 group-hover:shadow-sm',
+            : 'border-transparent group-hover/item:border-gray-300 group-hover/item:shadow-sm',
           renderType === 'color' ? 'rounded-full' : 'rounded-lg',
         ]"
       >
@@ -117,7 +117,7 @@ const gap = computed(() => {
           :class="
             isSelected(option.value)
               ? 'text-primary'
-              : 'text-gray-600 group-hover:text-gray-900'
+              : 'text-gray-600 group-hover/item:text-gray-900'
           "
         >
           {{ option.render || option.label || option.value }}
@@ -129,7 +129,7 @@ const gap = computed(() => {
         :class="
           isSelected(option.value)
             ? 'font-semibold text-gray-900'
-            : 'text-gray-500 group-hover:text-gray-700'
+            : 'text-gray-500 group-hover/item:text-gray-700'
         "
       >
         {{ option.label }}

@@ -1,9 +1,9 @@
-import Logo from "@/assets/logo.png";
-import DefaultEditor from "@/components/editor/DefaultEditor.vue";
-import { usePluginModuleStore } from "@/stores/plugin";
 import type { EditorProvider } from "@halo-dev/ui-shared";
 import { markRaw, shallowRef, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import Logo from "@/assets/logo-64x64.png?inline";
+import DefaultEditor from "@/components/editor/DefaultEditor.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 interface useEditorExtensionPointsReturn {
   editorProviders: Ref<EditorProvider[]>;

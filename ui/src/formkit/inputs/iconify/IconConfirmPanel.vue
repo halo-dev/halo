@@ -3,9 +3,9 @@ import { Toast, VButton } from "@halo-dev/components";
 import { Icon as IconifyIcon } from "@iconify/vue";
 import { refDefault } from "@vueuse/shared";
 import { AxiosError } from "axios";
-import { inject, onMounted, ref, type Ref } from "vue";
+import { computed, inject, onMounted, ref, type Ref } from "vue";
 import { ICONIFY_BASE_URL, iconifyClient } from "./api";
-import type { IconifyFormat, IconifyValue } from "./types";
+import type { IconifyFormat, IconifySizing, IconifyValue } from "./types";
 
 const props = defineProps<{
   iconName: string;
@@ -16,12 +16,27 @@ const emit = defineEmits<{
 }>();
 
 const format = inject<Ref<IconifyFormat>>("format");
+const sizing = inject<Ref<IconifySizing>>("sizing");
 const currentIconifyValue = inject<Ref<IconifyValue | undefined>>(
   "currentIconifyValue"
 );
 
 const color = ref<string>("");
-const width = refDefault<string | undefined>(ref(), "24");
+const width = refDefault<string | undefined>(
+  ref(),
+  sizing?.value.default || "24"
+);
+
+const defaultSizeOptions = ["12", "24", "48", "96", "1em", "1.2em", "2em"];
+
+const sizeOptions = computed(() => {
+  return Array.from(
+    new Set([
+      sizing?.value.default || "24",
+      ...(sizing?.value.presets || defaultSizeOptions),
+    ])
+  );
+});
 
 onMounted(() => {
   if (currentIconifyValue?.value) {
@@ -92,6 +107,7 @@ async function handleConfirm() {
     <div>
       <FormKit type="form" ignore>
         <FormKit
+          v-if="sizing?.enabled"
           v-model="width"
           type="select"
           name="size"
@@ -102,36 +118,12 @@ async function handleConfirm() {
           :options="[
             {
               label: $t('core.common.text.none'),
-              value: 'none',
+              value: '',
             },
-            {
-              label: '12px',
-              value: '12',
-            },
-            {
-              label: '24px',
-              value: '24',
-            },
-            {
-              label: '48px',
-              value: '48',
-            },
-            {
-              label: '96px',
-              value: '96',
-            },
-            {
-              label: '1em',
-              value: '1em',
-            },
-            {
-              label: '1.2em',
-              value: '1.2em',
-            },
-            {
-              label: '2em',
-              value: '2em',
-            },
+            ...sizeOptions.map((size) => ({
+              label: size,
+              value: size,
+            })),
           ]"
           clearable
         ></FormKit>

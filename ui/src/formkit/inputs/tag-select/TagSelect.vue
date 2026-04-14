@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
-import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
+import { useAllPostTagsQuery } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
@@ -59,7 +59,7 @@ onClickOutside(
   }
 );
 
-const { tags: postTags, handleFetchTags } = usePostTag();
+const { data: postTags, refetch: handleFetchTags } = useAllPostTagsQuery();
 
 // search
 let fuse: Fuse<Tag> | undefined = undefined;

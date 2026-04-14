@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
@@ -19,6 +18,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useFileDialog } from "@vueuse/core";
 import { computed, defineAsyncComponent, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const props = withDefaults(
   defineProps<{
@@ -66,8 +66,9 @@ const UserAvatarCropper = defineAsyncComponent(
   () => import("./UserAvatarCropper.vue")
 );
 
-interface IUserAvatarCropperType
-  extends Ref<InstanceType<typeof UserAvatarCropper>> {
+interface IUserAvatarCropperType extends Ref<
+  InstanceType<typeof UserAvatarCropper>
+> {
   getCropperFile(): Promise<File>;
 }
 

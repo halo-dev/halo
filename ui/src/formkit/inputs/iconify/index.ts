@@ -2,13 +2,13 @@ import { initialValue, type FormKitInputs } from "@formkit/inputs";
 import { createInput } from "@formkit/vue";
 import { defineAsyncComponent } from "vue";
 import iconifyFeature from "./feature";
-import type { IconifyFormat, IconifyValue } from "./types";
+import type { IconifyFormat, IconifySizing, IconifyValue } from "./types";
 
 export const iconify = createInput(
   defineAsyncComponent(() => import("./IconifyInput.vue")),
   {
     type: "input",
-    props: ["format", "popperPlacement", "valueOnly"],
+    props: ["format", "popperPlacement", "valueOnly", "sizing"],
     features: [initialValue, iconifyFeature],
   }
 );
@@ -20,6 +20,7 @@ declare module "@formkit/inputs" {
       value?: IconifyValue | string;
       format: IconifyFormat;
       valueOnly?: boolean;
+      sizing?: IconifySizing;
     };
   }
 }

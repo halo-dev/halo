@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import PostContributorList from "@/components/user/PostContributorList.vue";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -30,6 +29,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { chunk } from "es-toolkit";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import PostContributorList from "@/components/user/PostContributorList.vue";
 import PostTag from "./tags/components/PostTag.vue";
 
 const { t } = useI18n();
@@ -259,7 +259,7 @@ watch(
                   {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.common.buttons.recovery") }}
+                  {{ $t("core.common.buttons.restore") }}
                 </VButton>
               </VSpace>
             </div>
@@ -425,7 +425,7 @@ watch(
                 {{ $t("core.common.buttons.delete_permanently") }}
               </VDropdownItem>
               <VDropdownItem @click="handleRecovery(post.post)">
-                {{ $t("core.common.buttons.recovery") }}
+                {{ $t("core.common.buttons.restore") }}
               </VDropdownItem>
             </template>
           </VEntity>

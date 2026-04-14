@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { CodemirrorProps } from "@/components/codemirror/supports";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { VButton, VPageHeader } from "@halo-dev/components";
 import { useEventListener } from "@vueuse/core";
 import { computed, ref, type PropType } from "vue";
 import RiFullscreenLine from "~icons/ri/fullscreen-line";
+import type { CodemirrorProps } from "@/components/codemirror/supports";
 
 const props = defineProps({
   context: {

@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Halo",
-    "version": "2.22.0-SNAPSHOT"
+    "version": "2.24.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -3344,7 +3344,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/JsonNode"
+                  "type": "object"
                 }
               }
             },
@@ -3382,7 +3382,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/JsonNode"
+                "type": "object"
               }
             }
           },
@@ -4454,9 +4454,6 @@
           }
         }
       },
-      "JsonNode": {
-        "type": "object"
-      },
       "JsonPatch": {
         "minItems": 1,
         "uniqueItems": true,
@@ -5490,7 +5487,6 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
@@ -6032,7 +6028,6 @@
           },
           "visible": {
             "type": "string",
-            "default": "PUBLIC",
             "enum": [
               "PUBLIC",
               "INTERNAL",
@@ -6212,6 +6207,9 @@
             "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
           },
           "cover": {
+            "type": "string"
+          },
+          "description": {
             "type": "string"
           },
           "displayName": {

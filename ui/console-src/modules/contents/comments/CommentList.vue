@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import type { ListedComment } from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import {
@@ -20,6 +19,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import CommentListItem from "./components/CommentListItem.vue";
 import useCommentsFetch from "./composables/use-comments-fetch";
 

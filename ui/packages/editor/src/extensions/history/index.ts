@@ -1,11 +1,11 @@
-import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import { UndoRedo as TiptapHistory } from "@tiptap/extensions";
 import { markRaw } from "vue";
 import MdiRedoVariant from "~icons/mdi/redo-variant";
 import MdiUndoVariant from "~icons/mdi/undo-variant";
+import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 
 export const ExtensionHistory = TiptapHistory.extend<ExtensionOptions>({
   addOptions() {

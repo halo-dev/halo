@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { matchMediaType } from "@/utils/media-type";
 import type { Attachment } from "@halo-dev/api-client";
 import { Toast, VButton, VTabbar } from "@halo-dev/components";
 import { stores } from "@halo-dev/ui-shared";
 import { useClipboard } from "@vueuse/core";
 import { computed, ref, toRefs } from "vue";
 import { useI18n } from "vue-i18n";
+import { matchMediaType } from "@/utils/media-type";
 
 const props = withDefaults(
   defineProps<{

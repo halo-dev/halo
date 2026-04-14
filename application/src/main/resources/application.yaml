@@ -3,9 +3,6 @@ server:
   forward-headers-strategy: native
   compression:
     enabled: true
-  error:
-    whitelabel:
-      enabled: false
 spring:
   output:
     ansi:
@@ -24,6 +21,9 @@ spring:
   messages:
     basename: config.i18n.messages
   web:
+    error:
+      whitelabel:
+        enabled: false
     resources:
       cache:
         cachecontrol:

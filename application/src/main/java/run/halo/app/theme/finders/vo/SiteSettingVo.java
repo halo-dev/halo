@@ -83,6 +83,7 @@ public record SiteSettingVo(
                 .archivePageSize(postSetting.getArchivePageSize())
                 .categoryPageSize(postSetting.getCategoryPageSize())
                 .tagPageSize(postSetting.getTagPageSize())
+                .authorPageSize(postSetting.getAuthorPageSize())
                 .build())
             .seo(SeoSetting.builder()
                 .blockSpiders(seoSetting.getBlockSpiders())
@@ -116,7 +117,8 @@ public record SiteSettingVo(
         Integer postPageSize,
         Integer archivePageSize,
         Integer categoryPageSize,
-        Integer tagPageSize
+        Integer tagPageSize,
+        Integer authorPageSize
     ) {
     }
 

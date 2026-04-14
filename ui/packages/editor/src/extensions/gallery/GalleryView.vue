@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
-import { i18n } from "@/locales";
-import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import { VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
+import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
+import { i18n } from "@/locales";
+import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -46,19 +46,19 @@ function handleImageLoad(event: Event, index: number) {
   }
 }
 
-const groupSize = computed(() => {
+const groupSize = computed<number>(() => {
   return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
 });
 
-const layout = computed(() => {
+const layout = computed<string>(() => {
   return props.node?.attrs.layout || "auto";
 });
 
-const gap = computed(() => {
+const gap = computed<number>(() => {
   return props.node?.attrs.gap;
 });
 
-const groups = computed(() => {
+const groups = computed<ExtensionGalleryImageItem[][]>(() => {
   return images.value.reduce(
     (
       acc: ExtensionGalleryImageItem[][],

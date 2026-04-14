@@ -1,6 +1,4 @@
 import type { FormKitTypeDefinition } from "@formkit/core";
-
-import { i18n } from "@/locales";
 import {
   $if,
   disablesChildren,
@@ -21,6 +19,7 @@ import {
   IconArrowUpCircleLine,
   IconCloseCircle,
 } from "@halo-dev/components";
+import { i18n } from "@/locales";
 import AddButton from "./AddButton.vue";
 import { lists } from "./features/lists";
 import {

@@ -1,4 +1,6 @@
 import type { FormKitNode } from "@formkit/core";
+import { isNil } from "es-toolkit";
+import { renderAttachmentLabelValue } from "./attachment";
 import { renderCategorySelectLabelValue } from "./category-select";
 import { renderCheckboxLabelValue } from "./checkbox";
 import { renderIconifyLabelValue } from "./iconify";
@@ -17,9 +19,7 @@ const defaultRenderer: LabelValueRenderer = ({
 }: {
   value: unknown;
 }): LabelValueResult => {
-  return {
-    value: String(value),
-  };
+  return isNil(value) ? { value: "" } : { value: String(value) };
 };
 
 /**
@@ -34,6 +34,7 @@ const rendererRegistry = new Map<string, LabelValueRenderer>([
   ["toggle", renderToggleLabelValue],
   ["tagSelect", renderTagSelectLabelValue],
   ["categorySelect", renderCategorySelectLabelValue],
+  ["attachment", renderAttachmentLabelValue],
 ]);
 
 /**
@@ -52,7 +53,7 @@ export function registerRenderer(
 export async function renderItemLabelValue(
   node: FormKitNode<unknown>,
   value: unknown
-): Promise<LabelValueResult> {
+): Promise<LabelValueResult | LabelValueResult[]> {
   const originalType = node.props.originalType;
   const renderer = rendererRegistry.get(originalType);
   if (renderer) {

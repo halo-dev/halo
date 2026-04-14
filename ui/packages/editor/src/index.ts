@@ -18,4 +18,5 @@ export {
   isEmpty,
   isListActive,
   isNodeContentEmpty,
+  getCursorCoords,
 } from "./utils";

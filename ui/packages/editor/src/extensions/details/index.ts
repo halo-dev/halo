@@ -1,3 +1,10 @@
+import TiptapDetails, {
+  DetailsContent,
+  DetailsSummary,
+  type DetailsOptions,
+} from "@tiptap/extension-details";
+import { markRaw } from "vue";
+import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import { i18n } from "@/locales";
@@ -12,13 +19,6 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { deleteNode } from "@/utils";
-import TiptapDetails, {
-  DetailsContent,
-  DetailsSummary,
-  type DetailsOptions,
-} from "@tiptap/extension-details";
-import { markRaw } from "vue";
-import MingcuteFoldVerticalLine from "~icons/mingcute/fold-vertical-line";
 
 export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 

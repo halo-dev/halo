@@ -1,5 +1,6 @@
-import { EditorView, Extension } from "@/tiptap";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { EditorView, Extension } from "@/tiptap";
+import { getCursorCoords } from "@/utils/get-cursor-coords";
 
 export interface SmartScrollOptions {
   /**
@@ -91,32 +92,32 @@ export const ExtensionSmartScroll = Extension.create<SmartScrollOptions>({
   },
 });
 
+const getScrollContainer = (
+  view: EditorView,
+  options: SmartScrollOptions
+): HTMLElement | null => {
+  let scrollContainer: HTMLElement | null = null;
+  if (!options.scrollContainer) {
+    const editorElement = view.dom as HTMLElement;
+    scrollContainer = findScrollContainer(editorElement);
+  } else {
+    if (typeof options.scrollContainer === "function") {
+      scrollContainer = options.scrollContainer(view);
+    } else if (typeof options.scrollContainer === "string") {
+      scrollContainer = document.querySelector(
+        options.scrollContainer
+      ) as HTMLElement;
+    } else {
+      scrollContainer = options.scrollContainer;
+    }
+  }
+
+  return scrollContainer;
+};
+
 const smartScroll = (view: EditorView, options: SmartScrollOptions): void => {
   try {
-    const { state } = view;
-    const { selection } = state;
-
-    const coords = view.coordsAtPos(selection.$head.pos);
-    if (!coords) {
-      return;
-    }
-
-    let scrollContainer: HTMLElement | null = null;
-    if (!options.scrollContainer) {
-      const editorElement = view.dom as HTMLElement;
-      scrollContainer = findScrollContainer(editorElement);
-    } else {
-      if (typeof options.scrollContainer === "function") {
-        scrollContainer = options.scrollContainer(view);
-      } else if (typeof options.scrollContainer === "string") {
-        scrollContainer = document.querySelector(
-          options.scrollContainer
-        ) as HTMLElement;
-      } else {
-        scrollContainer = options.scrollContainer;
-      }
-    }
-
+    const scrollContainer = getScrollContainer(view, options);
     if (!scrollContainer) {
       return;
     }
@@ -124,6 +125,11 @@ const smartScroll = (view: EditorView, options: SmartScrollOptions): void => {
     const containerRect = scrollContainer.getBoundingClientRect();
     const viewportTop = containerRect.top;
     const viewportBottom = containerRect.bottom;
+
+    const coords = getCursorCoords(view);
+    if (!coords) {
+      return;
+    }
 
     const cursorTop = coords.top;
     const cursorBottom = coords.bottom;

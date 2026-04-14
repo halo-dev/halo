@@ -1,28 +1,26 @@
 {
   "name": "@halo-dev/ui-plugin-bundler-kit",
-  "version": "2.22.0",
+  "version": "2.24.0",
   "homepage": "https://github.com/halo-dev/halo/tree/main/ui/packages/ui-plugin-bundler-kit#readme",
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
+  "license": "GPL-3.0",
+  "author": "@halo-dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/halo-dev/halo.git",
     "directory": "ui/packages/ui-plugin-bundler-kit"
   },
-  "license": "GPL-3.0",
-  "author": "@halo-dev",
   "type": "module",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
   "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
+    "build": "vp pack",
+    "dev": "vp pack --watch",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {

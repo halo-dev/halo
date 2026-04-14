@@ -5,9 +5,9 @@ import { useFuse } from "@vueuse/integrations/useFuse.mjs";
 import { flatten } from "es-toolkit";
 import { values } from "es-toolkit/compat";
 import { computed, ref } from "vue";
+import { iconifyClient } from "./api";
 import Collections from "./Collections.vue";
 import Icons from "./Icons.vue";
-import { iconifyClient } from "./api";
 import type { IconifyValue } from "./types";
 
 const emit = defineEmits<{

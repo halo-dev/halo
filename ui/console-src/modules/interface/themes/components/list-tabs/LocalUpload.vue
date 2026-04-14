@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 import { useThemeStore } from "@console/stores/theme";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
@@ -8,6 +7,7 @@ import type { ErrorResponse, UppyFile } from "@uppy/core";
 import type { Ref } from "vue";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
 import type { ThemeInstallationErrorResponse } from "../../types";
 

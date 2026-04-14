@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { PMNode, VueEditor } from "@/tiptap";
-import type { DragButtonType } from "@/types";
-import { formatShortcut } from "@/utils";
 import { VDropdown } from "@halo-dev/components";
 import { computed, ref, type Component } from "vue";
 import MaterialSymbolsArrowForwardIosRounded from "~icons/material-symbols/arrow-forward-ios-rounded";
+import type { PMNode, VueEditor } from "@/tiptap";
+import type { DragButtonType } from "@/types";
+import { formatShortcut } from "@/utils";
 import EditorDragHandleMenu from "./EditorDragMenu.vue";
 
 const props = defineProps<

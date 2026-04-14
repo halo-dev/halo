@@ -3,6 +3,7 @@ package run.halo.app.security.authorization;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
@@ -20,7 +21,7 @@ public class RequestInfoAuthorizationManager
     }
 
     @Override
-    public Mono<AuthorizationDecision> check(Mono<Authentication> authentication,
+    public Mono<AuthorizationResult> authorize(Mono<Authentication> authentication,
         AuthorizationContext context) {
         var request = context.getExchange().getRequest();
         var requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);

@@ -1,3 +1,4 @@
+import scrollIntoView from "scroll-into-view-if-needed";
 import type { PMNode } from "@/tiptap";
 import {
   Decoration,
@@ -9,7 +10,6 @@ import {
   Transaction,
 } from "@/tiptap/pm";
 import { Editor } from "@/tiptap/vue-3";
-import scrollIntoView from "scroll-into-view-if-needed";
 export interface SearchAndReplacePluginProps {
   editor: Editor;
   element: HTMLElement;

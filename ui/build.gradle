@@ -17,6 +17,12 @@ idea {
   }
 }
 
+pnpmInstall {
+  nodeModulesOutputFilter {
+    exclude('**')
+  }
+}
+
 tasks.named('clean') {
   dependsOn tasks.named('doClean')
 }
@@ -36,7 +42,7 @@ tasks.register('doBuild', PnpmTask) {
   dependsOn tasks.named('buildPackages')
   pnpmCommand = ['run', 'build']
   inputs.files(fileTree(layout.projectDirectory) {
-    include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', '*.js', '*.json', '*.yaml', 'index.html'
+    include 'console-src/**', 'uc-src/**', 'src/**', 'public/**', '*.js', '*.json', '*.yaml', '*.html'
     exclude '**/node_modules/**', '**/build/**', '**/dist/**'
   })
   outputs.dir(layout.buildDirectory.dir('dist'))

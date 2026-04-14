@@ -1,5 +1,3 @@
-import { Extension, type Extensions } from "@/tiptap";
-import type { ExtensionOptions } from "@/types";
 import type { HardBreakOptions } from "@tiptap/extension-hard-break";
 import type { HorizontalRuleOptions } from "@tiptap/extension-horizontal-rule";
 import type {
@@ -7,6 +5,8 @@ import type {
   DropcursorOptions,
   PlaceholderOptions,
 } from "@tiptap/extensions";
+import { Extension, type Extensions } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import { filterDuplicateExtensions } from "../utils";
 import { ExtensionAlign } from "./align";
 import type { ExtensionAudioOptions } from "./audio";

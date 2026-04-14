@@ -81,7 +81,7 @@ runs:
         username: ${{ inputs.f2c-registry-user }}
         password: ${{ inputs.f2c-registry-token }}
     - name: Build and push
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v7
       with:
         context: .
         file: ./Dockerfile

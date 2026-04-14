@@ -5,10 +5,9 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -24,7 +23,8 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
-import run.halo.app.infra.utils.JsonUtils;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @Component
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class SystemConfigEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                         )
-                        .implementation(ObjectNode.class))
+                        .implementation(Object.class))
                     .parameter(parameterBuilder()
                         .in(ParameterIn.PATH)
                         .name("group")
@@ -62,9 +62,7 @@ public class SystemConfigEndpoint implements CustomEndpoint {
                         .required(true)
                         .description("Group of the system config")
                     )
-                    .requestBody(requestBodyBuilder()
-                        .implementation(ObjectNode.class)
-                    )
+                    .requestBody(requestBodyBuilder().implementation(Object.class))
                     .response(responseBuilder()
                         .responseCode(String.valueOf(HttpStatus.NO_CONTENT))
                         .implementation(Void.class)
@@ -77,10 +75,12 @@ public class SystemConfigEndpoint implements CustomEndpoint {
         final var group = request.pathVariable("group");
         return request.bodyToMono(ObjectNode.class)
             .flatMap(objectNode -> configurableEnvironmentFetcher.getConfigMap()
-                .flatMap(configMap -> {
-                    var data = configMap.getData();
-                    data.put(group, JsonUtils.objectToJson(objectNode));
-                    return client.update(configMap);
+                .flatMap(cm -> {
+                    if (cm.getData() == null) {
+                        cm.setData(new HashMap<>());
+                    }
+                    cm.getData().put(group, objectNode.toString());
+                    return client.update(cm);
                 })
             )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
@@ -91,7 +91,7 @@ public class SystemConfigEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> getConfigByGroup(ServerRequest request) {
         final var group = request.pathVariable("group");
         return configurableEnvironmentFetcher.fetch(group, ObjectNode.class)
-            .switchIfEmpty(Mono.fromSupplier(JsonNodeFactory.instance::objectNode))
+            .switchIfEmpty(Mono.fromSupplier(JsonMapper.shared()::createObjectNode))
             .flatMap(json -> ServerResponse.ok().bodyValue(json));
     }
 

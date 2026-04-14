@@ -1,6 +1,6 @@
 package run.halo.app.extension.store;
 
-import java.util.List;
+import java.util.Collection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
@@ -34,7 +34,7 @@ public interface ExtensionStoreRepository extends R2dbcRepository<ExtensionStore
      * @param names names to find
      * @return a flux of extension stores
      */
-    Flux<ExtensionStore> findByNameIn(List<String> names);
+    Flux<ExtensionStore> findByNameIn(Collection<String> names);
 
     Flux<ExtensionStore> findAllByNameStartingWithAndNameGreaterThan(
         String prefix, String nameCursor, Pageable pageable);

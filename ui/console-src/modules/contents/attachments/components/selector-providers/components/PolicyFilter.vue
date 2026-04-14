@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { attachmentPolicyLabels } from "@/constants/labels";
 import type { PolicyTemplate } from "@halo-dev/api-client";
 import { IconAddCircle, VDropdown, VDropdownItem } from "@halo-dev/components";
 import { computed, ref } from "vue";
+import { attachmentPolicyLabels } from "@/constants/labels";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Input from "@/components/base/Input.vue";
 import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
-import { computed } from "vue";
 
 const props = defineProps<BubbleItemComponentProps>();
 

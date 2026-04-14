@@ -1,7 +1,4 @@
 <script setup lang="ts" name="BubbleMenu">
-import { i18n } from "@/locales";
-import type { Editor } from "@/tiptap";
-import { PluginKey } from "@/tiptap/pm";
 import { vTooltip } from "@halo-dev/components";
 import { computed, nextTick, ref, watch, type PropType } from "vue";
 import LucideReplace from "~icons/lucide/replace";
@@ -12,6 +9,9 @@ import MdiRegex from "~icons/mdi/regex";
 import MingcuteArrowDownLine from "~icons/mingcute/arrow-down-line";
 import MingcuteArrowUpLine from "~icons/mingcute/arrow-up-line";
 import MingcuteCloseLine from "~icons/mingcute/close-line";
+import { i18n } from "@/locales";
+import type { Editor } from "@/tiptap";
+import { PluginKey } from "@/tiptap/pm";
 import IconButton from "./IconButton.vue";
 import MatchToggleButton from "./MatchToggleButton.vue";
 import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";

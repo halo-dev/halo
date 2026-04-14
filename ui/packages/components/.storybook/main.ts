@@ -1,6 +1,6 @@
-import type { StorybookConfig } from "@storybook/vue3-vite";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { StorybookConfig } from "@storybook/vue3-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],

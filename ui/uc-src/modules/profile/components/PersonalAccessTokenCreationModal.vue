@@ -1,17 +1,27 @@
 <script lang="ts" setup>
-import SubmitButton from "@/components/button/SubmitButton.vue";
-import { useRoleTemplateSelection } from "@/composables/use-role";
-import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
-import { roleLabels } from "@/constants/labels";
-import { useRoleStore } from "@/stores/role";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
 import { ucApiClient } from "@halo-dev/api-client";
-import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import {
+  Dialog,
+  Toast,
+  VAlert,
+  VButton,
+  VModal,
+  VSpace,
+  VTabItem,
+  VTabs,
+} from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { useRoleTemplateSelection } from "@/composables/use-role";
+import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { roleLabels } from "@/constants/labels";
+import { useRoleStore } from "@/stores/role";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -21,6 +31,8 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+
+const method = ref<"role" | "role-template">("role");
 
 const formState = ref<
   Omit<PersonalAccessToken, "spec"> & {
@@ -54,14 +66,30 @@ const availableRoleTemplates = computed(() => {
   });
 });
 
+const availableRoles = computed(() => {
+  return permissions.permissions.filter((role) => {
+    return (
+      role.metadata.labels?.[roleLabels.HIDDEN] !== "true" &&
+      role.metadata.labels?.[roleLabels.TEMPLATE] !== "true"
+    );
+  });
+});
+
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection(availableRoleTemplates);
+const selectedRoles = ref<string[]>([]);
 
 const { copy } = useClipboard({
   legacy: true,
 });
 
-const { mutate, isLoading } = useMutation({
+const finalRoles = computed(() => {
+  return method.value === "role"
+    ? selectedRoles.value
+    : Array.from(selectedRoleTemplates.value);
+});
+
+const { mutate, mutateAsync, isPending } = useMutation({
   mutationKey: ["pat-creation"],
   mutationFn: async () => {
     if (formState.value.spec?.expiresAt) {
@@ -71,7 +99,7 @@ const { mutate, isLoading } = useMutation({
     }
     formState.value.spec = {
       ...formState.value.spec,
-      roles: Array.from(selectedRoleTemplates.value),
+      roles: finalRoles.value,
     };
     const { data } = await ucApiClient.security.personalAccessToken.generatePat(
       {
@@ -101,12 +129,32 @@ const { mutate, isLoading } = useMutation({
     });
   },
 });
+
+function onSubmit() {
+  if (finalRoles.value.some((role) => role === SUPER_ROLE_NAME)) {
+    Dialog.warning({
+      title: t("core.uc_profile.pat.creation_modal.super_role_warning.title"),
+      description: t(
+        "core.uc_profile.pat.creation_modal.super_role_warning.description"
+      ),
+      confirmText: t(
+        "core.uc_profile.pat.creation_modal.super_role_warning.confirm"
+      ),
+      confirmType: "danger",
+      onConfirm: async () => {
+        await mutateAsync();
+      },
+    });
+    return;
+  }
+  mutate();
+}
 </script>
 
 <template>
   <VModal
     ref="modal"
-    :width="700"
+    :width="800"
     :title="$t('core.uc_profile.pat.creation_modal.title')"
     @close="emit('close')"
   >
@@ -126,7 +174,7 @@ const { mutate, isLoading } = useMutation({
             v-model="formState.spec"
             type="form"
             name="pat-creation-form"
-            @submit="mutate()"
+            @submit="onSubmit"
           >
             <FormKit
               validation="required"
@@ -172,74 +220,129 @@ const { mutate, isLoading } = useMutation({
             </span>
           </div>
         </div>
-        <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
-          <dl class="divide-y divide-gray-100">
-            <div
-              v-for="(group, groupIndex) in roleTemplateGroups"
-              :key="groupIndex"
-              class="flex flex-col gap-3 bg-white py-5 first:pt-0"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                <div>
-                  {{ $t(`core.rbac.${group.module}`, group.module as string) }}
-                </div>
-              </dt>
-              <dd class="text-sm text-gray-900">
-                <ul class="space-y-2">
-                  <li v-for="(roleTemplate, index) in group.roles" :key="index">
-                    <label
-                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
-                    >
-                      <input
-                        v-model="selectedRoleTemplates"
-                        :value="roleTemplate.metadata.name"
-                        type="checkbox"
-                        @change="handleRoleTemplateSelect"
-                      />
-                      <div class="flex flex-1 flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          {{
-                            $t(
-                              `core.rbac.${
-                                roleTemplate.metadata.annotations?.[
-                                  rbacAnnotations.DISPLAY_NAME
-                                ]
-                              }`,
-                              roleTemplate.metadata.annotations?.[
+        <div class="mt-5 md:col-span-3 md:mt-0">
+          <VTabs v-model:active-id="method" type="outline">
+            <VTabItem id="role" :label="$t('core.role.title')">
+              <VAlert
+                :title="$t('core.common.text.tip')"
+                :description="
+                  $t(
+                    'core.uc_profile.pat.creation_modal.role_alert.description'
+                  )
+                "
+                :closable="false"
+              />
+              <ul class="mt-3 space-y-2 text-sm text-gray-900">
+                <li v-for="(role, index) in availableRoles" :key="index">
+                  <label
+                    class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
+                  >
+                    <input
+                      v-model="selectedRoles"
+                      :value="role.metadata.name"
+                      type="checkbox"
+                      name="roles"
+                    />
+                    <div class="flex flex-1 flex-col gap-y-3">
+                      <span class="font-medium text-gray-900">
+                        {{
+                          $t(
+                            `core.rbac.${
+                              role.metadata.annotations?.[
                                 rbacAnnotations.DISPLAY_NAME
-                              ] as string
-                            )
-                          }}
-                        </span>
-                        <span
-                          v-if="
-                            roleTemplate.metadata.annotations?.[
-                              rbacAnnotations.DEPENDENCIES
-                            ]
-                          "
-                          class="text-xs text-gray-400"
+                              ]
+                            }`,
+                            role.metadata.annotations?.[
+                              rbacAnnotations.DISPLAY_NAME
+                            ] as string
+                          )
+                        }}
+                      </span>
+                    </div>
+                  </label>
+                </li>
+              </ul>
+            </VTabItem>
+            <VTabItem
+              id="role-template"
+              :label="
+                $t('core.uc_profile.pat.creation_modal.groups.permissions')
+              "
+            >
+              <dl class="divide-y divide-gray-100">
+                <div
+                  v-for="(group, groupIndex) in roleTemplateGroups"
+                  :key="group.module || groupIndex"
+                  class="flex flex-col gap-3 bg-white py-5 first:pt-0"
+                >
+                  <dt class="text-sm font-medium text-gray-900">
+                    <div>
+                      {{
+                        $t(`core.rbac.${group.module}`, group.module as string)
+                      }}
+                    </div>
+                  </dt>
+                  <dd class="text-sm text-gray-900">
+                    <ul class="space-y-2">
+                      <li
+                        v-for="(roleTemplate, index) in group.roles"
+                        :key="index"
+                      >
+                        <label
+                          class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                         >
-                          {{
-                            $t("core.role.common.text.dependent_on", {
-                              roles: JSON.parse(
+                          <input
+                            v-model="selectedRoleTemplates"
+                            :value="roleTemplate.metadata.name"
+                            type="checkbox"
+                            @change="handleRoleTemplateSelect"
+                          />
+                          <div class="flex flex-1 flex-col gap-y-3">
+                            <span class="font-medium text-gray-900">
+                              {{
+                                $t(
+                                  `core.rbac.${
+                                    roleTemplate.metadata.annotations?.[
+                                      rbacAnnotations.DISPLAY_NAME
+                                    ]
+                                  }`,
+                                  roleTemplate.metadata.annotations?.[
+                                    rbacAnnotations.DISPLAY_NAME
+                                  ] as string
+                                )
+                              }}
+                            </span>
+                            <span
+                              v-if="
                                 roleTemplate.metadata.annotations?.[
                                   rbacAnnotations.DEPENDENCIES
                                 ]
-                              )
-                                .map((item: string) =>
-                                  $t(`core.rbac.${item}`, item as string)
-                                )
-                                .join("，"),
-                            })
-                          }}
-                        </span>
-                      </div>
-                    </label>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-          </dl>
+                              "
+                              class="text-xs text-gray-400"
+                            >
+                              {{
+                                $t("core.role.common.text.dependent_on", {
+                                  roles: JSON.parse(
+                                    roleTemplate.metadata.annotations?.[
+                                      rbacAnnotations.DEPENDENCIES
+                                    ]
+                                  )
+                                    .map((item: string) =>
+                                      $t(`core.rbac.${item}`, item as string)
+                                    )
+                                    .join("，"),
+                                })
+                              }}
+                            </span>
+                          </div>
+                        </label>
+                      </li>
+                    </ul>
+                  </dd>
+                </div>
+              </dl>
+            </VTabItem>
+          </VTabs>
         </div>
       </div>
     </div>
@@ -247,7 +350,7 @@ const { mutate, isLoading } = useMutation({
     <template #footer>
       <VSpace>
         <SubmitButton
-          :loading="isLoading"
+          :loading="isPending"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('pat-creation-form')"

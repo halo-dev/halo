@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import PostContributorList from "@/components/user/PostContributorList.vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import {
   consoleApiClient,
@@ -29,6 +28,7 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import PostContributorList from "@/components/user/PostContributorList.vue";
 
 const { t } = useI18n();
 
@@ -248,7 +248,7 @@ watch(
                   {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.common.buttons.recovery") }}
+                  {{ $t("core.common.buttons.restore") }}
                 </VButton>
               </VSpace>
             </div>
@@ -396,7 +396,7 @@ watch(
                 {{ $t("core.common.buttons.delete_permanently") }}
               </VDropdownItem>
               <VDropdownItem @click="handleRecovery(singlePage.page)">
-                {{ $t("core.common.buttons.recovery") }}
+                {{ $t("core.common.buttons.restore") }}
               </VDropdownItem>
             </template>
           </VEntity>

@@ -1,4 +1,3 @@
-import { attachmentPolicyLabels } from "@/constants/labels";
 import type {
   Policy,
   PolicyTemplate,
@@ -7,6 +6,7 @@ import type {
 } from "@halo-dev/api-client";
 import { coreApiClient, paginate } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
+import { attachmentPolicyLabels } from "@/constants/labels";
 
 export function useFetchAttachmentPolicy() {
   return useQuery<Policy[]>({
