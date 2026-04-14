@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery;
+import run.halo.app.theme.finders.impl.PostFinderImpl.RandomListQuery;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.NavigationPostVo;
@@ -36,7 +37,12 @@ public interface PostFinder {
 
     Flux<ListedPostVo> listAll();
 
-    Flux<ListedPostVo> random(Integer limit);
+    /**
+     * Lists random posts by query params.
+     *
+     * @param params query params see {@link RandomListQuery}
+     */
+    Flux<ListedPostVo> randomList(Map<String, Object> params);
 
     /**
      * Lists posts by query params.

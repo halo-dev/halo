@@ -5,14 +5,12 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
 import static run.halo.app.extension.index.query.Queries.notEqual;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
@@ -306,23 +304,40 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public Flux<ListedPostVo> random(Integer limit) {
-        return postPredicateResolver.getListOptions().flatMapMany(listOptions -> {
-            long total = client.indexedQueryEngine()
-                .retrieve(Post.GVK, listOptions, PageRequestImpl.ofSize(1)).getTotal();
-            return Flux.fromIterable(
-                    shufflePostList(IntStream.rangeClosed(1, (int) total).boxed().toList()).subList(0,
-                        limit == null || limit < 0 ? 0 : Math.min(limit, (int) total)
-                    ))
-                .flatMapSequential(pageNum -> client.listBy(Post.class, listOptions,
-                    PageRequestImpl.of(pageNum, 1)).flatMapIterable(ListResult::getItems));
-        }).flatMapSequential(postPublicQueryService::convertToListedVo);
-    }
-
-    private <T> List<T> shufflePostList(List<T> list) {
-        List<T> shuffledList = new ArrayList<>(list);
-        Collections.shuffle(shuffledList);
-        return shuffledList;
+    public Flux<ListedPostVo> randomList(Map<String, Object> params) {
+        var query = Optional.ofNullable(params)
+            .map(map -> JsonUtils.mapToObject(map, RandomListQuery.class))
+            .orElseGet(RandomListQuery::new);
+        Mono<ListOptions> listOptionsMono;
+        if (StringUtils.isNotBlank(query.getCategoryName())) {
+            listOptionsMono = listChildrenCategories(query.getCategoryName())
+                .map(category -> category.getMetadata().getName())
+                .collectList()
+                .map(categoryNames -> ListOptions.builder(query.toListOptions())
+                    .andQuery(in("spec.categories", categoryNames))
+                    .build()
+                );
+        } else {
+            listOptionsMono = Mono.just(query.toListOptions());
+        }
+        return listOptionsMono.flatMapMany(listOptions -> client.countBy(Post.class, listOptions)
+            .flatMapMany(total -> {
+                var sampleSize = query.getLimit() == null || query.getLimit() < 0 || total <= 0
+                    ? 0
+                    : (int) Math.min(query.getLimit(), total);
+                if (sampleSize == 0) {
+                    return Flux.empty();
+                }
+                return Flux.fromIterable(ThreadLocalRandom.current()
+                        .ints(1, Math.toIntExact(total) + 1)
+                        .distinct()
+                        .limit(sampleSize)
+                        .boxed()
+                        .toList())
+                    .concatMap(pageNum -> client.listBy(Post.class, listOptions,
+                        PageRequestImpl.of(pageNum, 1)).flatMapIterable(ListResult::getItems));
+            })
+            .flatMapSequential(postPublicQueryService::convertToListedVo));
     }
 
     static int pageNullSafe(Integer page) {
@@ -363,6 +378,31 @@ public class PostFinderImpl implements PostFinder {
         public PageRequest toPageRequest() {
             return PageRequestImpl.of(pageNullSafe(getPage()),
                 sizeNullSafe(getSize()), SortUtils.resolve(sort).and(defaultSort()));
+        }
+    }
+
+    @Data
+    public static class RandomListQuery {
+        private Integer limit;
+        private String categoryName;
+        private String tagName;
+        private String ownerName;
+
+        public ListOptions toListOptions() {
+            var builder = ListOptions.builder();
+            var hasQuery = false;
+            if (StringUtils.isNotBlank(ownerName)) {
+                builder.andQuery(equal("spec.owner", ownerName));
+                hasQuery = true;
+            }
+            if (StringUtils.isNotBlank(tagName)) {
+                builder.andQuery(equal("spec.tags", tagName));
+                hasQuery = true;
+            }
+            if (!hasQuery) {
+                builder.fieldQuery(notHiddenPostQuery());
+            }
+            return builder.build();
         }
     }
 }
