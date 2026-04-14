@@ -55,7 +55,7 @@ const permalink = computed(() => {
     return value;
   }
 
-  return `${globalInfo?.externalUrl}${value}`;
+  return new URL(value || "", globalInfo?.externalUrl).href;
 });
 
 const htmlText = computed(() => {
