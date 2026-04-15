@@ -10,7 +10,6 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
@@ -53,8 +52,15 @@ public class TagFinderImpl implements TagFinder {
         var options = ListOptions.builder()
             .andQuery(Queries.in("metadata.name", names))
             .build();
-        return client.listAll(Tag.class, options, ExtensionUtil.defaultSort())
-            .map(TagVo::from);
+        return client.listAll(Tag.class, options, Sort.unsorted())
+            .map(TagVo::from)
+            .collectMap(t -> t.getMetadata().getName())
+            .flatMapIterable(map -> names.stream()
+                .distinct()
+                .filter(map::containsKey)
+                .map(map::get)
+                .toList()
+            );
     }
 
     @Override

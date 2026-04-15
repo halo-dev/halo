@@ -24,7 +24,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -64,8 +63,15 @@ public class CategoryFinderImpl implements CategoryFinder {
         var options = ListOptions.builder()
             .andQuery(Queries.in("metadata.name", names))
             .build();
-        return client.listAll(Category.class, options, ExtensionUtil.defaultSort())
-            .map(CategoryVo::from);
+        return client.listAll(Category.class, options, Sort.unsorted())
+            .map(CategoryVo::from)
+            .collectMap(c -> c.getMetadata().getName())
+            .flatMapIterable(map -> names.stream()
+                .distinct()
+                .filter(map::containsKey)
+                .map(map::get)
+                .toList()
+            );
     }
 
     static Sort defaultSort() {

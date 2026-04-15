@@ -96,6 +96,26 @@ class CategoryFinderImplTest {
     }
 
     @Test
+    void getByNames() {
+        // categories sorted by default comparator: c3, c2, hello
+        var sortedCategories = categories().stream()
+            .sorted(CategoryFinderImpl.defaultComparator())
+            .toList();
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+            .thenReturn(Flux.fromIterable(sortedCategories));
+
+        // request in a specific order that differs from natural sort: hello, c3, c2
+        var result = categoryFinder.getByNames(List.of("hello", "c3", "c2"))
+            .collectList()
+            .block();
+        assertThat(result).hasSize(3);
+        assertThat(result.stream()
+            .map(vo -> vo.getMetadata().getName())
+            .toList())
+            .isEqualTo(List.of("hello", "c3", "c2"));
+    }
+
+    @Test
     void list() {
         ListResult<Category> categories = new ListResult<>(1, 10, 3,
             categories().stream()
