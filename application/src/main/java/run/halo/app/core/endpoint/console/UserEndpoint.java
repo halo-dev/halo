@@ -394,9 +394,6 @@ public class UserEndpoint implements CustomEndpoint {
                 throw new ServerWebInputException("Invalid part of file");
             }
 
-            if (!filePart.filename().endsWith(".png")) {
-                throw new ServerWebInputException("Only support avatar in PNG format");
-            }
             return filePart;
         }
     }
