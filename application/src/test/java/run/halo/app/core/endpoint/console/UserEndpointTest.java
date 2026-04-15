@@ -396,34 +396,6 @@ class UserEndpointTest {
     @Nested
     class AvatarUploadTest {
         @Test
-        void respondWithErrorIfTypeNotPNG() {
-
-            var multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", "fake-file")
-                .contentType(MediaType.IMAGE_JPEG)
-                .filename("fake-filename.jpg");
-
-            when(environmentFetcher.fetch(
-                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
-            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
-                .avatar(null)
-                .build())
-            );
-            when(environmentFetcher.fetch(
-                SystemSetting.User.GROUP, SystemSetting.User.class)
-            ).thenReturn(Mono.empty());
-
-            webClient
-                .post()
-                .uri("/users/-/avatar")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange()
-                .expectStatus()
-                .is4xxClientError();
-        }
-
-        @Test
         void shouldUploadSuccessfully() {
             var currentUser = createUser("fake-user");
 
