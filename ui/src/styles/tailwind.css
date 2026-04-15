@@ -18,7 +18,7 @@ input[type="tel"],
 input:where(:not([type])),
 select,
 textarea {
-  @apply border-none py-0 focus:outline-0 focus:ring-0;
+  @apply border-none py-0 outline-0 focus:outline-0 focus:ring-0;
 }
 
 input[type="checkbox"] {
