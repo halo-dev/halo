@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -30,9 +31,12 @@ import org.springframework.security.web.authentication.rememberme.InvalidCookieE
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutHandler;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.security.LoginParameterRequestCache;
+import run.halo.app.security.SecurityConstant;
 
 /**
  * <p>An {@link org.springframework.security.core.userdetails.UserDetailsService} is required
@@ -53,7 +57,7 @@ import reactor.core.publisher.Mono;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeServices {
+class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeServices {
 
     public static final String DEFAULT_ALGORITHM = "SHA-256";
 
@@ -69,7 +73,9 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
-    private RememberMeRequestCache rememberMeRequestCache = new WebSessionRememberMeRequestCache();
+    private final LoginParameterRequestCache parameterRequestCache;
+
+    private String parameterName = SecurityConstant.REMEMBER_ME_PARAMETER_NAME;
 
     private static boolean equals(String expected, String actual) {
         byte[] expectedBytes = bytesUtf8(expected);
@@ -79,6 +85,11 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
 
     private static byte[] bytesUtf8(String s) {
         return (s != null) ? Utf8.encode(s) : null;
+    }
+
+    public void setParameterName(String parameterName) {
+        Assert.hasText(parameterName, "Parameter name must not be blank");
+        this.parameterName = parameterName;
     }
 
     @Override
@@ -203,18 +214,16 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
     public Mono<Void> loginFail(ServerWebExchange exchange) {
         log.debug("Interactive login attempt was unsuccessful.");
         cancelCookie(exchange);
-        return rememberMeRequestCache.saveRememberMe(exchange);
+        return parameterRequestCache.saveParameter(exchange, parameterName);
     }
 
     @Override
     public Mono<Void> loginSuccess(ServerWebExchange exchange,
         Authentication successfulAuthentication) {
-        return rememberMeRequestCache.isRememberMe(exchange)
+        return rememberMeRequested(exchange)
             .filter(Boolean::booleanValue)
-            .switchIfEmpty(Mono.fromRunnable(() -> {
-                log.debug("Remember-me login not requested.");
-            }))
-            .flatMap(rememberMe -> onLoginSuccess(exchange, successfulAuthentication));
+            .flatMap(rememberMeRequest -> onLoginSuccess(exchange, successfulAuthentication))
+            .then(parameterRequestCache.removeParameter(exchange, parameterName));
     }
 
     protected Mono<Void> onLoginSuccess(ServerWebExchange exchange,
@@ -238,6 +247,23 @@ public class TokenBasedRememberMeServices implements ServerLogoutHandler, Rememb
                     });
             })
             .then();
+    }
+
+    private Mono<Boolean> rememberMeRequested(ServerWebExchange exchange) {
+        // load from query
+        return Mono.justOrEmpty(exchange.getRequest().getQueryParams().getFirst(parameterName))
+            .filter(Predicate.not(String::isBlank))
+            // load from form data
+            .switchIfEmpty(Mono.defer(() -> exchange.getFormData()
+                .mapNotNull(f -> f.getFirst(parameterName))
+                .filter(Predicate.not(String::isBlank)))
+            )
+            // load from request cache
+            .switchIfEmpty(
+                Mono.defer(() -> parameterRequestCache.getParameter(exchange, parameterName))
+            )
+            .map(Boolean::parseBoolean)
+            .defaultIfEmpty(false);
     }
 
     private Mono<UsernamePassword> retrieveUsernamePassword(

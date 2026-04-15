@@ -23,10 +23,10 @@ public class RememberMeAuthenticationManager implements ReactiveAuthenticationMa
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        if (authentication instanceof RememberMeAuthenticationToken rememberMeAuthenticationToken) {
-            return doAuthenticate(rememberMeAuthenticationToken);
-        }
-        return Mono.empty();
+        return Mono.justOrEmpty(authentication)
+            .filter(RememberMeAuthenticationToken.class::isInstance)
+            .cast(RememberMeAuthenticationToken.class)
+            .flatMap(this::doAuthenticate);
     }
 
     @Override
@@ -41,12 +41,9 @@ public class RememberMeAuthenticationManager implements ReactiveAuthenticationMa
 
     private Mono<Authentication> doAuthenticate(RememberMeAuthenticationToken token) {
         return cookieSignatureKeyResolver.resolveSigningKey()
-            .flatMap(key -> {
-                if (key.hashCode() != token.getKeyHash()) {
-                    return Mono.error(new BadCredentialsException(badCredentialMessage()));
-                }
-                return Mono.just(token);
-            });
+            .filter(key -> key.hashCode() == token.getKeyHash())
+            .switchIfEmpty(Mono.error(() -> new BadCredentialsException(badCredentialMessage())))
+            .thenReturn(token);
     }
 
     private String badCredentialMessage() {

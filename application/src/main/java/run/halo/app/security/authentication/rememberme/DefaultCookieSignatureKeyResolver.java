@@ -7,7 +7,8 @@ import run.halo.app.security.authentication.CryptoService;
 
 @Component
 @RequiredArgsConstructor
-public class DefaultCookieSignatureKeyResolver implements CookieSignatureKeyResolver {
+class DefaultCookieSignatureKeyResolver implements CookieSignatureKeyResolver {
+
     private final CryptoService cryptoService;
 
     @Override
