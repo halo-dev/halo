@@ -3,10 +3,11 @@ package run.halo.app.security.authentication.login;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
+import static run.halo.app.security.SecurityConstant.REMEMBER_ME_PARAMETER_NAME;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import java.net.URI;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,13 +27,13 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.LoginHandlerEnhancer;
+import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
-import run.halo.app.security.authentication.rememberme.RememberMeRequestCache;
-import run.halo.app.security.authentication.rememberme.WebSessionRememberMeRequestCache;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Slf4j
-public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
+@RequiredArgsConstructor
+class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
     ServerAuthenticationFailureHandler {
 
     private final ServerResponse.Context context;
@@ -41,20 +42,12 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
 
     private final LoginHandlerEnhancer loginHandlerEnhancer;
 
-    private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
+    private final LoginParameterRequestCache parameterRequestCache;
 
-    @Setter
-    private RememberMeRequestCache rememberMeRequestCache = new WebSessionRememberMeRequestCache();
+    private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     private final ServerAuthenticationSuccessHandler defaultSuccessHandler =
         new RedirectServerAuthenticationSuccessHandler("/uc");
-
-    public UsernamePasswordHandler(ServerResponse.Context context, MessageSource messageSource,
-        LoginHandlerEnhancer loginHandlerEnhancer) {
-        this.context = context;
-        this.messageSource = messageSource;
-        this.loginHandlerEnhancer = loginHandlerEnhancer;
-    }
 
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
@@ -86,12 +79,14 @@ public class UsernamePasswordHandler implements ServerAuthenticationSuccessHandl
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
         Authentication authentication) {
         if (authentication instanceof TwoFactorAuthentication) {
-            return rememberMeRequestCache.saveRememberMe(webFilterExchange.getExchange())
+            var exchange = webFilterExchange.getExchange();
+            // This will save the remember-me state into request cache
+            return parameterRequestCache.saveParameter(exchange, REMEMBER_ME_PARAMETER_NAME)
                 // Do not use RedirectServerAuthenticationSuccessHandler to redirect
                 // because it will use request cache to redirect
-                .then(redirectStrategy.sendRedirect(webFilterExchange.getExchange(),
-                    URI.create("/challenges/two-factor/totp"))
-                );
+                .then(redirectStrategy.sendRedirect(
+                    exchange, URI.create("/challenges/two-factor/totp")
+                ));
         }
 
         if (authentication instanceof CredentialsContainer container) {

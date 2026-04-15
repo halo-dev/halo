@@ -19,6 +19,8 @@ import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import run.halo.app.security.LoginParameterRequestCache;
+import run.halo.app.security.SecurityConstant;
 
 /**
  * <p>{@link RememberMeServices} implementation based on Barry Jaspan's <a href=
@@ -69,10 +71,17 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
         CookieSignatureKeyResolver cookieSignatureKeyResolver,
         ReactiveUserDetailsService userDetailsService,
         RememberMeCookieResolver rememberMeCookieResolver,
-        PersistentRememberMeTokenRepository tokenRepository) {
-        super(cookieSignatureKeyResolver, userDetailsService, rememberMeCookieResolver);
+        PersistentRememberMeTokenRepository tokenRepository,
+        LoginParameterRequestCache parameterRequestCache) {
+        super(
+            cookieSignatureKeyResolver,
+            userDetailsService,
+            rememberMeCookieResolver,
+            parameterRequestCache
+        );
         this.random = new SecureRandom();
         this.tokenRepository = tokenRepository;
+        setParameterName(SecurityConstant.REMEMBER_ME_PARAMETER_NAME);
     }
 
     @Override

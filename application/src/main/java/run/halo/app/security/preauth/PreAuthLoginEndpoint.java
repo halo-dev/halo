@@ -1,12 +1,15 @@
 package run.halo.app.security.preauth;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static run.halo.app.security.SecurityConstant.REMEMBER_ME_PARAMETER_NAME;
+import static run.halo.app.security.SecurityConstant.USERNAME_PARAMETER_NAME;
 
 import java.net.URI;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -25,9 +28,8 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.HaloServerRequestCache;
+import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.CryptoService;
-import run.halo.app.security.authentication.rememberme.RememberMeRequestCache;
-import run.halo.app.security.authentication.rememberme.WebSessionRememberMeRequestCache;
 
 /**
  * Pre-auth login endpoints.
@@ -36,6 +38,7 @@ import run.halo.app.security.authentication.rememberme.WebSessionRememberMeReque
  * @since 2.20.0
  */
 @Component
+@RequiredArgsConstructor
 class PreAuthLoginEndpoint {
 
     private final CryptoService cryptoService;
@@ -46,15 +49,7 @@ class PreAuthLoginEndpoint {
 
     private final ServerRequestCache serverRequestCache = new HaloServerRequestCache();
 
-    private final RememberMeRequestCache rememberMeRequestCache =
-        new WebSessionRememberMeRequestCache();
-
-    PreAuthLoginEndpoint(CryptoService cryptoService, GlobalInfoService globalInfoService,
-        AuthProviderService authProviderService) {
-        this.cryptoService = cryptoService;
-        this.globalInfoService = globalInfoService;
-        this.authProviderService = authProviderService;
-    }
+    private final LoginParameterRequestCache parameterRequestCache;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
@@ -112,7 +107,10 @@ class PreAuthLoginEndpoint {
                         "fragmentTemplateName", fragmentTemplateName,
                         "socialAuthProviders", socialAuthProviders,
                         "formAuthProviders", formAuthProviders,
-                        "rememberMe", rememberMeRequestCache.isRememberMe(exchange)
+                        "rememberMe",
+                        parameterRequestCache.getParameter(exchange, REMEMBER_ME_PARAMETER_NAME),
+                        "username",
+                        parameterRequestCache.getParameter(exchange, USERNAME_PARAMETER_NAME)
                         // TODO Add more models here
                     ))
                 ));
@@ -128,7 +126,9 @@ class PreAuthLoginEndpoint {
                     )))
                     .flatMap(ap -> {
                         var authenticationUrl = ap.getSpec().getAuthenticationUrl();
-                        return rememberMeRequestCache.saveRememberMe(request.exchange())
+                        return parameterRequestCache.saveParameter(
+                                request.exchange(), REMEMBER_ME_PARAMETER_NAME
+                            )
                             .then(Mono.defer(() -> ServerResponse.status(HttpStatus.FOUND)
                                 .location(URI.create(authenticationUrl))
                                 .build()
