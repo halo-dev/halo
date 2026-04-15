@@ -3,7 +3,6 @@ package run.halo.app.theme.finders.impl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Sort;
@@ -11,7 +10,6 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
@@ -51,17 +49,18 @@ public class TagFinderImpl implements TagFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
-        var nameList = Optional.of(names)
-            .filter(List.class::isInstance)
-            .map(list -> (List<String>) list)
-            .orElseGet(() -> List.copyOf(names));
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", nameList))
+            .andQuery(Queries.in("metadata.name", names))
             .build();
-        return client.listAll(Tag.class, options, ExtensionUtil.defaultSort())
+        return client.listAll(Tag.class, options, Sort.unsorted())
             .map(TagVo::from)
-            // we assume the size of the list won't be too large
-            .sort(Comparator.comparingInt(t -> nameList.indexOf(t.getMetadata().getName())));
+            .collectMap(t -> t.getMetadata().getName())
+            .flatMapIterable(map -> names.stream()
+                .distinct()
+                .filter(map::containsKey)
+                .map(map::get)
+                .toList()
+            );
     }
 
     @Override

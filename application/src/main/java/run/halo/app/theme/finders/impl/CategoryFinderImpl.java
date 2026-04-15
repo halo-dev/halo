@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -61,17 +60,18 @@ public class CategoryFinderImpl implements CategoryFinder {
         if (CollectionUtils.isEmpty(names)) {
             return Flux.empty();
         }
-        var nameList = Optional.of(names)
-            .filter(List.class::isInstance)
-            .map(list -> (List<String>) list)
-            .orElseGet(() -> List.copyOf(names));
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", nameList))
+            .andQuery(Queries.in("metadata.name", names))
             .build();
         return client.listAll(Category.class, options, Sort.unsorted())
             .map(CategoryVo::from)
-            // we assume the size of the list won't be too large
-            .sort(Comparator.comparingInt(c -> nameList.indexOf(c.getMetadata().getName())));
+            .collectMap(c -> c.getMetadata().getName())
+            .flatMapIterable(map -> names.stream()
+                .distinct()
+                .filter(map::containsKey)
+                .map(map::get)
+                .toList()
+            );
     }
 
     static Sort defaultSort() {
