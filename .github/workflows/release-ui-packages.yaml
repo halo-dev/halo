@@ -21,4 +21,4 @@ jobs:
         uses: ./.github/actions/setup-env
       - run: ./gradlew pnpmInstall
       - name: Publish to NPM
-        run: cd ui && pnpm run publish:packages
+        run: cd ui && pnpm build:packages && pnpm run publish:packages
