@@ -32,6 +32,8 @@ public class Theme extends AbstractExtension {
 
     public static final String THEME_NAME_LABEL = "theme.halo.run/theme-name";
 
+    public static final String REQUEST_RELOAD_ANNOTATION = "theme.halo.run/request-reload";
+
     @Schema(requiredMode = REQUIRED)
     private ThemeSpec spec;
 

@@ -7,6 +7,7 @@ import static run.halo.app.infra.utils.FileUtils.unzip;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -78,7 +79,7 @@ public class ThemeUtils {
             .load();
     }
 
-    static List<Unstructured> loadThemeResources(Path themePath) {
+    public static List<Unstructured> loadThemeResources(Path themePath) {
         try (Stream<Path> paths = Files.list(themePath)) {
             List<FileSystemResource> resources = paths
                 .filter(path -> {
@@ -99,6 +100,9 @@ public class ThemeUtils {
             return new YamlUnstructuredLoader(resources.toArray(new Resource[0]))
                 .load();
         } catch (IOException e) {
+            if (e instanceof NoSuchFileException) {
+                return List.of();
+            }
             throw new RuntimeException(e);
         }
     }
