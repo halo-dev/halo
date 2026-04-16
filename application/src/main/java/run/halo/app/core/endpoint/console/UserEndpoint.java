@@ -98,6 +98,8 @@ import run.halo.app.infra.utils.JsonUtils;
 @RequiredArgsConstructor
 public class UserEndpoint implements CustomEndpoint {
 
+    private static final String[] ALLOWED_AVATAR_EXTENSIONS =
+        new String[] {"png", "jpg", "jpeg", "gif"};
     private static final String SELF_USER = "-";
     private static final String USER_AVATAR_GROUP_NAME = "user-avatar-group";
     private static final String DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME = "default-policy";
@@ -394,6 +396,13 @@ public class UserEndpoint implements CustomEndpoint {
                 throw new ServerWebInputException("Invalid part of file");
             }
 
+            boolean isNoneExt = Arrays.stream(ALLOWED_AVATAR_EXTENSIONS)
+                .noneMatch(ext -> filePart.filename().endsWith("." + ext));
+
+            if (isNoneExt) {
+                throw new ServerWebInputException("Only support file with extension: "
+                    + String.join(", ", ALLOWED_AVATAR_EXTENSIONS));
+            }
             return filePart;
         }
     }

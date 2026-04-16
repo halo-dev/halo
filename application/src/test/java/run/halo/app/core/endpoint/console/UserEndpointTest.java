@@ -23,6 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -395,6 +397,77 @@ class UserEndpointTest {
 
     @Nested
     class AvatarUploadTest {
+        @Test
+        void respondWithErrorIfExtensionNotAllowed() {
+
+            var multipartBodyBuilder = new MultipartBodyBuilder();
+            multipartBodyBuilder.part("file", "fake-file")
+                .contentType(MediaType.parseMediaType("image/bmp"))
+                .filename("fake-filename.bmp");
+
+            when(environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                .avatar(null)
+                .build())
+            );
+            when(environmentFetcher.fetch(
+                SystemSetting.User.GROUP, SystemSetting.User.class)
+            ).thenReturn(Mono.empty());
+
+            webClient
+                .post()
+                .uri("/users/-/avatar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"png", "jpg", "jpeg", "gif"})
+        void shouldAllowAllowedExtensions(String ext) {
+            var currentUser = createUser("fake-user");
+
+            Attachment attachment = new Attachment();
+            Metadata metadata = new Metadata();
+            metadata.setName("fake-attachment");
+            attachment.setMetadata(metadata);
+
+            var multipartBodyBuilder = new MultipartBodyBuilder();
+            multipartBodyBuilder.part("file", "fake-file")
+                .contentType(MediaType.parseMediaType("image/" + ext))
+                .filename("fake-filename." + ext);
+
+            when(environmentFetcher.fetch(
+                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
+            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
+                .avatar(null)
+                .build())
+            );
+            when(environmentFetcher.fetch(
+                SystemSetting.User.GROUP, SystemSetting.User.class)
+            ).thenReturn(Mono.empty());
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(attachmentService.upload(eq("default-policy"), anyString(), anyString(),
+                any(), any(MediaType.class))).thenReturn(Mono.just(attachment));
+            when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
+
+            webClient.post()
+                .uri("/users/-/avatar")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(User.class).isEqualTo(currentUser);
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(currentUser);
+        }
+
         @Test
         void shouldUploadSuccessfully() {
             var currentUser = createUser("fake-user");
