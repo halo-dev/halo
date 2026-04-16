@@ -116,22 +116,23 @@ class ThemeReconciler implements Reconciler<Request> {
         var extensions = ThemeUtils.loadThemeResources(currentThemeRoot);
         extensions.stream()
             .filter(e -> ExtensionWhitelist.of(theme).isAllowed(e))
-            .peek(unstructured -> populateThemeNameLabel(unstructured, themeName))
-            .forEach(e -> client.fetch(e.groupVersionKind(), e.getMetadata().getName())
-                .ifPresentOrElse(
-                    existing -> {
-                        e.getMetadata().setVersion(existing.getMetadata().getVersion());
-                        log.debug("Updating extension [{}] for theme [{}]",
-                            e.getMetadata().getName(), themeName);
-                        client.update(e);
-                    },
-                    () -> {
-                        log.debug("Creating extension [{}] for theme [{}]",
-                            e.getMetadata().getName(), themeName);
-                        client.create(e);
-                    }
-                )
-            );
+            .forEach(e -> {
+                populateThemeNameLabel(e, themeName);
+                client.fetch(e.groupVersionKind(), e.getMetadata().getName())
+                    .ifPresentOrElse(
+                        existing -> {
+                            e.getMetadata().setVersion(existing.getMetadata().getVersion());
+                            log.debug("Updating extension [{}] for theme [{}]",
+                                e.getMetadata().getName(), themeName);
+                            client.update(e);
+                        },
+                        () -> {
+                            log.debug("Creating extension [{}] for theme [{}]",
+                                e.getMetadata().getName(), themeName);
+                            client.create(e);
+                        }
+                    );
+            });
     }
 
     private static void populateThemeNameLabel(Unstructured unstructured, String themeName) {

@@ -3,6 +3,8 @@ package run.halo.app.theme.service;
 import static java.nio.file.Files.createTempDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -22,7 +24,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -259,27 +260,11 @@ class ThemeServiceImplTest {
 
         themeService.reloadTheme("fake-theme")
             .as(StepVerifier::create)
-            .consumeNextWith(themeUpdated -> {
-                try {
-                    JSONAssert.assertEquals("""
-                            {
-                                "spec": {
-                                    "displayName": "Fake Theme",
-                                    "version": "*",
-                                    "requires": "*"
-                                },
-                                "apiVersion": "theme.halo.run/v1alpha1",
-                                "kind": "Theme",
-                                "metadata": {
-                                    "name": "fake-theme"
-                                }
-                            }
-                            """,
-                        JsonUtils.objectToJson(themeUpdated),
-                        true);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
+            .assertNext(themeUpdated -> {
+                assertTrue(themeUpdated.getMetadata().getAnnotations()
+                    .containsKey(Theme.REQUEST_RELOAD_ANNOTATION)
+                );
+                assertNull(themeUpdated.getSpec().getSettingName());
             })
             .verifyComplete();
         // delete fake-setting
@@ -337,68 +322,15 @@ class ThemeServiceImplTest {
                 return Mono.just(argument);
             });
 
-        when(client.create(any(Unstructured.class)))
-            .thenAnswer((Answer<Mono<Unstructured>>) invocation -> {
-                Unstructured argument = invocation.getArgument(0);
-                JSONAssert.assertEquals("""
-                        {
-                           "spec": {
-                             "forms": [
-                               {
-                                 "group": "sns",
-                                 "label": "社交资料",
-                                 "formSchema": [
-                                   {
-                                     "$el": "h1",
-                                     "children": "Register"
-                                   }
-                                 ]
-                               }
-                             ]
-                           },
-                           "apiVersion": "v1alpha1",
-                           "kind": "Setting",
-                           "metadata": {
-                              "name": "fake-setting",
-                              "labels": {
-                                  "theme.halo.run/theme-name": "fake-theme"
-                              }
-                            }
-                         }
-                        """,
-                    JsonUtils.objectToJson(argument),
-                    true);
-                return Mono.just(invocation.getArgument(0));
-            });
-
         when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
 
-        when(client.fetch(eq(Setting.GVK), eq("fake-setting")))
-            .thenReturn(Mono.empty());
         themeService.reloadTheme("fake-theme")
             .as(StepVerifier::create)
-            .consumeNextWith(themeUpdated -> {
-                try {
-                    JSONAssert.assertEquals("""
-                            {
-                                "spec": {
-                                    "settingName": "fake-setting",
-                                    "displayName": "Fake Theme",
-                                    "version": "*",
-                                    "requires": "*"
-                                },
-                                "apiVersion": "theme.halo.run/v1alpha1",
-                                "kind": "Theme",
-                                "metadata": {
-                                    "name": "fake-theme"
-                                }
-                            }
-                            """,
-                        JsonUtils.objectToJson(themeUpdated),
-                        true);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
+            .assertNext(themeUpdated -> {
+                assertTrue(themeUpdated.getMetadata().getAnnotations()
+                    .containsKey(Theme.REQUEST_RELOAD_ANNOTATION)
+                );
+                assertEquals("fake-setting", themeUpdated.getSpec().getSettingName());
             })
             .verifyComplete();
     }

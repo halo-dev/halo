@@ -218,20 +218,6 @@ public class ThemeServiceImpl implements ThemeService {
             });
     }
 
-    private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
-        return Mono.defer(() -> client.fetch(unstructured.groupVersionKind(),
-                    unstructured.getMetadata().getName())
-                .flatMap(existUnstructured -> {
-                    unstructured.getMetadata()
-                        .setVersion(existUnstructured.getMetadata().getVersion());
-                    return client.update(unstructured);
-                })
-                .switchIfEmpty(Mono.defer(() -> client.create(unstructured)))
-            )
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
-    }
-
     @Override
     public Mono<Theme> reloadTheme(String name) {
         return client.fetch(Theme.class, name)
