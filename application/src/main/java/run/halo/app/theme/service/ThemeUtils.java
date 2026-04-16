@@ -78,7 +78,7 @@ public class ThemeUtils {
             .load();
     }
 
-    static List<Unstructured> loadThemeResources(Path themePath) {
+    public static List<Unstructured> loadThemeResources(Path themePath) {
         try (Stream<Path> paths = Files.list(themePath)) {
             List<FileSystemResource> resources = paths
                 .filter(path -> {
