@@ -250,7 +250,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         @NotBlank
         private String secret;
 
-
+        @NotNull
         private String code;
 
         @NotBlank

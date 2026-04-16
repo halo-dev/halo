@@ -37,10 +37,10 @@ public class JwtProperties {
     /**
      * Location of the file containing the public key used to verify a JWT.
      */
-
+    @NotNull
     private Resource publicKeyLocation;
 
-
+    @NotNull
     private Resource privateKeyLocation;
 
     private final RSAPrivateKey privateKey;

@@ -23,7 +23,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class HaloProperties implements Validator {
 
-
+    @NotNull
     private Path workDir;
 
     /**
