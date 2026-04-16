@@ -16,6 +16,7 @@
 
 export interface TotpRequest {
     'code': string;
+    'currentTotpCode'?: string;
     'password': string;
     'secret': string;
 }

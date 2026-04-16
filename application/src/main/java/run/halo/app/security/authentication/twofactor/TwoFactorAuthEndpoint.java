@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -107,8 +108,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> deleteTotp(ServerRequest request) {
         var totpDeleteRequestMono = request.bodyToMono(PasswordRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required")))
-            .doOnNext(passwordRequest -> this.validateRequest(passwordRequest, "passwordRequest",
-                request)
+            .delayUntil(passwordRequest ->
+                this.validateRequest(passwordRequest, "passwordRequest", request)
             );
 
         var twoFactorAuthSettings =
@@ -120,6 +121,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                 })
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Invalid password")))
+                .delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))
                 .doOnNext(user -> {
                     var spec = user.getSpec();
                     spec.setTotpEncryptedSecret(null);
@@ -135,6 +137,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         @NotBlank
         private String password;
 
+        private String totpCode;
+
     }
 
     private Mono<ServerResponse> disableTwoFactor(ServerRequest request) {
@@ -148,8 +152,9 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> toggleTwoFactor(ServerRequest request, boolean enabled) {
         return request.bodyToMono(PasswordRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required")))
-            .doOnNext(passwordRequest -> this.validateRequest(passwordRequest,
-                "passwordRequest", request))
+            .delayUntil(passwordRequest ->
+                this.validateRequest(passwordRequest, "passwordRequest", request)
+            )
             .flatMap(passwordRequest -> getCurrentUser()
                 .filter(user -> {
                     var encodedPassword = user.getSpec().getPassword();
@@ -158,6 +163,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                 })
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Invalid password")))
+                .delayUntil(user -> validateTotpCode(user, passwordRequest.getTotpCode()))
                 .doOnNext(user -> user.getSpec().setTwoFactorAuthEnabled(enabled))
                 .flatMap(client::update)
                 .map(TwoFactorUtils::getTwoFactorAuthSettings))
@@ -200,7 +206,7 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> configureTotp(ServerRequest request) {
         var totpRequestMono = request.bodyToMono(TotpRequest.class)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .doOnNext(totpRequest -> this.validateRequest(totpRequest, "totp", request));
+            .delayUntil(totpRequest -> this.validateRequest(totpRequest, "totp", request));
 
         var configuredUser = totpRequestMono.flatMap(totpRequest -> {
             // validate password
@@ -211,21 +217,14 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                     return passwordEncoder.matches(rawPassword, encodedPassword);
                 })
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Invalid password")))
-                .doOnNext(user -> {
-                    // TimeBasedOneTimePasswordUtil.
+                .delayUntil(user -> validateTotpCode(user, totpRequest.getCurrentTotpCode()))
+                .delayUntil(user -> {
                     var rawSecret = totpRequest.getSecret();
-                    int code;
-                    try {
-                        code = Integer.parseInt(totpRequest.getCode());
-                    } catch (NumberFormatException e) {
-                        throw new ServerWebInputException("Invalid code");
-                    }
-                    var validated = totpAuthService.validateTotp(rawSecret, code);
-                    if (!validated) {
-                        throw new ServerWebInputException("Invalid secret or code");
-                    }
                     var encryptedSecret = totpAuthService.encryptSecret(rawSecret);
-                    user.getSpec().setTotpEncryptedSecret(encryptedSecret);
+                    return validateTotpCode(encryptedSecret, totpRequest.getCode())
+                        .then(Mono.fromRunnable(
+                            () -> user.getSpec().setTotpEncryptedSecret(encryptedSecret)
+                        ));
                 })
                 .flatMap(client::update);
         });
@@ -236,12 +235,13 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         return ServerResponse.ok().body(twoFactorAuthSettings, TwoFactorAuthSettings.class);
     }
 
-    private void validateRequest(Object target, String name, ServerRequest request) {
+    private Mono<Void> validateRequest(Object target, String name, ServerRequest request) {
         var bindingResult =
             ValidationUtils.validate(target, name, validator, request.exchange());
         if (bindingResult.hasErrors()) {
-            throw new RequestBodyValidationException(bindingResult);
+            return Mono.error(new RequestBodyValidationException(bindingResult));
         }
+        return Mono.empty();
     }
 
     @Data
@@ -256,6 +256,34 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         @NotBlank
         private String password;
 
+        private String currentTotpCode;
+
+    }
+
+    private Mono<Void> validateTotpCode(User user, String totpCode) {
+        var totpEncryptedSecret = user.getSpec().getTotpEncryptedSecret();
+        if (StringUtils.isBlank(totpEncryptedSecret)) {
+            // TOTP is not configured, no need to validate
+            return Mono.empty();
+        }
+        return validateTotpCode(totpEncryptedSecret, totpCode);
+    }
+
+    private Mono<Void> validateTotpCode(String totpEncryptedSecret, String totpCode) {
+        if (StringUtils.isBlank(totpCode)) {
+            return Mono.error(new ServerWebInputException("TOTP code is required"));
+        }
+        int code;
+        try {
+            code = Integer.parseInt(totpCode);
+        } catch (NumberFormatException e) {
+            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
+        }
+        var rawSecret = totpAuthService.decryptSecret(totpEncryptedSecret);
+        if (!totpAuthService.validateTotp(rawSecret, code)) {
+            return Mono.error(new ServerWebInputException("Invalid TOTP code"));
+        }
+        return Mono.empty();
     }
 
     private Mono<ServerResponse> getTwoFactorSettings(ServerRequest request) {

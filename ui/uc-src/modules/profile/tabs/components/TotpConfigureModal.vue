@@ -7,6 +7,10 @@ import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+const props = defineProps<{
+  totpConfigured?: boolean;
+}>();
+
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
@@ -98,6 +102,22 @@ function onSubmit(data: TotpRequest) {
         </details>
       </div>
       <FormKit id="totp-form" type="form" name="totp-form" @submit="onSubmit">
+        <FormKit
+          v-if="props.totpConfigured"
+          type="number"
+          name="currentTotpCode"
+          :label="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.current_code.label'
+            )
+          "
+          validation="required"
+          :help="
+            $t(
+              'core.uc_profile.2fa.methods.totp.operations.configure.fields.current_code.help'
+            )
+          "
+        ></FormKit>
         <FormKit
           type="number"
           name="code"
