@@ -15,6 +15,6 @@ class DeviceSecurityConfigurer implements SecurityConfigurer {
     @Override
     public void configure(ServerHttpSecurity http) {
         var filter = new DeviceSessionFilter(deviceService);
-        http.addFilterAfter(filter, SecurityWebFiltersOrder.REACTOR_CONTEXT);
+        http.addFilterBefore(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
 }

@@ -7,13 +7,16 @@ import static run.halo.app.security.authentication.rememberme.PersistentTokenBas
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +32,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Device;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -38,7 +42,7 @@ import run.halo.app.security.authentication.rememberme.PersistentRememberMeToken
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DeviceServiceImpl implements DeviceService {
+class DeviceServiceImpl implements DeviceService {
     private final ReactiveExtensionClient client;
     private final DeviceCookieResolver deviceCookieResolver;
     private final ReactiveSessionRepository<?> sessionRepository;
@@ -66,7 +70,7 @@ public class DeviceServiceImpl implements DeviceService {
             return Mono.empty();
         }
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
+            .mapNotNull(SecurityContext::getAuthentication)
             .filter(trustResolver::isAuthenticated)
             .map(Principal::getName)
             .flatMap(username -> {
@@ -88,9 +92,16 @@ public class DeviceServiceImpl implements DeviceService {
     private Mono<Device> updateWithRetry(String deviceId, String username,
         Function<Device, Mono<Device>> updateFunction) {
         return Mono.defer(() -> client.fetch(Device.class, deviceId)
-                .filter(device -> device.getSpec().getPrincipalName().equals(username))
-                .flatMap(updateFunction)
-                .flatMap(client::update)
+                .flatMap(device -> {
+                    if (!Objects.equals(username, device.getSpec().getPrincipalName())) {
+                        log.debug(
+                            "Principal name mismatch for device {}, expected {}, actual {}, "
+                                + "revoking device",
+                            deviceId, username, device.getSpec().getPrincipalName());
+                        return doRevoke(device).then(Mono.empty());
+                    }
+                    return updateFunction.apply(device).flatMap(client::update);
+                })
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance));
@@ -103,43 +114,44 @@ public class DeviceServiceImpl implements DeviceService {
             return Mono.empty();
         }
         var principalName = authentication.getName();
-        return updateWithRetry(deviceIdCookie.getValue(), principalName,
-            (Device existingDevice) -> {
-                var sessionId = existingDevice.getSpec().getSessionId();
-                return exchange.getSession()
-                    .flatMap(session -> {
-                        var userAgent =
-                            exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_AGENT);
-                        var deviceUa = existingDevice.getSpec().getUserAgent();
-                        if (!StringUtils.equals(deviceUa, userAgent)) {
-                            // User agent changed, create a new device
-                            return Mono.empty();
-                        }
-                        return Mono.just(session);
-                    })
-                    .flatMap(session -> {
-                        if (session.getId().equals(sessionId)) {
-                            return Mono.just(session);
-                        }
-                        return sessionRepository.deleteById(sessionId).thenReturn(session);
-                    })
-                    .map(session -> {
-                        existingDevice.getSpec().setSessionId(session.getId());
-                        existingDevice.getSpec().setLastAccessedTime(session.getLastAccessTime());
-                        existingDevice.getSpec().setLastAuthenticatedTime(Instant.now());
-                        return existingDevice;
-                    })
-                    .flatMap(this::removeRememberMeToken);
-            });
+        return updateWithRetry(deviceIdCookie.getValue(), principalName, existingDevice -> {
+            var userAgent = getUserAgent(exchange);
+            var deviceUa = existingDevice.getSpec().getUserAgent();
+            if (!Objects.equals(deviceUa, userAgent)) {
+                // User agent changed, create a new device
+                log.debug(
+                    "User agent changed for device {}, expected {}, actual {}, revoking device",
+                    existingDevice.getMetadata().getName(), deviceUa, userAgent);
+                return doRevoke(existingDevice).then(Mono.empty());
+            }
+            var sessionId = existingDevice.getSpec().getSessionId();
+            return exchange.getSession()
+                .delayUntil(session -> {
+                    if (session.getId().equals(sessionId)) {
+                        return Mono.empty();
+                    }
+                    log.debug("Session ID changed for device {}, deleting old session {}",
+                        existingDevice.getMetadata().getName(), sessionId);
+                    return sessionRepository.deleteById(sessionId);
+                })
+                .doOnNext(session -> {
+                    existingDevice.getSpec().setSessionId(session.getId());
+                    existingDevice.getSpec().setLastAccessedTime(session.getLastAccessTime());
+                    existingDevice.getSpec().setLastAuthenticatedTime(Instant.now());
+                    existingDevice.getSpec().setRememberMeSeriesId(
+                        exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                    );
+                })
+                .thenReturn(existingDevice);
+        });
     }
 
     @Override
     public Mono<Void> revoke(String principalName, String deviceId) {
         return client.fetch(Device.class, deviceId)
             .filter(device -> device.getSpec().getPrincipalName().equals(principalName))
-            .flatMap(this::removeRememberMeToken)
-            .flatMap(client::delete)
-            .flatMap(revoked -> sessionRepository.deleteById(revoked.getSpec().getSessionId()));
+            .delayUntil(this::doRevoke)
+            .then();
     }
 
     @Override
@@ -148,22 +160,36 @@ public class DeviceServiceImpl implements DeviceService {
             .andQuery(Queries.equal("spec.principalName", username))
             .build();
         return client.listAll(Device.class, listOptions, defaultSort())
-            .flatMap(this::removeRememberMeToken)
-            .flatMap(device -> sessionRepository.deleteById(device.getSpec().getSessionId())
-                .thenReturn(device)
-            )
-            .flatMap(client::delete)
+            .delayUntil(this::doRevoke)
             .then();
     }
 
-    private Mono<Device> removeRememberMeToken(Device device) {
+    @Override
+    public Mono<Device> resolveCurrentDevice(ServerWebExchange exchange) {
+        var deviceIdCookie = deviceCookieResolver.resolveCookie(exchange);
+        if (deviceIdCookie == null) {
+            return Mono.empty();
+        }
+        var deviceId = deviceIdCookie.getValue();
+        return client.fetch(Device.class, deviceId)
+            .filter(Predicate.not(ExtensionUtil::isDeleted));
+    }
+
+    private Mono<Void> doRevoke(Device device) {
+        return removeRememberMeToken(device)
+            .then(sessionRepository.deleteById(device.getSpec().getSessionId()))
+            .then(client.delete(device))
+            .then();
+    }
+
+    private Mono<Void> removeRememberMeToken(Device device) {
         var seriesId = device.getSpec().getRememberMeSeriesId();
         if (StringUtils.isBlank(seriesId)) {
-            return Mono.just(device);
+            return Mono.empty();
         }
-        log.debug("Removing remember-me token for seriesId: {}", seriesId);
-        return rememberMeTokenRepository.removeToken(seriesId)
-            .thenReturn(device);
+        log.debug("Removing remember-me token for seriesId: {} for device {}",
+            seriesId, device.getMetadata().getName());
+        return rememberMeTokenRepository.removeToken(seriesId);
     }
 
     Mono<Device> createDevice(ServerWebExchange exchange, Authentication authentication) {
@@ -174,8 +200,7 @@ public class DeviceServiceImpl implements DeviceService {
                     device.setMetadata(new Metadata());
                     device.getMetadata().setName(generateDeviceId());
 
-                    var userAgent =
-                        exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_AGENT);
+                    var userAgent = getUserAgent(exchange);
                     var deviceInfo = DeviceInfo.parse(userAgent);
                     device.setSpec(new Device.Spec()
                         .setUserAgent(userAgent)
@@ -183,7 +208,8 @@ public class DeviceServiceImpl implements DeviceService {
                         .setLastAuthenticatedTime(Instant.now())
                         .setIpAddress(getClientIp(exchange.getRequest()))
                         .setRememberMeSeriesId(
-                            exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME))
+                            exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                        )
                     );
                     device.getStatus()
                         .setOs(deviceInfo.os())
@@ -202,6 +228,11 @@ public class DeviceServiceImpl implements DeviceService {
     String generateDeviceId() {
         return UUID.randomUUID().toString()
             .replace("-", "").toLowerCase();
+    }
+
+    @Nullable
+    private static String getUserAgent(ServerWebExchange exchange) {
+        return exchange.getRequest().getHeaders().getFirst(HttpHeaders.USER_AGENT);
     }
 
     record DeviceInfo(String browser, String os) {
