@@ -16,10 +16,10 @@ public interface DeviceService {
     Mono<Void> revoke(String username);
 
     /**
-     * Resolve the current device from the request.
+     * Resolve the current device from the request. This method won't check current session ID.
      *
      * @param exchange the current server web exchange
-     * @return the current device, or empty if not found or session ID mismatch
+     * @return the current device, or empty if not found
      * @since 2.24.1
      */
     Mono<Device> resolveCurrentDevice(ServerWebExchange exchange);

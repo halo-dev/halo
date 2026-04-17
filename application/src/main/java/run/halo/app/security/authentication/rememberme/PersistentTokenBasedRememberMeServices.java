@@ -103,7 +103,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
         var presentedToken = cookieTokens[1];
         return this.tokenRepository.getTokenForSeries(presentedSeries)
             // No series match, so we can't authenticate using this cookie
-            .switchIfEmpty(Mono.error(new RememberMeAuthenticationException(
+            .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
                 "No persistent token found for series id: " + presentedSeries))
             )
             // Device must be validated before we can trust the token, as the token is only valid
@@ -130,8 +130,9 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 // *same* series number.
                 log.debug("Refreshing persistent login token for user '{}', series '{}'",
                     token.getUsername(), token.getSeries());
-                var newToken = new PersistentRememberMeToken(token.getUsername(), token.getSeries(),
-                    token.getTokenValue(), new Date());
+                var newToken = new PersistentRememberMeToken(
+                    token.getUsername(), token.getSeries(), generateTokenData(), new Date()
+                );
                 return Mono.just(newToken);
             })
             .flatMap(newToken -> updateToken(newToken)

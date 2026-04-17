@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Device;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -90,9 +92,16 @@ class DeviceServiceImpl implements DeviceService {
     private Mono<Device> updateWithRetry(String deviceId, String username,
         Function<Device, Mono<Device>> updateFunction) {
         return Mono.defer(() -> client.fetch(Device.class, deviceId)
-                .filter(device -> device.getSpec().getPrincipalName().equals(username))
-                .flatMap(updateFunction)
-                .flatMap(client::update)
+                .flatMap(device -> {
+                    if (!Objects.equals(username, device.getSpec().getPrincipalName())) {
+                        log.debug(
+                            "Principal name mismatch for device {}, expected {}, actual {}, "
+                                + "revoking device",
+                            deviceId, username, device.getSpec().getPrincipalName());
+                        return doRevoke(device).then(Mono.empty());
+                    }
+                    return updateFunction.apply(device).flatMap(client::update);
+                })
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance));
@@ -110,7 +119,10 @@ class DeviceServiceImpl implements DeviceService {
             var deviceUa = existingDevice.getSpec().getUserAgent();
             if (!Objects.equals(deviceUa, userAgent)) {
                 // User agent changed, create a new device
-                return Mono.empty();
+                log.debug(
+                    "User agent changed for device {}, expected {}, actual {}, revoking device",
+                    existingDevice.getMetadata().getName(), deviceUa, userAgent);
+                return doRevoke(existingDevice).then(Mono.empty());
             }
             var sessionId = existingDevice.getSpec().getSessionId();
             return exchange.getSession()
@@ -126,9 +138,11 @@ class DeviceServiceImpl implements DeviceService {
                     existingDevice.getSpec().setSessionId(session.getId());
                     existingDevice.getSpec().setLastAccessedTime(session.getLastAccessTime());
                     existingDevice.getSpec().setLastAuthenticatedTime(Instant.now());
+                    existingDevice.getSpec().setRememberMeSeriesId(
+                        exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                    );
                 })
-                .thenReturn(existingDevice)
-                .delayUntil(this::removeRememberMeToken);
+                .thenReturn(existingDevice);
         });
     }
 
@@ -158,9 +172,7 @@ class DeviceServiceImpl implements DeviceService {
         }
         var deviceId = deviceIdCookie.getValue();
         return client.fetch(Device.class, deviceId)
-            .filterWhen(d -> exchange.getSession()
-                .map(session -> session.getId().equals(d.getSpec().getSessionId()))
-            );
+            .filter(Predicate.not(ExtensionUtil::isDeleted));
     }
 
     private Mono<Void> doRevoke(Device device) {
@@ -196,7 +208,8 @@ class DeviceServiceImpl implements DeviceService {
                         .setLastAuthenticatedTime(Instant.now())
                         .setIpAddress(getClientIp(exchange.getRequest()))
                         .setRememberMeSeriesId(
-                            exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME))
+                            exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                        )
                     );
                     device.getStatus()
                         .setOs(deviceInfo.os())
