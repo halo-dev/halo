@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
@@ -29,6 +32,7 @@ public class ContributorVo implements ExtensionVoOperator {
 
     String permalink;
 
+    @Schema(requiredMode = REQUIRED)
     MetadataOperator metadata;
 
     /**

@@ -29,7 +29,7 @@ public class Reply extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private ReplySpec spec;
 
-    @Schema
+    @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
     @Data

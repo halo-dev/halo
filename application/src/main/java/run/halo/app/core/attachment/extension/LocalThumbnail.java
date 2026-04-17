@@ -1,6 +1,5 @@
 package run.halo.app.core.attachment.extension;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +24,7 @@ public class LocalThumbnail extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private Spec spec;
 
-    @Schema(requiredMode = NOT_REQUIRED)
+    @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
     public void setStatus(@Nullable Status status) {

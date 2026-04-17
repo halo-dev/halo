@@ -23,6 +23,7 @@ public class Device extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private Spec spec;
 
+    @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
     public void setStatus(@Nullable Status status) {
