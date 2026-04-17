@@ -37,21 +37,17 @@ class LoginHandlerEnhancerImpl implements LoginHandlerEnhancer {
     @Override
     public Mono<Void> onLoginSuccess(ServerWebExchange exchange,
         Authentication successfulAuthentication) {
-        return Mono.when(
-                rememberMeServices.loginSuccess(exchange, successfulAuthentication),
-                deviceService.loginSuccess(exchange, successfulAuthentication),
-                oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication),
-                userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName())
-            )
+        return rememberMeServices.loginSuccess(exchange, successfulAuthentication)
+            .then(deviceService.loginSuccess(exchange, successfulAuthentication))
+            .then(oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication))
+            .then(userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName()))
             .then(parameterRequestCache.removeParameter(exchange, USERNAME_PARAMETER_NAME));
     }
 
     @Override
     public Mono<Void> onLoginFailure(ServerWebExchange exchange,
         AuthenticationException exception) {
-        return Mono.when(
-            parameterRequestCache.saveParameter(exchange, USERNAME_PARAMETER_NAME),
-            rememberMeServices.loginFail(exchange)
-        );
+        return parameterRequestCache.saveParameter(exchange, USERNAME_PARAMETER_NAME)
+            .then(rememberMeServices.loginFail(exchange));
     }
 }

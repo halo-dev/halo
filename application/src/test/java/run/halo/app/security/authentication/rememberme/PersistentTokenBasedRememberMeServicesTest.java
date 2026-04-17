@@ -27,6 +27,9 @@ import org.springframework.security.web.authentication.rememberme.PersistentReme
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.security.web.server.WebFilterExchange;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import run.halo.app.core.extension.Device;
+import run.halo.app.security.device.DeviceService;
 
 /**
  * Tests for {@link PersistentTokenBasedRememberMeServices}.
@@ -47,6 +50,9 @@ class PersistentTokenBasedRememberMeServicesTest {
 
     @Mock
     private PersistentRememberMeTokenRepository tokenRepository;
+
+    @Mock
+    DeviceService deviceService;
 
     @InjectMocks
     private PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
@@ -85,6 +91,12 @@ class PersistentTokenBasedRememberMeServicesTest {
                         new Date()))
                 );
             when(tokenRepository.removeUserTokens(eq("test"))).thenReturn(Mono.empty());
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.fromSupplier(() -> {
+                var device = new Device();
+                device.setSpec(new Device.Spec());
+                device.getSpec().setRememberMeSeriesId("fake-series");
+                return device;
+            }));
             assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
                 new String[] {"fake-series", "token-value"},
                 exchange).block())
@@ -103,6 +115,12 @@ class PersistentTokenBasedRememberMeServicesTest {
                         new Date(Instant.now().minusSeconds(10).toEpochMilli())))
                 );
             when(rememberMeCookieResolver.getCookieMaxAge()).thenReturn(Duration.ofSeconds(5));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.fromSupplier(() -> {
+                var device = new Device();
+                device.setSpec(new Device.Spec());
+                device.getSpec().setRememberMeSeriesId("fake-series");
+                return device;
+            }));
             assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
                 new String[] {"fake-series", "token-value"},
                 exchange).block())
@@ -129,14 +147,61 @@ class PersistentTokenBasedRememberMeServicesTest {
                 });
 
             when(userDetailsService.findByUsername(eq("test"))).thenReturn(Mono.empty());
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.fromSupplier(() -> {
+                var device = new Device();
+                device.setSpec(new Device.Spec());
+                device.getSpec().setRememberMeSeriesId("fake-series");
+                return device;
+            }));
 
             persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                    new String[] {"fake-series", "token-value"}, exchange)
-                .block();
+                    new String[] {"fake-series", "token-value"}, exchange
+                )
+                .as(StepVerifier::create)
+                .verifyComplete();
 
             verify(rememberMeCookieResolver).setRememberMeCookie(eq(exchange),
                 eq(persistentTokenBasedRememberMeServices.encodeCookie(
                     new String[] {"fake-series", generatedTokenValue.get()})));
+        }
+
+        @Test
+        void shouldFailWhenDeviceNotFound() {
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            when(tokenRepository.getTokenForSeries(eq("fake-series")))
+                .thenReturn(Mono.just(
+                    new PersistentRememberMeToken("test", "fake-series", "token-value",
+                        new Date()))
+                );
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.empty());
+            persistentTokenBasedRememberMeServices.processAutoLoginCookie(
+                    new String[] {"fake-series", "token-value"},
+                    exchange
+                )
+                .as(StepVerifier::create)
+                .verifyError(RememberMeAuthenticationException.class);
+        }
+
+        @Test
+        void shouldFailWhenDeviceSeriesIdNotMatch() {
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            when(tokenRepository.getTokenForSeries(eq("fake-series")))
+                .thenReturn(Mono.just(
+                    new PersistentRememberMeToken("test", "fake-series", "token-value",
+                        new Date()))
+                );
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.fromSupplier(() -> {
+                var device = new Device();
+                device.setSpec(new Device.Spec());
+                device.getSpec().setRememberMeSeriesId("other-series");
+                return device;
+            }));
+            persistentTokenBasedRememberMeServices.processAutoLoginCookie(
+                    new String[] {"fake-series", "token-value"},
+                    exchange
+                )
+                .as(StepVerifier::create)
+                .verifyError(RememberMeAuthenticationException.class);
         }
     }
 

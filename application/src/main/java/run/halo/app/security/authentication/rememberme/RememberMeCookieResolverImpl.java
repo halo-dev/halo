@@ -8,6 +8,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 import run.halo.app.infra.properties.HaloProperties;
 
 @Getter
@@ -32,14 +33,18 @@ public class RememberMeCookieResolverImpl implements RememberMeCookieResolver {
     @Override
     public void setRememberMeCookie(ServerWebExchange exchange, String value) {
         Assert.notNull(value, "'value' is required");
-        exchange.getResponse().getCookies()
-            .set(getCookieName(), initCookie(exchange, value).build());
+        exchange.getResponse().beforeCommit(() -> Mono.fromRunnable(() -> {
+            var cookie = initCookie(exchange, value).build();
+            exchange.getResponse().getCookies().set(getCookieName(), cookie);
+        }));
     }
 
     @Override
     public void expireCookie(ServerWebExchange exchange) {
-        ResponseCookie cookie = initCookie(exchange, "").maxAge(0).build();
-        exchange.getResponse().getCookies().set(this.cookieName, cookie);
+        exchange.getResponse().beforeCommit(() -> Mono.fromRunnable(() -> {
+            var cookie = initCookie(exchange, "").maxAge(0).build();
+            exchange.getResponse().getCookies().set(this.cookieName, cookie);
+        }));
     }
 
     private ResponseCookie.ResponseCookieBuilder initCookie(ServerWebExchange exchange,
