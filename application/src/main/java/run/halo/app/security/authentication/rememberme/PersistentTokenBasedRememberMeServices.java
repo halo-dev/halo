@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.SecurityConstant;
+import run.halo.app.security.device.DeviceService;
 
 /**
  * <p>{@link RememberMeServices} implementation based on Barry Jaspan's <a href=
@@ -67,12 +69,15 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     private final PersistentRememberMeTokenRepository tokenRepository;
 
+    private final DeviceService deviceService;
+
     public PersistentTokenBasedRememberMeServices(
         CookieSignatureKeyResolver cookieSignatureKeyResolver,
         ReactiveUserDetailsService userDetailsService,
         RememberMeCookieResolver rememberMeCookieResolver,
         PersistentRememberMeTokenRepository tokenRepository,
-        LoginParameterRequestCache parameterRequestCache) {
+        LoginParameterRequestCache parameterRequestCache,
+        DeviceService deviceService) {
         super(
             cookieSignatureKeyResolver,
             userDetailsService,
@@ -81,6 +86,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
         );
         this.random = new SecureRandom();
         this.tokenRepository = tokenRepository;
+        this.deviceService = deviceService;
         setParameterName(SecurityConstant.REMEMBER_ME_PARAMETER_NAME);
     }
 
@@ -88,17 +94,21 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
     protected Mono<UserDetails> processAutoLoginCookie(String[] cookieTokens,
         ServerWebExchange exchange) {
         if (cookieTokens.length != 2) {
-            throw new InvalidCookieException(
-                "Cookie token did not contain " + 2 + " tokens, but contained '"
-                    + Arrays.asList(cookieTokens) + "'");
+            return Mono.error(new InvalidCookieException(
+                "Cookie token did not contain %d tokens, but contained '%s'".formatted(
+                    2, Arrays.asList(cookieTokens))
+            ));
         }
-        String presentedSeries = cookieTokens[0];
-        String presentedToken = cookieTokens[1];
+        var presentedSeries = cookieTokens[0];
+        var presentedToken = cookieTokens[1];
         return this.tokenRepository.getTokenForSeries(presentedSeries)
             // No series match, so we can't authenticate using this cookie
             .switchIfEmpty(Mono.error(new RememberMeAuthenticationException(
                 "No persistent token found for series id: " + presentedSeries))
             )
+            // Device must be validated before we can trust the token, as the token is only valid
+            // for a specific device.
+            .delayUntil(token -> validateDevice(exchange, token))
             .flatMap(token -> {
                 // We have a match for this user/series combination
                 if (!presentedToken.equals(token.getTokenValue())) {
@@ -135,6 +145,18 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
             );
     }
 
+    private Mono<Void> validateDevice(ServerWebExchange exchange, PersistentRememberMeToken token) {
+        return deviceService.resolveCurrentDevice(exchange)
+            .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
+                "Unable to determine device for remember-me authentication"
+            )))
+            .filter(d -> Objects.equals(d.getSpec().getRememberMeSeriesId(), token.getSeries()))
+            .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
+                "Remember-me series ID does not match current device's series ID"
+            )))
+            .then();
+    }
+
     private boolean isTokenExpired(PersistentRememberMeToken token) {
         return isTokenExpired(token.getDate().getTime() + getTokenValidityMillis());
     }
@@ -157,9 +179,9 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
         Authentication successfulAuthentication) {
         String username = successfulAuthentication.getName();
         log.debug("Creating new persistent login for user {}", username);
-        PersistentRememberMeToken persistentToken =
-            new PersistentRememberMeToken(username, generateSeriesData(),
-                generateTokenData(), new Date());
+        var persistentToken = new PersistentRememberMeToken(
+            username, generateSeriesData(), generateTokenData(), new Date()
+        );
         return this.tokenRepository.createNewToken(persistentToken)
             .doOnSuccess(unused -> addCookie(persistentToken, exchange))
             .onErrorResume(Throwable.class, ex -> {

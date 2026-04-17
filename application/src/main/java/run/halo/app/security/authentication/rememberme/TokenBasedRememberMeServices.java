@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -350,28 +351,30 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
     protected Mono<String> makeTokenSignature(long tokenExpiryTime, String username,
         String password, String algorithm) {
         return getKey()
-            .handle((key, sink) -> {
-                String data = username + ":" + tokenExpiryTime + ":" + password + ":" + key;
-                try {
-                    MessageDigest digest = MessageDigest.getInstance(algorithm);
-                    sink.next(new String(Hex.encode(digest.digest(data.getBytes()))));
-                } catch (NoSuchAlgorithmException ex) {
-                    sink.error(
-                        new IllegalStateException("No " + algorithm + " algorithm available!"));
-                }
-            });
+            .flatMap(key -> Mono.fromCallable(() -> {
+                var data = username + ":" + tokenExpiryTime + ":" + password + ":" + key;
+                var digest = MessageDigest.getInstance(algorithm);
+                return new String(Hex.encode(digest.digest(data.getBytes())));
+            }))
+            .onErrorMap(NoSuchAlgorithmException.class, ex ->
+                new IllegalStateException("No " + algorithm + " algorithm available!", ex)
+            );
     }
 
     protected String retrieveUserName(Authentication authentication) {
-        if (isInstanceOfUserDetails(authentication)) {
-            return ((UserDetails) authentication.getPrincipal()).getUsername();
+        var principal = authentication.getPrincipal();
+        Assert.notNull(principal, "Authentication principal cannot be null");
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername();
         }
-        return authentication.getPrincipal().toString();
+        return principal.toString();
     }
 
+    @Nullable
     protected String retrievePassword(Authentication authentication) {
-        if (isInstanceOfUserDetails(authentication)) {
-            return ((UserDetails) authentication.getPrincipal()).getPassword();
+        var principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getPassword();
         }
         if (authentication.getCredentials() != null) {
             return authentication.getCredentials().toString();
