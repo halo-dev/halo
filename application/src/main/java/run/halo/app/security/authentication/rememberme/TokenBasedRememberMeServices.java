@@ -382,10 +382,6 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         return null;
     }
 
-    private boolean isInstanceOfUserDetails(Authentication authentication) {
-        return authentication.getPrincipal() instanceof UserDetails;
-    }
-
     protected Mono<String> getKey() {
         return cookieSignatureKeyResolver.resolveSigningKey();
     }
