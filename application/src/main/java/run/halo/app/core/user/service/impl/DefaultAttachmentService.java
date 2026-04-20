@@ -168,11 +168,26 @@ public class DefaultAttachmentService implements AttachmentService {
     @Override
     public Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename) {
+        return transferFromUrl(url, policyName, groupName, filename,
+            dataBufferFetcher::head, dataBufferFetcher::fetch);
+    }
+
+    @Override
+    public Mono<Attachment> uploadFromPublicUrl(@NonNull URL url, @NonNull String policyName,
+        String groupName, String filename) {
+        return transferFromUrl(url, policyName, groupName, filename,
+            dataBufferFetcher::headPublic, dataBufferFetcher::fetchPublic);
+    }
+
+    private Mono<Attachment> transferFromUrl(@NonNull URL url, @NonNull String policyName,
+        String groupName, String filename,
+        Function<URI, Mono<HttpHeaders>> headersFetcher,
+        Function<URI, Flux<DataBuffer>> contentFetcher) {
         var uri = URI.create(url.toString());
         AtomicReference<MediaType> mediaTypeRef = new AtomicReference<>();
         AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
 
-        Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)
+        Mono<Flux<DataBuffer>> contentMono = headersFetcher.apply(uri)
             .map(httpHeaders -> {
                 if (!StringUtils.hasText(fileNameRef.get())) {
                     fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
@@ -181,7 +196,7 @@ public class DefaultAttachmentService implements AttachmentService {
                 mediaTypeRef.set(contentType);
                 return httpHeaders;
             })
-            .map(response -> dataBufferFetcher.fetch(uri));
+            .map(response -> contentFetcher.apply(uri));
 
         return contentMono.flatMap(
                 (content) -> upload(policyName, groupName, fileNameRef.get(), content,

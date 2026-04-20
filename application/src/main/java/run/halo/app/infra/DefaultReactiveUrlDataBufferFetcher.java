@@ -22,10 +22,17 @@ import reactor.netty.http.client.HttpClient;
 public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetcher {
     private final HttpClient httpClient = HttpClient.create()
         .followRedirect(true);
+    private final HttpClient publicHttpClient = HttpClient.create()
+        .followRedirect(false);
     private final ContentLengthFetcher contentLengthFetcher = new ContentLengthFetcher();
+    private final PublicRemoteUriValidator publicRemoteUriValidator =
+        new PublicRemoteUriValidator();
 
     private final WebClient webClient = WebClient.builder()
         .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .build();
+    private final WebClient publicWebClient = WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(publicHttpClient))
         .build();
 
     @Override
@@ -38,7 +45,23 @@ public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBuffe
     }
 
     @Override
+    public Flux<DataBuffer> fetchPublic(URI uri) {
+        publicRemoteUriValidator.validate(uri);
+        return publicWebClient.get()
+            .uri(uri)
+            .accept(MediaType.APPLICATION_OCTET_STREAM)
+            .retrieve()
+            .bodyToFlux(DataBuffer.class);
+    }
+
+    @Override
     public Mono<HttpHeaders> head(URI uri) {
+        return contentLengthFetcher.fetchContentLength(uri);
+    }
+
+    @Override
+    public Mono<HttpHeaders> headPublic(URI uri) {
+        publicRemoteUriValidator.validate(uri);
         return contentLengthFetcher.fetchContentLength(uri);
     }
 

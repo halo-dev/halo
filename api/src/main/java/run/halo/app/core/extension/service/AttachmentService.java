@@ -114,4 +114,18 @@ public interface AttachmentService {
      */
     Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename);
+
+    /**
+     * Transfers a public remote URL into an attachment with public-network validation.
+     *
+     * @param url external url
+     * @param policyName policy name
+     * @param groupName group name
+     * @param filename filename
+     * @return attachment
+     */
+    default Mono<Attachment> uploadFromPublicUrl(@NonNull URL url, @NonNull String policyName,
+        String groupName, String filename) {
+        return uploadFromUrl(url, policyName, groupName, filename);
+    }
 }

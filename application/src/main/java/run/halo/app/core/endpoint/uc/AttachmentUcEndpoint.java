@@ -204,7 +204,7 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                 uploadFromUrlRequest -> {
                     var url = uploadFromUrlRequest.url();
                     var fileName = uploadFromUrlRequest.filename();
-                    return attachmentService.uploadFromUrl(url,
+                    return attachmentService.uploadFromPublicUrl(url,
                         postSetting.getAttachmentPolicyName(),
                         postSetting.getAttachmentGroupName(),
                         fileName

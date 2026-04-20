@@ -23,10 +23,30 @@ public interface ReactiveUrlDataBufferFetcher {
     Flux<DataBuffer> fetch(URI uri);
 
     /**
+     * Fetches data from a public HTTP(S) URL only.
+     *
+     * @param uri uri to fetch
+     * @return data buffer flux
+     */
+    default Flux<DataBuffer> fetchPublic(URI uri) {
+        return fetch(uri);
+    }
+
+    /**
      * <p>Get head of the uri.</p>
      *
      * @param uri uri to fetch
      * @return response entity
      */
     Mono<HttpHeaders> head(URI uri);
+
+    /**
+     * Gets headers from a public HTTP(S) URL only.
+     *
+     * @param uri uri to fetch
+     * @return response headers
+     */
+    default Mono<HttpHeaders> headPublic(URI uri) {
+        return head(uri);
+    }
 }
