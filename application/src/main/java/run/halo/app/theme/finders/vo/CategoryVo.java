@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -17,6 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 @EqualsAndHashCode
 public class CategoryVo implements ExtensionVoOperator {
 
+    @Schema(requiredMode = REQUIRED)
     MetadataOperator metadata;
 
     Category.CategorySpec spec;

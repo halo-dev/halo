@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.pf4j.Extension;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.PluginManager;
@@ -14,7 +15,6 @@ import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
 
 /**
  * <p>Basic implementation of an extension factory.</p>

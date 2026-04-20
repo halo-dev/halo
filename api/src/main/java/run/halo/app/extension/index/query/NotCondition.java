@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
 
 record NotCondition(Condition condition) implements Condition {
@@ -14,7 +13,6 @@ record NotCondition(Condition condition) implements Condition {
         return condition;
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "NOT (" + condition + ")";

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.core.util.Json;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -36,8 +35,7 @@ public class JsonUtils {
      * @param <T> target object type
      * @return the object specified type
      */
-    @NonNull
-    public static <T> T mapToObject(@NonNull Map<String, ?> sourceMap, @NonNull Class<T> type) {
+    public static <T> T mapToObject(Map<String, ?> sourceMap, Class<T> type) {
         return DEFAULT_JSON_MAPPER.convertValue(sourceMap, type);
     }
 
@@ -47,8 +45,7 @@ public class JsonUtils {
      * @param source source object must not be null
      * @return json format of the source object
      */
-    @NonNull
-    public static String objectToJson(@NonNull Object source) {
+    public static String objectToJson(Object source) {
         Assert.notNull(source, "Source object must not be null");
         try {
             return DEFAULT_JSON_MAPPER.writeValueAsString(source);

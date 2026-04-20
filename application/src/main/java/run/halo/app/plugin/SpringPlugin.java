@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -16,7 +15,6 @@ public interface SpringPlugin {
      *
      * @return plugin context
      */
-    @NonNull
     PluginContext getPluginContext();
 
     /**
@@ -25,7 +23,6 @@ public interface SpringPlugin {
      * @return application context of the plugin
      * @throws IllegalStateException if the application context is not ready yet
      */
-    @NonNull
     ApplicationContext getApplicationContext();
 
 }

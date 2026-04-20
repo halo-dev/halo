@@ -3,7 +3,6 @@ package run.halo.app.theme;
 import lombok.Builder;
 import lombok.Data;
 import org.pf4j.ExtensionPoint;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
 
@@ -25,7 +24,7 @@ public interface ReactiveSinglePageContentHandler extends ExtensionPoint {
      * @param singlePageContent content to be handled
      * @return handled content
      */
-    Mono<SinglePageContentContext> handle(@NonNull SinglePageContentContext singlePageContent);
+    Mono<SinglePageContentContext> handle(SinglePageContentContext singlePageContent);
 
     @Data
     @Builder

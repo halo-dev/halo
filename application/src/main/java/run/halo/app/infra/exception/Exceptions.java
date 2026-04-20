@@ -8,14 +8,13 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -66,7 +65,6 @@ public enum Exceptions {
         return errorResponse;
     }
 
-    @NonNull
     private static ErrorResponse handleException(Throwable t, @Nullable HttpStatusCode status) {
         var responseStatusAnno = MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY)
             .get(ResponseStatus.class);
@@ -86,8 +84,7 @@ public enum Exceptions {
         return builder.build();
     }
 
-    @Nullable
-    private static ErrorResponse handleConflictException(Throwable t) {
+    private static @Nullable ErrorResponse handleConflictException(Throwable t) {
         if (t instanceof ConcurrencyFailureException) {
             return ErrorResponse.builder(t, ProblemDetail.forStatus(HttpStatus.CONFLICT))
                 .type(URI.create(CONFLICT_TYPE))

@@ -1,7 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * This condition is only for backward compatibility.
  *
@@ -17,7 +15,6 @@ public record And(Condition left, Condition right) implements Condition {
         return left.not().or(right.not());
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "(" + left + " AND " + right + ")";

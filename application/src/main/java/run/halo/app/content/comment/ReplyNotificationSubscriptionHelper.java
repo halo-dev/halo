@@ -3,7 +3,7 @@ package run.halo.app.content.comment;
 import io.micrometer.common.util.StringUtils;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.content.Comment;
@@ -57,8 +57,7 @@ public class ReplyNotificationSubscriptionHelper {
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
-    @Nullable
-    private Subscription.Subscriber createSubscriber(UserIdentity author) {
+    private Subscription.@Nullable Subscriber createSubscriber(UserIdentity author) {
         if (StringUtils.isBlank(author.name())) {
             return null;
         }

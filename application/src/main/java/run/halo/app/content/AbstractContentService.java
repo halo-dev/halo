@@ -7,9 +7,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.Assert;
@@ -68,8 +68,7 @@ public abstract class AbstractContentService {
     }
 
     protected Mono<ContentWrapper> draftContent(@Nullable String baseSnapshotName,
-        ContentRequest contentRequest,
-        @Nullable String parentSnapshotName) {
+        ContentRequest contentRequest, @Nullable String parentSnapshotName) {
         return create(baseSnapshotName, contentRequest, parentSnapshotName)
             .flatMap(head -> {
                 String baseSnapshotNameToUse =
@@ -83,8 +82,7 @@ public abstract class AbstractContentService {
     }
 
     private Mono<Snapshot> create(@Nullable String baseSnapshotName,
-        ContentRequest contentRequest,
-        @Nullable String parentSnapshotName) {
+        ContentRequest contentRequest, @Nullable String parentSnapshotName) {
         Snapshot snapshot = contentRequest.toSnapshot();
         snapshot.getMetadata().setName(UUID.randomUUID().toString());
         snapshot.getSpec().setParentSnapshotName(parentSnapshotName);

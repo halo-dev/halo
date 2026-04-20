@@ -10,7 +10,6 @@ import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerWebInputException;
@@ -142,7 +141,7 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
     }
 
     @Override
-    public Mono<Void> removeBySubject(@NonNull Ref subjectRef) {
+    public Mono<Void> removeBySubject(Ref subjectRef) {
         Assert.notNull(subjectRef, "The subjectRef must not be null.");
         return cleanupComments(subjectRef, 200);
     }

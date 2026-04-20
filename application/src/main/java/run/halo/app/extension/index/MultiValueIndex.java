@@ -13,9 +13,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.Extension;
@@ -223,11 +222,9 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
     class UpsertTransactionalOperation implements TransactionalOperation {
 
-        @NonNull
         private final String primaryKey;
 
-        @Nullable
-        private final Set<K> newKeys;
+        private final @Nullable Set<K> newKeys;
 
         private boolean committed;
 
@@ -235,9 +232,7 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
         private boolean previousNullKey;
 
-        UpsertTransactionalOperation(
-            @NonNull String primaryKey, @Nullable Set<K> newKeys
-        ) {
+        UpsertTransactionalOperation(String primaryKey, @Nullable Set<K> newKeys) {
             this.primaryKey = primaryKey;
             this.newKeys = newKeys;
         }
@@ -326,7 +321,6 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
     class DeleteTransactionalOperation implements TransactionalOperation {
 
-        @NonNull
         private final String primaryKey;
 
         private boolean committed;
@@ -335,7 +329,7 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
         private boolean previousNullKey;
 
-        DeleteTransactionalOperation(@NonNull String primaryKey) {
+        DeleteTransactionalOperation(String primaryKey) {
             this.primaryKey = primaryKey;
         }
 

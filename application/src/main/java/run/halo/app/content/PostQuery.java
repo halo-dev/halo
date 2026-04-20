@@ -11,8 +11,8 @@ import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springdoc.core.fn.builders.operation.Builder;
-import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListOptions;
@@ -27,7 +27,7 @@ import run.halo.app.extension.router.SortableRequest;
  */
 public class PostQuery extends SortableRequest {
 
-    private final String username;
+    private final @Nullable String username;
 
     public PostQuery(ServerRequest request) {
         this(request, null);
@@ -38,19 +38,16 @@ public class PostQuery extends SortableRequest {
         this.username = username;
     }
 
-    @Nullable
-    public String getPublishPhase() {
+    public @Nullable String getPublishPhase() {
         return queryParams.getFirst("publishPhase");
     }
 
-    @Nullable
-    public String getCategoryWithChildren() {
+    public @Nullable String getCategoryWithChildren() {
         var value = queryParams.getFirst("categoryWithChildren");
         return StringUtils.defaultIfBlank(value, null);
     }
 
-    @Nullable
-    public String getKeyword() {
+    public @Nullable String getKeyword() {
         return StringUtils.defaultIfBlank(queryParams.getFirst("keyword"), null);
     }
 

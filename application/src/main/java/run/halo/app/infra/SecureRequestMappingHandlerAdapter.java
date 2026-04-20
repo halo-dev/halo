@@ -1,6 +1,5 @@
 package run.halo.app.infra;
 
-import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.server.ServerWebExchange;
@@ -15,11 +14,7 @@ import reactor.core.publisher.Mono;
 public class SecureRequestMappingHandlerAdapter extends RequestMappingHandlerAdapter {
 
     @Override
-    @NonNull
-    public Mono<HandlerResult> handle(
-        @NonNull ServerWebExchange exchange,
-        @NonNull Object handler
-    ) {
+    public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
         return super.handle(new SecureServerWebExchange(exchange), handler);
     }
 

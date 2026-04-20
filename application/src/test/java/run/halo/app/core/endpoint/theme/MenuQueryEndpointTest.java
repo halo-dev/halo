@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,7 +80,7 @@ class MenuQueryEndpointTest {
             eq(SystemSetting.Menu.class));
     }
 
-    @NonNull
+
     private static MenuItem createMenuItem(String name) {
         MenuItem menuItem = new MenuItem();
         menuItem.setMetadata(new Metadata());

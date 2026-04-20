@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
 import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
@@ -33,8 +33,7 @@ public class DefaultController<R> implements Controller {
 
     private final Executor executor;
 
-    @Nullable
-    private final Synchronizer<R> synchronizer;
+    private final @Nullable Synchronizer<R> synchronizer;
 
     private final Duration minDelay;
 

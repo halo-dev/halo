@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 import org.apache.commons.lang3.ObjectUtils;
@@ -10,6 +13,8 @@ import run.halo.app.infra.utils.JsonUtils;
 @Value
 @Builder
 public class UserVo implements ExtensionVoOperator {
+
+    @Schema(requiredMode = REQUIRED)
     MetadataOperator metadata;
 
     User.UserSpec spec;

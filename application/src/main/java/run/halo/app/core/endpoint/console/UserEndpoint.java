@@ -52,7 +52,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -642,7 +641,6 @@ public class UserEndpoint implements CustomEndpoint {
         String password) {
     }
 
-    @NonNull
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
@@ -663,7 +661,6 @@ public class UserEndpoint implements CustomEndpoint {
 
     }
 
-    @NonNull
     Mono<ServerResponse> grantPermission(ServerRequest request) {
         var username = request.pathVariable("name");
         return request.bodyToMono(GrantRequest.class)
@@ -676,7 +673,7 @@ public class UserEndpoint implements CustomEndpoint {
     record GrantRequest(Set<String> roles) {
     }
 
-    @NonNull
+
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
         var username = request.pathVariable("name");
         return Mono.defer(() -> {

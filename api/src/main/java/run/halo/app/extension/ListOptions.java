@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.index.query.LabelCondition;
 import run.halo.app.extension.index.query.Query;
@@ -13,11 +13,12 @@ import run.halo.app.extension.router.selector.LabelSelector;
 
 @Data
 @Accessors(chain = true)
+@SuppressWarnings("removal")
 public class ListOptions {
 
-    private LabelSelector labelSelector;
+    private @Nullable LabelSelector labelSelector;
 
-    private FieldSelector fieldSelector;
+    private @Nullable FieldSelector fieldSelector;
 
     @Override
     public String toString() {
@@ -29,7 +30,6 @@ public class ListOptions {
      *
      * @return the condition, never null
      */
-    @NonNull
     public Condition toCondition() {
         Condition condition = null;
         var fieldSelector = getFieldSelector();
@@ -67,7 +67,9 @@ public class ListOptions {
 
     public static class ListOptionsBuilder {
         private LabelSelectorBuilder labelSelectorBuilder;
-        private Query query;
+
+        @SuppressWarnings("removal")
+        private @Nullable Query query;
 
         public ListOptionsBuilder() {
         }

@@ -1,8 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * String key wrapper for nullable string comparison. Only for backward compatibility. May remove
@@ -15,7 +14,7 @@ import org.springframework.lang.Nullable;
 record UnknownKey(@Nullable String value) implements Comparable<UnknownKey> {
 
     @Override
-    public int compareTo(@NotNull UnknownKey o) {
+    public int compareTo(UnknownKey o) {
         return KeyComparator.INSTANCE.compare(this.value, o.value);
     }
 
@@ -29,7 +28,6 @@ record UnknownKey(@Nullable String value) implements Comparable<UnknownKey> {
         return Objects.equals(value, unknownKey.value);
     }
 
-    @NotNull
     @Override
     public String toString() {
         return Objects.toString(value);

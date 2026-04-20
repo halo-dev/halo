@@ -101,6 +101,7 @@ public interface ExtensionClient {
      */
     <E extends Extension> void delete(E extension);
 
+    @SuppressWarnings("removal")
     @Deprecated(forRemoval = true, since = "2.22.0")
     IndexedQueryEngine indexedQueryEngine();
 

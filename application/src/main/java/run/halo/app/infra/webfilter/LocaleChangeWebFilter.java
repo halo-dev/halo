@@ -10,7 +10,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
-import org.springframework.lang.NonNull;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -44,8 +43,7 @@ public class LocaleChangeWebFilter implements WebFilter {
     }
 
     @Override
-    @NonNull
-    public Mono<Void> filter(ServerWebExchange exchange, @NonNull WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return matcher.matches(exchange)
             .filter(MatchResult::isMatch)
             .doOnNext(result -> {

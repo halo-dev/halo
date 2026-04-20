@@ -13,7 +13,6 @@ import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.ErrorResponse;
@@ -121,9 +120,8 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
         }
 
         @Override
-        @NonNull
         protected Mono<Map<String, Object>> getModelAttributes(Map<String, ?> model,
-            @NonNull ServerWebExchange exchange) {
+            ServerWebExchange exchange) {
             Mono<Map<String, Object>> contextBasedStaticVariables =
                 getContextBasedStaticVariables(exchange);
             Mono<Map<String, Object>> modelAttributes = super.getModelAttributes(model, exchange);
@@ -139,7 +137,6 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
             );
         }
 
-        @NonNull
         private Mono<Map<String, Object>> getContextBasedStaticVariables(
             ServerWebExchange exchange) {
             ApplicationContext applicationContext = obtainApplicationContext();

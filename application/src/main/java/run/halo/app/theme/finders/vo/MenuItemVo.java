@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +22,7 @@ import run.halo.app.extension.MetadataOperator;
 @Builder
 public class MenuItemVo implements VisualizableTreeNode<MenuItemVo>, ExtensionVoOperator {
 
+    @Schema(requiredMode = REQUIRED)
     MetadataOperator metadata;
 
     MenuItem.MenuItemSpec spec;

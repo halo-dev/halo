@@ -25,7 +25,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
@@ -375,7 +374,6 @@ public class ThemeEndpoint implements CustomEndpoint {
             super(queryParams);
         }
 
-        @NonNull
         public Boolean getUninstalled() {
             return Boolean.parseBoolean(queryParams.getFirst("uninstalled"));
         }
@@ -461,7 +459,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             });
     }
 
-    private Mono<List<Theme>> filterUnInstalledThemes(@NonNull List<Theme> allThemes) {
+    private Mono<List<Theme>> filterUnInstalledThemes(List<Theme> allThemes) {
         return client.list(Theme.class, null, null)
             .map(theme -> theme.getMetadata().getName())
             .collectList()

@@ -8,13 +8,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -57,12 +56,8 @@ public class DefaultAttachmentService implements AttachmentService {
     }
 
     @Override
-    public Mono<Attachment> upload(
-        @NonNull String username,
-        @NonNull String policyName,
-        @Nullable String groupName,
-        @NonNull FilePart filePart,
-        @Nullable Consumer<Attachment> beforeCreating) {
+    public Mono<Attachment> upload(String username, String policyName, @Nullable String groupName,
+        FilePart filePart, @Nullable Consumer<Attachment> beforeCreating) {
         var builder = UploadOption.builder();
         builder.file(filePart);
         var getPolicyAndConfigMap = client.get(Policy.class, policyName)
@@ -108,11 +103,8 @@ public class DefaultAttachmentService implements AttachmentService {
     }
 
     @Override
-    public Mono<Attachment> upload(@NonNull String policyName,
-        @Nullable String groupName,
-        @NonNull String filename,
-        @NonNull Flux<DataBuffer> content,
-        @Nullable MediaType mediaType) {
+    public Mono<Attachment> upload(String policyName, @Nullable String groupName,
+        String filename, Flux<DataBuffer> content, @Nullable MediaType mediaType) {
         var file = new SimpleFilePart(filename, content, mediaType);
         return authenticationConsumer(
             authentication -> upload(authentication.getName(), policyName, groupName, file, null));
@@ -166,10 +158,10 @@ public class DefaultAttachmentService implements AttachmentService {
     }
 
     @Override
-    public Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
+    public Mono<Attachment> uploadFromUrl(URL url, String policyName,
         String groupName, String filename) {
         var uri = URI.create(url.toString());
-        AtomicReference<MediaType> mediaTypeRef = new AtomicReference<>();
+        AtomicReference<@Nullable MediaType> mediaTypeRef = new AtomicReference<>();
         AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
 
         Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)

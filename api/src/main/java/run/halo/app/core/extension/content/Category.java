@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
@@ -69,7 +70,7 @@ public class Category extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
-        private List<String> children;
+        private @Nullable List<String> children;
 
         /**
          * <p>if a category is queried for related posts, the default behavior is to

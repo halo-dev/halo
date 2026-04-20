@@ -2,7 +2,6 @@ package run.halo.app.plugin;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -31,8 +30,7 @@ public class DefaultPluginRouterFunctionRegistry
     }
 
     @Override
-    @NonNull
-    public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
+    public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         var secureRequest = new SecureServerRequest(request);
         return Flux.fromIterable(this.routerFunctions)
             .concatMap(routerFunction -> {
@@ -52,7 +50,7 @@ public class DefaultPluginRouterFunctionRegistry
     }
 
     @Override
-    public void accept(@NonNull RouterFunctions.Visitor visitor) {
+    public void accept(RouterFunctions.Visitor visitor) {
         this.routerFunctions.forEach(routerFunction -> routerFunction.accept(visitor));
     }
 

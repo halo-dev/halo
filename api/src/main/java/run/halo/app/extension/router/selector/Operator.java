@@ -1,15 +1,14 @@
 package run.halo.app.extension.router.selector;
 
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
 
 public enum Operator implements Converter<String, SelectorCriteria> {
 
     Equals("=", 3) {
         @Override
-        @Nullable
-        public SelectorCriteria convert(@Nullable String selector) {
+        public @Nullable SelectorCriteria convert(@Nullable String selector) {
             if (preFlightCheck(selector, 3)) {
                 var i = selector.indexOf(getOperator());
                 if (i > 0 && (i + getOperator().length()) <= selector.length() - 1) {
@@ -55,8 +54,7 @@ public enum Operator implements Converter<String, SelectorCriteria> {
     },
     NotExist("!", 0) {
         @Override
-        @Nullable
-        public SelectorCriteria convert(@Nullable String selector) {
+        public @Nullable SelectorCriteria convert(@Nullable String selector) {
             if (preFlightCheck(selector, 2)) {
                 if (selector.startsWith(getOperator())) {
                     return new SelectorCriteria(selector.substring(1), this, Set.of());

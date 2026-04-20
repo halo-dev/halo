@@ -1,8 +1,8 @@
 package run.halo.app.infra.exception;
 
 import java.net.URI;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.web.server.ResponseStatusException;
 
 public class RateLimitExceededException extends ResponseStatusException {

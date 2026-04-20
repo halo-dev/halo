@@ -11,7 +11,6 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 @UtilityClass
@@ -66,7 +65,6 @@ public class FileTypeDetectUtils {
      * <p>Get file extension from file name.</p>
      * <p>The obtained file extension is in lowercase and includes the dot, such as ".jpg".</p>
      */
-    @NonNull
     public static String getFileExtension(String fileName) {
         Assert.notNull(fileName, "The fileName must not be null");
         int lastDot = fileName.lastIndexOf(".");

@@ -12,8 +12,8 @@ import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import org.pf4j.PluginState;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
@@ -39,14 +39,13 @@ public class Plugin extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private PluginSpec spec;
 
-    private PluginStatus status;
+    private @Nullable PluginStatus status;
 
     /**
      * Gets plugin status.
      *
      * @return empty object if status is null.
      */
-    @NonNull
     @JsonIgnore
     public PluginStatus statusNonNull() {
         if (this.status == null) {
@@ -130,7 +129,7 @@ public class Plugin extends AbstractExtension {
         @Schema(description = "Load location of the plugin, often a path.")
         private URI loadLocation;
 
-        public static ConditionList nullSafeConditions(@NonNull PluginStatus status) {
+        public static ConditionList nullSafeConditions(PluginStatus status) {
             Assert.notNull(status, "The status must not be null.");
             if (status.getConditions() == null) {
                 status.setConditions(new ConditionList());

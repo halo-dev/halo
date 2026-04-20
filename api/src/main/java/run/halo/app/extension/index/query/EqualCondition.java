@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
 
 record EqualCondition(String indexName, Object key) implements IndexCondition {
@@ -14,7 +13,6 @@ record EqualCondition(String indexName, Object key) implements IndexCondition {
         return new NotEqualCondition(indexName, key);
     }
 
-    @NotNull
     @Override
     public String toString() {
         return indexName + " = " + key;

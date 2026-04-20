@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import lombok.Data;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
@@ -39,7 +38,7 @@ public class SystemState {
      *
      * @return config map
      */
-    public static SystemState deserialize(@NonNull ConfigMap configMap) {
+    public static SystemState deserialize(ConfigMap configMap) {
         Map<String, String> data = configMap.getData();
         if (data == null) {
             return new SystemState();
@@ -54,7 +53,7 @@ public class SystemState {
      * @param systemState modified system state
      * @param configMap config map
      */
-    public static void update(@NonNull SystemState systemState, @NonNull ConfigMap configMap) {
+    public static void update(SystemState systemState, ConfigMap configMap) {
         Map<String, String> data = configMap.getData();
         if (data == null) {
             data = new LinkedHashMap<>();

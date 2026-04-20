@@ -7,7 +7,6 @@ import lombok.Getter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.relational.core.sql.Visitable;
 import org.springframework.data.relational.core.sql.Visitor;
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.index.Indices;
 import run.halo.app.extension.index.LabelIndexQuery;
@@ -41,7 +40,6 @@ public class QueryVisitor<E extends Extension> implements Visitor {
         result.addAll(visitor.getResult());
     }
 
-    @NonNull
     public Set<String> getResult() {
         return result;
     }
@@ -56,7 +54,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
         }
 
         @Override
-        public void enter(@NonNull Visitable segment) {
+        public void enter(Visitable segment) {
             switch (segment) {
                 case And(var left, var right) ->
                     // delegate to AndCondition for backward compatibility
@@ -120,8 +118,7 @@ public class QueryVisitor<E extends Extension> implements Visitor {
                     nbc.indexName(), nbc.fromKey(), nbc.fromInclusive(), nbc.toKey(),
                     nbc.toInclusive(), true
                 ));
-                case IsNullCondition(var indexName) ->
-                    result.addAll(isNullQuery(indexName, false));
+                case IsNullCondition(var indexName) -> result.addAll(isNullQuery(indexName, false));
                 case IsNotNullCondition(var indexName) ->
                     result.addAll(isNullQuery(indexName, true));
                 case StringContainsCondition(var indexName, var keyword) ->

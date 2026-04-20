@@ -3,7 +3,6 @@ package run.halo.app.theme;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.linkbuilder.StandardLinkBuilder;
@@ -58,7 +57,7 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             .build().toString();
     }
 
-    static boolean linkInSite(@NonNull URI externalUri, @NonNull String link) {
+    static boolean linkInSite(URI externalUri, String link) {
         if (!PathUtils.isAbsoluteUri(link)) {
             // relative uri is always in site
             return true;

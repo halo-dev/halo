@@ -1,7 +1,6 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
-import org.jspecify.annotations.NonNull;
 import org.pf4j.PluginRuntimeException;
 import run.halo.app.core.extension.Plugin;
 
@@ -20,7 +19,6 @@ public interface PluginFinder {
      * @return the found plugin
      * @throws PluginRuntimeException if any error occurs during finding plugin
      */
-    @NonNull
-    Plugin find(@NonNull Path pluginPath);
+    Plugin find(Path pluginPath);
 
 }

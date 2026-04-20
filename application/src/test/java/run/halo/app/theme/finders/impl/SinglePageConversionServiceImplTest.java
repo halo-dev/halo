@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -62,8 +61,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerA implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContentContext> handle(
-            @NonNull SinglePageContentContext pageContent) {
+        public Mono<SinglePageContentContext> handle(SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-A");
             return Mono.just(pageContent);
         }
@@ -72,8 +70,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerB implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContentContext> handle(
-            @NonNull SinglePageContentContext pageContent) {
+        public Mono<SinglePageContentContext> handle(SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-B");
             return Mono.just(pageContent);
         }
@@ -82,8 +79,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerC implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContentContext> handle(
-            @NonNull SinglePageContentContext pageContent) {
+        public Mono<SinglePageContentContext> handle(SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-C");
             return Mono.just(pageContent);
         }

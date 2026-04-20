@@ -4,7 +4,6 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Duration;
 import org.springframework.context.event.EventListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.CategoryHiddenStateChangeEvent;
@@ -52,7 +51,7 @@ public class PostHideFromListStateUpdater
     }
 
     @EventListener(CategoryHiddenStateChangeEvent.class)
-    public void onApplicationEvent(@NonNull CategoryHiddenStateChangeEvent event) {
+    public void onApplicationEvent(CategoryHiddenStateChangeEvent event) {
         this.queue.addImmediately(event);
     }
 }

@@ -10,7 +10,6 @@ import org.pf4j.ExtensionPoint;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -100,7 +99,6 @@ public class DefaultExtensionGetter implements ExtensionGetter {
         return extensionPointDefinitionGetter.getByClassName(extensionPoint.getName());
     }
 
-    @NonNull
     protected <T> List<T> lookExtensions(Class<T> type) {
         List<T> beans = new ArrayList<>();
         // avoid concurrent modification

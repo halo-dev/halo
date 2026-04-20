@@ -9,7 +9,6 @@ import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -29,7 +28,6 @@ public class ExtensionRouterFunctionFactory {
         this.client = client;
     }
 
-    @NonNull
     public RouterFunction<ServerResponse> create() {
         var getHandler = new ExtensionGetHandler(scheme, client);
         var listHandler = new ExtensionListHandler(scheme, client);

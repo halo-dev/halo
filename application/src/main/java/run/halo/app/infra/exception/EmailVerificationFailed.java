@@ -1,6 +1,6 @@
 package run.halo.app.infra.exception;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.server.ServerWebInputException;
 
 /**
@@ -20,7 +20,7 @@ public class EmailVerificationFailed extends ServerWebInputException {
     }
 
     public EmailVerificationFailed(String reason, @Nullable Throwable cause,
-        @Nullable String messageDetailCode, @Nullable Object[] messageDetailArguments) {
+        @Nullable String messageDetailCode, Object @Nullable [] messageDetailArguments) {
         super(reason, null, cause, messageDetailCode, messageDetailArguments);
     }
 }

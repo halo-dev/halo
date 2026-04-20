@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Category;
@@ -47,7 +46,7 @@ class ExtensionPermalinkPatternUpdater implements ApplicationListener<SystemConf
 
     @Override
     @Async
-    public void onApplicationEvent(@NonNull SystemConfigChangedEvent event) {
+    public void onApplicationEvent(SystemConfigChangedEvent event) {
         var oldData = event.getOldData();
         var newData = event.getNewData();
         var oldRules = SystemSetting.get(oldData, ThemeRouteRules.GROUP, ThemeRouteRules.class);

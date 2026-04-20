@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RequestPredicate;
@@ -62,8 +61,7 @@ public class SinglePageRoute
     private final LocaleContextResolver localeContextResolver;
 
     @Override
-    @NonNull
-    public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
+    public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return Flux.fromIterable(routerFunctions())
             .concatMap(routerFunction -> routerFunction.route(request))
             .next();
@@ -79,7 +77,7 @@ public class SinglePageRoute
     }
 
     @Override
-    public void accept(@NonNull RouterFunctions.Visitor visitor) {
+    public void accept(RouterFunctions.Visitor visitor) {
         routerFunctions().forEach(routerFunction -> routerFunction.accept(visitor));
     }
 

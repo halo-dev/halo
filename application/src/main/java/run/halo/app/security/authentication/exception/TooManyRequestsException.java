@@ -1,6 +1,6 @@
 package run.halo.app.security.authentication.exception;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.AuthenticationException;
 import run.halo.app.infra.exception.RateLimitExceededException;
 

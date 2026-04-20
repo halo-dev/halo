@@ -5,7 +5,6 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final ReactiveExtensionClient client;
 
     @Override
-    public Flux<Category> listChildren(@NonNull String categoryName) {
+    public Flux<Category> listChildren(String categoryName) {
         return client.fetch(Category.class, categoryName)
             .expand(category -> {
                 var children = category.getSpec().getChildren();
@@ -37,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Mono<Category> getParentByName(@NonNull String name) {
+    public Mono<Category> getParentByName(String name) {
         if (StringUtils.isBlank(name)) {
             return Mono.empty();
         }
@@ -52,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Mono<Boolean> isCategoryHidden(@NonNull String categoryName) {
+    public Mono<Boolean> isCategoryHidden(String categoryName) {
         return client.fetch(Category.class, categoryName)
             .expand(category -> getParentByName(category.getMetadata().getName()))
             .filter(category -> category.getSpec().isHideFromList())
