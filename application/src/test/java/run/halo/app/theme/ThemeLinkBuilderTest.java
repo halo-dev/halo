@@ -99,6 +99,26 @@ class ThemeLinkBuilderTest {
     }
 
     @Test
+    void processAssetsDirectoryLinkShouldNotAppendVersion() {
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
+
+        // Directory-like paths should not get ?v appended to avoid breaking manual concatenation
+        String link = "/assets";
+        String processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets");
+
+        link = "/assets/";
+        processed = themeLinkBuilder.processLink(null, link);
+        // Note: combinePath strips the trailing slash
+        assertThat(processed).isEqualTo("/themes/test-theme/assets");
+
+        link = "/assets/js";
+        processed = themeLinkBuilder.processLink(null, link);
+        assertThat(processed).isEqualTo("/themes/test-theme/assets/js");
+    }
+
+    @Test
     void processNullLink() {
         ThemeLinkBuilder themeLinkBuilder =
             new ThemeLinkBuilder(getTheme(false), externalUrlSupplier);
