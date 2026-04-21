@@ -65,6 +65,7 @@ public enum ExtensionUtil {
      *
      * @return Query
      */
+    @SuppressWarnings("removal")
     public static Query notDeleting() {
         return Queries.isNull("metadata.deletionTimestamp");
     }

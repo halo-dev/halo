@@ -2,8 +2,8 @@ package run.halo.app.plugin;
 
 import java.util.Objects;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.lang.NonNull;
 
 /**
  * The event that delegates to another shared event published by a plugin.
@@ -19,13 +19,13 @@ class PluginSharedEventDelegator extends ApplicationEvent {
      */
     private final ApplicationEvent delegate;
 
-    public PluginSharedEventDelegator(@NonNull Object source, @NonNull ApplicationEvent delegate) {
+    public PluginSharedEventDelegator(Object source, ApplicationEvent delegate) {
         super(source);
         this.delegate = delegate;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

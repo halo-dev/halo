@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ConfigMap;
@@ -97,7 +96,6 @@ class DefaultSystemConfigFetcher
         return fetch(SystemSetting.ThemeRouteRules.GROUP, SystemSetting.ThemeRouteRules.class);
     }
 
-    @NonNull
     private Mono<Map<String, String>> getValuesInternal() {
         return configMapMono;
     }

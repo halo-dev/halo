@@ -1,7 +1,7 @@
 package run.halo.app.extension.router.selector;
 
 import java.util.Objects;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.index.query.Condition;
 import run.halo.app.extension.index.query.Queries;

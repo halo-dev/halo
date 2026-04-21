@@ -2,7 +2,6 @@ package run.halo.app.notification;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.concurrent.atomic.AtomicReference;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +80,6 @@ public class EmailNotifier implements ReactiveNotifier {
             .then();
     }
 
-    @NonNull
     private MimeMessagePreparator getMimeMessagePreparator(String toEmail,
         EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
         return emailSenderHelper.createMimeMessagePreparator(emailSenderConfig, toEmail,

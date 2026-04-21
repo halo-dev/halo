@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +62,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
     }
 
     @Override
-    public Mono<SinglePageVo> convertToVo(@NonNull SinglePage singlePage) {
+    public Mono<SinglePageVo> convertToVo(SinglePage singlePage) {
         return convert(singlePage, singlePage.getSpec().getReleaseSnapshot());
     }
 

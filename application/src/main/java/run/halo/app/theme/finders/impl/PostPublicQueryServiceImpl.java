@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -84,7 +83,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
 
     @Override
-    public Mono<ListedPostVo> convertToListedVo(@NonNull Post post) {
+    public Mono<ListedPostVo> convertToListedVo(Post post) {
         Assert.notNull(post, "Post must not be null");
         ListedPostVo postVo = ListedPostVo.from(post);
         postVo.setCategories(List.of());
@@ -246,7 +245,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             });
     }
 
-    @NonNull
+
     protected Mono<ContentVo> extendPostContent(Post post,
         ContentWrapper wrapper) {
         Assert.notNull(post, "Post name must not be null");

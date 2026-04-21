@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -112,7 +112,7 @@ public class Role extends AbstractExtension {
             this.verbs = nullElseEmpty(verbs);
         }
 
-        String[] nullElseEmpty(String... items) {
+        String[] nullElseEmpty(String @Nullable ... items) {
             if (items == null) {
                 return new String[] {};
             }
@@ -120,7 +120,7 @@ public class Role extends AbstractExtension {
         }
 
         @Override
-        public int compareTo(@NonNull PolicyRule other) {
+        public int compareTo(PolicyRule other) {
             int result = compare(apiGroups, other.apiGroups);
             if (result != 0) {
                 return result;

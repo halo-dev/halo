@@ -1,7 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
-
 record StringEndsWithCondition(String indexName, String suffix) implements IndexCondition {
 
     @Override
@@ -9,7 +7,6 @@ record StringEndsWithCondition(String indexName, String suffix) implements Index
         return new StringNotEndsWithCondition(indexName, suffix);
     }
 
-    @NotNull
     @Override
     public String toString() {
         return indexName + " ENDS WITH " + suffix;

@@ -10,7 +10,6 @@ import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
@@ -32,8 +31,7 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
 
 
     @Override
-    @NonNull
-    public LocaleContext resolveLocaleContext(@NonNull ServerWebExchange exchange) {
+    public LocaleContext resolveLocaleContext(ServerWebExchange exchange) {
         var request = exchange.getRequest();
         var locale = getLocaleFromQueryParameter(request)
             .or(() -> getLocaleFromCookie(request))

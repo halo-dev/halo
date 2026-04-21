@@ -8,9 +8,9 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
@@ -31,18 +31,15 @@ public class CommentQuery extends SortableRequest {
         super(request.exchange());
     }
 
-    @Nullable
-    public String getKeyword() {
+    public @Nullable String getKeyword() {
         return queryParams.getFirst("keyword");
     }
 
-    @Nullable
-    public String getOwnerKind() {
+    public @Nullable String getOwnerKind() {
         return queryParams.getFirst("ownerKind");
     }
 
-    @Nullable
-    public String getOwnerName() {
+    public @Nullable String getOwnerName() {
         return queryParams.getFirst("ownerName");
     }
 

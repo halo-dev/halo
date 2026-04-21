@@ -20,7 +20,6 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -181,13 +180,11 @@ class AuthorizationTest {
                 .build();
         }
 
-        @NonNull
         Mono<ServerResponse> queryPosts(ServerRequest request) {
             return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
                 .bodyValue("returned posts");
         }
 
-        @NonNull
         Mono<ServerResponse> updatePost(ServerRequest request) {
             var name = request.pathVariable("name");
             return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)

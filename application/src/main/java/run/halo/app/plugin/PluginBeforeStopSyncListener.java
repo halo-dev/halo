@@ -4,7 +4,6 @@ import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,7 +33,7 @@ class PluginBeforeStopSyncListener {
     }
 
     @EventListener
-    void onApplicationEvent(@NonNull HaloPluginBeforeStopEvent event) {
+    void onApplicationEvent(HaloPluginBeforeStopEvent event) {
         var pluginWrapper = event.getPlugin();
         var p = pluginWrapper.getPlugin();
         if (!(p instanceof SpringPlugin springPlugin)) {

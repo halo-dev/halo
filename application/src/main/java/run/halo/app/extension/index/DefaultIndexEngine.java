@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -50,7 +49,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
-    public <E extends Extension> void insert(@NonNull Iterable<E> extensions) {
+    public <E extends Extension> void insert(Iterable<E> extensions) {
         extensions.forEach(extension -> {
             // get indices manager
             var indices = indicesManager.get((Class<E>) extension.getClass());
@@ -59,7 +58,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
-    public <E extends Extension> void update(@NonNull Iterable<E> extensions) {
+    public <E extends Extension> void update(Iterable<E> extensions) {
         extensions.forEach(extension -> {
             var indices = indicesManager.get((Class<E>) extension.getClass());
             indices.update(extension);
@@ -67,7 +66,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
-    public <E extends Extension> void delete(@NonNull Iterable<E> extensions) {
+    public <E extends Extension> void delete(Iterable<E> extensions) {
         extensions.forEach(extension -> {
             var indices = indicesManager.get((Class<E>) extension.getClass());
             indices.delete(extension);
@@ -207,7 +206,6 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
-    @NonNull
     public IndicesManager getIndicesManager() {
         return this.indicesManager;
     }

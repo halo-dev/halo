@@ -1,17 +1,14 @@
 package run.halo.app.notification;
 
 import lombok.Data;
-import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
 public interface EmailSenderHelper {
 
-    @NonNull
     JavaMailSender createJavaMailSender(EmailSenderConfig senderConfig);
 
-    @NonNull
     MimeMessagePreparator createMimeMessagePreparator(EmailSenderConfig senderConfig,
         String toEmail, String subject, String raw, String html);
 

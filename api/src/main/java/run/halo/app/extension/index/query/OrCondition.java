@@ -1,6 +1,5 @@
 package run.halo.app.extension.index.query;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
 
 record OrCondition(Condition left, Condition right) implements Condition {
@@ -15,7 +14,6 @@ record OrCondition(Condition left, Condition right) implements Condition {
         return left.not().and(right.not());
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "(" + left + " OR " + right + ")";

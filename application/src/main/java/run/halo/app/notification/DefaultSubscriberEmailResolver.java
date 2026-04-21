@@ -1,6 +1,5 @@
 package run.halo.app.notification;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -44,7 +43,6 @@ public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
         return subscriber;
     }
 
-    @NonNull
     String getEmail(Subscription.Subscriber subscriber) {
         var identity = UserIdentity.of(subscriber.getName());
         if (!identity.isAnonymous()) {

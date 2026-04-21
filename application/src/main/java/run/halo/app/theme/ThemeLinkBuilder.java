@@ -3,7 +3,6 @@ package run.halo.app.theme;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.linkbuilder.StandardLinkBuilder;
@@ -40,7 +39,8 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             var path = PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
             var uriComponents = UriComponentsBuilder.fromUriString(path).build();
             if (StringUtils.isNotBlank(theme.getVersion())
-                && uriComponents.getQueryParams().isEmpty()) {
+                && uriComponents.getQueryParams().isEmpty()
+                && !isDirectoryPath(link)) {
                 return UriComponentsBuilder.fromUriString(path)
                     .queryParam("v", theme.getVersion())
                     .build().toString();
@@ -58,7 +58,7 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             .build().toString();
     }
 
-    static boolean linkInSite(@NonNull URI externalUri, @NonNull String link) {
+    static boolean linkInSite(URI externalUri, String link) {
         if (!PathUtils.isAbsoluteUri(link)) {
             // relative uri is always in site
             return true;
@@ -75,5 +75,20 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
     private boolean isAssetsRequest(String link) {
         String assetsPrefix = externalUrlSupplier.get().resolve(THEME_ASSETS_PREFIX).toString();
         return link.startsWith(assetsPrefix) || link.startsWith(THEME_ASSETS_PREFIX);
+    }
+
+    private static boolean isDirectoryPath(String link) {
+        if (link.endsWith("/")) {
+            return true;
+        }
+        var uri = UriComponentsBuilder.fromUriString(link).build();
+        var path = uri.getPath();
+        if (path == null) {
+            return false;
+        }
+        var pathSegments = uri.getPathSegments();
+        var lastSegment = pathSegments.getLast();
+        // If the last segment has no dot, treat it as a directory path
+        return StringUtils.isNotBlank(lastSegment) && !lastSegment.contains(".");
     }
 }

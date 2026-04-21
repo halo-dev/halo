@@ -14,9 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.Extension;
 
@@ -144,7 +142,7 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
             .collect(Collectors.toSet());
     }
 
-    record LabelEntry(@NonNull String labelKey, @Nullable String labelValue)
+    record LabelEntry(String labelKey, @Nullable String labelValue)
         implements Comparable<LabelEntry> {
 
         public LabelEntry {
@@ -152,7 +150,7 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
         }
 
         @Override
-        public int compareTo(@NotNull LabelEntry o) {
+        public int compareTo(LabelEntry o) {
             var compare = Comparator.<String>naturalOrder().compare(this.labelKey, o.labelKey);
             if (compare != 0) {
                 return compare;

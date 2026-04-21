@@ -2,7 +2,6 @@ package run.halo.app.extension.index;
 
 import java.io.Closeable;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
 public interface IndicesManager extends Closeable {
@@ -24,7 +23,6 @@ public interface IndicesManager extends Closeable {
      * @return the indices for the given extension type
      * @throws IllegalArgumentException if the indices for the given extension type does not exist
      */
-    @NonNull
     <E extends Extension> Indices<E> get(Class<E> type);
 
     /**

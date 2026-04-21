@@ -5,9 +5,8 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -30,8 +29,7 @@ public class Reply extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private ReplySpec spec;
 
-    @Schema
-    @Getter(onMethod_ = @NonNull)
+    @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
     @Data
@@ -50,7 +48,7 @@ public class Reply extends AbstractExtension {
         private Long observedVersion;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(@Nullable Status status) {
         this.status = status == null ? new Status() : status;
     }
 }

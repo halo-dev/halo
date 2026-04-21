@@ -58,7 +58,6 @@ import org.apache.lucene.util.IOUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import reactor.core.Exceptions;
@@ -386,7 +385,6 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     private static class HaloDocumentConverter implements Converter<HaloDocument, Document> {
 
         @Override
-        @NonNull
         public Document convert(HaloDocument haloDoc) {
             var doc = new Document();
             doc.add(new StringField("id", haloDoc.getId(), YES));
@@ -441,7 +439,6 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     private static class DocumentConverter implements Converter<Document, HaloDocument> {
 
         @Override
-        @NonNull
         public HaloDocument convert(Document doc) {
             var haloDoc = new HaloDocument();
             haloDoc.setId(doc.get("id"));

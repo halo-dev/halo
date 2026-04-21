@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,6 +24,7 @@ import run.halo.app.extension.MetadataOperator;
 @EqualsAndHashCode
 public class ListedSinglePageVo implements ExtensionVoOperator {
 
+    @Schema(requiredMode = REQUIRED)
     private MetadataOperator metadata;
 
     private SinglePage.SinglePageSpec spec;

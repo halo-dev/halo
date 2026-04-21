@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
 import lombok.Builder;
@@ -22,6 +25,7 @@ import run.halo.app.extension.MetadataOperator;
 @EqualsAndHashCode
 public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo>, ExtensionVoOperator {
 
+    @Schema(requiredMode = REQUIRED)
     private MetadataOperator metadata;
 
     private Category.CategorySpec spec;

@@ -5,11 +5,10 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.attachment.ThumbnailSize;
@@ -35,12 +34,8 @@ public interface AttachmentService {
      * @param beforeCreating is an attachment modifier before creating.
      * @return attachment.
      */
-    Mono<Attachment> upload(
-        @NonNull String username,
-        @NonNull String policyName,
-        @Nullable String groupName,
-        @NonNull FilePart filePart,
-        @Nullable Consumer<Attachment> beforeCreating);
+    Mono<Attachment> upload(String username, String policyName, @Nullable String groupName,
+        FilePart filePart, @Nullable Consumer<Attachment> beforeCreating);
 
     /**
      * Uploads the given attachment to specific storage using handlers in plugins. Please note
@@ -56,11 +51,8 @@ public interface AttachmentService {
      * @param mediaType is media type of the attachment.
      * @return attachment.
      */
-    Mono<Attachment> upload(@NonNull String policyName,
-        @Nullable String groupName,
-        @NonNull String filename,
-        @NonNull Flux<DataBuffer> content,
-        @Nullable MediaType mediaType);
+    Mono<Attachment> upload(String policyName, @Nullable String groupName, String filename,
+        Flux<DataBuffer> content, @Nullable MediaType mediaType);
 
     /**
      * Deletes an attachment using handlers in plugins.
@@ -112,7 +104,7 @@ public interface AttachmentService {
      * @param filename filename
      * @return attachment
      */
-    Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
+    Mono<Attachment> uploadFromUrl(URL url, String policyName,
         String groupName, String filename);
 
 }

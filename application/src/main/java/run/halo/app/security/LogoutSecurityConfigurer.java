@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -150,7 +149,7 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
             this.location = URI.create(location);
         }
 
-        public void setRequestCache(@NonNull ServerRequestCache requestCache) {
+        public void setRequestCache(ServerRequestCache requestCache) {
             Assert.notNull(requestCache, "requestCache cannot be null");
             this.requestCache = requestCache;
         }

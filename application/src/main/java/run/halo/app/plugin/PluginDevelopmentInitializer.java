@@ -9,7 +9,6 @@ import org.pf4j.PluginManager;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -41,7 +40,7 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
     }
 
     @Override
-    public void onApplicationEvent(@NonNull ApplicationReadyEvent ignored) {
+    public void onApplicationEvent(ApplicationReadyEvent ignored) {
         if (!pluginManager.isDevelopment()) {
             return;
         }

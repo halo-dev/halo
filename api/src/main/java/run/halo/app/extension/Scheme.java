@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.util.Json;
 import java.util.Map;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.exception.ExtensionException;
 
@@ -66,8 +66,7 @@ public record Scheme(Class<? extends Extension> type,
      * @return GVK annotation.
      * @throws ExtensionException when the type has not annotated @GVK.
      */
-    @NonNull
-    public static GVK getGvkFromType(@NonNull Class<? extends Extension> type) {
+    public static GVK getGvkFromType(Class<? extends Extension> type) {
         var gvk = type.getAnnotation(GVK.class);
         Assert.notNull(gvk,
             "Missing annotation " + GVK.class.getName() + " on type " + type.getName());
@@ -75,7 +74,7 @@ public record Scheme(Class<? extends Extension> type,
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

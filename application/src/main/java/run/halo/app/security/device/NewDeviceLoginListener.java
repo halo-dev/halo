@@ -4,7 +4,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Device;
@@ -32,7 +31,7 @@ public class NewDeviceLoginListener {
     private final NotificationReasonEmitter notificationReasonEmitter;
 
     @EventListener
-    Mono<Void> onApplicationEvent(@NonNull NewDeviceLoginEvent event) {
+    Mono<Void> onApplicationEvent(NewDeviceLoginEvent event) {
         return subscribeForNewDeviceLoginReason(event.getDevice())
             .then(sendNewDeviceNotification(event.getDevice()));
     }

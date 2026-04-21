@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.engine.AbstractTemplateHandler;
@@ -47,10 +46,8 @@ public class HaloPostTemplateHandler extends AbstractTemplateHandler {
         super.handleOpenElement((IOpenElementTag) processedTag);
     }
 
-    @NonNull
-    private IProcessableElementTag handleElementTag(
-        @NonNull IProcessableElementTag processableElementTag
-    ) {
+
+    private IProcessableElementTag handleElementTag(IProcessableElementTag processableElementTag) {
         IProcessableElementTag processedTag = processableElementTag;
         if (!CollectionUtils.isEmpty(postProcessors)) {
             var tagProcessorChain = Mono.just(processableElementTag);

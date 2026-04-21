@@ -28,7 +28,6 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -53,7 +52,7 @@ public abstract class FileUtils {
      * @param targetPath the target path
      * @return a Mono signaling when unzip is complete
      */
-    public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath) {
+    public static Mono<Void> unzip(Publisher<DataBuffer> content, Path targetPath) {
         return unzip(content, targetPath, null);
     }
 
@@ -66,7 +65,7 @@ public abstract class FileUtils {
      * @return a Mono signaling when unzip is complete
      */
     public static Mono<Void> unzip(
-        Publisher<DataBuffer> content, @NonNull Path targetPath, @Nullable Scheduler scheduler
+        Publisher<DataBuffer> content, Path targetPath, @Nullable Scheduler scheduler
     ) {
         var unzip = Mono.fromCallable(() -> {
             try (var is = subscriberInputStream(content, 1);
@@ -83,7 +82,7 @@ public abstract class FileUtils {
         return unzip;
     }
 
-    public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
+    public static void unzip(ZipInputStream zis, Path targetPath)
         throws IOException {
         // 1. unzip file to folder
         // 2. return the folder path
@@ -162,7 +161,7 @@ public abstract class FileUtils {
      * @param path path must not be null
      * @throws IOException io exception
      */
-    public static void createIfAbsent(@NonNull Path path) throws IOException {
+    public static void createIfAbsent(Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
 
         if (Files.notExists(path)) {
@@ -179,7 +178,7 @@ public abstract class FileUtils {
      * @param path path must not be null
      * @throws IOException io exception
      */
-    public static void ensureEmpty(@NonNull Path path) throws IOException {
+    public static void ensureEmpty(Path path) throws IOException {
         if (!isEmpty(path)) {
             throw new DirectoryNotEmptyException("Target directory: " + path + " was not empty");
         }
@@ -192,7 +191,7 @@ public abstract class FileUtils {
      * @return true if the given path is empty; false otherwise
      * @throws IOException io exception
      */
-    public static boolean isEmpty(@NonNull Path path) throws IOException {
+    public static boolean isEmpty(Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
 
         if (!Files.isDirectory(path) || Files.notExists(path)) {
@@ -234,8 +233,8 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath,
-        @NonNull Path pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath,
+        Path pathToCheck) {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 
@@ -253,8 +252,8 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull String parentPath,
-        @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(String parentPath,
+        String pathToCheck) {
         checkDirectoryTraversal(Paths.get(parentPath), Paths.get(pathToCheck));
     }
 
@@ -264,8 +263,8 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath,
-        @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath,
+        String pathToCheck) {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
@@ -288,7 +287,7 @@ public abstract class FileUtils {
     public static Mono<Boolean> deleteRecursivelyAndSilently(
         Path root, @Nullable Scheduler scheduler
     ) {
-        var delete =  Mono.fromSupplier(() -> {
+        var delete = Mono.fromSupplier(() -> {
             try {
                 return deleteRecursively(root);
             } catch (IOException ignored) {

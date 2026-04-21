@@ -17,7 +17,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -106,7 +105,6 @@ public class PostRouteFactory implements RouteFactory {
         };
     }
 
-    @NonNull
     private Mono<ServerResponse> postResponse(ServerRequest request,
         PostPatternVariable patternVariable) {
         Mono<PostVo> postVoMono = bestMatchPost(patternVariable);

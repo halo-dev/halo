@@ -96,6 +96,7 @@ public class DelegateExtensionClient implements ExtensionClient {
         client.delete(extension).block(TIMEOUT);
     }
 
+    @SuppressWarnings("removal")
     @Override
     public IndexedQueryEngine indexedQueryEngine() {
         return client.indexedQueryEngine();

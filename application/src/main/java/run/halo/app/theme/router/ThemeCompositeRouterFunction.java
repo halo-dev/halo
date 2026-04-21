@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -94,15 +93,14 @@ public class ThemeCompositeRouterFunction implements
     }
 
     @Override
-    @NonNull
-    public Mono<HandlerFunction<ServerResponse>> route(@NonNull ServerRequest request) {
+    public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return Flux.fromIterable(cachedRouters)
             .concatMap(routerFunction -> routerFunction.route(request))
             .next();
     }
 
     @Override
-    public void accept(@NonNull RouterFunctions.Visitor visitor) {
+    public void accept(RouterFunctions.Visitor visitor) {
         cachedRouters.forEach(routerFunction -> routerFunction.accept(visitor));
     }
 

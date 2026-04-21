@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -128,7 +127,6 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
             .flatMap(matrix -> ServerResponse.ok().bodyValue(matrix));
     }
 
-    @NonNull
     private static <T> Map<String, Integer> toNameIndexMap(List<T> collection,
         Function<T, String> nameGetter) {
         Map<String, Integer> indexMap = new HashMap<>();

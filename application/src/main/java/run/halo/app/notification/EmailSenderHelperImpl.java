@@ -2,7 +2,6 @@ package run.halo.app.notification;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 public class EmailSenderHelperImpl implements EmailSenderHelper {
 
     @Override
-    @NonNull
     public JavaMailSender createJavaMailSender(EmailSenderConfig senderConfig) {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(senderConfig.getHost());
@@ -52,7 +50,6 @@ public class EmailSenderHelperImpl implements EmailSenderHelper {
     }
 
     @Override
-    @NonNull
     public MimeMessagePreparator createMimeMessagePreparator(EmailSenderConfig senderConfig,
         String toEmail, String subject, String raw, String html) {
         return mimeMessage -> {
