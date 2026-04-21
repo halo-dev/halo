@@ -3,6 +3,7 @@ package run.halo.app.infra;
 import java.net.URI;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,16 +24,6 @@ public interface ReactiveUrlDataBufferFetcher {
     Flux<DataBuffer> fetch(URI uri);
 
     /**
-     * Fetches data from a public HTTP(S) URL only.
-     *
-     * @param uri uri to fetch
-     * @return data buffer flux
-     */
-    default Flux<DataBuffer> fetchPublic(URI uri) {
-        return fetch(uri);
-    }
-
-    /**
      * <p>Get head of the uri.</p>
      *
      * @param uri uri to fetch
@@ -41,12 +32,11 @@ public interface ReactiveUrlDataBufferFetcher {
     Mono<HttpHeaders> head(URI uri);
 
     /**
-     * Gets headers from a public HTTP(S) URL only.
+     * Gets the response entity of the uri, which contains the status code, headers and body.
      *
      * @param uri uri to fetch
-     * @return response headers
+     * @return response entity
      */
-    default Mono<HttpHeaders> headPublic(URI uri) {
-        return head(uri);
-    }
+    Mono<ResponseEntity<Flux<DataBuffer>>> fetchResponseEntity(URI uri);
+
 }

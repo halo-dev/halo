@@ -1,16 +1,20 @@
 package run.halo.app.infra;
 
 import java.net.URI;
+import java.net.UnknownHostException;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
+import run.halo.app.infra.utils.HttpSecurityUtils;
 
 /**
  * <p>A default implementation of {@link ReactiveUrlDataBufferFetcher}.</p>
@@ -19,20 +23,10 @@ import reactor.netty.http.client.HttpClient;
  * @since 2.6.0
  */
 @Component
-public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetcher {
-    private final HttpClient httpClient = HttpClient.create()
-        .followRedirect(true);
-    private final HttpClient publicHttpClient = HttpClient.create()
-        .followRedirect(false);
-    private final ContentLengthFetcher contentLengthFetcher = new ContentLengthFetcher();
-    private final PublicRemoteUriValidator publicRemoteUriValidator =
-        new PublicRemoteUriValidator();
+class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetcher {
 
     private final WebClient webClient = WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(httpClient))
-        .build();
-    private final WebClient publicWebClient = WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(publicHttpClient))
+        .clientConnector(new ReactorClientHttpConnector(HttpSecurityUtils.secureHttpClient()))
         .build();
 
     @Override
@@ -41,52 +35,44 @@ public class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBuffe
             .uri(uri)
             .accept(MediaType.APPLICATION_OCTET_STREAM)
             .retrieve()
-            .bodyToFlux(DataBuffer.class);
-    }
-
-    @Override
-    public Flux<DataBuffer> fetchPublic(URI uri) {
-        publicRemoteUriValidator.validate(uri);
-        return publicWebClient.get()
-            .uri(uri)
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
-            .retrieve()
-            .bodyToFlux(DataBuffer.class);
+            .bodyToFlux(DataBuffer.class)
+            .onErrorMap(
+                WebClientRequestException.class,
+                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+            );
     }
 
     @Override
     public Mono<HttpHeaders> head(URI uri) {
-        return contentLengthFetcher.fetchContentLength(uri);
+        return webClient.get().uri(uri)
+            .retrieve()
+            .toBodilessEntity()
+            .map(HttpEntity::getHeaders)
+            .onErrorMap(
+                WebClientRequestException.class,
+                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+            );
     }
 
     @Override
-    public Mono<HttpHeaders> headPublic(URI uri) {
-        publicRemoteUriValidator.validate(uri);
-        return contentLengthFetcher.fetchContentLength(uri);
+    public Mono<ResponseEntity<Flux<DataBuffer>>> fetchResponseEntity(URI uri) {
+        return webClient.get().uri(uri)
+            .accept(MediaType.APPLICATION_OCTET_STREAM)
+            .retrieve()
+            .toEntityFlux(DataBuffer.class)
+            .onErrorMap(
+                WebClientRequestException.class,
+                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+            );
     }
 
-    static class ContentLengthFetcher {
-
-        private final WebClient webClient;
-
-        ContentLengthFetcher() {
-            this.webClient = WebClient.builder()
-                .exchangeStrategies(ExchangeStrategies.builder()
-                    .codecs(config -> config.defaultCodecs().maxInMemorySize(1))
-                    .build())
-                .build();
+    private static Throwable mapToErrorResponse(WebClientRequestException ex) {
+        if (ex.getCause() instanceof UnknownHostException uhe) {
+            return new ServerWebInputException(
+                "Unable to resolve host or private IP resolved: " + uhe.getMessage()
+            );
         }
-
-        Mono<HttpHeaders> fetchContentLength(URI url) {
-            return webClient.get()
-                .uri(url)
-                .exchangeToMono(response -> {
-                    HttpHeaders headers = response.headers().asHttpHeaders();
-
-                    return response.bodyToMono(byte[].class)
-                        .onErrorResume(ex -> Mono.empty())
-                        .thenReturn(headers);
-                });
-        }
+        return ex;
     }
+
 }

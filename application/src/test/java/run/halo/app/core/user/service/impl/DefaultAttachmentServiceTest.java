@@ -1,7 +1,6 @@
 package run.halo.app.core.user.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -75,8 +74,8 @@ class DefaultAttachmentServiceTest {
 
         when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
         when(client.get(ConfigMap.class, "fake-configmap")).thenReturn(Mono.just(configMap));
-        when(dataBufferFetcher.headPublic(any())).thenReturn(Mono.just(new HttpHeaders()));
-        when(dataBufferFetcher.fetchPublic(any())).thenReturn(Flux.just(dataBuffer));
+        when(dataBufferFetcher.head(any())).thenReturn(Mono.just(new HttpHeaders()));
+        when(dataBufferFetcher.fetch(any())).thenReturn(Flux.just(dataBuffer));
         when(extensionGetter.getExtensions(AttachmentHandler.class)).thenReturn(Flux.just(handler));
         when(handler.upload(any())).thenReturn(Mono.just(attachment));
         when(client.create(attachment)).thenReturn(Mono.just(attachment));
@@ -88,15 +87,13 @@ class DefaultAttachmentServiceTest {
             .expectNext(attachment)
             .verifyComplete();
 
-        verify(dataBufferFetcher).headPublic(any());
-        verify(dataBufferFetcher).fetchPublic(any());
         verify(dataBufferFetcher, never()).head(any());
         verify(dataBufferFetcher, never()).fetch(any());
     }
 
     @Test
     void shouldWrapValidationErrorsForPublicRemoteImport() throws Exception {
-        when(dataBufferFetcher.headPublic(any()))
+        when(dataBufferFetcher.head(any()))
             .thenReturn(Mono.error(new IllegalArgumentException("blocked")));
 
         attachmentService.uploadFromPublicUrl(new URL("http://127.0.0.1/file.png"),
@@ -110,8 +107,8 @@ class DefaultAttachmentServiceTest {
             })
             .verify();
 
-        verify(dataBufferFetcher).headPublic(any());
-        verify(dataBufferFetcher, never()).fetchPublic(any());
+        verify(dataBufferFetcher).fetch(any());
+        verify(dataBufferFetcher, never()).fetch(any());
     }
 
     private static reactor.util.context.Context withAuthentication(String username) {

@@ -1,11 +1,13 @@
 package run.halo.app.core.user.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -168,43 +170,30 @@ public class DefaultAttachmentService implements AttachmentService {
     @Override
     public Mono<Attachment> uploadFromUrl(@NonNull URL url, @NonNull String policyName,
         String groupName, String filename) {
-        return transferFromUrl(url, policyName, groupName, filename,
-            dataBufferFetcher::head, dataBufferFetcher::fetch);
-    }
-
-    @Override
-    public Mono<Attachment> uploadFromPublicUrl(@NonNull URL url, @NonNull String policyName,
-        String groupName, String filename) {
-        return transferFromUrl(url, policyName, groupName, filename,
-            dataBufferFetcher::headPublic, dataBufferFetcher::fetchPublic);
-    }
-
-    private Mono<Attachment> transferFromUrl(@NonNull URL url, @NonNull String policyName,
-        String groupName, String filename,
-        Function<URI, Mono<HttpHeaders>> headersFetcher,
-        Function<URI, Flux<DataBuffer>> contentFetcher) {
-        var uri = URI.create(url.toString());
-        AtomicReference<MediaType> mediaTypeRef = new AtomicReference<>();
-        AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
-
-        Mono<Flux<DataBuffer>> contentMono = headersFetcher.apply(uri)
-            .map(httpHeaders -> {
-                if (!StringUtils.hasText(fileNameRef.get())) {
-                    fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
-                }
-                MediaType contentType = httpHeaders.getContentType();
-                mediaTypeRef.set(contentType);
-                return httpHeaders;
-            })
-            .map(response -> contentFetcher.apply(uri));
-
-        return contentMono.flatMap(
-                (content) -> upload(policyName, groupName, fileNameRef.get(), content,
-                    mediaTypeRef.get())
-            )
-            .onErrorResume(throwable -> Mono.error(
-                new ServerWebInputException(
-                    "Failed to transfer the attachment from the external URL."))
+        return Mono.fromCallable(url::toURI)
+            .flatMap(uri -> dataBufferFetcher.fetchResponseEntity(uri)
+                .filter(response -> response.getStatusCode().is2xxSuccessful())
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                    "Failed to fetch the content from the external URL due to non-successful "
+                        + "response status."
+                )))
+                .flatMap(response -> {
+                    if (!response.hasBody()) {
+                        return Mono.error(new ServerWebInputException(
+                            "Failed to fetch the content from the external URL due to empty "
+                                + "response body."
+                        ));
+                    }
+                    var body = response.getBody();
+                    var headers = response.getHeaders();
+                    var finalFilename = Optional.ofNullable(filename)
+                        .filter(StringUtils::hasText)
+                        .orElseGet(() -> getExternalUrlFilename(uri, headers));
+                    var contentType = headers.getContentType();
+                    return upload(
+                        policyName, groupName, finalFilename, requireNonNull(body), contentType
+                    );
+                })
             );
     }
 
