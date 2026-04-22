@@ -106,5 +106,4 @@ public interface AttachmentService {
      */
     Mono<Attachment> uploadFromUrl(URL url, String policyName,
         String groupName, String filename);
-
 }
