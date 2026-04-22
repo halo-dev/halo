@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.server.ServerWebInputException;
@@ -25,9 +26,26 @@ import run.halo.app.infra.utils.HttpSecurityUtils;
 @Component
 class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetcher {
 
-    private final WebClient webClient = WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(HttpSecurityUtils.secureHttpClient()))
-        .build();
+    private static final int MAX_RESPONSE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+    private WebClient webClient;
+
+    DefaultReactiveUrlDataBufferFetcher() {
+        this.webClient = WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(HttpSecurityUtils.secureHttpClient()))
+            .filter(HttpSecurityUtils.maxResponseSizeFilter(MAX_RESPONSE_SIZE))
+            .build();
+    }
+
+    /**
+     * Only for testing purposes, allows setting a custom WebClient instance.
+     *
+     * @param webClient the WebClient instance to use for fetching data buffers
+     */
+    void setWebClient(WebClient webClient) {
+        Assert.notNull(webClient, "WebClient must not be null");
+        this.webClient = webClient;
+    }
 
     @Override
     public Flux<DataBuffer> fetch(URI uri) {
@@ -38,7 +56,7 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
             .bodyToFlux(DataBuffer.class)
             .onErrorMap(
                 WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+                DefaultReactiveUrlDataBufferFetcher::mapRequestException
             );
     }
 
@@ -50,7 +68,7 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
             .map(HttpEntity::getHeaders)
             .onErrorMap(
                 WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+                DefaultReactiveUrlDataBufferFetcher::mapRequestException
             );
     }
 
@@ -62,11 +80,11 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
             .toEntityFlux(DataBuffer.class)
             .onErrorMap(
                 WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapToErrorResponse
+                DefaultReactiveUrlDataBufferFetcher::mapRequestException
             );
     }
 
-    private static Throwable mapToErrorResponse(WebClientRequestException ex) {
+    private static Throwable mapRequestException(WebClientRequestException ex) {
         if (ex.getCause() instanceof UnknownHostException uhe) {
             return new ServerWebInputException(
                 "Unable to resolve host or private IP resolved: " + uhe.getMessage()

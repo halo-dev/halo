@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
@@ -185,6 +187,15 @@ public class DefaultAttachmentService implements AttachmentService {
                     return upload(
                         policyName, groupName, finalFilename, requireNonNull(body), contentType
                     );
+                })
+                .onErrorMap(WebClientResponseException.class, e -> {
+                    if (e.getCause() instanceof DataBufferLimitException) {
+                        return new ServerWebInputException("""
+                            Response body from the external URL is too large to be buffered in \
+                            memory. Please ensure the file size is within the allowed limit."""
+                        );
+                    }
+                    return e;
                 })
             );
     }
