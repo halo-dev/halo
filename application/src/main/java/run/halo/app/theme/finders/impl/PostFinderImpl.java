@@ -14,8 +14,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.CategoryService;
@@ -52,7 +54,7 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
  */
 @Finder("postFinder")
 @AllArgsConstructor
-public class PostFinderImpl implements PostFinder {
+class PostFinderImpl implements PostFinder {
 
     private final ReactiveExtensionClient client;
 
@@ -300,6 +302,25 @@ public class PostFinderImpl implements PostFinder {
             .collectList()
             .flatMap(postPublicQueryService::convertToListedVos)
             .flatMapMany(Flux::fromIterable);
+    }
+
+    @Override
+    public Mono<List<ListedPostVo>> random(int maxSize) {
+        Assert.isTrue(maxSize > 0 && maxSize <= 100, "Size must be between 1 and 100");
+        return postPredicateResolver.getListOptions()
+            .flatMap(listOptions -> client.countBy(Post.class, listOptions)
+                .filter(total -> total > 0)
+                .flatMap(total -> {
+                    // calculate random page number
+                    var totalPages = (int) Math.ceil((double) total / maxSize);
+                    var page = RandomUtils.insecure().randomInt(1, totalPages + 1);
+                    var pageRequest = PageRequestImpl.of(page, maxSize, defaultSort());
+                    return client.listBy(Post.class, listOptions, pageRequest)
+                        .map(ListResult::getItems)
+                        .flatMap(postPublicQueryService::convertToListedVos);
+                })
+                .switchIfEmpty(Mono.fromSupplier(List::of))
+            );
     }
 
     static int pageNullSafe(Integer page) {
