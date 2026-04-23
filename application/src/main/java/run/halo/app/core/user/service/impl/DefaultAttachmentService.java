@@ -1,15 +1,18 @@
 package run.halo.app.core.user.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +22,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
@@ -160,28 +164,39 @@ public class DefaultAttachmentService implements AttachmentService {
     @Override
     public Mono<Attachment> uploadFromUrl(URL url, String policyName,
         String groupName, String filename) {
-        var uri = URI.create(url.toString());
-        AtomicReference<@Nullable MediaType> mediaTypeRef = new AtomicReference<>();
-        AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
-
-        Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)
-            .map(httpHeaders -> {
-                if (!StringUtils.hasText(fileNameRef.get())) {
-                    fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
-                }
-                MediaType contentType = httpHeaders.getContentType();
-                mediaTypeRef.set(contentType);
-                return httpHeaders;
-            })
-            .map(response -> dataBufferFetcher.fetch(uri));
-
-        return contentMono.flatMap(
-                (content) -> upload(policyName, groupName, fileNameRef.get(), content,
-                    mediaTypeRef.get())
-            )
-            .onErrorResume(throwable -> Mono.error(
-                new ServerWebInputException(
-                    "Failed to transfer the attachment from the external URL."))
+        return Mono.fromCallable(url::toURI)
+            .flatMap(uri -> dataBufferFetcher.fetchResponseEntity(uri)
+                .filter(response -> response.getStatusCode().is2xxSuccessful())
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                    "Failed to fetch the content from the external URL due to non-successful "
+                        + "response status."
+                )))
+                .flatMap(response -> {
+                    if (!response.hasBody()) {
+                        return Mono.error(new ServerWebInputException(
+                            "Failed to fetch the content from the external URL due to empty "
+                                + "response body."
+                        ));
+                    }
+                    var body = response.getBody();
+                    var headers = response.getHeaders();
+                    var finalFilename = Optional.ofNullable(filename)
+                        .filter(StringUtils::hasText)
+                        .orElseGet(() -> getExternalUrlFilename(uri, headers));
+                    var contentType = headers.getContentType();
+                    return upload(
+                        policyName, groupName, finalFilename, requireNonNull(body), contentType
+                    );
+                })
+                .onErrorMap(WebClientResponseException.class, e -> {
+                    if (e.getCause() instanceof DataBufferLimitException) {
+                        return new ServerWebInputException("""
+                            Response body from the external URL is too large to be buffered in \
+                            memory. Please ensure the file size is within the allowed limit."""
+                        );
+                    }
+                    return e;
+                })
             );
     }
 
