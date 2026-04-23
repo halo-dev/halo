@@ -139,6 +139,24 @@ class MenuItemReconciler implements Reconciler<Request> {
             .orElse(null));
     }
 
+    private void handleCategoryRef(MenuItem menuItem, String categoryName) {
+        var category = client.fetch(Category.class, categoryName).orElse(null);
+        if (category == null || ExtensionUtil.isDeleted(category)) {
+            resetStatus(menuItem);
+            return;
+        }
+        if (menuItem.getStatus() == null) {
+            menuItem.setStatus(new MenuItemStatus());
+        }
+        var status = menuItem.getStatus();
+        status.setHref(Optional.ofNullable(category.getStatus())
+            .map(Category.CategoryStatus::getPermalink)
+            .orElse(null));
+        status.setDisplayName(Optional.ofNullable(category.getSpec())
+            .map(Category.CategorySpec::getDisplayName)
+            .orElse(null));
+    }
+
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
@@ -210,8 +228,7 @@ class MenuItemReconciler implements Reconciler<Request> {
         if (metadata.getAnnotations() == null) {
             metadata.setAnnotations(new HashMap<>());
         }
-        metadata.getAnnotations()
-            .put(MenuItem.REQUEST_TO_UPDATE_ANNO, Instant.now().toString());
+        metadata.getAnnotations().put(MenuItem.REQUEST_TO_UPDATE_ANNO, Instant.now().toString());
     }
 
     private static void resetStatus(MenuItem menuItem) {
@@ -219,24 +236,6 @@ class MenuItemReconciler implements Reconciler<Request> {
             status.setHref(null);
             status.setDisplayName(null);
         });
-    }
-
-    private void handleCategoryRef(MenuItem menuItem, String categoryName) {
-        var category = client.fetch(Category.class, categoryName).orElse(null);
-        if (category == null || ExtensionUtil.isDeleted(category)) {
-            resetStatus(menuItem);
-            return;
-        }
-        var status = menuItem.getStatus();
-        if (status == null) {
-            status = new MenuItemStatus();
-        }
-        status.setHref(Optional.ofNullable(category.getStatus())
-            .map(Category.CategoryStatus::getPermalink)
-            .orElse(null));
-        status.setDisplayName(Optional.ofNullable(category.getSpec())
-            .map(Category.CategorySpec::getDisplayName)
-            .orElse(null));
     }
 
 }
