@@ -9,8 +9,8 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferLimitException;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 @Slf4j
@@ -41,17 +41,17 @@ public enum HttpSecurityUtils {
             .map(response -> response.mutate()
                 .body(body -> {
                     var countDown = new AtomicLong(maxByteCount);
-                    return body.delayUntil(dataBuffer -> {
-                        long remainder = countDown.addAndGet(-dataBuffer.readableByteCount());
+                    return body.handle((buffer, sink) -> {
+                        long remainder = countDown.addAndGet(-buffer.readableByteCount());
                         if (remainder < 0) {
-                            // No need to release the data buffer here as it will be released
-                            // after the error is propagated and handled by the framework.
-                            return Mono.error(new DataBufferLimitException(
+                            DataBufferUtils.release(buffer);
+                            sink.error(new DataBufferLimitException(
                                 "Response body exceeds the maximum allowed size of "
                                     + maxByteCount + " bytes"
                             ));
+                        } else {
+                            sink.next(buffer);
                         }
-                        return Mono.empty();
                     });
                 })
                 .build());
