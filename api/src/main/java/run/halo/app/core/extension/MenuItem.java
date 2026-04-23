@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
@@ -21,10 +22,14 @@ import run.halo.app.extension.Ref;
     plural = "menuitems", singular = "menuitem")
 public class MenuItem extends AbstractExtension {
 
+    public static final String REQUEST_TO_UPDATE_ANNO = "halo.run/request-to-update";
+
     @Schema(description = "The spec of menu item.", requiredMode = REQUIRED)
+    @Nullable
     private MenuItemSpec spec;
 
     @Schema(description = "The status of menu item.")
+    @Nullable
     private MenuItemStatus status;
 
     public enum Target {
@@ -68,6 +73,7 @@ public class MenuItem extends AbstractExtension {
         private LinkedHashSet<String> children;
 
         @Schema(description = "Target reference. Like Category, Tag, Post or SinglePage")
+        @Nullable
         private Ref targetRef;
 
     }
@@ -76,9 +82,11 @@ public class MenuItem extends AbstractExtension {
     public static class MenuItemStatus {
 
         @Schema(description = "Calculated Display name of menu item.")
+        @Nullable
         private String displayName;
 
         @Schema(description = "Calculated href of manu item.")
+        @Nullable
         private String href;
 
     }

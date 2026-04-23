@@ -75,4 +75,14 @@ public class Ref {
         return groupKindEquals(ref, gvk) && Objects.equals(ref.getName(), name);
     }
 
+    /**
+     * Convert the ref to a string identifier with format "group/kind/name".
+     *
+     * @param ref the reference object
+     * @return the string identifier
+     */
+    public static String toIdentifier(Ref ref) {
+        return ref.getGroup() + "/" + ref.getKind() + "/" + ref.getName();
+    }
+
 }

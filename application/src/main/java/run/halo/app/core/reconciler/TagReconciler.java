@@ -7,10 +7,12 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.event.post.TagUpdatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
@@ -31,6 +33,7 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     static final String FINALIZER_NAME = "tag-protection";
     private final ExtensionClient client;
     private final TagPermalinkPolicy tagPermalinkPolicy;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Result reconcile(Request request) {
@@ -39,6 +42,7 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 if (ExtensionUtil.isDeleted(tag)) {
                     if (removeFinalizers(tag.getMetadata(), Set.of(FINALIZER_NAME))) {
                         client.update(tag);
+                        eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
                     }
                     return;
                 }
@@ -67,6 +71,7 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 status.setObservedVersion(tag.getMetadata().getVersion() + 1);
 
                 client.update(tag);
+                eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
             });
         return Result.doNotRetry();
     }

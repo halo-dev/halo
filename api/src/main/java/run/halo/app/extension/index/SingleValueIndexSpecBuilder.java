@@ -1,6 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.Extension;
 
 /**
@@ -20,6 +21,6 @@ public interface SingleValueIndexSpecBuilder<E extends Extension, K extends Comp
      * @param indexFunc the index function
      * @return the builder itself
      */
-    SingleValueIndexSpecBuilder<E, K> indexFunc(Function<E, K> indexFunc);
+    SingleValueIndexSpecBuilder<E, K> indexFunc(Function<E, @Nullable K> indexFunc);
 
 }
