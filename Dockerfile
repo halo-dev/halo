@@ -21,6 +21,8 @@ ENV JVM_OPTS="" \
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
+RUN java -XX:ArchiveClassesAtExit=application.jsa -Dspring.context.exit=onRefresh -jar application.jar
+
 EXPOSE 8090
 
-ENTRYPOINT ["sh", "-c", "exec java ${JVM_OPTS} -jar application.jar \"$@\"", "--"]
+ENTRYPOINT ["sh", "-c", "exec java ${JVM_OPTS} -XX:SharedArchiveFile=application.jsa -jar application.jar \"$@\"", "--"]
