@@ -2,6 +2,10 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -17,9 +21,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
@@ -32,6 +38,7 @@ import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 
 /**
  * Tests for {@link PostFinderImpl}.
@@ -62,6 +69,9 @@ class PostFinderImplTest {
 
     @Mock
     private PostPublicQueryService publicQueryService;
+
+    @Mock
+    ReactiveQueryPostPredicateResolver postPredicateResolver;
 
     @InjectMocks
     private PostFinderImpl postFinder;
@@ -100,6 +110,37 @@ class PostFinderImplTest {
         assertThat(items.get(1).getYear()).isEqualTo("2021");
         assertThat(items.get(1).getMonths()).hasSize(1);
         assertThat(items.get(1).getMonths().get(0).getMonth()).isEqualTo("01");
+    }
+
+    @Test
+    void shouldReturnEmptyRandomPostsIfNoPostsFound() {
+        var listOptions = mock(ListOptions.class);
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+        when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(0L));
+        postFinder.random(10)
+            .as(StepVerifier::create)
+            .expectNext(List.of())
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnRandomPosts() {
+        var listOptions = mock(ListOptions.class);
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+        when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(100L));
+        var post1 = post(1);
+        var post2 = post(2);
+        when(client.listBy(same(Post.class), same(listOptions), isA(PageRequest.class)))
+            .thenReturn(Mono.just(new ListResult<>(0, 10, 100, List.of(post1, post2))));
+        var postVo1 = ListedPostVo.from(post1);
+        var postVo2 = ListedPostVo.from(post2);
+        when(publicQueryService.convertToListedVos(eq(List.of(post1, post2))))
+            .thenReturn(Mono.just(List.of(postVo1, postVo2)));
+
+        postFinder.random(10)
+            .as(StepVerifier::create)
+            .expectNext(List.of(postVo1, postVo2))
+            .verifyComplete();
     }
 
     List<Post> postsForArchives() {
