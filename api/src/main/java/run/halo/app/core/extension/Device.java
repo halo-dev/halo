@@ -47,6 +47,7 @@ public class Device extends AbstractExtension {
         @Schema(maxLength = 500)
         private String userAgent;
 
+        @Nullable
         private String rememberMeSeriesId;
 
         private Instant lastAccessedTime;
