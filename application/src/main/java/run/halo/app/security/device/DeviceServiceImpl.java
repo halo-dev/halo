@@ -82,6 +82,9 @@ class DeviceServiceImpl implements DeviceService {
                         .flatMap(session -> {
                             device.getSpec().setSessionId(session.getId());
                             device.getSpec().setLastAccessedTime(session.getLastAccessTime());
+                            device.getSpec().setRememberMeSeriesId(
+                                exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                            );
                             return sessionRepository.deleteById(oldSessionId);
                         })
                         .thenReturn(device);
