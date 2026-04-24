@@ -21,14 +21,14 @@ class DeviceServiceImplTest {
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like "
                     + "Gecko) Chrome/126.0.0.0 Safari/537.36",
                 "Mac OS X 10.15.7",
-                "Chrome 126.0"
+                "Chrome 126.0.0"
             ),
             Arguments.of(
                 "Mozilla/5.0 (Phone; OpenHarmony 5.0) AppleWebKit/537.36 (KHTML, like Gecko) "
                     + "Chrome/114.0.0.0 Safari/537.36 ArkWeb/4.1.6.1 Mobile HuaweiBrowser/5.0.4"
                     + ".300",
                 "OpenHarmony 5.0",
-                "Chrome 114.0"
+                "Huawei Browser 5.0.4"
             )
         );
     }
