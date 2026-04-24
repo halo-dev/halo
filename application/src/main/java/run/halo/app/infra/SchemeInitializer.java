@@ -65,6 +65,7 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.extension.notification.Subscription.InterestReason;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.MetadataOperator;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
 import run.halo.app.extension.index.IndexSpec;
@@ -198,7 +199,15 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Secret.class);
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
-        schemeManager.register(MenuItem.class);
+        schemeManager.register(MenuItem.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<MenuItem, String>single("spec.targetRef", String.class)
+                .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
+                    .map(MenuItem.MenuItemSpec::getTargetRef)
+                    .map(Ref::toIdentifier)
+                    .orElse(null)
+                )
+            );
+        });
         schemeManager.register(Post.class, indexSpecs -> {
             indexSpecs.add(IndexSpecs.<Post, String>single("spec.title", String.class)
                 .indexFunc(post -> Optional.ofNullable(post.getSpec())
