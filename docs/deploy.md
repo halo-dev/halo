@@ -84,3 +84,35 @@ sudo docker run -d --name halo -p 8090:8090 -v \~/.halo2:/root/.halo2 halohub/ha
 
 \- 查看日志：sudo docker logs halo
 
+
+## Nginx 反向代理配置
+
+### 安装 Nginx
+```bash
+sudo apt update
+sudo apt install nginx -y
+```
+
+### 配置反向代理
+```bash
+sudo tee /etc/nginx/sites-available/halo > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name 111.229.210.162;
+    location / {
+        proxy_pass http://127.0.0.1:8090;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+EOF
+sudo ln -s /etc/nginx/sites-available/halo /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### 访问地址（更新）
+- 博客前台：http://111.229.210.162
+- 管理后台：http://111.229.210.162/console
+
