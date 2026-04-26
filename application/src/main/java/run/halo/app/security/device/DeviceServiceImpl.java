@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +37,9 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
+import run.halo.app.infra.utils.UserAgentUtils;
 import run.halo.app.security.authentication.rememberme.PersistentRememberMeTokenRepository;
+import ua_parser.UserAgent;
 
 @Slf4j
 @Component
@@ -239,77 +241,22 @@ class DeviceServiceImpl implements DeviceService {
     }
 
     record DeviceInfo(String browser, String os) {
-        static final String UNKNOWN = "Unknown";
-        static final Pattern BROWSER_REGEX =
-            Pattern.compile("(MSIE|Trident|Edge|Edg|OPR|Opera|Chrome|Safari|Firefox"
-                    + "|FxiOS|SamsungBrowser|UCBrowser|UCWEB|CriOS|Silk|Raven\\|Raven\\|)",
-                Pattern.CASE_INSENSITIVE);
-        static final Pattern BROWSER_VERSION_REGEX =
-            Pattern.compile("(?:version/|chrome/|firefox/|safari/|msie "
-                    + "|rv:|opr/|edg/|ucbrowser/|samsungbrowser/|crios/|silk/)(\\d+\\.\\d+)",
-                Pattern.CASE_INSENSITIVE);
 
-        static final Pattern OS_REGEX =
-            Pattern.compile(
-                "(Windows NT|Mac OS X|Android|Linux|iPhone|iPad|Windows Phone|OpenHarmony)");
-        static final Pattern[] osRegexes = {
-            Pattern.compile("Windows NT (\\d+\\.\\d+)"),
-            Pattern.compile("Mac OS X (\\d+[\\._]\\d+([\\._]\\d+)?)"),
-            Pattern.compile("iPhone OS (\\d+_\\d+(_\\d+)?)"),
-            Pattern.compile("Android (\\d+\\.\\d+(\\.\\d+)?)"),
-            Pattern.compile("OpenHarmony (\\d+\\.\\d+(\\.\\d+)?)")
-        };
+        public static DeviceInfo parse(String agentString) {
+            var client = UserAgentUtils.parse(agentString);
+            UserAgent ua = client.userAgent;
+            var browserVersion = Stream.of(ua.major, ua.minor, ua.patch)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining("."));
+            var browserString = ua.family + (browserVersion.isEmpty() ? "" : " " + browserVersion);
 
-        public static DeviceInfo parse(String userAgent) {
-            return new DeviceInfo(concat(parseBrowser(userAgent).name(),
-                parseBrowser(userAgent).version()),
-                concat(parseOperatingSystem(userAgent).name(),
-                    parseOperatingSystem(userAgent).version())
-            );
+            var os = client.os;
+            var osVersion = Stream.of(os.major, os.minor, os.patch, os.patchMinor)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining("."));
+            var osString = os.family + (osVersion.isEmpty() ? "" : " " + osVersion);
+            return new DeviceInfo(browserString, osString);
         }
 
-        private static Pair parseBrowser(String userAgent) {
-            Matcher matcher = BROWSER_REGEX.matcher(userAgent);
-            if (matcher.find()) {
-                String browserName = matcher.group(1);
-                matcher = BROWSER_VERSION_REGEX.matcher(userAgent);
-
-                if (matcher.find()) {
-                    String browserVersion = matcher.group(1);
-                    return new Pair(browserName, browserVersion);
-                } else {
-                    return new Pair(browserName, null);
-                }
-            } else {
-                return new Pair(UNKNOWN, null);
-            }
-        }
-
-        record Pair(String name, String version) {
-        }
-
-        private static Pair parseOperatingSystem(String userAgent) {
-            Matcher matcher = OS_REGEX.matcher(userAgent);
-            var osName = UNKNOWN;
-            if (matcher.find()) {
-                osName = matcher.group(1);
-            }
-            var osVersion = parseOsVersion(userAgent);
-            return new Pair(osName, osVersion);
-        }
-
-        private static String parseOsVersion(String userAgent) {
-            for (Pattern pattern : osRegexes) {
-                Matcher matcher = pattern.matcher(userAgent);
-                if (matcher.find()) {
-                    return matcher.group(1).replace("_", ".");
-                }
-            }
-            return "";
-        }
-
-        private static String concat(String name, String version) {
-            return StringUtils.isBlank(version) ? name : name + " " + version;
-        }
     }
 }
