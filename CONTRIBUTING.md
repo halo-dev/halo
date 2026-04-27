@@ -1,6 +1,8 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to Halo.
+Thank you for your interest in contributing to Halo. As a contributor, you should agree that:
+
+a. The producer can adjust the open-source agreement to be more strict or relaxed as deemed necessary. b. Your contributed code may be used for commercial purposes, including but not limited to its cloud business operations.
 
 This document explains the recommended workflow for submitting high-quality contributions, including code, tests, and documentation updates.
 
