@@ -1,0 +1,47 @@
+<!doctype html>
+<html th:lang="${#locale.toLanguageTag}" th:fragment="html (title,hero,content,head,footer,sidebar,contentClass)">
+  <head>
+    <th:block th:replace="~{modules/base-head :: base-head(title = ${title})}" />
+
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+  </head>
+  <body class="bg-slate-50 dark:bg-slate-900">
+    <th:block th:replace="~{modules/header}" />
+    <th:block th:if="${hero != null}">
+      <th:block th:replace="${hero}" />
+    </th:block>
+    <th:block th:unless="${hero != null}">
+      <th:block th:replace="~{modules/hero :: hero(isHome = true, cover = null, title = null)}" />
+    </th:block>
+    <section
+      class="mx-auto mt-6 grid max-w-7xl grid-cols-1 gap-6 px-4 md:grid-cols-[1fr_18rem] lg:px-6"
+      th:classappend="${contentClass}"
+    >
+      <div class="z-0 min-w-0">
+        <th:block th:replace="${content}" />
+      </div>
+      <th:block th:if="${sidebar != null}">
+        <th:block th:replace="${sidebar}" />
+      </th:block>
+      <th:block th:if="${sidebar == null}">
+        <th:block th:replace="~{modules/sidebar :: sidebar(prepend = null)}" />
+      </th:block>
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+    <th:block th:if="${footer != null}">
+      <th:block th:replace="${footer}" />
+    </th:block>
+
+    <button
+      th:if="${theme.config.global.show_scroll_button}"
+      type="button"
+      id="btn-scroll-to-top"
+      th:aria-label="#{fragment.layout.toTop}"
+      class="fixed bottom-5 right-5 flex items-center justify-center rounded-full bg-white p-3 opacity-0 shadow transition-all duration-300 hover:opacity-70 hover:shadow-lg dark:bg-slate-600 lg:bottom-10 lg:right-10"
+    >
+      <span class="i-tabler-chevron-up text-2xl text-gray-600 dark:text-slate-200"></span>
+    </button>
+  </body>
+</html>

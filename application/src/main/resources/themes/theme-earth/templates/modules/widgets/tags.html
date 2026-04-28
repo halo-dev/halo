@@ -1,0 +1,28 @@
+<div
+  class="w-full overflow-hidden rounded-xl bg-white p-3 shadow transition-all duration-500 hover:shadow-md dark:bg-slate-800"
+>
+  <div class="flex items-center justify-between">
+    <h2 class="inline-flex items-center gap-2 text-base dark:text-slate-50">
+      <span class="i-tabler-tags text-lg"></span>
+      <th:block th:text="#{widget.tags.title}"></th:block>
+    </h2>
+    <a
+      class="group inline-flex items-center gap-2 text-sm text-gray-600 transition-all hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-300"
+      th:href="@{/tags}"
+    >
+      <span th:text="#{common.more}"></span>
+      <span class="i-tabler-chevron-right -translate-x-1 text-lg transition-all group-hover:translate-x-0"></span>
+    </a>
+  </div>
+  <div class="mt-2 flex flex-wrap gap-2" th:with="tags = ${tagFinder.list(1,50)}">
+    <a
+      th:each="tag : ${tags}"
+      th:href="@{${tag.status.permalink}}"
+      th:title="${tag.spec.displayName}"
+      class="inline-flex items-center gap-x-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-800 shadow-sm hover:border-indigo-400 dark:border-slate-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-indigo-200"
+    >
+      <th:block th:text="|#${tag.spec.displayName}|" />
+      <sup th:text="${tag.postCount ?: 0}"></sup>
+    </a>
+  </div>
+</div>

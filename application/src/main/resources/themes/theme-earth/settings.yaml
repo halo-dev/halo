@@ -1,0 +1,519 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-earth-setting
+spec:
+  forms:
+    - group: layout
+      label: 布局
+      formSchema:
+        - $formkit: select
+          name: post_list_layout
+          label: 文章列表布局
+          value: grid_3
+          options:
+            - label: 网格（一行三列）
+              value: grid_3
+            - label: 网格（一行两列）
+              value: grid_2
+            - label: 单条
+              value: single
+          help: "选择单条时，文章卡片的图片将位于左侧"
+        - $formkit: select
+          name: header_widget
+          id: header_widget
+          label: 首页顶部模块
+          value: site_title
+          options:
+            - label: 无
+              value: none
+            - label: 最新一篇文章
+              value: latest_post
+            - label: 文章网格（最新五篇文章）
+              value: latest_post_grid
+            - label: 站点标题
+              value: site_title
+        - $formkit: select
+          if: "$get(header_widget).value !== none"
+          name: header_background_type
+          id: header_background_type
+          key: header_background_type
+          label: 首页顶部背景
+          value: image
+          options:
+            - label: 手动设置
+              value: manual
+            - label: 图片
+              value: image
+        - $formkit: text
+          if: "$get(header_widget).value !== none && $get(header_background_type).value === manual"
+          name: header_background
+          id: header_background
+          key: header_background
+          label: 首页顶部背景
+        - $formkit: attachment
+          if: "$get(header_widget).value !== none && $get(header_background_type).value === image"
+          name: header_background_image
+          id: header_background_image
+          key: header_background_image
+          label: 首页顶部背景图片
+          value: /themes/theme-earth/assets/images/default-background-2023-10-12.jpeg
+        - $formkit: color
+          if: "$get(header_widget).value === site_title"
+          name: title_color
+          id: title_color
+          key: title_color
+          label: 标题文字颜色
+          value: "#ffffff"
+        - $formkit: checkbox
+          name: content_header
+          label: 显示文章页面顶部背景
+          value: true
+
+    - group: global
+      label: 全局
+      formSchema:
+        - $formkit: select
+          name: logo_type
+          id: logo_type
+          label: 菜单栏 Logo 类型
+          value: image
+          options:
+            - label: 文字
+              value: text
+            - label: 图片
+              value: image
+        - $formkit: checkbox
+          name: show_scroll_button
+          label: 显示滚动到顶部按钮
+          value: true
+
+    - group: style
+      label: 样式
+      formSchema:
+        - $formkit: select
+          name: color_scheme
+          label: 默认配色
+          value: system
+          options:
+            - label: 跟随系统
+              value: system
+            - label: 深色
+              value: dark
+            - label: 浅色
+              value: light
+
+        - $formkit: checkbox
+          name: enable_change_color_scheme
+          label: 允许访客切换配色
+          value: true
+
+    - group: post
+      label: 文章
+      formSchema:
+        - $formkit: select
+          name: content_style
+          label: 内容样式
+          value: "github"
+          options:
+            - label: GitHub 风格
+              value: github
+            - label: Tailwind CSS Typography
+              value: tailwind
+        - $formkit: select
+          name: title_position
+          label: 标题位置
+          value: "content"
+          options:
+            - value: "content"
+              label: "正文中"
+            - value: "cover"
+              label: "封面中"
+        - $formkit: text
+          name: cover_height
+          label: 封面图高度
+          value: "24rem"
+        - $formkit: checkbox
+          name: show_upvote_button
+          label: 显示点赞按钮
+          value: true
+        - $formkit: checkbox
+          name: show_share_button
+          id: show_share_button
+          label: 显示分享按钮
+          value: true
+        - $formkit: select
+          if: $get(show_share_button).value
+          name: share_item_ids
+          key: share_item_ids
+          id: share_item_ids
+          multiple: true
+          sortable: true
+          label: 分享平台
+          value:
+            - wechat
+            - x
+            - telegram
+            - facebook
+            - qq
+            - qzone
+            - weibo
+            - douban
+            - native
+          options:
+            - label: 微信
+              value: wechat
+            - label: X
+              value: x
+            - label: Telegram
+              value: telegram
+            - label: Facebook
+              value: facebook
+            - label: QQ
+              value: qq
+            - label: QQ 空间
+              value: qzone
+            - label: 微博
+              value: weibo
+            - label: 豆瓣
+              value: douban
+            - label: 系统分享
+              value: native
+        - $formkit: checkbox
+          name: show_deprecated_items
+          key: show_deprecated_items
+          id: show_deprecated_items
+          label: 显示已过时选项
+          value: false
+          help: 这些选项将在未来的版本移除，请尽快使用替代方案
+        - $formkit: repeater
+          if: $get(show_deprecated_items).value
+          name: share_items
+          key: share_items
+          id: share_items
+          label: 分享按钮
+          help: 此选项已过时，请使用上方新提供的分享平台设置项
+          value:
+            - id: wechat
+            - id: x
+            - id: telegram
+            - id: facebook
+            - id: qq
+            - id: qzone
+            - id: weibo
+            - id: douban
+            - id: native
+          children:
+            - $formkit: select
+              name: id
+              label: 分享平台
+              options:
+                - label: 微信
+                  value: wechat
+                - label: X
+                  value: x
+                - label: Telegram
+                  value: telegram
+                - label: Facebook
+                  value: facebook
+                - label: QQ
+                  value: qq
+                - label: QQ 空间
+                  value: qzone
+                - label: 微博
+                  value: weibo
+                - label: 豆瓣
+                  value: douban
+                - label: 系统分享
+                  value: native
+    - group: sidebar
+      label: 侧边栏
+      formSchema:
+        - $formkit: repeater
+          name: widgets
+          label: 小部件
+          value:
+            - value: popular-posts
+            - value: categories
+            - value: tags
+          children:
+            - $formkit: select
+              name: value
+              label: 部件
+              options:
+                - label: 站点资料
+                  value: profile
+                - label: 热门文章
+                  value: popular-posts
+                - label: 文章分类
+                  value: categories
+                - label: 文章标签
+                  value: tags
+
+        - $formkit: group
+          name: profile
+          value:
+            logo:
+          children:
+            - $formkit: attachment
+              name: logo
+              label: 站点资料 Logo
+
+        - $formkit: repeater
+          name: social_media
+          label: 社交媒体
+          value: []
+          children:
+            - $formkit: select
+              name: icon
+              label: 图标
+              options:
+                - label: 电子邮箱
+                  value: i-tabler-mail
+                - label: 微信
+                  value: i-simple-icons-wechat
+                - label: 腾讯 QQ
+                  value: i-simple-icons-tencentqq
+                - label: 新浪微博
+                  value: i-simple-icons-sinaweibo
+                - label: 知乎
+                  value: i-simple-icons-zhihu
+                - label: 豆瓣
+                  value: i-simple-icons-douban
+                - label: 哔哩哔哩
+                  value: i-simple-icons-bilibili
+                - label: 抖音 / TikTok
+                  value: i-simple-icons-tiktok
+                - label: Telegram
+                  value: i-simple-icons-telegram
+                - label: Facebook
+                  value: i-simple-icons-facebook
+                - label: Instagram
+                  value: i-simple-icons-instagram
+                - label: LinkedIn
+                  value: i-simple-icons-linkedin
+                - label: Twitter
+                  value: i-simple-icons-twitter
+                - label: Slack
+                  value: i-simple-icons-slack
+                - label: Discord
+                  value: i-simple-icons-discord
+                - label: YouTube
+                  value: i-simple-icons-youtube
+                - label: Steam
+                  value: i-simple-icons-steam
+                - label: GitHub
+                  value: i-simple-icons-github
+                - label: GitLab
+                  value: i-simple-icons-gitlab
+                - label: RSS
+                  value: i-simple-icons-rss
+            - $formkit: text
+              name: name
+              label: 名称
+            - $formkit: text
+              name: url
+              label: 链接
+              validation: "required"
+            - $formkit: select
+              name: url_type
+              label: 链接类型
+              value: normal
+              help: "如果选择了图片类型，那么在访客点击之后会使用弹框的形式加载"
+              options:
+                - label: 跳转链接
+                  value: normal
+                - label: 图片
+                  value: image
+
+    - group: footer
+      label: 页脚
+      formSchema:
+        - $formkit: select
+          name: style
+          id: style
+          key: style
+          label: 页脚风格
+          value: style_1
+          options:
+            - label: 风格一
+              value: style_1
+            - label: 风格二
+              value: style_2
+
+        - $formkit: attachment
+          name: logo
+          label: Logo
+          help: 如果不设置，将使用站点设置的 Logo
+
+        - $formkit: text
+          name: title
+          label: 标题
+          help: 如果不设置，将使用站点设置的标题
+
+        - $formkit: textarea
+          rows: 3
+          name: slogan
+          id: slogan
+          key: slogan
+          if: "$get(style).value === style_2"
+          label: 标语
+
+        - $formkit: select
+          if: "$get(style).value === style_1"
+          name: right_menu
+          id: right_menu
+          key: right_menu
+          label: 右侧菜单
+          action: "/api/v1alpha1/menus"
+          autoSelect: false
+          clearable: true
+          requestOption:
+            labelField: "spec.displayName"
+            valueField: "metadata.name"
+
+        - $formkit: select
+          if: "$get(style).value === style_2"
+          name: menu_names
+          id: menu_names
+          key: menu_names
+          label: 菜单组
+          value: []
+          multiple: true
+          sortable: true
+          action: "/api/v1alpha1/menus"
+          requestOption:
+            labelField: "spec.displayName"
+            valueField: "metadata.name"
+
+        - $formkit: repeater
+          name: social_media
+          label: 社交媒体
+          value: []
+          children:
+            - $formkit: select
+              name: icon
+              label: 图标
+              options:
+                - label: 电子邮箱
+                  value: i-tabler-mail
+                - label: 微信
+                  value: i-simple-icons-wechat
+                - label: 腾讯 QQ
+                  value: i-simple-icons-tencentqq
+                - label: 新浪微博
+                  value: i-simple-icons-sinaweibo
+                - label: 知乎
+                  value: i-simple-icons-zhihu
+                - label: 豆瓣
+                  value: i-simple-icons-douban
+                - label: 哔哩哔哩
+                  value: i-simple-icons-bilibili
+                - label: 抖音 / TikTok
+                  value: i-simple-icons-tiktok
+                - label: Telegram
+                  value: i-simple-icons-telegram
+                - label: Facebook
+                  value: i-simple-icons-facebook
+                - label: Instagram
+                  value: i-simple-icons-instagram
+                - label: LinkedIn
+                  value: i-simple-icons-linkedin
+                - label: Twitter
+                  value: i-simple-icons-twitter
+                - label: Slack
+                  value: i-simple-icons-slack
+                - label: Discord
+                  value: i-simple-icons-discord
+                - label: YouTube
+                  value: i-simple-icons-youtube
+                - label: Steam
+                  value: i-simple-icons-steam
+                - label: GitHub
+                  value: i-simple-icons-github
+                - label: GitLab
+                  value: i-simple-icons-gitlab
+                - label: RSS
+                  value: i-simple-icons-rss
+            - $formkit: text
+              name: name
+              label: 名称
+            - $formkit: text
+              name: url
+              label: 链接
+              validation: "required"
+            - $formkit: select
+              name: url_type
+              label: 链接类型
+              value: normal
+              help: "如果选择了图片类型，那么在访客点击之后会使用弹框的形式加载"
+              options:
+                - label: 跳转链接
+                  value: normal
+                - label: 图片
+                  value: image
+
+        - $formkit: checkbox
+          name: show_deprecated_items
+          key: show_deprecated_items
+          id: show_deprecated_items
+          label: 显示已过时选项
+          value: false
+          help: 这些选项将在未来的版本移除，请尽快使用替代方案
+
+        - $formkit: menuRadio
+          if: "$get(show_deprecated_items).value"
+          name: menu
+          id: menu
+          key: menu
+          label: 右侧菜单
+          help: 此选项已过时，请使用上方新提供的右侧菜单设置项
+
+        - $formkit: repeater
+          if: "$get(show_deprecated_items).value"
+          name: menus
+          id: menus
+          key: menus
+          label: 菜单组
+          value: []
+          help: 此选项已过时，请使用上方新提供的菜单组设置项
+          children:
+            - $formkit: menuRadio
+              name: name
+              label: 菜单
+              validation: "required"
+    - group: beian
+      label: 备案设置
+      formSchema:
+        - $formkit: text
+          name: icp_text
+          label: ICP备案号
+        - $formkit: text
+          name: icp_link
+          label: ICP备案跳转链接
+          value: https://beian.miit.gov.cn/
+
+        - $formkit: text
+          name: gongan_text
+          label: 公安联网备案号
+        - $formkit: text
+          name: gongan_link
+          label: 公安联网备案跳转链接
+          value: https://beian.mps.gov.cn/#/query/webSearch
+    - group: plugin
+      label: 插件集成
+      formSchema:
+        - $formkit: group
+          name: docsme
+          label: Docsme 文档管理
+          value:
+            source: theme
+          children:
+            - $formkit: select
+              name: source
+              label: 模板来源
+              options:
+                - label: 由此主题提供
+                  value: theme
+                - label: 使用插件默认模板
+                  value: plugin
