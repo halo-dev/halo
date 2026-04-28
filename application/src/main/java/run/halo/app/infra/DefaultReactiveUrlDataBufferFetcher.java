@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.utils.HttpSecurityUtils;
+import reactor.netty.http.client.HttpClient;
 
 /**
  * <p>A default implementation of {@link ReactiveUrlDataBufferFetcher}.</p>
@@ -26,14 +26,13 @@ import run.halo.app.infra.utils.HttpSecurityUtils;
 @Component
 class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetcher {
 
-    private static final int MAX_RESPONSE_SIZE = 10 * 1024 * 1024; // 10 MB
-
     private WebClient webClient;
 
     DefaultReactiveUrlDataBufferFetcher() {
         this.webClient = WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(HttpSecurityUtils.secureHttpClient()))
-            .filter(HttpSecurityUtils.maxResponseSizeFilter(MAX_RESPONSE_SIZE))
+            .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                .followRedirect(true)
+            ))
             .build();
     }
 
