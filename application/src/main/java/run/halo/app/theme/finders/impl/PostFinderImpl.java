@@ -311,13 +311,29 @@ class PostFinderImpl implements PostFinder {
             .flatMap(listOptions -> client.countBy(Post.class, listOptions)
                 .filter(total -> total > 0)
                 .flatMap(total -> {
-                    // calculate random page number
-                    var totalPages = (int) Math.ceil((double) total / maxSize);
+                    var totalInt = total.intValue();
+                    var effectiveSize = Math.min(maxSize, totalInt);
+                    var totalPages = (int) Math.ceil((double) totalInt / effectiveSize);
                     var page = RandomUtils.insecure().randomInt(1, totalPages + 1);
-                    var pageRequest = PageRequestImpl.of(page, maxSize, defaultSort());
-                    return client.listBy(Post.class, listOptions, pageRequest)
+                    var sort = defaultSort();
+                    var firstRequest = PageRequestImpl.of(page, effectiveSize, sort);
+                    return client.listBy(Post.class, listOptions, firstRequest)
                         .map(ListResult::getItems)
-                        .flatMap(postPublicQueryService::convertToListedVos);
+                        .flatMap(items -> {
+                            if (items.size() >= effectiveSize) {
+                                return postPublicQueryService.convertToListedVos(items);
+                            }
+                            // wrap around to the beginning to fill up to effectiveSize
+                            var remaining = effectiveSize - items.size();
+                            var wrapRequest = PageRequestImpl.of(1, remaining, sort);
+                            return client.listBy(Post.class, listOptions, wrapRequest)
+                                .map(ListResult::getItems)
+                                .flatMap(wrapItems -> {
+                                    var combined = new java.util.ArrayList<>(items);
+                                    combined.addAll(wrapItems);
+                                    return postPublicQueryService.convertToListedVos(combined);
+                                });
+                        });
                 })
                 .switchIfEmpty(Mono.fromSupplier(List::of))
             );

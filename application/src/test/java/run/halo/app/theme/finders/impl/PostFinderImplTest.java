@@ -128,18 +128,18 @@ class PostFinderImplTest {
         var listOptions = mock(ListOptions.class);
         when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
         when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(100L));
-        var post1 = post(1);
-        var post2 = post(2);
+        var posts = java.util.stream.IntStream.rangeClosed(1, 10)
+            .mapToObj(this::post)
+            .toList();
         when(client.listBy(same(Post.class), same(listOptions), isA(PageRequest.class)))
-            .thenReturn(Mono.just(new ListResult<>(0, 10, 100, List.of(post1, post2))));
-        var postVo1 = ListedPostVo.from(post1);
-        var postVo2 = ListedPostVo.from(post2);
-        when(publicQueryService.convertToListedVos(eq(List.of(post1, post2))))
-            .thenReturn(Mono.just(List.of(postVo1, postVo2)));
+            .thenReturn(Mono.just(new ListResult<>(0, 10, 100, posts)));
+        var postVos = posts.stream().map(ListedPostVo::from).toList();
+        when(publicQueryService.convertToListedVos(eq(posts)))
+            .thenReturn(Mono.just(postVos));
 
         postFinder.random(10)
             .as(StepVerifier::create)
-            .expectNext(List.of(postVo1, postVo2))
+            .expectNext(postVos)
             .verifyComplete();
     }
 
