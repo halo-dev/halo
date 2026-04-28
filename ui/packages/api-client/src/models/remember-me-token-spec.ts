@@ -15,7 +15,7 @@
 
 
 export interface RememberMeTokenSpec {
-    'lastUsed': string;
+    'lastUsed'?: string;
     /**
      * The previous token value, stored when the token is rotated.  Used to accept recently-rotated tokens within a grace period  to prevent false-positive cookie theft detection during  concurrent requests.
      */

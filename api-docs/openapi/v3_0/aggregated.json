@@ -21252,7 +21252,6 @@
       },
       "RememberMeTokenSpec": {
         "required": [
-          "lastUsed",
           "series",
           "tokenValue",
           "username"
