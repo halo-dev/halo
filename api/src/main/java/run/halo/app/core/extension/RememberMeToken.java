@@ -7,6 +7,7 @@ import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -32,6 +33,16 @@ public class RememberMeToken extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String tokenValue;
 
+        @Schema(requiredMode = REQUIRED)
         private Instant lastUsed;
+
+        /**
+         * The previous token value, stored when the token is rotated.
+         * Used to accept recently-rotated tokens within a grace period
+         * to prevent false-positive cookie theft detection during
+         * concurrent requests.
+         */
+        @Nullable
+        private String previousTokenValue;
     }
 }

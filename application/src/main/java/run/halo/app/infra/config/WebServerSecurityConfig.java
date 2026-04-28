@@ -52,8 +52,7 @@ public class WebServerSecurityConfig {
 
         var pathMatcher = pathMatchers("/**");
         var staticResourcesMatcher = pathMatchers(HttpMethod.GET,
-            "/console/assets/**",
-            "/uc/assets/**",
+            "/ui-assets/**",
             "/themes/{themeName}/assets/{*resourcePaths}",
             "/plugins/{pluginName}/assets/**",
             "/webjars/**",
