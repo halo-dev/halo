@@ -45,6 +45,12 @@
   <th:block th:fragment="sidebar">
     <th:block th:replace="~{modules/sidebar :: sidebar(prepend = ~{::sidebar_prepend})}"></th:block>
   </th:block>
+<div class="ai-summary-card">
+  <div class="ai-summary-tag">AI摘要</div>
+  <div class="ai-summary-content">
+    [[${post.summary}]]
+  </div>
+</div>
   <th:block th:fragment="content">
   <!-- AI 摘要卡片 - 静态结构 -->
   <div class="ai-summary-card">
