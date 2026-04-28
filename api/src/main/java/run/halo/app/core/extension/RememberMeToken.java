@@ -33,7 +33,7 @@ public class RememberMeToken extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String tokenValue;
 
-        @Schema(requiredMode = REQUIRED)
+        @Nullable
         private Instant lastUsed;
 
         /**

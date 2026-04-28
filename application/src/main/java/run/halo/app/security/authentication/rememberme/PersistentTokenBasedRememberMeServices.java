@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -175,14 +176,16 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
 
     private boolean isTokenStolen(RememberMeToken token, String presentedToken) {
-        var lastUsed = token.getSpec().getLastUsed();
+        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
+            .orElseGet(() -> token.getMetadata().getCreationTimestamp());
         var now = clock.instant();
         return now.isAfter(lastUsed.plus(TOKEN_GRACE_PERIOD))
             || !Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue());
     }
 
     private boolean isTokenExpired(RememberMeToken token) {
-        var lastUsed = token.getSpec().getLastUsed();
+        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
+            .orElseGet(() -> token.getMetadata().getCreationTimestamp());
         var now = clock.instant();
         return now.isAfter(lastUsed.plus(rememberMeCookieResolver.getCookieMaxAge()));
     }
