@@ -425,3 +425,44 @@
 ::-ms-reveal {
     display: none;
 }
+/* ===== AI 摘要卡片样式 ===== */
+.ai-summary-card {
+  background-color: #f0f7ff; /* 浅蓝色背景 */
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 12px 0;
+  position: relative;
+  border: 1px solid #e6f0ff;
+  box-sizing: border-box;
+}
+
+/* 左侧蓝色竖线 */
+.ai-summary-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 4px;
+  background-color: #409eff;
+  border-radius: 2px;
+}
+
+/* AI 摘要标签 */
+.ai-summary-tag {
+  display: inline-block;
+  background-color: #409eff;
+  color: #ffffff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+/* 摘要正文 */
+.ai-summary-content {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+}

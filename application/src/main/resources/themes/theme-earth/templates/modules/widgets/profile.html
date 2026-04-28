@@ -1,0 +1,82 @@
+<div
+  class="w-full overflow-hidden rounded-xl bg-white p-3 shadow transition-all duration-500 hover:shadow-md dark:bg-slate-800"
+  th:with="stats = ${siteStatsFinder.getStats()}"
+>
+  <div class="flex flex-col items-center justify-center gap-4">
+    <div th:if="${not #strings.isEmpty(theme.config.sidebar.profile.logo)}" class="relative h-24 w-24">
+      <img
+        th:src="${theme.config.sidebar.profile.logo}"
+        th:alt="${site.title}"
+        width="96"
+        height="96"
+        class="size-full rounded-full object-cover"
+      />
+    </div>
+    <div><h1 class="text-2xl font-medium dark:text-slate-50" th:text="${site.title}"></h1></div>
+    <div th:if="${not #strings.isEmpty(site.subtitle)}">
+      <p class="text-center text-sm text-gray-700 dark:text-slate-300" th:text="${site.subtitle}"></p>
+    </div>
+    <div class="grid grid-cols-4 gap-5">
+      <div class="inline-flex flex-col items-center">
+        <span class="text-xl font-medium tabular-nums text-gray-900 dark:text-slate-100" th:text="${stats.post}"></span>
+        <span
+          class="text-xs font-light text-gray-600 dark:text-slate-300"
+          th:text="#{widget.profile.postCount.label}"
+        ></span>
+      </div>
+      <div class="inline-flex flex-col items-center">
+        <span
+          class="text-xl font-medium tabular-nums text-gray-900 dark:text-slate-100"
+          th:text="${stats.category}"
+        ></span>
+        <span
+          class="text-xs font-light text-gray-600 dark:text-slate-300"
+          th:text="#{widget.profile.categoryCount.label}"
+        ></span>
+      </div>
+      <div class="inline-flex flex-col items-center">
+        <span
+          class="text-xl font-medium tabular-nums text-gray-900 dark:text-slate-100"
+          th:text="${stats.comment}"
+        ></span>
+        <span
+          class="text-xs font-light text-gray-600 dark:text-slate-300"
+          th:text="#{widget.profile.commentCount.label}"
+        ></span>
+      </div>
+      <div class="inline-flex flex-col items-center">
+        <span class="text-xl font-medium tabular-nums text-gray-900 dark:text-slate-100" th:text="${stats.visit}"></span
+        ><span
+          class="text-xs font-light text-gray-600 dark:text-slate-300"
+          th:text="#{widget.profile.visitCount.label}"
+        ></span>
+      </div>
+    </div>
+    <div
+      th:with="social_medias = ${theme.config.sidebar.social_media}"
+      class="flex flex-wrap items-center justify-center gap-5"
+    >
+      <th:block th:each="social_media : ${social_medias}">
+        <a
+          th:if="${social_media.url_type == 'normal'}"
+          th:aria-label="${social_media.name}"
+          class="flex cursor-pointer items-center justify-center rounded p-1 hover:bg-gray-100 dark:hover:bg-slate-700"
+          th:href="${social_media.url}"
+          target="_blank"
+        >
+          <span class="text-gray-600 dark:text-slate-400" th:classappend="${social_media.icon}"></span>
+        </a>
+
+        <span
+          th:if="${social_media.url_type == 'image'}"
+          th:attr="x-data=|{openImageModal:false,image: '${social_media.url}', alt: '${social_media.name}'}|"
+          class="flex cursor-pointer items-center justify-center rounded p-1 hover:bg-gray-100 dark:hover:bg-slate-700"
+          @click="openImageModal = true"
+        >
+          <div th:classappend="${social_media.icon}" class="text-gray-600 dark:text-slate-400"></div>
+          <th:block th:replace="~{modules/image-view-modal}" />
+        </span>
+      </th:block>
+    </div>
+  </div>
+</div>

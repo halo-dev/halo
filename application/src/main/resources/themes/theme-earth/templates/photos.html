@@ -1,0 +1,51 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = |#{page.photos.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
+      <h1 class="mb-9 text-2xl font-medium dark:text-slate-50" th:text="#{page.photos.title}"></h1>
+      <div class="mb-8">
+        <nav class="flex flex-wrap gap-4" aria-label="Tabs">
+          <a
+            th:href="@{/photos}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.isEmpty(param.group) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+          >
+            <span th:text="#{common.all}"></span>
+          </a>
+          <a
+            th:each="group : ${photoFinder.groupBy()}"
+            th:href="@{|/photos?group=${group.metadata.name}|}"
+            class="rounded bg-gray-100 px-1 py-0.5 text-sm text-gray-900 hover:bg-gray-200 dark:bg-slate-600 dark:text-slate-50 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            th:classappend="${#lists.contains(param.group, group.metadata.name) ? '!bg-gray-200 dark:!bg-slate-700 dark:!text-slate-100 ring-2 ring-gray-300 dark:ring-slate-600' : ''}"
+            th:text="${group.spec.displayName}"
+          >
+          </a>
+        </nav>
+      </div>
+
+      <div
+        id="photos"
+        class="columns-1 gap-3 pb-12 sm:columns-2 sm:gap-3 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-3"
+      >
+        <div th:each="photo : ${photos.items}" class="group relative h-auto max-w-full">
+          <img
+            class="animated fadeIn transform-gpu rounded-lg transition-all"
+            th:src="${photo.spec.url}"
+            th:srcset="|${thumbnail.gen(photo.spec.url, 's')} 400w,
+                        ${thumbnail.gen(photo.spec.url, 'm')} 800w,
+                        ${thumbnail.gen(photo.spec.url, 'l')} 1200w|"
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            th:alt="${photo.spec.displayName}"
+          />
+        </div>
+      </div>
+
+      <th:block
+        th:replace="~{modules/pagination :: pagination(context = '/photos/', prevUrl = ${photos.prevUrl}, nextUrl = ${photos.nextUrl}, totalPages = ${photos.totalPages}, page = ${photos.page}, hasPrevious = ${photos.hasPrevious()}, hasNext = ${photos.hasNext()})}"
+      />
+    </div>
+  </th:block>
+</html>

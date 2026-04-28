@@ -1,0 +1,31 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = null)}"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/category-filter}" />
+
+    <div
+      id="post-list"
+      th:if="${posts.total gt 0}"
+      th:with="postItems=${posts.items},list_layout=${theme.config.layout.post_list_layout}"
+      class="mt-6 grid grid-cols-1 gap-6"
+      th:classappend="|${list_layout == 'grid_3' ? 'md:grid-cols-2 xl:grid-cols-3' : ''} ${list_layout == 'grid_2' ? 'md:grid-cols-2' : ''}|"
+    >
+      <th:block th:each="post : ${postItems}">
+        <th:block
+          th:replace="~{modules/post-card :: post-card(${post},true,true,true,${list_layout == 'single' ? 'column' : 'row'})}"
+        />
+      </th:block>
+    </div>
+
+    <div th:if="${posts.total == 0}" class="mt-6 flex items-center justify-center">
+      <span class="text-sm font-light text-gray-600" th:text="#{common.noPosts}"></span>
+    </div>
+
+    <th:block
+      th:replace="~{modules/pagination :: pagination(context = '/', prevUrl = ${posts.prevUrl}, nextUrl = ${posts.nextUrl}, totalPages = ${posts.totalPages}, page = ${posts.page}, hasPrevious = ${posts.hasPrevious()}, hasNext = ${posts.hasNext()})}"
+    />
+  </th:block>
+</html>
