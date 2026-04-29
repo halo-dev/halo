@@ -83,6 +83,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff; /* 文字改成白色，适配深色渐变背景 */
   border: none; /* 原来的 border 可以去掉 */
+position: relative;
 }
   .ai-summary-header {
     display: flex;
@@ -94,7 +95,22 @@
   }
   .ai-icon { font-size: 1.1rem; }
   .ai-summary-content p { margin: 0; color: #374151; line-height: 1.6; }
-  </style>
+/* 左侧加粗竖线 */
+.ai-summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px; /* 控制粗细，4px就是加粗了 */
+  background: rgba(255,255,255,0.5); /* 半透明白色，适配你的渐变背景 */
+  border-radius: 2px 0 0 2px;
+}
+.ai-summary-card p {
+  font-size: 15px; /* 调整字号 */
+  line-height: 1.6; /* 调整行高 */
+  font-weight: 400;
+}  </style>
 
   <!-- 原来的正文代码 -->
   <div x-data="upvote('post','content.halo.run','posts')" class="...">
