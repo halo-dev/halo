@@ -110,7 +110,38 @@ position: relative;
   font-size: 15px; /* 调整字号 */
   line-height: 1.6; /* 调整行高 */
   font-weight: 400;
-}  </style>
+} 
+.like-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+  background: #ffecec;
+}
+
+.like-btn .heart-icon {
+  font-size: 18px;
+}
+
+.like-btn .like-count {
+  font-size: 16px;
+  color: #333;
+}
+ </style>
 
   <!-- 原来的正文代码 -->
   <div x-data="upvote('post','content.halo.run','posts')" class="...">
