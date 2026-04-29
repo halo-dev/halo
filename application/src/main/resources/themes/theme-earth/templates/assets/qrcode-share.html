@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>二维码分享</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+      img {
+        width: 300px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+  </body>
+  <script src="/themes/theme-earth/assets/js/qrious.min.js"></script>
+  <script>
+    (function () {
+      const url = window.location.search.split("=")[1];
+      new QRious({
+        element: document.getElementById("canvas"),
+        value: url,
+        size: 260,
+      });
+    })();
+  </script>
+</html>
