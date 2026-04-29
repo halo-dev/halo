@@ -269,6 +269,12 @@ position: relative;
         <h2 class="mb-2 text-base font-medium text-gray-900 dark:text-slate-50" th:text="#{common.comment}"></h2>
         <halo:comment group="content.halo.run" kind="Post" th:attr="name=${post.metadata.name}" />
       </div>
+<div class="like-button-container">
+  <button class="like-btn">
+    <span class="heart-icon">❤️</span>
+    <span class="like-count">0</span>
+  </button>
+</div>
     </div>
   </th:block>
 const progressBar = document.querySelector('.read-progress-bar');
