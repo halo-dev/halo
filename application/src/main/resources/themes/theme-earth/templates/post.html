@@ -1,10 +1,21 @@
 <!doctype html>
+<div class="read-progress-bar"></div>
 <html
   xmlns:th="https://www.thymeleaf.org"
   th:replace="~{modules/layout :: html(title = ${post.spec.title} + ' - ' + ${site.title}, hero = ~{::hero}, content = ~{::content}, head = ~{::head}, footer = ~{::footer}, sidebar = ~{::sidebar}, contentClass = ${theme.config.layout.content_header} and ${not #strings.isEmpty(post.spec.cover)} ? '!-mt-20' : '')}"
 >
   <th:block th:fragment="head">
     <link
+.read-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: #409eff;
+    z-index: 9999;
+    transition: width 0.2s ease;
+}
       th:if="${theme.config.post.content_style == 'github'}"
       rel="stylesheet"
       th:href="@{/assets/styles/github-markdown.css?v={version}(version=${theme.spec.version})}"
@@ -64,13 +75,16 @@
   </div>
 
   <style>
-  .ai-summary-card {
-    margin: 1.5rem 0;
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    background-color: #f0f7ff;
-    border: 1px solid #cce0ff;
-  }
+ .ai-summary-card {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  /* 原来的 background-color 删掉，换成下面的渐变 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff; /* 文字改成白色，适配深色渐变背景 */
+  border: none; /* 原来的 border 可以去掉 */
+position: relative;
+}
   .ai-summary-header {
     display: flex;
     align-items: center;
@@ -81,7 +95,53 @@
   }
   .ai-icon { font-size: 1.1rem; }
   .ai-summary-content p { margin: 0; color: #374151; line-height: 1.6; }
-  </style>
+/* 左侧加粗竖线 */
+.ai-summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px; /* 控制粗细，4px就是加粗了 */
+  background: rgba(255,255,255,0.5); /* 半透明白色，适配你的渐变背景 */
+  border-radius: 2px 0 0 2px;
+}
+.ai-summary-card p {
+  font-size: 15px; /* 调整字号 */
+  line-height: 1.6; /* 调整行高 */
+  font-weight: 400;
+} 
+.like-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+  background: #ffecec;
+}
+
+.like-btn .heart-icon {
+  font-size: 18px;
+}
+
+.like-btn .like-count {
+  font-size: 16px;
+  color: #333;
+}
+ </style>
 
   <!-- 原来的正文代码 -->
   <div x-data="upvote('post','content.halo.run','posts')" class="...">
@@ -240,6 +300,19 @@
         <h2 class="mb-2 text-base font-medium text-gray-900 dark:text-slate-50" th:text="#{common.comment}"></h2>
         <halo:comment group="content.halo.run" kind="Post" th:attr="name=${post.metadata.name}" />
       </div>
+<div class="like-button-container">
+  <button class="like-btn">
+    <span class="heart-icon">❤️</span>
+    <span class="like-count">0</span>
+  </button>
+</div>
     </div>
   </th:block>
+const progressBar = document.querySelector('.read-progress-bar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / scrollHeight) * 100;
+  progressBar.style.width = progress + '%';
+});
 </html>
