@@ -75,13 +75,15 @@
   </div>
 
   <style>
-  .ai-summary-card {
-    margin: 1.5rem 0;
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    background-color: #f0f7ff;
-    border: 1px solid #cce0ff;
-  }
+ .ai-summary-card {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  /* 原来的 background-color 删掉，换成下面的渐变 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff; /* 文字改成白色，适配深色渐变背景 */
+  border: none; /* 原来的 border 可以去掉 */
+}
   .ai-summary-header {
     display: flex;
     align-items: center;
