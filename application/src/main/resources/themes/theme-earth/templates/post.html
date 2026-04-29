@@ -1,10 +1,21 @@
 <!doctype html>
+<div class="read-progress-bar"></div>
 <html
   xmlns:th="https://www.thymeleaf.org"
   th:replace="~{modules/layout :: html(title = ${post.spec.title} + ' - ' + ${site.title}, hero = ~{::hero}, content = ~{::content}, head = ~{::head}, footer = ~{::footer}, sidebar = ~{::sidebar}, contentClass = ${theme.config.layout.content_header} and ${not #strings.isEmpty(post.spec.cover)} ? '!-mt-20' : '')}"
 >
   <th:block th:fragment="head">
     <link
+.read-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: #409eff;
+    z-index: 9999;
+    transition: width 0.2s ease;
+}
       th:if="${theme.config.post.content_style == 'github'}"
       rel="stylesheet"
       th:href="@{/assets/styles/github-markdown.css?v={version}(version=${theme.spec.version})}"
@@ -242,4 +253,11 @@
       </div>
     </div>
   </th:block>
+const progressBar = document.querySelector('.read-progress-bar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / scrollHeight) * 100;
+  progressBar.style.width = progress + '%';
+});
 </html>
