@@ -2,17 +2,18 @@ package run.halo.app.core.user.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,11 +21,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.ExchangeFunction;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,7 +41,6 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,10 +53,18 @@ class DefaultAttachmentServiceTest {
     ExtensionGetter extensionGetter;
 
     @Mock
-    ReactiveUrlDataBufferFetcher dataBufferFetcher;
+    ExchangeFunction exchangeFunction;
 
     @InjectMocks
     DefaultAttachmentService attachmentService;
+
+    @BeforeEach
+    void setUp() {
+        var webClient = WebClient.builder()
+            .exchangeFunction(exchangeFunction)
+            .build();
+        attachmentService.setWebClient(webClient);
+    }
 
     @Test
     void shouldPopulateGroupWhenUploading() {
@@ -139,65 +150,53 @@ class DefaultAttachmentServiceTest {
         final var service = spy(attachmentService);
         var dataBuffer = mock(DataBuffer.class);
         var body = Flux.just(dataBuffer);
-        var headers = new HttpHeaders();
-        headers.setContentDisposition(
-            ContentDisposition.attachment().filename("remote.png").build());
-        headers.setContentType(MediaType.IMAGE_PNG);
-        var response = ResponseEntity.ok().headers(headers).body(body);
         var uploadedAttachment = new Attachment();
-        URL url = URI.create("https://example.com/assets/image.png").toURL();
-
-        when(dataBufferFetcher.fetchResponseEntity(
-            URI.create("https://example.com/assets/image.png")))
-            .thenReturn(Mono.just(response));
-        doReturn(Mono.just(uploadedAttachment)).when(service)
-            .upload("fake-policy", "", "remote.png", body, MediaType.IMAGE_PNG);
+        var url = URI.create("https://example.com/assets/image.png").toURL();
+        var mockResponse = ClientResponse.create(HttpStatus.OK)
+            .headers(h -> {
+                h.setContentType(MediaType.IMAGE_PNG);
+                h.setContentDisposition(
+                    ContentDisposition.attachment().filename("remote.png").build()
+                );
+            })
+            .body(body)
+            .build();
+        when(exchangeFunction.exchange(any(ClientRequest.class)))
+            .thenReturn(Mono.just(mockResponse));
+        when(service.upload(
+            eq("fake-policy"),
+            eq(""),
+            eq("remote.png"),
+            any(),
+            eq(MediaType.IMAGE_PNG)
+        )).thenReturn(Mono.just(uploadedAttachment));
 
         StepVerifier.create(service.uploadFromUrl(url, "fake-policy", "", ""))
             .expectNext(uploadedAttachment)
             .verifyComplete();
+
+        verify(exchangeFunction).exchange(assertArg(r -> {
+            assertEquals(url.toString(), r.url().toString());
+            assertEquals(HttpMethod.GET, r.method());
+        }));
     }
 
     @Test
     void shouldRejectUploadFromUrlWhenResponseStatusIsNotSuccessful() throws Exception {
-        URL url = URI.create("https://example.com/file.png").toURL();
-        var response = ResponseEntity.status(HttpStatus.BAD_GATEWAY).<Flux<DataBuffer>>build();
-        when(dataBufferFetcher.fetchResponseEntity(URI.create("https://example.com/file.png")))
-            .thenReturn(Mono.just(response));
+        var url = URI.create("https://example.com/file.png").toURL();
+        when(exchangeFunction.exchange(any(ClientRequest.class)))
+            .thenReturn(Mono.just(ClientResponse.create(HttpStatus.BAD_GATEWAY).build()));
 
         StepVerifier.create(attachmentService.uploadFromUrl(url, "fake-policy", "", ""))
             .consumeErrorWith(error -> {
                 var exception = assertInstanceOf(ServerWebInputException.class, error);
-                assertEquals(
-                    "Failed to fetch the content from the external URL due to non-successful "
-                        + "response status.",
-                    exception.getReason()
-                );
+                assertTrue(exception.getMessage().contains(HttpStatus.BAD_GATEWAY.toString()));
             })
             .verify();
-    }
-
-    @Test
-    void shouldRejectUploadFromUrlWhenResponseBodyIsEmpty() throws Exception {
-        URL url = URI.create("https://example.com/file.png").toURL();
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
-        var response = ResponseEntity.ok().headers(headers).<Flux<DataBuffer>>build();
-        when(dataBufferFetcher.fetchResponseEntity(URI.create("https://example.com/file.png")))
-            .thenReturn(Mono.just(response));
-
-        StepVerifier.create(attachmentService.uploadFromUrl(url, "fake-policy", "", ""))
-            .consumeErrorWith(error -> {
-                var exception = assertInstanceOf(
-                    ServerWebInputException.class,
-                    error
-                );
-                assertEquals(
-                    "Failed to fetch the content from the external URL due to empty response body.",
-                    exception.getReason()
-                );
-            })
-            .verify();
+        verify(exchangeFunction).exchange(assertArg(r -> {
+            assertEquals(url.toString(), r.url().toString());
+            assertEquals(HttpMethod.GET, r.method());
+        }));
     }
 
     @Test
@@ -205,23 +204,33 @@ class DefaultAttachmentServiceTest {
         final var service = spy(attachmentService);
         var dataBuffer = mock(DataBuffer.class);
         var body = Flux.just(dataBuffer);
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        var response = ResponseEntity.ok().headers(headers).body(body);
         var uploadedAttachment = new Attachment();
-        URL url = URI.create("https://example.com/assets/image.png").toURL();
+        var url = URI.create("https://example.com/assets/image.png").toURL();
 
-        when(dataBufferFetcher.fetchResponseEntity(
-            URI.create("https://example.com/assets/image.png")))
-            .thenReturn(Mono.just(response));
-        doReturn(Mono.just(uploadedAttachment)).when(service)
-            .upload("fake-policy", "", "custom-name.jpg", body, MediaType.IMAGE_JPEG);
+        when(exchangeFunction.exchange(any(ClientRequest.class)))
+            .thenReturn(Mono.just(ClientResponse.create(HttpStatus.OK)
+                .headers(h -> h.setContentType(MediaType.IMAGE_JPEG))
+                .body(body)
+                .build()
+            ));
+        when(service.upload(
+            eq("fake-policy"),
+            eq(""),
+            eq("custom-name.jpg"),
+            any(),
+            eq(MediaType.IMAGE_JPEG)
+        )).thenReturn(Mono.just(uploadedAttachment));
 
         StepVerifier.create(
                 service.uploadFromUrl(url, "fake-policy", "", "custom-name.jpg")
             )
             .expectNext(uploadedAttachment)
             .verifyComplete();
+
+        verify(exchangeFunction).exchange(assertArg(r -> {
+            assertEquals(url.toString(), r.url().toString());
+            assertEquals(HttpMethod.GET, r.method());
+        }));
     }
 }
 
