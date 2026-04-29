@@ -1,11 +1,14 @@
 package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -134,13 +137,17 @@ class PostFinderImplTest {
         when(client.listBy(same(Post.class), same(listOptions), isA(PageRequest.class)))
             .thenReturn(Mono.just(new ListResult<>(0, 10, 100, posts)));
         var postVos = posts.stream().map(ListedPostVo::from).toList();
-        when(publicQueryService.convertToListedVos(eq(posts)))
+        when(publicQueryService.convertToListedVos(anyList()))
             .thenReturn(Mono.just(postVos));
 
         postFinder.random(10)
             .as(StepVerifier::create)
             .expectNext(postVos)
             .verifyComplete();
+
+        verify(publicQueryService).convertToListedVos(assertArg(items -> {
+            assertTrue(items.containsAll(posts));
+        }));
     }
 
     List<Post> postsForArchives() {

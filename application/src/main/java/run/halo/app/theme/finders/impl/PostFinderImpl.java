@@ -5,10 +5,13 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
 import static run.halo.app.extension.index.query.Queries.notEqual;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -315,13 +318,13 @@ class PostFinderImpl implements PostFinder {
                     var effectiveSize = Math.min(maxSize, totalInt);
                     var totalPages = (int) Math.ceil((double) totalInt / effectiveSize);
                     var page = RandomUtils.insecure().randomInt(1, totalPages + 1);
-                    var sort = defaultSort();
+                    var sort = Sort.unsorted();
                     var firstRequest = PageRequestImpl.of(page, effectiveSize, sort);
                     return client.listBy(Post.class, listOptions, firstRequest)
                         .map(ListResult::getItems)
                         .flatMap(items -> {
-                            if (items.size() >= effectiveSize) {
-                                return postPublicQueryService.convertToListedVos(items);
+                            if (items.size() >= effectiveSize || total <= effectiveSize) {
+                                return Mono.just(items);
                             }
                             // wrap around to the beginning to fill up to effectiveSize
                             var remaining = effectiveSize - items.size();
@@ -329,12 +332,18 @@ class PostFinderImpl implements PostFinder {
                             return client.listBy(Post.class, listOptions, wrapRequest)
                                 .map(ListResult::getItems)
                                 .flatMap(wrapItems -> {
-                                    var combined = new java.util.ArrayList<>(items);
+                                    var combined = new ArrayList<>(items);
                                     combined.addAll(wrapItems);
-                                    return postPublicQueryService.convertToListedVos(combined);
+                                    return Mono.just(combined);
                                 });
                         });
                 })
+                .map(items -> {
+                    var randomItems = new ArrayList<>(items);
+                    Collections.shuffle(randomItems, ThreadLocalRandom.current());
+                    return randomItems;
+                })
+                .flatMap(postPublicQueryService::convertToListedVos)
                 .switchIfEmpty(Mono.fromSupplier(List::of))
             );
     }
