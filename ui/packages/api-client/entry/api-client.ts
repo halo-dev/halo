@@ -22,7 +22,6 @@ import {
   GroupV1alpha1Api,
   IndexV1alpha1PublicApi,
   IndicesV1alpha1ConsoleApi,
-  LocalThumbnailV1alpha1Api,
   MenuItemV1alpha1Api,
   MenuV1alpha1Api,
   MenuV1alpha1PublicApi,
@@ -68,7 +67,6 @@ import {
   TagV1alpha1PublicApi,
   ThemeV1alpha1Api,
   ThemeV1alpha1ConsoleApi,
-  ThumbnailV1alpha1Api,
   TwoFactorAuthV1alpha1UcApi,
   UserConnectionV1alpha1Api,
   UserPreferenceV1alpha1UcApi,
@@ -170,12 +168,6 @@ function createCoreApiClient(axiosInstance: AxiosInstance) {
         baseURL,
         axiosInstance
       ),
-      localThumbnail: new LocalThumbnailV1alpha1Api(
-        undefined,
-        baseURL,
-        axiosInstance
-      ),
-      thumbnail: new ThumbnailV1alpha1Api(undefined, baseURL, axiosInstance),
     },
 
     // plugin.halo.run
