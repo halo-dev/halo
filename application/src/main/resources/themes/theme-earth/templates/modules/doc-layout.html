@@ -1,0 +1,48 @@
+<!doctype html>
+<html th:lang="${#locale.toLanguageTag}" th:fragment="html (title,hero,content,head,footer,sidebar,contentClass)">
+  <head>
+    <th:block th:replace="~{modules/base-head :: base-head(title = ${title})}" />
+
+    <script>
+      var docsme = {
+        disableThemeFunction: true,
+      };
+    </script>
+
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+
+    <style>
+      footer {
+        margin: 0 !important;
+      }
+
+      #header-menu {
+        box-shadow: none !important;
+      }
+
+      #btn-search {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <th:block th:replace="~{modules/header}" />
+    <section class="w-full" th:classappend="${contentClass}">
+      <th:block th:replace="${content}" />
+    </section>
+    <th:block th:replace="~{modules/footer}" />
+
+    <button
+      th:if="${theme.config.global.show_scroll_button}"
+      type="button"
+      id="btn-scroll-to-top"
+      th:aria-label="#{fragment.layout.toTop}"
+      class="fixed bottom-5 right-5 flex items-center justify-center rounded-full bg-white p-3 opacity-0 shadow transition-all duration-300 hover:opacity-70 hover:shadow-lg dark:bg-slate-600 lg:bottom-10 lg:right-10"
+    >
+      <span class="i-tabler-chevron-up text-2xl text-gray-600 dark:text-slate-200"></span>
+    </button>
+  </body>
+</html>

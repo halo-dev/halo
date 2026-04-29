@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-4">
+  <h2 class="inline-flex items-center gap-2 text-base text-gray-900 dark:text-slate-50">
+    <span class="i-tabler-tags text-lg"></span>
+    <th:block th:text="#{fragment.tagFilter.allTags}"></th:block>
+  </h2>
+  <div class="flex flex-wrap gap-2" th:with="tags = ${tagFinder.listAll()}">
+    <a
+      th:each="tagItem,tagStat: ${tags}"
+      th:href="@{${tagItem.status.permalink}}"
+      th:title="${tagItem.spec.displayName}"
+      class="inline-flex items-center gap-x-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-800 shadow-sm hover:border-indigo-400 dark:border-slate-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:border-indigo-200"
+      th:classappend="(${tag} and ${tag.metadata.name == tagItem.metadata.name}) or (not ${tag} and ${tagStat.index == 0}) ? '!border-indigo-400 dark:!border-indigo-200' : ''"
+    >
+      <th:block th:text="|#${tagItem.spec.displayName}|" />
+      <sup th:text="${tagItem.postCount ?: 0}"></sup>
+    </a>
+  </div>
+</div>

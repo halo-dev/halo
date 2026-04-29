@@ -1,0 +1,51 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = |#{page.categories.title} - ${site.title}|, hero = null, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = null)}"
+>
+  <th:block th:fragment="content">
+    <th:block th:replace="~{modules/category-filter}" />
+
+    <th:block th:with="categories = ${categoryFinder.listAsTree()}">
+      <th:block th:if="${#lists.isEmpty(categories)}">
+        <div class="mt-6 flex items-center justify-center">
+          <span class="text-sm font-light text-gray-600" th:text="#{page.categories.empty}"></span>
+        </div>
+      </th:block>
+
+      <th:block th:unless="${#lists.isEmpty(categories)}" th:with="category = ${categories[0]}">
+        <th:block
+          th:with="posts = ${postFinder.listByCategory(1,10,category.metadata.name)},list_layout=${theme.config.layout.post_list_layout}"
+        >
+          <div
+            id="post-list"
+            th:if="${posts.total gt 0}"
+            class="mt-6 grid grid-cols-1 gap-6"
+            th:classappend="|${list_layout == 'grid_3' ? 'md:grid-cols-2 xl:grid-cols-3' : ''} ${list_layout == 'grid_2' ? 'md:grid-cols-2' : ''}|"
+          >
+            <th:block th:each="post : ${posts.items}">
+              <th:block
+                th:replace="~{modules/post-card :: post-card(${post},true,true,true,${list_layout == 'single' ? 'column' : 'row'})}"
+              />
+            </th:block>
+          </div>
+
+          <div th:if="${posts.total == 0}" class="mt-6 flex items-center justify-center">
+            <span class="text-sm font-light text-gray-600" th:text="#{common.noPosts}"></span>
+          </div>
+          <div th:if="${posts.total gt 10}" class="mt-10 flex justify-end">
+            <a
+              class="group inline-flex items-center gap-2 truncate text-sm text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-200"
+              th:href="@{${category.status.permalink}}"
+            >
+              <span th:text="#{page.categories.morePosts}"></span>
+              <span
+                class="i-tabler-chevron-right -translate-x-1 text-lg transition-all group-hover:translate-x-0"
+              ></span>
+            </a>
+          </div>
+        </th:block>
+      </th:block>
+    </th:block>
+  </th:block>
+</html>

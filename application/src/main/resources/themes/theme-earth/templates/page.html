@@ -1,0 +1,117 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = ${singlePage.spec.title} + ' - ' + ${site.title}, hero = ~{::hero}, content = ~{::content}, head = ~{::head}, footer = ~{::footer}, sidebar = null, contentClass = ${theme.config.layout.content_header} and ${not #strings.isEmpty(singlePage.spec.cover)} ? '!-mt-20' : '')}"
+>
+  <th:block th:fragment="head">
+    <link
+      th:if="${theme.config.post.content_style == 'github'}"
+      rel="stylesheet"
+      th:href="@{/assets/styles/github-markdown.css?v={version}(version=${theme.spec.version})}"
+    />
+  </th:block>
+  <th:block th:fragment="hero">
+    <section th:unless="${#strings.isEmpty(singlePage.spec.cover)}">
+      <div class="relative flex items-center" th:styleappend="|height:${theme.config.post.cover_height ?: '24rem'}|">
+        <div
+          class="before:z-1 relative size-full bg-cover bg-center bg-no-repeat before:absolute before:inset-0 before:bg-black/40"
+          th:style="|background-image: url('${singlePage.spec.cover}')|"
+        ></div>
+        <header
+          class="pattern-header-text absolute top-1/3 mx-auto flex w-full flex-col items-center justify-center gap-3"
+          th:if="${theme.config.post.title_position == 'cover'}"
+        >
+          <h1 class="text-center text-2xl text-white sm:text-5xl" th:text="${singlePage.spec.title}"></h1>
+        </header>
+      </div>
+    </section>
+  </th:block>
+  <th:block th:fragment="content">
+    <div class="rounded-xl bg-white p-4 dark:bg-slate-800">
+      <div class="flex items-center justify-between">
+        <div class="inline-flex items-center justify-start gap-2">
+          <a
+            th:unless="${#strings.isEmpty(singlePage.owner.avatar)}"
+            th:href="@{${singlePage.owner.permalink}}"
+            th:title="${singlePage.owner.displayName}"
+          >
+            <img
+              th:src="${singlePage.owner.avatar}"
+              th:alt="${singlePage.owner.displayName}"
+              class="size-10 rounded-full"
+            />
+          </a>
+          <div class="flex flex-col gap-0.5">
+            <a
+              th:href="@{${singlePage.owner.permalink}}"
+              class="text-sm font-semibold text-gray-900 hover:text-gray-600 dark:text-slate-100 dark:hover:text-slate-200"
+              th:text="${singlePage.owner.displayName}"
+              th:title="${singlePage.owner.displayName}"
+            ></a>
+            <div class="flex items-center gap-2 text-xs font-light text-gray-600 dark:text-slate-100">
+              <span th:text="#{common.publishedOn(${#dates.format(singlePage.spec.publishTime,'yyyy-MM-dd')})}"></span>
+              <span class="text-gray-300 dark:text-slate-200">/</span>
+              <span th:text="#{common.visitCount(${singlePage.stats?.visit ?:0})}"></span>
+            </div>
+          </div>
+        </div>
+        <div class="inline-flex flex-row gap-1">
+          <div
+            sec:authorize="isAuthenticated()"
+            th:attr="x-data=|uiPermission('${#authentication.name}','system:singlepages:manage')|"
+            class="flex items-center justify-between"
+            id="edit-button"
+          >
+            <template x-if="shouldDisplay">
+              <a
+                th:href="|/console/single-pages/editor?name=${singlePage.metadata.name}&returnToView=true|"
+                class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600 dark:hover:text-white"
+              >
+                <span class="i-tabler-edit text-lg transition-all group-hover:-translate-x-1"></span>
+                <span th:text="#{common.edit}"></span>
+              </a>
+            </template>
+          </div>
+          <a
+            th:if="${haloCommentEnabled}"
+            href="#comment"
+            class="group inline-flex cursor-pointer items-center gap-0.5 rounded-lg"
+          >
+            <div
+              class="inline-flex items-center justify-center rounded-full p-2 transition-all group-hover:bg-gray-100 dark:group-hover:bg-slate-700"
+            >
+              <div
+                class="i-tabler-message-circle text-lg text-gray-600 group-hover:text-indigo-500 dark:text-slate-500"
+              ></div>
+            </div>
+            <span
+              class="text-sm text-gray-600 group-hover:text-indigo-500 dark:text-slate-500"
+              th:text="${singlePage.stats?.comment ?:0}"
+            ></span>
+          </a>
+          <div th:if="${false}" class="cursor-pointer rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-slate-600">
+            <div
+              class="i-tabler-share text-lg text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-50"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <h1
+        th:if="${#strings.isEmpty(singlePage.spec.cover)} or ${theme.config.post.title_position == 'content'}"
+        class="my-3 text-3xl font-medium dark:text-slate-50"
+        th:text="${singlePage.spec.title}"
+      ></h1>
+
+      <article
+        class="!max-w-none break-words"
+        th:classappend="${theme.config.post.content_style == 'github' ? 'markdown-body' : 'tailwind-typography'}"
+        th:utext="${singlePage.content.content}"
+      ></article>
+      <hr th:if="${haloCommentEnabled}" class="my-10 dark:border-slate-700" />
+      <div id="comment" th:if="${haloCommentEnabled}">
+        <h2 class="mb-2 text-base font-medium text-gray-900 dark:text-slate-50" th:text="#{common.comment}"></h2>
+        <halo:comment group="content.halo.run" kind="SinglePage" th:attr="name=${singlePage.metadata.name}" />
+      </div>
+    </div>
+  </th:block>
+</html>

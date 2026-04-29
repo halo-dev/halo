@@ -1,0 +1,34 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = |#{page.author.title(${author.spec.displayName})} - ${site.title}|, hero = ~{::hero}, content = ~{::content}, head = null, footer = null, sidebar = null, contentClass = null)}"
+>
+  <th:block th:fragment="hero">
+    <th:block
+      th:replace="~{modules/hero :: hero(isHome = false, cover = ${theme.config.layout.header_background_image}, title = #{page.author.title(${author.spec.displayName})})}"
+    />
+  </th:block>
+  <th:block th:fragment="content">
+    <div
+      id="post-list"
+      th:if="${posts.total gt 0}"
+      th:with="postItems=${posts.items},list_layout=${theme.config.layout.post_list_layout}"
+      class="grid grid-cols-1 gap-6"
+      th:classappend="|${list_layout == 'grid_3' ? 'md:grid-cols-2 xl:grid-cols-3' : ''} ${list_layout == 'grid_2' ? 'md:grid-cols-2' : ''}|"
+    >
+      <th:block th:each="post : ${postItems}">
+        <th:block
+          th:replace="~{modules/post-card :: post-card(${post},true,true,true,${list_layout == 'single' ? 'column' : 'row'})}"
+        />
+      </th:block>
+    </div>
+
+    <div th:if="${posts.total == 0}" class="mt-6 flex items-center justify-center">
+      <span class="text-sm font-light text-gray-600 dark:text-slate-200" th:text="#{common.noPosts}"></span>
+    </div>
+
+    <th:block
+      th:replace="~{modules/pagination :: pagination(context = |${author.status.permalink}/|, prevUrl = ${posts.prevUrl}, nextUrl = ${posts.nextUrl}, totalPages = ${posts.totalPages}, page = ${posts.page}, hasPrevious = ${posts.hasPrevious()}, hasNext = ${posts.hasNext()})}"
+    />
+  </th:block>
+</html>
