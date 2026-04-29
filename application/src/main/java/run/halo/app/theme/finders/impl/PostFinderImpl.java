@@ -318,7 +318,7 @@ class PostFinderImpl implements PostFinder {
                     var effectiveSize = Math.min(maxSize, totalInt);
                     var totalPages = (int) Math.ceil((double) totalInt / effectiveSize);
                     var page = RandomUtils.insecure().randomInt(1, totalPages + 1);
-                    var sort = Sort.unsorted();
+                    var sort = defaultSort();
                     var firstRequest = PageRequestImpl.of(page, effectiveSize, sort);
                     return client.listBy(Post.class, listOptions, firstRequest)
                         .map(ListResult::getItems)
