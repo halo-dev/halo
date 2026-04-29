@@ -21262,6 +21262,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "previousTokenValue": {
+            "type": "string",
+            "description": "The previous token value, stored when the token is rotated.\n Used to accept recently-rotated tokens within a grace period\n to prevent false-positive cookie theft detection during\n concurrent requests."
+          },
           "series": {
             "minLength": 1,
             "type": "string"

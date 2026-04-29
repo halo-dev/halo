@@ -13,7 +13,7 @@ import run.halo.app.infra.properties.HaloProperties;
 
 @Getter
 @Component
-public class RememberMeCookieResolverImpl implements RememberMeCookieResolver {
+class RememberMeCookieResolverImpl implements RememberMeCookieResolver {
     public static final String SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY = "remember-me";
 
     private final String cookieName = SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
@@ -35,7 +35,7 @@ public class RememberMeCookieResolverImpl implements RememberMeCookieResolver {
         Assert.notNull(value, "'value' is required");
         exchange.getResponse().beforeCommit(() -> Mono.fromRunnable(() -> {
             var cookie = initCookie(exchange, value).build();
-            exchange.getResponse().getCookies().set(getCookieName(), cookie);
+            exchange.getResponse().addCookie(cookie);
         }));
     }
 
