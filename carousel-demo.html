@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园清新风格博客首页</title>
+  <style>
+    /* 校园清新风格配色变量 */
+    :root {
+      --primary-color: #4A90E2;    /* 主色：清爽天蓝 */
+      --secondary-color: #6BBF70;  /* 辅助色：嫩草绿 */
+      --text-color: #333333;       /* 正文色：深灰，保证可读性 */
+      --light-text: #666666;       /* 次要文字色：中灰 */
+      --bg-color: #F8FAFC;         /* 背景色：米白，不刺眼 */
+      --card-bg: #FFFFFF;          /* 卡片背景：纯白 */
+      --border-color: #E2E8F0;     /* 边框色：浅灰 */
+    }
+
+    /* 全局样式 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* 轮播图容器 */
+    .carousel {
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      border: 1px solid var(--border-color);
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 页面标题 */
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    /* 文章卡片 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      color: var(--primary-color);
+      margin-top: 0;
+    }
+
+    .card p {
+      color: var(--light-text);
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部轮播图模块 -->
+  <div class="carousel">
+    <img src="https://picsum.photos/1200/400?random=1" alt="校园活动轮播图1">
+  </div>
+
+  <!-- 模拟博客首页文章卡片 -->
+  <h1>我的校园博客</h1>
+  <div class="card">
+    <h3>校园生活分享</h3>
+    <p>记录在校园里的日常点滴，分享学习与生活的小确幸...</p>
+  </div>
+  <div class="card">
+    <h3>期末复习指南</h3>
+    <p>整理了各科的复习重点和笔记，希望能帮到大家...</p>
+  </div>
+</body>
+</html>
