@@ -4,6 +4,8 @@ import static run.halo.app.security.authentication.oauth2.HaloOAuth2Authenticati
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -23,8 +25,8 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserConnectionService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.security.LoginHandlerEnhancer;
@@ -53,7 +55,7 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
 
     private final LoginHandlerEnhancer loginHandlerEnhancer;
 
-    private final ReactiveExtensionClient client;
+    private final UserService userService;
 
     private final SystemConfigFetcher systemConfigFetcher;
 
@@ -66,13 +68,13 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
         UserConnectionService connectionService,
         ReactiveUserDetailsService userDetailsService,
         LoginHandlerEnhancer loginHandlerEnhancer,
-        ReactiveExtensionClient client,
+        UserService userService,
         SystemConfigFetcher systemConfigFetcher) {
         this.connectionService = connectionService;
         this.securityContextRepository = securityContextRepository;
         this.userDetailsService = userDetailsService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
-        this.client = client;
+        this.userService = userService;
         this.systemConfigFetcher = systemConfigFetcher;
     }
 
@@ -143,25 +145,20 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
 
                 var user = new User();
                 user.setMetadata(new Metadata());
-                user.getMetadata().setGenerateName("user-");
+                user.getMetadata().setName("user-" + UUID.randomUUID().toString().substring(0, 8));
                 user.setSpec(new User.UserSpec());
                 user.getSpec().setDisplayName(extractDisplayName(attrs));
                 user.getSpec().setEmail(extractEmail(attrs));
                 user.getSpec().setEmailVerified(StringUtils.hasText(extractEmail(attrs)));
                 user.getSpec().setRegisteredAt(Instant.now());
 
-                return client.create(user)
+                return userService.createUser(user, Set.of(defaultRole))
                     .flatMap(createdUser -> {
                         var username = createdUser.getMetadata().getName();
-                        var roleBinding = run.halo.app.core.extension.RoleBinding
-                            .create(username, defaultRole);
-                        return client.create(roleBinding).thenReturn(username);
-                    })
-                    .flatMap(username ->
-                        connectionService.createUserConnection(
+                        return connectionService.createUserConnection(
                             username, registrationId, oauth2User
-                        )
-                    );
+                        );
+                    });
             });
     }
 

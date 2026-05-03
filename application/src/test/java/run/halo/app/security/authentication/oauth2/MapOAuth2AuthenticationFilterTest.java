@@ -2,12 +2,15 @@ package run.halo.app.security.authentication.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +35,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.user.service.UserConnectionService;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.security.LoginHandlerEnhancer;
@@ -55,7 +58,7 @@ class MapOAuth2AuthenticationFilterTest {
     LoginHandlerEnhancer loginHandlerEnhancer;
 
     @Mock
-    ReactiveExtensionClient client;
+    UserService userService;
 
     @Mock
     SystemConfigFetcher systemConfigFetcher;
@@ -69,7 +72,7 @@ class MapOAuth2AuthenticationFilterTest {
     void setUp() {
         filter = new MapOAuth2AuthenticationFilter(
             securityContextRepository, connectionService, userDetailsService,
-            loginHandlerEnhancer, client, systemConfigFetcher
+            loginHandlerEnhancer, userService, systemConfigFetcher
         );
         filter.setAuthenticationTrustResolver(authenticationTrustResolver);
     }
@@ -110,10 +113,8 @@ class MapOAuth2AuthenticationFilterTest {
             .thenReturn(Mono.empty());
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
             .thenReturn(Mono.just(userSetting));
-        when(client.create(any(run.halo.app.core.extension.User.class)))
+        when(userService.createUser(any(run.halo.app.core.extension.User.class), anySet()))
             .thenReturn(Mono.just(createdUser));
-        when(client.create(any(run.halo.app.core.extension.RoleBinding.class)))
-            .thenReturn(Mono.just(new run.halo.app.core.extension.RoleBinding()));
         when(connectionService.createUserConnection("user-abc123", "github", oauth2User))
             .thenReturn(Mono.just(connection));
 
@@ -137,9 +138,9 @@ class MapOAuth2AuthenticationFilterTest {
         verify(connectionService).createUserConnection("user-abc123", "github", oauth2User);
 
         var userCaptor = ArgumentCaptor.forClass(run.halo.app.core.extension.User.class);
-        verify(client).create(userCaptor.capture());
+        verify(userService).createUser(userCaptor.capture(), eq(Set.of("test-role")));
         var capturedUser = userCaptor.getValue();
-        assertThat(capturedUser.getMetadata().getGenerateName()).isEqualTo("user-");
+        assertThat(capturedUser.getMetadata().getName()).startsWith("user-");
         assertThat(capturedUser.getSpec().getDisplayName()).isEqualTo("octocat");
         assertThat(capturedUser.getSpec().getEmail()).isEqualTo("octocat@github.com");
         assertThat(capturedUser.getSpec().isEmailVerified()).isTrue();
@@ -181,10 +182,8 @@ class MapOAuth2AuthenticationFilterTest {
             .thenReturn(Mono.empty());
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
             .thenReturn(Mono.just(userSetting));
-        when(client.create(any(run.halo.app.core.extension.User.class)))
+        when(userService.createUser(any(run.halo.app.core.extension.User.class), anySet()))
             .thenReturn(Mono.just(createdUser));
-        when(client.create(any(run.halo.app.core.extension.RoleBinding.class)))
-            .thenReturn(Mono.just(new run.halo.app.core.extension.RoleBinding()));
         when(connectionService.createUserConnection("user-def456", "github", oauth2User))
             .thenReturn(Mono.just(connection));
 
@@ -204,7 +203,7 @@ class MapOAuth2AuthenticationFilterTest {
         ).verifyComplete();
 
         var userCaptor = ArgumentCaptor.forClass(run.halo.app.core.extension.User.class);
-        verify(client).create(userCaptor.capture());
+        verify(userService).createUser(userCaptor.capture(), anySet());
         assertThat(userCaptor.getValue().getSpec().getDisplayName()).isEqualTo("octocat");
     }
 
@@ -244,10 +243,8 @@ class MapOAuth2AuthenticationFilterTest {
             .thenReturn(Mono.empty());
         when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
             .thenReturn(Mono.just(userSetting));
-        when(client.create(any(run.halo.app.core.extension.User.class)))
+        when(userService.createUser(any(run.halo.app.core.extension.User.class), anySet()))
             .thenReturn(Mono.just(createdUser));
-        when(client.create(any(run.halo.app.core.extension.RoleBinding.class)))
-            .thenReturn(Mono.just(new run.halo.app.core.extension.RoleBinding()));
         when(connectionService.createUserConnection("user-ghi789", "github", oauth2User))
             .thenReturn(Mono.just(connection));
 
@@ -267,7 +264,7 @@ class MapOAuth2AuthenticationFilterTest {
         ).verifyComplete();
 
         var userCaptor = ArgumentCaptor.forClass(run.halo.app.core.extension.User.class);
-        verify(client).create(userCaptor.capture());
+        verify(userService).createUser(userCaptor.capture(), anySet());
         var capturedUser = userCaptor.getValue();
         assertThat(capturedUser.getSpec().getEmail()).isNull();
         assertThat(capturedUser.getSpec().isEmailVerified()).isFalse();
@@ -344,7 +341,7 @@ class MapOAuth2AuthenticationFilterTest {
                     Mono.just(securityContext)))
         ).verifyComplete();
 
-        verify(client, never()).create(any());
+        verify(userService, never()).createUser(any(), anySet());
         verify(connectionService, never()).createUserConnection(any(), any(), any());
     }
 }
