@@ -17,6 +17,7 @@ import { useI18n } from "vue-i18n";
 import { rbacAnnotations } from "@/constants/annotations";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useDarkModeStore } from "@/stores/useDarkModeStore";
+import type { DarkModePreference } from "@/stores/useDarkModeStore";
 
 const props = defineProps<{
   platform?: "console" | "uc";
@@ -27,6 +28,15 @@ const { t } = useI18n();
 const { currentUser } = storeToRefs(stores.currentUser());
 
 const darkModeStore = useDarkModeStore();
+
+const themeTooltip = computed(() => {
+  const labels: Record<DarkModePreference, string> = {
+    light: "Switch to system mode",
+    dark: "Switch to light mode",
+    system: "Switch to dark mode",
+  };
+  return labels[darkModeStore.preference];
+});
 
 const handleLogout = () => {
   Dialog.warning({
@@ -157,15 +167,13 @@ const actions = computed(() => {
 
     <div class="user-profile__actions">
       <button
-        v-tooltip="
-          darkModeStore.isDark ? 'Switch to light mode' : 'Switch to dark mode'
-        "
+        v-tooltip="themeTooltip"
         class="user-profile__action-button"
         @click="darkModeStore.cyclePreference()"
       >
-        <!-- Sun icon -->
+        <!-- Sun icon: explicit light mode -->
         <svg
-          v-if="darkModeStore.isDark"
+          v-if="darkModeStore.preference === 'light'"
           class="user-profile__action-icon"
           viewBox="0 0 24 24"
           fill="none"
@@ -184,7 +192,20 @@ const actions = computed(() => {
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </svg>
-        <!-- Moon icon -->
+        <!-- Moon icon: explicit dark mode -->
+        <svg
+          v-else-if="darkModeStore.preference === 'dark'"
+          class="user-profile__action-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <!-- Monitor icon: system mode -->
         <svg
           v-else
           class="user-profile__action-icon"
@@ -195,7 +216,9 @@ const actions = computed(() => {
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
         </svg>
       </button>
       <button

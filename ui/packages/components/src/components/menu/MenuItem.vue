@@ -98,7 +98,7 @@ function handleExpand() {
     width: 3px;
     height: 26px;
     content: "";
-    background: #242e41;
+    background: theme("colors.secondary");
     border-radius: 6px;
   }
 }

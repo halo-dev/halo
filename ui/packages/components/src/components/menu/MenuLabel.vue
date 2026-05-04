@@ -7,7 +7,7 @@
 .menu-label {
   padding-top: 10px;
   padding-bottom: 10px;
-  color: #847e7e;
+  color: theme("colors.gray.400");
   font-size: 14px;
   font-weight: 400;
 }

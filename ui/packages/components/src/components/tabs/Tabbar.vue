@@ -246,7 +246,7 @@ onUnmounted(() => {
     @apply flex flex-row items-center overflow-x-auto py-0.5;
 
     &::-webkit-scrollbar-track-piece {
-      background-color: #f8f8f8;
+      background-color: theme("colors.gray.50");
       -webkit-border-radius: 2em;
       -moz-border-radius: 2em;
       border-radius: 2em;
@@ -258,7 +258,7 @@ onUnmounted(() => {
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: #ddd;
+      background-color: theme("colors.gray.300");
       background-clip: padding-box;
       -webkit-border-radius: 2em;
       -moz-border-radius: 2em;
@@ -266,7 +266,7 @@ onUnmounted(() => {
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background-color: #bbb;
+      background-color: theme("colors.gray.400");
     }
   }
 

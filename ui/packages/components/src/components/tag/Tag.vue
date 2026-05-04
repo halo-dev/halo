@@ -52,8 +52,8 @@ const classes = computed(() => {
   }
 
   &.tag-danger {
-    background: #d71d1d;
-    border: 1px solid #d71d1d;
+    background: theme("colors.danger");
+    border: 1px solid theme("colors.danger");
     @apply text-white;
   }
 

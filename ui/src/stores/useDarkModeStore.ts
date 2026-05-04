@@ -1,50 +1,34 @@
-import { useDark, useToggle } from "@vueuse/core";
+import { useMediaQuery, useStorage, useToggle } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
 
 export type DarkModePreference = "light" | "dark" | "system";
 
 const STORAGE_KEY = "halo-dark-mode-preference";
 
 export const useDarkModeStore = defineStore("darkMode", () => {
-  const preference = ref<DarkModePreference>(
-    (localStorage.getItem(STORAGE_KEY) as DarkModePreference) || "system"
-  );
+  const preference = useStorage<DarkModePreference>(STORAGE_KEY, "system");
 
-  const systemIsDark = useDark({
-    selector: "html",
-    attribute: "class",
-    valueDark: "dark",
-    valueLight: "",
-  });
+  // Only READ system preference — don't let vueuse manage the DOM class
+  const systemPrefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 
   const isDark = computed(() => {
     if (preference.value === "system") {
-      return systemIsDark.value;
+      return systemPrefersDark.value;
     }
     return preference.value === "dark";
   });
 
   const toggleDark = useToggle(isDark);
 
-  // Sync .dark class on <html> whenever isDark changes
+  // Manage .dark class ourselves — no conflict with vueuse auto-management
   watch(
     isDark,
     (dark) => {
-      const html = document.documentElement;
-      if (dark) {
-        html.classList.add("dark");
-      } else {
-        html.classList.remove("dark");
-      }
+      document.documentElement.classList.toggle("dark", dark);
     },
     { immediate: true }
   );
-
-  // Persist preference
-  watch(preference, (val) => {
-    localStorage.setItem(STORAGE_KEY, val);
-  });
 
   function setPreference(value: DarkModePreference) {
     preference.value = value;
