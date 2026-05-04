@@ -136,30 +136,30 @@ $btn-themes: (
   ),
   primary: (
     bg: theme("colors.primary"),
-    color: #fff,
+    color: theme("colors.white"),
     border: none,
     hover-bg: theme("colors.primary"),
-    icon-color: #fff,
+    icon-color: theme("colors.white"),
     ghost-color: theme("colors.primary"),
     ghost-hover-bg: theme("colors.primary / 10%"),
     ghost-icon-color: theme("colors.primary"),
   ),
   secondary: (
     bg: theme("colors.secondary"),
-    color: #fff,
+    color: theme("colors.white"),
     border: none,
     hover-bg: theme("colors.secondary"),
-    icon-color: #fff,
+    icon-color: theme("colors.white"),
     ghost-color: theme("colors.secondary"),
     ghost-hover-bg: theme("colors.secondary / 10%"),
     ghost-icon-color: theme("colors.secondary"),
   ),
   danger: (
     bg: theme("colors.danger"),
-    color: #fff,
+    color: theme("colors.white"),
     border: none,
     hover-bg: theme("colors.danger"),
-    icon-color: #fff,
+    icon-color: theme("colors.white"),
     ghost-color: theme("colors.danger"),
     ghost-hover-bg: theme("colors.danger / 10%"),
     ghost-icon-color: theme("colors.danger"),
@@ -217,7 +217,7 @@ $btn-themes: (
     height: map.get($md-config, icon-size);
     width: map.get($md-config, icon-size);
     margin-right: map.get($md-config, icon-margin);
-    color: #fff;
+    color: theme("colors.white");
     display: inline-flex;
     align-items: center;
     justify-content: center;

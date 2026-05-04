@@ -12,8 +12,12 @@ import { computed, inject, onMounted, provide, reactive } from "vue";
 import { RouterView } from "vue-router";
 import { useAppTitle } from "@/composables/use-title";
 import { i18n } from "@/locales";
+import { useDarkModeStore } from "@/stores/useDarkModeStore";
 
 useAppTitle();
+
+// Dark mode — initializes theme class watcher on <html>
+useDarkModeStore();
 
 const { globalInfo } = storeToRefs(stores.globalInfo());
 
@@ -84,7 +88,7 @@ window.addEventListener(
 
 <style lang="scss">
 body {
-  background: #eff4f9;
+  background: theme("colors.gray.100");
 }
 
 html,

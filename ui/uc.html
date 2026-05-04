@@ -14,6 +14,15 @@
     <link href="/ui-assets/favicon.ico" rel="icon" type="image/x-icon" />
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="theme-color" content="#ffffff" />
+    <script>
+      // Prevent flash of wrong color theme (FOUC)
+      (function () {
+        const pref = localStorage.getItem("halo-dark-mode-preference");
+        if (pref === "dark" || (!pref && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
     <style>
       body {
         height: 100%;

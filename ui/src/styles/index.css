@@ -21,3 +21,8 @@
 ::-ms-reveal {
   display: none;
 }
+
+/* Dark mode: invert sidebar logo for visibility */
+.dark .sidebar__logo {
+  filter: brightness(0) invert(1);
+}
