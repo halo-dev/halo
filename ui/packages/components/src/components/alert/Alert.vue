@@ -94,7 +94,7 @@ const handleClose = () => {
       @apply cursor-pointer self-center rounded-full p-0.5;
 
       &:hover {
-        @apply bg-gray-300 text-white transition-all;
+        @apply bg-gray-300 text-always-white transition-all;
       }
     }
   }

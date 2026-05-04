@@ -85,7 +85,7 @@ const handleChange = () => {
     }
 
     .switch-indicator {
-      @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out;
+      @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-always-white shadow ring-0 transition duration-200 ease-in-out;
     }
   }
 }

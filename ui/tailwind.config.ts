@@ -37,6 +37,9 @@ export default {
             // Base
             white: "#fff",
             black: "#000",
+            // Semantic: never invert (text on colored backgrounds, etc.)
+            "always-white": "#fff",
+            "always-black": "#000",
             // Gray (primary background/text scale)
             gray: {
               50: "#f9fafb",
@@ -215,6 +218,9 @@ export default {
               // Base (inverted)
               white: "#18181b",
               black: "#fafafa",
+              // Semantic: never invert
+              "always-white": "#fff",
+              "always-black": "#000",
               // Gray (inverted: 50↔900, 100↔800, 200↔700, 300↔600, 400↔500)
               gray: {
                 50: "#18181b",

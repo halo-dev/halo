@@ -40,21 +40,21 @@ const classes = computed(() => {
   @apply box-border inline-flex h-5 w-auto flex-shrink-0 cursor-pointer flex-wrap items-center justify-center rounded-base border border-solid px-1 text-center align-middle text-xs;
 
   &.tag-default {
-    border: 1px solid #d9d9d9;
+    border: 1px solid theme("colors.gray.300");
   }
 
   &.tag-primary {
-    @apply border-primary bg-primary text-white;
+    @apply border-primary bg-primary text-always-white;
   }
 
   &.tag-secondary {
-    @apply border-secondary bg-secondary text-white;
+    @apply border-secondary bg-secondary text-always-white;
   }
 
   &.tag-danger {
     background: theme("colors.danger");
     border: 1px solid theme("colors.danger");
-    @apply text-white;
+    @apply text-always-white;
   }
 
   &.tag-rounded {

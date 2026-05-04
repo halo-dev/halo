@@ -27,11 +27,11 @@ defineProps<{
 </template>
 <style lang="scss">
 .card-wrapper {
-  @apply box-border flex flex-col rounded-base bg-white shadow-sm ring-1 ring-[#eaecf0];
+  @apply box-border flex flex-col rounded-base bg-white shadow-sm ring-1 ring-gray-200;
 
   .card-header {
     @apply flex justify-between overflow-hidden rounded-t-base;
-    border-bottom: 1px solid #eaecf0;
+    border-bottom: 1px solid theme("colors.gray.200");
 
     .card-header-title {
       @apply self-center text-base font-bold;
@@ -50,7 +50,7 @@ defineProps<{
 
   .card-footer {
     @apply overflow-hidden rounded-b-base;
-    border-top: 1px solid #eaecf0;
+    border-top: 1px solid theme("colors.gray.200");
     padding: 12px 16px;
   }
 }

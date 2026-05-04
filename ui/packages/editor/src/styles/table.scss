@@ -1,9 +1,9 @@
 .halo-rich-text-editor {
-  $tableBorderColor: #d8d8d8;
-  $tableHeaderBgColor: #f6f8fa;
-  $tableSelectedBorderColor: rgb(0 101 255);
+  $tableBorderColor: var(--table-border-color, #d8d8d8);
+  $tableHeaderBgColor: var(--table-header-bg, #f6f8fa);
+  $tableSelectedBorderColor: var(--table-selected-border, #3b82f6);
   $tableSelectedCellBgColor: transparent;
-  $tableResizeHandleBgColor: #adf;
+  $tableResizeHandleBgColor: var(--table-resize-handle, #93c5fd);
 
   .ProseMirror {
     .table-container {
@@ -84,7 +84,7 @@
       }
 
       td {
-        background: #fff;
+        background: theme("colors.white");
       }
 
       td,
@@ -156,7 +156,7 @@
 
         width: 4px;
         height: 4px;
-        background-color: #d8d8d8;
+        background-color: $tableBorderColor;
         border-radius: 50%;
         display: block;
       }
@@ -170,13 +170,13 @@
         left: 0;
         width: 100%;
         height: 10px;
-        background: #f6f8fa;
-        border: 1px solid #d8d8d8;
+        background: $tableHeaderBgColor;
+        border: 1px solid $tableBorderColor;
         display: block;
       }
 
       &:hover {
-        color: rgb(0 101 255);
+        color: $tableSelectedBorderColor;
 
         > div {
           font-size: 14px;
@@ -187,8 +187,8 @@
         }
 
         &::after {
-          background: #2584ff;
-          border-color: #2584ff;
+          background: $tableSelectedBorderColor;
+          border-color: $tableSelectedBorderColor;
         }
       }
 
@@ -197,8 +197,8 @@
       }
 
       &.selected::after {
-        background: #2584ff;
-        border-color: #2584ff;
+        background: $tableSelectedBorderColor;
+        border-color: $tableSelectedBorderColor;
       }
     }
 
@@ -233,7 +233,7 @@
         bottom: -2px;
         width: 4px;
         height: 4px;
-        background-color: #d8d8d8;
+        background-color: $tableBorderColor;
         border-radius: 50%;
         display: block;
       }
@@ -247,13 +247,13 @@
         top: 0;
         height: 100%;
         width: 10px;
-        background: #f6f8fa;
-        border: 1px solid #d8d8d8;
+        background: $tableHeaderBgColor;
+        border: 1px solid $tableBorderColor;
         display: block;
       }
 
       &:hover {
-        color: rgb(0 101 255);
+        color: $tableSelectedBorderColor;
 
         > div {
           font-size: 14px;
@@ -264,8 +264,8 @@
         }
 
         &::after {
-          background: #2584ff;
-          border-color: rgb(0 101 255);
+          background: $tableSelectedBorderColor;
+          border-color: $tableSelectedBorderColor;
         }
       }
 
@@ -274,8 +274,8 @@
       }
 
       &.selected::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
+        background: $tableSelectedBorderColor;
+        border-color: $tableSelectedBorderColor;
       }
     }
 
@@ -288,21 +288,21 @@
         top: -12px;
         left: -12px;
         display: block;
-        background: #f6f8fa;
+        background: $tableHeaderBgColor;
         width: 10px;
         height: 10px;
-        border: 1px solid #d8d8d8;
+        border: 1px solid $tableBorderColor;
         border-top-left-radius: 3px;
       }
 
       &:hover::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
+        background: $tableSelectedBorderColor;
+        border-color: $tableSelectedBorderColor;
       }
 
       &.selected::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
+        background: $tableSelectedBorderColor;
+        border-color: $tableSelectedBorderColor;
       }
     }
 

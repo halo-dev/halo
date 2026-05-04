@@ -294,7 +294,8 @@ onUnmounted(() => {
       border-bottom-width: 2px;
 
       &.tabbar-item-active {
-        @apply border-b-secondary text-secondary;
+        border-bottom-color: theme("colors.primary");
+        color: theme("colors.primary");
       }
     }
   }
@@ -369,7 +370,7 @@ onUnmounted(() => {
         border-right-width: 2px;
 
         &.tabbar-item-active {
-          @apply border-r-secondary;
+          border-right-color: theme("colors.primary");
         }
       }
     }

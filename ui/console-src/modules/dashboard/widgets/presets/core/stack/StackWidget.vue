@@ -99,7 +99,7 @@ async function handleSave(config: StackWidgetConfig) {
   >
     <div
       v-if="editMode || previewMode"
-      class="absolute inset-0 z-10 flex h-10 flex-none items-center justify-between rounded-t-lg border-b border-[#eaecf0] bg-white px-4"
+      class="absolute inset-0 z-10 flex h-10 flex-none items-center justify-between rounded-t-lg border-b border-gray-200 bg-white px-4"
     >
       <div class="inline-flex items-center gap-2">
         <div class="flex-1 shrink text-base font-medium">

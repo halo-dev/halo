@@ -165,7 +165,7 @@ defineExpose({ close });
     @apply absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500;
 
     span {
-      @apply text-[0.7rem] text-white;
+      @apply text-[0.7rem] text-always-white;
     }
   }
 }

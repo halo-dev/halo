@@ -66,12 +66,12 @@ const sanitizedContent = computed(() => {
   }
 
   pre {
-    background: #0d0d0d;
+    background: theme("colors.gray.900");
     padding: 0.75rem 1rem;
     margin: 0;
 
     code {
-      color: #ccc;
+      color: theme("colors.gray.300");
       background: none;
       font-size: 0.8rem;
       padding: 0 !important;

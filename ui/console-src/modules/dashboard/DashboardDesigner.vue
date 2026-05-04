@@ -181,7 +181,7 @@ const designContainerStyles = computed(() => {
   return {
     width: `${device?.pixels}px`,
     margin: "1rem auto",
-    border: "1px dashed #e0e0e0",
+    border: "1px dashed rgba(224,224,224,0.6)",
     borderRadius: "0.75rem",
     padding: "2px",
   };

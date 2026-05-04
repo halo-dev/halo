@@ -150,7 +150,7 @@ function handleSelectHome() {
     align-items: center;
     justify-content: center;
     padding: 0.25rem;
-    color: theme("colors.white");
+    color: theme("colors.always-white");
   }
 
   &__icon-container {

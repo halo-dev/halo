@@ -127,7 +127,7 @@ $btn-themes: (
   default: (
     bg: transparent,
     color: inherit,
-    border: 1px solid #d9d9d9,
+    border: 1px solid theme("colors.gray.300"),
     hover-bg: theme("colors.gray.100"),
     icon-color: theme("colors.secondary"),
     ghost-color: inherit,
@@ -136,30 +136,30 @@ $btn-themes: (
   ),
   primary: (
     bg: theme("colors.primary"),
-    color: theme("colors.white"),
+    color: theme("colors.always-white"),
     border: none,
     hover-bg: theme("colors.primary"),
-    icon-color: theme("colors.white"),
+    icon-color: theme("colors.always-white"),
     ghost-color: theme("colors.primary"),
     ghost-hover-bg: theme("colors.primary / 10%"),
     ghost-icon-color: theme("colors.primary"),
   ),
   secondary: (
     bg: theme("colors.secondary"),
-    color: theme("colors.white"),
+    color: theme("colors.always-white"),
     border: none,
     hover-bg: theme("colors.secondary"),
-    icon-color: theme("colors.white"),
+    icon-color: theme("colors.always-white"),
     ghost-color: theme("colors.secondary"),
     ghost-hover-bg: theme("colors.secondary / 10%"),
     ghost-icon-color: theme("colors.secondary"),
   ),
   danger: (
     bg: theme("colors.danger"),
-    color: theme("colors.white"),
+    color: theme("colors.always-white"),
     border: none,
     hover-bg: theme("colors.danger"),
-    icon-color: theme("colors.white"),
+    icon-color: theme("colors.always-white"),
     ghost-color: theme("colors.danger"),
     ghost-hover-bg: theme("colors.danger / 10%"),
     ghost-icon-color: theme("colors.danger"),
@@ -217,7 +217,7 @@ $btn-themes: (
     height: map.get($md-config, icon-size);
     width: map.get($md-config, icon-size);
     margin-right: map.get($md-config, icon-margin);
-    color: theme("colors.white");
+    color: theme("colors.always-white");
     display: inline-flex;
     align-items: center;
     justify-content: center;

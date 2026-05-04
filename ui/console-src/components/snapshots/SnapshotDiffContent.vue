@@ -289,13 +289,13 @@ const handleDiffScroll = () => {
             <template #popper>
               <div class="w-52">
                 <ul class="flex flex-col gap-2">
-                  <li class="rounded bg-[#ffe6e6] px-1 py-0.5 line-through">
+                  <li class="rounded bg-red-100 px-1 py-0.5 line-through">
                     {{ $t("core.snapshots.diff_mode.legend.removed") }}
                   </li>
-                  <li class="rounded bg-[#e6ffe6] px-1 py-0.5">
+                  <li class="rounded bg-green-100 px-1 py-0.5">
                     {{ $t("core.snapshots.diff_mode.legend.added") }}
                   </li>
-                  <li class="rounded bg-[#e6f2ff] px-1 py-0.5">
+                  <li class="rounded bg-blue-100 px-1 py-0.5">
                     {{ $t("core.snapshots.diff_mode.legend.modified") }}
                   </li>
                 </ul>
@@ -321,12 +321,12 @@ const handleDiffScroll = () => {
   }
 
   pre {
-    background: #0d0d0d;
+    background: theme("colors.gray.900");
     padding: 0.75rem 1rem;
     margin: 0;
 
     code {
-      color: #ccc;
+      color: theme("colors.gray.300");
       background: none;
       font-size: 0.8rem;
       padding: 0 !important;
@@ -374,16 +374,16 @@ const handleDiffScroll = () => {
   }
 
   .vdd-removed {
-    background-color: #ffe6e6;
+    background-color: theme("colors.red.100");
     text-decoration: line-through;
   }
 
   .vdd-added {
-    background-color: #e6ffe6;
+    background-color: theme("colors.green.100");
   }
 
   .vdd-modified {
-    background-color: #e6f2ff;
+    background-color: theme("colors.blue.100");
   }
 }
 </style>

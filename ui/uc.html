@@ -27,6 +27,12 @@
       body {
         height: 100%;
         background-color: #f5f5f5;
+        color: #111827;
+      }
+
+      .dark body {
+        background-color: #1f2937;
+        color: #fafafa;
       }
 
       #loader {
@@ -36,12 +42,17 @@
         bottom: 0;
         left: 0;
         margin: auto;
-        border: solid 3px #e5e5e5;
+        border: solid 3px #e5e7eb;
         border-top-color: #333;
         border-radius: 50%;
         width: 30px;
         height: 30px;
         animation: spin 0.6s linear infinite;
+      }
+
+      .dark #loader {
+        border-color: #3f3f46;
+        border-top-color: #fafafa;
       }
 
       @keyframes spin {
