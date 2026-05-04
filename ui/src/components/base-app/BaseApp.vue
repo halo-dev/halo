@@ -89,6 +89,7 @@ window.addEventListener(
 <style lang="scss">
 body {
   background: theme("colors.gray.100");
+  color: theme("colors.gray.900");
 }
 
 html,
