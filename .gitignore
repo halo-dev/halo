@@ -67,6 +67,9 @@ nbdist/
 !.vscode/settings.json
 !.vscode/extensions.json
 
+### Temp files
+application/tmp/
+
 ### Local file
 application-local.yml
 application-local.yaml
