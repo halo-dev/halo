@@ -135,7 +135,8 @@ const next = () => {
 
 <style lang="scss">
 .pagination {
-  @apply flex flex-1 items-center gap-2 bg-white;
+  @apply flex flex-1 items-center gap-2;
+  background-color: var(--colors-white, #fff);
 
   &__total {
     @apply hidden text-sm text-gray-500 sm:block;
@@ -150,7 +151,8 @@ const next = () => {
   }
 
   &__btn {
-    @apply relative inline-flex h-8 cursor-pointer items-center rounded-base border border-gray-300 bg-white px-2 py-1.5 text-sm font-medium text-gray-500 outline-none hover:bg-gray-50 disabled:cursor-not-allowed;
+    @apply relative inline-flex h-8 cursor-pointer items-center rounded-base border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-500 outline-none hover:bg-gray-50 disabled:cursor-not-allowed;
+    background-color: var(--colors-white, #fff);
 
     &--prev {
       @apply rounded-r-none;

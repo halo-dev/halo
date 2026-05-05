@@ -3,7 +3,8 @@ const textClassification = {
   wrapper: "flex flex-col gap-4",
   inner:
     "bg-white inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
-  input: "resize-none w-full text-black block transition-all px-3 text-sm",
+  input:
+    "resize-none w-full bg-transparent text-black block transition-all px-3 text-sm",
 };
 
 const boxClassification = {

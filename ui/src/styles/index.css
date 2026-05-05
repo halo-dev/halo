@@ -26,3 +26,51 @@
 .dark .sidebar__logo {
   filter: brightness(0) invert(1);
 }
+
+/* Dark mode: markdown-body (notification content, etc.) */
+.dark .markdown-body {
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+.dark .markdown-body h1,
+.dark .markdown-body h2,
+.dark .markdown-body h3,
+.dark .markdown-body h4,
+.dark .markdown-body h5,
+.dark .markdown-body h6 {
+  color: #f3f4f6;
+  border-color: #3f3f46;
+}
+
+.dark .markdown-body a {
+  color: #60a5fa;
+}
+
+.dark .markdown-body code {
+  background-color: #27272a;
+  color: #e5e7eb;
+}
+
+.dark .markdown-body pre {
+  background-color: #27272a;
+  border-color: #3f3f46;
+}
+
+.dark .markdown-body blockquote {
+  border-color: #3f3f46;
+  color: #a1a1aa;
+}
+
+.dark .markdown-body hr {
+  background-color: #3f3f46;
+}
+
+.dark .markdown-body table th,
+.dark .markdown-body table td {
+  border-color: #3f3f46;
+}
+
+.dark .markdown-body img {
+  opacity: 0.9;
+}

@@ -401,7 +401,7 @@ useEventListener("keydown", handleKeydown);
         ref="globalSearchInput"
         v-model="keyword"
         :placeholder="$t('core.components.global_search.placeholder')"
-        class="w-full px-0 py-1 text-base outline-none"
+        class="w-full bg-transparent px-0 py-1 text-base outline-none"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
