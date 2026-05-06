@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { useThemeStore } from "@console/stores/theme";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { Dialog, Toast } from "@halo-dev/components";
+import { Dialog, Toast, VAlert } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { ErrorResponse, UppyFile } from "@uppy/core";
 import type { Ref } from "vue";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
 import type { ThemeInstallationErrorResponse } from "../../types";
 
@@ -70,7 +69,28 @@ const handleCatchExistsException = async (
 
 <template>
   <div class="pb-3">
-    <AppDownloadAlert />
+    <VAlert
+      type="warning"
+      :title="$t('core.common.text.warning')"
+      :closable="false"
+    >
+      <template #description>
+        <i18n-t
+          keypath="core.theme.list_modal.security_alert.description"
+          tag="p"
+        >
+          <template #url>
+            <a
+              href="https://www.halo.run/store/apps"
+              target="_blank"
+              class="underline-offset-2 hover:text-gray-900 hover:underline"
+            >
+              {{ $t("core.common.text.official_app_store") }}
+            </a>
+          </template>
+        </i18n-t>
+      </template>
+    </VAlert>
   </div>
   <UppyUpload
     :restrictions="{
