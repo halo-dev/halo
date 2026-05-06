@@ -334,7 +334,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String username, String email) {
-        String rateLimiterKey = "send-email-verification-code-" + username + ":" + email;
+        String rateLimiterKey = "send-email-verification-code-" + username;
         var rateLimiter =
             rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
         return RateLimiterOperator.of(rateLimiter);
