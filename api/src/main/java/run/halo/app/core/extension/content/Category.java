@@ -33,9 +33,11 @@ public class Category extends AbstractExtension {
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Category.class);
 
     @Schema(requiredMode = REQUIRED)
+    @Nullable
     private CategorySpec spec;
 
     @Schema
+    @Nullable
     private CategoryStatus status;
 
     @JsonIgnore

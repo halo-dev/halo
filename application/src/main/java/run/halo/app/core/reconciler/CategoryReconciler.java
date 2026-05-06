@@ -17,6 +17,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.CategoryHiddenStateChangeEvent;
+import run.halo.app.event.post.CategoryUpdatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListOptions;
@@ -53,6 +54,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
                         refreshHiddenState(category, false);
                         updateCategoryForPost(category.getMetadata().getName());
                         client.update(category);
+                        eventPublisher.publishEvent(new CategoryUpdatedEvent(this, category));
                     }
                     return;
                 }
@@ -63,6 +65,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
                 checkHiddenState(category);
 
                 client.update(category);
+                eventPublisher.publishEvent(new CategoryUpdatedEvent(this, category));
             });
         return Result.doNotRetry();
     }

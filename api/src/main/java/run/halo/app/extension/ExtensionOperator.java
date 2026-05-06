@@ -43,7 +43,7 @@ public interface ExtensionOperator {
 
     @Schema(requiredMode = REQUIRED, implementation = Metadata.class)
     @JsonProperty("metadata")
-    @Nullable MetadataOperator getMetadata();
+    MetadataOperator getMetadata();
 
     void setApiVersion(String apiVersion);
 

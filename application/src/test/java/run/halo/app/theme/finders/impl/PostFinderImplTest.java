@@ -1,7 +1,14 @@
 package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.assertArg;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -17,9 +24,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.content.PostService;
 import run.halo.app.core.counter.CounterService;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
@@ -32,6 +41,7 @@ import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 
 /**
  * Tests for {@link PostFinderImpl}.
@@ -62,6 +72,9 @@ class PostFinderImplTest {
 
     @Mock
     private PostPublicQueryService publicQueryService;
+
+    @Mock
+    ReactiveQueryPostPredicateResolver postPredicateResolver;
 
     @InjectMocks
     private PostFinderImpl postFinder;
@@ -100,6 +113,41 @@ class PostFinderImplTest {
         assertThat(items.get(1).getYear()).isEqualTo("2021");
         assertThat(items.get(1).getMonths()).hasSize(1);
         assertThat(items.get(1).getMonths().get(0).getMonth()).isEqualTo("01");
+    }
+
+    @Test
+    void shouldReturnEmptyRandomPostsIfNoPostsFound() {
+        var listOptions = mock(ListOptions.class);
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+        when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(0L));
+        postFinder.random(10)
+            .as(StepVerifier::create)
+            .expectNext(List.of())
+            .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnRandomPosts() {
+        var listOptions = mock(ListOptions.class);
+        when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+        when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(100L));
+        var posts = java.util.stream.IntStream.rangeClosed(1, 10)
+            .mapToObj(this::post)
+            .toList();
+        when(client.listBy(same(Post.class), same(listOptions), isA(PageRequest.class)))
+            .thenReturn(Mono.just(new ListResult<>(0, 10, 100, posts)));
+        var postVos = posts.stream().map(ListedPostVo::from).toList();
+        when(publicQueryService.convertToListedVos(anyList()))
+            .thenReturn(Mono.just(postVos));
+
+        postFinder.random(10)
+            .as(StepVerifier::create)
+            .expectNext(postVos)
+            .verifyComplete();
+
+        verify(publicQueryService).convertToListedVos(assertArg(items -> {
+            assertTrue(items.containsAll(posts));
+        }));
     }
 
     List<Post> postsForArchives() {

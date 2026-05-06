@@ -1,12 +1,12 @@
 package run.halo.app.theme.finders;
 
+import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
-import run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.NavigationPostVo;
@@ -37,9 +37,18 @@ public interface PostFinder {
     Flux<ListedPostVo> listAll();
 
     /**
+     * Gets random posts.
+     *
+     * @param maxSize the max size of random posts. It should be between 1 and 100.
+     * @return a list of random posts with size less than or equal to {@code maxSize}.
+     */
+    Mono<List<ListedPostVo>> random(int maxSize);
+
+    /**
      * Lists posts by query params.
      *
-     * @param params query params see {@link PostQuery}
+     * @param params query params see
+     * {@link run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery}
      */
     Mono<ListResult<ListedPostVo>> list(Map<String, Object> params);
 
@@ -59,4 +68,5 @@ public interface PostFinder {
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year, String month);
+
 }

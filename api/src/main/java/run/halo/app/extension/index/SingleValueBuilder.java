@@ -1,6 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 
@@ -16,14 +17,14 @@ class SingleValueBuilder<E extends Extension, K extends Comparable<K>>
     extends AbstractValueIndexSpecBuilder<E, K, SingleValueIndexSpecBuilder<E, K>>
     implements SingleValueIndexSpecBuilder<E, K> {
 
-    private Function<E, K> indexFunc;
+    private Function<E, @Nullable K> indexFunc;
 
     SingleValueBuilder(String name, Class<K> keyType) {
         super(name, keyType);
     }
 
     @Override
-    public SingleValueBuilder<E, K> indexFunc(Function<E, K> indexFunc) {
+    public SingleValueBuilder<E, K> indexFunc(Function<E, @Nullable K> indexFunc) {
         this.indexFunc = indexFunc;
         return this;
     }
@@ -36,6 +37,7 @@ class SingleValueBuilder<E extends Extension, K extends Comparable<K>>
 
         return new SingleValueIndexSpec<>() {
             @Override
+            @Nullable
             public K getValue(E extension) {
                 return indexFunc.apply(extension);
             }
