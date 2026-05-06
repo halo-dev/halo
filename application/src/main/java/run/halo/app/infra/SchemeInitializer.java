@@ -3,7 +3,6 @@ package run.halo.app.infra;
 import static java.util.Objects.requireNonNullElse;
 import static run.halo.app.core.extension.Role.ROLE_AGGREGATE_LABEL_PREFIX;
 import static run.halo.app.core.extension.content.Comment.CommentOwner.ownerIdentity;
-import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
@@ -14,8 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.Stats;
-import run.halo.app.core.attachment.extension.LocalThumbnail;
-import run.halo.app.core.attachment.extension.Thumbnail;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
@@ -65,9 +62,9 @@ import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.core.extension.notification.Subscription.InterestReason;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.MetadataOperator;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
-import run.halo.app.extension.index.IndexSpec;
 import run.halo.app.extension.index.IndexSpecs;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.migration.Backup;
@@ -198,7 +195,15 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Secret.class);
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
-        schemeManager.register(MenuItem.class);
+        schemeManager.register(MenuItem.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<MenuItem, String>single("spec.targetRef", String.class)
+                .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
+                    .map(MenuItem.MenuItemSpec::getTargetRef)
+                    .map(Ref::toIdentifier)
+                    .orElse(null)
+                )
+            );
+        });
         schemeManager.register(Post.class, indexSpecs -> {
             indexSpecs.add(IndexSpecs.<Post, String>single("spec.title", String.class)
                 .indexFunc(post -> Optional.ofNullable(post.getSpec())
@@ -660,42 +665,6 @@ class SchemeInitializer implements SmartLifecycle {
             );
         });
         schemeManager.register(PolicyTemplate.class);
-        schemeManager.register(Thumbnail.class, indexSpec -> {
-            indexSpec.add(new IndexSpec()
-                // see run.halo.app.core.attachment.ThumbnailMigration
-                // .setUnique(true)
-                .setName(Thumbnail.ID_INDEX)
-                .setIndexFunc(simpleAttribute(Thumbnail.class, Thumbnail::idIndexFunc)));
-        });
-        schemeManager.register(LocalThumbnail.class, indexSpec -> {
-            // make sure image and size are unique
-            indexSpec.add(new IndexSpec()
-                // see run.halo.app.core.attachment.ThumbnailMigration
-                // .setUnique(true)
-                .setName(LocalThumbnail.UNIQUE_IMAGE_AND_SIZE_INDEX)
-                .setIndexFunc(
-                    simpleAttribute(LocalThumbnail.class, LocalThumbnail::uniqueImageAndSize)
-                )
-            );
-            indexSpec.add(new IndexSpec().setName("spec.imageSignature")
-                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
-                    thumbnail -> thumbnail.getSpec().getImageSignature())
-                )
-            );
-            indexSpec.add(new IndexSpec().setName("spec.thumbSignature").setUnique(true)
-                .setIndexFunc(simpleAttribute(LocalThumbnail.class,
-                    thumbnail -> thumbnail.getSpec().getThumbSignature())
-                )
-            );
-            indexSpec.add(new IndexSpec().setName("status.phase").setIndexFunc(
-                simpleAttribute(LocalThumbnail.class,
-                    thumbnail -> Optional.of(thumbnail.getStatus())
-                        .map(LocalThumbnail.Status::getPhase)
-                        .map(LocalThumbnail.Phase::name)
-                        .orElse(null)
-                )
-            ));
-        });
         // metrics.halo.run
         schemeManager.register(Counter.class);
         // auth.halo.run

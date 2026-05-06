@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
@@ -39,9 +40,11 @@ public class SinglePage extends AbstractExtension {
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
 
     @Schema(requiredMode = REQUIRED)
+    @Nullable
     private SinglePageSpec spec;
 
     @Schema
+    @Nullable
     private SinglePageStatus status;
 
     @JsonIgnore

@@ -1,24 +1,35 @@
 package run.halo.app.core.user.service.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
@@ -35,24 +46,38 @@ import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
+import run.halo.app.infra.utils.HttpSecurityUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Component
-public class DefaultAttachmentService implements AttachmentService {
+class DefaultAttachmentService implements AttachmentService {
+
+    private static final int MAX_RESPONSE_SIZE = 10 * 1024 * 1024; // 10 MB
 
     private final ReactiveExtensionClient client;
 
     private final ExtensionGetter extensionGetter;
 
-    private final ReactiveUrlDataBufferFetcher dataBufferFetcher;
+    private WebClient webClient;
 
     public DefaultAttachmentService(ReactiveExtensionClient client,
-        ExtensionGetter extensionGetter,
-        ReactiveUrlDataBufferFetcher dataBufferFetcher) {
+        ExtensionGetter extensionGetter) {
         this.client = client;
         this.extensionGetter = extensionGetter;
-        this.dataBufferFetcher = dataBufferFetcher;
+        this.webClient = WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(HttpSecurityUtils.secureHttpClient()))
+            .filter(HttpSecurityUtils.maxResponseSizeFilter(MAX_RESPONSE_SIZE))
+            .build();
+    }
+
+    /**
+     * Only for testing purpose.
+     *
+     * @param webClient new web client
+     */
+    void setWebClient(WebClient webClient) {
+        Assert.notNull(webClient, "WebClient must not be null");
+        this.webClient = webClient;
     }
 
     @Override
@@ -159,29 +184,53 @@ public class DefaultAttachmentService implements AttachmentService {
 
     @Override
     public Mono<Attachment> uploadFromUrl(URL url, String policyName,
-        String groupName, String filename) {
-        var uri = URI.create(url.toString());
-        AtomicReference<@Nullable MediaType> mediaTypeRef = new AtomicReference<>();
-        AtomicReference<String> fileNameRef = new AtomicReference<>(filename);
-
-        Mono<Flux<DataBuffer>> contentMono = dataBufferFetcher.head(uri)
-            .map(httpHeaders -> {
-                if (!StringUtils.hasText(fileNameRef.get())) {
-                    fileNameRef.set(getExternalUrlFilename(uri, httpHeaders));
-                }
-                MediaType contentType = httpHeaders.getContentType();
-                mediaTypeRef.set(contentType);
-                return httpHeaders;
-            })
-            .map(response -> dataBufferFetcher.fetch(uri));
-
-        return contentMono.flatMap(
-                (content) -> upload(policyName, groupName, fileNameRef.get(), content,
-                    mediaTypeRef.get())
-            )
-            .onErrorResume(throwable -> Mono.error(
-                new ServerWebInputException(
-                    "Failed to transfer the attachment from the external URL."))
+        @Nullable String groupName, @Nullable String filename) {
+        return Mono.fromCallable(url::toURI)
+            .flatMap(uri -> webClient.get().uri(uri)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError,
+                    response -> Mono.error(new ServerWebInputException(MessageFormat.format("""
+                            Failed to fetch the content from the external URL due to \
+                            non-successful response status: {0}""",
+                        response.statusCode()
+                    )))
+                )
+                .toEntityFlux(DataBuffer.class)
+                .flatMap(response -> {
+                    if (!response.hasBody() || Flux.empty().equals(response.getBody())) {
+                        return Mono.error(new ServerWebInputException(
+                            "Failed to fetch the content from the external URL due to empty "
+                                + "response body."
+                        ));
+                    }
+                    var body = response.getBody();
+                    var headers = response.getHeaders();
+                    var finalFilename = Optional.ofNullable(filename)
+                        .filter(StringUtils::hasText)
+                        .orElseGet(() -> getExternalUrlFilename(uri, headers));
+                    var contentType = headers.getContentType();
+                    return upload(
+                        policyName, groupName, finalFilename, requireNonNull(body), contentType
+                    );
+                })
+                .onErrorMap(WebClientRequestException.class, e -> {
+                    if (e.getCause() instanceof UnknownHostException ex) {
+                        return new ServerWebInputException("""
+                            Unable to resolve host or private IP resolved: %s
+                            """.formatted(ex.getMessage()));
+                    }
+                    return e;
+                })
+                .onErrorMap(WebClientResponseException.class, e -> {
+                    if (e.getCause() instanceof DataBufferLimitException) {
+                        return new ServerWebInputException("""
+                            Response body from the external URL is too large to be buffered in \
+                            memory. Please ensure the file size is within the allowed limit."""
+                        );
+                    }
+                    return e;
+                })
             );
     }
 

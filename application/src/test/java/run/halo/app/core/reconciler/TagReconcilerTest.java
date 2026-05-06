@@ -16,9 +16,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.core.reconciler.TagReconciler;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 
@@ -31,13 +31,16 @@ import run.halo.app.extension.Metadata;
 @ExtendWith(MockitoExtension.class)
 class TagReconcilerTest {
     @Mock
-    private ExtensionClient client;
+    ExtensionClient client;
 
     @Mock
-    private TagPermalinkPolicy tagPermalinkPolicy;
+    TagPermalinkPolicy tagPermalinkPolicy;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
-    private TagReconciler tagReconciler;
+    TagReconciler tagReconciler;
 
     @Test
     void reconcile() {
