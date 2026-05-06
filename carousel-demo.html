@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的校园博客</title>
+  <style>
+    /* 校园清新风格配色变量 */
+    :root {
+      --primary-color: #4A90E2;    /* 主色：清爽天蓝 */
+      --secondary-color: #6BBF70;  /* 辅助色：嫩草绿 */
+      --text-color: #333333;       /* 正文色：深灰，保证可读性 */
+      --light-text: #666666;       /* 次要文字色：中灰 */
+      --bg-color: #F8FAFC;         /* 背景色：米白，不刺眼 */
+      --card-bg: #FFFFFF;          /* 卡片背景：纯白 */
+      --border-color: #E2E8F0;     /* 边框色：浅灰 */
+    }
+
+    /* 全局样式 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 头部导航栏（Logo+副标题） */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Logo文字 */
+    .site-logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    /* 副标题 */
+    .site-subtitle {
+      font-size: 16px;
+      color: var(--light-text);
+      margin: 8px 0 0;
+    }
+
+    /* 轮播图容器 */
+    .carousel {
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 12px;
+      margin: 30px auto;
+      border: 1px solid var(--border-color);
+      max-width: 1200px;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 文章卡片 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      color: var(--primary-color);
+      margin-top: 0;
+    }
+
+    .card p {
+      color: var(--light-text);
+    }
+
+    /* 页脚信息 */
+    footer {
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 20px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .footer-text {
+      color: var(--light-text);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部：Logo + 副标题 -->
+  <header>
+    <h1 class="site-logo">✨ 我的校园博客</h1>
+    <p class="site-subtitle">记录校园生活 · 分享学习点滴 · 留下青春印记</p>
+  </header>
+
+  <!-- 轮播图模块 -->
+  <div class="carousel">
+    <img src="https://picsum.photos/1200/400?random=1" alt="校园活动轮播图">
+  </div>
+
+  <!-- 博客内容区 -->
+  <div class="container">
+    <div class="card">
+      <h3>校园生活分享</h3>
+      <p>记录在校园里的日常点滴，分享学习与生活的小确幸...</p>
+    </div>
+    <div class="card">
+      <h3>期末复习指南</h3>
+      <p>整理了各科的复习重点和笔记，希望能帮到大家...</p>
+    </div>
+  </div>
+
+  <!-- 页脚信息 -->
+  <footer>
+    <p class="footer-text">© 2026 我的校园博客 | All Rights Reserved</p>
+    <p class="footer-text"> Powered by Halo | 校园清新主题 v1.0</p>
+  </footer>
+</body>
+</html>
