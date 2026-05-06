@@ -2,7 +2,7 @@
 import { useThemeStore } from "@console/stores/theme";
 import { submitForm } from "@formkit/core";
 import { consoleApiClient } from "@halo-dev/api-client";
-import { Dialog, Toast, VButton } from "@halo-dev/components";
+import { Dialog, Toast, VAlert, VButton } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
@@ -94,6 +94,30 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="mb-4">
+    <VAlert
+      type="warning"
+      :title="$t('core.common.text.warning')"
+      :closable="false"
+    >
+      <template #description>
+        <i18n-t
+          keypath="core.theme.list_modal.security_alert.description"
+          tag="p"
+        >
+          <template #url>
+            <a
+              href="https://www.halo.run/store/apps"
+              target="_blank"
+              class="underline-offset-2 hover:text-gray-900 hover:underline"
+            >
+              {{ $t("core.common.text.official_app_store") }}
+            </a>
+          </template>
+        </i18n-t>
+      </template>
+    </VAlert>
+  </div>
   <FormKit
     id="theme-remote-download-form"
     name="theme-remote-download-form"

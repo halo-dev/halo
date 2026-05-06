@@ -319,7 +319,7 @@ public class UserEndpoint implements CustomEndpoint {
                 var email = tuple.getT1();
                 var username = tuple.getT2();
                 return Mono.just(username)
-                    .transformDeferred(sendEmailVerificationCodeRateLimiter(username, email))
+                    .transformDeferred(sendEmailVerificationCodeRateLimiter(username))
                     .flatMap(u -> emailVerificationService.sendVerificationCode(username, email))
                     .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
             })
@@ -333,8 +333,8 @@ public class UserEndpoint implements CustomEndpoint {
         return RateLimiterOperator.of(rateLimiter);
     }
 
-    <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String username, String email) {
-        String rateLimiterKey = "send-email-verification-code-" + username + ":" + email;
+    <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String username) {
+        String rateLimiterKey = "send-email-verification-code-" + username;
         var rateLimiter =
             rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
         return RateLimiterOperator.of(rateLimiter);
