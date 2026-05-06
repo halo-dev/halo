@@ -2,10 +2,8 @@ package run.halo.app.theme.dialect;
 
 import static org.thymeleaf.templatemode.TemplateMode.HTML;
 
-import com.github.zafarkhaja.semver.Version;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
 import org.thymeleaf.dialect.IPostProcessorDialect;
