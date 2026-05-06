@@ -276,7 +276,8 @@ class KeyComparatorTest {
                         "kai-fang-gong-gong-api-halo-2.5.0-fa-bu",
                         "xing-neng-you-hua-yu-gong-neng-gai-jin-halo-2.13-fa-bu",
                         "ye-wu-tuo-zhan-jing-li",
-                        "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-zhu-ti-you-jiang-zheng-ji",
+                        "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-"
+                                + "zhu-ti-you-jiang-zheng-ji",
                         "zhi-chi-bao-chi-deng-lu-hui-hua-halo-2.16.0-fa-bu",
                         "zhi-chi-bei-fen-hui-fu-halo-2.8.0-fa-bu",
                         "zhi-chi-ge-ren-zhong-xin-halo-2.11.0-fa-bu");

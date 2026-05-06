@@ -215,11 +215,15 @@ class QueriesTest {
                 Queries.between("salary", 50000, true, 100000, false)
                         .and(Queries.equal("department", "Engineering").not())
                         .or(Queries.in("role", "Manager", "Director"));
+        // spotless:off
         assertEquals(
                 """
-                ((salary BETWEEN [50000, 100000) AND department != Engineering) OR role IN (Manager,\
+                ((salary BETWEEN [50000, 100000)\
+                 AND department != Engineering)\
+                 OR role IN (Manager,\
                  Director))\
                 """,
                 condition.toString());
+        // spotless:on
     }
 }

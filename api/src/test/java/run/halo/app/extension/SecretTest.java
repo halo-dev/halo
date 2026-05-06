@@ -67,6 +67,8 @@ class SecretTest {
         assertThat(secret.getStringData()).containsEntry("password", "t0p-Secret");
     }
 
+    // spotless:off — checkstyle expects text block closing at continuation indent (12 spaces),
+    // google-java-format wants it at content indent (8 spaces).
     private String testJsonString() {
         return """
         {
@@ -80,6 +82,7 @@ class SecretTest {
                 "password": "YWRtaW4="
             }
         }
-        """;
+            """;
     }
+    // spotless:on
 }
