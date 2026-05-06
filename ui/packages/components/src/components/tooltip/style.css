@@ -1,3 +1,12 @@
 .v-popper--theme-tooltip {
   pointer-events: none;
 }
+/* 点赞爱心弹跳动画 */
+.like-btn.active .heart-icon {
+  color: #c91f37;
+  animation: heartBounce 0.6s ease;
+}
+@keyframes heartBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
