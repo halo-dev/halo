@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -32,6 +33,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.notification.Subscription;
+import run.halo.app.event.post.SinglePageUpdatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ExtensionUtil;
@@ -80,12 +82,15 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private final NotificationCenter notificationCenter;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Override
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
                 if (ExtensionOperator.isDeleted(singlePage)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
+                    eventPublisher.publishEvent(new SinglePageUpdatedEvent(this, singlePage));
                     return;
                 }
 
@@ -100,6 +105,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 // then
                 reconcileMetadata(request.name());
                 reconcileStatus(request.name());
+                eventPublisher.publishEvent(new SinglePageUpdatedEvent(this, singlePage));
             });
         return new Result(false, null);
     }

@@ -102,7 +102,15 @@
     "vue-router": "^5.0.2"
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.409",
+    "@iconify-json/fluent": "^1.2.45",
+    "@iconify-json/gridicons": "^1.2.4",
+    "@iconify-json/lucide": "^1.2.102",
+    "@iconify-json/material-symbols": "^1.2.68",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/mingcute": "^1.2.7",
+    "@iconify-json/ph": "^1.2.2",
+    "@iconify-json/ri": "^1.2.10",
+    "@iconify-json/vscode-icons": "^1.2.46",
     "@iconify/types": "^2.0.0",
     "@intlify/unplugin-vue-i18n": "^11.0.7",
     "@tailwindcss/aspect-ratio": "^0.4.2",

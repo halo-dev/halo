@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
@@ -30,9 +31,11 @@ public class Tag extends AbstractExtension {
     public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
 
     @Schema(requiredMode = REQUIRED)
+    @Nullable
     private TagSpec spec;
 
     @Schema
+    @Nullable
     private TagStatus status;
 
     @Data

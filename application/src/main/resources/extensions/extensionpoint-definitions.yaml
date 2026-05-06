@@ -107,3 +107,157 @@ spec:
   displayName: 图片缩略图生成
   type: MULTI_INSTANCE
   description: "提供生成图片缩略图的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: attachment-handler
+spec:
+  className: run.halo.app.core.extension.attachment.endpoint.AttachmentHandler
+  displayName: "附件存储策略"
+  type: MULTI_INSTANCE
+  description: "提供附件上传、删除和存储的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: comment-subject
+spec:
+  className: run.halo.app.content.comment.CommentSubject
+  displayName: "评论主体"
+  type: MULTI_INSTANCE
+  description: "提供评论主体展示的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: template-head-processor
+spec:
+  className: run.halo.app.theme.dialect.TemplateHeadProcessor
+  displayName: "页头内容处理器"
+  type: MULTI_INSTANCE
+  description: "提供用于扩展主题页面 <head> 标签内容的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: element-tag-post-processor
+spec:
+  className: run.halo.app.theme.dialect.ElementTagPostProcessor
+  displayName: "元素标签后置处理器"
+  type: MULTI_INSTANCE
+  description: "提供用于对 Thymeleaf 元素标签进行后置处理的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: before-security-webfilter
+spec:
+  className: run.halo.app.security.BeforeSecurityWebFilter
+  displayName: "Security 前置过滤器"
+  type: MULTI_INSTANCE
+  description: "提供在 Security 过滤器链最前面执行的 Web 过滤器扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: after-security-webfilter
+spec:
+  className: run.halo.app.security.AfterSecurityWebFilter
+  displayName: "Security 后置过滤器"
+  type: MULTI_INSTANCE
+  description: "提供在 Security 过滤器链最后面执行的 Web 过滤器扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: http-basic-security-webfilter
+spec:
+  className: run.halo.app.security.HttpBasicSecurityWebFilter
+  displayName: "HTTP Basic 认证过滤器"
+  type: MULTI_INSTANCE
+  description: "提供 HTTP Basic 认证逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: form-login-security-webfilter
+spec:
+  className: run.halo.app.security.FormLoginSecurityWebFilter
+  displayName: "表单登录认证过滤器"
+  type: MULTI_INSTANCE
+  description: "提供表单登录认证逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: authentication-security-webfilter
+spec:
+  className: run.halo.app.security.AuthenticationSecurityWebFilter
+  displayName: "普通认证过滤器"
+  type: MULTI_INSTANCE
+  description: "提供普通认证逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: anonymous-authentication-security-webfilter
+spec:
+  className: run.halo.app.security.AnonymousAuthenticationSecurityWebFilter
+  displayName: "匿名认证过滤器"
+  type: MULTI_INSTANCE
+  description: "提供匿名认证逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: oauth2-authorization-code-security-webfilter
+spec:
+  className: run.halo.app.security.OAuth2AuthorizationCodeSecurityWebFilter
+  displayName: "OAuth2 授权码认证过滤器"
+  type: MULTI_INSTANCE
+  description: "提供 OAuth2 授权码认证逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: halo-documents-provider
+spec:
+  className: run.halo.app.search.HaloDocumentsProvider
+  displayName: "搜索文档提供者"
+  type: MULTI_INSTANCE
+  description: "提供用于重建搜索索引的文档数据"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: user-pre-creating-handler
+spec:
+  className: run.halo.app.core.user.service.UserPreCreatingHandler
+  displayName: "用户创建前处理器"
+  type: MULTI_INSTANCE
+  description: "提供在用户创建之前执行自定义逻辑的扩展方式"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: user-post-creating-handler
+spec:
+  className: run.halo.app.core.user.service.UserPostCreatingHandler
+  displayName: "用户创建后处理器"
+  type: MULTI_INSTANCE
+  description: "提供在用户创建之后执行自定义逻辑的扩展方式"
