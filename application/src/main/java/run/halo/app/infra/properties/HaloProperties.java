@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import run.halo.app.notification.NotificationAutoCleanupProperties;
 
 /**
  * @author guqing
@@ -64,6 +65,11 @@ public class HaloProperties implements Validator {
     @Valid
     @NestedConfigurationProperty
     private final AttachmentProperties attachment = new AttachmentProperties();
+
+    @Valid
+    @NestedConfigurationProperty
+    private final NotificationAutoCleanupProperties notification =
+        new NotificationAutoCleanupProperties();
 
     @Override
     public boolean supports(Class<?> clazz) {
