@@ -51,7 +51,7 @@ class YamlPluginFinderTest {
         var tempDirectory = Files.createTempDirectory("halo-test-plugin");
         try {
             var directories =
-                Files.createDirectories(tempDirectory.resolve("build/resources/main"));
+                    Files.createDirectories(tempDirectory.resolve("build/resources/main"));
             FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
 
             var plugin = pluginFinder.find(tempDirectory);
@@ -68,8 +68,9 @@ class YamlPluginFinderTest {
     void findFromJar() throws IOException, URISyntaxException {
         Path tempDirectory = Files.createTempDirectory("halo-plugin");
         try {
-            var plugin002Uri = requireNonNull(
-                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+            var plugin002Uri =
+                    requireNonNull(getClass().getClassLoader().getResource("plugin/plugin-0.0.2"))
+                            .toURI();
 
             Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
             FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
@@ -85,7 +86,8 @@ class YamlPluginFinderTest {
     void unstructuredToPluginTest() throws JSONException {
         Plugin plugin = pluginFinder.unstructuredToPlugin(new FileSystemResource(testFile));
         assertThat(plugin).isNotNull();
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                   {
                     "spec": {
                         "displayName": "a name to show",
@@ -113,60 +115,66 @@ class YamlPluginFinderTest {
                         "name": "plugin-1"
                     }
                 }
-                  """,
-            JsonUtils.objectToJson(plugin),
-            true);
+                """,
+                JsonUtils.objectToJson(plugin),
+                true);
     }
 
     @Test
     void findFailedWhenFileNotFound() {
         var test = Paths.get("");
         assertThatThrownBy(() -> pluginFinder.find(test))
-            .isInstanceOf(PluginRuntimeException.class)
-            .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
+                .isInstanceOf(PluginRuntimeException.class)
+                .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
     }
 
     @Test
     void acceptArrayObjectLicense() throws JSONException {
-        Resource pluginResource = new InMemoryResource("""
-            apiVersion: v1
-            kind: Plugin
-            metadata:
-              name: plugin-1
-            spec:
-              license:
-                - name: MIT
-                  url: https://exmple.com
-            """);
+        Resource pluginResource =
+                new InMemoryResource(
+                        """
+                        apiVersion: v1
+                        kind: Plugin
+                        metadata:
+                          name: plugin-1
+                        spec:
+                          license:
+                            - name: MIT
+                              url: https://exmple.com
+                        """);
         Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
         assertThat(plugin.getSpec()).isNotNull();
-        JSONAssert.assertEquals("""
-            [{
-                "name": "MIT",
-                "url": "https://exmple.com"
-            }]
-            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
+        JSONAssert.assertEquals(
+                """
+                [{
+                    "name": "MIT",
+                    "url": "https://exmple.com"
+                }]
+                """,
+                JsonUtils.objectToJson(plugin.getSpec().getLicense()),
+                false);
     }
 
     @Test
     void deserializeLicense() throws JSONException, JsonProcessingException {
-        String pluginJson = """
-            {
-                "apiVersion": "plugin.halo.run/v1alpha1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "plugin-1"
-                },
-                "spec": {
-                    "license": [
-                        {
-                            "name": "MIT",
-                            "url": "https://exmple.com"
-                        }
-                    ]
+        String pluginJson =
+                """
+                {
+                    "apiVersion": "plugin.halo.run/v1alpha1",
+                    "kind": "Plugin",
+                    "metadata": {
+                        "name": "plugin-1"
+                    },
+                    "spec": {
+                        "license": [
+                            {
+                                "name": "MIT",
+                                "url": "https://exmple.com"
+                            }
+                        ]
+                    }
                 }
-            }
-            """;
+                """;
         Plugin plugin = Unstructured.OBJECT_MAPPER.readValue(pluginJson, Plugin.class);
         assertThat(plugin.getSpec()).isNotNull();
         JSONAssert.assertEquals(pluginJson, JsonUtils.objectToJson(plugin), false);

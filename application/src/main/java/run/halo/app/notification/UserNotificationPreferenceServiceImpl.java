@@ -28,39 +28,45 @@ public class UserNotificationPreferenceServiceImpl implements UserNotificationPr
     public Mono<UserNotificationPreference> getByUser(String username) {
         var configName = buildUserPreferenceConfigMapName(username);
         return client.fetch(ConfigMap.class, configName)
-            .map(config -> {
-                if (config.getData() == null) {
-                    return new UserNotificationPreference();
-                }
-                String s = config.getData().get(NOTIFICATION_PREFERENCE);
-                if (StringUtils.isNotBlank(s)) {
-                    return JsonUtils.jsonToObject(s, UserNotificationPreference.class);
-                }
-                return new UserNotificationPreference();
-            })
-            .defaultIfEmpty(new UserNotificationPreference());
+                .map(
+                        config -> {
+                            if (config.getData() == null) {
+                                return new UserNotificationPreference();
+                            }
+                            String s = config.getData().get(NOTIFICATION_PREFERENCE);
+                            if (StringUtils.isNotBlank(s)) {
+                                return JsonUtils.jsonToObject(s, UserNotificationPreference.class);
+                            }
+                            return new UserNotificationPreference();
+                        })
+                .defaultIfEmpty(new UserNotificationPreference());
     }
 
     @Override
-    public Mono<Void> saveByUser(String username,
-        UserNotificationPreference userNotificationPreference) {
+    public Mono<Void> saveByUser(
+            String username, UserNotificationPreference userNotificationPreference) {
         var configName = buildUserPreferenceConfigMapName(username);
         return client.fetch(ConfigMap.class, configName)
-            .switchIfEmpty(Mono.defer(() -> {
-                var configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(configName);
-                return client.create(configMap);
-            }))
-            .flatMap(config -> {
-                if (config.getData() == null) {
-                    config.setData(new HashMap<>());
-                }
-                config.getData().put(NOTIFICATION_PREFERENCE,
-                    JsonUtils.objectToJson(userNotificationPreference));
-                return client.update(config);
-            })
-            .then();
+                .switchIfEmpty(
+                        Mono.defer(
+                                () -> {
+                                    var configMap = new ConfigMap();
+                                    configMap.setMetadata(new Metadata());
+                                    configMap.getMetadata().setName(configName);
+                                    return client.create(configMap);
+                                }))
+                .flatMap(
+                        config -> {
+                            if (config.getData() == null) {
+                                config.setData(new HashMap<>());
+                            }
+                            config.getData()
+                                    .put(
+                                            NOTIFICATION_PREFERENCE,
+                                            JsonUtils.objectToJson(userNotificationPreference));
+                            return client.update(config);
+                        })
+                .then();
     }
 
     static String buildUserPreferenceConfigMapName(String username) {

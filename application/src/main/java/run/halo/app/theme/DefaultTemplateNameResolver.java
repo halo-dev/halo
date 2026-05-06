@@ -20,8 +20,8 @@ public class DefaultTemplateNameResolver implements TemplateNameResolver {
     private final ApplicationContext applicationContext;
     private final ViewNameResolver viewNameResolver;
 
-    public DefaultTemplateNameResolver(ViewNameResolver viewNameResolver,
-        ApplicationContext applicationContext) {
+    public DefaultTemplateNameResolver(
+            ViewNameResolver viewNameResolver, ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.viewNameResolver = viewNameResolver;
     }
@@ -30,24 +30,24 @@ public class DefaultTemplateNameResolver implements TemplateNameResolver {
     public Mono<String> resolveTemplateNameOrDefault(ServerWebExchange exchange, String name) {
         if (applicationContext instanceof PluginApplicationContext pluginApplicationContext) {
             var pluginName = pluginApplicationContext.getPluginId();
-            return this.resolveTemplateNameOrDefault(exchange, name,
-                pluginClassPathTemplate(pluginName, name));
+            return this.resolveTemplateNameOrDefault(
+                    exchange, name, pluginClassPathTemplate(pluginName, name));
         }
-        return resolveTemplateNameOrDefault(exchange, name,
-            pluginClassPathTemplate(SYSTEM_PLUGIN_NAME, name));
+        return resolveTemplateNameOrDefault(
+                exchange, name, pluginClassPathTemplate(SYSTEM_PLUGIN_NAME, name));
     }
 
     @Override
-    public Mono<String> resolveTemplateNameOrDefault(ServerWebExchange exchange, String name,
-        String defaultName) {
+    public Mono<String> resolveTemplateNameOrDefault(
+            ServerWebExchange exchange, String name, String defaultName) {
         return viewNameResolver.resolveViewNameOrDefault(exchange, name, defaultName);
     }
 
     @Override
     public Mono<Boolean> isTemplateAvailableInTheme(ServerWebExchange exchange, String name) {
         return this.resolveTemplateNameOrDefault(exchange, name, "")
-            .filter(StringUtils::isNotBlank)
-            .hasElement();
+                .filter(StringUtils::isNotBlank)
+                .hasElement();
     }
 
     String pluginClassPathTemplate(String pluginName, String templateName) {

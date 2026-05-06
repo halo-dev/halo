@@ -21,13 +21,14 @@ import run.halo.app.infra.utils.ReactiveUtils;
  */
 @Component
 public class PostHideFromListStateUpdater
-    extends AbstractEventReconciler<CategoryHiddenStateChangeEvent> {
+        extends AbstractEventReconciler<CategoryHiddenStateChangeEvent> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private final ReactiveExtensionPaginatedOperator reactiveExtensionPaginatedOperator;
     private final ReactiveExtensionClient client;
 
-    protected PostHideFromListStateUpdater(ReactiveExtensionClient client,
-        ReactiveExtensionPaginatedOperator reactiveExtensionPaginatedOperator) {
+    protected PostHideFromListStateUpdater(
+            ReactiveExtensionClient client,
+            ReactiveExtensionPaginatedOperator reactiveExtensionPaginatedOperator) {
         super(PostHideFromListStateUpdater.class.getName());
         this.reactiveExtensionPaginatedOperator = reactiveExtensionPaginatedOperator;
         this.client = client;
@@ -36,17 +37,18 @@ public class PostHideFromListStateUpdater
     @Override
     public Result reconcile(CategoryHiddenStateChangeEvent request) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            equal("spec.categories", request.getCategoryName())
-        ));
+        listOptions.setFieldSelector(
+                FieldSelector.of(equal("spec.categories", request.getCategoryName())));
 
-        reactiveExtensionPaginatedOperator.list(Post.class, listOptions)
-            .flatMap(post -> {
-                post.getStatusOrDefault().setHideFromList(request.isHidden());
-                return client.update(post);
-            })
-            .then()
-            .block(BLOCKING_TIMEOUT);
+        reactiveExtensionPaginatedOperator
+                .list(Post.class, listOptions)
+                .flatMap(
+                        post -> {
+                            post.getStatusOrDefault().setHideFromList(request.isHidden());
+                            return client.update(post);
+                        })
+                .then()
+                .block(BLOCKING_TIMEOUT);
         return Result.doNotRetry();
     }
 

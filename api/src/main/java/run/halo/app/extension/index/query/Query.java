@@ -11,6 +11,4 @@ package run.halo.app.extension.index.query;
  * @deprecated Use {@link Condition} instead.
  */
 @Deprecated(since = "2.22.0", forRemoval = true)
-public interface Query {
-
-}
+public interface Query {}

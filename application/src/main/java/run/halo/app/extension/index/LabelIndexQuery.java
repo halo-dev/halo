@@ -55,5 +55,4 @@ public interface LabelIndexQuery {
      * collection.
      */
     Set<String> notIn(String labelKey, Collection<String> labelValues);
-
 }

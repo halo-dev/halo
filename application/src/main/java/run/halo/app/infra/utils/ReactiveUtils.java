@@ -37,8 +37,8 @@ public enum ReactiveUtils {
      * @param value the normal value or reactive value
      * @return the resolved value
      */
-    public static @Nullable Object blockReactiveValue(@Nullable Object value,
-        ContextView contextView) {
+    public static @Nullable Object blockReactiveValue(
+            @Nullable Object value, ContextView contextView) {
         return blockReactiveValue(value, contextView, DEFAULT_TIMEOUT);
     }
 
@@ -50,8 +50,7 @@ public enum ReactiveUtils {
      * @return the resolved value
      */
     public static @Nullable Object blockReactiveValue(
-        @Nullable Object value, @Nullable ContextView contextView, Duration timeout
-    ) {
+            @Nullable Object value, @Nullable ContextView contextView, Duration timeout) {
         if (value == null) {
             return null;
         }

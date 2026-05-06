@@ -32,7 +32,7 @@ public interface IListRequest {
         protected final MultiValueMap<String, String> queryParams;
 
         private final ConversionService conversionService =
-            ApplicationConversionService.getSharedInstance();
+                ApplicationConversionService.getSharedInstance();
 
         public QueryListRequest(MultiValueMap<String, String> queryParams) {
             this.queryParams = queryParams;
@@ -68,30 +68,33 @@ public interface IListRequest {
     }
 
     static void buildParameters(Builder builder) {
-        builder.parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("page")
-                .implementation(Integer.class)
-                .required(false)
-                .description("Page number. Default is 0."))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("size")
-                .implementation(Integer.class)
-                .required(false)
-                .description("Size number. Default is 0."))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("labelSelector")
-                .required(false)
-                .description("Label selector. e.g.: hidden!=true")
-                .implementationArray(String.class))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("fieldSelector")
-                .required(false)
-                .description("Field selector. e.g.: metadata.name==halo")
-                .implementationArray(String.class)
-            );
+        builder.parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("page")
+                                .implementation(Integer.class)
+                                .required(false)
+                                .description("Page number. Default is 0."))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("size")
+                                .implementation(Integer.class)
+                                .required(false)
+                                .description("Size number. Default is 0."))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("labelSelector")
+                                .required(false)
+                                .description("Label selector. e.g.: hidden!=true")
+                                .implementationArray(String.class))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("fieldSelector")
+                                .required(false)
+                                .description("Field selector. e.g.: metadata.name==halo")
+                                .implementationArray(String.class));
     }
 }

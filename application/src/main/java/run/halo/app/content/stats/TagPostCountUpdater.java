@@ -35,7 +35,7 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class TagPostCountUpdater
-    extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
+        extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
     private final ExtensionClient client;
 
     public TagPostCountUpdater(ExtensionClient client) {
@@ -50,17 +50,19 @@ public class TagPostCountUpdater
         }
 
         // Update last associated tags when handled
-        client.fetch(Post.class, postRelatedTags.postName()).ifPresent(post -> {
-            var tags = defaultIfNull(post.getSpec().getTags(), List.<String>of());
-            var annotations = MetadataUtil.nullSafeAnnotations(post);
-            var tagAnno = JsonUtils.objectToJson(tags);
-            var oldTagAnno = annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO);
+        client.fetch(Post.class, postRelatedTags.postName())
+                .ifPresent(
+                        post -> {
+                            var tags = defaultIfNull(post.getSpec().getTags(), List.<String>of());
+                            var annotations = MetadataUtil.nullSafeAnnotations(post);
+                            var tagAnno = JsonUtils.objectToJson(tags);
+                            var oldTagAnno = annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO);
 
-            if (!tagAnno.equals(oldTagAnno)) {
-                annotations.put(Post.LAST_ASSOCIATED_TAGS_ANNO, tagAnno);
-                client.update(post);
-            }
-        });
+                            if (!tagAnno.equals(oldTagAnno)) {
+                                annotations.put(Post.LAST_ASSOCIATED_TAGS_ANNO, tagAnno);
+                                client.update(post);
+                            }
+                        });
         return Result.doNotRetry();
     }
 
@@ -77,8 +79,7 @@ public class TagPostCountUpdater
         }
 
         if (postEvent instanceof PostDeletedEvent deletedEvent) {
-            var tags = defaultIfNull(deletedEvent.getPost().getSpec().getTags(),
-                List.<String>of());
+            var tags = defaultIfNull(deletedEvent.getPost().getSpec().getTags(), List.<String>of());
             queue.addImmediately(new PostRelatedTags(postName, Sets.newHashSet(tags)));
         }
     }
@@ -86,10 +87,11 @@ public class TagPostCountUpdater
     private Set<String> calcTagsToUpdate(String postName) {
         var post = client.fetch(Post.class, postName).orElseThrow();
         var annotations = MetadataUtil.nullSafeAnnotations(post);
-        var oldTags = Optional.ofNullable(annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO))
-            .filter(StringUtils::isNotBlank)
-            .map(tagsJson -> JsonUtils.jsonToObject(tagsJson, String[].class))
-            .orElse(new String[0]);
+        var oldTags =
+                Optional.ofNullable(annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO))
+                        .filter(StringUtils::isNotBlank)
+                        .map(tagsJson -> JsonUtils.jsonToObject(tagsJson, String[].class))
+                        .orElse(new String[0]);
 
         var tagsToUpdate = Sets.newHashSet(oldTags);
         var newTags = post.getSpec().getTags();
@@ -99,38 +101,47 @@ public class TagPostCountUpdater
         return tagsToUpdate;
     }
 
-    public record PostRelatedTags(String postName, Set<String> tags) {
-    }
+    public record PostRelatedTags(String postName, Set<String> tags) {}
 
     private void updateTagRelatedPostCount(String tagName) {
-        client.fetch(Tag.class, tagName).ifPresent(tag -> {
-            var commonFieldQuery = and(
-                equal("spec.tags", tag.getMetadata().getName()),
-                isNull("metadata.deletionTimestamp")
-            );
-            // Update post count
-            var allPostOptions = new ListOptions();
-            allPostOptions.setFieldSelector(FieldSelector.of(commonFieldQuery));
-            var result = client.listBy(Post.class, allPostOptions, PageRequestImpl.ofSize(1));
-            tag.getStatusOrDefault().setPostCount((int) result.getTotal());
+        client.fetch(Tag.class, tagName)
+                .ifPresent(
+                        tag -> {
+                            var commonFieldQuery =
+                                    and(
+                                            equal("spec.tags", tag.getMetadata().getName()),
+                                            isNull("metadata.deletionTimestamp"));
+                            // Update post count
+                            var allPostOptions = new ListOptions();
+                            allPostOptions.setFieldSelector(FieldSelector.of(commonFieldQuery));
+                            var result =
+                                    client.listBy(
+                                            Post.class, allPostOptions, PageRequestImpl.ofSize(1));
+                            tag.getStatusOrDefault().setPostCount((int) result.getTotal());
 
-            // Update visible post count
-            var publicPostOptions = new ListOptions();
-            publicPostOptions.setLabelSelector(LabelSelector.builder()
-                .eq(Post.PUBLISHED_LABEL, "true")
-                .build());
-            publicPostOptions.setFieldSelector(FieldSelector.of(
-                and(
-                    commonFieldQuery,
-                    equal("spec.deleted", "false"),
-                    equal("spec.visible", Post.VisibleEnum.PUBLIC.name())
-                )
-            ));
-            var publicPosts =
-                client.listBy(Post.class, publicPostOptions, PageRequestImpl.ofSize(1));
-            tag.getStatusOrDefault().setVisiblePostCount((int) publicPosts.getTotal());
+                            // Update visible post count
+                            var publicPostOptions = new ListOptions();
+                            publicPostOptions.setLabelSelector(
+                                    LabelSelector.builder()
+                                            .eq(Post.PUBLISHED_LABEL, "true")
+                                            .build());
+                            publicPostOptions.setFieldSelector(
+                                    FieldSelector.of(
+                                            and(
+                                                    commonFieldQuery,
+                                                    equal("spec.deleted", "false"),
+                                                    equal(
+                                                            "spec.visible",
+                                                            Post.VisibleEnum.PUBLIC.name()))));
+                            var publicPosts =
+                                    client.listBy(
+                                            Post.class,
+                                            publicPostOptions,
+                                            PageRequestImpl.ofSize(1));
+                            tag.getStatusOrDefault()
+                                    .setVisiblePostCount((int) publicPosts.getTotal());
 
-            client.update(tag);
-        });
+                            client.update(tag);
+                        });
     }
 }

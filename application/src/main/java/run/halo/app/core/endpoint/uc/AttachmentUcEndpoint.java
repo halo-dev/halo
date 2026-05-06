@@ -72,109 +72,141 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "AttachmentV1alpha1Uc";
-        return route()
-            .POST("/attachments",
-                this::createAttachmentForPost,
-                builder -> builder.operationId("CreateAttachmentForPost").tag(tag)
-                    .description("""
-                        Create attachment for the given post. \
-                        Deprecated in favor of /attachments/-/upload."""
-                    )
-                    .deprecated(true)
-                    .parameter(parameterBuilder()
-                        .name("waitForPermalink")
-                        .description("Wait for permalink.")
-                        .in(ParameterIn.QUERY)
-                        .required(false)
-                        .implementation(boolean.class))
-                    .requestBody(requestBodyBuilder()
-                        .content(contentBuilder()
-                            .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(schemaBuilder().implementation(PostAttachmentRequest.class)))
-                    )
-                    .response(responseBuilder().implementation(Attachment.class))
-            )
-            .POST(
-                "/attachments/-/upload",
-                contentType(MediaType.MULTIPART_FORM_DATA),
-                this::uploadAttachment,
-                builder -> {
-                    builder.operationId("UploadAttachmentForUc")
-                        .description("Upload attachment to user center storage.")
-                        .tag(tag);
-                    this.attachmentHandler.buildDoc(builder);
-                }
-            )
-            .POST("/attachments/-/upload-from-url", contentType(MediaType.APPLICATION_JSON),
-                this::uploadFromUrlForPost,
-                builder -> builder
-                    .operationId("ExternalTransferAttachment_1")
-                    .description("""
-                        Upload attachment from the given URL.
-                        Deprecated in favor of /attachments/-/upload.""")
-                    .tag(tag)
-                    .deprecated(true)
-                    .parameter(parameterBuilder()
-                        .name("waitForPermalink")
-                        .description("Wait for permalink.")
-                        .in(ParameterIn.QUERY)
-                        .required(false)
-                        .implementation(boolean.class))
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(UploadFromUrlRequest.class))
-                        ))
-                    .response(responseBuilder().implementation(Attachment.class))
-                    .build()
-            )
-            .GET("/attachments", this::listMyAttachments, builder -> {
-                builder.operationId("ListMyAttachments")
-                    .description("List attachments of the current user uploaded.")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(Attachment.class))
-                    );
-                SearchRequest.buildParameters(builder);
-            })
-            .build();
+        return route().POST(
+                        "/attachments",
+                        this::createAttachmentForPost,
+                        builder ->
+                                builder.operationId("CreateAttachmentForPost")
+                                        .tag(tag)
+                                        .description(
+                                                """
+                                                Create attachment for the given post. \
+                                                Deprecated in favor of /attachments/-/upload.\
+                                                """)
+                                        .deprecated(true)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("waitForPermalink")
+                                                        .description("Wait for permalink.")
+                                                        .in(ParameterIn.QUERY)
+                                                        .required(false)
+                                                        .implementation(boolean.class))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .MULTIPART_FORM_DATA_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                PostAttachmentRequest
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder().implementation(Attachment.class)))
+                .POST(
+                        "/attachments/-/upload",
+                        contentType(MediaType.MULTIPART_FORM_DATA),
+                        this::uploadAttachment,
+                        builder -> {
+                            builder.operationId("UploadAttachmentForUc")
+                                    .description("Upload attachment to user center storage.")
+                                    .tag(tag);
+                            this.attachmentHandler.buildDoc(builder);
+                        })
+                .POST(
+                        "/attachments/-/upload-from-url",
+                        contentType(MediaType.APPLICATION_JSON),
+                        this::uploadFromUrlForPost,
+                        builder ->
+                                builder.operationId("ExternalTransferAttachment_1")
+                                        .description(
+                                                """
+                                                Upload attachment from the given URL.
+                                                Deprecated in favor of /attachments/-/upload.\
+                                                """)
+                                        .tag(tag)
+                                        .deprecated(true)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("waitForPermalink")
+                                                        .description("Wait for permalink.")
+                                                        .in(ParameterIn.QUERY)
+                                                        .required(false)
+                                                        .implementation(boolean.class))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                UploadFromUrlRequest
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder().implementation(Attachment.class))
+                                        .build())
+                .GET(
+                        "/attachments",
+                        this::listMyAttachments,
+                        builder -> {
+                            builder.operationId("ListMyAttachments")
+                                    .description("List attachments of the current user uploaded.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    Attachment.class)));
+                            SearchRequest.buildParameters(builder);
+                        })
+                .build();
     }
 
     private Mono<ServerResponse> uploadAttachment(ServerRequest request) {
-        var getConfigFromUser = systemSettingFetcher.fetch(
-                SystemSetting.User.GROUP,
-                SystemSetting.User.class
-            )
-            .mapNotNull(SystemSetting.User::getUcAttachmentPolicy)
-            .filter(StringUtils::isNotBlank)
-            .map(policyName -> SystemSetting.Attachment.UploadOptions.builder()
-                .policyName(policyName)
-                .build()
-            );
-        var getConfig = systemSettingFetcher.fetch(
-                SystemSetting.Attachment.GROUP,
-                SystemSetting.Attachment.class
-            )
-            .mapNotNull(SystemSetting.Attachment::uc)
-            .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
-            .switchIfEmpty(Mono.defer(() -> getConfigFromUser))
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "Attachment system setting is not configured for console"
-            )));
+        var getConfigFromUser =
+                systemSettingFetcher
+                        .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+                        .mapNotNull(SystemSetting.User::getUcAttachmentPolicy)
+                        .filter(StringUtils::isNotBlank)
+                        .map(
+                                policyName ->
+                                        SystemSetting.Attachment.UploadOptions.builder()
+                                                .policyName(policyName)
+                                                .build());
+        var getConfig =
+                systemSettingFetcher
+                        .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
+                        .mapNotNull(SystemSetting.Attachment::uc)
+                        .filter(uo -> StringUtils.isNotBlank(uo.policyName()))
+                        .switchIfEmpty(Mono.defer(() -> getConfigFromUser))
+                        .switchIfEmpty(
+                                Mono.error(
+                                        () ->
+                                                new ServerWebInputException(
+                                                        "Attachment system setting is not"
+                                                                + " configured for console")));
         return attachmentHandler.handleUpload(request, getConfig);
     }
 
     private Mono<ServerResponse> listMyAttachments(ServerRequest request) {
         return getCurrentUser()
-            .flatMap(username -> {
-                var searchRequest = new UcSearchRequest(request, username);
-                return attachmentLister.listBy(searchRequest)
-                    .flatMap(listResult -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(listResult)
-                    );
-            });
+                .flatMap(
+                        username -> {
+                            var searchRequest = new UcSearchRequest(request, username);
+                            return attachmentLister
+                                    .listBy(searchRequest)
+                                    .flatMap(
+                                            listResult ->
+                                                    ServerResponse.ok()
+                                                            .contentType(MediaType.APPLICATION_JSON)
+                                                            .bodyValue(listResult));
+                        });
     }
 
     @Getter
@@ -191,30 +223,31 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         public ListOptions toListOptions(List<String> hiddenGroups) {
             var listOptions = super.toListOptions(hiddenGroups);
             return ListOptions.builder(listOptions)
-                .andQuery((equal("spec.ownerName", owner)))
-                .build();
+                    .andQuery((equal("spec.ownerName", owner)))
+                    .build();
         }
     }
 
     private Mono<ServerResponse> uploadFromUrlForPost(ServerRequest request) {
         var uploadFromUrlRequestMono = request.bodyToMono(UploadFromUrlRequest.class);
 
-        var uploadAttachment = getPostSettingMono()
-            .flatMap(postSetting -> uploadFromUrlRequestMono.flatMap(
-                uploadFromUrlRequest -> {
-                    var url = uploadFromUrlRequest.url();
-                    var fileName = uploadFromUrlRequest.filename();
-                    return attachmentService.uploadFromUrl(url,
-                        postSetting.getAttachmentPolicyName(),
-                        postSetting.getAttachmentGroupName(),
-                        fileName
-                    );
-                })
-            );
+        var uploadAttachment =
+                getPostSettingMono()
+                        .flatMap(
+                                postSetting ->
+                                        uploadFromUrlRequestMono.flatMap(
+                                                uploadFromUrlRequest -> {
+                                                    var url = uploadFromUrlRequest.url();
+                                                    var fileName = uploadFromUrlRequest.filename();
+                                                    return attachmentService.uploadFromUrl(
+                                                            url,
+                                                            postSetting.getAttachmentPolicyName(),
+                                                            postSetting.getAttachmentGroupName(),
+                                                            fileName);
+                                                }));
 
-        var waitForPermalink = request.queryParam("waitForPermalink")
-            .map(Boolean::valueOf)
-            .orElse(false);
+        var waitForPermalink =
+                request.queryParam("waitForPermalink").map(Boolean::valueOf).orElse(false);
         if (waitForPermalink) {
             uploadAttachment = waitForPermalink(uploadAttachment);
         }
@@ -222,23 +255,35 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> createAttachmentForPost(ServerRequest request) {
-        var postAttachmentRequestMono = request.body(BodyExtractors.toMultipartData())
-            .map(PostAttachmentRequest::from)
-            .cache();
+        var postAttachmentRequestMono =
+                request.body(BodyExtractors.toMultipartData())
+                        .map(PostAttachmentRequest::from)
+                        .cache();
 
         // get settings
         var createdAttachment =
-            getPostSettingMono().flatMap(postSetting -> postAttachmentRequestMono
-                .flatMap(postAttachmentRequest -> getCurrentUser().flatMap(
-                    username -> attachmentService.upload(username,
-                        postSetting.getAttachmentPolicyName(),
-                        postSetting.getAttachmentGroupName(),
-                        postAttachmentRequest.file(),
-                        linkWith(postAttachmentRequest)))));
+                getPostSettingMono()
+                        .flatMap(
+                                postSetting ->
+                                        postAttachmentRequestMono.flatMap(
+                                                postAttachmentRequest ->
+                                                        getCurrentUser()
+                                                                .flatMap(
+                                                                        username ->
+                                                                                attachmentService
+                                                                                        .upload(
+                                                                                                username,
+                                                                                                postSetting
+                                                                                                        .getAttachmentPolicyName(),
+                                                                                                postSetting
+                                                                                                        .getAttachmentGroupName(),
+                                                                                                postAttachmentRequest
+                                                                                                        .file(),
+                                                                                                linkWith(
+                                                                                                        postAttachmentRequest)))));
 
-        var waitForPermalink = request.queryParam("waitForPermalink")
-            .map(Boolean::valueOf)
-            .orElse(false);
+        var waitForPermalink =
+                request.queryParam("waitForPermalink").map(Boolean::valueOf).orElse(false);
         if (waitForPermalink) {
             createdAttachment = waitForPermalink(createdAttachment);
         }
@@ -246,30 +291,39 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     }
 
     private Mono<Attachment> waitForPermalink(Mono<Attachment> createdAttachment) {
-        createdAttachment = createdAttachment.flatMap(attachment ->
-            attachmentService.getPermalink(attachment)
-                .doOnNext(permalink -> {
-                    var status = attachment.getStatus();
-                    if (status == null) {
-                        status = new Attachment.AttachmentStatus();
-                        attachment.setStatus(status);
-                    }
-                    status.setPermalink(permalink.toString());
-                })
-                .thenReturn(attachment));
+        createdAttachment =
+                createdAttachment.flatMap(
+                        attachment ->
+                                attachmentService
+                                        .getPermalink(attachment)
+                                        .doOnNext(
+                                                permalink -> {
+                                                    var status = attachment.getStatus();
+                                                    if (status == null) {
+                                                        status = new Attachment.AttachmentStatus();
+                                                        attachment.setStatus(status);
+                                                    }
+                                                    status.setPermalink(permalink.toString());
+                                                })
+                                        .thenReturn(attachment));
         return createdAttachment;
     }
 
     private Mono<SystemSetting.Post> getPostSettingMono() {
-        return systemSettingFetcher.fetchPost().handle((postSetting, sink) -> {
-            var attachmentPolicyName = postSetting.getAttachmentPolicyName();
-            if (StringUtils.isBlank(attachmentPolicyName)) {
-                sink.error(new ServerWebInputException(
-                    "Please configure storage policy for post attachment first."));
-                return;
-            }
-            sink.next(postSetting);
-        });
+        return systemSettingFetcher
+                .fetchPost()
+                .handle(
+                        (postSetting, sink) -> {
+                            var attachmentPolicyName = postSetting.getAttachmentPolicyName();
+                            if (StringUtils.isBlank(attachmentPolicyName)) {
+                                sink.error(
+                                        new ServerWebInputException(
+                                                "Please configure storage policy for post"
+                                                        + " attachment first."));
+                                return;
+                            }
+                            sink.next(postSetting);
+                        });
     }
 
     private Consumer<Attachment> linkWith(PostAttachmentRequest request) {
@@ -290,20 +344,25 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
 
     private Mono<Void> checkPostOwnership(Mono<PostAttachmentRequest> postAttachmentRequest) {
         // check the post
-        var postNotFoundError = Mono.<Post>error(
-            () -> new NotFoundException("The post was not found or deleted.")
-        );
-        return postAttachmentRequest.map(PostAttachmentRequest::postName)
-            .flatMap(postName -> getCurrentUser()
-                .flatMap(username -> postService.getByUsername(postName, username)
-                    .switchIfEmpty(postNotFoundError)))
-            .then();
+        var postNotFoundError =
+                Mono.<Post>error(() -> new NotFoundException("The post was not found or deleted."));
+        return postAttachmentRequest
+                .map(PostAttachmentRequest::postName)
+                .flatMap(
+                        postName ->
+                                getCurrentUser()
+                                        .flatMap(
+                                                username ->
+                                                        postService
+                                                                .getByUsername(postName, username)
+                                                                .switchIfEmpty(postNotFoundError)))
+                .then();
     }
 
     private Mono<String> getCurrentUser() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName);
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getName);
     }
 
     @Override
@@ -312,8 +371,9 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
     }
 
     @Schema(name = "UcUploadFromUrlRequest")
-    public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
-                                       @Schema(description = "Custom file name") String filename) {
+    public record UploadFromUrlRequest(
+            @Schema(requiredMode = REQUIRED) URL url,
+            @Schema(description = "Custom file name") String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");
@@ -323,15 +383,10 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
 
     @Schema(types = "object")
     public record PostAttachmentRequest(
-        @Schema(requiredMode = REQUIRED, description = "Attachment data.")
-        FilePart file,
-
-        @Schema(requiredMode = NOT_REQUIRED, description = "Post name.")
-        String postName,
-
-        @Schema(requiredMode = NOT_REQUIRED, description = "Single page name.")
-        String singlePageName
-    ) {
+            @Schema(requiredMode = REQUIRED, description = "Attachment data.") FilePart file,
+            @Schema(requiredMode = NOT_REQUIRED, description = "Post name.") String postName,
+            @Schema(requiredMode = NOT_REQUIRED, description = "Single page name.")
+                    String singlePageName) {
 
         /**
          * Convert multipart data into PostAttachmentRequest.
@@ -359,6 +414,5 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
 
             return new PostAttachmentRequest(file, postName, singlePageName);
         }
-
     }
 }

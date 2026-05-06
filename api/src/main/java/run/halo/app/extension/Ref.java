@@ -59,7 +59,7 @@ public class Ref {
      */
     public static boolean groupKindEquals(Ref ref, GroupVersionKind gvk) {
         return Objects.equals(ref.getGroup(), gvk.group())
-            && Objects.equals(ref.getKind(), gvk.kind());
+                && Objects.equals(ref.getKind(), gvk.kind());
     }
 
     /**
@@ -84,5 +84,4 @@ public class Ref {
     public static String toIdentifier(Ref ref) {
         return ref.getGroup() + "/" + ref.getKind() + "/" + ref.getName();
     }
-
 }

@@ -6,5 +6,4 @@ import lombok.Data;
 public class CacheProperties {
 
     private boolean disabled;
-
 }

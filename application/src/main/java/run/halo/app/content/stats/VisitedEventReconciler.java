@@ -39,7 +39,7 @@ import run.halo.app.infra.InitializationPhase;
 @Slf4j
 @Component
 public class VisitedEventReconciler
-    implements Reconciler<VisitedEventReconciler.VisitCountBucket>, SmartLifecycle {
+        implements Reconciler<VisitedEventReconciler.VisitCountBucket>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
@@ -61,15 +61,18 @@ public class VisitedEventReconciler
 
     private void createOrUpdateVisits(String name, Integer visits) {
         client.fetch(Counter.class, name)
-            .ifPresentOrElse(counter -> {
-                Integer existingVisit = ObjectUtils.defaultIfNull(counter.getVisit(), 0);
-                counter.setVisit(existingVisit + visits);
-                client.update(counter);
-            }, () -> {
-                Counter counter = Counter.emptyCounter(name);
-                counter.setVisit(visits);
-                client.create(counter);
-            });
+                .ifPresentOrElse(
+                        counter -> {
+                            Integer existingVisit =
+                                    ObjectUtils.defaultIfNull(counter.getVisit(), 0);
+                            counter.setVisit(existingVisit + visits);
+                            client.update(counter);
+                        },
+                        () -> {
+                            Counter counter = Counter.emptyCounter(name);
+                            counter.setVisit(visits);
+                            client.create(counter);
+                        });
     }
 
     /**
@@ -88,12 +91,12 @@ public class VisitedEventReconciler
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            visitedEventQueue,
-            null,
-            Duration.ofMillis(300),
-            Duration.ofMinutes(5));
+                this.getClass().getName(),
+                this,
+                visitedEventQueue,
+                null,
+                Duration.ofMillis(300),
+                Duration.ofMinutes(5));
     }
 
     @Override
@@ -129,8 +132,7 @@ public class VisitedEventReconciler
         return InitializationPhase.CONTROLLERS.getPhase();
     }
 
-    public record VisitCountBucket(String name, int visits) {
-    }
+    public record VisitCountBucket(String name, int visits) {}
 
     @Component
     @RequiredArgsConstructor
@@ -150,32 +152,36 @@ public class VisitedEventReconciler
                 return;
             }
             String counterName =
-                MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
-            pooledVisitsMap.compute(counterName, (name, visits) -> {
-                if (visits == null) {
-                    return 1;
-                } else {
-                    return visits + 1;
-                }
-            });
+                    MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
+            pooledVisitsMap.compute(
+                    counterName,
+                    (name, visits) -> {
+                        if (visits == null) {
+                            return 1;
+                        } else {
+                            return visits + 1;
+                        }
+                    });
         }
 
         private boolean checkVisitSubject(GroupPluralName groupPluralName) {
-            Optional<Scheme> schemeOptional = schemeManager.schemes().stream()
-                .filter(scheme -> {
-                    GroupVersionKind gvk = scheme.groupVersionKind();
-                    return scheme.plural().equals(groupPluralName.plural())
-                        && gvk.group().equals(groupPluralName.group());
-                })
-                .findFirst();
-            return schemeOptional.map(
-                    scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
-                        .isPresent()
-                )
-                .orElse(false);
+            Optional<Scheme> schemeOptional =
+                    schemeManager.schemes().stream()
+                            .filter(
+                                    scheme -> {
+                                        GroupVersionKind gvk = scheme.groupVersionKind();
+                                        return scheme.plural().equals(groupPluralName.plural())
+                                                && gvk.group().equals(groupPluralName.group());
+                                    })
+                            .findFirst();
+            return schemeOptional
+                    .map(
+                            scheme ->
+                                    client.fetch(scheme.groupVersionKind(), groupPluralName.name())
+                                            .isPresent())
+                    .orElse(false);
         }
 
-        record GroupPluralName(String group, String plural, String name) {
-        }
+        record GroupPluralName(String group, String plural, String name) {}
     }
 }

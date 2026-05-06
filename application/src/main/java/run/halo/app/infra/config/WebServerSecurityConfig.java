@@ -44,56 +44,71 @@ import run.halo.app.security.authorization.AuthorityUtils;
 public class WebServerSecurityConfig {
 
     @Bean
-    SecurityWebFilterChain filterChain(ServerHttpSecurity http,
-        ObjectProvider<SecurityConfigurer> securityConfigurers,
-        ServerSecurityContextRepository securityContextRepository,
-        HaloProperties haloProperties,
-        ServerRequestCache serverRequestCache) {
+    SecurityWebFilterChain filterChain(
+            ServerHttpSecurity http,
+            ObjectProvider<SecurityConfigurer> securityConfigurers,
+            ServerSecurityContextRepository securityContextRepository,
+            HaloProperties haloProperties,
+            ServerRequestCache serverRequestCache) {
 
         var pathMatcher = pathMatchers("/**");
-        var staticResourcesMatcher = pathMatchers(HttpMethod.GET,
-            "/ui-assets/**",
-            "/themes/{themeName}/assets/{*resourcePaths}",
-            "/plugins/{pluginName}/assets/**",
-            "/webjars/**",
-            "/js/**",
-            "/styles/**",
-            "/halo-tracker.js",
-            "/images/**"
-        );
+        var staticResourcesMatcher =
+                pathMatchers(
+                        HttpMethod.GET,
+                        "/ui-assets/**",
+                        "/themes/{themeName}/assets/{*resourcePaths}",
+                        "/plugins/{pluginName}/assets/**",
+                        "/webjars/**",
+                        "/js/**",
+                        "/styles/**",
+                        "/halo-tracker.js",
+                        "/images/**");
 
-        var securityMatcher = new AndServerWebExchangeMatcher(pathMatcher,
-            new NegatedServerWebExchangeMatcher(staticResourcesMatcher));
+        var securityMatcher =
+                new AndServerWebExchangeMatcher(
+                        pathMatcher, new NegatedServerWebExchangeMatcher(staticResourcesMatcher));
 
         http.securityMatcher(securityMatcher)
-            .anonymous(spec -> {
-                spec.authorities(AuthorityUtils.ROLE_PREFIX + AnonymousUserConst.Role);
-                spec.principal(AnonymousUserConst.PRINCIPAL);
-            })
-            .securityContextRepository(securityContextRepository)
-            .httpBasic(basic -> {
-                if (haloProperties.getSecurity().getBasicAuth().isDisabled()) {
-                    basic.disable();
-                }
-            })
-            .headers(headerSpec -> headerSpec
-                .frameOptions(frameSpec -> {
-                    var frameOptions = haloProperties.getSecurity().getFrameOptions();
-                    frameSpec.mode(frameOptions.getMode());
-                    if (frameOptions.isDisabled()) {
-                        frameSpec.disable();
-                    }
-                })
-                .referrerPolicy(referrerPolicySpec -> referrerPolicySpec.policy(
-                    haloProperties.getSecurity().getReferrerOptions().getPolicy())
-                )
-                .hsts(hstsSpec -> hstsSpec.includeSubdomains(false))
-            )
-            .requestCache(spec -> spec.requestCache(serverRequestCache));
+                .anonymous(
+                        spec -> {
+                            spec.authorities(AuthorityUtils.ROLE_PREFIX + AnonymousUserConst.Role);
+                            spec.principal(AnonymousUserConst.PRINCIPAL);
+                        })
+                .securityContextRepository(securityContextRepository)
+                .httpBasic(
+                        basic -> {
+                            if (haloProperties.getSecurity().getBasicAuth().isDisabled()) {
+                                basic.disable();
+                            }
+                        })
+                .headers(
+                        headerSpec ->
+                                headerSpec
+                                        .frameOptions(
+                                                frameSpec -> {
+                                                    var frameOptions =
+                                                            haloProperties
+                                                                    .getSecurity()
+                                                                    .getFrameOptions();
+                                                    frameSpec.mode(frameOptions.getMode());
+                                                    if (frameOptions.isDisabled()) {
+                                                        frameSpec.disable();
+                                                    }
+                                                })
+                                        .referrerPolicy(
+                                                referrerPolicySpec ->
+                                                        referrerPolicySpec.policy(
+                                                                haloProperties
+                                                                        .getSecurity()
+                                                                        .getReferrerOptions()
+                                                                        .getPolicy()))
+                                        .hsts(hstsSpec -> hstsSpec.includeSubdomains(false)))
+                .requestCache(spec -> spec.requestCache(serverRequestCache));
 
         // Integrate with other configurers separately
-        securityConfigurers.orderedStream()
-            .forEach(securityConfigurer -> securityConfigurer.configure(http));
+        securityConfigurers
+                .orderedStream()
+                .forEach(securityConfigurer -> securityConfigurer.configure(http));
         return http.build();
     }
 
@@ -108,9 +123,8 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
-    DefaultUserDetailService userDetailsService(UserService userService,
-        RoleService roleService,
-        HaloProperties haloProperties) {
+    DefaultUserDetailService userDetailsService(
+            UserService userService, RoleService roleService, HaloProperties haloProperties) {
         var userDetailService = new DefaultUserDetailService(userService, roleService);
         var twoFactorAuthDisabled = haloProperties.getSecurity().getTwoFactorAuth().isDisabled();
         userDetailService.setTwoFactorAuthDisabled(twoFactorAuthDisabled);
@@ -135,6 +149,4 @@ public class WebServerSecurityConfig {
     CryptoService cryptoService(HaloProperties haloProperties) {
         return new RsaKeyService(haloProperties.getWorkDir().resolve("keys"));
     }
-
-
 }

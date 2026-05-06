@@ -32,34 +32,37 @@ public class RoleReconciler implements Reconciler<Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Role.class, request.name())
-            .ifPresent(role -> {
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(role);
-                // override dependency rules to annotations
-                annotations.put(Role.ROLE_DEPENDENCY_RULES, "[]");
-                annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO, "[]");
+                .ifPresent(
+                        role -> {
+                            Map<String, String> annotations =
+                                    MetadataUtil.nullSafeAnnotations(role);
+                            // override dependency rules to annotations
+                            annotations.put(Role.ROLE_DEPENDENCY_RULES, "[]");
+                            annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO, "[]");
 
-                updateLabelsAndAnnotations(role);
-            });
+                            updateLabelsAndAnnotations(role);
+                        });
         return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Role())
-            .build();
+        return builder.extension(new Role()).build();
     }
 
     private void updateLabelsAndAnnotations(Role role) {
         var annotations = role.getMetadata().getAnnotations();
         var labels = role.getMetadata().getLabels();
         client.fetch(Role.class, role.getMetadata().getName())
-            .filter(freshRole -> !deepEquals(annotations, freshRole.getMetadata().getAnnotations())
-            || deepEquals(labels, freshRole.getMetadata().getLabels()))
-            .ifPresent(freshRole -> {
-                freshRole.getMetadata().setAnnotations(annotations);
-                freshRole.getMetadata().setLabels(labels);
-                client.update(freshRole);
-            });
+                .filter(
+                        freshRole ->
+                                !deepEquals(annotations, freshRole.getMetadata().getAnnotations())
+                                        || deepEquals(labels, freshRole.getMetadata().getLabels()))
+                .ifPresent(
+                        freshRole -> {
+                            freshRole.getMetadata().setAnnotations(annotations);
+                            freshRole.getMetadata().setLabels(labels);
+                            client.update(freshRole);
+                        });
     }
 }

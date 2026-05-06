@@ -30,14 +30,19 @@ public class CategoriesRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
-        return RouterFunctions.route(GET(StringUtils.prependIfMissing(prefix, "/")),
-            handlerFunction());
+        return RouterFunctions.route(
+                GET(StringUtils.prependIfMissing(prefix, "/")), handlerFunction());
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
-        return request -> ServerResponse.ok()
-            .render(DefaultTemplateEnum.CATEGORIES.getValue(),
-                Map.of("categories", categoryFinder.listAsTree(),
-                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORIES.getValue()));
+        return request ->
+                ServerResponse.ok()
+                        .render(
+                                DefaultTemplateEnum.CATEGORIES.getValue(),
+                                Map.of(
+                                        "categories",
+                                        categoryFinder.listAsTree(),
+                                        ModelConst.TEMPLATE_ID,
+                                        DefaultTemplateEnum.CATEGORIES.getValue()));
     }
 }

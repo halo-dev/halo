@@ -31,16 +31,21 @@ public class SortableRequest extends IListRequest.QueryListRequest {
         this.exchange = exchange;
     }
 
-    @ArraySchema(uniqueItems = true,
-        arraySchema = @Schema(name = "sort",
-            description = "Sort property and direction of the list result. Support sorting based "
-                + "on attribute name path."),
-        schema = @Schema(description = "like field,asc or field,desc",
-            implementation = String.class,
-            example = "metadata.creationTimestamp,desc"))
+    @ArraySchema(
+            uniqueItems = true,
+            arraySchema =
+                    @Schema(
+                            name = "sort",
+                            description =
+                                    "Sort property and direction of the list result. Support"
+                                            + " sorting based on attribute name path."),
+            schema =
+                    @Schema(
+                            description = "like field,asc or field,desc",
+                            implementation = String.class,
+                            example = "metadata.creationTimestamp,desc"))
     public Sort getSort() {
-        return SortResolver.defaultInstance.resolve(exchange)
-            .and(defaultSort());
+        return SortResolver.defaultInstance.resolve(exchange).and(defaultSort());
     }
 
     /**
@@ -64,27 +69,32 @@ public class SortableRequest extends IListRequest.QueryListRequest {
      */
     public <T extends Extension> Comparator<T> toComparator() {
         var sort = getSort();
-        var fallbackComparator = Stream.<Comparator<T>>of(
-            compareCreationTimestamp(false),
-            compareName(true)
-        );
-        var comparatorStream = sort.stream().map(order -> {
-            var property = order.getProperty();
-            var direction = order.getDirection();
-            Function<T, Object> function = extension -> {
-                BeanWrapper beanWrapper = new BeanWrapperImpl(extension);
-                return beanWrapper.getPropertyValue(property);
-            };
-            var comparator =
-                Comparator.comparing(function, nullsComparator(direction.isAscending()));
-            if (direction.isDescending()) {
-                comparator = comparator.reversed();
-            }
-            return comparator;
-        });
+        var fallbackComparator =
+                Stream.<Comparator<T>>of(compareCreationTimestamp(false), compareName(true));
+        var comparatorStream =
+                sort.stream()
+                        .map(
+                                order -> {
+                                    var property = order.getProperty();
+                                    var direction = order.getDirection();
+                                    Function<T, Object> function =
+                                            extension -> {
+                                                BeanWrapper beanWrapper =
+                                                        new BeanWrapperImpl(extension);
+                                                return beanWrapper.getPropertyValue(property);
+                                            };
+                                    var comparator =
+                                            Comparator.comparing(
+                                                    function,
+                                                    nullsComparator(direction.isAscending()));
+                                    if (direction.isDescending()) {
+                                        comparator = comparator.reversed();
+                                    }
+                                    return comparator;
+                                });
         return Stream.concat(comparatorStream, fallbackComparator)
-            .reduce(Comparator::thenComparing)
-            .orElse(null);
+                .reduce(Comparator::thenComparing)
+                .orElse(null);
     }
 
     public static void buildParameters(Builder builder) {

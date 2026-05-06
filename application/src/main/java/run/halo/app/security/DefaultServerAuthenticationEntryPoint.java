@@ -22,38 +22,48 @@ import run.halo.app.infra.utils.HaloUtils;
  */
 public class DefaultServerAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
-    private final ServerWebExchangeMatcher xhrMatcher = exchange -> {
-        if (HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
-            return MatchResult.match();
-        }
-        return MatchResult.notMatch();
-    };
+    private final ServerWebExchangeMatcher xhrMatcher =
+            exchange -> {
+                if (HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
+                    return MatchResult.match();
+                }
+                return MatchResult.notMatch();
+            };
 
     private final RedirectServerAuthenticationEntryPoint redirectEntryPoint;
 
     public DefaultServerAuthenticationEntryPoint(ServerRequestCache serverRequestCache) {
         var entryPoint =
-            new RedirectServerAuthenticationEntryPoint("/login?authentication_required");
+                new RedirectServerAuthenticationEntryPoint("/login?authentication_required");
         entryPoint.setRequestCache(serverRequestCache);
         this.redirectEntryPoint = entryPoint;
     }
 
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
-        return xhrMatcher.matches(exchange)
-            .filter(MatchResult::isMatch)
-            .switchIfEmpty(
-                Mono.defer(() -> this.redirectEntryPoint.commence(exchange, ex).then(Mono.empty()))
-            )
-            .flatMap(match -> Mono.defer(
-                () -> {
-                    var response = exchange.getResponse();
-                    var wwwAuthenticate = "FormLogin realm=\"console\"";
-                    response.getHeaders().set(HttpHeaders.WWW_AUTHENTICATE, wwwAuthenticate);
-                    response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                    return response.setComplete();
-                }).then(Mono.empty())
-            );
+        return xhrMatcher
+                .matches(exchange)
+                .filter(MatchResult::isMatch)
+                .switchIfEmpty(
+                        Mono.defer(
+                                () ->
+                                        this.redirectEntryPoint
+                                                .commence(exchange, ex)
+                                                .then(Mono.empty())))
+                .flatMap(
+                        match ->
+                                Mono.defer(
+                                                () -> {
+                                                    var response = exchange.getResponse();
+                                                    var wwwAuthenticate =
+                                                            "FormLogin realm=\"console\"";
+                                                    response.getHeaders()
+                                                            .set(
+                                                                    HttpHeaders.WWW_AUTHENTICATE,
+                                                                    wwwAuthenticate);
+                                                    response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                                                    return response.setComplete();
+                                                })
+                                        .then(Mono.empty()));
     }
-
 }

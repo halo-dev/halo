@@ -30,59 +30,64 @@ class PolicyRuleTest {
     public void constructPolicyRule() throws JsonProcessingException, JSONException {
         Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null);
         assertThat(policyRule).isNotNull();
-        JSONAssert.assertEquals("""
-            {
-                "apiGroups": [],
-                "resources": [],
-                "resourceNames": [],
-                "nonResourceURLs": [],
-                "verbs": []
-            }
-            """,
-            JsonUtils.objectToJson(policyRule),
-            true);
+        JSONAssert.assertEquals(
+                """
+                {
+                    "apiGroups": [],
+                    "resources": [],
+                    "resourceNames": [],
+                    "nonResourceURLs": [],
+                    "verbs": []
+                }
+                """,
+                JsonUtils.objectToJson(policyRule),
+                true);
 
         Role.PolicyRule policyByBuilder = new Role.PolicyRule.Builder().build();
-        JSONAssert.assertEquals("""
-            {
-                "apiGroups": [],
-                "resources": [],
-                "resourceNames": [],
-                "nonResourceURLs": [],
-                "verbs": []
-            }
-            """,
-            JsonUtils.objectToJson(policyByBuilder),
-            true);
+        JSONAssert.assertEquals(
+                """
+                {
+                    "apiGroups": [],
+                    "resources": [],
+                    "resourceNames": [],
+                    "nonResourceURLs": [],
+                    "verbs": []
+                }
+                """,
+                JsonUtils.objectToJson(policyByBuilder),
+                true);
 
-        Role.PolicyRule policyNonNull = new Role.PolicyRule.Builder()
-            .apiGroups("group")
-            .resources("resource-1", "resource-2")
-            .resourceNames("resourceName")
-            .nonResourceURLs("non resource url")
-            .verbs("verbs")
-            .build();
+        Role.PolicyRule policyNonNull =
+                new Role.PolicyRule.Builder()
+                        .apiGroups("group")
+                        .resources("resource-1", "resource-2")
+                        .resourceNames("resourceName")
+                        .nonResourceURLs("non resource url")
+                        .verbs("verbs")
+                        .build();
 
-        JsonNode expected = objectMapper.readTree("""
-            {
-                "apiGroups": [
-                    "group"
-                ],
-                "resources": [
-                    "resource-1",
-                    "resource-2"
-                ],
-                "resourceNames": [
-                    "resourceName"
-                ],
-                "nonResourceURLs": [
-                    "non resource url"
-                ],
-                "verbs": [
-                    "verbs"
-                ]
-            }
-            """);
+        JsonNode expected =
+                objectMapper.readTree(
+                        """
+                        {
+                            "apiGroups": [
+                                "group"
+                            ],
+                            "resources": [
+                                "resource-1",
+                                "resource-2"
+                            ],
+                            "resourceNames": [
+                                "resourceName"
+                            ],
+                            "nonResourceURLs": [
+                                "non resource url"
+                            ],
+                            "verbs": [
+                                "verbs"
+                            ]
+                        }
+                        """);
         JsonNode policyNonNullJson = objectMapper.valueToTree(policyNonNull);
         assertThat(policyNonNullJson).isEqualTo(expected);
     }

@@ -40,4 +40,3 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "themes", "themes/activation", "themes/setting", "themes/config", "themes/json-config" ]
     verbs: [ "get", "list" ]
-

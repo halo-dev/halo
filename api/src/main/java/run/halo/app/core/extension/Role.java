@@ -23,25 +23,21 @@ import run.halo.app.extension.GVK;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = GROUP,
-    version = VERSION,
-    kind = KIND,
-    plural = "roles",
-    singular = "role")
+@GVK(group = GROUP, version = VERSION, kind = KIND, plural = "roles", singular = "role")
 public class Role extends AbstractExtension {
     public static final String ROLE_DEPENDENCY_RULES =
-        "rbac.authorization.halo.run/dependency-rules";
+            "rbac.authorization.halo.run/dependency-rules";
     public static final String ROLE_AGGREGATE_LABEL_PREFIX =
-        "rbac.authorization.halo.run/aggregate-to-";
+            "rbac.authorization.halo.run/aggregate-to-";
     public static final String ROLE_DEPENDENCIES_ANNO = "rbac.authorization.halo.run/dependencies";
     public static final String UI_PERMISSIONS_ANNO = "rbac.authorization.halo.run/ui-permissions";
 
     public static final String SYSTEM_RESERVED_LABELS =
-        "rbac.authorization.halo.run/system-reserved";
+            "rbac.authorization.halo.run/system-reserved";
     public static final String HIDDEN_LABEL_NAME = "halo.run/hidden";
     public static final String TEMPLATE_LABEL_NAME = "halo.run/role-template";
     public static final String UI_PERMISSIONS_AGGREGATED_ANNO =
-        "rbac.authorization.halo.run/ui-permissions-aggregated";
+            "rbac.authorization.halo.run/ui-permissions-aggregated";
 
     public static final String GROUP = "";
     public static final String VERSION = "v1alpha1";
@@ -102,9 +98,12 @@ public class Role extends AbstractExtension {
             this(null, null, null, null, null);
         }
 
-        public PolicyRule(String[] apiGroups, String[] resources,
-            String[] resourceNames,
-            String[] nonResourceURLs, String[] verbs) {
+        public PolicyRule(
+                String[] apiGroups,
+                String[] resources,
+                String[] resourceNames,
+                String[] nonResourceURLs,
+                String[] verbs) {
             this.apiGroups = nullElseEmpty(apiGroups);
             this.resources = nullElseEmpty(resources);
             this.resourceNames = nullElseEmpty(resourceNames);
@@ -178,9 +177,7 @@ public class Role extends AbstractExtension {
             }
 
             public PolicyRule build() {
-                return new PolicyRule(apiGroups, resources, resourceNames,
-                    nonResourceURLs,
-                    verbs);
+                return new PolicyRule(apiGroups, resources, resourceNames, nonResourceURLs, verbs);
             }
         }
     }

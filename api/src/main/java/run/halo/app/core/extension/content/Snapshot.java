@@ -21,8 +21,12 @@ import run.halo.app.extension.Ref;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Snapshot.KIND,
-    plural = "snapshots", singular = "snapshot")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = Snapshot.KIND,
+        plural = "snapshots",
+        singular = "snapshot")
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";

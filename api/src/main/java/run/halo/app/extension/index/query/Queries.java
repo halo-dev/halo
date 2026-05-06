@@ -26,8 +26,7 @@ public enum Queries {
      */
     public static Condition and(Condition condition, Condition... additionalConditions) {
         Assert.notNull(condition, "Condition must not be null");
-        return Arrays.stream(additionalConditions)
-            .reduce(condition, Condition::and);
+        return Arrays.stream(additionalConditions).reduce(condition, Condition::and);
     }
 
     /**
@@ -39,8 +38,7 @@ public enum Queries {
      */
     public static Condition or(Condition condition, Condition... additionalConditions) {
         Assert.notNull(condition, "Condition must not be null");
-        return Arrays.stream(additionalConditions)
-            .reduce(condition, Condition::or);
+        return Arrays.stream(additionalConditions).reduce(condition, Condition::or);
     }
 
     /**
@@ -64,8 +62,12 @@ public enum Queries {
      * @param toInclusive whether the end value is inclusive
      * @return the "between" condition
      */
-    public static Condition between(String fieldName,
-        Object fromValue, boolean fromInclusive, Object toValue, boolean toInclusive) {
+    public static Condition between(
+            String fieldName,
+            Object fromValue,
+            boolean fromInclusive,
+            Object toValue,
+            boolean toInclusive) {
         return new BetweenCondition(fieldName, fromValue, fromInclusive, toValue, toInclusive);
     }
 
@@ -106,9 +108,7 @@ public enum Queries {
      * @return the "equal" condition
      */
     public static Condition equal(String fieldName, Object attributeValue) {
-        Assert.notNull(attributeValue,
-            "Attribute key of field " + fieldName + " must not be null"
-        );
+        Assert.notNull(attributeValue, "Attribute key of field " + fieldName + " must not be null");
         return new EqualCondition(fieldName, attributeValue);
     }
 
@@ -121,7 +121,7 @@ public enum Queries {
      * @return the "greater than" condition
      */
     public static Condition greaterThan(
-        String fieldName, Object attributeValue, boolean inclusive) {
+            String fieldName, Object attributeValue, boolean inclusive) {
         return new GreaterThanCondition(fieldName, attributeValue, inclusive);
     }
 
@@ -147,10 +147,8 @@ public enum Queries {
      */
     @SuppressWarnings("unchecked")
     public static Condition in(
-        String fieldName, Object attributeValue, Object... additionalValues) {
-        Assert.notNull(attributeValue,
-            "Attribute key of field " + fieldName + " must not be null"
-        );
+            String fieldName, Object attributeValue, Object... additionalValues) {
+        Assert.notNull(attributeValue, "Attribute key of field " + fieldName + " must not be null");
         if (attributeValue instanceof Collection<?> collection) {
             // Allow passing a collection directly
             return in(fieldName, (Collection<Object>) collection);
@@ -280,5 +278,4 @@ public enum Queries {
     public static LabelCondition labelIn(String labelKey, Collection<String> labelValues) {
         return new LabelInCondition(labelKey, labelValues);
     }
-
 }

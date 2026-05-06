@@ -21,7 +21,7 @@ class GcWatcher implements Watcher {
         // TODO Should we ignore finalizers here?
         if (!isDisposed() && extension.getMetadata().getDeletionTimestamp() != null) {
             queue.addImmediately(
-                new GcRequest(extension.groupVersionKind(), extension.getMetadata().getName()));
+                    new GcRequest(extension.groupVersionKind(), extension.getMetadata().getName()));
         }
     }
 
@@ -29,7 +29,7 @@ class GcWatcher implements Watcher {
     public void onUpdate(Extension oldExt, Extension newExt) {
         if (!isDisposed() && newExt.getMetadata().getDeletionTimestamp() != null) {
             queue.addImmediately(
-                new GcRequest(newExt.groupVersionKind(), newExt.getMetadata().getName()));
+                    new GcRequest(newExt.groupVersionKind(), newExt.getMetadata().getName()));
         }
     }
 
@@ -37,7 +37,7 @@ class GcWatcher implements Watcher {
     public void onDelete(Extension extension) {
         if (!isDisposed() && extension.getMetadata().getDeletionTimestamp() != null) {
             queue.addImmediately(
-                new GcRequest(extension.groupVersionKind(), extension.getMetadata().getName()));
+                    new GcRequest(extension.groupVersionKind(), extension.getMetadata().getName()));
         }
     }
 

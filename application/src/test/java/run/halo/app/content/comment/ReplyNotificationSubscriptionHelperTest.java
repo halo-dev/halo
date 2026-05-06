@@ -37,11 +37,9 @@ import run.halo.app.notification.UserIdentity;
 @ExtendWith(MockitoExtension.class)
 class ReplyNotificationSubscriptionHelperTest {
 
-    @Mock
-    NotificationCenter notificationCenter;
+    @Mock NotificationCenter notificationCenter;
 
-    @InjectMocks
-    ReplyNotificationSubscriptionHelper notificationSubscriptionHelper;
+    @InjectMocks ReplyNotificationSubscriptionHelper notificationSubscriptionHelper;
 
     @Test
     void subscribeNewReplyReasonForCommentTest() {
@@ -52,10 +50,11 @@ class ReplyNotificationSubscriptionHelperTest {
 
         spyNotificationSubscriptionHelper.subscribeNewReplyReasonForComment(comment);
 
-        verify(spyNotificationSubscriptionHelper).subscribeReply(
-            eq(ReplyNotificationSubscriptionHelper.identityFrom(
-                comment.getSpec().getOwner()))
-        );
+        verify(spyNotificationSubscriptionHelper)
+                .subscribeReply(
+                        eq(
+                                ReplyNotificationSubscriptionHelper.identityFrom(
+                                        comment.getSpec().getOwner())));
     }
 
     @Test
@@ -76,17 +75,18 @@ class ReplyNotificationSubscriptionHelperTest {
 
         spyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
 
-        verify(spyNotificationSubscriptionHelper).subscribeReply(
-            eq(ReplyNotificationSubscriptionHelper.identityFrom(
-                reply.getSpec().getOwner()))
-        );
+        verify(spyNotificationSubscriptionHelper)
+                .subscribeReply(
+                        eq(
+                                ReplyNotificationSubscriptionHelper.identityFrom(
+                                        reply.getSpec().getOwner())));
     }
 
     @Test
     void subscribeReplyTest() {
         var comment = createComment();
-        var identity = ReplyNotificationSubscriptionHelper.identityFrom(
-            comment.getSpec().getOwner());
+        var identity =
+                ReplyNotificationSubscriptionHelper.identityFrom(comment.getSpec().getOwner());
 
         when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
 
@@ -110,13 +110,12 @@ class ReplyNotificationSubscriptionHelperTest {
             owner.setKind(User.KIND);
             owner.setName("fake-user");
 
-            assertThat(identityFrom(owner))
-                .isEqualTo(UserIdentity.of(owner.getName()));
+            assertThat(identityFrom(owner)).isEqualTo(UserIdentity.of(owner.getName()));
 
             owner.setKind(Comment.CommentOwner.KIND_EMAIL);
             owner.setName("example@example.com");
             assertThat(identityFrom(owner))
-                .isEqualTo(UserIdentity.anonymousWithEmail(owner.getName()));
+                    .isEqualTo(UserIdentity.anonymousWithEmail(owner.getName()));
         }
     }
 
@@ -129,8 +128,8 @@ class ReplyNotificationSubscriptionHelperTest {
         commentOwner.setKind(Comment.CommentOwner.KIND_EMAIL);
         commentOwner.setName("example@example.com");
         comment.getSpec().setOwner(commentOwner);
-        comment.getSpec().setSubjectRef(
-            Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
+        comment.getSpec()
+                .setSubjectRef(Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
         return comment;
     }
 }

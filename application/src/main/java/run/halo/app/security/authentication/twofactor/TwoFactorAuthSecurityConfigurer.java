@@ -30,10 +30,10 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
     private final ServerRequestCache serverRequestCache;
 
     public TwoFactorAuthSecurityConfigurer(
-        ServerSecurityContextRepository securityContextRepository,
-        TotpAuthService totpAuthService, LoginHandlerEnhancer loginHandlerEnhancer,
-        ServerRequestCache serverRequestCache
-    ) {
+            ServerSecurityContextRepository securityContextRepository,
+            TotpAuthService totpAuthService,
+            LoginHandlerEnhancer loginHandlerEnhancer,
+            ServerRequestCache serverRequestCache) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
@@ -45,17 +45,14 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
         var authManager = new TotpAuthenticationManager(totpAuthService);
         var filter = new AuthenticationWebFilter(authManager);
         filter.setRequiresAuthenticationMatcher(
-            pathMatchers(HttpMethod.POST, "/challenges/two-factor/totp")
-        );
+                pathMatchers(HttpMethod.POST, "/challenges/two-factor/totp"));
         filter.setSecurityContextRepository(securityContextRepository);
         filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
         filter.setAuthenticationSuccessHandler(
-            new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache)
-        );
+                new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache));
         filter.setAuthenticationFailureHandler(
-            new RedirectServerAuthenticationFailureHandler("/challenges/two-factor/totp?error")
-        );
+                new RedirectServerAuthenticationFailureHandler(
+                        "/challenges/two-factor/totp?error"));
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
-
 }

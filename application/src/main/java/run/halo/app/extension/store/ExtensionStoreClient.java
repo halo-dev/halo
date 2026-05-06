@@ -70,5 +70,5 @@ public interface ExtensionStoreClient {
      */
     ExtensionStore delete(String name, Long version);
 
-    //TODO add watch method here.
+    // TODO add watch method here.
 }

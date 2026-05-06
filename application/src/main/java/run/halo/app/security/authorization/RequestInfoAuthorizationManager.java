@@ -12,7 +12,7 @@ import run.halo.app.core.user.service.RoleService;
 
 @Slf4j
 public class RequestInfoAuthorizationManager
-    implements ReactiveAuthorizationManager<AuthorizationContext> {
+        implements ReactiveAuthorizationManager<AuthorizationContext> {
 
     private final AuthorizationRuleResolver ruleResolver;
 
@@ -21,20 +21,21 @@ public class RequestInfoAuthorizationManager
     }
 
     @Override
-    public Mono<AuthorizationResult> authorize(Mono<Authentication> authentication,
-        AuthorizationContext context) {
+    public Mono<AuthorizationResult> authorize(
+            Mono<Authentication> authentication, AuthorizationContext context) {
         var request = context.getExchange().getRequest();
         var requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
 
         // We allow anonymous user to access some resources
         // so we don't invoke AuthenticationTrustResolver.isAuthenticated
         // to check if the user is authenticated
-        return authentication.filter(Authentication::isAuthenticated)
-            .flatMap(auth -> ruleResolver.visitRules(auth, requestInfo))
-            .doOnNext(visitor -> showErrorMessage(visitor.getErrors()))
-            .map(AuthorizingVisitor::isAllowed)
-            .defaultIfEmpty(false)
-            .map(AuthorizationDecision::new);
+        return authentication
+                .filter(Authentication::isAuthenticated)
+                .flatMap(auth -> ruleResolver.visitRules(auth, requestInfo))
+                .doOnNext(visitor -> showErrorMessage(visitor.getErrors()))
+                .map(AuthorizingVisitor::isAllowed)
+                .defaultIfEmpty(false)
+                .map(AuthorizationDecision::new);
     }
 
     private void showErrorMessage(List<Throwable> errors) {
@@ -42,5 +43,4 @@ public class RequestInfoAuthorizationManager
             errors.forEach(error -> log.error("Access decision error", error));
         }
     }
-
 }

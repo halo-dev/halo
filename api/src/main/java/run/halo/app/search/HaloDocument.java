@@ -16,14 +16,12 @@ public final class HaloDocument {
     /**
      * Document ID. It should be unique globally.
      */
-    @NotBlank
-    private String id;
+    @NotBlank private String id;
 
     /**
      * Metadata name of the corresponding extension.
      */
-    @NotBlank
-    private String metadataName;
+    @NotBlank private String metadataName;
 
     /**
      * Custom metadata. Make sure the map is serializable.
@@ -33,8 +31,7 @@ public final class HaloDocument {
     /**
      * Document title.
      */
-    @NotBlank
-    private String title;
+    @NotBlank private String title;
 
     /**
      * Document description.
@@ -44,8 +41,7 @@ public final class HaloDocument {
     /**
      * Document content. Safety content, without HTML tag.
      */
-    @NotBlank
-    private String content;
+    @NotBlank private String content;
 
     /**
      * Document categories. The item in the list is the category metadata name.
@@ -75,32 +71,26 @@ public final class HaloDocument {
     /**
      * Document owner metadata name.
      */
-    @NotBlank
-    private String ownerName;
+    @NotBlank private String ownerName;
 
     /**
      * Document creation timestamp.
      */
-    @PastOrPresent
-    private Instant creationTimestamp;
+    @PastOrPresent private Instant creationTimestamp;
 
     /**
      * Document update timestamp.
      */
-    @PastOrPresent
-    private Instant updateTimestamp;
+    @PastOrPresent private Instant updateTimestamp;
 
     /**
      * Document permalink.
      */
-    @NotBlank
-    private String permalink;
+    @NotBlank private String permalink;
 
     /**
      * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment
      * .halo.run, doc.doc.halo.run.
      */
-    @NotBlank
-    private String type;
-
+    @NotBlank private String type;
 }

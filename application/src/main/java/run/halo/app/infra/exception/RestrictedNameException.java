@@ -16,8 +16,10 @@ public class RestrictedNameException extends ServerWebInputException {
         super("The name is restricted");
     }
 
-    public RestrictedNameException(String reason, @Nullable String messageDetailCode,
-        @Null Object[] messageDetailArguments) {
+    public RestrictedNameException(
+            String reason,
+            @Nullable String messageDetailCode,
+            @Null Object[] messageDetailArguments) {
         super(reason, null, null, messageDetailCode, messageDetailArguments);
     }
 }

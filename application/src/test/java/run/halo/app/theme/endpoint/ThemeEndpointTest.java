@@ -52,29 +52,21 @@ import run.halo.app.theme.service.ThemeService;
 @ExtendWith(MockitoExtension.class)
 class ThemeEndpointTest {
 
-    @Mock
-    ThemeRootGetter themeRoot;
+    @Mock ThemeRootGetter themeRoot;
 
-    @Mock
-    ThemeService themeService;
+    @Mock ThemeService themeService;
 
-    @Mock
-    TemplateEngineManager templateEngineManager;
+    @Mock TemplateEngineManager templateEngineManager;
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @Mock
-    private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
+    @Mock private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 
-    @Mock
-    private SettingConfigService settingConfigService;
+    @Mock private SettingConfigService settingConfigService;
 
-    @InjectMocks
-    ThemeEndpoint themeEndpoint;
+    @InjectMocks ThemeEndpoint themeEndpoint;
 
     private Path tmpHaloWorkDir;
 
@@ -87,9 +79,7 @@ class ThemeEndpointTest {
         tmpHaloWorkDir = Files.createTempDirectory("halo-theme-endpoint-test");
         lenient().when(themeRoot.get()).thenReturn(tmpHaloWorkDir);
         defaultTheme = ResourceUtils.getFile("classpath:themes/test-theme.zip");
-        webTestClient = WebTestClient
-            .bindToRouterFunction(themeEndpoint.endpoint())
-            .build();
+        webTestClient = WebTestClient.bindToRouterFunction(themeEndpoint.endpoint()).build();
     }
 
     @AfterEach
@@ -103,18 +93,22 @@ class ThemeEndpointTest {
         @Test
         void shouldNotOkIfThemeNotInstalled() {
             var bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("file", new FileSystemResource(defaultTheme))
-                .contentType(MediaType.MULTIPART_FORM_DATA);
+            bodyBuilder
+                    .part("file", new FileSystemResource(defaultTheme))
+                    .contentType(MediaType.MULTIPART_FORM_DATA);
 
             when(themeService.upgrade(eq("invalid-missing-manifest"), isA(Publisher.class)))
-                .thenReturn(
-                    Mono.error(() -> new ServerWebInputException("Failed to upgrade theme")));
+                    .thenReturn(
+                            Mono.error(
+                                    () -> new ServerWebInputException("Failed to upgrade theme")));
 
-            webTestClient.post()
-                .uri("/themes/invalid-missing-manifest/upgrade")
-                .body(fromMultipartData(bodyBuilder.build()))
-                .exchange()
-                .expectStatus().isBadRequest();
+            webTestClient
+                    .post()
+                    .uri("/themes/invalid-missing-manifest/upgrade")
+                    .body(fromMultipartData(bodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
 
             verify(themeService).upgrade(eq("invalid-missing-manifest"), isA(Publisher.class));
         }
@@ -122,8 +116,9 @@ class ThemeEndpointTest {
         @Test
         void shouldUpgradeSuccessfullyIfThemeInstalled() {
             var bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("file", new FileSystemResource(defaultTheme))
-                .contentType(MediaType.MULTIPART_FORM_DATA);
+            bodyBuilder
+                    .part("file", new FileSystemResource(defaultTheme))
+                    .contentType(MediaType.MULTIPART_FORM_DATA);
 
             var metadata = new Metadata();
             metadata.setName("default");
@@ -131,16 +126,17 @@ class ThemeEndpointTest {
             newTheme.setMetadata(metadata);
 
             when(themeService.upgrade(eq("default"), isA(Publisher.class)))
-                .thenReturn(Mono.just(newTheme));
+                    .thenReturn(Mono.just(newTheme));
 
-            when(templateEngineManager.clearCache(eq("default")))
-                .thenReturn(Mono.empty());
+            when(templateEngineManager.clearCache(eq("default"))).thenReturn(Mono.empty());
 
-            webTestClient.post()
-                .uri("/themes/default/upgrade")
-                .body(fromMultipartData(bodyBuilder.build()))
-                .exchange()
-                .expectStatus().isOk();
+            webTestClient
+                    .post()
+                    .uri("/themes/default/upgrade")
+                    .body(fromMultipartData(bodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
 
             verify(themeService).upgrade(eq("default"), isA(Publisher.class));
 
@@ -154,17 +150,18 @@ class ThemeEndpointTest {
             metadata.setName("default");
             var fakeTheme = new Theme();
             fakeTheme.setMetadata(metadata);
-            when(themeService.upgrade(eq("default"), any()))
-                .thenReturn(Mono.just(fakeTheme));
-            when(templateEngineManager.clearCache(eq("default")))
-                .thenReturn(Mono.empty());
+            when(themeService.upgrade(eq("default"), any())).thenReturn(Mono.just(fakeTheme));
+            when(templateEngineManager.clearCache(eq("default"))).thenReturn(Mono.empty());
             var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
-            webTestClient.post()
-                .uri("/themes/default/upgrade-from-uri")
-                .bodyValue(body)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Theme.class).isEqualTo(fakeTheme);
+            webTestClient
+                    .post()
+                    .uri("/themes/default/upgrade-from-uri")
+                    .bodyValue(body)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(Theme.class)
+                    .isEqualTo(fakeTheme);
 
             verify(themeService).upgrade(eq("default"), any());
 
@@ -175,8 +172,9 @@ class ThemeEndpointTest {
     @Test
     void install() {
         var multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", new FileSystemResource(defaultTheme))
-            .contentType(MediaType.MULTIPART_FORM_DATA);
+        multipartBodyBuilder
+                .part("file", new FileSystemResource(defaultTheme))
+                .contentType(MediaType.MULTIPART_FORM_DATA);
 
         var installedTheme = new Theme();
         var metadata = new Metadata();
@@ -184,25 +182,28 @@ class ThemeEndpointTest {
         installedTheme.setMetadata(metadata);
         when(themeService.install(any())).thenReturn(Mono.just(installedTheme));
 
-        webTestClient.post()
-            .uri("/themes/install")
-            .body(fromMultipartData(multipartBodyBuilder.build()))
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(Theme.class)
-            .isEqualTo(installedTheme);
+        webTestClient
+                .post()
+                .uri("/themes/install")
+                .body(fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Theme.class)
+                .isEqualTo(installedTheme);
 
         verify(themeService).install(any());
 
-
-        when(themeService.install(any())).thenReturn(
-            Mono.error(new RuntimeException("Fake exception")));
+        when(themeService.install(any()))
+                .thenReturn(Mono.error(new RuntimeException("Fake exception")));
         // Verify the theme is installed.
-        webTestClient.post()
-            .uri("/themes/install")
-            .body(fromMultipartData(multipartBodyBuilder.build()))
-            .exchange()
-            .expectStatus().is5xxServerError();
+        webTestClient
+                .post()
+                .uri("/themes/install")
+                .body(fromMultipartData(multipartBodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
     }
 
     @Test
@@ -215,12 +216,15 @@ class ThemeEndpointTest {
 
         when(themeService.install(any())).thenReturn(Mono.just(theme));
         var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
-        webTestClient.post()
-            .uri("/themes/-/install-from-uri")
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(Theme.class).isEqualTo(theme);
+        webTestClient
+                .post()
+                .uri("/themes/-/install-from-uri")
+                .bodyValue(body)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Theme.class)
+                .isEqualTo(theme);
 
         verify(themeService).install(any());
     }
@@ -228,19 +232,13 @@ class ThemeEndpointTest {
     @Test
     void reloadTheme() {
         when(themeService.reloadTheme(any())).thenReturn(Mono.empty());
-        webTestClient.put()
-            .uri("/themes/fake/reload")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.put().uri("/themes/fake/reload").exchange().expectStatus().isOk();
     }
 
     @Test
     void resetSettingConfig() {
         when(themeService.resetSettingConfig(any())).thenReturn(Mono.empty());
-        webTestClient.put()
-            .uri("/themes/fake/reset-config")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.put().uri("/themes/fake/reset-config").exchange().expectStatus().isOk();
     }
 
     @Nested
@@ -255,13 +253,15 @@ class ThemeEndpointTest {
 
             when(client.fetch(eq(Theme.class), eq("fake-theme"))).thenReturn(Mono.just(theme));
             when(settingConfigService.upsertConfig(eq("fake-config-map"), any()))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.empty());
 
-            webTestClient.put()
-                .uri("/themes/fake-theme/json-config")
-                .body(Mono.just(Map.of()), Map.class)
-                .exchange()
-                .expectStatus().is2xxSuccessful();
+            webTestClient
+                    .put()
+                    .uri("/themes/fake-theme/json-config")
+                    .body(Mono.just(Map.of()), Map.class)
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful();
         }
     }
 
@@ -271,12 +271,14 @@ class ThemeEndpointTest {
         theme.setMetadata(new Metadata());
         theme.getMetadata().setName("fake-activated");
         when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(theme));
-        webTestClient.get()
-            .uri("/themes/-/activation")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(Theme.class)
-            .isEqualTo(theme);
+        webTestClient
+                .get()
+                .uri("/themes/-/activation")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Theme.class)
+                .isEqualTo(theme);
     }
 
     @Test
@@ -288,13 +290,10 @@ class ThemeEndpointTest {
         theme.getSpec().setSettingName("fake-setting");
 
         when(client.fetch(eq(Setting.class), eq("fake-setting")))
-            .thenReturn(Mono.just(new Setting()));
+                .thenReturn(Mono.just(new Setting()));
 
         when(client.fetch(eq(Theme.class), eq("fake"))).thenReturn(Mono.just(theme));
-        webTestClient.get()
-            .uri("/themes/fake/setting")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/themes/fake/setting").exchange().expectStatus().isOk();
 
         verify(client).fetch(eq(Setting.class), eq("fake-setting"));
         verify(client).fetch(eq(Theme.class), eq("fake"));
@@ -311,10 +310,7 @@ class ThemeEndpointTest {
         when(settingConfigService.fetchConfig(eq("fake-config"))).thenReturn(Mono.empty());
 
         when(client.fetch(eq(Theme.class), eq("fake"))).thenReturn(Mono.just(theme));
-        webTestClient.get()
-            .uri("/themes/fake/json-config")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/themes/fake/json-config").exchange().expectStatus().isOk();
 
         verify(settingConfigService).fetchConfig(eq("fake-config"));
         verify(client).fetch(eq(Theme.class), eq("fake"));

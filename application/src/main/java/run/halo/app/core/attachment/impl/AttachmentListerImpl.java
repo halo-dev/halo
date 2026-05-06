@@ -20,18 +20,17 @@ public class AttachmentListerImpl implements AttachmentLister {
 
     @Override
     public Mono<ListResult<Attachment>> listBy(SearchRequest searchRequest) {
-        var groupListOptions = ListOptions.builder()
-            .labelSelector()
-            .exists(Group.HIDDEN_LABEL)
-            .end()
-            .build();
+        var groupListOptions =
+                ListOptions.builder().labelSelector().exists(Group.HIDDEN_LABEL).end().build();
         return client.listAll(Group.class, groupListOptions, Sort.unsorted())
-            .map(group -> group.getMetadata().getName())
-            .collectList()
-            .defaultIfEmpty(List.of())
-            .flatMap(hiddenGroups -> client.listBy(Attachment.class,
-                searchRequest.toListOptions(hiddenGroups),
-                searchRequest.toPageRequest()
-            ));
+                .map(group -> group.getMetadata().getName())
+                .collectList()
+                .defaultIfEmpty(List.of())
+                .flatMap(
+                        hiddenGroups ->
+                                client.listBy(
+                                        Attachment.class,
+                                        searchRequest.toListOptions(hiddenGroups),
+                                        searchRequest.toPageRequest()));
     }
 }

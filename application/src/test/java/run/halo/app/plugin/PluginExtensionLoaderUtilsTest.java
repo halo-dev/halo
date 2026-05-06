@@ -24,10 +24,11 @@ class PluginExtensionLoaderUtilsTest {
         var classLoader = new URLClassLoader(new URL[] {rootResource.getURL()}, null);
         var resources = lookupExtensions(classLoader);
         assertTrue(resources.length >= 1);
-        var settingResource = Arrays.stream(resources)
-            .filter(r -> Objects.equals("setting.yaml", r.getFilename()))
-            .findFirst()
-            .orElseThrow();
+        var settingResource =
+                Arrays.stream(resources)
+                        .filter(r -> Objects.equals("setting.yaml", r.getFilename()))
+                        .findFirst()
+                        .orElseThrow();
 
         var loader = new YamlUnstructuredLoader(settingResource);
         var unstructuredList = loader.load();

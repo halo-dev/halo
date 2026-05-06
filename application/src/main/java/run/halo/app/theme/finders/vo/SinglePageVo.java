@@ -33,11 +33,11 @@ public class SinglePageVo extends ListedSinglePageVo {
         SinglePage.SinglePageSpec spec = singlePage.getSpec();
         SinglePage.SinglePageStatus pageStatus = singlePage.getStatus();
         return SinglePageVo.builder()
-            .metadata(singlePage.getMetadata())
-            .spec(spec)
-            .status(pageStatus)
-            .contributors(List.of())
-            .content(new ContentVo(null, null))
-            .build();
+                .metadata(singlePage.getMetadata())
+                .spec(spec)
+                .status(pageStatus)
+                .contributors(List.of())
+                .content(new ContentVo(null, null))
+                .build();
     }
 }

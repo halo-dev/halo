@@ -24,32 +24,43 @@ class ContentRequestTest {
         ref.setKind(Post.KIND);
         ref.setGroup("content.halo.run");
         ref.setName("test-post");
-        contentRequest = new ContentRequest(ref, "snapshot-1", null, """
-            Four score and seven
-            years ago our fathers
+        contentRequest =
+                new ContentRequest(
+                        ref,
+                        "snapshot-1",
+                        null,
+                        """
+                        Four score and seven
+                        years ago our fathers
 
-            brought forth on this continent
-            """,
-            """
-                <p>Four score and seven</p>
-                <p>years ago our fathers</p>
-                <br/>
-                <p>brought forth on this continent</p>
-                """,
-            "MARKDOWN");
+                        brought forth on this continent
+                        """,
+                        """
+                        <p>Four score and seven</p>
+                        <p>years ago our fathers</p>
+                        <br/>
+                        <p>brought forth on this continent</p>
+                        """,
+                        "MARKDOWN");
     }
 
     @Test
     void toSnapshot() throws JSONException {
         String expectedContentPath =
-            "<p>Four score and seven</p>\\n<p>years ago our fathers</p>\\n<br/>\\n<p>brought forth "
-                + "on this continent</p>\\n";
+                "<p>Four score and seven</p>\\n"
+                        + "<p>years ago our fathers</p>\\n"
+                        + "<br/>\\n"
+                        + "<p>brought forth on this continent</p>\\n";
         String expectedRawPatch =
-            "Four score and seven\\nyears ago our fathers\\n\\nbrought forth on this continent\\n";
+                "Four score and seven\\n"
+                        + "years ago our fathers\\n"
+                        + "\\n"
+                        + "brought forth on this continent\\n";
         Snapshot snapshot = contentRequest.toSnapshot();
         snapshot.getMetadata().setName("7b149646-ac60-4a5c-98ee-78b2dd0631b2");
-        JSONAssert.assertEquals(JsonUtils.objectToJson(snapshot),
-            """
+        JSONAssert.assertEquals(
+                JsonUtils.objectToJson(snapshot),
+                """
                 {
                     "spec": {
                         "subjectRef": {
@@ -68,18 +79,22 @@ class ContentRequestTest {
                         "annotations": {}
                     }
                 }
-                """.formatted(expectedRawPatch, expectedContentPath),
-            true);
+                """
+                        .formatted(expectedRawPatch, expectedContentPath),
+                true);
     }
 
     @Test
     void rawPatchFrom() throws JSONException {
-        String s = contentRequest.rawPatchFrom("""
-            Four score and seven
-            years ago our fathers
-            """);
-        JSONAssert.assertEquals(s,
-            """
+        String s =
+                contentRequest.rawPatchFrom(
+                        """
+                        Four score and seven
+                        years ago our fathers
+                        """);
+        JSONAssert.assertEquals(
+                s,
+                """
                    [
                     {
                         "source": {
@@ -96,32 +111,38 @@ class ContentRequestTest {
                         "type": "INSERT"
                     }
                 ]
-                """, true);
+                """,
+                true);
     }
 
     @Test
     void contentPatchFrom() throws JSONException {
-        String s = contentRequest.contentPatchFrom("""
-            <p>Four score and seven</p>
-            <p>years ago our fathers</p>
-            """);
-        JSONAssert.assertEquals(s, """
-            [
-                 {
-                     "source": {
-                         "position": 2,
-                         "lines": []
-                     },
-                     "target": {
-                         "position": 2,
-                         "lines": [
-                             "<br/>",
-                             "<p>brought forth on this continent</p>"
-                         ]
-                     },
-                     "type": "INSERT"
-                 }
-            ]
-            """, true);
+        String s =
+                contentRequest.contentPatchFrom(
+                        """
+                        <p>Four score and seven</p>
+                        <p>years ago our fathers</p>
+                        """);
+        JSONAssert.assertEquals(
+                s,
+                """
+                [
+                     {
+                         "source": {
+                             "position": 2,
+                             "lines": []
+                         },
+                         "target": {
+                             "position": 2,
+                             "lines": [
+                                 "<br/>",
+                                 "<p>brought forth on this continent</p>"
+                             ]
+                         },
+                         "type": "INSERT"
+                     }
+                ]
+                """,
+                true);
     }
 }

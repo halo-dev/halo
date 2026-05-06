@@ -24,9 +24,6 @@ public class ContentVo {
      * Empty content object.
      */
     public static ContentVo empty() {
-        return ContentVo.builder()
-            .raw("")
-            .content("")
-            .build();
+        return ContentVo.builder().raw("").content("").build();
     }
 }

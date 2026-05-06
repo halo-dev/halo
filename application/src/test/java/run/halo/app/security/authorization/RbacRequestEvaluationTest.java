@@ -38,10 +38,9 @@ class RbacRequestEvaluationTest {
         assertThat(matchResourceName(rbacRequestEvaluation, "*", "hello")).isTrue();
     }
 
-    boolean matchResourceName(RbacRequestEvaluation rbacRequestEvaluation, String rule,
-        String requestedName) {
-        return rbacRequestEvaluation.resourceNameMatches(new Role.PolicyRule.Builder()
-            .resourceNames(rule)
-            .build(), requestedName);
+    boolean matchResourceName(
+            RbacRequestEvaluation rbacRequestEvaluation, String rule, String requestedName) {
+        return rbacRequestEvaluation.resourceNameMatches(
+                new Role.PolicyRule.Builder().resourceNames(rule).build(), requestedName);
     }
 }

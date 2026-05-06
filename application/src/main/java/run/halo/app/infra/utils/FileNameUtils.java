@@ -8,8 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class FileNameUtils {
 
-    private FileNameUtils() {
-    }
+    private FileNameUtils() {}
 
     /**
      * Check whether the file name has an extension.
@@ -47,14 +46,11 @@ public final class FileNameUtils {
      */
     public static String randomFileName(String filename, int length) {
         return renameFilename(
-            filename, () -> RandomStringUtils.secure().nextAlphabetic(length), false
-        );
+                filename, () -> RandomStringUtils.secure().nextAlphabetic(length), false);
     }
 
     public static String renameFilename(
-        String filename,
-        Supplier<String> renameSupplier,
-        boolean excludeBasename) {
+            String filename, Supplier<String> renameSupplier, boolean excludeBasename) {
         var nameWithoutExt = Files.getNameWithoutExtension(filename);
         var ext = Files.getFileExtension(filename);
         var rename = renameSupplier.get();

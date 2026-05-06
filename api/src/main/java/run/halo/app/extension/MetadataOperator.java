@@ -25,8 +25,11 @@ public interface MetadataOperator {
     @JsonProperty("name")
     String getName();
 
-    @Schema(name = "generateName", description = "The name field will be generated automatically "
-        + "according to the given generateName field")
+    @Schema(
+            name = "generateName",
+            description =
+                    "The name field will be generated automatically "
+                            + "according to the given generateName field")
     @Nullable String getGenerateName();
 
     @Schema(name = "labels")
@@ -83,13 +86,13 @@ public interface MetadataOperator {
             return false;
         }
         return Objects.equals(left.getName(), right.getName())
-            && Objects.equals(left.getGenerateName(), right.getGenerateName())
-            && Objects.equals(left.getLabels(), right.getLabels())
-            && Objects.equals(left.getAnnotations(), right.getAnnotations())
-            && Objects.equals(left.getCreationTimestamp(), right.getCreationTimestamp())
-            && Objects.equals(left.getDeletionTimestamp(), right.getDeletionTimestamp())
-            && Objects.equals(left.getVersion(), right.getVersion())
-            && Objects.equals(left.getFinalizers(), right.getFinalizers());
+                && Objects.equals(left.getGenerateName(), right.getGenerateName())
+                && Objects.equals(left.getLabels(), right.getLabels())
+                && Objects.equals(left.getAnnotations(), right.getAnnotations())
+                && Objects.equals(left.getCreationTimestamp(), right.getCreationTimestamp())
+                && Objects.equals(left.getDeletionTimestamp(), right.getDeletionTimestamp())
+                && Objects.equals(left.getVersion(), right.getVersion())
+                && Objects.equals(left.getFinalizers(), right.getFinalizers());
     }
 
     /**
@@ -100,14 +103,13 @@ public interface MetadataOperator {
      */
     static int hashCode(MetadataOperator metadata) {
         return Objects.hash(
-            metadata.getName(),
-            metadata.getGenerateName(),
-            metadata.getLabels(),
-            metadata.getAnnotations(),
-            metadata.getCreationTimestamp(),
-            metadata.getDeletionTimestamp(),
-            metadata.getVersion(),
-            metadata.getFinalizers()
-        );
+                metadata.getName(),
+                metadata.getGenerateName(),
+                metadata.getLabels(),
+                metadata.getAnnotations(),
+                metadata.getCreationTimestamp(),
+                metadata.getDeletionTimestamp(),
+                metadata.getVersion(),
+                metadata.getFinalizers());
     }
 }

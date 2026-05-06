@@ -22,10 +22,10 @@ public class LabelSelector {
             return Condition.empty().toString();
         }
         return conditions.stream()
-            .map(c -> (Condition) c)
-            .reduce(Condition::and)
-            .orElseGet(Condition::empty)
-            .toString();
+                .map(c -> (Condition) c)
+                .reduce(Condition::and)
+                .orElseGet(Condition::empty)
+                .toString();
     }
 
     /**
@@ -51,8 +51,7 @@ public class LabelSelector {
     public static class LabelSelectorBuilder<T extends LabelSelectorBuilder<T>> {
         private final List<LabelCondition> conditions = new ArrayList<>();
 
-        public LabelSelectorBuilder() {
-        }
+        public LabelSelectorBuilder() {}
 
         /**
          * Create a new label selector builder with the given matchers.

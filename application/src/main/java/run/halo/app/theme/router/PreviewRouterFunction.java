@@ -55,127 +55,151 @@ public class PreviewRouterFunction {
     @Bean
     RouterFunction<ServerResponse> previewRouter() {
         return RouterFunctions.route()
-            .GET("/preview/posts/{name}", this::previewPost)
-            .GET("/preview/singlepages/{name}", this::previewSinglePage)
-            .build();
+                .GET("/preview/posts/{name}", this::previewPost)
+                .GET("/preview/singlepages/{name}", this::previewSinglePage)
+                .build();
     }
 
     private Mono<ServerResponse> previewPost(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
-            .flatMap(principal -> client.fetch(Post.class, name))
-            .flatMap(post -> {
-                String snapshotName = request.queryParam(SNAPSHOT_NAME_PARAM)
-                    .orElse(post.getSpec().getHeadSnapshot());
-                return convertToPostVo(post, snapshotName);
-            })
-            .flatMap(post -> canPreview(post.getContributors())
-                .doOnNext(canPreview -> {
-                    if (!canPreview) {
-                        throw new NotFoundException("Post not found.");
-                    }
-                })
-                .thenReturn(post)
-            )
-            // Check permissions before throwing this exception
-            .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")))
-            .flatMap(postVo -> {
-                String template = postVo.getSpec().getTemplate();
-                Map<String, Object> model = ModelMapUtils.postModel(postVo);
-                // Mark as preview mode for downstream view processing
-                request.exchange().getAttributes()
-                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
-                return viewNameResolver.resolveViewNameOrDefault(request, template,
-                        DefaultTemplateEnum.POST.getValue())
-                    .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
-            });
+                .flatMap(principal -> client.fetch(Post.class, name))
+                .flatMap(
+                        post -> {
+                            String snapshotName =
+                                    request.queryParam(SNAPSHOT_NAME_PARAM)
+                                            .orElse(post.getSpec().getHeadSnapshot());
+                            return convertToPostVo(post, snapshotName);
+                        })
+                .flatMap(
+                        post ->
+                                canPreview(post.getContributors())
+                                        .doOnNext(
+                                                canPreview -> {
+                                                    if (!canPreview) {
+                                                        throw new NotFoundException(
+                                                                "Post not found.");
+                                                    }
+                                                })
+                                        .thenReturn(post))
+                // Check permissions before throwing this exception
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")))
+                .flatMap(
+                        postVo -> {
+                            String template = postVo.getSpec().getTemplate();
+                            Map<String, Object> model = ModelMapUtils.postModel(postVo);
+                            // Mark as preview mode for downstream view processing
+                            request.exchange()
+                                    .getAttributes()
+                                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
+                            return viewNameResolver
+                                    .resolveViewNameOrDefault(
+                                            request, template, DefaultTemplateEnum.POST.getValue())
+                                    .flatMap(
+                                            templateName ->
+                                                    ServerResponse.ok()
+                                                            .render(templateName, model));
+                        });
     }
 
     private Mono<PostVo> convertToPostVo(Post post, String snapshotName) {
-        return postPublicQueryService.convertToVo(post, snapshotName)
-            .doOnNext(postVo -> {
-                // fake some attributes only for preview when they are not published
-                Post.PostSpec spec = postVo.getSpec();
-                if (spec.getPublishTime() == null) {
-                    spec.setPublishTime(Instant.now());
-                }
-                if (spec.getPublish() == null) {
-                    spec.setPublish(false);
-                }
-                Post.PostStatus status = postVo.getStatus();
-                if (status == null) {
-                    status = new Post.PostStatus();
-                    postVo.setStatus(status);
-                }
-                if (status.getLastModifyTime() == null) {
-                    status.setLastModifyTime(Instant.now());
-                }
-            });
+        return postPublicQueryService
+                .convertToVo(post, snapshotName)
+                .doOnNext(
+                        postVo -> {
+                            // fake some attributes only for preview when they are not published
+                            Post.PostSpec spec = postVo.getSpec();
+                            if (spec.getPublishTime() == null) {
+                                spec.setPublishTime(Instant.now());
+                            }
+                            if (spec.getPublish() == null) {
+                                spec.setPublish(false);
+                            }
+                            Post.PostStatus status = postVo.getStatus();
+                            if (status == null) {
+                                status = new Post.PostStatus();
+                                postVo.setStatus(status);
+                            }
+                            if (status.getLastModifyTime() == null) {
+                                status.setLastModifyTime(Instant.now());
+                            }
+                        });
     }
 
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {
         final var name = request.pathVariable("name");
         return currentAuthenticatedUserName()
-            .flatMap(principal -> client.fetch(SinglePage.class, name))
-            .flatMap(singlePage -> {
-                String snapshotName = request.queryParam(SNAPSHOT_NAME_PARAM)
-                    .orElse(singlePage.getSpec().getHeadSnapshot());
-                return singlePageConversionService.convertToVo(singlePage, snapshotName);
-            })
-            .doOnNext(pageVo -> {
-                // fake some attributes only for preview when they are not published
-                SinglePage.SinglePageSpec spec = pageVo.getSpec();
-                if (spec.getPublishTime() == null) {
-                    spec.setPublishTime(Instant.now());
-                }
-                if (spec.getPublish() == null) {
-                    spec.setPublish(false);
-                }
-                SinglePage.SinglePageStatus status = pageVo.getStatus();
-                if (status == null) {
-                    status = new SinglePage.SinglePageStatus();
-                    pageVo.setStatus(status);
-                }
-                if (status.getLastModifyTime() == null) {
-                    status.setLastModifyTime(Instant.now());
-                }
-            })
-            .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
-                .doOnNext(canPreview -> {
-                    if (!canPreview) {
-                        throw new NotFoundException("Single page not found.");
-                    }
-                })
-                .thenReturn(singlePageVo)
-            )
-            // Check permissions before throwing this exception
-            .switchIfEmpty(Mono.error(() -> new NotFoundException("Single page not found.")))
-            .flatMap(singlePageVo -> {
-                Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
-                // Mark as preview mode for downstream view processing
-                request.exchange().getAttributes()
-                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
-                String template = singlePageVo.getSpec().getTemplate();
-                return viewNameResolver.resolveViewNameOrDefault(request, template,
-                        DefaultTemplateEnum.SINGLE_PAGE.getValue())
-                    .flatMap(viewName -> ServerResponse.ok().render(viewName, model));
-            });
+                .flatMap(principal -> client.fetch(SinglePage.class, name))
+                .flatMap(
+                        singlePage -> {
+                            String snapshotName =
+                                    request.queryParam(SNAPSHOT_NAME_PARAM)
+                                            .orElse(singlePage.getSpec().getHeadSnapshot());
+                            return singlePageConversionService.convertToVo(
+                                    singlePage, snapshotName);
+                        })
+                .doOnNext(
+                        pageVo -> {
+                            // fake some attributes only for preview when they are not published
+                            SinglePage.SinglePageSpec spec = pageVo.getSpec();
+                            if (spec.getPublishTime() == null) {
+                                spec.setPublishTime(Instant.now());
+                            }
+                            if (spec.getPublish() == null) {
+                                spec.setPublish(false);
+                            }
+                            SinglePage.SinglePageStatus status = pageVo.getStatus();
+                            if (status == null) {
+                                status = new SinglePage.SinglePageStatus();
+                                pageVo.setStatus(status);
+                            }
+                            if (status.getLastModifyTime() == null) {
+                                status.setLastModifyTime(Instant.now());
+                            }
+                        })
+                .flatMap(
+                        singlePageVo ->
+                                canPreview(singlePageVo.getContributors())
+                                        .doOnNext(
+                                                canPreview -> {
+                                                    if (!canPreview) {
+                                                        throw new NotFoundException(
+                                                                "Single page not found.");
+                                                    }
+                                                })
+                                        .thenReturn(singlePageVo))
+                // Check permissions before throwing this exception
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Single page not found.")))
+                .flatMap(
+                        singlePageVo -> {
+                            Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
+                            // Mark as preview mode for downstream view processing
+                            request.exchange()
+                                    .getAttributes()
+                                    .put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
+                            String template = singlePageVo.getSpec().getTemplate();
+                            return viewNameResolver
+                                    .resolveViewNameOrDefault(
+                                            request,
+                                            template,
+                                            DefaultTemplateEnum.SINGLE_PAGE.getValue())
+                                    .flatMap(
+                                            viewName ->
+                                                    ServerResponse.ok().render(viewName, model));
+                        });
     }
 
     private Mono<Boolean> canPreview(List<ContributorVo> contributors) {
         Assert.notNull(contributors, "The contributors must not be null");
-        Set<String> contributorNames = contributors.stream()
-            .map(ContributorVo::getName)
-            .collect(Collectors.toSet());
-        return currentAuthenticatedUserName()
-            .map(contributorNames::contains)
-            .defaultIfEmpty(false);
+        Set<String> contributorNames =
+                contributors.stream().map(ContributorVo::getName).collect(Collectors.toSet());
+        return currentAuthenticatedUserName().map(contributorNames::contains).defaultIfEmpty(false);
     }
 
     Mono<String> currentAuthenticatedUserName() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName)
-            .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
     }
 }

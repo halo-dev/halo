@@ -48,47 +48,71 @@ public class IndexRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
-        return RouterFunctions
-            .route(GET("/").or(GET("/page/{page:\\d+}")
-                .or(GET("/index")).or(GET("/index/page/{page:\\d+}"))
-                .and(accept(MediaType.TEXT_HTML))), handlerFunction());
+        return RouterFunctions.route(
+                GET("/").or(
+                                GET("/page/{page:\\d+}")
+                                        .or(GET("/index"))
+                                        .or(GET("/index/page/{page:\\d+}"))
+                                        .and(accept(MediaType.TEXT_HTML))),
+                handlerFunction());
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
-        return request -> Mono.deferContextual(contextView -> {
-            var posts = new LazyContextVariable<UrlContextListResult<ListedPostVo>>() {
-                @Override
-                protected UrlContextListResult<ListedPostVo> loadValue() {
-                    return postList(request).contextWrite(contextView).block(BLOCKING_TIMEOUT);
-                }
-            };
-            return ServerResponse.ok().render(DefaultTemplateEnum.INDEX.getValue(), Map.of(
-                "posts", posts,
-                ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue()
-            ));
-        });
+        return request ->
+                Mono.deferContextual(
+                        contextView -> {
+                            var posts =
+                                    new LazyContextVariable<UrlContextListResult<ListedPostVo>>() {
+                                        @Override
+                                        protected UrlContextListResult<ListedPostVo> loadValue() {
+                                            return postList(request)
+                                                    .contextWrite(contextView)
+                                                    .block(BLOCKING_TIMEOUT);
+                                        }
+                                    };
+                            return ServerResponse.ok()
+                                    .render(
+                                            DefaultTemplateEnum.INDEX.getValue(),
+                                            Map.of(
+                                                    "posts",
+                                                    posts,
+                                                    ModelConst.TEMPLATE_ID,
+                                                    DefaultTemplateEnum.INDEX.getValue()));
+                        });
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request) {
         String path = request.path();
 
         return configuredPageSize(environmentFetcher, SystemSetting.Post::getPostPageSize)
-            .flatMap(pageSize -> postFinder.list(pageNumInPathVariable(request), pageSize))
-            .doOnNext(list -> list.getItems()
-                .forEach(listedPostVo -> listedPostVo.getSpec()
-                    .setTitle(titleVisibilityIdentifyCalculator.calculateTitle(
-                        listedPostVo.getSpec().getTitle(),
-                        listedPostVo.getSpec().getVisible(),
-                        localeContextResolver.resolveLocaleContext(request.exchange())
-                            .getLocale())
-                    )
-                )
-            )
-            .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
-                .listResult(list)
-                .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
-                .prevUrl(PageUrlUtils.prevPageUrl(path))
-                .build()
-            );
+                .flatMap(pageSize -> postFinder.list(pageNumInPathVariable(request), pageSize))
+                .doOnNext(
+                        list ->
+                                list.getItems()
+                                        .forEach(
+                                                listedPostVo ->
+                                                        listedPostVo
+                                                                .getSpec()
+                                                                .setTitle(
+                                                                        titleVisibilityIdentifyCalculator
+                                                                                .calculateTitle(
+                                                                                        listedPostVo
+                                                                                                .getSpec()
+                                                                                                .getTitle(),
+                                                                                        listedPostVo
+                                                                                                .getSpec()
+                                                                                                .getVisible(),
+                                                                                        localeContextResolver
+                                                                                                .resolveLocaleContext(
+                                                                                                        request
+                                                                                                                .exchange())
+                                                                                                .getLocale()))))
+                .map(
+                        list ->
+                                new UrlContextListResult.Builder<ListedPostVo>()
+                                        .listResult(list)
+                                        .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
+                                        .prevUrl(PageUrlUtils.prevPageUrl(path))
+                                        .build());
     }
 }

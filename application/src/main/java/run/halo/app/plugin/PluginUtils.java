@@ -30,6 +30,6 @@ public class PluginUtils {
     public static boolean isDevelopmentMode(Plugin plugin) {
         var annotations = plugin.getMetadata().getAnnotations();
         return annotations != null
-            && Objects.equals("dev", annotations.get(PluginConst.RUNTIME_MODE_ANNO));
+                && Objects.equals("dev", annotations.get(PluginConst.RUNTIME_MODE_ANNO));
     }
 }

@@ -29,14 +29,11 @@ import run.halo.app.extension.controller.Reconciler;
 @ExtendWith(MockitoExtension.class)
 class NotificationTriggerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    NotificationCenter notificationCenter;
+    @Mock NotificationCenter notificationCenter;
 
-    @InjectMocks
-    NotificationTrigger notificationTrigger;
+    @InjectMocks NotificationTrigger notificationTrigger;
 
     @Test
     void shouldCleanUpAfterNotified() {
@@ -46,8 +43,7 @@ class NotificationTriggerTest {
         when(metadata.getDeletionTimestamp()).thenReturn(null);
         when(metadata.getFinalizers()).thenReturn(Set.of());
 
-        when(client.fetch(eq(Reason.class), eq("fake-reason")))
-            .thenReturn(Optional.of(reason));
+        when(client.fetch(eq(Reason.class), eq("fake-reason"))).thenReturn(Optional.of(reason));
 
         when(notificationCenter.notify(eq(reason))).thenReturn(Mono.empty());
         notificationTrigger.reconcile(new Reconciler.Request("fake-reason"));
@@ -63,11 +59,9 @@ class NotificationTriggerTest {
         var metadata = mock(Metadata.class);
         when(reason.getMetadata()).thenReturn(metadata);
         when(metadata.getDeletionTimestamp()).thenReturn(Instant.now());
-        when(metadata.getFinalizers())
-            .thenReturn(Set.of(NotificationTrigger.TRIGGERED_FINALIZER));
+        when(metadata.getFinalizers()).thenReturn(Set.of(NotificationTrigger.TRIGGERED_FINALIZER));
 
-        when(client.fetch(eq(Reason.class), eq("fake-reason")))
-            .thenReturn(Optional.of(reason));
+        when(client.fetch(eq(Reason.class), eq("fake-reason"))).thenReturn(Optional.of(reason));
 
         notificationTrigger.reconcile(new Reconciler.Request("fake-reason"));
 

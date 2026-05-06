@@ -21,25 +21,28 @@ class PostTest {
 
     static Stream<Arguments> isRecycledProvider() {
         Function<Consumer<Metadata>, Metadata> metadataCreator =
-            metadataConsumer -> {
-                var metadata = new Metadata();
-                metadataConsumer.accept(metadata);
-                return metadata;
-            };
+                metadataConsumer -> {
+                    var metadata = new Metadata();
+                    metadataConsumer.accept(metadata);
+                    return metadata;
+                };
         return Stream.of(
-            Arguments.of(metadataCreator.apply(metadata -> {
-            }), false),
-            Arguments.of(metadataCreator.apply(metadata ->
-                    metadata.setLabels(Map.of(Post.DELETED_LABEL, "false"))),
-                false),
-            Arguments.of(metadataCreator.apply(metadata ->
-                    metadata.setLabels(Map.of(Post.DELETED_LABEL, "invalid"))),
-                false),
-            Arguments.of(metadataCreator.apply(metadata -> {
-                metadata.setLabels(Map.of(Post.DELETED_LABEL, "true"));
-            }), true)
-        );
-
+                Arguments.of(metadataCreator.apply(metadata -> {}), false),
+                Arguments.of(
+                        metadataCreator.apply(
+                                metadata ->
+                                        metadata.setLabels(Map.of(Post.DELETED_LABEL, "false"))),
+                        false),
+                Arguments.of(
+                        metadataCreator.apply(
+                                metadata ->
+                                        metadata.setLabels(Map.of(Post.DELETED_LABEL, "invalid"))),
+                        false),
+                Arguments.of(
+                        metadataCreator.apply(
+                                metadata -> {
+                                    metadata.setLabels(Map.of(Post.DELETED_LABEL, "true"));
+                                }),
+                        true));
     }
-
 }

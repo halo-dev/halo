@@ -26,13 +26,13 @@ public class ReverseProxyRouterFunctionRegistry {
     private final ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
     private final StampedLock lock = new StampedLock();
     private final Map<String, RouterFunction<ServerResponse>> proxyNameRouterFunctionRegistry =
-        new HashMap<>();
+            new HashMap<>();
     private final LinkedHashMultimap<String, String> pluginIdReverseProxyMap =
-        LinkedHashMultimap.create();
+            LinkedHashMultimap.create();
 
     public ReverseProxyRouterFunctionRegistry(
-        PluginRouterFunctionRegistry pluginRouterFunctionRegistry,
-        ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory) {
+            PluginRouterFunctionRegistry pluginRouterFunctionRegistry,
+            ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory) {
         this.pluginRouterFunctionRegistry = pluginRouterFunctionRegistry;
         this.reverseProxyRouterFunctionFactory = reverseProxyRouterFunctionFactory;
     }
@@ -82,5 +82,4 @@ public class ReverseProxyRouterFunctionRegistry {
             lock.unlockWrite(stamp);
         }
     }
-
 }

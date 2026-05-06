@@ -20,14 +20,17 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "ReasonType",
-    plural = "reasontypes", singular = "reasontype")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "ReasonType",
+        plural = "reasontypes",
+        singular = "reasontype")
 public class ReasonType extends AbstractExtension {
     public static final String LOCALIZED_RESOURCE_NAME_ANNO =
-        "notification.halo.run/localized-resource-name";
+            "notification.halo.run/localized-resource-name";
 
-    @Schema
-    private Spec spec;
+    @Schema private Spec spec;
 
     @Data
     @Schema(name = "ReasonTypeSpec")

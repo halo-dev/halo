@@ -13,8 +13,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
-    plural = "policies", singular = "policy")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = KIND,
+        plural = "policies",
+        singular = "policy")
 public class Policy extends AbstractExtension {
     public static final String POLICY_OWNER_LABEL = "storage.halo.run/policy-owner";
 
@@ -34,7 +38,5 @@ public class Policy extends AbstractExtension {
 
         @Schema(description = "Reference name of ConfigMap extension")
         private String configMapName;
-
     }
-
 }

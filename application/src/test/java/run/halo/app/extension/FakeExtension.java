@@ -4,11 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-@GVK(group = "fake.halo.run",
-    version = "v1alpha1",
-    kind = "Fake",
-    plural = "fakes",
-    singular = "fake")
+@GVK(
+        group = "fake.halo.run",
+        version = "v1alpha1",
+        kind = "Fake",
+        plural = "fakes",
+        singular = "fake")
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

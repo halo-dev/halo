@@ -17,26 +17,29 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @AutoConfigureWebTestClient
 class SecurityConfigTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
     @Test
     void shouldNotIncludeSubdomainForHstsHeader() {
-        webClient.get()
-            .uri(builder -> builder.scheme("https").path("/fake").build())
-            .accept(MediaType.TEXT_HTML)
-            .exchange()
-            .expectHeader()
-            .value(STRICT_TRANSPORT_SECURITY,
-                hsts -> assertFalse(hsts.contains("includeSubDomains")));
+        webClient
+                .get()
+                .uri(builder -> builder.scheme("https").path("/fake").build())
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectHeader()
+                .value(
+                        STRICT_TRANSPORT_SECURITY,
+                        hsts -> assertFalse(hsts.contains("includeSubDomains")));
 
-        webClient.get()
-            .uri(builder -> builder.scheme("https").path("/apis/fake").build())
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectHeader()
-            .value(STRICT_TRANSPORT_SECURITY,
-                hsts -> assertFalse(hsts.contains("includeSubDomains")));
+        webClient
+                .get()
+                .uri(builder -> builder.scheme("https").path("/apis/fake").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectHeader()
+                .value(
+                        STRICT_TRANSPORT_SECURITY,
+                        hsts -> assertFalse(hsts.contains("includeSubDomains")));
     }
 
     @Test
@@ -44,5 +47,4 @@ class SecurityConfigTest {
         var encoded = passwordEncoder.encode(RandomStringUtils.secure().nextAlphanumeric(73));
         assertNotNull(encoded);
     }
-
 }

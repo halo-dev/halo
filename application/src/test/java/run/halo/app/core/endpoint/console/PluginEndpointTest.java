@@ -59,23 +59,17 @@ import run.halo.app.plugin.PluginService;
 @ExtendWith(MockitoExtension.class)
 class PluginEndpointTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    SystemVersionSupplier systemVersionSupplier;
+    @Mock SystemVersionSupplier systemVersionSupplier;
 
-    @Mock
-    PluginService pluginService;
+    @Mock PluginService pluginService;
 
-    @Mock
-    SettingConfigService settingConfigService;
+    @Mock SettingConfigService settingConfigService;
 
-    @Spy
-    WebProperties webProperties = new WebProperties();
+    @Spy WebProperties webProperties = new WebProperties();
 
-    @InjectMocks
-    PluginEndpoint endpoint;
+    @InjectMocks PluginEndpoint endpoint;
 
     @Nested
     class PluginListTest {
@@ -83,93 +77,100 @@ class PluginEndpointTest {
         @Test
         void shouldListEmptyPluginsWhenNoPlugins() {
             when(client.listBy(same(Plugin.class), any(ListOptions.class), any(PageRequest.class)))
-                .thenReturn(Mono.just(ListResult.emptyResult()));
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
 
             bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/plugins")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(0)
-                .jsonPath("$.total").isEqualTo(0);
+                    .build()
+                    .get()
+                    .uri("/plugins")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(0)
+                    .jsonPath("$.total")
+                    .isEqualTo(0);
         }
 
         @Test
         void shouldListPluginsWhenPluginPresent() {
-            var plugins = List.of(
-                createPlugin("fake-plugin-1"),
-                createPlugin("fake-plugin-2"),
-                createPlugin("fake-plugin-3")
-            );
+            var plugins =
+                    List.of(
+                            createPlugin("fake-plugin-1"),
+                            createPlugin("fake-plugin-2"),
+                            createPlugin("fake-plugin-3"));
             var expectResult = new ListResult<>(plugins);
             when(client.listBy(same(Plugin.class), any(ListOptions.class), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+                    .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/plugins")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(3)
-                .jsonPath("$.total").isEqualTo(3);
+                    .build()
+                    .get()
+                    .uri("/plugins")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(3)
+                    .jsonPath("$.total")
+                    .isEqualTo(3);
         }
 
         @Test
         void shouldFilterPluginsWhenKeywordProvided() {
-            var expectPlugin =
-                createPlugin("fake-plugin-2", "expected display name", "", false);
+            var expectPlugin = createPlugin("fake-plugin-2", "expected display name", "", false);
             var unexpectedPlugin1 =
-                createPlugin("fake-plugin-1", "first fake display name", "", false);
+                    createPlugin("fake-plugin-1", "first fake display name", "", false);
             var unexpectedPlugin2 =
-                createPlugin("fake-plugin-3", "second fake display name", "", false);
-            var plugins = List.of(
-                expectPlugin
-            );
+                    createPlugin("fake-plugin-3", "second fake display name", "", false);
+            var plugins = List.of(expectPlugin);
             var expectResult = new ListResult<>(plugins);
             when(client.listBy(same(Plugin.class), any(ListOptions.class), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+                    .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/plugins?keyword=Expected")
-                .exchange()
-                .expectStatus().isOk();
+                    .build()
+                    .get()
+                    .uri("/plugins?keyword=Expected")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
         }
 
         @Test
         void shouldFilterPluginsWhenEnabledProvided() {
-            var expectPlugin =
-                createPlugin("fake-plugin-2", "expected display name", "", true);
-            var plugins = List.of(
-                expectPlugin
-            );
+            var expectPlugin = createPlugin("fake-plugin-2", "expected display name", "", true);
+            var plugins = List.of(expectPlugin);
             var expectResult = new ListResult<>(plugins);
 
             when(client.listBy(same(Plugin.class), any(ListOptions.class), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+                    .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/plugins?enabled=true")
-                .exchange()
-                .expectStatus().isOk();
+                    .build()
+                    .get()
+                    .uri("/plugins?enabled=true")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
         }
 
         @Test
         void shouldSortPluginsWhenCreationTimestampSet() {
-            var expectPlugin =
-                createPlugin("fake-plugin-2", "expected display name", "", true);
+            var expectPlugin = createPlugin("fake-plugin-2", "expected display name", "", true);
             var expectResult = new ListResult<>(List.of(expectPlugin));
             when(client.listBy(same(Plugin.class), any(ListOptions.class), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+                    .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/plugins?sort=creationTimestamp,desc")
-                .exchange()
-                .expectStatus().isOk();
+                    .build()
+                    .get()
+                    .uri("/plugins?sort=creationTimestamp,desc")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
         }
     }
 
@@ -184,15 +185,15 @@ class PluginEndpointTest {
 
         @BeforeEach
         void setUp() throws URISyntaxException, IOException {
-            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-                .build();
+            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
 
             lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
             tempDirectory = Files.createTempDirectory("halo-test-plugin-upgrade-");
             plugin002 = tempDirectory.resolve("plugin-0.0.2.jar");
 
-            var plugin002Uri = requireNonNull(
-                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+            var plugin002Uri =
+                    requireNonNull(getClass().getClassLoader().getResource("plugin/plugin-0.0.2"))
+                            .toURI();
 
             FileUtils.jar(Paths.get(plugin002Uri), tempDirectory.resolve("plugin-0.0.2.jar"));
         }
@@ -205,21 +206,24 @@ class PluginEndpointTest {
         @Test
         void shouldResponseBadRequestIfNoPluginInstalledBefore() {
             var bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("file", new FileSystemResource(plugin002))
-                .contentType(MediaType.MULTIPART_FORM_DATA);
+            bodyBuilder
+                    .part("file", new FileSystemResource(plugin002))
+                    .contentType(MediaType.MULTIPART_FORM_DATA);
 
             when(pluginService.upgrade(eq("fake-plugin"), isA(Path.class)))
-                .thenReturn(Mono.error(new ServerWebInputException("plugin not found")));
+                    .thenReturn(Mono.error(new ServerWebInputException("plugin not found")));
 
-            webClient.post().uri("/plugins/fake-plugin/upgrade")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(fromMultipartData(bodyBuilder.build()))
-                .exchange()
-                .expectStatus().isBadRequest();
+            webClient
+                    .post()
+                    .uri("/plugins/fake-plugin/upgrade")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(fromMultipartData(bodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
 
             verify(pluginService).upgrade(eq("fake-plugin"), isA(Path.class));
         }
-
     }
 
     @Nested
@@ -237,10 +241,12 @@ class PluginEndpointTest {
             plugin.getSpec().setConfigMapName(null);
 
             when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
-            webClient.put()
-                .uri("/plugins/fake-plugin/json-config")
-                .exchange()
-                .expectStatus().isBadRequest();
+            webClient
+                    .put()
+                    .uri("/plugins/fake-plugin/json-config")
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
         }
 
         @Test
@@ -250,13 +256,15 @@ class PluginEndpointTest {
 
             when(client.fetch(eq(Plugin.class), eq("fake-plugin"))).thenReturn(Mono.just(plugin));
             when(settingConfigService.upsertConfig(eq("fake-config-map"), any()))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.empty());
 
-            webClient.put()
-                .uri("/plugins/fake-plugin/json-config")
-                .body(Mono.just(Map.of()), Map.class)
-                .exchange()
-                .expectStatus().is2xxSuccessful();
+            webClient
+                    .put()
+                    .uri("/plugins/fake-plugin/json-config")
+                    .body(Mono.just(Map.of()), Map.class)
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful();
         }
     }
 
@@ -266,8 +274,7 @@ class PluginEndpointTest {
 
         @BeforeEach
         void setUp() {
-            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-                .build();
+            webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
         }
 
         @Test
@@ -276,13 +283,10 @@ class PluginEndpointTest {
             plugin.getSpec().setSettingName("fake-setting");
 
             when(client.fetch(eq(Setting.class), eq("fake-setting")))
-                .thenReturn(Mono.just(new Setting()));
+                    .thenReturn(Mono.just(new Setting()));
 
             when(client.fetch(eq(Plugin.class), eq("fake"))).thenReturn(Mono.just(plugin));
-            webClient.get()
-                .uri("/plugins/fake/setting")
-                .exchange()
-                .expectStatus().isOk();
+            webClient.get().uri("/plugins/fake/setting").exchange().expectStatus().isOk();
 
             verify(client).fetch(eq(Setting.class), eq("fake-setting"));
             verify(client).fetch(eq(Plugin.class), eq("fake"));
@@ -293,13 +297,9 @@ class PluginEndpointTest {
             Plugin plugin = createPlugin("fake");
             plugin.getSpec().setConfigMapName("fake-config");
 
-            when(settingConfigService.fetchConfig(eq("fake-config")))
-                .thenReturn(Mono.empty());
+            when(settingConfigService.fetchConfig(eq("fake-config"))).thenReturn(Mono.empty());
             when(client.fetch(eq(Plugin.class), eq("fake"))).thenReturn(Mono.just(plugin));
-            webClient.get()
-                .uri("/plugins/fake/json-config")
-                .exchange()
-                .expectStatus().isOk();
+            webClient.get().uri("/plugins/fake/json-config").exchange().expectStatus().isOk();
 
             verify(settingConfigService).fetchConfig(eq("fake-config"));
             verify(client).fetch(eq(Plugin.class), eq("fake"));
@@ -354,23 +354,33 @@ class PluginEndpointTest {
         @Test
         void shouldBeRedirectedWhileFetchingBundleJsWithoutVersion() {
             when(pluginService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
-            webClient.get().uri("/plugins/-/bundle.js")
-                .exchange()
-                .expectStatus().is3xxRedirection()
-                .expectHeader().cacheControl(CacheControl.noStore())
-                .expectHeader().location(
-                    "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=fake-version");
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.js")
+                    .exchange()
+                    .expectStatus()
+                    .is3xxRedirection()
+                    .expectHeader()
+                    .cacheControl(CacheControl.noStore())
+                    .expectHeader()
+                    .location(
+                            "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=fake-version");
         }
 
         @Test
         void shouldBeRedirectedWhileFetchingBundleCssWithoutVersion() {
             when(pluginService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
-            webClient.get().uri("/plugins/-/bundle.css")
-                .exchange()
-                .expectStatus().is3xxRedirection()
-                .expectHeader().cacheControl(CacheControl.noStore())
-                .expectHeader().location(
-                    "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?v=fake-version");
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.css")
+                    .exchange()
+                    .expectStatus()
+                    .is3xxRedirection()
+                    .expectHeader()
+                    .cacheControl(CacheControl.noStore())
+                    .expectHeader()
+                    .location(
+                            "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?v=fake-version");
         }
 
         @Test
@@ -382,14 +392,21 @@ class PluginEndpointTest {
             endpoint.afterPropertiesSet();
 
             when(pluginService.getCssBundle("fake-version"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
-            webClient.get().uri("/plugins/-/bundle.css?v=fake-version")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().cacheControl(CacheControl.noCache())
-                .expectHeader().contentType("text/css")
-                .expectHeader().lastModified(lastModified)
-                .expectBody(String.class).isEqualTo("fake-css");
+                    .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.css?v=fake-version")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .cacheControl(CacheControl.noCache())
+                    .expectHeader()
+                    .contentType("text/css")
+                    .expectHeader()
+                    .lastModified(lastModified)
+                    .expectBody(String.class)
+                    .isEqualTo("fake-css");
         }
 
         @Test
@@ -401,40 +418,61 @@ class PluginEndpointTest {
             endpoint.afterPropertiesSet();
 
             when(pluginService.getJsBundle("fake-version"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
-            webClient.get().uri("/plugins/-/bundle.js?v=fake-version")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().cacheControl(CacheControl.noStore())
-                .expectHeader().contentType("text/javascript")
-                .expectHeader().lastModified(lastModified)
-                .expectBody(String.class).isEqualTo("fake-js");
+                    .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.js?v=fake-version")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .cacheControl(CacheControl.noStore())
+                    .expectHeader()
+                    .contentType("text/javascript")
+                    .expectHeader()
+                    .lastModified(lastModified)
+                    .expectBody(String.class)
+                    .isEqualTo("fake-js");
         }
 
         @Test
         void shouldFetchBundleCss() {
             when(pluginService.getCssBundle("fake-version"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
-            webClient.get().uri("/plugins/-/bundle.css?v=fake-version")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().cacheControl(CacheControl.empty())
-                .expectHeader().contentType("text/css")
-                .expectHeader().lastModified(-1)
-                .expectBody(String.class).isEqualTo("fake-css");
+                    .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.css?v=fake-version")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .cacheControl(CacheControl.empty())
+                    .expectHeader()
+                    .contentType("text/css")
+                    .expectHeader()
+                    .lastModified(-1)
+                    .expectBody(String.class)
+                    .isEqualTo("fake-css");
         }
 
         @Test
         void shouldFetchBundleJs() {
             when(pluginService.getJsBundle("fake-version"))
-                .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
-            webClient.get().uri("/plugins/-/bundle.js?v=fake-version")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().cacheControl(CacheControl.empty())
-                .expectHeader().contentType("text/javascript")
-                .expectHeader().lastModified(-1)
-                .expectBody(String.class).isEqualTo("fake-js");
+                    .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
+            webClient
+                    .get()
+                    .uri("/plugins/-/bundle.js?v=fake-version")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .cacheControl(CacheControl.empty())
+                    .expectHeader()
+                    .contentType("text/javascript")
+                    .expectHeader()
+                    .lastModified(-1)
+                    .expectBody(String.class)
+                    .isEqualTo("fake-js");
         }
 
         Resource mockResource(String content) {
@@ -449,5 +487,4 @@ class PluginEndpointTest {
             return resource;
         }
     }
-
 }

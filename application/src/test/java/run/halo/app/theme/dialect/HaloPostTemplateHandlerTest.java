@@ -30,27 +30,19 @@ class HaloPostTemplateHandlerTest {
 
     HaloPostTemplateHandler postHandler;
 
-    @Mock
-    ITemplateContext templateContext;
+    @Mock ITemplateContext templateContext;
 
-    @Mock
-    ITemplateHandler next;
+    @Mock ITemplateHandler next;
 
-    @Mock
-    ApplicationContext applicationContext;
+    @Mock ApplicationContext applicationContext;
 
-    @Mock
-    IStandaloneElementTag standaloneElementTag;
+    @Mock IStandaloneElementTag standaloneElementTag;
 
-    @Mock
-    IOpenElementTag openElementTag;
+    @Mock IOpenElementTag openElementTag;
 
-    @Mock
-    ObjectProvider<ExtensionGetter> extensionGetterProvider;
+    @Mock ObjectProvider<ExtensionGetter> extensionGetterProvider;
 
-    @Mock
-    ExtensionGetter extensionGetter;
-
+    @Mock ExtensionGetter extensionGetter;
 
     @BeforeEach
     void setUp() {
@@ -58,19 +50,18 @@ class HaloPostTemplateHandlerTest {
         var evaluationContext = mock(ThymeleafEvaluationContext.class);
         when(evaluationContext.getApplicationContext()).thenReturn(applicationContext);
         when(templateContext.getVariable(THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME))
-            .thenReturn(evaluationContext);
+                .thenReturn(evaluationContext);
         when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenReturn(extensionGetterProvider);
+                .thenReturn(extensionGetterProvider);
         when(extensionGetterProvider.getIfUnique()).thenReturn(extensionGetter);
     }
 
     @ParameterizedTest
     @MethodSource("provideEmptyElementTagProcessors")
     void shouldHandleStandaloneElementIfNoElementTagProcessors(
-        List<ElementTagPostProcessor> processors
-    ) {
+            List<ElementTagPostProcessor> processors) {
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .thenReturn(processors);
+                .thenReturn(processors);
 
         postHandler.setContext(templateContext);
         postHandler.setNext(next);
@@ -82,11 +73,11 @@ class HaloPostTemplateHandlerTest {
     void shouldHandleStandaloneElementIfOneElementTagProcessorProvided() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IStandaloneElementTag.class);
-        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
-            standaloneElementTag))
-            .thenReturn(Mono.just(newTag));
+        when(processor.process(
+                        SecureTemplateContextWrapper.wrap(templateContext), standaloneElementTag))
+                .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .thenReturn(List.of(processor));
+                .thenReturn(List.of(processor));
 
         postHandler.setContext(templateContext);
         postHandler.setNext(next);
@@ -98,11 +89,11 @@ class HaloPostTemplateHandlerTest {
     void shouldHandleStandaloneElementIfTagTypeChanged() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IStandaloneElementTag.class);
-        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
-            standaloneElementTag))
-            .thenReturn(Mono.just(newTag));
+        when(processor.process(
+                        SecureTemplateContextWrapper.wrap(templateContext), standaloneElementTag))
+                .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .thenReturn(List.of(processor));
+                .thenReturn(List.of(processor));
 
         postHandler.setContext(templateContext);
         postHandler.setNext(next);
@@ -116,13 +107,13 @@ class HaloPostTemplateHandlerTest {
         var processor2 = mock(ElementTagPostProcessor.class);
         var newTag1 = mock(IStandaloneElementTag.class);
         var newTag2 = mock(IStandaloneElementTag.class);
-        when(processor1.process(SecureTemplateContextWrapper.wrap(templateContext),
-            standaloneElementTag))
-            .thenReturn(Mono.just(newTag1));
+        when(processor1.process(
+                        SecureTemplateContextWrapper.wrap(templateContext), standaloneElementTag))
+                .thenReturn(Mono.just(newTag1));
         when(processor2.process(SecureTemplateContextWrapper.wrap(templateContext), newTag1))
-            .thenReturn(Mono.just(newTag2));
+                .thenReturn(Mono.just(newTag2));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .thenReturn(List.of(processor1, processor2));
+                .thenReturn(List.of(processor1, processor2));
 
         postHandler.setContext(templateContext);
         postHandler.setNext(next);
@@ -134,24 +125,20 @@ class HaloPostTemplateHandlerTest {
     void shouldNotHandleIfProcessedTagTypeChanged() {
         var processor = mock(ElementTagPostProcessor.class);
         var newTag = mock(IOpenElementTag.class);
-        when(processor.process(SecureTemplateContextWrapper.wrap(templateContext),
-            standaloneElementTag))
-            .thenReturn(Mono.just(newTag));
+        when(processor.process(
+                        SecureTemplateContextWrapper.wrap(templateContext), standaloneElementTag))
+                .thenReturn(Mono.just(newTag));
         when(extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .thenReturn(List.of(processor));
+                .thenReturn(List.of(processor));
 
         postHandler.setContext(templateContext);
         postHandler.setNext(next);
-        assertThrows(ClassCastException.class,
-            () -> postHandler.handleStandaloneElement(standaloneElementTag)
-        );
+        assertThrows(
+                ClassCastException.class,
+                () -> postHandler.handleStandaloneElement(standaloneElementTag));
     }
 
     static Stream<List<ElementTagPostProcessor>> provideEmptyElementTagProcessors() {
-        return Stream.of(
-            null,
-            List.of()
-        );
+        return Stream.of(null, List.of());
     }
-
 }

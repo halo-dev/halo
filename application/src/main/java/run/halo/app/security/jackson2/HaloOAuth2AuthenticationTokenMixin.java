@@ -16,16 +16,15 @@ import run.halo.app.security.authentication.oauth2.HaloOAuth2AuthenticationToken
  * @since 2.20.0
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class HaloOAuth2AuthenticationTokenMixin {
 
     @JsonCreator
     HaloOAuth2AuthenticationTokenMixin(
-        @JsonProperty("userDetails") UserDetails userDetails,
-        @JsonProperty("original") OAuth2AuthenticationToken original
-    ) {
-    }
+            @JsonProperty("userDetails") UserDetails userDetails,
+            @JsonProperty("original") OAuth2AuthenticationToken original) {}
 }

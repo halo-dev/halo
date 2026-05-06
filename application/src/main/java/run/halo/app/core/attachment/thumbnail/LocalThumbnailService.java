@@ -29,5 +29,4 @@ public interface LocalThumbnailService {
      * @param source the source image path
      */
     void delete(Path source);
-
 }

@@ -25,12 +25,15 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Subscription",
-    plural = "subscriptions", singular = "subscription")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "Subscription",
+        plural = "subscriptions",
+        singular = "subscription")
 public class Subscription extends AbstractExtension {
 
-    @Schema
-    private Spec spec;
+    @Schema private Spec spec;
 
     @Data
     @Schema(name = "SubscriptionSpec")
@@ -44,19 +47,23 @@ public class Subscription extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, description = "The reason to be interested in")
         private InterestReason reason;
 
-        @Schema(description = "Perhaps users need to unsubscribe and "
-            + "interact without receiving notifications again")
+        @Schema(
+                description =
+                        "Perhaps users need to unsubscribe and "
+                                + "interact without receiving notifications again")
         private boolean disabled;
     }
 
     @Data
     public static class InterestReason {
-        @Schema(requiredMode = REQUIRED, description = "The name of the reason definition to be "
-            + "interested in")
+        @Schema(
+                requiredMode = REQUIRED,
+                description = "The name of the reason definition to be " + "interested in")
         private String reasonType;
 
-        @Schema(requiredMode = REQUIRED, description = "The subject name of reason type to be"
-            + " interested in")
+        @Schema(
+                requiredMode = REQUIRED,
+                description = "The subject name of reason type to be" + " interested in")
         private ReasonSubject subject;
 
         @Schema(requiredMode = NOT_REQUIRED, description = "The expression to be interested in")
@@ -87,14 +94,14 @@ public class Subscription extends AbstractExtension {
             }
             var fallback = createFallbackSubject();
             return fallback.getKind().equals(reasonSubject.getKind())
-                && fallback.getApiVersion().equals(reasonSubject.getApiVersion());
+                    && fallback.getApiVersion().equals(reasonSubject.getApiVersion());
         }
 
         static ReasonSubject createFallbackSubject() {
             return ReasonSubject.builder()
-                .apiVersion("notification.halo.run/v1alpha1")
-                .kind("NonexistentKind")
-                .build();
+                    .apiVersion("notification.halo.run/v1alpha1")
+                    .kind("NonexistentKind")
+                    .build();
         }
     }
 
@@ -105,8 +112,11 @@ public class Subscription extends AbstractExtension {
     @Schema(name = "InterestReasonSubject")
     public static class ReasonSubject {
 
-        @Schema(requiredMode = NOT_REQUIRED, description = "if name is not specified, it presents "
-            + "all subjects of the specified reason type and custom resources")
+        @Schema(
+                requiredMode = NOT_REQUIRED,
+                description =
+                        "if name is not specified, it presents "
+                                + "all subjects of the specified reason type and custom resources")
         private String name;
 
         @Schema(requiredMode = REQUIRED, minLength = 1)

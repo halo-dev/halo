@@ -31,8 +31,8 @@ public interface TemplateNameResolver {
      * @param defaultName default template name to use if given template name not exists
      * @return template name if exists or default template name given
      */
-    Mono<String> resolveTemplateNameOrDefault(ServerWebExchange exchange, String name,
-        String defaultName);
+    Mono<String> resolveTemplateNameOrDefault(
+            ServerWebExchange exchange, String name, String defaultName);
 
     /**
      * Determine whether the template file exists in the current theme.

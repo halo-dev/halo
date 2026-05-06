@@ -18,8 +18,12 @@ import run.halo.app.extension.Metadata;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "auth.halo.run", version = "v1alpha1", kind = "UserConnection",
-    singular = "userconnection", plural = "userconnections")
+@GVK(
+        group = "auth.halo.run",
+        version = "v1alpha1",
+        kind = "UserConnection",
+        singular = "userconnection",
+        plural = "userconnections")
 public class UserConnection extends AbstractExtension {
 
     @Schema(requiredMode = REQUIRED)
@@ -51,6 +55,5 @@ public class UserConnection extends AbstractExtension {
          * The time when the user connection was last updated.
          */
         private Instant updatedAt;
-
     }
 }

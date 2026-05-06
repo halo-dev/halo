@@ -59,46 +59,50 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Comment.class, request.name())
-            .ifPresent(comment -> {
-                if (isDeleted(comment)) {
-                    if (removeFinalizers(comment.getMetadata(), Set.of(FINALIZER_NAME))) {
-                        cleanUpResources(comment);
-                        client.update(comment);
-                    }
-                    return;
-                }
-                if (addFinalizers(comment.getMetadata(), Set.of(FINALIZER_NAME))) {
-                    replyNotificationSubscriptionHelper.subscribeNewReplyReasonForComment(comment);
-                    client.update(comment);
-                    eventPublisher.publishEvent(new CommentCreatedEvent(this, comment));
-                }
+                .ifPresent(
+                        comment -> {
+                            if (isDeleted(comment)) {
+                                if (removeFinalizers(
+                                        comment.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                    cleanUpResources(comment);
+                                    client.update(comment);
+                                }
+                                return;
+                            }
+                            if (addFinalizers(comment.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                replyNotificationSubscriptionHelper
+                                        .subscribeNewReplyReasonForComment(comment);
+                                client.update(comment);
+                                eventPublisher.publishEvent(new CommentCreatedEvent(this, comment));
+                            }
 
-                compatibleCreationTime(comment);
-                Comment.CommentStatus status = comment.getStatusOrDefault();
-                status.setHasNewReply(defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
+                            compatibleCreationTime(comment);
+                            Comment.CommentStatus status = comment.getStatusOrDefault();
+                            status.setHasNewReply(
+                                    defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
 
-                updateUnReplyCountIfNecessary(comment);
-                updateSameSubjectRefCommentCounter(comment);
+                            updateUnReplyCountIfNecessary(comment);
+                            updateSameSubjectRefCommentCounter(comment);
 
-                // version + 1 is required to truly equal version
-                // as a version will be incremented after the update
-                comment.getStatusOrDefault()
-                    .setObservedVersion(comment.getMetadata().getVersion() + 1);
+                            // version + 1 is required to truly equal version
+                            // as a version will be incremented after the update
+                            comment.getStatusOrDefault()
+                                    .setObservedVersion(comment.getMetadata().getVersion() + 1);
 
-                client.update(comment);
-            });
+                            client.update(comment);
+                        });
         return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var extension = new Comment();
-        return builder
-            .extension(extension)
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(equal(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
-                .build())
-            .build();
+        return builder.extension(extension)
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .andQuery(equal(Comment.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                                .build())
+                .build();
     }
 
     /**
@@ -108,8 +112,10 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
     void compatibleCreationTime(Comment comment) {
         var creationTime = comment.getSpec().getCreationTime();
         if (creationTime == null) {
-            creationTime = defaultIfNull(comment.getSpec().getApprovedTime(),
-                comment.getMetadata().getCreationTimestamp());
+            creationTime =
+                    defaultIfNull(
+                            comment.getSpec().getApprovedTime(),
+                            comment.getMetadata().getCreationTimestamp());
         }
         comment.getSpec().setCreationTime(creationTime);
     }
@@ -136,50 +142,63 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         var commentSubjectRef = comment.getSpec().getSubjectRef();
         var totalCount = countTotalComments(commentSubjectRef);
         var approvedTotalCount = countApprovedComments(commentSubjectRef);
-        var findScheme = schemeManager.schemes().stream()
-            .filter(scheme -> {
-                var gvk = scheme.groupVersionKind();
-                return Objects.equals(gvk.group(), commentSubjectRef.getGroup())
-                    && Objects.equals(gvk.kind(), commentSubjectRef.getKind());
-            })
-            .findFirst();
-        findScheme.ifPresent(scheme -> {
-            String counterName =
-                MeterUtils.nameOf(commentSubjectRef.getGroup(), scheme.plural(),
-                    commentSubjectRef.getName());
-            client.fetch(Counter.class, counterName).ifPresentOrElse(counter -> {
-                counter.setTotalComment(totalCount);
-                counter.setApprovedComment(approvedTotalCount);
-                client.update(counter);
-            }, () -> {
-                Counter counter = Counter.emptyCounter(counterName);
-                counter.setTotalComment(totalCount);
-                counter.setApprovedComment(approvedTotalCount);
-                client.create(counter);
-            });
-        });
+        var findScheme =
+                schemeManager.schemes().stream()
+                        .filter(
+                                scheme -> {
+                                    var gvk = scheme.groupVersionKind();
+                                    return Objects.equals(gvk.group(), commentSubjectRef.getGroup())
+                                            && Objects.equals(
+                                                    gvk.kind(), commentSubjectRef.getKind());
+                                })
+                        .findFirst();
+        findScheme.ifPresent(
+                scheme -> {
+                    String counterName =
+                            MeterUtils.nameOf(
+                                    commentSubjectRef.getGroup(),
+                                    scheme.plural(),
+                                    commentSubjectRef.getName());
+                    client.fetch(Counter.class, counterName)
+                            .ifPresentOrElse(
+                                    counter -> {
+                                        counter.setTotalComment(totalCount);
+                                        counter.setApprovedComment(approvedTotalCount);
+                                        client.update(counter);
+                                    },
+                                    () -> {
+                                        Counter counter = Counter.emptyCounter(counterName);
+                                        counter.setTotalComment(totalCount);
+                                        counter.setApprovedComment(approvedTotalCount);
+                                        client.create(counter);
+                                    });
+                });
     }
 
     int countTotalComments(Ref commentSubjectRef) {
         var totalListOptions = new ListOptions();
         totalListOptions.setFieldSelector(FieldSelector.of(getBaseQuery(commentSubjectRef)));
-        return (int) client.listBy(Comment.class, totalListOptions, PageRequestImpl.ofSize(1))
-            .getTotal();
+        return (int)
+                client.listBy(Comment.class, totalListOptions, PageRequestImpl.ofSize(1))
+                        .getTotal();
     }
 
     int countApprovedComments(Ref commentSubjectRef) {
         var approvedListOptions = new ListOptions();
-        approvedListOptions.setFieldSelector(FieldSelector.of(and(
-            getBaseQuery(commentSubjectRef),
-            equal("spec.approved", BooleanUtils.TRUE)
-        )));
-        return (int) client.listBy(Comment.class, approvedListOptions, PageRequestImpl.ofSize(1))
-            .getTotal();
+        approvedListOptions.setFieldSelector(
+                FieldSelector.of(
+                        and(
+                                getBaseQuery(commentSubjectRef),
+                                equal("spec.approved", BooleanUtils.TRUE))));
+        return (int)
+                client.listBy(Comment.class, approvedListOptions, PageRequestImpl.ofSize(1))
+                        .getTotal();
     }
 
     private static Condition getBaseQuery(Ref commentSubjectRef) {
-        return and(equal("spec.subjectRef", Comment.toSubjectRefKey(commentSubjectRef)),
-            isNull("metadata.deletionTimestamp"));
+        return and(
+                equal("spec.subjectRef", Comment.toSubjectRefKey(commentSubjectRef)),
+                isNull("metadata.deletionTimestamp"));
     }
 
     private void cleanUpResources(Comment comment) {
@@ -189,5 +208,4 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         // decrement total comment count
         updateSameSubjectRefCommentCounter(comment);
     }
-
 }

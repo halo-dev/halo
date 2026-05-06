@@ -14,12 +14,10 @@ import run.halo.app.plugin.SharedEvent;
 @SharedEvent
 public class UserConnectionDisconnectedEvent extends ApplicationEvent {
 
-    @Getter
-    private final UserConnection userConnection;
+    @Getter private final UserConnection userConnection;
 
     public UserConnectionDisconnectedEvent(Object source, UserConnection userConnection) {
         super(source);
         this.userConnection = userConnection;
     }
-
 }

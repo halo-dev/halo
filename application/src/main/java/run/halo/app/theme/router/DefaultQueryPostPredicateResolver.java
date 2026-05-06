@@ -30,44 +30,46 @@ public class DefaultQueryPostPredicateResolver implements ReactiveQueryPostPredi
 
     @Override
     public Mono<Predicate<Post>> getPredicate() {
-        Predicate<Post> predicate = post -> post.isPublished()
-            && !ExtensionUtil.isDeleted(post)
-            && Objects.equals(false, post.getSpec().getDeleted());
+        Predicate<Post> predicate =
+                post ->
+                        post.isPublished()
+                                && !ExtensionUtil.isDeleted(post)
+                                && Objects.equals(false, post.getSpec().getDeleted());
         Predicate<Post> visiblePredicate =
-            post -> Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
+                post -> Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
         return currentUserName()
-            .map(username -> predicate.and(
-                visiblePredicate.or(post -> username.equals(post.getSpec().getOwner())))
-            )
-            .defaultIfEmpty(predicate.and(visiblePredicate));
+                .map(
+                        username ->
+                                predicate.and(
+                                        visiblePredicate.or(
+                                                post ->
+                                                        username.equals(
+                                                                post.getSpec().getOwner()))))
+                .defaultIfEmpty(predicate.and(visiblePredicate));
     }
 
     @Override
     public Mono<ListOptions> getListOptions() {
         var listOptions = new ListOptions();
-        listOptions.setLabelSelector(LabelSelector.builder()
-            .eq(Post.PUBLISHED_LABEL, "true").build());
+        listOptions.setLabelSelector(
+                LabelSelector.builder().eq(Post.PUBLISHED_LABEL, "true").build());
 
-        var fieldQuery = and(
-            isNull("metadata.deletionTimestamp"),
-            equal("spec.deleted", "false")
-        );
+        var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.deleted", "false"));
         var visibleQuery = equal("spec.visible", Post.VisibleEnum.PUBLIC.name());
         return currentUserName()
-            .map(username -> and(fieldQuery,
-                or(visibleQuery, equal("spec.owner", username)))
-            )
-            .defaultIfEmpty(and(fieldQuery, visibleQuery))
-            .map(query -> {
-                listOptions.setFieldSelector(FieldSelector.of(query));
-                return listOptions;
-            });
+                .map(username -> and(fieldQuery, or(visibleQuery, equal("spec.owner", username))))
+                .defaultIfEmpty(and(fieldQuery, visibleQuery))
+                .map(
+                        query -> {
+                            listOptions.setFieldSelector(FieldSelector.of(query));
+                            return listOptions;
+                        });
     }
 
     Mono<String> currentUserName() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName)
-            .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
     }
 }

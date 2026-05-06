@@ -19,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class RememberTokenCleanerTest {
-    @InjectMocks
-    private RememberTokenCleaner rememberTokenCleaner;
+    @InjectMocks private RememberTokenCleaner rememberTokenCleaner;
 
     @Test
     void test() {

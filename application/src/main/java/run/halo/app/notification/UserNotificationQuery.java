@@ -29,7 +29,7 @@ public class UserNotificationQuery extends SortableRequest {
     @Override
     public ListOptions toListOptions() {
         var listOptions =
-            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+                labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
         var builder = ListOptions.builder(listOptions);
         if (StringUtils.isNotBlank(username)) {
             builder.andQuery(equal("spec.recipient", username));

@@ -41,7 +41,7 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Slf4j
 class DefaultReactiveSettingFetcher
-    implements ReactiveSettingFetcher, Reconciler<Reconciler.Request>, ApplicationContextAware {
+        implements ReactiveSettingFetcher, Reconciler<Reconciler.Request>, ApplicationContextAware {
 
     private static final Duration TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
@@ -65,29 +65,31 @@ class DefaultReactiveSettingFetcher
     private final String configMapName;
 
     public DefaultReactiveSettingFetcher(
-        PluginContext pluginContext, ReactiveExtensionClient client
-    ) {
+            PluginContext pluginContext, ReactiveExtensionClient client) {
         this.client = client;
         this.pluginName = pluginContext.getName();
         this.configMapName = pluginContext.getConfigMapName();
-        this.configMapCache = Mono.defer(() -> {
-            if (StringUtils.isBlank(configMapName)) {
-                return Mono.empty();
-            }
-            return client.fetch(ConfigMap.class, configMapName);
-        }).cacheInvalidateIf(cm -> isCacheInvalidated.getAndSet(false));
+        this.configMapCache =
+                Mono.defer(
+                                () -> {
+                                    if (StringUtils.isBlank(configMapName)) {
+                                        return Mono.empty();
+                                    }
+                                    return client.fetch(ConfigMap.class, configMapName);
+                                })
+                        .cacheInvalidateIf(cm -> isCacheInvalidated.getAndSet(false));
     }
 
     @Override
     public <T> Mono<T> fetch(String group, Class<T> clazz) {
-        return getSettingValue(group)
-            .map(n -> mapper.convertValue(n, clazz));
+        return getSettingValue(group).map(n -> mapper.convertValue(n, clazz));
     }
 
     @Override
     public Mono<JsonNode> get(String group) {
-        return getValues().mapNotNull(m -> m.get(group))
-            .switchIfEmpty(Mono.fromSupplier(v2Mapper::createObjectNode));
+        return getValues()
+                .mapNotNull(m -> m.get(group))
+                .switchIfEmpty(Mono.fromSupplier(v2Mapper::createObjectNode));
     }
 
     @Override
@@ -97,42 +99,40 @@ class DefaultReactiveSettingFetcher
 
     @Override
     public Mono<Map<String, JsonNode>> getValues() {
-        return configMapCache.mapNotNull(ConfigMap::getData)
-            .map(this::toJackson2JsonNodeMap)
-            .defaultIfEmpty(Map.of());
+        return configMapCache
+                .mapNotNull(ConfigMap::getData)
+                .map(this::toJackson2JsonNodeMap)
+                .defaultIfEmpty(Map.of());
     }
 
     @Override
     public Mono<Map<String, tools.jackson.databind.JsonNode>> getSettingValues() {
-        return configMapCache.mapNotNull(ConfigMap::getData)
-            .map(this::toJackson3JsonNodeMap)
-            .defaultIfEmpty(Map.of());
+        return configMapCache
+                .mapNotNull(ConfigMap::getData)
+                .map(this::toJackson3JsonNodeMap)
+                .defaultIfEmpty(Map.of());
     }
 
     private Map<String, tools.jackson.databind.JsonNode> toJackson3JsonNodeMap(
-        @Nullable Map<String, String> data
-    ) {
+            @Nullable Map<String, String> data) {
         if (data == null) {
             return Map.of();
         }
-        return data.entrySet().stream().collect(Collectors.toMap(
-            Map.Entry::getKey,
-            e -> toJackson3JsonNode(e.getValue())
-        ));
+        return data.entrySet().stream()
+                .collect(
+                        Collectors.toMap(Map.Entry::getKey, e -> toJackson3JsonNode(e.getValue())));
     }
 
     private Map<String, JsonNode> toJackson2JsonNodeMap(@Nullable Map<String, String> data) {
         if (data == null) {
             return Map.of();
         }
-        return data.entrySet().stream().collect(Collectors.toMap(
-            Map.Entry::getKey,
-            e -> toJackson2JsonNode(e.getValue())
-        ));
+        return data.entrySet().stream()
+                .collect(
+                        Collectors.toMap(Map.Entry::getKey, e -> toJackson2JsonNode(e.getValue())));
     }
 
-    private tools.jackson.databind.JsonNode toJackson3JsonNode(
-        @Nullable String json) {
+    private tools.jackson.databind.JsonNode toJackson3JsonNode(@Nullable String json) {
         if (StringUtils.isBlank(json)) {
             return mapper.missingNode();
         }
@@ -164,53 +164,70 @@ class DefaultReactiveSettingFetcher
     @Override
     public Result reconcile(Request request) {
         return client.fetch(ConfigMap.class, configMapName)
-            .filter(Predicate.not(ExtensionUtil::isDeleted))
-            .flatMap(cm -> {
-                // get data snapshot
-                var snapshot = SystemConfigUtils.getDataSnapshot(cm);
-                if (SystemConfigUtils.populateChecksum(cm)) {
-                    // if config map is changed
-                    SystemConfigUtils.updateDataSnapshot(cm);
-                    return client.update(cm).then(Mono.fromCallable(() -> {
-                        this.isCacheInvalidated.set(true);
-                        applicationContext.publishEvent(PluginConfigUpdatedEvent.builder()
-                            .source(this)
-                            .oldConfig(toJackson2JsonNodeMap(snapshot))
-                            .newConfig(toJackson2JsonNodeMap(cm.getData()))
-                            .oldSettingValues(toJackson3JsonNodeMap(snapshot))
-                            .newSettingValues(toJackson3JsonNodeMap(cm.getData()))
-                            .build());
-                        return null;
-                    }));
-                }
-                return Mono.<Result>empty();
-            }).blockOptional(TIMEOUT).orElse(null);
+                .filter(Predicate.not(ExtensionUtil::isDeleted))
+                .flatMap(
+                        cm -> {
+                            // get data snapshot
+                            var snapshot = SystemConfigUtils.getDataSnapshot(cm);
+                            if (SystemConfigUtils.populateChecksum(cm)) {
+                                // if config map is changed
+                                SystemConfigUtils.updateDataSnapshot(cm);
+                                return client.update(cm)
+                                        .then(
+                                                Mono.fromCallable(
+                                                        () -> {
+                                                            this.isCacheInvalidated.set(true);
+                                                            applicationContext.publishEvent(
+                                                                    PluginConfigUpdatedEvent
+                                                                            .builder()
+                                                                            .source(this)
+                                                                            .oldConfig(
+                                                                                    toJackson2JsonNodeMap(
+                                                                                            snapshot))
+                                                                            .newConfig(
+                                                                                    toJackson2JsonNodeMap(
+                                                                                            cm
+                                                                                                    .getData()))
+                                                                            .oldSettingValues(
+                                                                                    toJackson3JsonNodeMap(
+                                                                                            snapshot))
+                                                                            .newSettingValues(
+                                                                                    toJackson3JsonNodeMap(
+                                                                                            cm
+                                                                                                    .getData()))
+                                                                            .build());
+                                                            return null;
+                                                        }));
+                            }
+                            return Mono.<Result>empty();
+                        })
+                .blockOptional(TIMEOUT)
+                .orElse(null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         if (StringUtils.isBlank(configMapName)) {
             // Disable the controller if the config map name is not set
-            return builder
-                .extension(new ConfigMap())
-                .syncAllOnStart(false)
-                .onAddMatcher(extension -> false)
-                .onUpdateMatcher(extension -> false)
-                .onDeleteMatcher(extension -> false)
-                .build();
+            return builder.extension(new ConfigMap())
+                    .syncAllOnStart(false)
+                    .onAddMatcher(extension -> false)
+                    .onUpdateMatcher(extension -> false)
+                    .onDeleteMatcher(extension -> false)
+                    .build();
         }
         ExtensionMatcher matcher =
-            extension -> Objects.equals(extension.getMetadata().getName(), configMapName);
-        return builder
-            .extension(new ConfigMap())
-            .syncAllOnStart(true)
-            .syncAllListOptions(ListOptions.builder()
-                .fieldQuery(equal("metadata.name", configMapName))
-                .build())
-            .onAddMatcher(matcher)
-            .onUpdateMatcher(matcher)
-            .onDeleteMatcher(matcher)
-            .build();
+                extension -> Objects.equals(extension.getMetadata().getName(), configMapName);
+        return builder.extension(new ConfigMap())
+                .syncAllOnStart(true)
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .fieldQuery(equal("metadata.name", configMapName))
+                                .build())
+                .onAddMatcher(matcher)
+                .onUpdateMatcher(matcher)
+                .onDeleteMatcher(matcher)
+                .build();
     }
 
     @Override

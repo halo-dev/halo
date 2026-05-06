@@ -27,24 +27,24 @@ public class ThemeFinderImpl implements ThemeFinder {
     private final ReactiveExtensionClient client;
     private final SystemConfigFetcher environmentFetcher;
 
-    public ThemeFinderImpl(ReactiveExtensionClient client,
-        SystemConfigFetcher environmentFetcher) {
+    public ThemeFinderImpl(ReactiveExtensionClient client, SystemConfigFetcher environmentFetcher) {
         this.client = client;
         this.environmentFetcher = environmentFetcher;
     }
 
     @Override
     public Mono<ThemeVo> activation() {
-        return environmentFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
-            .map(SystemSetting.Theme::getActive)
-            .flatMap(themeName -> client.fetch(Theme.class, themeName))
-            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
+        return environmentFetcher
+                .fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
+                .map(SystemSetting.Theme::getActive)
+                .flatMap(themeName -> client.fetch(Theme.class, themeName))
+                .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
     }
 
     @Override
     public Mono<ThemeVo> getByName(String themeName) {
         return client.fetch(Theme.class, themeName)
-            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
+                .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
     }
 
     private Mono<ThemeVo> themeWithConfig(ThemeVo themeVo) {
@@ -52,15 +52,20 @@ public class ThemeFinderImpl implements ThemeFinder {
             return Mono.just(themeVo);
         }
         return client.fetch(ConfigMap.class, themeVo.getSpec().getConfigMapName())
-            .map(configMap -> {
-                Map<String, JsonNode> config = new HashMap<>();
-                configMap.getData().forEach((k, v) -> {
-                    JsonNode jsonNode = JsonUtils.jsonToObject(v, JsonNode.class);
-                    config.put(k, jsonNode);
-                });
-                JsonNode configJson = JsonUtils.mapToObject(config, JsonNode.class);
-                return themeVo.withConfig(configJson);
-            })
-            .defaultIfEmpty(themeVo);
+                .map(
+                        configMap -> {
+                            Map<String, JsonNode> config = new HashMap<>();
+                            configMap
+                                    .getData()
+                                    .forEach(
+                                            (k, v) -> {
+                                                JsonNode jsonNode =
+                                                        JsonUtils.jsonToObject(v, JsonNode.class);
+                                                config.put(k, jsonNode);
+                                            });
+                            JsonNode configJson = JsonUtils.mapToObject(config, JsonNode.class);
+                            return themeVo.withConfig(configJson);
+                        })
+                .defaultIfEmpty(themeVo);
     }
 }

@@ -35,15 +35,16 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
     private volatile boolean running;
 
     public static final Set<String> REQUIRED_EXTENSION_LOCATIONS =
-        Set.of("classpath:/extensions/*.yaml", "classpath:/extensions/*.yml");
+            Set.of("classpath:/extensions/*.yaml", "classpath:/extensions/*.yml");
     private final HaloProperties haloProperties;
     private final ReactiveExtensionClient extensionClient;
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public ExtensionResourceInitializer(HaloProperties haloProperties,
-        ReactiveExtensionClient extensionClient,
-        ApplicationEventPublisher eventPublisher) {
+    public ExtensionResourceInitializer(
+            HaloProperties haloProperties,
+            ReactiveExtensionClient extensionClient,
+            ApplicationEventPublisher eventPublisher) {
         this.haloProperties = haloProperties;
         this.extensionClient = extensionClient;
         this.eventPublisher = eventPublisher;
@@ -67,30 +68,43 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
         }
 
         Flux.fromIterable(locations)
-            .doOnNext(location ->
-                log.debug("Trying to initialize extension resources from location: {}", location))
-            .map(this::listResources)
-            .distinct()
-            .flatMapIterable(resources -> resources)
-            .doOnNext(resource -> log.debug("Initializing extension resource from location: {}",
-                resource))
-            .map(resource -> new YamlUnstructuredLoader(resource).load())
-            .flatMapIterable(extensions -> extensions)
-            .doOnNext(extension -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("Initializing extension resource: {}/{}",
-                        extension.groupVersionKind(), extension.getMetadata().getName());
-                }
-            })
-            .flatMap(this::createOrUpdate)
-            .doOnNext(extension -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("Initialized extension resource: {}/{}", extension.groupVersionKind(),
-                        extension.getMetadata().getName());
-                }
-            })
-            .then()
-            .block(Duration.ofMinutes(1));
+                .doOnNext(
+                        location ->
+                                log.debug(
+                                        "Trying to initialize extension resources from location:"
+                                                + " {}",
+                                        location))
+                .map(this::listResources)
+                .distinct()
+                .flatMapIterable(resources -> resources)
+                .doOnNext(
+                        resource ->
+                                log.debug(
+                                        "Initializing extension resource from location: {}",
+                                        resource))
+                .map(resource -> new YamlUnstructuredLoader(resource).load())
+                .flatMapIterable(extensions -> extensions)
+                .doOnNext(
+                        extension -> {
+                            if (log.isDebugEnabled()) {
+                                log.debug(
+                                        "Initializing extension resource: {}/{}",
+                                        extension.groupVersionKind(),
+                                        extension.getMetadata().getName());
+                            }
+                        })
+                .flatMap(this::createOrUpdate)
+                .doOnNext(
+                        extension -> {
+                            if (log.isDebugEnabled()) {
+                                log.debug(
+                                        "Initialized extension resource: {}/{}",
+                                        extension.groupVersionKind(),
+                                        extension.getMetadata().getName());
+                            }
+                        })
+                .then()
+                .block(Duration.ofMinutes(1));
         eventPublisher.publishEvent(new ExtensionInitializedEvent(this));
     }
 
@@ -112,30 +126,38 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
         return InitializationPhase.EXTENSION_RESOURCES.getPhase();
     }
 
-
     private Mono<Unstructured> createOrUpdate(Unstructured extension) {
         return Mono.just(extension)
-            .flatMap(ext -> extensionClient.fetch(extension.groupVersionKind(),
-                extension.getMetadata().getName()))
-            .flatMap(existingExt -> {
-                if (ExtensionUtil.hasDoNotOverwriteLabel(existingExt)) {
-                    log.debug("Extension {} is marked as do-not-overwrite, skipping update",
-                        existingExt.getMetadata().getName()
-                    );
-                    // skip update
-                    return Mono.just(existingExt);
-                }
-                // force update
-                extension.getMetadata().setVersion(existingExt.getMetadata().getVersion());
-                return extensionClient.update(extension);
-            })
-            .switchIfEmpty(Mono.defer(() -> {
-                if (ExtensionUtil.isDeleted(extension)) {
-                    // skip deleted extension
-                    return Mono.empty();
-                }
-                return extensionClient.create(extension);
-            }));
+                .flatMap(
+                        ext ->
+                                extensionClient.fetch(
+                                        extension.groupVersionKind(),
+                                        extension.getMetadata().getName()))
+                .flatMap(
+                        existingExt -> {
+                            if (ExtensionUtil.hasDoNotOverwriteLabel(existingExt)) {
+                                log.debug(
+                                        "Extension {} is marked as do-not-overwrite, skipping"
+                                                + " update",
+                                        existingExt.getMetadata().getName());
+                                // skip update
+                                return Mono.just(existingExt);
+                            }
+                            // force update
+                            extension
+                                    .getMetadata()
+                                    .setVersion(existingExt.getMetadata().getVersion());
+                            return extensionClient.update(extension);
+                        })
+                .switchIfEmpty(
+                        Mono.defer(
+                                () -> {
+                                    if (ExtensionUtil.isDeleted(extension)) {
+                                        // skip deleted extension
+                                        return Mono.empty();
+                                    }
+                                    return extensionClient.create(extension);
+                                }));
     }
 
     private List<Resource> listResources(String location) {
@@ -146,5 +168,4 @@ public class ExtensionResourceInitializer implements SmartLifecycle {
             throw new IllegalArgumentException("Invalid extension location: " + location, ie);
         }
     }
-
 }

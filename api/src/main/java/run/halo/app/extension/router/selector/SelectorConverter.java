@@ -13,14 +13,15 @@ public class SelectorConverter implements Converter<String, SelectorCriteria> {
     @Override
     public @Nullable SelectorCriteria convert(@Nullable String selector) {
         return Arrays.stream(Operator.values())
-            .sorted(Comparator.comparing(Operator::getOrder))
-            .map(operator -> {
-                log.debug("Resolving selector: {} with operator: {}", selector, operator);
-                return operator.convert(selector);
-            })
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+                .sorted(Comparator.comparing(Operator::getOrder))
+                .map(
+                        operator -> {
+                            log.debug(
+                                    "Resolving selector: {} with operator: {}", selector, operator);
+                            return operator.convert(selector);
+                        })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
-
 }

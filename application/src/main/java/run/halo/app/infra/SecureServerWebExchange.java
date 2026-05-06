@@ -21,5 +21,4 @@ public class SecureServerWebExchange extends ServerWebExchangeDecorator {
         // Always return null to prevent access to application context
         return null;
     }
-
 }

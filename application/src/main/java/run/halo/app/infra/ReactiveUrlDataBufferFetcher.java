@@ -38,5 +38,4 @@ public interface ReactiveUrlDataBufferFetcher {
      * @return response entity
      */
     Mono<ResponseEntity<Flux<DataBuffer>>> fetchResponseEntity(URI uri);
-
 }

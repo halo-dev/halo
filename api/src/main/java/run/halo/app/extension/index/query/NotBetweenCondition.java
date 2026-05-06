@@ -1,8 +1,8 @@
 package run.halo.app.extension.index.query;
 
 record NotBetweenCondition(
-    String indexName, Object fromKey, boolean fromInclusive, Object toKey, boolean toInclusive)
-    implements IndexCondition {
+        String indexName, Object fromKey, boolean fromInclusive, Object toKey, boolean toInclusive)
+        implements IndexCondition {
 
     @Override
     public Condition not() {
@@ -11,11 +11,12 @@ record NotBetweenCondition(
 
     @Override
     public String toString() {
-        return indexName + " NOT BETWEEN "
-            + (fromInclusive ? "[" : "(")
-            + fromKey
-            + ", "
-            + toKey
-            + (toInclusive ? "]" : ")");
+        return indexName
+                + " NOT BETWEEN "
+                + (fromInclusive ? "[" : "(")
+                + fromKey
+                + ", "
+                + toKey
+                + (toInclusive ? "]" : ")");
     }
 }

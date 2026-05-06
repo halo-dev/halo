@@ -23,22 +23,24 @@ public class InMemoryResetTokenRepository implements ResetTokenRepository {
     private final Cache<String, ResetToken> tokens;
 
     public InMemoryResetTokenRepository() {
-        this.tokens = Caffeine.newBuilder()
-            .expireAfterWrite(Duration.ofDays(1))
-            .maximumSize(10000)
-            .build();
+        this.tokens =
+                Caffeine.newBuilder()
+                        .expireAfterWrite(Duration.ofDays(1))
+                        .maximumSize(10000)
+                        .build();
     }
 
     @Override
     public Mono<Void> save(ResetToken resetToken) {
-        return Mono.defer(() -> {
-            var savedResetToken = tokens.get(resetToken.tokenHash(), k -> resetToken);
-            if (Objects.equals(savedResetToken, resetToken)) {
-                return Mono.empty();
-            }
-            // should never happen
-            return Mono.error(new DuplicateKeyException("Reset token already exists"));
-        });
+        return Mono.defer(
+                () -> {
+                    var savedResetToken = tokens.get(resetToken.tokenHash(), k -> resetToken);
+                    if (Objects.equals(savedResetToken, resetToken)) {
+                        return Mono.empty();
+                    }
+                    // should never happen
+                    return Mono.error(new DuplicateKeyException("Reset token already exists"));
+                });
     }
 
     @Override
@@ -50,5 +52,4 @@ public class InMemoryResetTokenRepository implements ResetTokenRepository {
     public Mono<Void> removeByTokenHash(String tokenHash) {
         return Mono.fromRunnable(() -> tokens.invalidate(tokenHash));
     }
-
 }

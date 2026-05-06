@@ -16,9 +16,8 @@ public class HaloUser implements HaloUserDetails, CredentialsContainer {
 
     private String totpEncryptedSecret;
 
-    public HaloUser(UserDetails delegate,
-        boolean twoFactorAuthEnabled,
-        String totpEncryptedSecret) {
+    public HaloUser(
+            UserDetails delegate, boolean twoFactorAuthEnabled, String totpEncryptedSecret) {
         Assert.notNull(delegate, "Delegate user must not be null");
         this.delegate = delegate;
         this.twoFactorAuthEnabled = twoFactorAuthEnabled;

@@ -15,8 +15,7 @@ import run.halo.app.extension.GroupVersion;
 @ExtendWith(MockitoExtension.class)
 class WebSocketHandlerMappingTest {
 
-    @InjectMocks
-    WebSocketHandlerMapping handlerMapping;
+    @InjectMocks WebSocketHandlerMapping handlerMapping;
 
     @Test
     void shouldRegisterEndpoint() {
@@ -51,5 +50,4 @@ class WebSocketHandlerMappingTest {
             return WebSocketSession::close;
         }
     }
-
 }

@@ -32,21 +32,21 @@ public class PluginQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "PluginV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("plugins/{name}/available", this::availableByName,
-                builder -> builder.operationId("queryPluginAvailableByName")
-                    .description("Gets plugin available by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Plugin name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(Boolean.class)
-                    )
-            )
-            .build();
+                .GET(
+                        "plugins/{name}/available",
+                        this::availableByName,
+                        builder ->
+                                builder.operationId("queryPluginAvailableByName")
+                                        .description("Gets plugin available by name.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Plugin name")
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(Boolean.class)))
+                .build();
     }
 
     private Mono<ServerResponse> availableByName(ServerRequest request) {

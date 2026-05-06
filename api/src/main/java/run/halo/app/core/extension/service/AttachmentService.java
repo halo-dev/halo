@@ -34,8 +34,12 @@ public interface AttachmentService {
      * @param beforeCreating is an attachment modifier before creating.
      * @return attachment.
      */
-    Mono<Attachment> upload(String username, String policyName, @Nullable String groupName,
-        FilePart filePart, @Nullable Consumer<Attachment> beforeCreating);
+    Mono<Attachment> upload(
+            String username,
+            String policyName,
+            @Nullable String groupName,
+            FilePart filePart,
+            @Nullable Consumer<Attachment> beforeCreating);
 
     /**
      * Uploads the given attachment to specific storage using handlers in plugins. Please note
@@ -51,8 +55,12 @@ public interface AttachmentService {
      * @param mediaType is media type of the attachment.
      * @return attachment.
      */
-    Mono<Attachment> upload(String policyName, @Nullable String groupName, String filename,
-        Flux<DataBuffer> content, @Nullable MediaType mediaType);
+    Mono<Attachment> upload(
+            String policyName,
+            @Nullable String groupName,
+            String filename,
+            Flux<DataBuffer> content,
+            @Nullable MediaType mediaType);
 
     /**
      * Deletes an attachment using handlers in plugins.
@@ -104,6 +112,6 @@ public interface AttachmentService {
      * @param filename filename
      * @return attachment
      */
-    Mono<Attachment> uploadFromUrl(URL url, String policyName,
-        @Nullable String groupName, @Nullable String filename);
+    Mono<Attachment> uploadFromUrl(
+            URL url, String policyName, @Nullable String groupName, @Nullable String filename);
 }

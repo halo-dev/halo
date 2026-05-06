@@ -14,11 +14,9 @@ import run.halo.app.infra.properties.HaloProperties;
 @ExtendWith(MockitoExtension.class)
 class PluginsRootGetterImplTest {
 
-    @Mock
-    HaloProperties haloProperties;
+    @Mock HaloProperties haloProperties;
 
-    @InjectMocks
-    PluginsRootGetterImpl pluginsRootGetter;
+    @InjectMocks PluginsRootGetterImpl pluginsRootGetter;
 
     @Test
     void shouldGetterPluginsRootCorrectly() {
@@ -26,5 +24,4 @@ class PluginsRootGetterImplTest {
         when(haloProperties.getWorkDir()).thenReturn(haloWorkDir);
         assertEquals(haloWorkDir.resolve("plugins"), pluginsRootGetter.get());
     }
-
 }

@@ -45,28 +45,34 @@ public class LocaleChangeWebFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return matcher.matches(exchange)
-            .filter(MatchResult::isMatch)
-            .doOnNext(result -> {
-                var localeContext = themeLocaleContextResolver.resolveLocaleContext(exchange);
-                var locale = localeContext.getLocale();
-                if (locale != null) {
-                    setLanguageCookieIfAbsent(exchange, locale);
-                }
-            })
-            .then(Mono.defer(() -> chain.filter(exchange)));
+                .filter(MatchResult::isMatch)
+                .doOnNext(
+                        result -> {
+                            var localeContext =
+                                    themeLocaleContextResolver.resolveLocaleContext(exchange);
+                            var locale = localeContext.getLocale();
+                            if (locale != null) {
+                                setLanguageCookieIfAbsent(exchange, locale);
+                            }
+                        })
+                .then(Mono.defer(() -> chain.filter(exchange)));
     }
 
     void setLanguageCookieIfAbsent(ServerWebExchange exchange, Locale locale) {
         var languageCookie = exchange.getRequest().getCookies().getFirst(LANGUAGE_COOKIE_NAME);
         if (languageCookie != null
-            && Objects.equals(languageCookie.getValue(), locale.toLanguageTag())) {
+                && Objects.equals(languageCookie.getValue(), locale.toLanguageTag())) {
             return;
         }
-        var cookie = ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
-            .path("/")
-            .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))
-            .sameSite("Lax")
-            .build();
+        var cookie =
+                ResponseCookie.from(LANGUAGE_COOKIE_NAME, locale.toLanguageTag())
+                        .path("/")
+                        .secure(
+                                "https"
+                                        .equalsIgnoreCase(
+                                                exchange.getRequest().getURI().getScheme()))
+                        .sameSite("Lax")
+                        .build();
         exchange.getResponse().getCookies().set(LANGUAGE_COOKIE_NAME, cookie);
     }
 }

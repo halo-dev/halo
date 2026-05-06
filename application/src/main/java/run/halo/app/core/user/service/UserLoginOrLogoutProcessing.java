@@ -20,19 +20,22 @@ public class UserLoginOrLogoutProcessing {
     private final ApplicationEventPublisher eventPublisher;
 
     public Mono<Void> loginProcessing(String username) {
-        return userService.getUser(username)
-            .doOnNext(user -> {
-                eventPublisher.publishEvent(new UserLoginEvent(this, user));
-            })
-            .then();
+        return userService
+                .getUser(username)
+                .doOnNext(
+                        user -> {
+                            eventPublisher.publishEvent(new UserLoginEvent(this, user));
+                        })
+                .then();
     }
 
     public Mono<Void> logoutProcessing(String username) {
-        return userService.getUser(username)
-            .doOnNext(user -> {
-                eventPublisher.publishEvent(new UserLogoutEvent(this, user));
-            })
-            .then();
+        return userService
+                .getUser(username)
+                .doOnNext(
+                        user -> {
+                            eventPublisher.publishEvent(new UserLogoutEvent(this, user));
+                        })
+                .then();
     }
-
 }

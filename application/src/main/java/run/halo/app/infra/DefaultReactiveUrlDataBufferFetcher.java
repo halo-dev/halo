@@ -29,11 +29,12 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
     private WebClient webClient;
 
     DefaultReactiveUrlDataBufferFetcher() {
-        this.webClient = WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
-                .followRedirect(true)
-            ))
-            .build();
+        this.webClient =
+                WebClient.builder()
+                        .clientConnector(
+                                new ReactorClientHttpConnector(
+                                        HttpClient.create().followRedirect(true)))
+                        .build();
     }
 
     /**
@@ -48,48 +49,48 @@ class DefaultReactiveUrlDataBufferFetcher implements ReactiveUrlDataBufferFetche
 
     @Override
     public Flux<DataBuffer> fetch(URI uri) {
-        return webClient.get()
-            .uri(uri)
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
-            .retrieve()
-            .bodyToFlux(DataBuffer.class)
-            .onErrorMap(
-                WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapRequestException
-            );
+        return webClient
+                .get()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToFlux(DataBuffer.class)
+                .onErrorMap(
+                        WebClientRequestException.class,
+                        DefaultReactiveUrlDataBufferFetcher::mapRequestException);
     }
 
     @Override
     public Mono<HttpHeaders> head(URI uri) {
-        return webClient.get().uri(uri)
-            .retrieve()
-            .toBodilessEntity()
-            .map(HttpEntity::getHeaders)
-            .onErrorMap(
-                WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapRequestException
-            );
+        return webClient
+                .get()
+                .uri(uri)
+                .retrieve()
+                .toBodilessEntity()
+                .map(HttpEntity::getHeaders)
+                .onErrorMap(
+                        WebClientRequestException.class,
+                        DefaultReactiveUrlDataBufferFetcher::mapRequestException);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<DataBuffer>>> fetchResponseEntity(URI uri) {
-        return webClient.get().uri(uri)
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
-            .retrieve()
-            .toEntityFlux(DataBuffer.class)
-            .onErrorMap(
-                WebClientRequestException.class,
-                DefaultReactiveUrlDataBufferFetcher::mapRequestException
-            );
+        return webClient
+                .get()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .toEntityFlux(DataBuffer.class)
+                .onErrorMap(
+                        WebClientRequestException.class,
+                        DefaultReactiveUrlDataBufferFetcher::mapRequestException);
     }
 
     private static Throwable mapRequestException(WebClientRequestException ex) {
         if (ex.getCause() instanceof UnknownHostException uhe) {
             return new ServerWebInputException(
-                "Unable to resolve host or private IP resolved: " + uhe.getMessage()
-            );
+                    "Unable to resolve host or private IP resolved: " + uhe.getMessage());
         }
         return ex;
     }
-
 }

@@ -35,13 +35,7 @@ public abstract class AbstractEventReconciler<E> implements Reconciler<E>, Smart
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            controllerName,
-            this,
-            queue,
-            null,
-            Duration.ofMillis(100),
-            Duration.ofMinutes(10)
-        );
+                controllerName, this, queue, null, Duration.ofMillis(100), Duration.ofMinutes(10));
     }
 
     @Override

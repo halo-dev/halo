@@ -23,11 +23,9 @@ import run.halo.app.infra.ExternalUrlSupplier;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionRouterTest {
 
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @InjectMocks
-    SubscriptionRouter subscriptionRouter;
+    @InjectMocks SubscriptionRouter subscriptionRouter;
 
     @Test
     void getUnsubscribeUrlTest() throws MalformedURLException {
@@ -39,8 +37,10 @@ class SubscriptionRouterTest {
         subscription.getSpec().setUnsubscribeToken("fake-unsubscribe-token");
 
         var url = subscriptionRouter.getUnsubscribeUrl(subscription);
-        assertThat(url).isEqualTo("https://halo.run/apis/api.notification.halo.run/v1alpha1"
-            + "/subscriptions/fake-subscription/unsubscribe"
-            + "?token=fake-unsubscribe-token");
+        assertThat(url)
+                .isEqualTo(
+                        "https://halo.run/apis/api.notification.halo.run/v1alpha1"
+                                + "/subscriptions/fake-subscription/unsubscribe"
+                                + "?token=fake-unsubscribe-token");
     }
 }

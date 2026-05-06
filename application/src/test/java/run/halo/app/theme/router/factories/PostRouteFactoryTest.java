@@ -46,26 +46,19 @@ import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 @ExtendWith(MockitoExtension.class)
 class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
-    @Mock
-    private PostFinder postFinder;
+    @Mock private PostFinder postFinder;
 
-    @Mock
-    private ViewNameResolver viewNameResolver;
+    @Mock private ViewNameResolver viewNameResolver;
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private ReactiveQueryPostPredicateResolver predicateResolver;
+    @Mock private ReactiveQueryPostPredicateResolver predicateResolver;
 
-    @Mock
-    private LocaleContextResolver localeContextResolver;
+    @Mock private LocaleContextResolver localeContextResolver;
 
-    @Mock
-    private TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+    @Mock private TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 
-    @InjectMocks
-    private PostRouteFactory postRouteFactory;
+    @InjectMocks private PostRouteFactory postRouteFactory;
 
     @Test
     void shouldBeSameResultWhenParsePattenMultiply() {
@@ -88,35 +81,37 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
         when(client.fetch(eq(Post.class), eq("fake-name"))).thenReturn(Mono.just(post));
 
         when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
-            .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
+                .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
         when(predicateResolver.getPredicate())
-            .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
+                .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
 
         RouterFunction<ServerResponse> routerFunction = postRouteFactory.create("/archives/{name}");
         WebTestClient webTestClient = getWebTestClient(routerFunction);
 
         when(localeContextResolver.resolveLocaleContext(any()))
-            .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
+                .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
         when(viewResolver.resolveViewName(any(), any()))
-            .thenReturn(Mono.just(new EmptyView() {
-                @Override
-                public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-                    ServerWebExchange exchange) {
-                    assertThat(model).containsKey(ModelConst.TEMPLATE_ID);
-                    assertThat(model.get(ModelConst.TEMPLATE_ID))
-                        .isEqualTo(DefaultTemplateEnum.POST.getValue());
-                    assertThat(model.get("name"))
-                        .isEqualTo(post.getMetadata().getName());
-                    assertThat(model.get("plural")).isEqualTo("posts");
-                    assertThat(model.get("post")).isNotNull();
-                    assertThat(model.get("groupVersionKind"))
-                        .isEqualTo(GroupVersionKind.fromExtension(Post.class));
-                    return super.render(model, contentType, exchange);
-                }
-            }));
-        webTestClient.get()
-            .uri("/archives/fake-name")
-            .exchange()
-            .expectStatus().isOk();
+                .thenReturn(
+                        Mono.just(
+                                new EmptyView() {
+                                    @Override
+                                    public Mono<Void> render(
+                                            Map<String, ?> model,
+                                            MediaType contentType,
+                                            ServerWebExchange exchange) {
+                                        assertThat(model).containsKey(ModelConst.TEMPLATE_ID);
+                                        assertThat(model.get(ModelConst.TEMPLATE_ID))
+                                                .isEqualTo(DefaultTemplateEnum.POST.getValue());
+                                        assertThat(model.get("name"))
+                                                .isEqualTo(post.getMetadata().getName());
+                                        assertThat(model.get("plural")).isEqualTo("posts");
+                                        assertThat(model.get("post")).isNotNull();
+                                        assertThat(model.get("groupVersionKind"))
+                                                .isEqualTo(
+                                                        GroupVersionKind.fromExtension(Post.class));
+                                        return super.render(model, contentType, exchange);
+                                    }
+                                }));
+        webTestClient.get().uri("/archives/fake-name").exchange().expectStatus().isOk();
     }
 }

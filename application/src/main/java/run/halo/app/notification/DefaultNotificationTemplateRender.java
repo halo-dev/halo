@@ -42,21 +42,25 @@ public class DefaultNotificationTemplateRender implements NotificationTemplateRe
     @Override
     public Mono<String> render(String template, Map<String, Object> model) {
         var context = new Context(Locale.getDefault(), model);
-        var externalUrl = Optional.ofNullable(externalUrlSupplier.getRaw())
-            .map(url -> StringUtils.removeEnd(url.toString(), "/"))
-            .orElse(StringUtils.EMPTY);
-        var globalAttributeMono = getBasicSetting()
-            .doOnNext(basic -> {
-                var site = new HashMap<>();
-                site.put("title", basic.getTitle());
-                site.put("logo", basic.getLogo());
-                site.put("subtitle", basic.getSubtitle());
-                site.put("url", externalUrl);
-                context.setVariable("site", site);
-            });
+        var externalUrl =
+                Optional.ofNullable(externalUrlSupplier.getRaw())
+                        .map(url -> StringUtils.removeEnd(url.toString(), "/"))
+                        .orElse(StringUtils.EMPTY);
+        var globalAttributeMono =
+                getBasicSetting()
+                        .doOnNext(
+                                basic -> {
+                                    var site = new HashMap<>();
+                                    site.put("title", basic.getTitle());
+                                    site.put("logo", basic.getLogo());
+                                    site.put("subtitle", basic.getSubtitle());
+                                    site.put("url", externalUrl);
+                                    context.setVariable("site", site);
+                                });
         return Mono.when(globalAttributeMono)
-            .then(Mono.fromSupplier(() ->
-                TEMPLATE_ENGINE.process(defaultString(template), context)));
+                .then(
+                        Mono.fromSupplier(
+                                () -> TEMPLATE_ENGINE.process(defaultString(template), context)));
     }
 
     static TemplateEngine createTemplateEngine() {

@@ -14,5 +14,4 @@ public interface ContributorFinder {
     Mono<ContributorVo> getContributor(String name);
 
     Flux<ContributorVo> getContributors(Collection<String> names);
-
 }

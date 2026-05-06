@@ -30,32 +30,31 @@ import run.halo.app.extension.Ref;
  */
 @ExtendWith(MockitoExtension.class)
 class SinglePageCommentSubjectTest {
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private SinglePageCommentSubject singlePageCommentSubject;
+    @InjectMocks private SinglePageCommentSubject singlePageCommentSubject;
 
     @Test
     void get() {
-        when(client.fetch(eq(SinglePage.class), any()))
-            .thenReturn(Mono.empty());
+        when(client.fetch(eq(SinglePage.class), any())).thenReturn(Mono.empty());
 
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName("fake-single-page");
 
         when(client.fetch(eq(SinglePage.class), eq("fake-single-page")))
-            .thenReturn(Mono.just(singlePage));
+                .thenReturn(Mono.just(singlePage));
 
-        singlePageCommentSubject.get("fake-single-page")
-            .as(StepVerifier::create)
-            .expectNext(singlePage)
-            .verifyComplete();
+        singlePageCommentSubject
+                .get("fake-single-page")
+                .as(StepVerifier::create)
+                .expectNext(singlePage)
+                .verifyComplete();
 
-        singlePageCommentSubject.get("fake-single-page-2")
-            .as(StepVerifier::create)
-            .verifyComplete();
+        singlePageCommentSubject
+                .get("fake-single-page-2")
+                .as(StepVerifier::create)
+                .verifyComplete();
 
         verify(client, times(1)).fetch(eq(SinglePage.class), eq("fake-single-page"));
     }
@@ -75,7 +74,6 @@ class SinglePageCommentSubjectTest {
         assertThat(supports).isFalse();
     }
 
-
     @Test
     void shouldSupportRefWithoutVersion() {
         var ref = new Ref();
@@ -84,5 +82,4 @@ class SinglePageCommentSubjectTest {
         ref.setKind(SinglePage.KIND);
         assertTrue(singlePageCommentSubject.supports(ref));
     }
-
 }

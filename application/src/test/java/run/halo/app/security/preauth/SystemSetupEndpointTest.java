@@ -18,13 +18,18 @@ class SystemSetupEndpointTest {
         var properties = new Properties();
         properties.setProperty("username", "guqing");
         properties.setProperty("timestamp", "2024-09-30");
-        var str = SystemSetupEndpoint.PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders("""
-            ${username}
-            ${timestamp}
-            """, properties);
-        assertThat(str).isEqualTo("""
-            guqing
-            2024-09-30
-            """);
+        var str =
+                SystemSetupEndpoint.PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(
+                        """
+                        ${username}
+                        ${timestamp}
+                        """,
+                        properties);
+        assertThat(str)
+                .isEqualTo(
+                        """
+                        guqing
+                        2024-09-30
+                        """);
     }
 }

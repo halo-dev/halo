@@ -17,5 +17,4 @@ public class TooManyRequestsException extends AuthenticationException {
     public TooManyRequestsException(@Nullable Throwable throwable) {
         super("Too many requests.", throwable);
     }
-
 }

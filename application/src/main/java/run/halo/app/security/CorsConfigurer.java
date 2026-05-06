@@ -24,28 +24,37 @@ public class CorsConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        http.cors(spec -> {
-            if (corsOptions.isDisabled()) {
-                spec.disable();
-                return;
-            }
-            spec.configurationSource(apiCorsConfigSource());
-        });
+        http.cors(
+                spec -> {
+                    if (corsOptions.isDisabled()) {
+                        spec.disable();
+                        return;
+                    }
+                    spec.configurationSource(apiCorsConfigSource());
+                });
     }
 
     CorsConfigurationSource apiCorsConfigSource() {
         var source = new UrlBasedCorsConfigurationSource();
         // additional CORS configuration
-        this.corsOptions.getConfigs().forEach(corsConfig -> source.registerCorsConfiguration(
-            corsConfig.getPathPattern(), corsConfig.getConfig().toCorsConfiguration()
-        ));
+        this.corsOptions
+                .getConfigs()
+                .forEach(
+                        corsConfig ->
+                                source.registerCorsConfiguration(
+                                        corsConfig.getPathPattern(),
+                                        corsConfig.getConfig().toCorsConfiguration()));
 
         // default CORS configuration
         var configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedHeaders(
-            List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT,
-                "X-XSRF-TOKEN", HttpHeaders.COOKIE));
+                List.of(
+                        HttpHeaders.AUTHORIZATION,
+                        HttpHeaders.CONTENT_TYPE,
+                        HttpHeaders.ACCEPT,
+                        "X-XSRF-TOKEN",
+                        HttpHeaders.COOKIE));
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         source.registerCorsConfiguration("/api/**", configuration);

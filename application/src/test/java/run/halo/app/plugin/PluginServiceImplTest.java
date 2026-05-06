@@ -61,35 +61,29 @@ import run.halo.app.infra.utils.FileUtils;
 @ExtendWith(MockitoExtension.class)
 class PluginServiceImplTest {
 
-    @Mock
-    SystemVersionSupplier systemVersionSupplier;
+    @Mock SystemVersionSupplier systemVersionSupplier;
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
-    @Mock
-    PluginsRootGetter pluginsRootGetter;
+    @Mock PluginsRootGetter pluginsRootGetter;
 
-    @Mock
-    SpringPluginManager pluginManager;
+    @Mock SpringPluginManager pluginManager;
 
-    @Spy
-    @InjectMocks
-    PluginServiceImpl pluginService;
+    @Spy @InjectMocks PluginServiceImpl pluginService;
 
     @Nested
     class InstallUpdateReloadTest {
 
         Path fakePluginPath;
 
-        @TempDir
-        Path tempDirectory;
+        @TempDir Path tempDirectory;
 
         @BeforeEach
         void setUp() throws URISyntaxException, IOException {
             fakePluginPath = tempDirectory.resolve("plugin-0.0.2.jar");
-            var fakePluingUri = requireNonNull(
-                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+            var fakePluingUri =
+                    requireNonNull(getClass().getClassLoader().getResource("plugin/plugin-0.0.2"))
+                            .toURI();
             FileUtils.jar(Paths.get(fakePluingUri), tempDirectory.resolve("plugin-0.0.2.jar"));
 
             lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
@@ -100,9 +94,7 @@ class PluginServiceImplTest {
             var existingPlugin = new YamlPluginFinder().find(fakePluginPath);
             when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.just(existingPlugin));
             var plugin = pluginService.install(fakePluginPath);
-            StepVerifier.create(plugin)
-                .expectError(PluginAlreadyExistsException.class)
-                .verify();
+            StepVerifier.create(plugin).expectError(PluginAlreadyExistsException.class).verify();
 
             verify(client).fetch(Plugin.class, "fake-plugin");
             verify(systemVersionSupplier).get();
@@ -115,9 +107,7 @@ class PluginServiceImplTest {
             var createdPlugin = mock(Plugin.class);
             when(client.create(isA(Plugin.class))).thenReturn(Mono.just(createdPlugin));
             var plugin = pluginService.install(fakePluginPath);
-            StepVerifier.create(plugin)
-                .expectNext(createdPlugin)
-                .verifyComplete();
+            StepVerifier.create(plugin).expectNext(createdPlugin).verifyComplete();
 
             verify(client).fetch(Plugin.class, "fake-plugin");
             verify(systemVersionSupplier).get();
@@ -127,9 +117,7 @@ class PluginServiceImplTest {
         @Test
         void upgradeWhenPluginNameMismatch() {
             var plugin = pluginService.upgrade("non-fake-plugin", fakePluginPath);
-            StepVerifier.create(plugin)
-                .expectError(ServerWebInputException.class)
-                .verify();
+            StepVerifier.create(plugin).expectError(ServerWebInputException.class).verify();
 
             verify(client, never()).fetch(Plugin.class, "fake-plugin");
         }
@@ -138,9 +126,7 @@ class PluginServiceImplTest {
         void upgradeWhenPluginNotFound() {
             when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.empty());
             var plugin = pluginService.upgrade("fake-plugin", fakePluginPath);
-            StepVerifier.create(plugin)
-                .expectError(ServerWebInputException.class)
-                .verify();
+            StepVerifier.create(plugin).expectError(ServerWebInputException.class).verify();
 
             verify(client).fetch(Plugin.class, "fake-plugin");
         }
@@ -149,50 +135,53 @@ class PluginServiceImplTest {
         void upgradeNormally() {
             when(pluginsRootGetter.get()).thenReturn(tempDirectory.resolve("plugins"));
 
-            var oldFakePlugin = createPlugin("fake-plugin", plugin -> {
-                plugin.getSpec().setEnabled(true);
-                plugin.getSpec().setVersion("0.0.1");
-            });
+            var oldFakePlugin =
+                    createPlugin(
+                            "fake-plugin",
+                            plugin -> {
+                                plugin.getSpec().setEnabled(true);
+                                plugin.getSpec().setVersion("0.0.1");
+                            });
 
             when(client.fetch(Plugin.class, "fake-plugin"))
-                .thenReturn(Mono.just(oldFakePlugin))
-                .thenReturn(Mono.just(oldFakePlugin))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.just(oldFakePlugin))
+                    .thenReturn(Mono.just(oldFakePlugin))
+                    .thenReturn(Mono.empty());
 
             when(client.update(oldFakePlugin)).thenReturn(Mono.just(oldFakePlugin));
 
             var plugin = pluginService.upgrade("fake-plugin", fakePluginPath);
 
-            StepVerifier.create(plugin)
-                .expectNext(oldFakePlugin)
-                .verifyComplete();
+            StepVerifier.create(plugin).expectNext(oldFakePlugin).verifyComplete();
 
             verify(client).fetch(Plugin.class, "fake-plugin");
             verify(client).update(oldFakePlugin);
             assertTrue(oldFakePlugin.getSpec().getEnabled());
             assertEquals("0.0.2", oldFakePlugin.getSpec().getVersion());
             assertEquals(
-                tempDirectory.resolve("plugins").resolve("fake-plugin-0.0.2.jar").toString(),
-                oldFakePlugin.getMetadata().getAnnotations().get(PluginConst.PLUGIN_PATH));
+                    tempDirectory.resolve("plugins").resolve("fake-plugin-0.0.2.jar").toString(),
+                    oldFakePlugin.getMetadata().getAnnotations().get(PluginConst.PLUGIN_PATH));
         }
 
         @Test
         void shouldNotReloadIfLoadLocationIsNotReady() {
             var pluginName = "test-plugin";
 
-            var testPlugin = createPlugin(pluginName, plugin -> {
-            });
+            var testPlugin = createPlugin(pluginName, plugin -> {});
 
             when(client.get(Plugin.class, pluginName)).thenReturn(Mono.just(testPlugin));
 
-            pluginService.reload(pluginName)
-                .as(StepVerifier::create)
-                .consumeErrorWith(t -> {
-                    assertInstanceOf(IllegalStateException.class, t);
-                    assertEquals("Load location of plugin has not been populated.",
-                        t.getMessage());
-                })
-                .verify();
+            pluginService
+                    .reload(pluginName)
+                    .as(StepVerifier::create)
+                    .consumeErrorWith(
+                            t -> {
+                                assertInstanceOf(IllegalStateException.class, t);
+                                assertEquals(
+                                        "Load location of plugin has not been populated.",
+                                        t.getMessage());
+                            })
+                    .verify();
 
             verify(client).get(Plugin.class, pluginName);
         }
@@ -201,24 +190,28 @@ class PluginServiceImplTest {
         void shouldReloadIfLoadLocationReady() {
             var pluginName = "test-plugin";
 
-            var testPlugin = createPlugin(pluginName, plugin -> {
-                plugin.getStatus().setLoadLocation(fakePluginPath.toUri());
-            });
+            var testPlugin =
+                    createPlugin(
+                            pluginName,
+                            plugin -> {
+                                plugin.getStatus().setLoadLocation(fakePluginPath.toUri());
+                            });
 
             when(client.get(Plugin.class, pluginName)).thenReturn(Mono.just(testPlugin));
             when(client.update(testPlugin)).thenReturn(Mono.just(testPlugin));
 
-            pluginService.reload(pluginName)
-                .as(StepVerifier::create)
-                .expectNext(testPlugin)
-                .verifyComplete();
+            pluginService
+                    .reload(pluginName)
+                    .as(StepVerifier::create)
+                    .expectNext(testPlugin)
+                    .verifyComplete();
 
-            assertEquals(fakePluginPath.toString(),
-                testPlugin.getMetadata().getAnnotations().get(PluginConst.PLUGIN_PATH));
+            assertEquals(
+                    fakePluginPath.toString(),
+                    testPlugin.getMetadata().getAnnotations().get(PluginConst.PLUGIN_PATH));
             verify(client).get(Plugin.class, pluginName);
             verify(client).update(testPlugin);
         }
-
     }
 
     @Test
@@ -247,10 +240,11 @@ class PluginServiceImplTest {
         var result = Hashing.sha256().hashUnencodedChars(str).toString();
         assertThat(result.length()).isEqualTo(64);
 
-        pluginService.generateBundleVersion()
-            .as(StepVerifier::create)
-            .consumeNextWith(version -> assertThat(version).isEqualTo(result))
-            .verifyComplete();
+        pluginService
+                .generateBundleVersion()
+                .as(StepVerifier::create)
+                .consumeNextWith(version -> assertThat(version).isEqualTo(result))
+                .verifyComplete();
 
         var plugin4 = mock(PluginWrapper.class);
         var descriptor4 = mock(PluginDescriptor.class);
@@ -260,10 +254,11 @@ class PluginServiceImplTest {
         var str2 = "fake-1:1.0.0fake-2:2.0.0fake-4:3.0.0";
         var result2 = Hashing.sha256().hashUnencodedChars(str2).toString();
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin4));
-        pluginService.generateBundleVersion()
-            .as(StepVerifier::create)
-            .consumeNextWith(version -> assertThat(version).isEqualTo(result2))
-            .verifyComplete();
+        pluginService
+                .generateBundleVersion()
+                .as(StepVerifier::create)
+                .consumeNextWith(version -> assertThat(version).isEqualTo(result2))
+                .verifyComplete();
 
         assertThat(result).isNotEqualTo(result2);
     }
@@ -273,10 +268,11 @@ class PluginServiceImplTest {
         var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         pluginService.setClock(clock);
         when(pluginManager.isDevelopment()).thenReturn(true);
-        pluginService.generateBundleVersion()
-            .as(StepVerifier::create)
-            .expectNext(String.valueOf(clock.instant().toEpochMilli()))
-            .verifyComplete();
+        pluginService
+                .generateBundleVersion()
+                .as(StepVerifier::create)
+                .expectNext(String.valueOf(clock.instant().toEpochMilli()))
+                .verifyComplete();
 
         verify(pluginManager, never()).startedPlugins();
     }
@@ -289,10 +285,11 @@ class PluginServiceImplTest {
         when(plugin2.getPluginId()).thenReturn("plugin-2");
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin1, plugin2));
 
-        pluginService.getStartedPluginNames()
-            .as(StepVerifier::create)
-            .expectNext("plugin-1", "plugin-2")
-            .verifyComplete();
+        pluginService
+                .getStartedPluginNames()
+                .as(StepVerifier::create)
+                .expectNext("plugin-1", "plugin-2")
+                .verifyComplete();
     }
 
     @Nested
@@ -300,44 +297,58 @@ class PluginServiceImplTest {
 
         @Test
         void shouldEnablePluginIfPluginWasNotStarted() {
-            var plugin = createPlugin("fake-plugin", p -> {
-                p.getSpec().setEnabled(false);
-                p.statusNonNull().setPhase(Plugin.Phase.RESOLVED);
-            });
+            var plugin =
+                    createPlugin(
+                            "fake-plugin",
+                            p -> {
+                                p.getSpec().setEnabled(false);
+                                p.statusNonNull().setPhase(Plugin.Phase.RESOLVED);
+                            });
 
-            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
-                .thenReturn(Mono.fromSupplier(() -> {
-                    plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
-                    return plugin;
-                }));
+            when(client.get(Plugin.class, "fake-plugin"))
+                    .thenReturn(Mono.just(plugin))
+                    .thenReturn(
+                            Mono.fromSupplier(
+                                    () -> {
+                                        plugin.statusNonNull().setPhase(Plugin.Phase.STARTED);
+                                        return plugin;
+                                    }));
             when(client.update(plugin)).thenReturn(Mono.just(plugin));
 
-            pluginService.changeState("fake-plugin", true, false)
-                .as(StepVerifier::create)
-                .expectNext(plugin)
-                .verifyComplete();
+            pluginService
+                    .changeState("fake-plugin", true, false)
+                    .as(StepVerifier::create)
+                    .expectNext(plugin)
+                    .verifyComplete();
 
             assertTrue(plugin.getSpec().getEnabled());
         }
 
         @Test
         void shouldDisablePluginIfAlreadyStarted() {
-            var plugin = createPlugin("fake-plugin", p -> {
-                p.getSpec().setEnabled(true);
-                p.statusNonNull().setPhase(Plugin.Phase.STARTED);
-            });
+            var plugin =
+                    createPlugin(
+                            "fake-plugin",
+                            p -> {
+                                p.getSpec().setEnabled(true);
+                                p.statusNonNull().setPhase(Plugin.Phase.STARTED);
+                            });
 
-            when(client.get(Plugin.class, "fake-plugin")).thenReturn(Mono.just(plugin))
-                .thenReturn(Mono.fromSupplier(() -> {
-                    plugin.getStatus().setPhase(Plugin.Phase.STOPPED);
-                    return plugin;
-                }));
+            when(client.get(Plugin.class, "fake-plugin"))
+                    .thenReturn(Mono.just(plugin))
+                    .thenReturn(
+                            Mono.fromSupplier(
+                                    () -> {
+                                        plugin.getStatus().setPhase(Plugin.Phase.STOPPED);
+                                        return plugin;
+                                    }));
             when(client.update(plugin)).thenReturn(Mono.just(plugin));
 
-            pluginService.changeState("fake-plugin", false, false)
-                .as(StepVerifier::create)
-                .expectNext(plugin)
-                .verifyComplete();
+            pluginService
+                    .changeState("fake-plugin", false, false)
+                    .as(StepVerifier::create)
+                    .expectNext(plugin)
+                    .verifyComplete();
             assertFalse(plugin.getSpec().getEnabled());
         }
     }
@@ -347,8 +358,7 @@ class PluginServiceImplTest {
 
         PluginServiceImpl.BundleCache cache;
 
-        @TempDir
-        Path tempDir;
+        @TempDir Path tempDir;
 
         @BeforeEach
         void setUp() {
@@ -359,21 +369,24 @@ class PluginServiceImplTest {
         @Test
         void shouldComputeBundleFileIfAbsent() {
             doReturn(Mono.just("different-version")).when(pluginService).generateBundleVersion();
-            var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap("fake-content".getBytes(
-                UTF_8)));
+            var fakeContent =
+                    Mono.<DataBuffer>just(sharedInstance.wrap("fake-content".getBytes(UTF_8)));
             cache.computeIfAbsent("fake-version", fakeContent)
-                .as(StepVerifier::create)
-                .assertNext(resource -> {
-                    try {
-                        assertEquals(tempDir.resolve("different-version.js"),
-                            resource.getFile().toPath());
-                        assertEquals("different-version.js", resource.getFilename());
-                        assertEquals("fake-content", resource.getContentAsString(UTF_8));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .verifyComplete();
+                    .as(StepVerifier::create)
+                    .assertNext(
+                            resource -> {
+                                try {
+                                    assertEquals(
+                                            tempDir.resolve("different-version.js"),
+                                            resource.getFile().toPath());
+                                    assertEquals("different-version.js", resource.getFilename());
+                                    assertEquals(
+                                            "fake-content", resource.getContentAsString(UTF_8));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .verifyComplete();
 
             try {
                 FileSystemUtils.deleteRecursively(tempDir);
@@ -381,101 +394,117 @@ class PluginServiceImplTest {
                 throw new RuntimeException(e);
             }
             cache.computeIfAbsent("fake-version", fakeContent)
-                .as(StepVerifier::create)
-                .assertNext(resource -> {
-                    try {
-                        assertThat(Files.exists(tempDir)).isTrue();
-                        assertEquals(tempDir.resolve("different-version.js"),
-                            resource.getFile().toPath());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .verifyComplete();
+                    .as(StepVerifier::create)
+                    .assertNext(
+                            resource -> {
+                                try {
+                                    assertThat(Files.exists(tempDir)).isTrue();
+                                    assertEquals(
+                                            tempDir.resolve("different-version.js"),
+                                            resource.getFile().toPath());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .verifyComplete();
         }
 
         @Test
         void shouldNotComputeBundleFileIfPresentAndVersionIsMatch() {
             shouldComputeBundleFileIfAbsent();
 
-            var fakeContent = Mono.<DataBuffer>just(
-                sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
+            var fakeContent =
+                    Mono.<DataBuffer>just(
+                            sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
 
             cache.computeIfAbsent("different-version", fakeContent)
-                .as(StepVerifier::create)
-                .assertNext(resource -> {
-                    try {
-                        assertEquals("different-version.js", resource.getFilename());
-                        // The content won't be changed if the version is matched.
-                        assertEquals("fake-content", resource.getContentAsString(UTF_8));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .verifyComplete();
+                    .as(StepVerifier::create)
+                    .assertNext(
+                            resource -> {
+                                try {
+                                    assertEquals("different-version.js", resource.getFilename());
+                                    // The content won't be changed if the version is matched.
+                                    assertEquals(
+                                            "fake-content", resource.getContentAsString(UTF_8));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .verifyComplete();
         }
 
         @Test
         void shouldComputeBundleFileIfPresentButVersionMismatch() {
             shouldComputeBundleFileIfAbsent();
 
-            var fakeContent = Mono.<DataBuffer>just(
-                sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
+            var fakeContent =
+                    Mono.<DataBuffer>just(
+                            sharedInstance.wrap("another-fake-content".getBytes(UTF_8)));
 
             doReturn(Mono.just("updated-version")).when(pluginService).generateBundleVersion();
 
             cache.computeIfAbsent("mismatch-version", fakeContent)
-                .as(StepVerifier::create)
-                .assertNext(resource -> {
-                    try {
-                        assertTrue(Files.notExists(tempDir.resolve("different-version.js")));
-                        assertEquals("updated-version.js", resource.getFilename());
-                        assertEquals("another-fake-content", resource.getContentAsString(UTF_8));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .verifyComplete();
+                    .as(StepVerifier::create)
+                    .assertNext(
+                            resource -> {
+                                try {
+                                    assertTrue(
+                                            Files.notExists(
+                                                    tempDir.resolve("different-version.js")));
+                                    assertEquals("updated-version.js", resource.getFilename());
+                                    assertEquals(
+                                            "another-fake-content",
+                                            resource.getContentAsString(UTF_8));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .verifyComplete();
         }
 
         @RepeatedTest(10)
         void concurrentComputeBundleFileIfAbsent() {
-            lenient().doReturn(Mono.just("different-version"))
-                .when(pluginService)
-                .generateBundleVersion();
+            lenient()
+                    .doReturn(Mono.just("different-version"))
+                    .when(pluginService)
+                    .generateBundleVersion();
 
             var executorService = Executors.newCachedThreadPool();
 
             var probes = new ArrayList<PublisherProbe<DataBuffer>>();
-            List<? extends Future<?>> futures = IntStream.range(0, 10)
-                .mapToObj(i -> {
-                    var fakeContent = Mono.<DataBuffer>just(sharedInstance.wrap(
-                        ("fake-content-" + i).getBytes(UTF_8)
-                    ));
-                    var probe = PublisherProbe.of(fakeContent);
-                    probes.add(probe);
-                    return executorService.submit(
-                        () -> {
-                            cache.computeIfAbsent("fake-version", probe.mono())
-                                .as(StepVerifier::create)
-                                .expectNextCount(1)
-                                .verifyComplete();
-                        });
-                })
-                .toList();
+            List<? extends Future<?>> futures =
+                    IntStream.range(0, 10)
+                            .mapToObj(
+                                    i -> {
+                                        var fakeContent =
+                                                Mono.<DataBuffer>just(
+                                                        sharedInstance.wrap(
+                                                                ("fake-content-" + i)
+                                                                        .getBytes(UTF_8)));
+                                        var probe = PublisherProbe.of(fakeContent);
+                                        probes.add(probe);
+                                        return executorService.submit(
+                                                () -> {
+                                                    cache.computeIfAbsent(
+                                                                    "fake-version", probe.mono())
+                                                            .as(StepVerifier::create)
+                                                            .expectNextCount(1)
+                                                            .verifyComplete();
+                                                });
+                                    })
+                            .toList();
             executorService.shutdown();
-            futures.forEach(future -> {
-                try {
-                    future.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            futures.forEach(
+                    future -> {
+                        try {
+                            future.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
             // ensure only one probe was subscribed
-            var subscribedCount = probes.stream()
-                .filter(PublisherProbe::wasSubscribed)
-                .count();
+            var subscribedCount = probes.stream().filter(PublisherProbe::wasSubscribed).count();
             assertEquals(1, subscribedCount);
         }
     }

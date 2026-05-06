@@ -23,5 +23,4 @@ public class HaloDocumentDeleteRequestEvent extends ApplicationEvent {
     public Iterable<String> getDocIds() {
         return docIds;
     }
-
 }

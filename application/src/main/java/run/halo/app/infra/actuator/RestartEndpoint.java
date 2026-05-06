@@ -28,14 +28,15 @@ class RestartEndpoint implements ApplicationListener<ApplicationStartedEvent> {
 
     @WriteOperation
     public Mono<Map<String, String>> restart() {
-        return Mono.fromSupplier(() -> {
-            var threadGroup = new ThreadGroup("RestartGroup");
-            var thread = new Thread(threadGroup, this::doRestart, "restartMain");
-            thread.setDaemon(false);
-            thread.setContextClassLoader(Application.class.getClassLoader());
-            thread.start();
-            return Map.of("message", "Restarting");
-        });
+        return Mono.fromSupplier(
+                () -> {
+                    var threadGroup = new ThreadGroup("RestartGroup");
+                    var thread = new Thread(threadGroup, this::doRestart, "restartMain");
+                    thread.setDaemon(false);
+                    thread.setContextClassLoader(Application.class.getClassLoader());
+                    thread.start();
+                    return Map.of("message", "Restarting");
+                });
     }
 
     private synchronized void doRestart() {

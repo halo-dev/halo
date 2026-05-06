@@ -30,14 +30,11 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 @ExtendWith(MockitoExtension.class)
 class SinglePageFinderImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private SinglePageConversionService singlePageConversionService;
+    @Mock private SinglePageConversionService singlePageConversionService;
 
-    @InjectMocks
-    private SinglePageFinderImpl singlePageFinder;
+    @InjectMocks private SinglePageFinderImpl singlePageFinder;
 
     @Test
     void getByName() {
@@ -54,16 +51,16 @@ class SinglePageFinderImplTest {
         singlePage.getSpec().setDeleted(false);
         singlePage.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
         singlePage.setStatus(new SinglePage.SinglePageStatus());
-        when(client.get(eq(SinglePage.class), eq(fakePageName)))
-            .thenReturn(Mono.just(singlePage));
+        when(client.get(eq(SinglePage.class), eq(fakePageName))).thenReturn(Mono.just(singlePage));
 
         when(singlePageConversionService.convertToVo(eq(singlePage)))
-            .thenReturn(Mono.just(mock(SinglePageVo.class)));
+                .thenReturn(Mono.just(mock(SinglePageVo.class)));
 
-        singlePageFinder.getByName(fakePageName)
-            .as(StepVerifier::create)
-            .consumeNextWith(page -> assertThat(page).isNotNull())
-            .verifyComplete();
+        singlePageFinder
+                .getByName(fakePageName)
+                .as(StepVerifier::create)
+                .consumeNextWith(page -> assertThat(page).isNotNull())
+                .verifyComplete();
 
         verify(client).get(SinglePage.class, fakePageName);
     }

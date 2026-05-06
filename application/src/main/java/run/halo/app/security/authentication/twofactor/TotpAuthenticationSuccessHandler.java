@@ -16,8 +16,8 @@ public class TotpAuthenticationSuccessHandler implements ServerAuthenticationSuc
 
     private final ServerAuthenticationSuccessHandler successHandler;
 
-    public TotpAuthenticationSuccessHandler(LoginHandlerEnhancer loginEnhancer,
-        ServerRequestCache serverRequestCache) {
+    public TotpAuthenticationSuccessHandler(
+            LoginHandlerEnhancer loginEnhancer, ServerRequestCache serverRequestCache) {
         this.loginEnhancer = loginEnhancer;
         var successHandler = new RedirectServerAuthenticationSuccessHandler("/uc");
         successHandler.setRequestCache(serverRequestCache);
@@ -25,9 +25,10 @@ public class TotpAuthenticationSuccessHandler implements ServerAuthenticationSuc
     }
 
     @Override
-    public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
-        Authentication authentication) {
-        return loginEnhancer.onLoginSuccess(webFilterExchange.getExchange(), authentication)
-            .then(successHandler.onAuthenticationSuccess(webFilterExchange, authentication));
+    public Mono<Void> onAuthenticationSuccess(
+            WebFilterExchange webFilterExchange, Authentication authentication) {
+        return loginEnhancer
+                .onLoginSuccess(webFilterExchange.getExchange(), authentication)
+                .then(successHandler.onAuthenticationSuccess(webFilterExchange, authentication));
     }
 }

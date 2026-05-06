@@ -19,12 +19,15 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "NotifierDescriptor",
-    plural = "notifierDescriptors", singular = "notifierDescriptor")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "NotifierDescriptor",
+        plural = "notifierDescriptors",
+        singular = "notifierDescriptor")
 public class NotifierDescriptor extends AbstractExtension {
 
-    @Schema
-    private Spec spec;
+    @Schema private Spec spec;
 
     @Data
     @Schema(name = "NotifierDescriptorSpec")

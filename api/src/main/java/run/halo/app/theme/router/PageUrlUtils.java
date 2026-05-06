@@ -29,7 +29,7 @@ public class PageUrlUtils {
         String[] split = StringUtils.split(path, "/");
         if (split.length > 1) {
             return PAGE_PART.equals(split[split.length - 2])
-                && NumberUtils.isDigits(split[split.length - 1]);
+                    && NumberUtils.isDigits(split[split.length - 1]);
         }
         return false;
     }

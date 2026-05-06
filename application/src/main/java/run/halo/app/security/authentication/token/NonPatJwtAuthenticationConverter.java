@@ -14,9 +14,8 @@ import reactor.core.publisher.Mono;
  * @param delegate the delegate converter
  */
 @Slf4j
-record NonPatJwtAuthenticationConverter(
-    Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate
-) implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+record NonPatJwtAuthenticationConverter(Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate)
+        implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
@@ -27,5 +26,4 @@ record NonPatJwtAuthenticationConverter(
         }
         return delegate.convert(jwt);
     }
-
 }

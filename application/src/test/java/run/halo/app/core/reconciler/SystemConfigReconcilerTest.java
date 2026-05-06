@@ -32,14 +32,11 @@ import run.halo.app.infra.SystemSetting;
 @ExtendWith(MockitoExtension.class)
 class SystemConfigReconcilerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+    @Mock ApplicationEventPublisher eventPublisher;
 
-    @InjectMocks
-    SystemConfigReconciler reconciler;
+    @InjectMocks SystemConfigReconciler reconciler;
 
     ConfigMap systemConfigMap;
     ConfigMap defaultConfigMap;
@@ -54,7 +51,7 @@ class SystemConfigReconcilerTest {
     void reconcileShouldDoNothingWhenConfigMapNotFound() {
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         reconciler.reconcile(request);
 
@@ -67,7 +64,7 @@ class SystemConfigReconcilerTest {
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         systemConfigMap.getMetadata().setDeletionTimestamp(Instant.now());
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
 
         reconciler.reconcile(request);
 
@@ -88,24 +85,28 @@ class SystemConfigReconcilerTest {
         systemConfigMap.setData(data);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.of(defaultConfigMap));
+                .thenReturn(Optional.of(defaultConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
 
         // Verify checksum annotation was added
-        verify(client, times(1)).update(argThat(configMap -> {
-            var annotations = configMap.getMetadata().getAnnotations();
-            return annotations != null
-                && annotations.containsKey(Constant.CHECKSUM_CONFIG_ANNO)
-                && annotations.containsKey("halo.run/data-snapshot");
-        }));
+        verify(client, times(1))
+                .update(
+                        argThat(
+                                configMap -> {
+                                    var annotations = configMap.getMetadata().getAnnotations();
+                                    return annotations != null
+                                            && annotations.containsKey(
+                                                    Constant.CHECKSUM_CONFIG_ANNO)
+                                            && annotations.containsKey("halo.run/data-snapshot");
+                                }));
 
         // Verify event was published
         ArgumentCaptor<SystemConfigChangedEvent> eventCaptor =
-            ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
+                ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
         verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
 
         var event = eventCaptor.getValue();
@@ -118,15 +119,19 @@ class SystemConfigReconcilerTest {
         systemConfigMap.setData(data);
 
         // Pre-set checksum to match current data - sha256 of data.toString()
-        var existingChecksum = com.google.common.hash.Hashing.sha256()
-            .hashString(systemConfigMap.getData().toString(),
-                java.nio.charset.StandardCharsets.UTF_8)
-            .toString();
-        systemConfigMap.getMetadata().getAnnotations()
-            .put(Constant.CHECKSUM_CONFIG_ANNO, existingChecksum);
+        var existingChecksum =
+                com.google.common.hash.Hashing.sha256()
+                        .hashString(
+                                systemConfigMap.getData().toString(),
+                                java.nio.charset.StandardCharsets.UTF_8)
+                        .toString();
+        systemConfigMap
+                .getMetadata()
+                .getAnnotations()
+                .put(Constant.CHECKSUM_CONFIG_ANNO, existingChecksum);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
@@ -140,9 +145,9 @@ class SystemConfigReconcilerTest {
         systemConfigMap.setData(null);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.of(defaultConfigMap));
+                .thenReturn(Optional.of(defaultConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
@@ -161,15 +166,15 @@ class SystemConfigReconcilerTest {
         defaultConfigMap.setData(defaultData);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.of(defaultConfigMap));
+                .thenReturn(Optional.of(defaultConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
 
         ArgumentCaptor<SystemConfigChangedEvent> eventCaptor =
-            ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
+                ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
         verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
 
         var event = eventCaptor.getValue();
@@ -182,9 +187,9 @@ class SystemConfigReconcilerTest {
         systemConfigMap.setData(Map.of());
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.of(defaultConfigMap));
+                .thenReturn(Optional.of(defaultConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
@@ -200,22 +205,24 @@ class SystemConfigReconcilerTest {
 
         // Set initial data and snapshot
         systemConfigMap.setData(oldData);
-        systemConfigMap.getMetadata().getAnnotations()
-            .put("halo.run/data-snapshot", "{\"key1\":\"old-value\"}");
+        systemConfigMap
+                .getMetadata()
+                .getAnnotations()
+                .put("halo.run/data-snapshot", "{\"key1\":\"old-value\"}");
 
         // Update to new data
         systemConfigMap.setData(newData);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.of(defaultConfigMap));
+                .thenReturn(Optional.of(defaultConfigMap));
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
 
         ArgumentCaptor<SystemConfigChangedEvent> eventCaptor =
-            ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
+                ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
         verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
 
         var event = eventCaptor.getValue();
@@ -229,9 +236,9 @@ class SystemConfigReconcilerTest {
         systemConfigMap.setData(data);
 
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Optional.of(systemConfigMap));
+                .thenReturn(Optional.of(systemConfigMap));
         when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         var request = new Reconciler.Request(SystemSetting.SYSTEM_CONFIG);
         reconciler.reconcile(request);
@@ -239,7 +246,7 @@ class SystemConfigReconcilerTest {
         verify(client, times(1)).update(any(ConfigMap.class));
 
         ArgumentCaptor<SystemConfigChangedEvent> eventCaptor =
-            ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
+                ArgumentCaptor.forClass(SystemConfigChangedEvent.class);
         verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
 
         var event = eventCaptor.getValue();

@@ -80,33 +80,36 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
 
     @Override
     public Set<String> exists(String labelKey) {
-        return index.subMap(
-                new LabelEntry(labelKey, null), true,
-                new LabelEntry(labelKey, Character.MAX_VALUE + ""), true
-            ).values().stream()
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        return index
+                .subMap(
+                        new LabelEntry(labelKey, null), true,
+                        new LabelEntry(labelKey, Character.MAX_VALUE + ""), true)
+                .values()
+                .stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<String> equal(String labelKey, String labelValue) {
         return Optional.ofNullable(index.get(new LabelEntry(labelKey, labelValue)))
-            .orElse(Set.of());
+                .orElse(Set.of());
     }
 
     @Override
     public Set<String> notEqual(String labelKey, String labelValue) {
         // collect all primary keys
         var labelEntry = new LabelEntry(labelKey, labelValue);
-        return index.subMap(
-                new LabelEntry(labelKey, null), true,
-                new LabelEntry(labelKey, Character.MAX_VALUE + ""), true
-            )
-            .entrySet().stream()
-            .filter(entry -> !Objects.equals(entry.getKey(), labelEntry))
-            .map(Map.Entry::getValue)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        return index
+                .subMap(
+                        new LabelEntry(labelKey, null), true,
+                        new LabelEntry(labelKey, Character.MAX_VALUE + ""), true)
+                .entrySet()
+                .stream()
+                .filter(entry -> !Objects.equals(entry.getKey(), labelEntry))
+                .map(Map.Entry::getValue)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -115,12 +118,12 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
             return Set.of();
         }
         return labelValues.stream()
-            .distinct()
-            .map(labelValue -> new LabelEntry(labelKey, labelValue))
-            .map(index::get)
-            .filter(Objects::nonNull)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+                .distinct()
+                .map(labelValue -> new LabelEntry(labelKey, labelValue))
+                .map(index::get)
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -128,22 +131,21 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
         if (CollectionUtils.isEmpty(labelValues)) {
             return Set.of();
         }
-        var valueSet =
-            labelValues instanceof Set<String> set ? set : Set.copyOf(labelValues);
-        return index.subMap(
-                new LabelEntry(labelKey, null), true,
-                new LabelEntry(labelKey, Character.MAX_VALUE + ""), true
-            )
-            .entrySet()
-            .stream()
-            .filter(entry -> !valueSet.contains(entry.getKey().labelValue()))
-            .map(Map.Entry::getValue)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        var valueSet = labelValues instanceof Set<String> set ? set : Set.copyOf(labelValues);
+        return index
+                .subMap(
+                        new LabelEntry(labelKey, null), true,
+                        new LabelEntry(labelKey, Character.MAX_VALUE + ""), true)
+                .entrySet()
+                .stream()
+                .filter(entry -> !valueSet.contains(entry.getKey().labelValue()))
+                .map(Map.Entry::getValue)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     record LabelEntry(String labelKey, @Nullable String labelValue)
-        implements Comparable<LabelEntry> {
+            implements Comparable<LabelEntry> {
 
         public LabelEntry {
             Objects.requireNonNull(labelKey, "labelKey must not be null");
@@ -156,7 +158,7 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
                 return compare;
             }
             return Comparator.nullsFirst(Comparator.<String>naturalOrder())
-                .compare(this.labelValue, o.labelValue);
+                    .compare(this.labelValue, o.labelValue);
         }
     }
 
@@ -177,12 +179,17 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
 
         @Override
         public void prepare() {
-            this.previousLabels = Optional.ofNullable(invertedIndex.get(primaryKey))
-                .map(labelEntries -> labelEntries.stream()
-                    .filter(entry -> entry.labelValue() != null)
-                    .collect(toUnmodifiableMap(LabelEntry::labelKey, LabelEntry::labelValue))
-                )
-                .orElse(null);
+            this.previousLabels =
+                    Optional.ofNullable(invertedIndex.get(primaryKey))
+                            .map(
+                                    labelEntries ->
+                                            labelEntries.stream()
+                                                    .filter(entry -> entry.labelValue() != null)
+                                                    .collect(
+                                                            toUnmodifiableMap(
+                                                                    LabelEntry::labelKey,
+                                                                    LabelEntry::labelValue)))
+                            .orElse(null);
         }
 
         @Override
@@ -204,7 +211,6 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
             removeLabels(primaryKey, labels);
             addLabels(primaryKey, previousLabels);
         }
-
     }
 
     class DeleteTransactionalOperation implements TransactionalOperation {
@@ -221,12 +227,17 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
 
         @Override
         public void prepare() {
-            this.previousLabels = Optional.ofNullable(invertedIndex.get(primaryKey))
-                .map(labelEntries -> labelEntries.stream()
-                    .filter(entry -> entry.labelValue() != null)
-                    .collect(toUnmodifiableMap(LabelEntry::labelKey, LabelEntry::labelValue))
-                )
-                .orElse(null);
+            this.previousLabels =
+                    Optional.ofNullable(invertedIndex.get(primaryKey))
+                            .map(
+                                    labelEntries ->
+                                            labelEntries.stream()
+                                                    .filter(entry -> entry.labelValue() != null)
+                                                    .collect(
+                                                            toUnmodifiableMap(
+                                                                    LabelEntry::labelKey,
+                                                                    LabelEntry::labelValue)))
+                            .orElse(null);
         }
 
         @Override
@@ -247,23 +258,25 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
         }
     }
 
-
     private void removeLabels(String primaryKey, Map<String, String> labels) {
         if (CollectionUtils.isEmpty(labels)) {
             emptyLabelsSet.remove(primaryKey);
             return;
         }
         invertedIndex.remove(primaryKey);
-        labels.forEach((labelKey, labelValue) -> {
-            var labelEntry = new LabelEntry(labelKey, labelValue);
-            index.computeIfPresent(labelEntry, (key, primaryKeys) -> {
-                primaryKeys.remove(primaryKey);
-                if (primaryKeys.isEmpty()) {
-                    return null;
-                }
-                return primaryKeys;
-            });
-        });
+        labels.forEach(
+                (labelKey, labelValue) -> {
+                    var labelEntry = new LabelEntry(labelKey, labelValue);
+                    index.computeIfPresent(
+                            labelEntry,
+                            (key, primaryKeys) -> {
+                                primaryKeys.remove(primaryKey);
+                                if (primaryKeys.isEmpty()) {
+                                    return null;
+                                }
+                                return primaryKeys;
+                            });
+                });
     }
 
     private void addLabels(String primaryKey, Map<String, String> labels) {
@@ -272,22 +285,27 @@ class LabelIndex<E extends Extension> implements LabelIndexQuery, Index<E, Strin
             return;
         }
         emptyLabelsSet.remove(primaryKey);
-        labels.forEach((labelKey, labelValue) -> {
-            var labelEntry = new LabelEntry(labelKey, labelValue);
-            index.compute(labelEntry, (key, primaryKeys) -> {
-                if (primaryKeys == null) {
-                    primaryKeys = ConcurrentHashMap.newKeySet();
-                }
-                primaryKeys.add(primaryKey);
-                return primaryKeys;
-            });
-            invertedIndex.compute(primaryKey, (pk, labelEntries) -> {
-                if (labelEntries == null) {
-                    labelEntries = ConcurrentHashMap.newKeySet();
-                }
-                labelEntries.add(labelEntry);
-                return labelEntries;
-            });
-        });
+        labels.forEach(
+                (labelKey, labelValue) -> {
+                    var labelEntry = new LabelEntry(labelKey, labelValue);
+                    index.compute(
+                            labelEntry,
+                            (key, primaryKeys) -> {
+                                if (primaryKeys == null) {
+                                    primaryKeys = ConcurrentHashMap.newKeySet();
+                                }
+                                primaryKeys.add(primaryKey);
+                                return primaryKeys;
+                            });
+                    invertedIndex.compute(
+                            primaryKey,
+                            (pk, labelEntries) -> {
+                                if (labelEntries == null) {
+                                    labelEntries = ConcurrentHashMap.newKeySet();
+                                }
+                                labelEntries.add(labelEntry);
+                                return labelEntries;
+                            });
+                });
     }
 }

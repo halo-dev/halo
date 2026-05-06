@@ -13,10 +13,8 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 abstract class AbstractValueIndexSpecBuilder<
-    E extends Extension,
-    K extends Comparable<K>,
-    B extends IndexSpecBuilder<E, K, B>
-    > implements IndexSpecBuilder<E, K, B> {
+                E extends Extension, K extends Comparable<K>, B extends IndexSpecBuilder<E, K, B>>
+        implements IndexSpecBuilder<E, K, B> {
 
     protected final String name;
 
@@ -42,5 +40,4 @@ abstract class AbstractValueIndexSpecBuilder<
         this.nullable = nullable;
         return (B) this;
     }
-
 }

@@ -29,8 +29,9 @@ public class FieldSelectorConverter implements Converter<SelectorCriteria, Condi
                 Set<String> valueArr = defaultIfNull(criteria.values(), Set.of());
                 return Queries.in(key, valueArr);
             }
-            default -> throw new IllegalArgumentException(
-                "Unsupported operator: " + criteria.operator());
+            default ->
+                    throw new IllegalArgumentException(
+                            "Unsupported operator: " + criteria.operator());
         }
     }
 

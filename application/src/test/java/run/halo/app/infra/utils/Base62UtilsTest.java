@@ -17,14 +17,16 @@ class Base62UtilsTest {
 
     @Test
     void encode() {
-        getNaiveTestSet().forEach(
-            (str, encoded) -> assertThat(Base62Utils.encode(str)).isEqualTo(encoded));
+        getNaiveTestSet()
+                .forEach((str, encoded) -> assertThat(Base62Utils.encode(str)).isEqualTo(encoded));
     }
 
     @Test
     void decodeToString() {
-        getNaiveTestSet().forEach(
-            (str, encoded) -> assertThat(Base62Utils.decodeToString(encoded)).isEqualTo(str));
+        getNaiveTestSet()
+                .forEach(
+                        (str, encoded) ->
+                                assertThat(Base62Utils.decodeToString(encoded)).isEqualTo(str));
     }
 
     public static Map<String, String> getNaiveTestSet() {
@@ -37,10 +39,12 @@ class Base62UtilsTest {
         testSet.put("Just a test", "7G0iTmJjQFG2t6K");
         testSet.put("!!!!!!!!!!!!!!!!!", "4A7f43EVXQoS6Am897ZKbAn");
         testSet.put("0123456789", "18XU2xYejWO9d3");
-        testSet.put("The quick brown fox jumps over the lazy dog",
-            "83UM8dOjD4xrzASgmqLOXTgTagvV1jPegUJ39mcYnwHwTlzpdfKXvpp4RL");
-        testSet.put("Sphinx of black quartz, judge my vow",
-            "1Ul5yQGNM8YFBp3sz19dYj1kTp95OW7jI8pTcTP5JhYjIaFmx");
+        testSet.put(
+                "The quick brown fox jumps over the lazy dog",
+                "83UM8dOjD4xrzASgmqLOXTgTagvV1jPegUJ39mcYnwHwTlzpdfKXvpp4RL");
+        testSet.put(
+                "Sphinx of black quartz, judge my vow",
+                "1Ul5yQGNM8YFBp3sz19dYj1kTp95OW7jI8pTcTP5JhYjIaFmx");
 
         return testSet;
     }

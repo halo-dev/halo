@@ -19,11 +19,9 @@ import run.halo.app.theme.finders.CategoryFinder;
  */
 class CategoriesRouteFactoryTest extends RouteFactoryTestSuite {
 
-    @Mock
-    private CategoryFinder categoryFinder;
+    @Mock private CategoryFinder categoryFinder;
 
-    @InjectMocks
-    private CategoriesRouteFactory categoriesRouteFactory;
+    @InjectMocks private CategoriesRouteFactory categoriesRouteFactory;
 
     @Test
     void create() {
@@ -31,11 +29,7 @@ class CategoriesRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = categoriesRouteFactory.create(prefix);
         WebTestClient webClient = getWebTestClient(routerFunction);
 
-        when(categoryFinder.listAsTree())
-            .thenReturn(Flux.empty());
-        webClient.get()
-            .uri(prefix)
-            .exchange()
-            .expectStatus().isOk();
+        when(categoryFinder.listAsTree()).thenReturn(Flux.empty());
+        webClient.get().uri(prefix).exchange().expectStatus().isOk();
     }
 }

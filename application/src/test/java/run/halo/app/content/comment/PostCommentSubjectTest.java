@@ -29,27 +29,23 @@ import run.halo.app.extension.Ref;
  */
 @ExtendWith(MockitoExtension.class)
 class PostCommentSubjectTest {
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private PostCommentSubject postCommentSubject;
+    @InjectMocks private PostCommentSubject postCommentSubject;
 
     @Test
     void get() {
-        when(client.fetch(eq(Post.class), any()))
-            .thenReturn(Mono.empty());
+        when(client.fetch(eq(Post.class), any())).thenReturn(Mono.empty());
         when(client.fetch(eq(Post.class), eq("fake-post")))
-            .thenReturn(Mono.just(TestPost.postV1()));
+                .thenReturn(Mono.just(TestPost.postV1()));
 
-        postCommentSubject.get("fake-post")
-            .as(StepVerifier::create)
-            .expectNext(TestPost.postV1())
-            .verifyComplete();
+        postCommentSubject
+                .get("fake-post")
+                .as(StepVerifier::create)
+                .expectNext(TestPost.postV1())
+                .verifyComplete();
 
-        postCommentSubject.get("fake-post2")
-            .as(StepVerifier::create)
-            .verifyComplete();
+        postCommentSubject.get("fake-post2").as(StepVerifier::create).verifyComplete();
     }
 
     @Test

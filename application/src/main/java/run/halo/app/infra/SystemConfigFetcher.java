@@ -47,5 +47,4 @@ public interface SystemConfigFetcher {
      * @return latest configMap from {@link ReactiveExtensionClient} without any cache.
      */
     Optional<ConfigMap> getConfigMapBlocking();
-
 }

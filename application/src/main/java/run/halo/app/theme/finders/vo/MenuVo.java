@@ -28,8 +28,7 @@ public class MenuVo implements ExtensionVoOperator {
 
     Menu.Spec spec;
 
-    @With
-    List<MenuItemVo> menuItems;
+    @With List<MenuItemVo> menuItems;
 
     /**
      * Convert {@link Menu} to {@link MenuVo}.
@@ -39,10 +38,10 @@ public class MenuVo implements ExtensionVoOperator {
      */
     public static MenuVo from(Menu menu) {
         return builder()
-            .metadata(menu.getMetadata())
-            .spec(menu.getSpec())
-            .menuItems(List.of())
-            .build();
+                .metadata(menu.getMetadata())
+                .spec(menu.getSpec())
+                .menuItems(List.of())
+                .build();
     }
 
     public void print(StringBuilder buffer) {

@@ -24,8 +24,12 @@ import run.halo.app.infra.model.License;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "theme.halo.run", version = "v1alpha1", kind = Theme.KIND,
-    plural = "themes", singular = "theme")
+@GVK(
+        group = "theme.halo.run",
+        version = "v1alpha1",
+        kind = Theme.KIND,
+        plural = "themes",
+        singular = "theme")
 public class Theme extends AbstractExtension {
 
     public static final String KIND = "Theme";
@@ -71,9 +75,7 @@ public class Theme extends AbstractExtension {
 
         private List<License> license;
 
-        @Schema
-        private CustomTemplates customTemplates;
-
+        @Schema private CustomTemplates customTemplates;
     }
 
     @Data
@@ -141,5 +143,4 @@ public class Theme extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String file;
     }
-
 }

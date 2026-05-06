@@ -23,42 +23,46 @@ class YamlUnstructuredLoaderTest {
 
     @BeforeEach
     void setUp() {
-        String viewCategoriesRoleYaml = """
-            apiVersion: v1alpha1
-            kind: Fake
-            metadata:
-              name: test1
-            hello:
-              world: halo
-            """;
+        String viewCategoriesRoleYaml =
+                """
+                apiVersion: v1alpha1
+                kind: Fake
+                metadata:
+                  name: test1
+                hello:
+                  world: halo
+                """;
 
-        String multipleRoleYaml = """
-            apiVersion: v1alpha1
-            kind: Fake
-            metadata:
-              name: test2
-            hello:
-              world: haha
-            ---
-            apiVersion: v1alpha1
-            kind: Fake
-            metadata:
-              name: test2
-            hello:
-              world: bang
-            """;
+        String multipleRoleYaml =
+                """
+                apiVersion: v1alpha1
+                kind: Fake
+                metadata:
+                  name: test2
+                hello:
+                  world: haha
+                ---
+                apiVersion: v1alpha1
+                kind: Fake
+                metadata:
+                  name: test2
+                hello:
+                  world: bang
+                """;
 
-        notSpecYaml = """
-            server:
-              port: 8090
-            spring:
-              jackson:
-                date-format: yyyy-MM-dd HH:mm:ss
-            """;
+        notSpecYaml =
+                """
+                server:
+                  port: 8090
+                spring:
+                  jackson:
+                    date-format: yyyy-MM-dd HH:mm:ss
+                """;
 
-        yamlResources = Stream.of(viewCategoriesRoleYaml, multipleRoleYaml, notSpecYaml)
-            .map(InMemoryResource::new)
-            .toList();
+        yamlResources =
+                Stream.of(viewCategoriesRoleYaml, multipleRoleYaml, notSpecYaml)
+                        .map(InMemoryResource::new)
+                        .toList();
     }
 
     @Test
@@ -69,40 +73,42 @@ class YamlUnstructuredLoaderTest {
         assertThat(unstructuredList).isNotNull();
         assertThat(unstructuredList).hasSize(3);
 
-        assertThat(JsonUtils.objectToJson(unstructuredList)).isEqualToIgnoringWhitespace("""
-            [
-                 {
-                     "apiVersion": "v1alpha1",
-                     "kind": "Fake",
-                     "metadata": {
-                         "name": "test1"
-                     },
-                     "hello": {
-                         "world": "halo"
-                     }
-                 },
-                 {
-                     "apiVersion": "v1alpha1",
-                     "kind": "Fake",
-                     "metadata": {
-                         "name": "test2"
-                     },
-                     "hello": {
-                         "world": "haha"
-                     }
-                 },
-                 {
-                     "apiVersion": "v1alpha1",
-                     "kind": "Fake",
-                     "metadata": {
-                         "name": "test2"
-                     },
-                     "hello": {
-                         "world": "bang"
-                     }
-                 }
-             ]
-            """);
+        assertThat(JsonUtils.objectToJson(unstructuredList))
+                .isEqualToIgnoringWhitespace(
+                        """
+                        [
+                             {
+                                 "apiVersion": "v1alpha1",
+                                 "kind": "Fake",
+                                 "metadata": {
+                                     "name": "test1"
+                                 },
+                                 "hello": {
+                                     "world": "halo"
+                                 }
+                             },
+                             {
+                                 "apiVersion": "v1alpha1",
+                                 "kind": "Fake",
+                                 "metadata": {
+                                     "name": "test2"
+                                 },
+                                 "hello": {
+                                     "world": "haha"
+                                 }
+                             },
+                             {
+                                 "apiVersion": "v1alpha1",
+                                 "kind": "Fake",
+                                 "metadata": {
+                                     "name": "test2"
+                                 },
+                                 "hello": {
+                                     "world": "bang"
+                                 }
+                             }
+                         ]
+                        """);
     }
 
     @Test
@@ -112,5 +118,4 @@ class YamlUnstructuredLoaderTest {
         List<Unstructured> unstructuredList = yamlUnstructuredLoader.load();
         assertThat(unstructuredList).isEmpty();
     }
-
 }

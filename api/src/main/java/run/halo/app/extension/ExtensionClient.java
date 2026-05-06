@@ -27,8 +27,8 @@ public interface ExtensionClient {
      * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
-    <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator);
+    <E extends Extension> List<E> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator);
 
     /**
      * Lists Extensions by Extension type, filter, sorter and page info.
@@ -43,21 +43,21 @@ public interface ExtensionClient {
      * @deprecated use {@link #listAll(Class, ListOptions, Sort)} instead.
      */
     @Deprecated
-    <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size);
+    <E extends Extension> ListResult<E> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size);
 
     <E extends Extension> List<E> listAll(Class<E> type, ListOptions options, Sort sort);
 
     <E extends Extension> List<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
 
-    <E extends Extension> List<String> listTopNames(Class<E> type, ListOptions options, Sort sort,
-        int topN);
+    <E extends Extension> List<String> listTopNames(
+            Class<E> type, ListOptions options, Sort sort, int topN);
 
-    <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options,
-        PageRequest page);
+    <E extends Extension> ListResult<E> listBy(
+            Class<E> type, ListOptions options, PageRequest page);
 
-    <E extends Extension> ListResult<String> listNamesBy(Class<E> type, ListOptions options,
-        PageRequest page);
+    <E extends Extension> ListResult<String> listNamesBy(
+            Class<E> type, ListOptions options, PageRequest page);
 
     <E extends Extension> long countBy(Class<E> type, ListOptions options);
 
@@ -72,7 +72,6 @@ public interface ExtensionClient {
     <E extends Extension> Optional<E> fetch(Class<E> type, String name);
 
     Optional<Unstructured> fetch(GroupVersionKind gvk, String name);
-
 
     /**
      * Creates an Extension.
@@ -106,5 +105,4 @@ public interface ExtensionClient {
     IndexedQueryEngine indexedQueryEngine();
 
     void watch(Watcher watcher);
-
 }

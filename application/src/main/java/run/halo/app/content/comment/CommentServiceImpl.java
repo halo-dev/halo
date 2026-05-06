@@ -44,9 +44,13 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
     private final ExtensionGetter extensionGetter;
     private final SystemConfigFetcher environmentFetcher;
 
-    public CommentServiceImpl(RoleService roleService, ReactiveExtensionClient client,
-        UserService userService, CounterService counterService, ExtensionGetter extensionGetter,
-        SystemConfigFetcher environmentFetcher) {
+    public CommentServiceImpl(
+            RoleService roleService,
+            ReactiveExtensionClient client,
+            UserService userService,
+            CounterService counterService,
+            ExtensionGetter extensionGetter,
+            SystemConfigFetcher environmentFetcher) {
         super(roleService, client, userService, counterService);
         this.extensionGetter = extensionGetter;
         this.environmentFetcher = environmentFetcher;
@@ -54,79 +58,96 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
 
     @Override
     public Mono<ListResult<ListedComment>> listComment(CommentQuery commentQuery) {
-        return this.client.listBy(Comment.class, commentQuery.toListOptions(),
-                commentQuery.toPageRequest())
-            .flatMap(comments -> Flux.fromStream(comments.get()
-                    .map(this::toListedComment))
-                .flatMapSequential(Function.identity())
-                .collectList()
-                .map(list -> new ListResult<>(comments.getPage(), comments.getSize(),
-                    comments.getTotal(), list)
-                )
-            );
+        return this.client
+                .listBy(Comment.class, commentQuery.toListOptions(), commentQuery.toPageRequest())
+                .flatMap(
+                        comments ->
+                                Flux.fromStream(comments.get().map(this::toListedComment))
+                                        .flatMapSequential(Function.identity())
+                                        .collectList()
+                                        .map(
+                                                list ->
+                                                        new ListResult<>(
+                                                                comments.getPage(),
+                                                                comments.getSize(),
+                                                                comments.getTotal(),
+                                                                list)));
     }
 
     @Override
     public Mono<Comment> create(Comment comment) {
         if (comment.getSpec() == null
-            || comment.getSpec().getContent() == null
-            || !isSafeHtml(comment.getSpec().getContent())) {
-            return Mono.error(new ServerWebInputException("""
-                The content of comment must not be empty or contains unsafe HTML.\
-                """));
+                || comment.getSpec().getContent() == null
+                || !isSafeHtml(comment.getSpec().getContent())) {
+            return Mono.error(
+                    new ServerWebInputException(
+                            """
+                            The content of comment must not be empty or contains unsafe HTML.\
+                            """));
         }
-        return environmentFetcher.fetchComment()
-            .flatMap(commentSetting -> {
-                if (Boolean.FALSE.equals(commentSetting.getEnable())) {
-                    return Mono.error(
-                        new AccessDeniedException("The comment function has been turned off.",
-                            "problemDetail.comment.turnedOff", null));
-                }
-                if (checkCommentOwner(comment, commentSetting.getSystemUserOnly())) {
-                    return Mono.error(
-                        new AccessDeniedException("Allow only system users to comment.",
-                            "problemDetail.comment.systemUsersOnly", null));
-                }
+        return environmentFetcher
+                .fetchComment()
+                .flatMap(
+                        commentSetting -> {
+                            if (Boolean.FALSE.equals(commentSetting.getEnable())) {
+                                return Mono.error(
+                                        new AccessDeniedException(
+                                                "The comment function has been turned off.",
+                                                "problemDetail.comment.turnedOff",
+                                                null));
+                            }
+                            if (checkCommentOwner(comment, commentSetting.getSystemUserOnly())) {
+                                return Mono.error(
+                                        new AccessDeniedException(
+                                                "Allow only system users to comment.",
+                                                "problemDetail.comment.systemUsersOnly",
+                                                null));
+                            }
 
-                if (comment.getSpec().getTop() == null) {
-                    comment.getSpec().setTop(false);
-                }
-                if (comment.getSpec().getPriority() == null) {
-                    comment.getSpec().setPriority(0);
-                }
-                comment.getSpec()
-                    .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
+                            if (comment.getSpec().getTop() == null) {
+                                comment.getSpec().setTop(false);
+                            }
+                            if (comment.getSpec().getPriority() == null) {
+                                comment.getSpec().setPriority(0);
+                            }
+                            comment.getSpec()
+                                    .setApproved(
+                                            Boolean.FALSE.equals(
+                                                    commentSetting.getRequireReviewForNew()));
 
-                if (BooleanUtils.isTrue(comment.getSpec().getApproved())
-                    && comment.getSpec().getApprovedTime() == null) {
-                    comment.getSpec().setApprovedTime(Instant.now());
-                }
+                            if (BooleanUtils.isTrue(comment.getSpec().getApproved())
+                                    && comment.getSpec().getApprovedTime() == null) {
+                                comment.getSpec().setApprovedTime(Instant.now());
+                            }
 
-                if (comment.getSpec().getCreationTime() == null) {
-                    comment.getSpec().setCreationTime(Instant.now());
-                }
+                            if (comment.getSpec().getCreationTime() == null) {
+                                comment.getSpec().setCreationTime(Instant.now());
+                            }
 
-                if (comment.getSpec().getHidden() == null) {
-                    comment.getSpec().setHidden(false);
-                }
+                            if (comment.getSpec().getHidden() == null) {
+                                comment.getSpec().setHidden(false);
+                            }
 
-                return Mono.just(comment);
-            })
-            .flatMap(populatedComment -> Mono.when(populateOwner(populatedComment),
-                    populateApproveState(populatedComment))
-                .thenReturn(populatedComment)
-            )
-            .flatMap(client::create);
+                            return Mono.just(comment);
+                        })
+                .flatMap(
+                        populatedComment ->
+                                Mono.when(
+                                                populateOwner(populatedComment),
+                                                populateApproveState(populatedComment))
+                                        .thenReturn(populatedComment))
+                .flatMap(client::create);
     }
 
     private Mono<Void> populateApproveState(Comment comment) {
         return hasCommentManagePermission()
-            .filter(Boolean::booleanValue)
-            .doOnNext(hasPermission -> {
-                comment.getSpec().setApproved(true);
-                comment.getSpec().setApprovedTime(Instant.now());
-            })
-            .then();
+                .filter(Boolean::booleanValue)
+                .doOnNext(
+                        hasPermission -> {
+                            comment.getSpec().setApproved(true);
+                            comment.getSpec().setApprovedTime(Instant.now());
+                        })
+                .then();
     }
 
     Mono<Void> populateOwner(Comment comment) {
@@ -134,10 +155,10 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
             return Mono.empty();
         }
         return fetchCurrentUser()
-            .switchIfEmpty(Mono.error(new IllegalStateException("The owner must not be null.")))
-            .map(this::toCommentOwner)
-            .doOnNext(owner -> comment.getSpec().setOwner(owner))
-            .then();
+                .switchIfEmpty(Mono.error(new IllegalStateException("The owner must not be null.")))
+                .map(this::toCommentOwner)
+                .doOnNext(owner -> comment.getSpec().setOwner(owner))
+                .then();
     }
 
     @Override
@@ -148,38 +169,42 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
 
     private Mono<Void> cleanupComments(Ref subjectRef, int batchSize) {
         // ascending order by creation time and name
-        final var pageRequest = PageRequestImpl.of(1, batchSize,
-            Sort.by("metadata.creationTimestamp", "metadata.name"));
+        final var pageRequest =
+                PageRequestImpl.of(
+                        1, batchSize, Sort.by("metadata.creationTimestamp", "metadata.name"));
         // forever loop first page until no more to delete
         return listCommentsByRef(subjectRef, pageRequest)
-            .flatMap(page -> Flux.fromIterable(page.getItems())
-                .flatMap(this::deleteWithRetry)
-                .then(page.hasNext() ? cleanupComments(subjectRef, batchSize) : Mono.empty())
-            );
+                .flatMap(
+                        page ->
+                                Flux.fromIterable(page.getItems())
+                                        .flatMap(this::deleteWithRetry)
+                                        .then(
+                                                page.hasNext()
+                                                        ? cleanupComments(subjectRef, batchSize)
+                                                        : Mono.empty()));
     }
 
     private Mono<Comment> deleteWithRetry(Comment item) {
         return client.delete(item)
-            .onErrorResume(OptimisticLockingFailureException.class,
-                e -> attemptToDelete(item.getMetadata().getName()));
+                .onErrorResume(
+                        OptimisticLockingFailureException.class,
+                        e -> attemptToDelete(item.getMetadata().getName()));
     }
 
     private Mono<Comment> attemptToDelete(String name) {
-        return Mono.defer(() -> client.fetch(Comment.class, name)
-                .flatMap(client::delete)
-            )
-            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
+        return Mono.defer(() -> client.fetch(Comment.class, name).flatMap(client::delete))
+                .retryWhen(
+                        Retry.backoff(8, Duration.ofMillis(100))
+                                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     Mono<ListResult<Comment>> listCommentsByRef(Ref subjectRef, PageRequest pageRequest) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            and(
-                equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
-                isNull("metadata.deletionTimestamp")
-            )
-        ));
+        listOptions.setFieldSelector(
+                FieldSelector.of(
+                        and(
+                                equal("spec.subjectRef", Comment.toSubjectRefKey(subjectRef)),
+                                isNull("metadata.deletionTimestamp"))));
         return client.listBy(Comment.class, listOptions, pageRequest);
     }
 
@@ -194,21 +219,20 @@ public class CommentServiceImpl extends AbstractCommentService implements Commen
     private Mono<ListedComment> toListedComment(Comment comment) {
         var builder = ListedComment.builder().comment(comment);
         // not empty
-        var ownerInfoMono = getOwnerInfo(comment.getSpec().getOwner())
-            .doOnNext(builder::owner);
-        var subjectMono = getCommentSubject(comment.getSpec().getSubjectRef())
-            .doOnNext(builder::subject);
-        var statsMono = fetchCommentStats(comment.getMetadata().getName())
-            .doOnNext(builder::stats);
+        var ownerInfoMono = getOwnerInfo(comment.getSpec().getOwner()).doOnNext(builder::owner);
+        var subjectMono =
+                getCommentSubject(comment.getSpec().getSubjectRef()).doOnNext(builder::subject);
+        var statsMono = fetchCommentStats(comment.getMetadata().getName()).doOnNext(builder::stats);
         return Mono.when(ownerInfoMono, subjectMono, statsMono)
-            .then(Mono.fromSupplier(builder::build));
+                .then(Mono.fromSupplier(builder::build));
     }
 
     @SuppressWarnings("unchecked")
     Mono<Extension> getCommentSubject(Ref ref) {
-        return extensionGetter.getExtensions(CommentSubject.class)
-            .filter(subject -> subject.supports(ref))
-            .next()
-            .flatMap(subject -> subject.get(ref.getName()));
+        return extensionGetter
+                .getExtensions(CommentSubject.class)
+                .filter(subject -> subject.supports(ref))
+                .next()
+                .flatMap(subject -> subject.get(ref.getName()));
     }
 }

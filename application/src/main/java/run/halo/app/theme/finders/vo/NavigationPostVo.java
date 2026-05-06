@@ -17,16 +17,9 @@ import org.jspecify.annotations.Nullable;
  */
 @Builder
 public record NavigationPostVo(
+        @Schema(requiredMode = NOT_REQUIRED) @Nullable ListedPostVo previous,
+        @Schema(requiredMode = NOT_REQUIRED) @Nullable ListedPostVo next) {
 
-    @Schema(requiredMode = NOT_REQUIRED)
-    @Nullable
-    ListedPostVo previous,
-
-    @Schema(requiredMode = NOT_REQUIRED)
-    @Nullable
-    ListedPostVo next
-
-) {
     /**
      * Indicates whether it has next post.
      *

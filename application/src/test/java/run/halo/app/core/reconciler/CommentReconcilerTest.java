@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
-import run.halo.app.core.reconciler.CommentReconciler;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
@@ -40,17 +39,13 @@ import run.halo.app.extension.controller.Reconciler;
 @ExtendWith(MockitoExtension.class)
 class CommentReconcilerTest {
 
-    @Mock
-    private ExtensionClient client;
+    @Mock private ExtensionClient client;
 
-    @Mock
-    SchemeManager schemeManager;
+    @Mock SchemeManager schemeManager;
 
-    @Mock
-    ReplyService replyService;
+    @Mock ReplyService replyService;
 
-    @InjectMocks
-    private CommentReconciler commentReconciler;
+    @InjectMocks private CommentReconciler commentReconciler;
 
     private final Instant now = Instant.now();
 
@@ -68,13 +63,12 @@ class CommentReconcilerTest {
         comment.getSpec().setLastReadTime(now.plusSeconds(5));
         comment.setStatus(new Comment.CommentStatus());
 
-        when(client.fetch(eq(Comment.class), eq("test")))
-            .thenReturn(Optional.of(comment));
+        when(client.fetch(eq(Comment.class), eq("test"))).thenReturn(Optional.of(comment));
 
         when(replyService.removeAllByComment(eq(comment.getMetadata().getName())))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
         when(client.listBy(eq(Comment.class), any(ListOptions.class), isA(PageRequest.class)))
-            .thenReturn(ListResult.emptyResult());
+                .thenReturn(ListResult.emptyResult());
 
         Reconciler.Result reconcile = commentReconciler.reconcile(new Reconciler.Request("test"));
         assertThat(reconcile.reEnqueue()).isFalse();
@@ -85,8 +79,8 @@ class CommentReconcilerTest {
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         verify(client, times(1)).update(captor.capture());
         Comment value = captor.getValue();
-        assertThat(value.getMetadata().getFinalizers()
-            .contains(CommentReconciler.FINALIZER_NAME)).isFalse();
+        assertThat(value.getMetadata().getFinalizers().contains(CommentReconciler.FINALIZER_NAME))
+                .isFalse();
     }
 
     @Test
@@ -101,7 +95,7 @@ class CommentReconcilerTest {
         commentReconciler.compatibleCreationTime(comment);
 
         assertThat(comment.getSpec().getCreationTime())
-            .isEqualTo(comment.getSpec().getApprovedTime());
+                .isEqualTo(comment.getSpec().getApprovedTime());
     }
 
     private static Ref getRef() {

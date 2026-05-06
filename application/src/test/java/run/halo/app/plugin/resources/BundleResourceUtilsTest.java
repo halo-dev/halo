@@ -28,8 +28,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 @ExtendWith(MockitoExtension.class)
 class BundleResourceUtilsTest {
 
-    @Mock
-    private PluginManager pluginManager;
+    @Mock private PluginManager pluginManager;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -38,30 +37,34 @@ class BundleResourceUtilsTest {
         lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
         lenient().when(pluginManager.getPlugin(eq("fake-plugin"))).thenReturn(pluginWrapper);
 
-        lenient().when(pluginClassLoader.getResource(eq("console/main.js"))).thenReturn(
-            new URL("file://console/main.js"));
-        lenient().when(pluginClassLoader.getResource(eq("console/style.css"))).thenReturn(
-            new URL("file://console/style.css"));
+        lenient()
+                .when(pluginClassLoader.getResource(eq("console/main.js")))
+                .thenReturn(new URL("file://console/main.js"));
+        lenient()
+                .when(pluginClassLoader.getResource(eq("console/style.css")))
+                .thenReturn(new URL("file://console/style.css"));
     }
 
     @Test
     void getJsBundleResource() {
         Resource jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+                BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
         assertThat(jsBundleResource).isNotNull();
         assertThat(jsBundleResource.exists()).isTrue();
 
         jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "test.js");
+                BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "test.js");
         assertThat(jsBundleResource).isNull();
 
         jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "nothing-plugin", "main.js");
+                BundleResourceUtils.getJsBundleResource(pluginManager, "nothing-plugin", "main.js");
         assertThat(jsBundleResource).isNull();
 
-        assertThatThrownBy(() -> {
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin",
-                "../test/main.js");
-        }).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+                        () -> {
+                            BundleResourceUtils.getJsBundleResource(
+                                    pluginManager, "fake-plugin", "../test/main.js");
+                        })
+                .isInstanceOf(AccessDeniedException.class);
     }
 }

@@ -45,10 +45,10 @@ import run.halo.app.theme.router.factories.TagsRouteFactory;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ThemeCompositeRouterFunction implements
-    RouterFunction<ServerResponse>,
-    SmartLifecycle,
-    ApplicationListener<SystemConfigChangedEvent> {
+public class ThemeCompositeRouterFunction
+        implements RouterFunction<ServerResponse>,
+                SmartLifecycle,
+                ApplicationListener<SystemConfigChangedEvent> {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
@@ -70,13 +70,11 @@ public class ThemeCompositeRouterFunction implements
     public void onApplicationEvent(SystemConfigChangedEvent event) {
         var oldData = event.getOldData();
         var newData = event.getNewData();
-        var oldRules = SystemSetting.get(oldData, ThemeRouteRules.GROUP,
-            ThemeRouteRules.class);
+        var oldRules = SystemSetting.get(oldData, ThemeRouteRules.GROUP, ThemeRouteRules.class);
         if (oldRules == null) {
             oldRules = ThemeRouteRules.empty();
         }
-        var newRules = SystemSetting.get(newData, ThemeRouteRules.GROUP,
-            ThemeRouteRules.class);
+        var newRules = SystemSetting.get(newData, ThemeRouteRules.GROUP, ThemeRouteRules.class);
         if (newRules == null) {
             newRules = ThemeRouteRules.empty();
         }
@@ -95,8 +93,8 @@ public class ThemeCompositeRouterFunction implements
     @Override
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return Flux.fromIterable(cachedRouters)
-            .concatMap(routerFunction -> routerFunction.route(request))
-            .next();
+                .concatMap(routerFunction -> routerFunction.route(request))
+                .next();
     }
 
     @Override
@@ -105,15 +103,11 @@ public class ThemeCompositeRouterFunction implements
     }
 
     private List<RouterFunction<ServerResponse>> routerFunctions(ThemeRouteRules rules) {
-        return transformedPatterns(rules).stream()
-            .map(this::createRouterFunction)
-            .toList();
+        return transformedPatterns(rules).stream().map(this::createRouterFunction).toList();
     }
 
     private List<RouterFunction<ServerResponse>> routerFunctions() {
-        return transformedPatterns().stream()
-            .map(this::createRouterFunction)
-            .toList();
+        return transformedPatterns().stream().map(this::createRouterFunction).toList();
     }
 
     private RouterFunction<ServerResponse> createRouterFunction(RoutePattern routePattern) {
@@ -127,7 +121,8 @@ public class ThemeCompositeRouterFunction implements
             case AUTHOR -> authorPostsRouteFactory.create(routePattern.pattern());
             case INDEX -> indexRouteFactory.create(routePattern.pattern());
             default ->
-                throw new IllegalStateException("Unexpected value: " + routePattern.identifier());
+                    throw new IllegalStateException(
+                            "Unexpected value: " + routePattern.identifier());
         };
     }
 
@@ -154,8 +149,7 @@ public class ThemeCompositeRouterFunction implements
         return running;
     }
 
-    record RoutePattern(DefaultTemplateEnum identifier, String pattern) {
-    }
+    record RoutePattern(DefaultTemplateEnum identifier, String pattern) {}
 
     private List<RoutePattern> transformedPatterns(ThemeRouteRules rules) {
         List<RoutePattern> routePatterns = new ArrayList<>();
@@ -177,14 +171,14 @@ public class ThemeCompositeRouterFunction implements
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
         return routePatterns;
-
     }
 
     private List<RoutePattern> transformedPatterns() {
-        var rules = environmentFetcher.fetch(ThemeRouteRules.GROUP, ThemeRouteRules.class)
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElseGet(ThemeRouteRules::empty);
+        var rules =
+                environmentFetcher
+                        .fetch(ThemeRouteRules.GROUP, ThemeRouteRules.class)
+                        .blockOptional(BLOCKING_TIMEOUT)
+                        .orElseGet(ThemeRouteRules::empty);
         return transformedPatterns(rules);
     }
-
 }

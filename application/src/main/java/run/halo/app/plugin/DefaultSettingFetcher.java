@@ -24,8 +24,7 @@ class DefaultSettingFetcher implements SettingFetcher {
 
     @Override
     public <T> Optional<T> fetch(String group, Class<T> clazz) {
-        return delegateFetcher.fetch(group, clazz)
-            .blockOptional(BLOCKING_TIMEOUT);
+        return delegateFetcher.fetch(group, clazz).blockOptional(BLOCKING_TIMEOUT);
     }
 
     @Override

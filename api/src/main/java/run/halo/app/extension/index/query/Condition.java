@@ -48,5 +48,4 @@ public interface Condition extends Visitable, Query {
     static Condition empty() {
         return new EmptyCondition();
     }
-
 }

@@ -64,8 +64,8 @@ public class SpringExtensionFactory implements ExtensionFactory {
     @Nullable
     public <T> T create(Class<T> extensionClass) {
         return getPluginApplicationContextBy(extensionClass)
-            .map(context -> context.getBean(extensionClass))
-            .orElseGet(() -> createWithoutSpring(extensionClass));
+                .map(context -> context.getBean(extensionClass))
+                .orElseGet(() -> createWithoutSpring(extensionClass));
     }
 
     /**
@@ -80,17 +80,25 @@ public class SpringExtensionFactory implements ExtensionFactory {
      */
     @SuppressWarnings("unchecked")
     protected <T> T createWithoutSpring(final Class<T> extensionClass)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         final Constructor<?> constructor =
-            getPublicConstructorWithShortestParameterList(extensionClass)
-                // An extension class is required to have at least one public constructor.
-                .orElseThrow(
-                    () -> new IllegalArgumentException("Extension class '" + nameOf(extensionClass)
-                        + "' must have at least one public constructor."));
+                getPublicConstructorWithShortestParameterList(extensionClass)
+                        // An extension class is required to have at least one public constructor.
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Extension class '"
+                                                        + nameOf(extensionClass)
+                                                        + "' must have at least one public"
+                                                        + " constructor."));
         try {
             if (log.isTraceEnabled()) {
-                log.trace("Instantiate '" + nameOf(extensionClass) + "' by calling '" + constructor
-                    + "'with standard Java reflection.");
+                log.trace(
+                        "Instantiate '"
+                                + nameOf(extensionClass)
+                                + "' by calling '"
+                                + constructor
+                                + "'with standard Java reflection.");
             }
             // Creating the instance by calling the constructor with null-parameters (if there
             // are any).
@@ -101,17 +109,19 @@ public class SpringExtensionFactory implements ExtensionFactory {
             // not the reflective call itself as we precisely searched for a fitting constructor.
             log.error(ex.getMessage(), ex);
             throw new RuntimeException(
-                "Most likely this exception is thrown because the called constructor ("
-                    + constructor + ")"
-                    + " cannot handle 'null' parameters. Original message was: "
-                    + ex.getMessage(), ex);
+                    "Most likely this exception is thrown because the called constructor ("
+                            + constructor
+                            + ")"
+                            + " cannot handle 'null' parameters. Original message was: "
+                            + ex.getMessage(),
+                    ex);
         }
     }
 
     private Optional<Constructor<?>> getPublicConstructorWithShortestParameterList(
-        final Class<?> extensionClass) {
+            final Class<?> extensionClass) {
         return Stream.of(extensionClass.getConstructors())
-            .min(Comparator.comparing(Constructor::getParameterCount));
+                .min(Comparator.comparing(Constructor::getParameterCount));
     }
 
     private Object[] nullParameters(final Constructor<?> constructor) {
@@ -119,12 +129,12 @@ public class SpringExtensionFactory implements ExtensionFactory {
     }
 
     protected <T> Optional<ApplicationContext> getPluginApplicationContextBy(
-        final Class<T> extensionClass) {
+            final Class<T> extensionClass) {
         return Optional.ofNullable(this.pluginManager.whichPlugin(extensionClass))
-            .map(PluginWrapper::getPlugin)
-            .filter(SpringPlugin.class::isInstance)
-            .map(plugin -> (SpringPlugin) plugin)
-            .map(SpringPlugin::getApplicationContext);
+                .map(PluginWrapper::getPlugin)
+                .filter(SpringPlugin.class::isInstance)
+                .map(plugin -> (SpringPlugin) plugin)
+                .map(SpringPlugin::getApplicationContext);
     }
 
     private <T> String nameOf(final Class<T> clazz) {

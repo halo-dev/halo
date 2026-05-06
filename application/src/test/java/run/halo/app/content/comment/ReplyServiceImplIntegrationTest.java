@@ -52,17 +52,13 @@ class ReplyServiceImplIntegrationTest {
             return replies;
         }
 
-        @Autowired
-        private SchemeManager schemeManager;
+        @Autowired private SchemeManager schemeManager;
 
-        @MockitoSpyBean
-        private ReactiveExtensionClient reactiveClient;
+        @MockitoSpyBean private ReactiveExtensionClient reactiveClient;
 
-        @Autowired
-        private ReactiveExtensionStoreClient storeClient;
+        @Autowired private ReactiveExtensionStoreClient storeClient;
 
-        @MockitoSpyBean
-        private ReplyServiceImpl replyService;
+        @MockitoSpyBean private ReplyServiceImpl replyService;
 
         Mono<Extension> deleteImmediately(Extension extension) {
             var name = extension.getMetadata().getName();
@@ -70,76 +66,76 @@ class ReplyServiceImplIntegrationTest {
 
             // delete from db
             var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);
-            return storeClient.delete(storeName, extension.getMetadata().getVersion())
-                .thenReturn(extension);
+            return storeClient
+                    .delete(storeName, extension.getMetadata().getVersion())
+                    .thenReturn(extension);
         }
 
         @BeforeEach
         void setUp() {
             Flux.fromIterable(storedReplies)
-                .flatMap(post -> reactiveClient.create(post))
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(post -> reactiveClient.create(post))
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(storedReplies)
-                .flatMap(this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @Test
         void removeAllByComment() {
             String commentName = "fake-comment";
-            replyService.removeAllByComment(commentName)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            replyService.removeAllByComment(commentName).as(StepVerifier::create).verifyComplete();
 
             verify(reactiveClient, times(storedReplies.size())).delete(any(Reply.class));
             verify(replyService, times(2)).listRepliesByComment(eq(commentName), any());
 
-            replyService.listRepliesByComment(commentName, PageRequestImpl.ofSize(1))
-                .as(StepVerifier::create)
-                .consumeNextWith(result -> assertThat(result.getTotal()).isEqualTo(0))
-                .verifyComplete();
+            replyService
+                    .listRepliesByComment(commentName, PageRequestImpl.ofSize(1))
+                    .as(StepVerifier::create)
+                    .consumeNextWith(result -> assertThat(result.getTotal()).isEqualTo(0))
+                    .verifyComplete();
         }
     }
 
     String fakeReplyJson() {
         return """
-                {
-                    "metadata":{
-                        "name":"fake-reply"
-                    },
-                    "spec":{
-                        "raw":"fake-raw",
-                        "content":"fake-content",
-                        "owner":{
-                            "kind":"User",
-                            "name":"fake-user",
-                            "displayName":"fake-display-name"
-                        },
-                        "creationTime": "2024-03-11T06:23:42.923294424Z",
-                        "ipAddress":"",
-                        "approved": true,
-                        "hidden": false,
-                        "allowNotification": false,
-                        "top": false,
-                        "priority": 0,
-                        "commentName":"fake-comment"
-                    },
+            {
+                "metadata":{
+                    "name":"fake-reply"
+                },
+                "spec":{
+                    "raw":"fake-raw",
+                    "content":"fake-content",
                     "owner":{
                         "kind":"User",
+                        "name":"fake-user",
                         "displayName":"fake-display-name"
                     },
-                    "stats":{
-                        "upvote":0
-                    }
+                    "creationTime": "2024-03-11T06:23:42.923294424Z",
+                    "ipAddress":"",
+                    "approved": true,
+                    "hidden": false,
+                    "allowNotification": false,
+                    "top": false,
+                    "priority": 0,
+                    "commentName":"fake-comment"
+                },
+                "owner":{
+                    "kind":"User",
+                    "displayName":"fake-display-name"
+                },
+                "stats":{
+                    "upvote":0
                 }
-            """;
+            }
+        """;
     }
 }

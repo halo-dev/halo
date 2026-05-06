@@ -12,9 +12,10 @@ public class WatcherPredicates {
     private final BiPredicate<Extension, Extension> onUpdatePredicate;
     private final Predicate<Extension> onDeletePredicate;
 
-    public WatcherPredicates(Predicate<Extension> onAddPredicate,
-        BiPredicate<Extension, Extension> onUpdatePredicate,
-        Predicate<Extension> onDeletePredicate) {
+    public WatcherPredicates(
+            Predicate<Extension> onAddPredicate,
+            BiPredicate<Extension, Extension> onUpdatePredicate,
+            Predicate<Extension> onDeletePredicate) {
         this.onAddPredicate = onAddPredicate;
         this.onUpdatePredicate = onUpdatePredicate;
         this.onDeletePredicate = onDeletePredicate;
@@ -59,8 +60,7 @@ public class WatcherPredicates {
             return this;
         }
 
-        public Builder onUpdatePredicate(
-            BiPredicate<Extension, Extension> onUpdatePredicate) {
+        public Builder onUpdatePredicate(BiPredicate<Extension, Extension> onUpdatePredicate) {
             this.onUpdatePredicate = onUpdatePredicate;
             return this;
         }
@@ -75,8 +75,10 @@ public class WatcherPredicates {
             BiPredicate<Extension, Extension> gvkBiPredicate = EMPTY_BI_PREDICATE;
             if (gvk != null) {
                 gvkPredicate = e -> gvk.equals(e.groupVersionKind());
-                gvkBiPredicate = (oldE, newE) -> oldE.groupVersionKind().equals(gvk)
-                    && newE.groupVersionKind().equals(gvk);
+                gvkBiPredicate =
+                        (oldE, newE) ->
+                                oldE.groupVersionKind().equals(gvk)
+                                        && newE.groupVersionKind().equals(gvk);
             }
             if (onAddPredicate == null) {
                 onAddPredicate = EMPTY_PREDICATE;
@@ -94,6 +96,5 @@ public class WatcherPredicates {
 
             return new WatcherPredicates(onAddPredicate, onUpdatePredicate, onDeletePredicate);
         }
-
     }
 }

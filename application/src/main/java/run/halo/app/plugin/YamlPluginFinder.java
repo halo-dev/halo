@@ -70,7 +70,7 @@ public class YamlPluginFinder implements PluginFinder {
             plugin.setStatus(pluginStatus);
         }
         MetadataUtil.nullSafeAnnotations(plugin)
-            .put(PluginConst.PLUGIN_PATH, pluginPath.toString());
+                .put(PluginConst.PLUGIN_PATH, pluginPath.toString());
         return plugin;
     }
 
@@ -95,15 +95,14 @@ public class YamlPluginFinder implements PluginFinder {
 
     protected Plugin unstructuredToPlugin(Resource propertyResource) {
         YamlUnstructuredLoader yamlUnstructuredLoader =
-            new YamlUnstructuredLoader(propertyResource);
+                new YamlUnstructuredLoader(propertyResource);
         List<Unstructured> unstructuredList = yamlUnstructuredLoader.load();
         if (unstructuredList.size() != 1) {
-            throw new PluginRuntimeException("Unable to find plugin descriptor file '{}'",
-                propertiesFileName);
+            throw new PluginRuntimeException(
+                    "Unable to find plugin descriptor file '{}'", propertiesFileName);
         }
         Unstructured unstructured = unstructuredList.get(0);
-        return Unstructured.OBJECT_MAPPER.convertValue(unstructured,
-            Plugin.class);
+        return Unstructured.OBJECT_MAPPER.convertValue(unstructured, Plugin.class);
     }
 
     protected Path getManifestPath(Path pluginPath, String propertiesFileName) {
@@ -116,7 +115,7 @@ public class YamlPluginFinder implements PluginFinder {
                 }
             }
             throw new PluginRuntimeException(
-                "Unable to find plugin descriptor file: " + DEFAULT_PROPERTIES_FILE_NAME);
+                    "Unable to find plugin descriptor file: " + DEFAULT_PROPERTIES_FILE_NAME);
         } else {
             // it's a jar file
             try {

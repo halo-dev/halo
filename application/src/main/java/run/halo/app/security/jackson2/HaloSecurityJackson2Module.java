@@ -24,14 +24,10 @@ public class HaloSecurityJackson2Module extends SimpleModule {
         SecurityJackson2Modules.enableDefaultTyping(context.getOwner());
         context.setMixInAnnotations(HaloUser.class, HaloUserMixin.class);
         context.setMixInAnnotations(
-            TwoFactorAuthentication.class, TwoFactorAuthenticationMixin.class
-        );
+                TwoFactorAuthentication.class, TwoFactorAuthenticationMixin.class);
         context.setMixInAnnotations(
-            HaloOAuth2AuthenticationToken.class, HaloOAuth2AuthenticationTokenMixin.class
-        );
+                HaloOAuth2AuthenticationToken.class, HaloOAuth2AuthenticationTokenMixin.class);
         context.setMixInAnnotations(
-            SwitchUserGrantedAuthority.class, SwitchUserGrantedAuthorityMixIn.class
-        );
+                SwitchUserGrantedAuthority.class, SwitchUserGrantedAuthorityMixIn.class);
     }
-
 }

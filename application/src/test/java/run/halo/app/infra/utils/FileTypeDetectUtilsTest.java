@@ -39,8 +39,7 @@ class FileTypeDetectUtilsTest {
         assertThat(mimeType).isEqualTo("text/javascript");
 
         stream = getFileInputStream("classpath:file-type-detect/index.html");
-        mimeType =
-            FileTypeDetectUtils.detectMimeType(stream, "index.html");
+        mimeType = FileTypeDetectUtils.detectMimeType(stream, "index.html");
         assertThat(mimeType).isEqualTo("text/html");
 
         stream = getFileInputStream("classpath:file-type-detect/test.json");
@@ -49,8 +48,8 @@ class FileTypeDetectUtilsTest {
 
         stream = getFileInputStream("classpath:file-type-detect/other.xlsx");
         mimeType = FileTypeDetectUtils.detectMimeType(stream, "other.xlsx");
-        assertThat(mimeType).isEqualTo(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        assertThat(mimeType)
+                .isEqualTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         // other.xlsx detect without name
         stream = getFileInputStream("classpath:file-type-detect/other.xlsx");
@@ -64,8 +63,9 @@ class FileTypeDetectUtilsTest {
 
         stream = getFileInputStream("classpath:file-type-detect/test.docx");
         mimeType = FileTypeDetectUtils.detectMimeType(stream, "test.docx");
-        assertThat(mimeType).isEqualTo(
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        assertThat(mimeType)
+                .isEqualTo(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 
         // docx detect without file name
         stream = getFileInputStream("classpath:file-type-detect/test.docx");
@@ -103,9 +103,8 @@ class FileTypeDetectUtilsTest {
 
     @Test
     void detectFileExtensionsTest() throws MimeTypeException {
-        var extensions = FileTypeDetectUtils.detectFileExtensions(
-            "application/x-x509-key; format=pem"
-        );
+        var extensions =
+                FileTypeDetectUtils.detectFileExtensions("application/x-x509-key; format=pem");
         assertThat(extensions).isEmpty();
 
         extensions = FileTypeDetectUtils.detectFileExtensions("text/plain");
@@ -136,36 +135,31 @@ class FileTypeDetectUtilsTest {
     @Test
     void isValidExtensionForMimeTest() {
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/bmp", "hello.html"))
-            .isFalse();
+                .isFalse();
 
-        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/bmp", "hello.bmp"))
-            .isTrue();
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/bmp", "hello.bmp")).isTrue();
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.html"))
-            .isFalse();
+                .isFalse();
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpeg"))
-            .isTrue();
+                .isTrue();
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.JPEG"))
-            .isTrue();
+                .isTrue();
 
-        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpg"))
-            .isTrue();
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpg")).isTrue();
 
-        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpe"))
-            .isTrue();
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("image/jpeg", "hello.jpe")).isTrue();
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.html"))
-            .isFalse();
+                .isFalse();
 
-        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.mp3"))
-            .isTrue();
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.mp3")).isTrue();
 
         assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.MPGA"))
-            .isTrue();
+                .isTrue();
 
-        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.m3a"))
-            .isTrue();
+        assertThat(FileTypeDetectUtils.isValidExtensionForMime("audio/mpeg", "hello.m3a")).isTrue();
     }
 }

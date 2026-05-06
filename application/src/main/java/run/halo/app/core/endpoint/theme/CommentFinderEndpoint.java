@@ -75,73 +75,108 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "CommentV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .POST("comments", this::createComment,
-                builder -> builder.operationId("CreateComment_1")
-                    .description("Create a comment.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(CommentRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Comment.class))
-            )
-            .POST("comments/{name}/reply", this::createReply,
-                builder -> builder.operationId("CreateReply_1")
-                    .description("Create a reply.")
-                    .tag(tag)
-                    .parameter(parameterBuilder().name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class))
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(ReplyRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Reply.class))
-            )
-            .GET("comments", this::listComments, builder -> {
-                builder.operationId("ListComments_1")
-                    .description("List comments.")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(CommentWithReplyVo.class))
-                    );
-                CommentQuery.buildParameters(builder);
-            })
-            .GET("comments/{name}", this::getComment, builder -> {
-                builder.operationId("GetComment")
-                    .description("Get a comment.")
-                    .tag(tag)
-                    .parameter(parameterBuilder().name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class))
-                    .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(CommentVo.class))
-                    );
-            })
-            .GET("comments/{name}/reply", this::listCommentReplies, builder -> {
-                builder.operationId("ListCommentReplies")
-                    .description("List comment replies.")
-                    .tag(tag)
-                    .parameter(parameterBuilder().name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class))
-                    .response(responseBuilder()
-                        .implementation(ListResult.generateGenericClass(ReplyVo.class))
-                    );
-                PageableRequest.buildParameters(builder);
-            })
-            .build();
+                .POST(
+                        "comments",
+                        this::createComment,
+                        builder ->
+                                builder.operationId("CreateComment_1")
+                                        .description("Create a comment.")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                CommentRequest
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Comment.class)))
+                .POST(
+                        "comments/{name}/reply",
+                        this::createReply,
+                        builder ->
+                                builder.operationId("CreateReply_1")
+                                        .description("Create a reply.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                ReplyRequest
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Reply.class)))
+                .GET(
+                        "comments",
+                        this::listComments,
+                        builder -> {
+                            builder.operationId("ListComments_1")
+                                    .description("List comments.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    CommentWithReplyVo.class)));
+                            CommentQuery.buildParameters(builder);
+                        })
+                .GET(
+                        "comments/{name}",
+                        this::getComment,
+                        builder -> {
+                            builder.operationId("GetComment")
+                                    .description("Get a comment.")
+                                    .tag(tag)
+                                    .parameter(
+                                            parameterBuilder()
+                                                    .name("name")
+                                                    .in(ParameterIn.PATH)
+                                                    .required(true)
+                                                    .implementation(String.class))
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    CommentVo.class)));
+                        })
+                .GET(
+                        "comments/{name}/reply",
+                        this::listCommentReplies,
+                        builder -> {
+                            builder.operationId("ListCommentReplies")
+                                    .description("List comment replies.")
+                                    .tag(tag)
+                                    .parameter(
+                                            parameterBuilder()
+                                                    .name("name")
+                                                    .in(ParameterIn.PATH)
+                                                    .required(true)
+                                                    .implementation(String.class))
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    ReplyVo.class)));
+                            PageableRequest.buildParameters(builder);
+                        })
+                .build();
     }
 
     @Override
@@ -151,57 +186,71 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> createComment(ServerRequest request) {
         return request.bodyToMono(CommentRequest.class)
-            .flatMap(commentRequest -> {
-                Comment comment = commentRequest.toComment();
-                comment.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
-                return commentService.create(comment);
-            })
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
-            .transformDeferred(createIpBasedRateLimiter(request))
-            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+                .flatMap(
+                        commentRequest -> {
+                            Comment comment = commentRequest.toComment();
+                            comment.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
+                            comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
+                            return commentService.create(comment);
+                        })
+                .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
+                .transformDeferred(createIpBasedRateLimiter(request))
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
     private <T> RateLimiterOperator<T> createIpBasedRateLimiter(ServerRequest request) {
         var clientIp = IpAddressUtils.getIpAddress(request);
-        var rateLimiter = rateLimiterRegistry.rateLimiter("comment-creation-from-ip-" + clientIp,
-            "comment-creation");
+        var rateLimiter =
+                rateLimiterRegistry.rateLimiter(
+                        "comment-creation-from-ip-" + clientIp, "comment-creation");
         return RateLimiterOperator.of(rateLimiter);
     }
 
     Mono<ServerResponse> createReply(ServerRequest request) {
         String commentName = request.pathVariable("name");
         return request.bodyToMono(ReplyRequest.class)
-            .flatMap(replyRequest -> {
-                Reply reply = replyRequest.toReply();
-                reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
-                return environmentFetcher.fetchComment()
-                    .map(commentSetting -> {
-                        if (isFalse(commentSetting.getEnable())) {
-                            throw new AccessDeniedException(
-                                "The comment function has been turned off.",
-                                "problemDetail.comment.turnedOff", null);
-                        }
-                        if (checkReplyOwner(reply, commentSetting.getSystemUserOnly())) {
-                            throw new AccessDeniedException("Allow only system users to comment.",
-                                "problemDetail.comment.systemUsersOnly", null);
-                        }
-                        reply.getSpec()
-                            .setApproved(isFalse(commentSetting.getRequireReviewForNew()));
+                .flatMap(
+                        replyRequest -> {
+                            Reply reply = replyRequest.toReply();
+                            reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
+                            reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
+                            return environmentFetcher
+                                    .fetchComment()
+                                    .map(
+                                            commentSetting -> {
+                                                if (isFalse(commentSetting.getEnable())) {
+                                                    throw new AccessDeniedException(
+                                                            "The comment function has been turned"
+                                                                    + " off.",
+                                                            "problemDetail.comment.turnedOff",
+                                                            null);
+                                                }
+                                                if (checkReplyOwner(
+                                                        reply,
+                                                        commentSetting.getSystemUserOnly())) {
+                                                    throw new AccessDeniedException(
+                                                            "Allow only system users to comment.",
+                                                            "problemDetail.comment.systemUsersOnly",
+                                                            null);
+                                                }
+                                                reply.getSpec()
+                                                        .setApproved(
+                                                                isFalse(
+                                                                        commentSetting
+                                                                                .getRequireReviewForNew()));
 
-                        if (reply.getSpec().getHidden() == null) {
-                            reply.getSpec().setHidden(false);
-                        }
+                                                if (reply.getSpec().getHidden() == null) {
+                                                    reply.getSpec().setHidden(false);
+                                                }
 
-                        return reply;
-                    })
-                    .defaultIfEmpty(reply);
-            })
-            .flatMap(reply -> replyService.create(commentName, reply))
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
-            .transformDeferred(createIpBasedRateLimiter(request))
-            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+                                                return reply;
+                                            })
+                                    .defaultIfEmpty(reply);
+                        })
+                .flatMap(reply -> replyService.create(commentName, reply))
+                .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
+                .transformDeferred(createIpBasedRateLimiter(request))
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
     private boolean checkReplyOwner(Reply reply, Boolean onlySystemUser) {
@@ -214,31 +263,33 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request);
-        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.toPageRequest())
-            .flatMap(result -> {
-                if (commentQuery.getWithReplies()) {
-                    return commentPublicQueryService.convertToWithReplyVo(result,
-                        commentQuery.getReplySize());
-                }
-                return Mono.just(result);
-            })
-            .flatMap(list -> ServerResponse.ok().bodyValue(list));
+        return commentPublicQueryService
+                .list(commentQuery.toRef(), commentQuery.toPageRequest())
+                .flatMap(
+                        result -> {
+                            if (commentQuery.getWithReplies()) {
+                                return commentPublicQueryService.convertToWithReplyVo(
+                                        result, commentQuery.getReplySize());
+                            }
+                            return Mono.just(result);
+                        })
+                .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
         return Mono.defer(() -> Mono.justOrEmpty(commentPublicQueryService.getByName(name)))
-            .subscribeOn(Schedulers.boundedElastic())
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
 
     Mono<ServerResponse> listCommentReplies(ServerRequest request) {
         String commentName = request.pathVariable("name");
         IListRequest.QueryListRequest queryParams =
-            new IListRequest.QueryListRequest(request.queryParams());
-        return commentPublicQueryService.listReply(commentName, queryParams.getPage(),
-                queryParams.getSize())
-            .flatMap(list -> ServerResponse.ok().bodyValue(list));
+                new IListRequest.QueryListRequest(request.queryParams());
+        return commentPublicQueryService
+                .listReply(commentName, queryParams.getPage(), queryParams.getSize())
+                .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     public static class CommentQuery extends PageableRequest {
@@ -288,27 +339,37 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return name;
         }
 
-        @Schema(description = "Whether to include replies. Default is false.",
-            defaultValue = "false")
+        @Schema(
+                description = "Whether to include replies. Default is false.",
+                defaultValue = "false")
         public Boolean getWithReplies() {
             var withReplies = queryParams.getFirst("withReplies");
             return StringUtils.isNotBlank(withReplies) && Boolean.parseBoolean(withReplies);
         }
 
-        @Schema(description = "Reply size of the comment, default is 10, only works when "
-            + "withReplies is true.", defaultValue = "10")
+        @Schema(
+                description =
+                        "Reply size of the comment, default is 10, only works when "
+                                + "withReplies is true.",
+                defaultValue = "10")
         public int getReplySize() {
             var replySize = queryParams.getFirst("replySize");
             return StringUtils.isNotBlank(replySize) ? Integer.parseInt(replySize) : 10;
         }
 
-        @ArraySchema(uniqueItems = true,
-            arraySchema = @Schema(name = "sort",
-                description = "Sort property and direction of the list result. Supported fields: "
-                    + "creationTimestamp"),
-            schema = @Schema(description = "like field,asc or field,desc",
-                implementation = String.class,
-                example = "creationTimestamp,desc"))
+        @ArraySchema(
+                uniqueItems = true,
+                arraySchema =
+                        @Schema(
+                                name = "sort",
+                                description =
+                                        "Sort property and direction of the list result. Supported"
+                                                + " fields: creationTimestamp"),
+                schema =
+                        @Schema(
+                                description = "like field,asc or field,desc",
+                                implementation = String.class,
+                                example = "creationTimestamp,desc"))
         public Sort getSort() {
             return SortResolver.defaultInstance.resolve(exchange);
         }
@@ -333,44 +394,52 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         public static void buildParameters(Builder builder) {
             PageableRequest.buildParameters(builder);
             builder.parameter(sortParameter())
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("group")
-                    .description("The comment subject group.")
-                    .required(false)
-                    .implementation(String.class))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("version")
-                    .description("The comment subject version.")
-                    .required(true)
-                    .implementation(String.class))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("kind")
-                    .description("The comment subject kind.")
-                    .required(true))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("name")
-                    .description("The comment subject name.")
-                    .required(true)
-                    .implementation(String.class))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("withReplies")
-                    .description("Whether to include replies. Default is false.")
-                    .required(false)
-                    .implementation(Boolean.class))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("replySize")
-                    .description("Reply size of the comment, default is 10, only works when "
-                        + "withReplies is true.")
-                    .required(false)
-                    .schema(schemaBuilder()
-                        .implementation(Integer.class)
-                        .defaultValue("10")));
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("group")
+                                    .description("The comment subject group.")
+                                    .required(false)
+                                    .implementation(String.class))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("version")
+                                    .description("The comment subject version.")
+                                    .required(true)
+                                    .implementation(String.class))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("kind")
+                                    .description("The comment subject kind.")
+                                    .required(true))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("name")
+                                    .description("The comment subject name.")
+                                    .required(true)
+                                    .implementation(String.class))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("withReplies")
+                                    .description("Whether to include replies. Default is false.")
+                                    .required(false)
+                                    .implementation(Boolean.class))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("replySize")
+                                    .description(
+                                            "Reply size of the comment, default is 10, only works"
+                                                    + " when withReplies is true.")
+                                    .required(false)
+                                    .schema(
+                                            schemaBuilder()
+                                                    .implementation(Integer.class)
+                                                    .defaultValue("10")));
         }
     }
 
@@ -393,19 +462,20 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         }
 
         public static void buildParameters(Builder builder) {
-            builder.parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("page")
-                    .implementation(Integer.class)
-                    .required(false)
-                    .description("Page number. Default is 0."))
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("size")
-                    .implementation(Integer.class)
-                    .required(false)
-                    .description("Size number. Default is 0."));
+            builder.parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("page")
+                                    .implementation(Integer.class)
+                                    .required(false)
+                                    .description("Page number. Default is 0."))
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("size")
+                                    .implementation(Integer.class)
+                                    .required(false)
+                                    .description("Size number. Default is 0."));
         }
-
     }
 }

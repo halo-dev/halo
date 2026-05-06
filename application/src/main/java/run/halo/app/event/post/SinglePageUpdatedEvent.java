@@ -6,12 +6,10 @@ import run.halo.app.core.extension.content.SinglePage;
 
 public class SinglePageUpdatedEvent extends ApplicationEvent {
 
-    @Getter
-    private final SinglePage singlePage;
+    @Getter private final SinglePage singlePage;
 
     public SinglePageUpdatedEvent(Object source, SinglePage singlePage) {
         super(source);
         this.singlePage = singlePage;
     }
-
 }

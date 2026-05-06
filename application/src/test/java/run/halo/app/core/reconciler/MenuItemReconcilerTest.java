@@ -46,29 +46,27 @@ import run.halo.app.extension.controller.Reconciler.Request;
 @ExtendWith(MockitoExtension.class)
 class MenuItemReconcilerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    ReactiveExtensionClient reactiveClient;
+    @Mock ReactiveExtensionClient reactiveClient;
 
-    @InjectMocks
-    MenuItemReconciler reconciler;
+    @InjectMocks MenuItemReconciler reconciler;
 
     @Nested
     class WhenCategoryRefSet {
 
         @Test
         void shouldResetMenuItemIfCategoryNotFound() {
-            var menuItem = createMenuItem("fake-name",
-                spec -> spec.setTargetRef(Ref.of("fake-category", Category.GVK)));
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> spec.setTargetRef(Ref.of("fake-category", Category.GVK)));
             var status = new MenuItem.MenuItemStatus();
             menuItem.setStatus(status);
             status.setHref("fake://old-permalink");
             status.setDisplayName("Old display name");
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
             when(client.fetch(Category.class, "fake-category")).thenReturn(Optional.empty());
 
             var result = reconciler.reconcile(new Request("fake-name"));
@@ -82,14 +80,16 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateMenuItemIfCategoryFound() {
-            var menuItem = createMenuItem("fake-name", spec -> {
-                spec.setTargetRef(Ref.of("fake-category", Category.GVK));
-            });
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> {
+                                spec.setTargetRef(Ref.of("fake-category", Category.GVK));
+                            });
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
             when(client.fetch(Category.class, "fake-category"))
-                .thenReturn(Optional.of(createCategory()));
+                    .thenReturn(Optional.of(createCategory()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
@@ -104,17 +104,14 @@ class MenuItemReconcilerTest {
         void shouldRequestToUpdateWhenCategoryUpdated() {
             var event = new CategoryUpdatedEvent(this, createCategory());
 
-            var menuItem = createMenuItem("fake-name", spec -> {
-            });
+            var menuItem = createMenuItem("fake-name", spec -> {});
 
             when(reactiveClient.listAll(
-                same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())
-            )).thenReturn(Flux.just(menuItem));
+                            same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(menuItem));
             when(reactiveClient.update(menuItem)).thenReturn(Mono.just(menuItem));
 
-            reconciler.onCategoryUpdated(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            reconciler.onCategoryUpdated(event).as(StepVerifier::create).verifyComplete();
 
             var annotations = menuItem.getMetadata().getAnnotations();
             assertNotNull(annotations);
@@ -143,13 +140,14 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateMenuItemIfPageFound() {
-            var menuItem = createMenuItem("fake-name",
-                spec -> spec.setTargetRef(Ref.of("fake-page", SinglePage.GVK)));
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> spec.setTargetRef(Ref.of("fake-page", SinglePage.GVK)));
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
             when(client.fetch(SinglePage.class, "fake-page"))
-                .thenReturn(Optional.of(createSinglePage()));
+                    .thenReturn(Optional.of(createSinglePage()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
@@ -164,17 +162,14 @@ class MenuItemReconcilerTest {
         @Test
         void shouldRequestToUpdateWhenSinglePageUpdated() {
             var event = new SinglePageUpdatedEvent(this, createSinglePage());
-            var menuItem = createMenuItem("fake-name", spec -> {
-            });
+            var menuItem = createMenuItem("fake-name", spec -> {});
 
             when(reactiveClient.listAll(
-                same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())
-            )).thenReturn(Flux.just(menuItem));
+                            same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(menuItem));
             when(reactiveClient.update(menuItem)).thenReturn(Mono.just(menuItem));
 
-            reconciler.onSinglePageUpdated(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            reconciler.onSinglePageUpdated(event).as(StepVerifier::create).verifyComplete();
             var annotations = menuItem.getMetadata().getAnnotations();
             assertNotNull(annotations);
             assertTrue(annotations.containsKey(MenuItem.REQUEST_TO_UPDATE_ANNO));
@@ -202,15 +197,15 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldResetMenuItemIfPostNotFound() {
-            var menuItem = createMenuItem("fake-name",
-                spec -> spec.setTargetRef(Ref.of("fake-post", Post.GVK)));
+            var menuItem =
+                    createMenuItem(
+                            "fake-name", spec -> spec.setTargetRef(Ref.of("fake-post", Post.GVK)));
             var status = new MenuItem.MenuItemStatus();
             menuItem.setStatus(status);
             status.setHref("fake://old-permalink");
             status.setDisplayName("Old display name");
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
             when(client.fetch(Post.class, "fake-post")).thenReturn(Optional.empty());
 
             var result = reconciler.reconcile(new Request("fake-name"));
@@ -224,14 +219,15 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateMenuItemIfPostFound() {
-            var menuItem = createMenuItem("fake-name", spec -> {
-                spec.setTargetRef(Ref.of("fake-post", Post.GVK));
-            });
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> {
+                                spec.setTargetRef(Ref.of("fake-post", Post.GVK));
+                            });
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
-            when(client.fetch(Post.class, "fake-post"))
-                .thenReturn(Optional.of(createPost()));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+            when(client.fetch(Post.class, "fake-post")).thenReturn(Optional.of(createPost()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
@@ -246,17 +242,14 @@ class MenuItemReconcilerTest {
         void shouldRequestToUpdateWhenPostUpdated() {
             var event = new PostUpdatedEvent(this, "fake-post");
 
-            var menuItem = createMenuItem("fake-name", spec -> {
-            });
+            var menuItem = createMenuItem("fake-name", spec -> {});
 
             when(reactiveClient.listAll(
-                same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())
-            )).thenReturn(Flux.just(menuItem));
+                            same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(menuItem));
             when(reactiveClient.update(menuItem)).thenReturn(Mono.just(menuItem));
 
-            reconciler.onPostUpdated(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            reconciler.onPostUpdated(event).as(StepVerifier::create).verifyComplete();
 
             var annotations = menuItem.getMetadata().getAnnotations();
             assertNotNull(annotations);
@@ -269,17 +262,14 @@ class MenuItemReconcilerTest {
             post.getMetadata().setDeletionTimestamp(Instant.now());
             var event = new PostDeletedEvent(this, post);
 
-            var menuItem = createMenuItem("fake-name", spec -> {
-            });
+            var menuItem = createMenuItem("fake-name", spec -> {});
 
             when(reactiveClient.listAll(
-                same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())
-            )).thenReturn(Flux.just(menuItem));
+                            same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(menuItem));
             when(reactiveClient.update(menuItem)).thenReturn(Mono.just(menuItem));
 
-            reconciler.onPostDeleted(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            reconciler.onPostDeleted(event).as(StepVerifier::create).verifyComplete();
 
             var annotations = menuItem.getMetadata().getAnnotations();
             assertNotNull(annotations);
@@ -308,14 +298,15 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateMenuItemIfTagFound() {
-            var menuItem = createMenuItem("fake-name", spec -> {
-                spec.setTargetRef(Ref.of("fake-tag", Tag.GVK));
-            });
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> {
+                                spec.setTargetRef(Ref.of("fake-tag", Tag.GVK));
+                            });
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
-            when(client.fetch(Tag.class, "fake-tag"))
-                .thenReturn(Optional.of(createTag()));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
+            when(client.fetch(Tag.class, "fake-tag")).thenReturn(Optional.of(createTag()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
@@ -328,15 +319,15 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldResetMenuItemIfTagNotFound() {
-            var menuItem = createMenuItem("fake-name",
-                spec -> spec.setTargetRef(Ref.of("fake-tag", Tag.GVK)));
+            var menuItem =
+                    createMenuItem(
+                            "fake-name", spec -> spec.setTargetRef(Ref.of("fake-tag", Tag.GVK)));
             var status = new MenuItem.MenuItemStatus();
             menuItem.setStatus(status);
             status.setHref("fake://old-permalink");
             status.setDisplayName("Old display name");
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
             when(client.fetch(Tag.class, "fake-tag")).thenReturn(Optional.empty());
 
             var result = reconciler.reconcile(new Request("fake-name"));
@@ -353,17 +344,14 @@ class MenuItemReconcilerTest {
             var tag = createTag();
             var event = new TagUpdatedEvent(this, tag);
 
-            var menuItem = createMenuItem("fake-name", spec -> {
-            });
+            var menuItem = createMenuItem("fake-name", spec -> {});
 
             when(reactiveClient.listAll(
-                same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())
-            )).thenReturn(Flux.just(menuItem));
+                            same(MenuItem.class), isA(ListOptions.class), eq(Sort.unsorted())))
+                    .thenReturn(Flux.just(menuItem));
             when(reactiveClient.update(menuItem)).thenReturn(Mono.just(menuItem));
 
-            reconciler.onTagUpdated(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            reconciler.onTagUpdated(event).as(StepVerifier::create).verifyComplete();
             var annotations = menuItem.getMetadata().getAnnotations();
             assertNotNull(annotations);
             assertTrue(annotations.containsKey(MenuItem.REQUEST_TO_UPDATE_ANNO));
@@ -391,16 +379,21 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldResetIfRefNotSupported() {
-            var menuItem = createMenuItem("fake-name", spec -> spec.setTargetRef(Ref.of("fake-ref",
-                GroupVersionKind.fromAPIVersionAndKind("fake.group/v1", "FakeKind")
-            )));
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec ->
+                                    spec.setTargetRef(
+                                            Ref.of(
+                                                    "fake-ref",
+                                                    GroupVersionKind.fromAPIVersionAndKind(
+                                                            "fake.group/v1", "FakeKind"))));
             var status = new MenuItem.MenuItemStatus();
             menuItem.setStatus(status);
             status.setHref("fake://old-permalink");
             status.setDisplayName("Old display name");
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 
@@ -414,7 +407,7 @@ class MenuItemReconcilerTest {
         @Test
         void shouldResetIfHrefNotSet() {
             var menuItem =
-                createMenuItem("fake-name", spec -> spec.setDisplayName("Fake display name"));
+                    createMenuItem("fake-name", spec -> spec.setDisplayName("Fake display name"));
             when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
 
             var result = reconciler.reconcile(new Request("fake-name"));
@@ -428,9 +421,12 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateIfDisplayNameNotSet() {
-            var menuItem = createMenuItem("fake-name", spec -> {
-                spec.setHref("/fake");
-            });
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> {
+                                spec.setHref("/fake");
+                            });
             when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
 
             var result = reconciler.reconcile(new Request("fake-name"));
@@ -444,13 +440,15 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateIfHrefAndDisplayNameSet() {
-            var menuItem = createMenuItem("fake-name", spec -> {
-                spec.setHref("/fake");
-                spec.setDisplayName("Fake display name");
-            });
+            var menuItem =
+                    createMenuItem(
+                            "fake-name",
+                            spec -> {
+                                spec.setHref("/fake");
+                                spec.setDisplayName("Fake display name");
+                            });
 
-            when(client.fetch(MenuItem.class, "fake-name"))
-                .thenReturn(Optional.of(menuItem));
+            when(client.fetch(MenuItem.class, "fake-name")).thenReturn(Optional.of(menuItem));
 
             var result = reconciler.reconcile(new Request("fake-name"));
 

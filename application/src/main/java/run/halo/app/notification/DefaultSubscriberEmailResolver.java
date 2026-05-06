@@ -29,8 +29,8 @@ public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
             return Mono.fromSupplier(() -> getEmail(subscriber));
         }
         return client.fetch(User.class, subscriber.getName())
-            .filter(user -> user.getSpec().isEmailVerified())
-            .mapNotNull(user -> user.getSpec().getEmail());
+                .filter(user -> user.getSpec().isEmailVerified())
+                .mapNotNull(user -> user.getSpec().getEmail());
     }
 
     @Override
@@ -49,7 +49,8 @@ public class DefaultSubscriberEmailResolver implements SubscriberEmailResolver {
             throw new IllegalStateException("The subscriber is not an anonymous subscriber");
         }
         return identity.getEmail()
-            .filter(StringUtils::isNotBlank)
-            .orElseThrow(() -> new IllegalStateException("The subscriber does not have an email"));
+                .filter(StringUtils::isNotBlank)
+                .orElseThrow(
+                        () -> new IllegalStateException("The subscriber does not have an email"));
     }
 }

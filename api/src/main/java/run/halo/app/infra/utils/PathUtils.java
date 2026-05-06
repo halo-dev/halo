@@ -71,7 +71,6 @@ public class PathUtils {
         return sb.toString();
     }
 
-
     /**
      * <p>Append a {@code '/'} if the path does not end with a {@code '/'}.</p>
      * Examples are as follows:
@@ -113,7 +112,6 @@ public class PathUtils {
                 if (colonIdx != -1) {
                     parts[i] = part.substring(0, colonIdx) + part.charAt(part.length() - 1);
                 }
-
             }
         }
         return combinePath(parts);

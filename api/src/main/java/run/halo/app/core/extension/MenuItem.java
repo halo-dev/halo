@@ -18,8 +18,12 @@ import run.halo.app.extension.Ref;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = "MenuItem",
-    plural = "menuitems", singular = "menuitem")
+@GVK(
+        group = "",
+        version = "v1alpha1",
+        kind = "MenuItem",
+        plural = "menuitems",
+        singular = "menuitem")
 public class MenuItem extends AbstractExtension {
 
     public static final String REQUEST_TO_UPDATE_ANNO = "halo.run/request-to-update";
@@ -67,15 +71,14 @@ public class MenuItem extends AbstractExtension {
         private Integer priority;
 
         @ArraySchema(
-            uniqueItems = true,
-            arraySchema = @Schema(description = "Children of this menu item"),
-            schema = @Schema(description = "The name of menu item child"))
+                uniqueItems = true,
+                arraySchema = @Schema(description = "Children of this menu item"),
+                schema = @Schema(description = "The name of menu item child"))
         private LinkedHashSet<String> children;
 
         @Schema(description = "Target reference. Like Category, Tag, Post or SinglePage")
         @Nullable
         private Ref targetRef;
-
     }
 
     @Data
@@ -88,6 +91,5 @@ public class MenuItem extends AbstractExtension {
         @Schema(description = "Calculated href of manu item.")
         @Nullable
         private String href;
-
     }
 }

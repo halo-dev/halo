@@ -16,12 +16,11 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class SharedApplicationContextFactoryTest {
 
-    @Autowired
-    ApplicationContext applicationContext;
+    @Autowired ApplicationContext applicationContext;
 
     @Test
     void createSharedApplicationContext() {
-        var sharedContext =  SharedApplicationContextFactory.create(applicationContext);
+        var sharedContext = SharedApplicationContextFactory.create(applicationContext);
         assertNotNull(sharedContext);
     }
 }

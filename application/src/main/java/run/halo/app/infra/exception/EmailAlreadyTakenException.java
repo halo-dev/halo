@@ -16,5 +16,4 @@ public class EmailAlreadyTakenException extends ServerWebInputException {
         super(reason);
         setType(TYPE);
     }
-
 }

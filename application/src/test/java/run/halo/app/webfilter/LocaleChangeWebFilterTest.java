@@ -30,97 +30,108 @@ class LocaleChangeWebFilterTest {
 
     @Test
     void shouldRespondLanguageCookie() {
-        WebFilterChain webFilterChain = filterExchange -> {
-            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
-            assertNotNull(languageCookie);
-            assertEquals("zh-CN", languageCookie.getValue());
-            return Mono.empty();
-        };
-        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+        WebFilterChain webFilterChain =
+                filterExchange -> {
+                    var languageCookie =
+                            filterExchange.getResponse().getCookies().getFirst("language");
+                    assertNotNull(languageCookie);
+                    assertEquals("zh-CN", languageCookie.getValue());
+                    return Mono.empty();
+                };
+        var exchange =
+                MockServerWebExchange.from(
+                        MockServerHttpRequest.get("/home")
+                                .accept(MediaType.TEXT_HTML)
+                                .queryParam("language", "zh-CN")
+                                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
     @Test
     void shouldNotRespondLanguageCookieIfChanged() {
-        WebFilterChain webFilterChain = filterExchange -> {
-            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
-            assertNotNull(languageCookie);
-            assertEquals("zh-CN", languageCookie.getValue());
-            return Mono.empty();
-        };
-        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .cookie(new HttpCookie("language", "zh-HK"))
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+        WebFilterChain webFilterChain =
+                filterExchange -> {
+                    var languageCookie =
+                            filterExchange.getResponse().getCookies().getFirst("language");
+                    assertNotNull(languageCookie);
+                    assertEquals("zh-CN", languageCookie.getValue());
+                    return Mono.empty();
+                };
+        var exchange =
+                MockServerWebExchange.from(
+                        MockServerHttpRequest.get("/home")
+                                .accept(MediaType.TEXT_HTML)
+                                .cookie(new HttpCookie("language", "zh-HK"))
+                                .queryParam("language", "zh-CN")
+                                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
     @Test
     void shouldNotRespondLanguageCookieIfNotChanged() {
-        WebFilterChain webFilterChain = filterExchange -> {
-            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
-            assertNull(languageCookie);
-            return Mono.empty();
-        };
-        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .cookie(new HttpCookie("language", "zh-CN"))
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+        WebFilterChain webFilterChain =
+                filterExchange -> {
+                    var languageCookie =
+                            filterExchange.getResponse().getCookies().getFirst("language");
+                    assertNull(languageCookie);
+                    return Mono.empty();
+                };
+        var exchange =
+                MockServerWebExchange.from(
+                        MockServerHttpRequest.get("/home")
+                                .accept(MediaType.TEXT_HTML)
+                                .cookie(new HttpCookie("language", "zh-CN"))
+                                .queryParam("language", "zh-CN")
+                                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
     @Test
     void shouldNotRespondLanguageCookieWithUndeterminedLanguageTag() {
-        WebFilterChain webFilterChain = filterExchange -> {
-            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
-            assertNull(languageCookie);
-            return Mono.empty();
-        };
-        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .queryParam("language", "invalid_language_tag")
-            .build()
-        );
+        WebFilterChain webFilterChain =
+                filterExchange -> {
+                    var languageCookie =
+                            filterExchange.getResponse().getCookies().getFirst("language");
+                    assertNull(languageCookie);
+                    return Mono.empty();
+                };
+        var exchange =
+                MockServerWebExchange.from(
+                        MockServerHttpRequest.get("/home")
+                                .accept(MediaType.TEXT_HTML)
+                                .queryParam("language", "invalid_language_tag")
+                                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidRequest")
     void shouldNotRespondLanguageCookieIfRequestNotMatch(MockServerHttpRequest mockRequest) {
-        WebFilterChain webFilterChain = filterExchange -> {
-            var languageCookie = filterExchange.getResponse().getCookies().getFirst("language");
-            assertNull(languageCookie);
-            return Mono.empty();
-        };
+        WebFilterChain webFilterChain =
+                filterExchange -> {
+                    var languageCookie =
+                            filterExchange.getResponse().getCookies().getFirst("language");
+                    assertNull(languageCookie);
+                    return Mono.empty();
+                };
         var exchange = MockServerWebExchange.from(mockRequest);
         this.filter.filter(exchange, webFilterChain).block();
     }
 
     static Stream<MockServerHttpRequest> provideInvalidRequest() {
         return Stream.of(
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.ALL)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.APPLICATION_JSON)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.post("/home")
-                .accept(MediaType.TEXT_HTML)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.TEXT_HTML)
-                .build()
-        );
+                MockServerHttpRequest.get("/home")
+                        .accept(MediaType.ALL)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.get("/home")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.post("/home")
+                        .accept(MediaType.TEXT_HTML)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.get("/home").accept(MediaType.TEXT_HTML).build());
     }
 }

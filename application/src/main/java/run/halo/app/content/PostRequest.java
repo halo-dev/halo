@@ -12,13 +12,18 @@ import run.halo.app.extension.Ref;
  * @author guqing
  * @since 2.0.0
  */
-public record PostRequest(@Schema(requiredMode = REQUIRED) Post post,
-                          @Schema(requiredMode = REQUIRED) ContentUpdateParam content) {
+public record PostRequest(
+        @Schema(requiredMode = REQUIRED) Post post,
+        @Schema(requiredMode = REQUIRED) ContentUpdateParam content) {
 
     public ContentRequest contentRequest() {
         Ref subjectRef = Ref.of(post);
-        return new ContentRequest(subjectRef, post.getSpec().getHeadSnapshot(), content.version(),
-            content.raw(), content.content(), content.rawType());
+        return new ContentRequest(
+                subjectRef,
+                post.getSpec().getHeadSnapshot(),
+                content.version(),
+                content.raw(),
+                content.content(),
+                content.rawType());
     }
-
 }

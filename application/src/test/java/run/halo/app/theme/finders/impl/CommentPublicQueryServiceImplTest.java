@@ -44,17 +44,13 @@ import run.halo.app.infra.utils.JsonUtils;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class CommentPublicQueryServiceImplTest {
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
-    @Mock
-    UserService userService;
+    @Mock UserService userService;
 
-    @Mock
-    CounterService counterService;
+    @Mock CounterService counterService;
 
-    @InjectMocks
-    CommentPublicQueryServiceImpl commentPublicQueryService;
+    @InjectMocks CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
@@ -68,11 +64,12 @@ class CommentPublicQueryServiceImplTest {
             var commentOwner = new Comment.CommentOwner();
             commentOwner.setName("fake-user");
             commentOwner.setDisplayName("Fake User");
-            commentOwner.setAnnotations(new HashMap<>() {
-                {
-                    put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
-                }
-            });
+            commentOwner.setAnnotations(
+                    new HashMap<>() {
+                        {
+                            put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                        }
+                    });
             var comment = commentForCompare("1", null, true, 0);
             comment.getSpec().setIpAddress("127.0.0.1");
             comment.getSpec().setOwner(commentOwner);
@@ -84,7 +81,8 @@ class CommentPublicQueryServiceImplTest {
             var result = commentPublicQueryService.toCommentVo(comment).block();
             result.getMetadata().setCreationTimestamp(null);
             result.getSpec().setCreationTime(null);
-            JSONAssert.assertEquals("""
+            JSONAssert.assertEquals(
+                    """
                     {
                          "metadata":{
                              "name":"1"
@@ -94,7 +92,7 @@ class CommentPublicQueryServiceImplTest {
                                  "name":"",
                                  "displayName":"Fake User",
                                  "annotations":{
-                    
+
                                  }
                              },
                              "ipAddress":"",
@@ -110,8 +108,8 @@ class CommentPublicQueryServiceImplTest {
                          }
                      }
                     """,
-                JsonUtils.objectToJson(result),
-                true);
+                    JsonUtils.objectToJson(result),
+                    true);
         }
 
         Comment commentForCompare(String name, Instant creationTime, boolean top, int priority) {
@@ -143,42 +141,45 @@ class CommentPublicQueryServiceImplTest {
             notApprovedWithAnonymous.getSpec().getOwner().setName(AnonymousUserConst.PRINCIPAL);
 
             Comment commentApprovedButAnotherOwner = createComment();
-            commentApprovedButAnotherOwner.getMetadata()
-                .setName("comment-approved-but-another-owner");
+            commentApprovedButAnotherOwner
+                    .getMetadata()
+                    .setName("comment-approved-but-another-owner");
             commentApprovedButAnotherOwner.getSpec().setApproved(true);
             commentApprovedButAnotherOwner.getSpec().getOwner().setName("another");
 
             Comment commentNotApprovedAndAnotherOwner = createComment();
-            commentNotApprovedAndAnotherOwner.getMetadata()
-                .setName("comment-not-approved-and-another");
+            commentNotApprovedAndAnotherOwner
+                    .getMetadata()
+                    .setName("comment-not-approved-and-another");
             commentNotApprovedAndAnotherOwner.getSpec().setApproved(false);
             commentNotApprovedAndAnotherOwner.getSpec().getOwner().setName("another");
 
             Comment notApprovedAndAnotherRef = createComment();
-            notApprovedAndAnotherRef.getMetadata()
-                .setName("comment-not-approved-and-another-ref");
+            notApprovedAndAnotherRef.getMetadata().setName("comment-not-approved-and-another-ref");
             notApprovedAndAnotherRef.getSpec().setApproved(false);
             Ref anotherRef =
-                Ref.of("another-fake-post", GroupVersionKind.fromExtension(Post.class));
+                    Ref.of("another-fake-post", GroupVersionKind.fromExtension(Post.class));
             notApprovedAndAnotherRef.getSpec().setSubjectRef(anotherRef);
 
-            when(client.list(eq(Comment.class), any(),
-                any(),
-                eq(1),
-                eq(10))
-            ).thenAnswer((Answer<Mono<ListResult<Comment>>>) invocation -> {
-                Predicate<Comment> predicate =
-                    invocation.getArgument(1, Predicate.class);
-                List<Comment> comments = Stream.of(
-                    commentNotApproved,
-                    commentApproved,
-                    commentApprovedButAnotherOwner,
-                    commentNotApprovedAndAnotherOwner,
-                    notApprovedWithAnonymous,
-                    notApprovedAndAnotherRef
-                ).filter(predicate).toList();
-                return Mono.just(new ListResult<>(1, 10, comments.size(), comments));
-            });
+            when(client.list(eq(Comment.class), any(), any(), eq(1), eq(10)))
+                    .thenAnswer(
+                            (Answer<Mono<ListResult<Comment>>>)
+                                    invocation -> {
+                                        Predicate<Comment> predicate =
+                                                invocation.getArgument(1, Predicate.class);
+                                        List<Comment> comments =
+                                                Stream.of(
+                                                                commentNotApproved,
+                                                                commentApproved,
+                                                                commentApprovedButAnotherOwner,
+                                                                commentNotApprovedAndAnotherOwner,
+                                                                notApprovedWithAnonymous,
+                                                                notApprovedAndAnotherRef)
+                                                        .filter(predicate)
+                                                        .toList();
+                                        return Mono.just(
+                                                new ListResult<>(1, 10, comments.size(), comments));
+                                    });
 
             extractedUser();
             when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
@@ -199,7 +200,7 @@ class CommentPublicQueryServiceImplTest {
             comment.getSpec().setContent("fake-content");
             comment.getSpec().setHidden(false);
             comment.getSpec()
-                .setSubjectRef(Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
+                    .setSubjectRef(Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
             Comment.CommentOwner commentOwner = new Comment.CommentOwner();
             commentOwner.setKind(User.KIND);
             commentOwner.setName("fake-user");

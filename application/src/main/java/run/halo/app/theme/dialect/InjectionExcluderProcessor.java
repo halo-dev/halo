@@ -27,7 +27,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProcessor {
 
     public static final String EXCLUDE_INJECTION_VARIABLE =
-        InjectionExcluderProcessor.class.getName() + ".EXCLUDE_INJECTION";
+            InjectionExcluderProcessor.class.getName() + ".EXCLUDE_INJECTION";
 
     private final PageInjectionExcluder injectionExcluder = new PageInjectionExcluder();
 
@@ -36,16 +36,20 @@ public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProces
     }
 
     @Override
-    public void doProcessTemplateStart(ITemplateContext context, ITemplateStart templateStart,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateStart(
+            ITemplateContext context,
+            ITemplateStart templateStart,
+            ITemplateBoundariesStructureHandler structureHandler) {
         if (isExcluded(context)) {
             structureHandler.setLocalVariable(EXCLUDE_INJECTION_VARIABLE, true);
         }
     }
 
     @Override
-    public void doProcessTemplateEnd(ITemplateContext context, ITemplateEnd templateEnd,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateEnd(
+            ITemplateContext context,
+            ITemplateEnd templateEnd,
+            ITemplateBoundariesStructureHandler structureHandler) {
         structureHandler.removeLocalVariable(EXCLUDE_INJECTION_VARIABLE);
     }
 
@@ -61,17 +65,13 @@ public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProces
 
     static class PageInjectionExcluder {
 
-        private final Set<String> exactMatches = Set.of(
-            "login",
-            "signup",
-            "logout"
-        );
+        private final Set<String> exactMatches = Set.of("login", "signup", "logout");
 
-        private final Set<Pattern> regexPatterns = Set.of(
-            Pattern.compile("error/.*"),
-            Pattern.compile("challenges/.*"),
-            Pattern.compile("password-reset/.*")
-        );
+        private final Set<Pattern> regexPatterns =
+                Set.of(
+                        Pattern.compile("error/.*"),
+                        Pattern.compile("challenges/.*"),
+                        Pattern.compile("password-reset/.*"));
 
         public boolean isExcluded(String templateName) {
             Assert.notNull(templateName, "Template name must not be null");

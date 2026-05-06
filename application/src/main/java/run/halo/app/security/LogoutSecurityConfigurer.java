@@ -53,10 +53,10 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        http.logout(logout -> logout
-            .logoutHandler(getLogoutHandler())
-            .logoutSuccessHandler(new LogoutSuccessHandler())
-        );
+        http.logout(
+                logout ->
+                        logout.logoutHandler(getLogoutHandler())
+                                .logoutSuccessHandler(new LogoutSuccessHandler()));
     }
 
     private ServerLogoutHandler getLogoutHandler() {
@@ -64,8 +64,7 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
         defaultLogoutHandler.setSecurityContextRepository(securityContextRepository);
         var logoutHandlers = new ArrayList<ServerLogoutHandler>();
         logoutHandlers.add(defaultLogoutHandler);
-        applicationContext.getBeanProvider(ServerLogoutHandler.class)
-            .forEach(logoutHandlers::add);
+        applicationContext.getBeanProvider(ServerLogoutHandler.class).forEach(logoutHandlers::add);
         if (logoutHandlers.size() == 1) {
             return logoutHandlers.getFirst();
         }
@@ -74,35 +73,43 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
 
     @Bean
     RouterFunction<ServerResponse> logoutPage(
-        UserService userService,
-        GlobalInfoService globalInfoService
-    ) {
+            UserService userService, GlobalInfoService globalInfoService) {
         return RouterFunctions.route()
-            .GET("/logout", request -> {
-                var user = ReactiveSecurityContextHolder.getContext()
-                    .map(SecurityContext::getAuthentication)
-                    .map(Authentication::getName)
-                    .flatMap(userService::getUser);
-                var exchange = request.exchange();
-                var contextPath = exchange.getRequest().getPath().contextPath().value();
+                .GET(
+                        "/logout",
+                        request -> {
+                            var user =
+                                    ReactiveSecurityContextHolder.getContext()
+                                            .map(SecurityContext::getAuthentication)
+                                            .map(Authentication::getName)
+                                            .flatMap(userService::getUser);
+                            var exchange = request.exchange();
+                            var contextPath = exchange.getRequest().getPath().contextPath().value();
 
-                return ServerResponse.ok().render("logout", Map.of(
-                    "globalInfo", globalInfoService.getGlobalInfo(),
-                    "action", contextPath + "/logout",
-                    "user", user
-                ));
-            })
-            .before(request -> {
-                request.exchange().getAttributes().put(ModelConst.NO_CACHE, true);
-                return request;
-            })
-            .filter((request, next) ->
-                // Save request before handling the logout
-                serverRequestCache.saveRequest(request.exchange()).then(next.handle(request))
-            )
-            .build();
+                            return ServerResponse.ok()
+                                    .render(
+                                            "logout",
+                                            Map.of(
+                                                    "globalInfo",
+                                                    globalInfoService.getGlobalInfo(),
+                                                    "action",
+                                                    contextPath + "/logout",
+                                                    "user",
+                                                    user));
+                        })
+                .before(
+                        request -> {
+                            request.exchange().getAttributes().put(ModelConst.NO_CACHE, true);
+                            return request;
+                        })
+                .filter(
+                        (request, next) ->
+                                // Save request before handling the logout
+                                serverRequestCache
+                                        .saveRequest(request.exchange())
+                                        .then(next.handle(request)))
+                .build();
     }
-
 
     private class LogoutSuccessHandler implements ServerLogoutSuccessHandler {
 
@@ -115,26 +122,33 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
         }
 
         @Override
-        public Mono<Void> onLogoutSuccess(WebFilterExchange exchange,
-            Authentication authentication) {
-            return userLoginOrLogoutProcessing.logoutProcessing(authentication.getName())
-                .then(ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
-                    .matches(exchange.getExchange())
-                    .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                    .switchIfEmpty(Mono.defer(() ->
-                        defaultHandler.onLogoutSuccess(exchange, authentication).then(Mono.empty())
-                    ))
-                    .flatMap(match -> {
-                        var response = exchange.getExchange().getResponse();
-                        response.setStatusCode(HttpStatus.NO_CONTENT);
-                        return response.setComplete();
-                    })
-                );
+        public Mono<Void> onLogoutSuccess(
+                WebFilterExchange exchange, Authentication authentication) {
+            return userLoginOrLogoutProcessing
+                    .logoutProcessing(authentication.getName())
+                    .then(
+                            ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
+                                    .matches(exchange.getExchange())
+                                    .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                                    .switchIfEmpty(
+                                            Mono.defer(
+                                                    () ->
+                                                            defaultHandler
+                                                                    .onLogoutSuccess(
+                                                                            exchange,
+                                                                            authentication)
+                                                                    .then(Mono.empty())))
+                                    .flatMap(
+                                            match -> {
+                                                var response = exchange.getExchange().getResponse();
+                                                response.setStatusCode(HttpStatus.NO_CONTENT);
+                                                return response.setComplete();
+                                            }));
         }
     }
 
     private static class RequestCacheRedirectLogoutSuccessHandler
-        implements ServerLogoutSuccessHandler {
+            implements ServerLogoutSuccessHandler {
 
         private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
@@ -142,8 +156,7 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
 
         private ServerRequestCache requestCache = new WebSessionServerRequestCache();
 
-        public RequestCacheRedirectLogoutSuccessHandler() {
-        }
+        public RequestCacheRedirectLogoutSuccessHandler() {}
 
         public RequestCacheRedirectLogoutSuccessHandler(String location) {
             this.location = URI.create(location);
@@ -156,14 +169,14 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
 
         @Override
         public Mono<Void> onLogoutSuccess(
-            WebFilterExchange exchange, Authentication authentication
-        ) {
-            return this.requestCache.getRedirectUri(exchange.getExchange())
-                .defaultIfEmpty(this.location)
-                .flatMap(location ->
-                    this.redirectStrategy.sendRedirect(exchange.getExchange(), location)
-                );
+                WebFilterExchange exchange, Authentication authentication) {
+            return this.requestCache
+                    .getRedirectUri(exchange.getExchange())
+                    .defaultIfEmpty(this.location)
+                    .flatMap(
+                            location ->
+                                    this.redirectStrategy.sendRedirect(
+                                            exchange.getExchange(), location));
         }
-
     }
 }

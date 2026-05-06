@@ -43,26 +43,31 @@ public class TagEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "TagV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("tags", this::listTag, builder -> {
-                    builder.operationId("ListPostTags")
-                        .description("List Post Tags.")
-                        .tag(tag)
-                        .response(
-                            responseBuilder()
-                                .implementation(ListResult.generateGenericClass(Tag.class))
-                        );
-                    TagQuery.buildParameters(builder);
-                }
-            )
-            .build();
+                .GET(
+                        "tags",
+                        this::listTag,
+                        builder -> {
+                            builder.operationId("ListPostTags")
+                                    .description("List Post Tags.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    Tag.class)));
+                            TagQuery.buildParameters(builder);
+                        })
+                .build();
     }
 
     Mono<ServerResponse> listTag(ServerRequest request) {
         var tagQuery = new TagQuery(request);
-        return client.listBy(Tag.class, tagQuery.toListOptions(),
-                PageRequestImpl.of(tagQuery.getPage(), tagQuery.getSize(), tagQuery.getSort())
-            )
-            .flatMap(tags -> ServerResponse.ok().bodyValue(tags));
+        return client.listBy(
+                        Tag.class,
+                        tagQuery.toListOptions(),
+                        PageRequestImpl.of(
+                                tagQuery.getPage(), tagQuery.getSize(), tagQuery.getSort()))
+                .flatMap(tags -> ServerResponse.ok().bodyValue(tags));
     }
 
     public static class TagQuery extends SortableRequest {
@@ -73,30 +78,32 @@ public class TagEndpoint implements CustomEndpoint {
 
         public Optional<String> getKeyword() {
             return Optional.ofNullable(queryParams.getFirst("keyword"))
-                .filter(StringUtils::hasText);
+                    .filter(StringUtils::hasText);
         }
 
         @Override
         public ListOptions toListOptions() {
             var builder = ListOptions.builder(super.toListOptions());
-            getKeyword().ifPresent(keyword -> builder.andQuery(
-                or(
-                    contains("spec.displayName", keyword),
-                    contains("spec.slug", keyword)
-                )
-            ));
+            getKeyword()
+                    .ifPresent(
+                            keyword ->
+                                    builder.andQuery(
+                                            or(
+                                                    contains("spec.displayName", keyword),
+                                                    contains("spec.slug", keyword))));
             return builder.build();
         }
 
         public static void buildParameters(Builder builder) {
             IListRequest.buildParameters(builder);
             builder.parameter(sortParameter())
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.QUERY)
-                    .name("keyword")
-                    .description("Post tags filtered by keyword.")
-                    .implementation(String.class)
-                    .required(false));
+                    .parameter(
+                            parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("keyword")
+                                    .description("Post tags filtered by keyword.")
+                                    .implementation(String.class)
+                                    .required(false));
         }
     }
 }

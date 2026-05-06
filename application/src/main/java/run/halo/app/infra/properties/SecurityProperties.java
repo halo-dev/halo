@@ -43,7 +43,6 @@ public class SecurityProperties {
          * Whether two-factor authentication is disabled.
          */
         private boolean disabled;
-
     }
 
     @Data
@@ -52,7 +51,6 @@ public class SecurityProperties {
         private boolean disabled;
 
         private final List<CorsConfig> configs = new ArrayList<>();
-
     }
 
     @Data
@@ -61,7 +59,6 @@ public class SecurityProperties {
         private String pathPattern;
 
         private CorsEndpointProperties config;
-
     }
 
     @Data
@@ -76,7 +73,6 @@ public class SecurityProperties {
     public static class ReferrerOptions {
 
         private ReferrerPolicy policy = STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
-
     }
 
     @Data
@@ -92,6 +88,5 @@ public class SecurityProperties {
         private URI href;
 
         private URI icon;
-
     }
 }

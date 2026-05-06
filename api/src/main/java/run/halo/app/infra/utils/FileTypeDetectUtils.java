@@ -43,10 +43,12 @@ public class FileTypeDetectUtils {
     }
 
     private static String doDetectMimeType(InputStream inputStream, Metadata metadata)
-        throws IOException {
+            throws IOException {
         Assert.notNull(inputStream, "The inputStream must not be null");
-        try (var stream = (!inputStream.markSupported()
-            ? new BufferedInputStream(inputStream) : inputStream)) {
+        try (var stream =
+                (!inputStream.markSupported()
+                        ? new BufferedInputStream(inputStream)
+                        : inputStream)) {
             return detector.detect(stream, metadata).toString();
         }
     }

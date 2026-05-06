@@ -26,6 +26,5 @@ public class BasePlugin extends Plugin {
         this.context = pluginContext;
     }
 
-    public BasePlugin() {
-    }
+    public BasePlugin() {}
 }

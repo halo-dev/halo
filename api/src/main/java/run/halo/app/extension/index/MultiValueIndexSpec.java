@@ -13,13 +13,12 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 interface MultiValueIndexSpec<E extends Extension, K extends Comparable<K>>
-    extends ValueIndexSpec<E, K> {
+        extends ValueIndexSpec<E, K> {
 
     @Nullable Set<K> getValues(E extension);
 
     static <E extends Extension, K extends Comparable<K>> MultiValueBuilder<E, K> builder(
-        String name, Class<K> keyType) {
+            String name, Class<K> keyType) {
         return new MultiValueBuilder<>(name, keyType);
     }
-
 }

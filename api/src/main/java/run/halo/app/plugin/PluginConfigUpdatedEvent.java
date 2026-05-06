@@ -48,12 +48,11 @@ public class PluginConfigUpdatedEvent extends ApplicationEvent {
 
     @Builder
     public PluginConfigUpdatedEvent(
-        Object source,
-        Map<String, JsonNode> oldConfig,
-        Map<String, JsonNode> newConfig,
-        Map<String, tools.jackson.databind.JsonNode> oldSettingValues,
-        Map<String, tools.jackson.databind.JsonNode> newSettingValues
-    ) {
+            Object source,
+            Map<String, JsonNode> oldConfig,
+            Map<String, JsonNode> newConfig,
+            Map<String, tools.jackson.databind.JsonNode> oldSettingValues,
+            Map<String, tools.jackson.databind.JsonNode> newSettingValues) {
         super(source);
         this.oldConfig = oldConfig;
         this.newConfig = newConfig;

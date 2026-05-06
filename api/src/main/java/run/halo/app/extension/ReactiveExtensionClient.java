@@ -24,8 +24,8 @@ public interface ReactiveExtensionClient {
      * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
-    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator);
+    <E extends Extension> Flux<E> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator);
 
     /**
      * Lists Extensions by Extension type, filter, sorter and page info.
@@ -39,21 +39,21 @@ public interface ReactiveExtensionClient {
      * @return a list of Extensions.
      */
     @Deprecated
-    <E extends Extension> Mono<ListResult<E>> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size);
+    <E extends Extension> Mono<ListResult<E>> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size);
 
     <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort);
 
     <E extends Extension> Flux<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
 
-    <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort,
-        int topN);
+    <E extends Extension> Flux<String> listTopNames(
+            Class<E> type, ListOptions options, Sort sort, int topN);
 
-    <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options,
-        PageRequest pageable);
+    <E extends Extension> Mono<ListResult<E>> listBy(
+            Class<E> type, ListOptions options, PageRequest pageable);
 
-    <E extends Extension> Mono<ListResult<String>> listNamesBy(Class<E> type, ListOptions options,
-        PageRequest pageable);
+    <E extends Extension> Mono<ListResult<String>> listNamesBy(
+            Class<E> type, ListOptions options, PageRequest pageable);
 
     <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options);
 
@@ -105,5 +105,4 @@ public interface ReactiveExtensionClient {
     IndexedQueryEngine indexedQueryEngine();
 
     void watch(Watcher watcher);
-
 }

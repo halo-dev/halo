@@ -30,49 +30,53 @@ import run.halo.app.notification.UserNotificationPreferenceService;
 @ExtendWith(MockitoExtension.class)
 class UserNotificationPreferencesEndpointTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private UserNotificationPreferenceService userNotificationPreferenceService;
+    @Mock private UserNotificationPreferenceService userNotificationPreferenceService;
 
-    @InjectMocks
-    private UserNotificationPreferencesEndpoint userNotificationPreferencesEndpoint;
+    @InjectMocks private UserNotificationPreferencesEndpoint userNotificationPreferencesEndpoint;
 
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        webTestClient = WebTestClient
-            .bindToRouterFunction(userNotificationPreferencesEndpoint.endpoint())
-            .build();
+        webTestClient =
+                WebTestClient.bindToRouterFunction(userNotificationPreferencesEndpoint.endpoint())
+                        .build();
 
-        when(client.listAll(eq(ReasonType.class), assertArg(option ->
-                assertThat(option.toString())
-                    .isEqualTo("NOT EXISTS metadata.labels['halo.run/hidden']")),
-            eq(ExtensionUtil.defaultSort()))
-        ).thenReturn(Flux.empty());
+        when(client.listAll(
+                        eq(ReasonType.class),
+                        assertArg(
+                                option ->
+                                        assertThat(option.toString())
+                                                .isEqualTo(
+                                                        "NOT EXISTS"
+                                                            + " metadata.labels['halo.run/hidden']")),
+                        eq(ExtensionUtil.defaultSort())))
+                .thenReturn(Flux.empty());
     }
 
     @Test
     void listNotificationPreferences() {
         when(client.list(eq(NotifierDescriptor.class), eq(null), any())).thenReturn(Flux.empty());
         when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
-        webTestClient.post()
-            .uri("/userspaces/{username}/notification-preferences", "guqing")
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .post()
+                .uri("/userspaces/{username}/notification-preferences", "guqing")
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 
     @Test
     void saveNotificationPreferences() {
         when(client.list(eq(NotifierDescriptor.class), eq(null), any())).thenReturn(Flux.empty());
         when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
-        webTestClient.post()
-            .uri("/userspaces/{username}/notification-preferences", "guqing")
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .post()
+                .uri("/userspaces/{username}/notification-preferences", "guqing")
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 }

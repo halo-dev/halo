@@ -51,5 +51,4 @@ public class Metadata implements MetadataOperator {
     private Instant deletionTimestamp;
 
     private Set<String> finalizers;
-
 }

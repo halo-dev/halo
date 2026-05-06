@@ -42,8 +42,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 @Slf4j
 public abstract class FileUtils {
 
-    private FileUtils() {
-    }
+    private FileUtils() {}
 
     /**
      * Unzip the given content to target path. Please note that no default scheduler will be used.
@@ -65,25 +64,26 @@ public abstract class FileUtils {
      * @return a Mono signaling when unzip is complete
      */
     public static Mono<Void> unzip(
-        Publisher<DataBuffer> content, Path targetPath, @Nullable Scheduler scheduler
-    ) {
-        var unzip = Mono.fromCallable(() -> {
-            try (var is = subscriberInputStream(content, 1);
-                 var zis = new ZipInputStream(is)) {
-                log.debug("Unzipping to target path: {}", targetPath);
-                unzip(zis, targetPath);
-                log.debug("Unzipped to target path: {}", targetPath);
-            }
-            return null;
-        }).then();
+            Publisher<DataBuffer> content, Path targetPath, @Nullable Scheduler scheduler) {
+        var unzip =
+                Mono.fromCallable(
+                                () -> {
+                                    try (var is = subscriberInputStream(content, 1);
+                                            var zis = new ZipInputStream(is)) {
+                                        log.debug("Unzipping to target path: {}", targetPath);
+                                        unzip(zis, targetPath);
+                                        log.debug("Unzipped to target path: {}", targetPath);
+                                    }
+                                    return null;
+                                })
+                        .then();
         if (scheduler != null) {
             return unzip.subscribeOn(scheduler);
         }
         return unzip;
     }
 
-    public static void unzip(ZipInputStream zis, Path targetPath)
-        throws IOException {
+    public static void unzip(ZipInputStream zis, Path targetPath) throws IOException {
         // 1. unzip file to folder
         // 2. return the folder path
         Assert.notNull(zis, "Zip input stream must not be null");
@@ -121,37 +121,41 @@ public abstract class FileUtils {
 
     public static void zip(Path sourcePath, Path targetPath) throws IOException {
         try (var zos = new ZipOutputStream(Files.newOutputStream(targetPath))) {
-            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException {
-                    checkDirectoryTraversal(sourcePath, file);
-                    var relativePath = sourcePath.relativize(file);
-                    var entry = new ZipEntry(relativePath.toString());
-                    zos.putNextEntry(entry);
-                    Files.copy(file, zos);
-                    zos.closeEntry();
-                    return super.visitFile(file, attrs);
-                }
-            });
+            Files.walkFileTree(
+                    sourcePath,
+                    new SimpleFileVisitor<>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                                throws IOException {
+                            checkDirectoryTraversal(sourcePath, file);
+                            var relativePath = sourcePath.relativize(file);
+                            var entry = new ZipEntry(relativePath.toString());
+                            zos.putNextEntry(entry);
+                            Files.copy(file, zos);
+                            zos.closeEntry();
+                            return super.visitFile(file, attrs);
+                        }
+                    });
         }
     }
 
     public static void jar(Path sourcePath, Path targetPath) throws IOException {
         try (var jos = new JarOutputStream(Files.newOutputStream(targetPath))) {
-            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException {
-                    checkDirectoryTraversal(sourcePath, file);
-                    var relativePath = sourcePath.relativize(file);
-                    var entry = new JarEntry(relativePath.toString());
-                    jos.putNextEntry(entry);
-                    Files.copy(file, jos);
-                    jos.closeEntry();
-                    return super.visitFile(file, attrs);
-                }
-            });
+            Files.walkFileTree(
+                    sourcePath,
+                    new SimpleFileVisitor<>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                                throws IOException {
+                            checkDirectoryTraversal(sourcePath, file);
+                            var relativePath = sourcePath.relativize(file);
+                            var entry = new JarEntry(relativePath.toString());
+                            jos.putNextEntry(entry);
+                            Files.copy(file, jos);
+                            jos.closeEntry();
+                            return super.visitFile(file, attrs);
+                        }
+                    });
         }
     }
 
@@ -214,8 +218,8 @@ public abstract class FileUtils {
      * @param closeable The resource to close, may be null.
      * @param consumer Consumes the IOException thrown by {@link Closeable#close()}.
      */
-    public static void closeQuietly(final Closeable closeable,
-        final Consumer<IOException> consumer) {
+    public static void closeQuietly(
+            final Closeable closeable, final Consumer<IOException> consumer) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -233,8 +237,7 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(Path parentPath,
-        Path pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath, Path pathToCheck) {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 
@@ -242,8 +245,10 @@ public abstract class FileUtils {
             return;
         }
 
-        throw new AccessDeniedException("Directory traversal detected: " + pathToCheck,
-            "problemDetail.directoryTraversal", new Object[] {parentPath, pathToCheck});
+        throw new AccessDeniedException(
+                "Directory traversal detected: " + pathToCheck,
+                "problemDetail.directoryTraversal",
+                new Object[] {parentPath, pathToCheck});
     }
 
     /**
@@ -252,8 +257,7 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(String parentPath,
-        String pathToCheck) {
+    public static void checkDirectoryTraversal(String parentPath, String pathToCheck) {
         checkDirectoryTraversal(Paths.get(parentPath), Paths.get(pathToCheck));
     }
 
@@ -263,8 +267,7 @@ public abstract class FileUtils {
      * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(Path parentPath,
-        String pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath, String pathToCheck) {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
@@ -285,21 +288,21 @@ public abstract class FileUtils {
     }
 
     public static Mono<Boolean> deleteRecursivelyAndSilently(
-        Path root, @Nullable Scheduler scheduler
-    ) {
-        var delete = Mono.fromSupplier(() -> {
-            try {
-                return deleteRecursively(root);
-            } catch (IOException ignored) {
-                return false;
-            }
-        });
+            Path root, @Nullable Scheduler scheduler) {
+        var delete =
+                Mono.fromSupplier(
+                        () -> {
+                            try {
+                                return deleteRecursively(root);
+                            } catch (IOException ignored) {
+                                return false;
+                            }
+                        });
         if (scheduler != null) {
             return delete.subscribeOn(scheduler);
         }
         return delete;
     }
-
 
     public static Mono<Boolean> deleteFileSilently(Path file) {
         return deleteFileSilently(file, Schedulers.boundedElastic());
@@ -307,17 +310,17 @@ public abstract class FileUtils {
 
     public static Mono<Boolean> deleteFileSilently(Path file, Scheduler scheduler) {
         return Mono.fromSupplier(
-                () -> {
-                    if (file == null || !Files.isRegularFile(file)) {
-                        return false;
-                    }
-                    try {
-                        return Files.deleteIfExists(file);
-                    } catch (IOException ignored) {
-                        return false;
-                    }
-                })
-            .subscribeOn(scheduler);
+                        () -> {
+                            if (file == null || !Files.isRegularFile(file)) {
+                                return false;
+                            }
+                            try {
+                                return Files.deleteIfExists(file);
+                            } catch (IOException ignored) {
+                                return false;
+                            }
+                        })
+                .subscribeOn(scheduler);
     }
 
     public static void copyResource(Resource resource, Path path) {
@@ -337,30 +340,35 @@ public abstract class FileUtils {
     }
 
     public static void copyRecursively(Path src, Path target, Set<String> excludes)
-        throws IOException {
+            throws IOException {
         var pathMatcher = new AntPathMatcher();
-        Predicate<Path> shouldExclude = path -> excludes.stream()
-            .anyMatch(pattern -> pathMatcher.match(pattern, path.toString()));
-        Files.walkFileTree(src, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                throws IOException {
-                if (!shouldExclude.test(src.relativize(file))) {
-                    Files.copy(file, target.resolve(src.relativize(file)), REPLACE_EXISTING);
-                }
-                return super.visitFile(file, attrs);
-            }
+        Predicate<Path> shouldExclude =
+                path ->
+                        excludes.stream()
+                                .anyMatch(pattern -> pathMatcher.match(pattern, path.toString()));
+        Files.walkFileTree(
+                src,
+                new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                            throws IOException {
+                        if (!shouldExclude.test(src.relativize(file))) {
+                            Files.copy(
+                                    file, target.resolve(src.relativize(file)), REPLACE_EXISTING);
+                        }
+                        return super.visitFile(file, attrs);
+                    }
 
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                throws IOException {
-                if (shouldExclude.test(src.relativize(dir))) {
-                    return FileVisitResult.SKIP_SUBTREE;
-                }
-                Files.createDirectories(target.resolve(src.relativize(dir)));
-                return super.preVisitDirectory(dir, attrs);
-            }
-        });
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                            throws IOException {
+                        if (shouldExclude.test(src.relativize(dir))) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                        Files.createDirectories(target.resolve(src.relativize(dir)));
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+                });
     }
 
     public static Mono<Path> createTempDir(String prefix, @Nullable Scheduler scheduler) {

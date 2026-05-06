@@ -26,10 +26,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
  */
 @ExtendWith(MockitoExtension.class)
 class AuthorPostsRouteFactoryTest extends RouteFactoryTestSuite {
-    @Mock
-    ReactiveExtensionClient client;
-    @InjectMocks
-    AuthorPostsRouteFactory authorPostsRouteFactory;
+    @Mock ReactiveExtensionClient client;
+    @InjectMocks AuthorPostsRouteFactory authorPostsRouteFactory;
 
     @Test
     void create() {
@@ -39,21 +37,11 @@ class AuthorPostsRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = spyAuthorRoute.create(null);
         WebTestClient webClient = getWebTestClient(routerFunction);
 
-        when(client.fetch(eq(User.class), eq("fake-user")))
-            .thenReturn(Mono.just(new User()));
-        webClient.get()
-            .uri("/authors/fake-user")
-            .exchange()
-            .expectStatus().isOk();
+        when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(new User()));
+        webClient.get().uri("/authors/fake-user").exchange().expectStatus().isOk();
 
-        webClient.get()
-            .uri("/authors/fake-user/page/p")
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient.get().uri("/authors/fake-user/page/p").exchange().expectStatus().isNotFound();
 
-        webClient.get()
-            .uri("/authors/fake-user/page/abc")
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient.get().uri("/authors/fake-user/page/abc").exchange().expectStatus().isNotFound();
     }
 }

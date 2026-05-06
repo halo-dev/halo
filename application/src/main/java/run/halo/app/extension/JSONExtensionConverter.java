@@ -36,8 +36,7 @@ import run.halo.app.extension.store.ExtensionStore;
 @Component
 class JSONExtensionConverter implements ExtensionConverter {
 
-    @Getter
-    public ObjectMapper objectMapper;
+    @Getter public ObjectMapper objectMapper;
 
     private final SchemeManager schemeManager;
 
@@ -64,21 +63,27 @@ class JSONExtensionConverter implements ExtensionConverter {
         var scheme = schemeManager.get(gvk);
 
         try {
-            var convertedExtension = Optional.of(extension)
-                .map(item -> scheme.type().isAssignableFrom(item.getClass()) ? item
-                    : objectMapper.convertValue(item, scheme.type())
-                )
-                .orElseThrow();
+            var convertedExtension =
+                    Optional.of(extension)
+                            .map(
+                                    item ->
+                                            scheme.type().isAssignableFrom(item.getClass())
+                                                    ? item
+                                                    : objectMapper.convertValue(
+                                                            item, scheme.type()))
+                            .orElseThrow();
             var validation = new ValidationData<>(extension);
 
             var extensionJsonNode = objectMapper.valueToTree(convertedExtension);
             var validator = getValidator(scheme);
             validator.validate(extensionJsonNode, validation);
             if (!validation.isValid()) {
-                log.debug("Failed to validate Extension: {}, and errors were: {}",
-                    extension.getClass(), validation.results());
-                throw new SchemaViolationException(extension.groupVersionKind(),
-                    validation.results());
+                log.debug(
+                        "Failed to validate Extension: {}, and errors were: {}",
+                        extension.getClass(),
+                        validation.results());
+                throw new SchemaViolationException(
+                        extension.groupVersionKind(), validation.results());
             }
 
             var version = extension.getMetadata().getVersion();
@@ -99,8 +104,8 @@ class JSONExtensionConverter implements ExtensionConverter {
             extension.getMetadata().setVersion(extensionStore.getVersion());
             return extension;
         } catch (IOException e) {
-            throw new ExtensionConvertException("Failed to read Extension " + type + " from bytes",
-                e);
+            throw new ExtensionConvertException(
+                    "Failed to read Extension " + type + " from bytes", e);
         }
     }
 
@@ -109,36 +114,39 @@ class JSONExtensionConverter implements ExtensionConverter {
         var removed = validatorMap.remove(event.getScheme());
         if (log.isDebugEnabled()) {
             if (removed == null) {
-                log.debug("No available validator found while removing validator for scheme: {}",
-                    event.getScheme().groupVersionKind()
-                );
+                log.debug(
+                        "No available validator found while removing validator for scheme: {}",
+                        event.getScheme().groupVersionKind());
             } else {
-                log.debug("Removed schema validator {} for scheme: {}",
-                    removed, event.getScheme().groupVersionKind()
-                );
+                log.debug(
+                        "Removed schema validator {} for scheme: {}",
+                        removed,
+                        event.getScheme().groupVersionKind());
             }
         }
     }
 
     private SchemaValidator getValidator(Scheme scheme)
-        throws MalformedURLException, ResolutionException {
-        return validatorMap.computeIfAbsent(scheme, s -> {
-            try {
-                var context = new ValidationContext<OAI3>(
-                    new OAI3Context(new URL("file:/"), scheme.openApiSchema())
-                );
-                context.setFastFail(false);
-                var validator = new SchemaValidator(context, null, scheme.openApiSchema());
-                if (log.isDebugEnabled()) {
-                    log.debug("Created schema validator {} for scheme: {}",
-                        validator, scheme.groupVersionKind()
-                    );
-                }
-                return validator;
-            } catch (ResolutionException | MalformedURLException e) {
-                throw Exceptions.propagate(e);
-            }
-        });
+            throws MalformedURLException, ResolutionException {
+        return validatorMap.computeIfAbsent(
+                scheme,
+                s -> {
+                    try {
+                        var context =
+                                new ValidationContext<OAI3>(
+                                        new OAI3Context(new URL("file:/"), scheme.openApiSchema()));
+                        context.setFastFail(false);
+                        var validator = new SchemaValidator(context, null, scheme.openApiSchema());
+                        if (log.isDebugEnabled()) {
+                            log.debug(
+                                    "Created schema validator {} for scheme: {}",
+                                    validator,
+                                    scheme.groupVersionKind());
+                        }
+                        return validator;
+                    } catch (ResolutionException | MalformedURLException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                });
     }
-
 }

@@ -13,8 +13,12 @@ import run.halo.app.extension.GVK;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "security.halo.run", version = "v1alpha1", kind = "RememberMeToken", plural =
-    "remembermetokens", singular = "remembermetoken")
+@GVK(
+        group = "security.halo.run",
+        version = "v1alpha1",
+        kind = "RememberMeToken",
+        plural = "remembermetokens",
+        singular = "remembermetoken")
 public class RememberMeToken extends AbstractExtension {
 
     @Schema(requiredMode = REQUIRED)
@@ -33,8 +37,7 @@ public class RememberMeToken extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String tokenValue;
 
-        @Nullable
-        private Instant lastUsed;
+        @Nullable private Instant lastUsed;
 
         /**
          * The previous token value, stored when the token is rotated.
@@ -42,7 +45,6 @@ public class RememberMeToken extends AbstractExtension {
          * to prevent false-positive cookie theft detection during
          * concurrent requests.
          */
-        @Nullable
-        private String previousTokenValue;
+        @Nullable private String previousTokenValue;
     }
 }

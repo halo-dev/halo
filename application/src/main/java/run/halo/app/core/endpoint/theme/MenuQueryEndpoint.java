@@ -38,38 +38,39 @@ public class MenuQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "MenuV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("menus/-", this::getByName,
-                builder -> builder.operationId("queryPrimaryMenu")
-                    .description("Gets primary menu.")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementation(MenuVo.class)
-                    )
-            )
-            .GET("menus/{name}", this::getByName,
-                builder -> builder.operationId("queryMenuByName")
-                    .description("Gets menu by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Menu name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(MenuVo.class)
-                    )
-            )
-            .build();
+                .GET(
+                        "menus/-",
+                        this::getByName,
+                        builder ->
+                                builder.operationId("queryPrimaryMenu")
+                                        .description("Gets primary menu.")
+                                        .tag(tag)
+                                        .response(responseBuilder().implementation(MenuVo.class)))
+                .GET(
+                        "menus/{name}",
+                        this::getByName,
+                        builder ->
+                                builder.operationId("queryMenuByName")
+                                        .description("Gets menu by name.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Menu name")
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(MenuVo.class)))
+                .build();
     }
 
     private Mono<ServerResponse> getByName(ServerRequest request) {
         return determineMenuName(request)
-            .flatMap(menuFinder::getByName)
-            .flatMap(menuVo -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(menuVo)
-            );
+                .flatMap(menuFinder::getByName)
+                .flatMap(
+                        menuVo ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(menuVo));
     }
 
     private Mono<String> determineMenuName(ServerRequest request) {
@@ -78,11 +79,14 @@ public class MenuQueryEndpoint implements CustomEndpoint {
             return Mono.just(name);
         }
         // If name is "-", then get primary menu.
-        return environmentFetcher.fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
-            .mapNotNull(SystemSetting.Menu::getPrimary)
-            .switchIfEmpty(
-                Mono.error(() -> new ServerWebInputException("Primary menu is not configured."))
-            );
+        return environmentFetcher
+                .fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
+                .mapNotNull(SystemSetting.Menu::getPrimary)
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "Primary menu is not configured.")));
     }
 
     @Override

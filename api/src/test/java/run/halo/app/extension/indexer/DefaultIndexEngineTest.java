@@ -12,17 +12,18 @@ class DefaultIndexEngineTest {
     void priorityQueueTest() {
         int n = 3;
         var pq = new PriorityQueue<>(n, Comparator.<Integer>naturalOrder().reversed());
-        List.of(5, 4, 3, 2, 1).forEach(i -> {
-            pq.offer(i);
-            if (pq.size() > n) {
-                pq.poll();
-            }
-        });
+        List.of(5, 4, 3, 2, 1)
+                .forEach(
+                        i -> {
+                            pq.offer(i);
+                            if (pq.size() > n) {
+                                pq.poll();
+                            }
+                        });
         var result = new ArrayList<>();
         while (!pq.isEmpty()) {
             result.addFirst(pq.poll());
         }
         result.forEach(System.out::println);
     }
-
 }

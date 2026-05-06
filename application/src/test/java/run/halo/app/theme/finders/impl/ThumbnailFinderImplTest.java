@@ -24,18 +24,17 @@ import run.halo.app.core.attachment.thumbnail.ThumbnailService;
 @ExtendWith(MockitoExtension.class)
 class ThumbnailFinderImplTest {
 
-    @Mock
-    ThumbnailService thumbnailService;
+    @Mock ThumbnailService thumbnailService;
 
-    @InjectMocks
-    ThumbnailFinderImpl thumbnailFinder;
+    @InjectMocks ThumbnailFinderImpl thumbnailFinder;
 
     @Test
     void shouldNotGenWhenUriIsInvalid() {
-        thumbnailFinder.gen("invalid uri", "l")
-            .as(StepVerifier::create)
-            .expectNext("invalid uri")
-            .verifyComplete();
+        thumbnailFinder
+                .gen("invalid uri", "l")
+                .as(StepVerifier::create)
+                .expectNext("invalid uri")
+                .verifyComplete();
 
         verify(thumbnailService, never()).get(any(), any());
     }
@@ -43,11 +42,12 @@ class ThumbnailFinderImplTest {
     @Test
     void shouldGenWhenUriIsValid() {
         when(thumbnailService.get(any(), any()))
-            .thenReturn(Mono.just(URI.create("/test-thumb.jpg")));
-        thumbnailFinder.gen("/test.jpg", "l")
-            .as(StepVerifier::create)
-            .expectNext("/test-thumb.jpg")
-            .verifyComplete();
+                .thenReturn(Mono.just(URI.create("/test-thumb.jpg")));
+        thumbnailFinder
+                .gen("/test.jpg", "l")
+                .as(StepVerifier::create)
+                .expectNext("/test-thumb.jpg")
+                .verifyComplete();
 
         verify(thumbnailService).get(any(), any());
     }

@@ -36,12 +36,12 @@ public class OwnerInfo {
             throw new IllegalArgumentException("Only support 'email' owner kind.");
         }
         return OwnerInfo.builder()
-            .kind(owner.getKind())
-            .name(owner.getName())
-            .email(owner.getName())
-            .displayName(owner.getDisplayName())
-            .avatar(owner.getAnnotation(Comment.CommentOwner.AVATAR_ANNO))
-            .build();
+                .kind(owner.getKind())
+                .name(owner.getName())
+                .email(owner.getName())
+                .displayName(owner.getDisplayName())
+                .avatar(owner.getAnnotation(Comment.CommentOwner.AVATAR_ANNO))
+                .build();
     }
 
     /**
@@ -52,11 +52,11 @@ public class OwnerInfo {
      */
     public static OwnerInfo from(User user) {
         return OwnerInfo.builder()
-            .kind(user.getKind())
-            .name(user.getMetadata().getName())
-            .email(user.getSpec().getEmail())
-            .avatar(user.getSpec().getAvatar())
-            .displayName(user.getSpec().getDisplayName())
-            .build();
+                .kind(user.getKind())
+                .name(user.getMetadata().getName())
+                .email(user.getSpec().getEmail())
+                .avatar(user.getSpec().getAvatar())
+                .displayName(user.getSpec().getDisplayName())
+                .build();
     }
 }

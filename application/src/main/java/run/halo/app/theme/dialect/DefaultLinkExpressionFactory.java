@@ -49,9 +49,13 @@ public class DefaultLinkExpressionFactory implements IExpressionObjectFactory {
             Validate.notNull(context, "Context cannot be null");
             this.context = context;
             Set<ILinkBuilder> linkBuilders = context.getConfiguration().getLinkBuilders();
-            linkBuilder = linkBuilders.stream()
-                .findFirst()
-                .orElseThrow(() -> new TemplateProcessingException("Link builder not found"));
+            linkBuilder =
+                    linkBuilders.stream()
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new TemplateProcessingException(
+                                                    "Link builder not found"));
         }
 
         public String assets(String path) {

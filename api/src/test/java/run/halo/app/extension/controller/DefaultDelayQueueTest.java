@@ -62,8 +62,8 @@ class DefaultDelayQueueTest {
         assertNotNull(delayedEntry);
         assertEquals(newRequest("fake-name"), delayedEntry.getEntry());
         assertEquals(minDelay.plusMillis(1), delayedEntry.getRetryAfter());
-        assertEquals(minDelay.plusMillis(1).toMillis(),
-            delayedEntry.getDelay(TimeUnit.MILLISECONDS));
+        assertEquals(
+                minDelay.plusMillis(1).toMillis(), delayedEntry.getDelay(TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -80,8 +80,7 @@ class DefaultDelayQueueTest {
     @Test
     void shouldNotAddRepeatedlyIfNotDone() throws InterruptedException {
         queue = new DefaultQueue<>(() -> now, Duration.ZERO);
-        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO,
-            () -> this.now);
+        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO, () -> this.now);
 
         queue.add(fakeEntry);
         assertEquals(1, queue.size());
@@ -101,37 +100,35 @@ class DefaultDelayQueueTest {
     @Test
     void shouldNotAddIfHavingEarlierEntryInQueue() {
         queue = new DefaultQueue<>(() -> now, Duration.ZERO);
-        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO,
-            () -> this.now);
+        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO, () -> this.now);
 
         assertTrue(queue.add(fakeEntry));
         assertEquals(1, queue.size());
         assertEquals(fakeEntry, queue.peek());
 
         assertFalse(queue.add(fakeEntry));
-        var laterEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100),
-            () -> this.now);
+        var laterEntry =
+                new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100), () -> this.now);
         assertFalse(queue.add(laterEntry));
     }
 
     @Test
     void shouldAddIfHavingLaterEntryInQueue() {
         queue = new DefaultQueue<>(() -> now, Duration.ZERO);
-        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100),
-            () -> this.now);
+        var fakeEntry =
+                new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100), () -> this.now);
 
         assertTrue(queue.add(fakeEntry));
         assertEquals(1, queue.size());
         assertEquals(fakeEntry, queue.peek());
 
         assertFalse(queue.add(fakeEntry));
-        var laterEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(99),
-            () -> this.now);
+        var laterEntry =
+                new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(99), () -> this.now);
         assertTrue(queue.add(laterEntry));
     }
 
     Request newRequest(String name) {
         return new Request(name);
     }
-
 }

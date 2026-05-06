@@ -50,7 +50,6 @@ class PluginRequestMappingHandlerMappingTest {
 
     private PluginRequestMappingHandlerMapping handlerMapping;
 
-
     @BeforeEach
     public void setup() {
         handlerMapping = new PluginRequestMappingHandlerMapping();
@@ -61,25 +60,27 @@ class PluginRequestMappingHandlerMappingTest {
     public void shouldAddPathPrefixWhenExistingApiVersion() throws Exception {
         Method method = UserController.class.getMethod("getUser");
         RequestMappingInfo info =
-            this.handlerMapping.getPluginMappingForMethod("fakePlugin", method,
-                UserController.class);
+                this.handlerMapping.getPluginMappingForMethod(
+                        "fakePlugin", method, UserController.class);
 
         assertThat(info).isNotNull();
-        assertThat(info.getPatternsCondition().getPatterns()).isEqualTo(
-            Collections.singleton(
-                new PathPatternParser().parse(
-                    "/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/user/{id}")));
+        assertThat(info.getPatternsCondition().getPatterns())
+                .isEqualTo(
+                        Collections.singleton(
+                                new PathPatternParser()
+                                        .parse(
+                                                "/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/user/{id}")));
     }
 
     @Test
     public void shouldKeepRawWhenMissingApiVersion() throws Exception {
         Method method = AppleMissingApiVersionController.class.getMethod("getName");
         RequestMappingInfo info =
-            this.handlerMapping.getPluginMappingForMethod("fakePlugin", method,
-                AppleMissingApiVersionController.class);
+                this.handlerMapping.getPluginMappingForMethod(
+                        "fakePlugin", method, AppleMissingApiVersionController.class);
 
         assertThat(info.getPatternsCondition().getPatterns())
-            .isEqualTo(Collections.singleton(new PathPatternParser().parse("/apples")));
+                .isEqualTo(Collections.singleton(new PathPatternParser().parse("/apples")));
     }
 
     @Test
@@ -91,8 +92,8 @@ class PluginRequestMappingHandlerMappingTest {
 
         List<RequestMappingInfo> mappings = handlerMapping.getMappings("fakePlugin");
         assertThat(mappings).hasSize(1);
-        assertThat(mappings.get(0).toString()).isEqualTo(
-            "{GET /apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/user/{id}}");
+        assertThat(mappings.get(0).toString())
+                .isEqualTo("{GET /apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/user/{id}}");
     }
 
     @Test
@@ -114,12 +115,12 @@ class PluginRequestMappingHandlerMappingTest {
 
         // resolve an expected method from TestController
         Method expected =
-            ResolvableMethod.on(TestController.class).annot(getMapping("/foo")).build();
+                ResolvableMethod.on(TestController.class).annot(getMapping("/foo")).build();
 
         // get handler by mock exchange
         ServerWebExchange exchange =
-            MockServerWebExchange.from(
-                get("/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/foo"));
+                MockServerWebExchange.from(
+                        get("/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/foo"));
         HandlerMethod hm = (HandlerMethod) this.handlerMapping.getHandler(exchange).block();
 
         assertThat(hm).isNotNull();
@@ -132,7 +133,9 @@ class PluginRequestMappingHandlerMappingTest {
         handlerMapping.registerHandlerMethods("fakePlugin", new TestController());
 
         Method expected =
-            ResolvableMethod.on(TestController.class).annot(getMapping("/foo").params("p")).build();
+                ResolvableMethod.on(TestController.class)
+                        .annot(getMapping("/foo").params("p"))
+                        .build();
 
         String requestPath = "/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin/foo?p=anything";
         ServerWebExchange exchange = MockServerWebExchange.from(get(requestPath));
@@ -146,8 +149,7 @@ class PluginRequestMappingHandlerMappingTest {
     public void getHandlerRootPathMatch() {
         // register handler methods first
         handlerMapping.registerHandlerMethods("fakePlugin", new TestController());
-        Method expected =
-            ResolvableMethod.on(TestController.class).annot(getMapping("")).build();
+        Method expected = ResolvableMethod.on(TestController.class).annot(getMapping("")).build();
 
         String requestPath = "/apis/api.plugin.halo.run/v1alpha1/plugins/fakePlugin";
         ServerWebExchange exchange = MockServerWebExchange.from(get(requestPath));
@@ -166,9 +168,12 @@ class PluginRequestMappingHandlerMappingTest {
         ServerWebExchange exchange = MockServerWebExchange.from(post(requestPath));
         Mono<Object> mono = this.handlerMapping.getHandler(exchange);
 
-        assertError(mono, MethodNotAllowedException.class,
-            ex -> assertThat(ex.getSupportedMethods()).isEqualTo(
-                Set.of(HttpMethod.GET, HttpMethod.HEAD)));
+        assertError(
+                mono,
+                MethodNotAllowedException.class,
+                ex ->
+                        assertThat(ex.getSupportedMethods())
+                                .isEqualTo(Set.of(HttpMethod.GET, HttpMethod.HEAD)));
     }
 
     @Test
@@ -181,14 +186,15 @@ class PluginRequestMappingHandlerMappingTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void assertError(Mono<Object> mono, final Class<T> exceptionClass,
-        final Consumer<T> consumer) {
+    private <T> void assertError(
+            Mono<Object> mono, final Class<T> exceptionClass, final Consumer<T> consumer) {
         StepVerifier.create(mono)
-            .consumeErrorWith(error -> {
-                assertThat(error.getClass()).isEqualTo(exceptionClass);
-                consumer.accept((T) error);
-            })
-            .verify();
+                .consumeErrorWith(
+                        error -> {
+                            assertThat(error.getClass()).isEqualTo(exceptionClass);
+                            consumer.accept((T) error);
+                        })
+                .verify();
     }
 
     private RequestMappingPredicate getMapping(String... path) {
@@ -215,14 +221,17 @@ class PluginRequestMappingHandlerMappingTest {
         public Method build() {
             Set<Method> methods = MethodIntrospector.selectMethods(this.objectClass, this::isMatch);
             Assert.state(!methods.isEmpty(), () -> "No matching method: " + this);
-            Assert.state(methods.size() == 1,
-                () -> "Multiple matching methods: " + this + formatMethods(methods));
+            Assert.state(
+                    methods.size() == 1,
+                    () -> "Multiple matching methods: " + this + formatMethods(methods));
             return methods.iterator().next();
         }
 
         private String formatMethods(Set<Method> methods) {
-            return "\nMatched:\n" + methods.stream()
-                .map(Method::toGenericString).collect(Collectors.joining(",\n\t", "[\n\t", "\n]"));
+            return "\nMatched:\n"
+                    + methods.stream()
+                            .map(Method::toGenericString)
+                            .collect(Collectors.joining(",\n\t", "[\n\t", "\n]"));
         }
 
         private boolean isMatch(Method method) {
@@ -238,11 +247,9 @@ class PluginRequestMappingHandlerMappingTest {
 
         private String[] params;
 
-
         private RequestMappingPredicate(String... path) {
             this.path = path;
         }
-
 
         public RequestMappingPredicate method(RequestMethod... methods) {
             this.method = methods;
@@ -257,11 +264,11 @@ class PluginRequestMappingHandlerMappingTest {
         @Override
         public boolean test(Method method) {
             RequestMapping annot =
-                AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+                    AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
             return annot != null
-                && Arrays.equals(this.path, annot.path())
-                && Arrays.equals(this.method, annot.method())
-                && (this.params == null || Arrays.equals(this.params, annot.params()));
+                    && Arrays.equals(this.path, annot.path())
+                    && Arrays.equals(this.method, annot.method())
+                    && (this.params == null || Arrays.equals(this.params, annot.params()));
         }
     }
 
@@ -291,19 +298,17 @@ class PluginRequestMappingHandlerMappingTest {
     @RequestMapping
     static class TestController {
         @GetMapping("/foo")
-        public void foo() {
-        }
+        public void foo() {}
 
         @GetMapping(path = "/foo", params = "p")
-        public void fooParam() {
-        }
+        public void fooParam() {}
 
-        @RequestMapping(path = "/ba*", method = {GET, HEAD})
-        public void bar() {
-        }
+        @RequestMapping(
+                path = "/ba*",
+                method = {GET, HEAD})
+        public void bar() {}
 
         @GetMapping("")
-        public void empty() {
-        }
+        public void empty() {}
     }
 }

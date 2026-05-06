@@ -59,13 +59,14 @@ public class RsaKeyService implements CryptoService, InitializingBean {
     public void afterPropertiesSet() throws JOSEException {
         this.keyPair = this.getRsaKeyPairOrCreate();
         this.keyId = sha256(keyPair.getPrivate().getEncoded());
-        this.jwk = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
-            .privateKey(keyPair.getPrivate())
-            .keyUse(KeyUse.SIGNATURE)
-            .keyOperations(Set.of(SIGN, VERIFY))
-            .keyIDFromThumbprint()
-            .algorithm(JWSAlgorithm.RS256)
-            .build();
+        this.jwk =
+                new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+                        .privateKey(keyPair.getPrivate())
+                        .keyUse(KeyUse.SIGNATURE)
+                        .keyOperations(Set.of(SIGN, VERIFY))
+                        .keyIDFromThumbprint()
+                        .algorithm(JWSAlgorithm.RS256)
+                        .build();
     }
 
     private KeyPair getRsaKeyPairOrCreate() {
@@ -102,8 +103,10 @@ public class RsaKeyService implements CryptoService, InitializingBean {
             Files.write(pubKeyPath, pubKey.getEncoded(), TRUNCATE_EXISTING);
             log.info("Wrote RSA keys for PAT into {} and {}", privKeyPath, pubKeyPath);
             return new KeyPair(pubKey, privKey);
-        } catch (JOSEException | IOException
-                 | InvalidKeySpecException | NoSuchAlgorithmException e) {
+        } catch (JOSEException
+                | IOException
+                | InvalidKeySpecException
+                | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to generate or read RSA key pair", e);
         }
     }
@@ -111,32 +114,33 @@ public class RsaKeyService implements CryptoService, InitializingBean {
     @Override
     public Mono<byte[]> decrypt(byte[] encryptedMessage) {
         return Mono.just(this.keyPair)
-            .map(KeyPair::getPrivate)
-            .flatMap(privateKey -> {
-                try {
-                    var cipher = Cipher.getInstance(TRANSFORMATION);
-                    cipher.init(Cipher.DECRYPT_MODE, privateKey);
-                    return Mono.just(cipher.doFinal(encryptedMessage));
-                } catch (NoSuchAlgorithmException
-                         | NoSuchPaddingException
-                         | InvalidKeyException e) {
-                    return Mono.error(new RuntimeException(
-                        "Failed to read private key or the key was invalid.", e
-                    ));
-                } catch (IllegalBlockSizeException | BadPaddingException e) {
-                    return Mono.error(new InvalidEncryptedMessageException(
-                        "Invalid encrypted message."
-                    ));
-                }
-            })
-            .subscribeOn(Schedulers.boundedElastic());
+                .map(KeyPair::getPrivate)
+                .flatMap(
+                        privateKey -> {
+                            try {
+                                var cipher = Cipher.getInstance(TRANSFORMATION);
+                                cipher.init(Cipher.DECRYPT_MODE, privateKey);
+                                return Mono.just(cipher.doFinal(encryptedMessage));
+                            } catch (NoSuchAlgorithmException
+                                    | NoSuchPaddingException
+                                    | InvalidKeyException e) {
+                                return Mono.error(
+                                        new RuntimeException(
+                                                "Failed to read private key or the key was"
+                                                        + " invalid.",
+                                                e));
+                            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                                return Mono.error(
+                                        new InvalidEncryptedMessageException(
+                                                "Invalid encrypted message."));
+                            }
+                        })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public Mono<byte[]> readPublicKey() {
-        return Mono.just(keyPair)
-            .map(KeyPair::getPublic)
-            .map(PublicKey::getEncoded);
+        return Mono.just(keyPair).map(KeyPair::getPublic).map(PublicKey::getEncoded);
     }
 
     @Override
@@ -158,5 +162,4 @@ public class RsaKeyService implements CryptoService, InitializingBean {
             throw new RuntimeException("Cannot obtain SHA-256 algorithm for message digest.", e);
         }
     }
-
 }

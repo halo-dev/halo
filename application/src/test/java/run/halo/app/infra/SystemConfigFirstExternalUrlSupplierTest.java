@@ -24,17 +24,13 @@ import run.halo.app.infra.properties.HaloProperties;
 @ExtendWith(MockitoExtension.class)
 class SystemConfigFirstExternalUrlSupplierTest {
 
-    @Mock
-    HaloProperties haloProperties;
+    @Mock HaloProperties haloProperties;
 
-    @Mock
-    WebFluxProperties webFluxProperties;
+    @Mock WebFluxProperties webFluxProperties;
 
-    @Mock
-    SystemConfigFetcher systemConfigFetcher;
+    @Mock SystemConfigFetcher systemConfigFetcher;
 
-    @InjectMocks
-    SystemConfigFirstExternalUrlSupplier externalUrl;
+    @InjectMocks SystemConfigFirstExternalUrlSupplier externalUrl;
 
     @Nested
     class HaloPropertiesSupplier {
@@ -71,7 +67,6 @@ class SystemConfigFirstExternalUrlSupplierTest {
 
             assertEquals(URI.create("https://halo.run/fake"), externalUrl.get());
         }
-
 
         @Test
         void getURIWhenUsingRelativePermalink() throws MalformedURLException {
@@ -130,7 +125,6 @@ class SystemConfigFirstExternalUrlSupplierTest {
             when(haloProperties.getExternalUrl()).thenReturn(null);
             assertNull(externalUrl.getRaw());
         }
-
     }
 
     @Nested
@@ -147,8 +141,8 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("https://www.halo.run"), externalUrl.get());
 
             var mockRequest = mock(HttpRequest.class);
-            assertEquals(URI.create("https://www.halo.run").toURL(),
-                externalUrl.getURL(mockRequest));
+            assertEquals(
+                    URI.create("https://www.halo.run").toURL(), externalUrl.getURL(mockRequest));
         }
 
         @Test
@@ -163,10 +157,8 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getRaw());
             assertEquals(URI.create("/fake"), externalUrl.get());
             var mockRequest = mock(HttpRequest.class);
-            assertEquals(URI.create("https://www.halo.run").toURL(),
-                externalUrl.getURL(mockRequest));
+            assertEquals(
+                    URI.create("https://www.halo.run").toURL(), externalUrl.getURL(mockRequest));
         }
-
     }
-
 }

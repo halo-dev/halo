@@ -30,8 +30,10 @@ class ExtensionGetHandler implements GetHandler {
         var extensionName = request.pathVariable("name");
 
         return client.get(scheme.type(), extensionName)
-            .flatMap(extension -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(extension));
+                .flatMap(
+                        extension ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(extension));
     }
 }

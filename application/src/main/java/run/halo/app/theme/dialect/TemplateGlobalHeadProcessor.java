@@ -32,23 +32,27 @@ public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
     }
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(
+            ITemplateContext context,
+            IModel model,
+            IElementModelStructureHandler structureHandler) {
         final IModelFactory modelFactory = context.getModelFactory();
         return fetchCodeInjection()
-            .doOnNext(codeInjection -> {
-                String globalHeader = codeInjection.getGlobalHead();
-                if (StringUtils.isNotBlank(globalHeader)) {
-                    model.add(modelFactory.createText(globalHeader + "\n"));
-                }
+                .doOnNext(
+                        codeInjection -> {
+                            String globalHeader = codeInjection.getGlobalHead();
+                            if (StringUtils.isNotBlank(globalHeader)) {
+                                model.add(modelFactory.createText(globalHeader + "\n"));
+                            }
 
-                // add content head to model
-                String contentHeader = codeInjection.getContentHead();
-                if (StringUtils.isNotBlank(contentHeader) && isContentTemplate(context)) {
-                    model.add(modelFactory.createText(contentHeader + "\n"));
-                }
-            })
-            .then();
+                            // add content head to model
+                            String contentHeader = codeInjection.getContentHead();
+                            if (StringUtils.isNotBlank(contentHeader)
+                                    && isContentTemplate(context)) {
+                                model.add(modelFactory.createText(contentHeader + "\n"));
+                            }
+                        })
+                .then();
     }
 
     private Mono<SystemSetting.CodeInjection> fetchCodeInjection() {
@@ -58,6 +62,6 @@ public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
     private boolean isContentTemplate(ITemplateContext context) {
         String templateId = (String) context.getVariable(ModelConst.TEMPLATE_ID);
         return DefaultTemplateEnum.POST.getValue().equals(templateId)
-            || DefaultTemplateEnum.SINGLE_PAGE.getValue().equals(templateId);
+                || DefaultTemplateEnum.SINGLE_PAGE.getValue().equals(templateId);
     }
 }

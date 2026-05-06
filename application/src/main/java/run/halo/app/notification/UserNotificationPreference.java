@@ -30,8 +30,9 @@ public class UserNotificationPreference {
          */
         public Set<String> getNotifiers(String reasonType) {
             var result = this.get(reasonType);
-            return result == null ? Set.of(DEFAULT_NOTIFIER)
-                : defaultIfNull(result.getNotifiers(), Set.of());
+            return result == null
+                    ? Set.of(DEFAULT_NOTIFIER)
+                    : defaultIfNull(result.getNotifiers(), Set.of());
         }
     }
 

@@ -58,8 +58,8 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
 
     private final AttachmentProperties.ThumbnailProperties thumbnailProperties;
 
-    public DefaultLocalThumbnailService(AttachmentRootGetter attachmentRootGetter,
-        HaloProperties haloProperties) {
+    public DefaultLocalThumbnailService(
+            AttachmentRootGetter attachmentRootGetter, HaloProperties haloProperties) {
         this.attachmentRootGetter = attachmentRootGetter;
         this.thumbnailProperties = haloProperties.getAttachment().getThumbnail();
         var concurrentThreads = this.thumbnailProperties.getConcurrentThreads();
@@ -67,10 +67,9 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             concurrentThreads = DEFAULT_GENERATION_CONCURRENT_THREADS;
         }
         this.executorService =
-            Executors.newFixedThreadPool(concurrentThreads, Thread.ofPlatform()
-                .daemon()
-                .name("thumbnail-generator-", 0)
-                .factory());
+                Executors.newFixedThreadPool(
+                        concurrentThreads,
+                        Thread.ofPlatform().daemon().name("thumbnail-generator-", 0).factory());
         this.inProgress = new ConcurrentHashMap<>();
     }
 
@@ -99,43 +98,55 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             log.trace("Thumbnail already exists: {}", thumbnailPath);
             return Mono.just(thumbnailResource);
         }
-        return Mono.fromFuture(() -> inProgress.computeIfAbsent(thumbnailPath, f ->
-                        CompletableFuture.supplyAsync(() -> generateThumbnail(
-                                    source, thumbnailPath, size
-                                ),
-                                this.executorService
-                            )
-                            .orTimeout(
-                                DEFAULT_GENERATION_TIMEOUT_SECONDS,
-                                TimeUnit.SECONDS
-                            )
-                    )
-                    .whenComplete((p, t) -> inProgress.remove(thumbnailPath)),
-                // We don't want to cancel the thumbnail generation task
-                // when some requests are cancelled
-                true
-            )
-            .map(PathResource::new);
+        return Mono.fromFuture(
+                        () ->
+                                inProgress
+                                        .computeIfAbsent(
+                                                thumbnailPath,
+                                                f ->
+                                                        CompletableFuture.supplyAsync(
+                                                                        () ->
+                                                                                generateThumbnail(
+                                                                                        source,
+                                                                                        thumbnailPath,
+                                                                                        size),
+                                                                        this.executorService)
+                                                                .orTimeout(
+                                                                        DEFAULT_GENERATION_TIMEOUT_SECONDS,
+                                                                        TimeUnit.SECONDS))
+                                        .whenComplete((p, t) -> inProgress.remove(thumbnailPath)),
+                        // We don't want to cancel the thumbnail generation task
+                        // when some requests are cancelled
+                        true)
+                .map(PathResource::new);
     }
 
     @Override
     public void delete(Path source) {
-        Arrays.stream(ThumbnailSize.values()).forEach(size -> {
-            var thumbnailPath = resolveThumbnailPath(source, size);
-            if (thumbnailPath.isEmpty()) {
-                log.warn("Failed to resolve thumbnail path for source: {}, size: {}", source, size);
-                return;
-            }
-            try {
-                var deleted = Files.deleteIfExists(thumbnailPath.get());
-                if (deleted) {
-                    log.info("Deleted thumbnail: {} for {}", thumbnailPath.get(), source);
-                }
-            } catch (IOException e) {
-                // Ignore the error
-                log.error("Failed to delete thumbnail: {}", thumbnailPath.get(), e);
-            }
-        });
+        Arrays.stream(ThumbnailSize.values())
+                .forEach(
+                        size -> {
+                            var thumbnailPath = resolveThumbnailPath(source, size);
+                            if (thumbnailPath.isEmpty()) {
+                                log.warn(
+                                        "Failed to resolve thumbnail path for source: {}, size: {}",
+                                        source,
+                                        size);
+                                return;
+                            }
+                            try {
+                                var deleted = Files.deleteIfExists(thumbnailPath.get());
+                                if (deleted) {
+                                    log.info(
+                                            "Deleted thumbnail: {} for {}",
+                                            thumbnailPath.get(),
+                                            source);
+                                }
+                            } catch (IOException e) {
+                                // Ignore the error
+                                log.error("Failed to delete thumbnail: {}", thumbnailPath.get(), e);
+                            }
+                        });
     }
 
     Optional<Path> resolveThumbnailPath(Path source, ThumbnailSize size) {
@@ -146,14 +157,19 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
         } catch (IllegalArgumentException e) {
             // The source path is not under the attachment root
             if (log.isDebugEnabled()) {
-                log.warn("Failed to resolve thumbnail path for source: {}, size: {}",
-                    source, size, e);
+                log.warn(
+                        "Failed to resolve thumbnail path for source: {}, size: {}",
+                        source,
+                        size,
+                        e);
             }
             return Optional.empty();
         }
-        var thumbnailPath = attachmentRoot.resolve(THUMBNAIL_ROOT)
-            .resolve("w" + size.getWidth())
-            .resolve(relativize);
+        var thumbnailPath =
+                attachmentRoot
+                        .resolve(THUMBNAIL_ROOT)
+                        .resolve("w" + size.getWidth())
+                        .resolve(relativize);
         return Optional.of(thumbnailPath);
     }
 
@@ -169,8 +185,10 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
         }
         if (log.isDebugEnabled()) {
             log.debug(
-                "Generating thumbnail for path: {}, target: {}, size: {}",
-                sourcePath, thumbnailPath, size);
+                    "Generating thumbnail for path: {}, target: {}, size: {}",
+                    sourcePath,
+                    thumbnailPath,
+                    size);
         }
         boolean shouldCleanup = true;
         try (var inputStream = Files.newInputStream(sourcePath, READ)) {
@@ -178,33 +196,39 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
             // Pass InputStream or File here.
             // See https://github.com/coobird/thumbnailator/issues/159#issuecomment-694978197
             // for more.
-            var builder = Thumbnails.of(inputStream)
-                .width(size.getWidth())
-                .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
-                .rendering(Rendering.SPEED)
-                .useExifOrientation(true);
+            var builder =
+                    Thumbnails.of(inputStream)
+                            .width(size.getWidth())
+                            .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE)
+                            .rendering(Rendering.SPEED)
+                            .useExifOrientation(true);
             if (thumbnailProperties.getQuality() != null) {
                 builder.outputQuality(thumbnailProperties.getQuality());
             }
             builder.toFile(thumbnailPath.toFile());
-            log.info("Generated thumbnail for path: {}, target: {}, size: {}",
-                sourcePath, thumbnailPath, size);
+            log.info(
+                    "Generated thumbnail for path: {}, target: {}, size: {}",
+                    sourcePath,
+                    thumbnailPath,
+                    size);
             // check size of thumbnails
             var attachmentFileSize = Files.size(sourcePath);
             var thumbnailFileSize = Files.size(thumbnailPath);
             if (attachmentFileSize < thumbnailFileSize) {
                 Files.copy(sourcePath, thumbnailPath, REPLACE_EXISTING);
-                log.info("""
+                log.info(
+                        """
                         Replaced thumbnail with original file since it's smaller, \
                         path: {}, size: {} < {}\
                         """,
-                    thumbnailPath, attachmentFileSize, thumbnailFileSize);
+                        thumbnailPath,
+                        attachmentFileSize,
+                        thumbnailFileSize);
             }
             shouldCleanup = false;
             return thumbnailPath;
         } catch (IOException e) {
-            log.warn("Failed to generate thumbnail for path: {}",
-                sourcePath, e);
+            log.warn("Failed to generate thumbnail for path: {}", sourcePath, e);
             // return the original attachment path
             return null;
         } finally {
@@ -214,11 +238,12 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
                     Files.deleteIfExists(thumbnailPath);
                 } catch (IOException ex) {
                     // ignore this error
-                    log.warn("Failed to delete possibly created thumbnail file: {}",
-                        thumbnailPath, ex);
+                    log.warn(
+                            "Failed to delete possibly created thumbnail file: {}",
+                            thumbnailPath,
+                            ex);
                 }
             }
         }
     }
-
 }

@@ -11,7 +11,7 @@ import org.springframework.web.server.ServerWebExchange;
 @UtilityClass
 public class ValidationUtils {
     public static final String NAME_REGEX =
-        "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$";
+            "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$";
     public static final Pattern NAME_PATTERN = Pattern.compile(NAME_REGEX);
 
     /**
@@ -24,8 +24,8 @@ public class ValidationUtils {
     /**
      * Validate the target object with given locale context.
      */
-    public static BindingResult validate(Object target, String objectName,
-        Validator validator, ServerWebExchange exchange) {
+    public static BindingResult validate(
+            Object target, String objectName, Validator validator, ServerWebExchange exchange) {
         BindingResult bindingResult = new BeanPropertyBindingResult(target, objectName);
         try {
             LocaleContextHolder.setLocaleContext(exchange.getLocaleContext());
@@ -36,8 +36,8 @@ public class ValidationUtils {
         }
     }
 
-    public static BindingResult validate(Object target, Validator validator,
-        ServerWebExchange exchange) {
+    public static BindingResult validate(
+            Object target, Validator validator, ServerWebExchange exchange) {
         return validate(target, "form", validator, exchange);
     }
 }

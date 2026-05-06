@@ -35,42 +35,30 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        http
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(BeforeSecurityWebFilter.class),
-                FIRST
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(HttpBasicSecurityWebFilter.class),
-                HTTP_BASIC
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class),
-                FORM_LOGIN
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AuthenticationSecurityWebFilter.class),
-                AUTHENTICATION
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AnonymousAuthenticationSecurityWebFilter.class),
-                ANONYMOUS_AUTHENTICATION
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(OAuth2AuthorizationCodeSecurityWebFilter.class),
-                OAUTH2_AUTHORIZATION_CODE
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AfterSecurityWebFilter.class),
-                LAST
-            )
-        ;
+        http.addFilterAt(new SecurityWebFilterChainProxy(BeforeSecurityWebFilter.class), FIRST)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(HttpBasicSecurityWebFilter.class),
+                        HTTP_BASIC)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class),
+                        FORM_LOGIN)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(AuthenticationSecurityWebFilter.class),
+                        AUTHENTICATION)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(
+                                AnonymousAuthenticationSecurityWebFilter.class),
+                        ANONYMOUS_AUTHENTICATION)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(
+                                OAuth2AuthorizationCodeSecurityWebFilter.class),
+                        OAUTH2_AUTHORIZATION_CODE)
+                .addFilterAt(new SecurityWebFilterChainProxy(AfterSecurityWebFilter.class), LAST);
     }
 
     public class SecurityWebFilterChainProxy implements WebFilter {
 
-        @Setter
-        private WebFilterChainProxy.WebFilterChainDecorator filterChainDecorator;
+        @Setter private WebFilterChainProxy.WebFilterChainDecorator filterChainDecorator;
 
         private final Class<? extends ExtensionPoint> extensionPointClass;
 
@@ -81,13 +69,13 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
         @Override
         public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-            return extensionGetter.getExtensions(this.extensionPointClass)
-                .sort(AnnotationAwareOrderComparator.INSTANCE)
-                .cast(WebFilter.class)
-                .collectList()
-                .map(filters -> filterChainDecorator.decorate(chain, filters))
-                .flatMap(decoratedChain -> decoratedChain.filter(exchange));
+            return extensionGetter
+                    .getExtensions(this.extensionPointClass)
+                    .sort(AnnotationAwareOrderComparator.INSTANCE)
+                    .cast(WebFilter.class)
+                    .collectList()
+                    .map(filters -> filterChainDecorator.decorate(chain, filters))
+                    .flatMap(decoratedChain -> decoratedChain.filter(exchange));
         }
     }
-
 }

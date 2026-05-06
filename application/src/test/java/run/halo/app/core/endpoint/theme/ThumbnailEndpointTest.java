@@ -25,26 +25,26 @@ class ThumbnailEndpointTest {
 
     WebTestClient webClient;
 
-    @Mock
-    private ThumbnailService thumbnailService;
+    @Mock private ThumbnailService thumbnailService;
 
-    @InjectMocks
-    private ThumbnailEndpoint endpoint;
+    @InjectMocks private ThumbnailEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
     @Test
     void thumbnailUriNotAccessible() {
         when(thumbnailService.get(URI.create("/myavatar.png"), ThumbnailSize.L))
-            .thenReturn(Mono.empty());
-        webClient.get()
-            .uri("/thumbnails/-/via-uri?size=l&uri=/myavatar.png")
-            .exchange()
-            .expectHeader().location("/myavatar.png")
-            .expectStatus().is3xxRedirection();
+                .thenReturn(Mono.empty());
+        webClient
+                .get()
+                .uri("/thumbnails/-/via-uri?size=l&uri=/myavatar.png")
+                .exchange()
+                .expectHeader()
+                .location("/myavatar.png")
+                .expectStatus()
+                .is3xxRedirection();
     }
 }

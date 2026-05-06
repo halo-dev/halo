@@ -6,8 +6,8 @@ import run.halo.app.extension.ExtensionClient;
 
 @Component
 public class ExtensionPointDefinitionGetterImpl
-    extends AbstractDefinitionGetter<ExtensionPointDefinition>
-    implements ExtensionPointDefinitionGetter {
+        extends AbstractDefinitionGetter<ExtensionPointDefinition>
+        implements ExtensionPointDefinitionGetter {
 
     public ExtensionPointDefinitionGetterImpl(ExtensionClient client) {
         super(client, new ExtensionPointDefinition());

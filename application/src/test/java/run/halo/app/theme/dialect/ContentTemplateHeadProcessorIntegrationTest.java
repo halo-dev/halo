@@ -56,20 +56,15 @@ import run.halo.app.theme.router.ModelConst;
  */
 @ExtendWith(MockitoExtension.class)
 class ContentTemplateHeadProcessorIntegrationTest {
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    private PostFinder postFinder;
+    @Mock private PostFinder postFinder;
 
-    @Mock
-    private SinglePageFinder singlePageFinder;
+    @Mock private SinglePageFinder singlePageFinder;
 
-    @Mock
-    private SystemConfigFetcher fetcher;
+    @Mock private SystemConfigFetcher fetcher;
 
-    @Mock
-    ExtensionGetter extensionGetter;
+    @Mock ExtensionGetter extensionGetter;
 
     private TemplateEngine templateEngine;
 
@@ -81,45 +76,57 @@ class ContentTemplateHeadProcessorIntegrationTest {
         templateEngine.addTemplateResolver(new TestTemplateResolver());
 
         Map<String, TemplateHeadProcessor> map = new HashMap<>();
-        map.put("postTemplateHeadProcessor",
-            new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
+        map.put(
+                "postTemplateHeadProcessor",
+                new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("seoProcessor", new GlobalSeoProcessor(fetcher));
         map.put("duplicateMetaTagProcessor", new DuplicateMetaTagProcessor());
-        lenient().when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
-            .thenReturn(map);
+        lenient()
+                .when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
+                .thenReturn(map);
 
         SystemSetting.Seo seo = new SystemSetting.Seo();
         seo.setKeywords("global keywords");
         seo.setDescription("global description");
-        lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP), eq(SystemSetting.Seo.class)))
-            .thenReturn(Mono.just(seo));
+        lenient()
+                .when(fetcher.fetch(eq(SystemSetting.Seo.GROUP), eq(SystemSetting.Seo.class)))
+                .thenReturn(Mono.just(seo));
 
         SystemSetting.CodeInjection codeInjection = new SystemSetting.CodeInjection();
         codeInjection.setGlobalHead(
-            "<meta name=\"description\" content=\"global-head-description\"/>");
+                "<meta name=\"description\" content=\"global-head-description\"/>");
         codeInjection.setContentHead(
-            "<meta name=\"description\" content=\"content-head-description\"/>");
-        lenient().when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
-            eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
+                "<meta name=\"description\" content=\"content-head-description\"/>");
+        lenient()
+                .when(
+                        fetcher.fetch(
+                                eq(SystemSetting.CodeInjection.GROUP),
+                                eq(SystemSetting.CodeInjection.class)))
+                .thenReturn(Mono.just(codeInjection));
 
-        lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP), eq(SystemSetting.Seo.class)))
-            .thenReturn(Mono.empty());
+        lenient()
+                .when(fetcher.fetch(eq(SystemSetting.Seo.GROUP), eq(SystemSetting.Seo.class)))
+                .thenReturn(Mono.empty());
 
-        lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenAnswer(invocation -> {
-                var objectProvider = mock(ObjectProvider.class);
-                when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
-                return objectProvider;
-            });
-        lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
-            Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
-        );
-        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(fetcher);
+        lenient()
+                .when(applicationContext.getBeanProvider(ExtensionGetter.class))
+                .thenAnswer(
+                        invocation -> {
+                            var objectProvider = mock(ObjectProvider.class);
+                            when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                            return objectProvider;
+                        });
+        lenient()
+                .when(extensionGetter.getExtensions(TemplateHeadProcessor.class))
+                .thenReturn(
+                        Flux.fromIterable(map.values())
+                                .sort(AnnotationAwareOrderComparator.INSTANCE));
+        lenient()
+                .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
+                .thenReturn(fetcher);
         lenient().when(fetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }
-
 
     @Test
     void overrideGlobalMetaTest() {
@@ -141,26 +148,30 @@ class ContentTemplateHeadProcessorIntegrationTest {
 
         String result = templateEngine.process("post", context);
         /*
-          this test case shows:
-            1. global seo meta keywords and description is overridden by content head meta
-            2. global head meta is overridden by content head meta
-            3. but global head meta is not overridden by global seo meta
-         */
+         this test case shows:
+           1. global seo meta keywords and description is overridden by content head meta
+           2. global head meta is overridden by content head meta
+           3. but global head meta is not overridden by global seo meta
+        */
         var outputSettings = new Document.OutputSettings().prettyPrint(true);
         var actual = Jsoup.parse(result).outputSettings(outputSettings).html();
-        var expected = Jsoup.parse("""
-            <!doctype html>
-            <html lang="en">
-             <head>
-              <meta charset="UTF-8">
-              <title>Post detail</title>
-              <meta name="keyword" content="postK1,postK2">
-              <meta name="description" content="post-description">
-              <meta name="other" content="post-other-meta">
-             </head>
-             <body>this is body</body>
-            </html>"""
-        ).outputSettings(outputSettings).html();
+        var expected =
+                Jsoup.parse(
+                                """
+                                <!doctype html>
+                                <html lang="en">
+                                 <head>
+                                  <meta charset="UTF-8">
+                                  <title>Post detail</title>
+                                  <meta name="keyword" content="postK1,postK2">
+                                  <meta name="description" content="post-description">
+                                  <meta name="other" content="post-other-meta">
+                                 </head>
+                                 <body>this is body</body>
+                                </html>\
+                                """)
+                        .outputSettings(outputSettings)
+                        .html();
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -174,16 +185,18 @@ class ContentTemplateHeadProcessorIntegrationTest {
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             if (template.equals("post")) {
                 return new StringTemplateResource(postTemplate());
             }
@@ -192,17 +205,17 @@ class ContentTemplateHeadProcessorIntegrationTest {
 
         private String postTemplate() {
             return """
-                <!DOCTYPE html>
-                <html lang="en" xmlns:th="http://www.thymeleaf.org">
-                  <head>
-                    <meta charset="UTF-8" />
-                    <title>Post detail</title>
-                  </head>
-                  <body>
-                    this is body
-                  </body>
-                </html>
-                """;
+            <!DOCTYPE html>
+            <html lang="en" xmlns:th="http://www.thymeleaf.org">
+              <head>
+                <meta charset="UTF-8" />
+                <title>Post detail</title>
+              </head>
+              <body>
+                this is body
+              </body>
+            </html>
+            """;
         }
     }
 }

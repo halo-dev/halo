@@ -22,18 +22,21 @@ public class CustomEndpointsBuilder {
 
     public CustomEndpointsBuilder add(CustomEndpoint customEndpoint) {
         routerFunctionsMap
-            .computeIfAbsent(customEndpoint.groupVersion(), gv -> new LinkedList<>())
-            .add(customEndpoint.endpoint());
+                .computeIfAbsent(customEndpoint.groupVersion(), gv -> new LinkedList<>())
+                .add(customEndpoint.endpoint());
         return this;
     }
 
     public RouterFunction<ServerResponse> build() {
         SpringdocRouteBuilder routeBuilder = SpringdocRouteBuilder.route();
-        routerFunctionsMap.forEach((gv, routerFunctions) ->
-            routeBuilder.nest(RequestPredicates.path("/apis/" + gv),
-                () -> routerFunctions.stream().reduce(RouterFunction::and).orElse(null)
-            )
-        );
+        routerFunctionsMap.forEach(
+                (gv, routerFunctions) ->
+                        routeBuilder.nest(
+                                RequestPredicates.path("/apis/" + gv),
+                                () ->
+                                        routerFunctions.stream()
+                                                .reduce(RouterFunction::and)
+                                                .orElse(null)));
         if (routerFunctionsMap.isEmpty()) {
             // return empty route.
             return request -> Mono.empty();

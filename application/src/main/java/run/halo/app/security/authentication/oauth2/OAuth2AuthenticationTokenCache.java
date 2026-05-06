@@ -37,5 +37,4 @@ public interface OAuth2AuthenticationTokenCache {
      * @return empty
      */
     Mono<Void> removeToken(ServerWebExchange exchange);
-
 }

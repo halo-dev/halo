@@ -113,8 +113,7 @@ public interface PluginService {
      * @param predicate the predicate to filter by {@link PluginWrapper},such as enabled or disabled
      * @return plugin names of required dependencies
      */
-    List<String> getRequiredDependencies(Plugin plugin,
-        Predicate<PluginWrapper> predicate);
+    List<String> getRequiredDependencies(Plugin plugin, Predicate<PluginWrapper> predicate);
 
     /**
      * Get started plugin names.
@@ -122,5 +121,4 @@ public interface PluginService {
      * @return started plugin names
      */
     Flux<String> getStartedPluginNames();
-
 }

@@ -11,8 +11,11 @@ public class PostVisibleChangedEvent extends PostEvent {
 
     private final Post.VisibleEnum newVisible;
 
-    public PostVisibleChangedEvent(Object source, String postName,
-        Post.@Nullable VisibleEnum oldVisible, Post.VisibleEnum newVisible) {
+    public PostVisibleChangedEvent(
+            Object source,
+            String postName,
+            Post.@Nullable VisibleEnum oldVisible,
+            Post.VisibleEnum newVisible) {
         super(source, postName);
         this.oldVisible = oldVisible;
         this.newVisible = newVisible;

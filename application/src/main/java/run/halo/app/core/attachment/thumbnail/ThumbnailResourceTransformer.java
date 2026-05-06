@@ -27,8 +27,10 @@ public class ThumbnailResourceTransformer implements ResourceTransformer {
     }
 
     @Override
-    public Mono<Resource> transform(ServerWebExchange exchange, Resource resource,
-        ResourceTransformerChain transformerChain) {
+    public Mono<Resource> transform(
+            ServerWebExchange exchange,
+            Resource resource,
+            ResourceTransformerChain transformerChain) {
         var width = exchange.getRequest().getQueryParams().getFirst("width");
         if (!StringUtils.hasText(width) || !resource.isFile()) {
             return transformerChain.transform(exchange, resource);
@@ -41,12 +43,12 @@ public class ThumbnailResourceTransformer implements ResourceTransformer {
         var size = ThumbnailSize.fromWidth(width);
         try {
             var source = resource.getFile().toPath();
-            return localThumbnailService.generate(source, size)
-                .switchIfEmpty(Mono.fromSupplier(() -> new PathResource(source)))
-                .flatMap(transformed -> transformerChain.transform(exchange, transformed));
+            return localThumbnailService
+                    .generate(source, size)
+                    .switchIfEmpty(Mono.fromSupplier(() -> new PathResource(source)))
+                    .flatMap(transformed -> transformerChain.transform(exchange, transformed));
         } catch (IOException e) {
             return Mono.error(e);
         }
     }
-
 }

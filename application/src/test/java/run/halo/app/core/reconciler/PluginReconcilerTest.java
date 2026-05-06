@@ -72,20 +72,15 @@ import run.halo.app.plugin.SpringPluginManager;
 @ExtendWith(MockitoExtension.class)
 class PluginReconcilerTest {
 
-    @Mock
-    SpringPluginManager pluginManager;
+    @Mock SpringPluginManager pluginManager;
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    PluginProperties pluginProperties;
+    @Mock PluginProperties pluginProperties;
 
-    @Mock
-    PluginService pluginService;
+    @Mock PluginService pluginService;
 
-    @InjectMocks
-    PluginReconciler reconciler;
+    @InjectMocks PluginReconciler reconciler;
 
     Clock clock = Clock.fixed(Instant.parse("2024-01-09T12:00:00Z"), ZoneOffset.UTC);
 
@@ -115,27 +110,35 @@ class PluginReconcilerTest {
     @Nested
     class WhenNotDeleting {
 
-        @TempDir
-        Path tempPath;
+        @TempDir Path tempPath;
 
         @BeforeEach
         void setUp() throws IOException {
-            lenient().when(pluginService.getRequiredDependencies(any(), any()))
-                .thenReturn(List.of());
+            lenient()
+                    .when(pluginService.getRequiredDependencies(any(), any()))
+                    .thenReturn(List.of());
             Files.createFile(tempPath.resolve("fake-plugin-1.2.3.jar"));
         }
 
         @Test
         void shouldNotStartPluginWithDevModeInNonDevEnv() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                plugin.getMetadata()
-                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev",
-                        PLUGIN_PATH, "fake-path")));
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                plugin.getMetadata()
+                                        .setAnnotations(
+                                                new HashMap<>(
+                                                        Map.of(
+                                                                RUNTIME_MODE_ANNO,
+                                                                "dev",
+                                                                PLUGIN_PATH,
+                                                                "fake-path")));
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
 
@@ -145,14 +148,17 @@ class PluginReconcilerTest {
             var status = fakePlugin.getStatus();
             assertEquals(Plugin.Phase.UNKNOWN, status.getPhase());
             var condition = status.getConditions().peekFirst();
-            assertEquals(Condition.builder()
-                .type(PluginReconciler.ConditionType.INITIALIZED)
-                .status(ConditionStatus.FALSE)
-                .reason(PluginReconciler.ConditionReason.INVALID_RUNTIME_MODE)
-                .message("""
-                    Cannot run the plugin with development mode in non-development environment.\
-                    """)
-                .build(), condition);
+            assertEquals(
+                    Condition.builder()
+                            .type(PluginReconciler.ConditionType.INITIALIZED)
+                            .status(ConditionStatus.FALSE)
+                            .reason(PluginReconciler.ConditionReason.INVALID_RUNTIME_MODE)
+                            .message(
+                                    """
+                                    Cannot run the plugin with development mode in non-development environment.\
+                                    """)
+                            .build(),
+                    condition);
 
             verify(client).update(fakePlugin);
             verify(client).fetch(Plugin.class, name);
@@ -163,20 +169,28 @@ class PluginReconcilerTest {
 
         @Test
         void shouldStartInDevMode() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                plugin.getMetadata()
-                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev",
-                        PLUGIN_PATH, "fake-path")));
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                plugin.getMetadata()
+                                        .setAnnotations(
+                                                new HashMap<>(
+                                                        Map.of(
+                                                                RUNTIME_MODE_ANNO,
+                                                                "dev",
+                                                                PLUGIN_PATH,
+                                                                "fake-path")));
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPlugin(name))
-                .thenReturn(null)
-                .thenReturn(mockPluginWrapper(PluginState.RESOLVED));
+                    .thenReturn(null)
+                    .thenReturn(mockPluginWrapper(PluginState.RESOLVED));
 
             when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
             when(pluginProperties.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
@@ -190,19 +204,23 @@ class PluginReconcilerTest {
 
         @Test
         void shouldThrowExceptionIfNoPluginPathProvidedInDevMode() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                plugin.getMetadata()
-                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev")));
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                plugin.getMetadata()
+                                        .setAnnotations(
+                                                new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev")));
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPlugin(name))
-                // loading plugin
-                .thenReturn(null);
+                    // loading plugin
+                    .thenReturn(null);
             when(pluginProperties.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
 
             var result = reconciler.reconcile(new Request(name));
@@ -211,13 +229,17 @@ class PluginReconcilerTest {
 
         @Test
         void shouldReloadIfReloadAnnotationPresent() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                plugin.getMetadata().setAnnotations(new HashMap<>(Map.of(RELOAD_ANNO, "true")));
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                plugin.getMetadata()
+                                        .setAnnotations(new HashMap<>(Map.of(RELOAD_ANNO, "true")));
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
@@ -237,26 +259,29 @@ class PluginReconcilerTest {
 
         @Test
         void shouldReportIfFailedToStartPlugin() throws IOException {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                spec.setSettingName(settingName);
-                spec.setConfigMapName(configMapName);
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                spec.setSettingName(settingName);
+                                spec.setConfigMapName(configMapName);
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
             when(pluginManager.getPlugin(name))
-                // loading plugin
-                .thenReturn(null)
-                // get setting extension
-                .thenReturn(mockPluginWrapperForSetting())
-                .thenReturn(mockPluginWrapperForStaticResources())
-                .thenReturn(
-                    mockPluginWrapper(PluginState.FAILED, new IllegalStateException("Fake error"))
-                );
+                    // loading plugin
+                    .thenReturn(null)
+                    // get setting extension
+                    .thenReturn(mockPluginWrapperForSetting())
+                    .thenReturn(mockPluginWrapperForStaticResources())
+                    .thenReturn(
+                            mockPluginWrapper(
+                                    PluginState.FAILED, new IllegalStateException("Fake error")));
             var result = reconciler.reconcile(new Request(name));
             assertFalse(result.reEnqueue());
 
@@ -274,43 +299,50 @@ class PluginReconcilerTest {
 
         @Test
         void shouldEnablePluginIfEnabled() throws IOException {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(true);
-                spec.setSettingName(settingName);
-                spec.setConfigMapName(configMapName);
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(true);
+                                spec.setSettingName(settingName);
+                                spec.setConfigMapName(configMapName);
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
             when(pluginManager.getPlugin(name))
-                // loading plugin
-                .thenReturn(null)
-                // get setting extension
-                .thenReturn(mockPluginWrapperForSetting())
-                .thenReturn(mockPluginWrapperForStaticResources())
-                // before starting
-                .thenReturn(mockPluginWrapper(PluginState.STARTED))
-                // sync plugin state
-                .thenReturn(mockPluginWrapper(PluginState.STARTED));
+                    // loading plugin
+                    .thenReturn(null)
+                    // get setting extension
+                    .thenReturn(mockPluginWrapperForSetting())
+                    .thenReturn(mockPluginWrapperForStaticResources())
+                    // before starting
+                    .thenReturn(mockPluginWrapper(PluginState.STARTED))
+                    // sync plugin state
+                    .thenReturn(mockPluginWrapper(PluginState.STARTED));
 
             var result = reconciler.reconcile(new Request(name));
 
             assertFalse(result.reEnqueue());
             assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
 
-            assertEquals("fake-plugin-1.2.3.jar",
-                fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
+            assertEquals(
+                    "fake-plugin-1.2.3.jar",
+                    fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
             var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
             assertEquals(tempPath.resolve("fake-plugin-1.2.3.jar"), loadLocation);
-            assertEquals("/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
-                fakePlugin.getStatus().getLogo());
-            assertEquals("/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
-                fakePlugin.getStatus().getEntry());
-            assertEquals("/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
-                fakePlugin.getStatus().getStylesheet());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
+                    fakePlugin.getStatus().getLogo());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                    fakePlugin.getStatus().getEntry());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                    fakePlugin.getStatus().getStylesheet());
             assertEquals(Plugin.Phase.STARTED, fakePlugin.getStatus().getPhase());
             assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
             assertNotNull(fakePlugin.getStatus().getLastStartTime());
@@ -334,45 +366,52 @@ class PluginReconcilerTest {
 
         @Test
         void shouldDisablePluginIfDisabled() throws IOException {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var spec = plugin.getSpec();
-                spec.setVersion("1.2.3");
-                spec.setLogo("fake-logo.svg");
-                spec.setEnabled(false);
-                spec.setSettingName(settingName);
-                spec.setConfigMapName(configMapName);
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var spec = plugin.getSpec();
+                                spec.setVersion("1.2.3");
+                                spec.setLogo("fake-logo.svg");
+                                spec.setEnabled(false);
+                                spec.setSettingName(settingName);
+                                spec.setConfigMapName(configMapName);
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
 
             when(pluginManager.getPlugin(name))
-                // loading plugin
-                .thenReturn(null)
-                // get setting files.
-                .thenReturn(mockPluginWrapperForSetting())
-                // resolving static resources
-                .thenReturn(mockPluginWrapperForStaticResources())
-                // before disabling plugin
-                .thenReturn(mock(PluginWrapper.class))
-                // sync plugin state
-                .thenReturn(mockPluginWrapper(PluginState.DISABLED));
+                    // loading plugin
+                    .thenReturn(null)
+                    // get setting files.
+                    .thenReturn(mockPluginWrapperForSetting())
+                    // resolving static resources
+                    .thenReturn(mockPluginWrapperForStaticResources())
+                    // before disabling plugin
+                    .thenReturn(mock(PluginWrapper.class))
+                    // sync plugin state
+                    .thenReturn(mockPluginWrapper(PluginState.DISABLED));
 
             var result = reconciler.reconcile(new Request("fake-plugin"));
 
             assertFalse(result.reEnqueue());
             assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
 
-            assertEquals("fake-plugin-1.2.3.jar",
-                fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
+            assertEquals(
+                    "fake-plugin-1.2.3.jar",
+                    fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
             var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
             assertEquals(tempPath.resolve("fake-plugin-1.2.3.jar"), loadLocation);
-            assertEquals("/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
-                fakePlugin.getStatus().getLogo());
-            assertEquals("/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
-                fakePlugin.getStatus().getEntry());
-            assertEquals("/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
-                fakePlugin.getStatus().getStylesheet());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
+                    fakePlugin.getStatus().getLogo());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                    fakePlugin.getStatus().getEntry());
+            assertEquals(
+                    "/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                    fakePlugin.getStatus().getStylesheet());
             assertEquals(Plugin.Phase.DISABLED, fakePlugin.getStatus().getPhase());
             assertEquals(PluginState.DISABLED, fakePlugin.getStatus().getLastProbeState());
 
@@ -392,7 +431,7 @@ class PluginReconcilerTest {
             var pluginWrapper = mock(PluginWrapper.class);
 
             var pluginRootResource =
-                new DefaultResourceLoader().getResource("classpath:plugin/plugin-0.0.1/");
+                    new DefaultResourceLoader().getResource("classpath:plugin/plugin-0.0.1/");
             var classLoader = new URLClassLoader(new URL[] {pluginRootResource.getURL()}, null);
             when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
             lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
@@ -403,10 +442,8 @@ class PluginReconcilerTest {
             // check
             var pluginWrapper = mock(PluginWrapper.class);
             var pluginClassLoader = mock(ClassLoader.class);
-            when(pluginClassLoader.getResource("console/main.js")).thenReturn(
-                mock(URL.class));
-            when(pluginClassLoader.getResource("console/style.css")).thenReturn(
-                mock(URL.class));
+            when(pluginClassLoader.getResource("console/main.js")).thenReturn(mock(URL.class));
+            when(pluginClassLoader.getResource("console/style.css")).thenReturn(mock(URL.class));
             when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
             lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;
@@ -423,7 +460,6 @@ class PluginReconcilerTest {
             lenient().when(pluginWrapper.getFailedException()).thenReturn(t);
             return pluginWrapper;
         }
-
     }
 
     @Nested
@@ -431,10 +467,13 @@ class PluginReconcilerTest {
 
         @Test
         void shouldDoNothingWithoutFinalizer() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var metadata = plugin.getMetadata();
-                metadata.setDeletionTimestamp(clock.instant());
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var metadata = plugin.getMetadata();
+                                metadata.setDeletionTimestamp(clock.instant());
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
 
@@ -448,24 +487,25 @@ class PluginReconcilerTest {
 
         @Test
         void shouldCleanUpResourceFully() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var metadata = plugin.getMetadata();
-                metadata.setDeletionTimestamp(clock.instant());
-                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
-                plugin.getStatus().setLastProbeState(PluginState.STARTED);
-                plugin.getSpec().setConfigMapName("fake-configmap");
-                plugin.getSpec().setSettingName("fake-setting");
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var metadata = plugin.getMetadata();
+                                metadata.setDeletionTimestamp(clock.instant());
+                                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                                plugin.getSpec().setConfigMapName("fake-configmap");
+                                plugin.getSpec().setSettingName("fake-setting");
+                            });
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
-            when(client.fetch(Setting.class, "fake-setting"))
-                .thenReturn(Optional.empty());
-            when(client.fetch(ReverseProxy.class, reverseProxyName))
-                .thenReturn(Optional.empty());
+            when(client.fetch(Setting.class, "fake-setting")).thenReturn(Optional.empty());
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
 
             when(pluginManager.getPlugin(name))
-                .thenReturn(mock(PluginWrapper.class))
-                .thenReturn(null);
+                    .thenReturn(mock(PluginWrapper.class))
+                    .thenReturn(null);
 
             var result = reconciler.reconcile(new Request(name));
 
@@ -483,26 +523,26 @@ class PluginReconcilerTest {
 
         @Test
         void shouldDeleteSettingAndRequeueIfExists() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var metadata = plugin.getMetadata();
-                metadata.setDeletionTimestamp(clock.instant());
-                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
-                plugin.getStatus().setLastProbeState(PluginState.STARTED);
-                plugin.getSpec().setSettingName(settingName);
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var metadata = plugin.getMetadata();
+                                metadata.setDeletionTimestamp(clock.instant());
+                                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                                plugin.getSpec().setSettingName(settingName);
+                            });
 
             var fakeSetting = createSetting(settingName);
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
-            when(client.fetch(Setting.class, settingName))
-                .thenReturn(Optional.of(fakeSetting));
-            when(client.fetch(ReverseProxy.class, reverseProxyName))
-                .thenReturn(Optional.empty());
+            when(client.fetch(Setting.class, settingName)).thenReturn(Optional.of(fakeSetting));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
 
-            var exception = assertThrows(
-                RequeueException.class,
-                () -> reconciler.reconcile(new Request(name))
-            );
+            var exception =
+                    assertThrows(
+                            RequeueException.class, () -> reconciler.reconcile(new Request(name)));
             assertEquals(Reconciler.Result.requeue(null), exception.getResult());
             assertEquals("Waiting for setting fake-setting to be deleted.", exception.getMessage());
 
@@ -520,26 +560,32 @@ class PluginReconcilerTest {
 
         @Test
         void shouldDeleteReverseProxyAndRequeueIfExists() {
-            var fakePlugin = createPlugin(name, plugin -> {
-                var metadata = plugin.getMetadata();
-                metadata.setDeletionTimestamp(clock.instant());
-                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
-                plugin.getStatus().setLastProbeState(PluginState.STARTED);
-                plugin.getSpec().setSettingName(settingName);
-            });
+            var fakePlugin =
+                    createPlugin(
+                            name,
+                            plugin -> {
+                                var metadata = plugin.getMetadata();
+                                metadata.setDeletionTimestamp(clock.instant());
+                                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                                plugin.getSpec().setSettingName(settingName);
+                            });
 
             var reverseProxy = createReverseProxy(reverseProxyName);
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(client.fetch(ReverseProxy.class, reverseProxyName))
-                .thenReturn(Optional.of(reverseProxy));
+                    .thenReturn(Optional.of(reverseProxy));
 
-            var exception = assertThrows(RequeueException.class,
-                () -> reconciler.reconcile(new Request(name)),
-                "Waiting for setting fake-setting to be deleted.");
+            var exception =
+                    assertThrows(
+                            RequeueException.class,
+                            () -> reconciler.reconcile(new Request(name)),
+                            "Waiting for setting fake-setting to be deleted.");
             assertEquals(Reconciler.Result.requeue(null), exception.getResult());
-            assertEquals("Waiting for reverse proxy " + reverseProxyName + " to be deleted.",
-                exception.getMessage());
+            assertEquals(
+                    "Waiting for reverse proxy " + reverseProxyName + " to be deleted.",
+                    exception.getMessage());
 
             // make sure the finalizer is removed.
             assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
@@ -552,7 +598,6 @@ class PluginReconcilerTest {
             verify(client, never()).fetch(Setting.class, settingName);
             verify(client, never()).update(fakePlugin);
         }
-
     }
 
     Setting createSetting(String name) {
@@ -581,5 +626,4 @@ class PluginReconcilerTest {
         pluginConsumer.accept(plugin);
         return plugin;
     }
-
 }

@@ -33,7 +33,7 @@ class R2dbcConfiguration {
         return new BeanPostProcessor() {
             @Override
             public Object postProcessBeforeInitialization(Object bean, String beanName)
-                throws BeansException {
+                    throws BeansException {
                 if (bean instanceof R2dbcMappingContext mappingContext) {
                     mappingContext.setForceQuote(false);
                 }
@@ -41,5 +41,4 @@ class R2dbcConfiguration {
             }
         };
     }
-
 }

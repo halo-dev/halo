@@ -2,7 +2,6 @@ package run.halo.app.extension.controller;
 
 import run.halo.app.extension.controller.Reconciler.Result;
 
-
 /**
  * Requeue with result data after throwing this exception.
  *

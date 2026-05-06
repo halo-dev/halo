@@ -30,19 +30,18 @@ import run.halo.app.extension.ReactiveExtensionClient;
  */
 @ExtendWith(MockitoExtension.class)
 class TagEndpointTest {
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
-    @InjectMocks
-    TagEndpoint tagEndpoint;
+    @InjectMocks TagEndpoint tagEndpoint;
 
     WebTestClient webClient;
 
     @BeforeEach
     void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(tagEndpoint.endpoint())
-            .apply(springSecurity())
-            .build();
+        webClient =
+                WebTestClient.bindToRouterFunction(tagEndpoint.endpoint())
+                        .apply(springSecurity())
+                        .build();
     }
 
     @Nested
@@ -51,36 +50,41 @@ class TagEndpointTest {
         @Test
         void shouldListEmptyTagsWhenNoTags() {
             when(client.listBy(same(Tag.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(ListResult.emptyResult()));
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
 
             bindToRouterFunction(tagEndpoint.endpoint())
-                .build()
-                .get().uri("/tags")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(0)
-                .jsonPath("$.total").isEqualTo(0);
+                    .build()
+                    .get()
+                    .uri("/tags")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(0)
+                    .jsonPath("$.total")
+                    .isEqualTo(0);
         }
 
         @Test
         void shouldListTagsWhenTagPresent() {
-            var tags = List.of(
-                createTag("fake-tag-1"),
-                createTag("fake-tag-2")
-            );
+            var tags = List.of(createTag("fake-tag-1"), createTag("fake-tag-2"));
             var expectResult = new ListResult<>(tags);
             when(client.listBy(same(Tag.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+                    .thenReturn(Mono.just(expectResult));
 
             bindToRouterFunction(tagEndpoint.endpoint())
-                .build()
-                .get().uri("/tags")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(2)
-                .jsonPath("$.total").isEqualTo(2);
+                    .build()
+                    .get()
+                    .uri("/tags")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(2)
+                    .jsonPath("$.total")
+                    .isEqualTo(2);
         }
 
         Tag createTag(String name) {
@@ -99,6 +103,5 @@ class TagEndpointTest {
             tag.setSpec(spec);
             return tag;
         }
-
     }
 }

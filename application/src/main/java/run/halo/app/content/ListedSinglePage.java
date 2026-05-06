@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import run.halo.app.core.extension.content.SinglePage;
 
-
 /**
  * An aggregate object of {@link SinglePage} and {@link Contributor} single page list.
  *

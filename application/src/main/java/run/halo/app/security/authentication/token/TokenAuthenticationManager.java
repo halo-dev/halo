@@ -47,7 +47,7 @@ class TokenAuthenticationManager implements ReactiveAuthenticationManager {
 
     private static boolean isPatToken(Authentication a) {
         return a instanceof BearerTokenAuthenticationToken t
-            && t.getToken().startsWith(PAT_TOKEN_PREFIX);
+                && t.getToken().startsWith(PAT_TOKEN_PREFIX);
     }
 
     private ReactiveAuthenticationManager createPatAuthManager() {
@@ -62,8 +62,7 @@ class TokenAuthenticationManager implements ReactiveAuthenticationManager {
 
         var converter = new ReactiveJwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(
-            new ReactiveJwtGrantedAuthoritiesConverterAdapter(authoritiesConverter)
-        );
+                new ReactiveJwtGrantedAuthoritiesConverterAdapter(authoritiesConverter));
 
         var authManager = new JwtReactiveAuthenticationManager(this.jwtDecoder);
         authManager.setJwtAuthenticationConverter(new NonPatJwtAuthenticationConverter(converter));

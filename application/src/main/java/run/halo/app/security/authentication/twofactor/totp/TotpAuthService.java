@@ -9,5 +9,4 @@ public interface TotpAuthService {
     String encryptSecret(String rawSecret);
 
     String decryptSecret(String encryptedSecret);
-
 }

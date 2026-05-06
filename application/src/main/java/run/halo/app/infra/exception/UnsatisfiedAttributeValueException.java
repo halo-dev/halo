@@ -17,8 +17,10 @@ public class UnsatisfiedAttributeValueException extends ServerWebInputException 
         super(reason);
     }
 
-    public UnsatisfiedAttributeValueException(String reason, @Nullable String messageDetailCode,
-        @Null Object[] messageDetailArguments) {
+    public UnsatisfiedAttributeValueException(
+            String reason,
+            @Nullable String messageDetailCode,
+            @Null Object[] messageDetailArguments) {
         super(reason, null, null, messageDetailCode, messageDetailArguments);
     }
 }

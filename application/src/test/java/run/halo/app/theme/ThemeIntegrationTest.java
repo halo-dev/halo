@@ -42,14 +42,11 @@ import run.halo.app.theme.router.ModelConst;
 @DirtiesContext
 public class ThemeIntegrationTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
-    @MockitoBean
-    InitializationStateGetter initializationStateGetter;
+    @MockitoBean InitializationStateGetter initializationStateGetter;
 
-    @Autowired
-    ExtensionClient client;
+    @Autowired ExtensionClient client;
 
     @BeforeEach
     void setUp() {
@@ -80,65 +77,83 @@ public class ThemeIntegrationTest {
         @Bean
         RouterFunction<ServerResponse> noTemplateExistsRoute() {
             return RouterFunctions.route()
-                .GET(
-                    "/no-template-exists",
-                    request -> ServerResponse.ok().render("no-template-exists")
-                )
-                .build();
+                    .GET(
+                            "/no-template-exists",
+                            request -> ServerResponse.ok().render("no-template-exists"))
+                    .build();
         }
 
         @Bean
         RouterFunction<ServerResponse> noCacheRoute() {
             return RouterFunctions.route()
-                .GET(
-                    "/should-not-cache",
-                    request -> ServerResponse.ok().render("no-template-exists")
-                )
-                .before(HaloUtils.noCache())
-                .build();
+                    .GET(
+                            "/should-not-cache",
+                            request -> ServerResponse.ok().render("no-template-exists"))
+                    .before(HaloUtils.noCache())
+                    .build();
         }
 
         @Bean
         AfterSecurityWebFilter poweredByHaloTemplateEngineCheckFilter() {
             var matcher = pathMatchers(HttpMethod.GET, "/should-not-cache");
-            return (exchange, chain) -> chain.filter(exchange)
-                .flatMap(v -> matcher.matches(exchange)
-                    .filter(MatchResult::isMatch)
-                    .switchIfEmpty(Mono.fromRunnable(() -> {
-                        assertNull(exchange.getAttribute(ModelConst.NO_CACHE));
-                        assertTrue(exchange.getRequiredAttribute(
-                            ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE)
-                        );
-                    }).then(Mono.empty()))
-                    .doOnNext(m -> {
-                        assertTrue(exchange.getRequiredAttribute(ModelConst.NO_CACHE));
-                        assertFalse(exchange.getRequiredAttribute(
-                            ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE)
-                        );
-                    })
-                )
-                .then();
+            return (exchange, chain) ->
+                    chain.filter(exchange)
+                            .flatMap(
+                                    v ->
+                                            matcher.matches(exchange)
+                                                    .filter(MatchResult::isMatch)
+                                                    .switchIfEmpty(
+                                                            Mono.fromRunnable(
+                                                                            () -> {
+                                                                                assertNull(
+                                                                                        exchange
+                                                                                                .getAttribute(
+                                                                                                        ModelConst
+                                                                                                                .NO_CACHE));
+                                                                                assertTrue(
+                                                                                        exchange
+                                                                                                .getRequiredAttribute(
+                                                                                                        ModelConst
+                                                                                                                .POWERED_BY_HALO_TEMPLATE_ENGINE));
+                                                                            })
+                                                                    .then(Mono.empty()))
+                                                    .doOnNext(
+                                                            m -> {
+                                                                assertTrue(
+                                                                        exchange
+                                                                                .getRequiredAttribute(
+                                                                                        ModelConst
+                                                                                                .NO_CACHE));
+                                                                assertFalse(
+                                                                        exchange
+                                                                                .getRequiredAttribute(
+                                                                                        ModelConst
+                                                                                                .POWERED_BY_HALO_TEMPLATE_ENGINE));
+                                                            }))
+                            .then();
         }
-
     }
 
     @Test
     void shouldRespondNotFoundIfNoTemplateFound() {
-        webClient.get()
-            .uri("/no-template-exists")
-            .accept(MediaType.TEXT_HTML)
-            .exchange()
-            .expectStatus().isNotFound()
-            .expectBody(String.class)
-            .value(Matchers.containsString("Template no-template-exists was not found"));
+        webClient
+                .get()
+                .uri("/no-template-exists")
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectStatus()
+                .isNotFound()
+                .expectBody(String.class)
+                .value(Matchers.containsString("Template no-template-exists was not found"));
 
-        webClient.get()
-            .uri("/should-not-cache")
-            .accept(MediaType.TEXT_HTML)
-            .exchange()
-            .expectStatus().isNotFound()
-            .expectBody(String.class)
-            .value(Matchers.containsString("Template no-template-exists was not found"));
+        webClient
+                .get()
+                .uri("/should-not-cache")
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectStatus()
+                .isNotFound()
+                .expectBody(String.class)
+                .value(Matchers.containsString("Template no-template-exists was not found"));
     }
-
 }

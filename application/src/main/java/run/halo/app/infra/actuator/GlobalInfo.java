@@ -31,5 +31,4 @@ public class GlobalInfo {
     private Boolean mustVerifyEmailOnRegistration;
 
     private String siteTitle;
-
 }

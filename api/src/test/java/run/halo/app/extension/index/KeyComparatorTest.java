@@ -24,41 +24,70 @@ class KeyComparatorTest {
     void keyComparator() {
         String[] strings = {"103", "101", "102", "1011", "1013", "1021", "1022", "1012", "1023"};
         Arrays.sort(strings, comparator);
-        assertThat(strings).isEqualTo(
-            new String[] {"101", "102", "103", "1011", "1012", "1013", "1021", "1022", "1023"});
+        assertThat(strings)
+                .isEqualTo(
+                        new String[] {
+                            "101", "102", "103", "1011", "1012", "1013", "1021", "1022", "1023"
+                        });
 
         Arrays.sort(strings, comparator.reversed());
-        assertThat(strings).isEqualTo(
-            new String[] {"1023", "1022", "1021", "1013", "1012", "1011", "103", "102", "101"});
+        assertThat(strings)
+                .isEqualTo(
+                        new String[] {
+                            "1023", "1022", "1021", "1013", "1012", "1011", "103", "102", "101"
+                        });
 
         // but if we use natural order, the result is:
         Arrays.sort(strings, Comparator.naturalOrder());
-        assertThat(strings).isEqualTo(
-            new String[] {"101", "1011", "1012", "1013", "102", "1021", "1022", "1023", "103"});
+        assertThat(strings)
+                .isEqualTo(
+                        new String[] {
+                            "101", "1011", "1012", "1013", "102", "1021", "1022", "1023", "103"
+                        });
     }
 
     @Test
     void keyComparator2() {
-        String[] strings =
-            {"moment-101", "moment-102", "moment-103", "moment-1011", "moment-1013", "moment-1021",
-                "moment-1022", "moment-1012", "moment-1023"};
+        String[] strings = {
+            "moment-101",
+            "moment-102",
+            "moment-103",
+            "moment-1011",
+            "moment-1013",
+            "moment-1021",
+            "moment-1022",
+            "moment-1012",
+            "moment-1023"
+        };
         Arrays.sort(strings, comparator);
-        assertThat(strings).isEqualTo(new String[] {"moment-101", "moment-102", "moment-103",
-            "moment-1011", "moment-1012", "moment-1013", "moment-1021", "moment-1022",
-            "moment-1023"});
+        assertThat(strings)
+                .isEqualTo(
+                        new String[] {
+                            "moment-101",
+                            "moment-102",
+                            "moment-103",
+                            "moment-1011",
+                            "moment-1012",
+                            "moment-1013",
+                            "moment-1021",
+                            "moment-1022",
+                            "moment-1023"
+                        });
 
         // date sort
         strings =
-            new String[] {"2022-01-15", "2022-02-01", "2021-12-25", "2022-01-01", "2022-01-02"};
+                new String[] {"2022-01-15", "2022-02-01", "2021-12-25", "2022-01-01", "2022-01-02"};
         Arrays.sort(strings, comparator);
-        assertThat(strings).isEqualTo(
-            new String[] {"2021-12-25", "2022-01-01", "2022-01-02", "2022-01-15", "2022-02-01"});
+        assertThat(strings)
+                .isEqualTo(
+                        new String[] {
+                            "2021-12-25", "2022-01-01", "2022-01-02", "2022-01-15", "2022-02-01"
+                        });
 
         // alphabet and number sort
         strings = new String[] {"abc123", "abc45", "abc9", "abc100", "abc20"};
         Arrays.sort(strings, comparator);
-        assertThat(strings).isEqualTo(
-            new String[] {"abc9", "abc20", "abc45", "abc100", "abc123"});
+        assertThat(strings).isEqualTo(new String[] {"abc9", "abc20", "abc45", "abc100", "abc123"});
 
         // test for pure alphabet sort
         strings = new String[] {"xyz", "abc", "def", "abcde", "xyzabc"};
@@ -83,137 +112,174 @@ class KeyComparatorTest {
 
     @Test
     void complexStringTest() {
-        var strings = new String[] {
-            "1719560085223",
-            "1719564195757",
-            "AJHQ9JKT",
-            "1719565849173",
-            "5InykKCe",
-            "123123123",
-            "adJhTqEo",
-            "123123",
-            "Ahvcq7Wn",
-            "asda",
-            "b5jHcxfe"
-        };
+        var strings =
+                new String[] {
+                    "1719560085223",
+                    "1719564195757",
+                    "AJHQ9JKT",
+                    "1719565849173",
+                    "5InykKCe",
+                    "123123123",
+                    "adJhTqEo",
+                    "123123",
+                    "Ahvcq7Wn",
+                    "asda",
+                    "b5jHcxfe"
+                };
         Arrays.sort(strings, comparator);
-        assertThat(strings).containsExactly(
-            "5InykKCe",
-            "123123",
-            "123123123",
-            "1719560085223",
-            "1719564195757",
-            "1719565849173",
-            "AJHQ9JKT",
-            "Ahvcq7Wn",
-            "adJhTqEo",
-            "asda",
-            "b5jHcxfe"
-        );
+        assertThat(strings)
+                .containsExactly(
+                        "5InykKCe",
+                        "123123",
+                        "123123123",
+                        "1719560085223",
+                        "1719564195757",
+                        "1719565849173",
+                        "AJHQ9JKT",
+                        "Ahvcq7Wn",
+                        "adJhTqEo",
+                        "asda",
+                        "b5jHcxfe");
     }
 
     @Test
     void complexButSkewedStringTest() {
-        var strings = new String[] {
-            "chu-shi-hua-gong-neng-you-hua-halo-2.9.0-fa-bu",
-            "cxcc",
-            "d",
-            "dddd",
-            "ddddd",
-            "de-dao",
-            "dENMr6tX",
-            "dian-shang-ke-fu",
-            "dong-tai-she-ji-shi-xi-25jie",
-            "eeeeeeee",
-            "ejqRrTp4",
-            "Fh8Jd09T",
-            "g5gZaGvS",
-        };
+        var strings =
+                new String[] {
+                    "chu-shi-hua-gong-neng-you-hua-halo-2.9.0-fa-bu",
+                    "cxcc",
+                    "d",
+                    "dddd",
+                    "ddddd",
+                    "de-dao",
+                    "dENMr6tX",
+                    "dian-shang-ke-fu",
+                    "dong-tai-she-ji-shi-xi-25jie",
+                    "eeeeeeee",
+                    "ejqRrTp4",
+                    "Fh8Jd09T",
+                    "g5gZaGvS",
+                };
         Arrays.sort(strings, comparator);
-        assertThat(strings).containsExactly(
-            "Fh8Jd09T",
-            "chu-shi-hua-gong-neng-you-hua-halo-2.9.0-fa-bu",
-            "cxcc",
-            "d",
-            "dENMr6tX",
-            "dddd",
-            "ddddd",
-            "de-dao",
-            "dian-shang-ke-fu",
-            "dong-tai-she-ji-shi-xi-25jie",
-            "eeeeeeee",
-            "ejqRrTp4",
-            "g5gZaGvS"
-        );
+        assertThat(strings)
+                .containsExactly(
+                        "Fh8Jd09T",
+                        "chu-shi-hua-gong-neng-you-hua-halo-2.9.0-fa-bu",
+                        "cxcc",
+                        "d",
+                        "dENMr6tX",
+                        "dddd",
+                        "ddddd",
+                        "de-dao",
+                        "dian-shang-ke-fu",
+                        "dong-tai-she-ji-shi-xi-25jie",
+                        "eeeeeeee",
+                        "ejqRrTp4",
+                        "g5gZaGvS");
     }
 
     @Test
     void mixLetterCaseStringTest() {
-        var strings = new String[] {
-            "VpLBxBJ7", "AJHQ9JKT", "asda", "Tq5EgH2V", "Fh8Jd09T", "J7KMLQeK", "adJhTqEo",
-            "Ahvcq7Wn",
-        };
+        var strings =
+                new String[] {
+                    "VpLBxBJ7",
+                    "AJHQ9JKT",
+                    "asda",
+                    "Tq5EgH2V",
+                    "Fh8Jd09T",
+                    "J7KMLQeK",
+                    "adJhTqEo",
+                    "Ahvcq7Wn",
+                };
         Arrays.sort(strings, comparator);
-        assertThat(strings).containsExactly(
-            "AJHQ9JKT", "Ahvcq7Wn", "Fh8Jd09T", "J7KMLQeK", "Tq5EgH2V", "VpLBxBJ7", "adJhTqEo",
-            "asda"
-        );
+        assertThat(strings)
+                .containsExactly(
+                        "AJHQ9JKT",
+                        "Ahvcq7Wn",
+                        "Fh8Jd09T",
+                        "J7KMLQeK",
+                        "Tq5EgH2V",
+                        "VpLBxBJ7",
+                        "adJhTqEo",
+                        "asda");
     }
 
     @Test
     void mixLetterCaseAndNumberTest() {
-        var strings = new String[] {
-            "1719565849173", "1719564195757", "1703040584263",
-            "AJHQ9JKT", "Ahvcq7Wn", "Fh8Jd09T", "adJhTqEo",
-            "asda", "1703053590063", "1702955288482",
-            "zhi-chi-bei-fen-hui-fu-halo-2.8.0-fa-bu",
-            "zhi-chi-ge-ren-zhong-xin-halo-2.11.0-fa-bu",
-            "J7KMLQeK", "Tq5EgH2V", "VpLBxBJ7",
-            "b5jHcxfe", "cao-ni-ma-a-huang-jian-ming", "chu-ji-ying-jian-kai-fa",
-            "ddddd", "de-dao", "dian-shang-ke-fu", "eeeeeeee", "ejqRrTp4",
-            "halo-maintainer-2023-nian-du-bang-dan", "hello-halo", "hello-world",
-            "dong-tai-she-ji-shi-xi-25jie", "halo-nuan-dong-li-yu-quan-chang-qi-zhe-qi", "hello",
-            "kai-fang-gong-gong-api-halo-2.5.0-fa-bu",
-            "xing-neng-you-hua-yu-gong-neng-gai-jin-halo-2.13-fa-bu", "ye-wu-tuo-zhan-jing-li",
-            "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-zhu-ti-you-jiang-zheng-ji",
-            "zhi-chi-bao-chi-deng-lu-hui-hua-halo-2.16.0-fa-bu",
-        };
+        var strings =
+                new String[] {
+                    "1719565849173",
+                    "1719564195757",
+                    "1703040584263",
+                    "AJHQ9JKT",
+                    "Ahvcq7Wn",
+                    "Fh8Jd09T",
+                    "adJhTqEo",
+                    "asda",
+                    "1703053590063",
+                    "1702955288482",
+                    "zhi-chi-bei-fen-hui-fu-halo-2.8.0-fa-bu",
+                    "zhi-chi-ge-ren-zhong-xin-halo-2.11.0-fa-bu",
+                    "J7KMLQeK",
+                    "Tq5EgH2V",
+                    "VpLBxBJ7",
+                    "b5jHcxfe",
+                    "cao-ni-ma-a-huang-jian-ming",
+                    "chu-ji-ying-jian-kai-fa",
+                    "ddddd",
+                    "de-dao",
+                    "dian-shang-ke-fu",
+                    "eeeeeeee",
+                    "ejqRrTp4",
+                    "halo-maintainer-2023-nian-du-bang-dan",
+                    "hello-halo",
+                    "hello-world",
+                    "dong-tai-she-ji-shi-xi-25jie",
+                    "halo-nuan-dong-li-yu-quan-chang-qi-zhe-qi",
+                    "hello",
+                    "kai-fang-gong-gong-api-halo-2.5.0-fa-bu",
+                    "xing-neng-you-hua-yu-gong-neng-gai-jin-halo-2.13-fa-bu",
+                    "ye-wu-tuo-zhan-jing-li",
+                    "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-zhu-ti-you-jiang-zheng-ji",
+                    "zhi-chi-bao-chi-deng-lu-hui-hua-halo-2.16.0-fa-bu",
+                };
         Arrays.sort(strings, comparator);
-        assertThat(strings).containsExactly(
-            "1702955288482",
-            "1703040584263",
-            "1703053590063",
-            "1719564195757",
-            "1719565849173",
-            "AJHQ9JKT",
-            "Ahvcq7Wn",
-            "Fh8Jd09T",
-            "J7KMLQeK",
-            "Tq5EgH2V",
-            "VpLBxBJ7",
-            "adJhTqEo",
-            "asda",
-            "b5jHcxfe",
-            "cao-ni-ma-a-huang-jian-ming",
-            "chu-ji-ying-jian-kai-fa",
-            "ddddd",
-            "de-dao",
-            "dian-shang-ke-fu",
-            "dong-tai-she-ji-shi-xi-25jie",
-            "eeeeeeee",
-            "ejqRrTp4",
-            "halo-maintainer-2023-nian-du-bang-dan",
-            "halo-nuan-dong-li-yu-quan-chang-qi-zhe-qi",
-            "hello",
-            "hello-halo",
-            "hello-world",
-            "kai-fang-gong-gong-api-halo-2.5.0-fa-bu",
-            "xing-neng-you-hua-yu-gong-neng-gai-jin-halo-2.13-fa-bu",
-            "ye-wu-tuo-zhan-jing-li",
-            "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-zhu-ti-you-jiang-zheng-ji",
-            "zhi-chi-bao-chi-deng-lu-hui-hua-halo-2.16.0-fa-bu",
-            "zhi-chi-bei-fen-hui-fu-halo-2.8.0-fa-bu",
-            "zhi-chi-ge-ren-zhong-xin-halo-2.11.0-fa-bu");
+        assertThat(strings)
+                .containsExactly(
+                        "1702955288482",
+                        "1703040584263",
+                        "1703053590063",
+                        "1719564195757",
+                        "1719565849173",
+                        "AJHQ9JKT",
+                        "Ahvcq7Wn",
+                        "Fh8Jd09T",
+                        "J7KMLQeK",
+                        "Tq5EgH2V",
+                        "VpLBxBJ7",
+                        "adJhTqEo",
+                        "asda",
+                        "b5jHcxfe",
+                        "cao-ni-ma-a-huang-jian-ming",
+                        "chu-ji-ying-jian-kai-fa",
+                        "ddddd",
+                        "de-dao",
+                        "dian-shang-ke-fu",
+                        "dong-tai-she-ji-shi-xi-25jie",
+                        "eeeeeeee",
+                        "ejqRrTp4",
+                        "halo-maintainer-2023-nian-du-bang-dan",
+                        "halo-nuan-dong-li-yu-quan-chang-qi-zhe-qi",
+                        "hello",
+                        "hello-halo",
+                        "hello-world",
+                        "kai-fang-gong-gong-api-halo-2.5.0-fa-bu",
+                        "xing-neng-you-hua-yu-gong-neng-gai-jin-halo-2.13-fa-bu",
+                        "ye-wu-tuo-zhan-jing-li",
+                        "ying-qu-jing-mei-zhou-bian-halo-ying-yong-shi-chang-zhu-ti-you-jiang-zheng-ji",
+                        "zhi-chi-bao-chi-deng-lu-hui-hua-halo-2.16.0-fa-bu",
+                        "zhi-chi-bei-fen-hui-fu-halo-2.8.0-fa-bu",
+                        "zhi-chi-ge-ren-zhong-xin-halo-2.11.0-fa-bu");
     }
 
     @Test
@@ -226,10 +292,10 @@ class KeyComparatorTest {
     @Test
     public void sortingWithDecimalStringsTest() {
         List<String> strings =
-            Arrays.asList("1.2", "1.10", "1.1", "1.20", "1.02", "1.22", "1.001", "1.002");
+                Arrays.asList("1.2", "1.10", "1.1", "1.20", "1.02", "1.22", "1.001", "1.002");
         strings.sort(comparator);
-        assertThat(strings).containsExactly("1.001", "1.002", "1.02", "1.1", "1.10", "1.2", "1.20",
-            "1.22");
+        assertThat(strings)
+                .containsExactly("1.001", "1.002", "1.02", "1.1", "1.10", "1.2", "1.20", "1.22");
     }
 
     @Test
@@ -328,7 +394,7 @@ class KeyComparatorTest {
             assertThat(comparator.compare("123abc", "123abc")).isZero();
             assertThat(comparator.compare("test", "test")).isZero();
             assertThat(comparator.compare("123abc", "123abc"))
-                .isEqualTo(comparator.compare("123abc", "123abc"));
+                    .isEqualTo(comparator.compare("123abc", "123abc"));
         }
 
         @Test
@@ -407,27 +473,45 @@ class KeyComparatorTest {
             assertThat(comparator.compare(largeNumber2, largeNumber1)).isGreaterThan(0);
 
             // large number str comparison
-            assertThat(comparator.compare("123456789012345678901234567890",
-                "123456789012345678901234567891")).isLessThan(0);
-            assertThat(comparator.compare("123456789012345678901234567890",
-                "123456789012345678901234567891")).isNotPositive();
-            assertThat(comparator.compare("999999999999999999999999999999",
-                "999999999999999999999999999998")).isGreaterThan(0);
-            assertThat(comparator.compare("999999999999999999999999999999",
-                "999999999999999999999999999998")).isNotNegative();
-            assertThat(comparator.compare("9999999999999999999999999999999999999999999999",
-                "9999999999999999999999999999999999999999999998")).isGreaterThan(0);
-            assertThat(comparator.compare("100000000000000000000000000000",
-                "100000000000000000000000000000")).isEqualTo(0);
+            assertThat(
+                            comparator.compare(
+                                    "123456789012345678901234567890",
+                                    "123456789012345678901234567891"))
+                    .isLessThan(0);
+            assertThat(
+                            comparator.compare(
+                                    "123456789012345678901234567890",
+                                    "123456789012345678901234567891"))
+                    .isNotPositive();
+            assertThat(
+                            comparator.compare(
+                                    "999999999999999999999999999999",
+                                    "999999999999999999999999999998"))
+                    .isGreaterThan(0);
+            assertThat(
+                            comparator.compare(
+                                    "999999999999999999999999999999",
+                                    "999999999999999999999999999998"))
+                    .isNotNegative();
+            assertThat(
+                            comparator.compare(
+                                    "9999999999999999999999999999999999999999999999",
+                                    "9999999999999999999999999999999999999999999998"))
+                    .isGreaterThan(0);
+            assertThat(
+                            comparator.compare(
+                                    "100000000000000000000000000000",
+                                    "100000000000000000000000000000"))
+                    .isEqualTo(0);
 
             // This specific case is to test the overflow for a real-world scenario
             assertThat(comparator.compare("5InykKCe", "1710683457874") < 0).isTrue();
             assertThat(comparator.compare("5InykKce", "1717477435943") > 0).isFalse();
 
-            assertThat(comparator.compare("0",
-                "9999999999999999999999999999999999999999999998")).isLessThan(0);
-            assertThat(comparator.compare("9999999999999999999999999999999999999999999998",
-                "0")).isGreaterThan(0);
+            assertThat(comparator.compare("0", "9999999999999999999999999999999999999999999998"))
+                    .isLessThan(0);
+            assertThat(comparator.compare("9999999999999999999999999999999999999999999998", "0"))
+                    .isGreaterThan(0);
         }
 
         @Test
@@ -465,25 +549,25 @@ class KeyComparatorTest {
 
             // Time comparison
             assertThat(comparator.compare("2024-08-29T12:00:00.000Z", "2024-08-29T12:00:00.001Z"))
-                .isLessThan(0);
+                    .isLessThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:00.001Z", "2024-08-29T12:00:00.000Z"))
-                .isGreaterThan(0);
+                    .isGreaterThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:00.000Z", "2024-08-29T12:00:01.000Z"))
-                .isLessThan(0);
+                    .isLessThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:01.000Z", "2024-08-29T12:00:00.000Z"))
-                .isGreaterThan(0);
+                    .isGreaterThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:00.000Z", "2024-08-29T12:01:00.000Z"))
-                .isLessThan(0);
+                    .isLessThan(0);
             assertThat(comparator.compare("2024-08-29T12:01:00.000Z", "2024-08-29T12:00:00.000Z"))
-                .isGreaterThan(0);
+                    .isGreaterThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:00.000Z", "2024-08-29T13:00:00.000Z"))
-                .isLessThan(0);
+                    .isLessThan(0);
             assertThat(comparator.compare("2024-08-29T13:00:00.000Z", "2024-08-29T12:00:00.000Z"))
-                .isGreaterThan(0);
+                    .isGreaterThan(0);
             assertThat(comparator.compare("2024-08-29T12:00:00.000Z", "2024-08-30T12:00:00.000Z"))
-                .isLessThan(0);
+                    .isLessThan(0);
             assertThat(comparator.compare("2024-08-30T12:00:00.000Z", "2024-08-29T12:00:00.000Z"))
-                .isGreaterThan(0);
+                    .isGreaterThan(0);
         }
 
         @Test

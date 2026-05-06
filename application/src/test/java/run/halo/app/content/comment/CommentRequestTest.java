@@ -23,7 +23,8 @@ class CommentRequestTest {
     void constructor() throws JSONException {
         CommentRequest commentRequest = createCommentRequest();
 
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "subjectRef": {
                         "group": "fake.halo.run",
@@ -36,8 +37,8 @@ class CommentRequestTest {
                     "allowNotification": true
                 }
                 """,
-            JsonUtils.objectToJson(commentRequest),
-            true);
+                JsonUtils.objectToJson(commentRequest),
+                true);
     }
 
     @Test
@@ -47,7 +48,8 @@ class CommentRequestTest {
         assertThat(comment.getMetadata().getName()).isNotNull();
 
         comment.getMetadata().setName("fake");
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "spec": {
                         "raw": "raw",
@@ -67,8 +69,8 @@ class CommentRequestTest {
                     }
                 }
                 """,
-            JsonUtils.objectToJson(comment),
-            true);
+                JsonUtils.objectToJson(comment),
+                true);
     }
 
     private static CommentRequest createCommentRequest() {

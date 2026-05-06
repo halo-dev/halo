@@ -48,40 +48,42 @@ class MenuItemReconciler implements Reconciler<Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(MenuItem.class, request.name())
-            .ifPresent(menuItem -> {
-                if (ExtensionUtil.isDeleted(menuItem)) {
-                    return;
-                }
-                if (menuItem.getSpec() == null) {
-                    menuItem.setSpec(new MenuItemSpec());
-                }
-                var spec = menuItem.getSpec();
-                var targetRef = spec.getTargetRef();
-                if (targetRef != null) {
-                    if (Ref.groupKindEquals(targetRef, Category.GVK)) {
-                        handleCategoryRef(menuItem, targetRef.getName());
-                    } else if (Ref.groupKindEquals(targetRef, Tag.GVK)) {
-                        handleTagRef(menuItem, targetRef.getName());
-                    } else if (Ref.groupKindEquals(targetRef, SinglePage.GVK)) {
-                        handleSinglePageSpec(menuItem, targetRef.getName());
-                    } else if (Ref.groupKindEquals(targetRef, Post.GVK)) {
-                        handlePostRef(menuItem, targetRef.getName());
-                    } else {
-                        // Do nothing while the targetRef is not supported, just log an error and
-                        // reset the status.
-                        log.error("Unsupported MenuItem targetRef " + targetRef);
-                        resetStatus(menuItem);
-                    }
-                } else {
-                    if (menuItem.getStatus() == null) {
-                        menuItem.setStatus(new MenuItemStatus());
-                    }
-                    var status = menuItem.getStatus();
-                    status.setHref(spec.getHref());
-                    status.setDisplayName(spec.getDisplayName());
-                }
-                client.update(menuItem);
-            });
+                .ifPresent(
+                        menuItem -> {
+                            if (ExtensionUtil.isDeleted(menuItem)) {
+                                return;
+                            }
+                            if (menuItem.getSpec() == null) {
+                                menuItem.setSpec(new MenuItemSpec());
+                            }
+                            var spec = menuItem.getSpec();
+                            var targetRef = spec.getTargetRef();
+                            if (targetRef != null) {
+                                if (Ref.groupKindEquals(targetRef, Category.GVK)) {
+                                    handleCategoryRef(menuItem, targetRef.getName());
+                                } else if (Ref.groupKindEquals(targetRef, Tag.GVK)) {
+                                    handleTagRef(menuItem, targetRef.getName());
+                                } else if (Ref.groupKindEquals(targetRef, SinglePage.GVK)) {
+                                    handleSinglePageSpec(menuItem, targetRef.getName());
+                                } else if (Ref.groupKindEquals(targetRef, Post.GVK)) {
+                                    handlePostRef(menuItem, targetRef.getName());
+                                } else {
+                                    // Do nothing while the targetRef is not supported, just log an
+                                    // error and
+                                    // reset the status.
+                                    log.error("Unsupported MenuItem targetRef " + targetRef);
+                                    resetStatus(menuItem);
+                                }
+                            } else {
+                                if (menuItem.getStatus() == null) {
+                                    menuItem.setStatus(new MenuItemStatus());
+                                }
+                                var status = menuItem.getStatus();
+                                status.setHref(spec.getHref());
+                                status.setDisplayName(spec.getDisplayName());
+                            }
+                            client.update(menuItem);
+                        });
         return Result.doNotRetry();
     }
 
@@ -95,12 +97,12 @@ class MenuItemReconciler implements Reconciler<Request> {
             menuItem.setStatus(new MenuItemStatus());
         }
         var status = menuItem.getStatus();
-        status.setHref(Optional.ofNullable(post.getStatus())
-            .map(Post.PostStatus::getPermalink)
-            .orElse(null));
-        status.setDisplayName(Optional.ofNullable(post.getSpec())
-            .map(Post.PostSpec::getTitle)
-            .orElse(null));
+        status.setHref(
+                Optional.ofNullable(post.getStatus())
+                        .map(Post.PostStatus::getPermalink)
+                        .orElse(null));
+        status.setDisplayName(
+                Optional.ofNullable(post.getSpec()).map(Post.PostSpec::getTitle).orElse(null));
     }
 
     private void handleSinglePageSpec(MenuItem menuItem, String singlePageName) {
@@ -113,12 +115,14 @@ class MenuItemReconciler implements Reconciler<Request> {
             menuItem.setStatus(new MenuItemStatus());
         }
         var status = menuItem.getStatus();
-        status.setHref(Optional.ofNullable(singlePage.getStatus())
-            .map(SinglePage.SinglePageStatus::getPermalink)
-            .orElse(null));
-        status.setDisplayName(Optional.ofNullable(singlePage.getSpec())
-            .map(SinglePage.SinglePageSpec::getTitle)
-            .orElse(null));
+        status.setHref(
+                Optional.ofNullable(singlePage.getStatus())
+                        .map(SinglePage.SinglePageStatus::getPermalink)
+                        .orElse(null));
+        status.setDisplayName(
+                Optional.ofNullable(singlePage.getSpec())
+                        .map(SinglePage.SinglePageSpec::getTitle)
+                        .orElse(null));
     }
 
     private void handleTagRef(MenuItem menuItem, String tagName) {
@@ -131,12 +135,10 @@ class MenuItemReconciler implements Reconciler<Request> {
             menuItem.setStatus(new MenuItemStatus());
         }
         var status = menuItem.getStatus();
-        status.setHref(Optional.ofNullable(tag.getStatus())
-            .map(Tag.TagStatus::getPermalink)
-            .orElse(null));
-        status.setDisplayName(Optional.ofNullable(tag.getSpec())
-            .map(Tag.TagSpec::getDisplayName)
-            .orElse(null));
+        status.setHref(
+                Optional.ofNullable(tag.getStatus()).map(Tag.TagStatus::getPermalink).orElse(null));
+        status.setDisplayName(
+                Optional.ofNullable(tag.getSpec()).map(Tag.TagSpec::getDisplayName).orElse(null));
     }
 
     private void handleCategoryRef(MenuItem menuItem, String categoryName) {
@@ -149,30 +151,31 @@ class MenuItemReconciler implements Reconciler<Request> {
             menuItem.setStatus(new MenuItemStatus());
         }
         var status = menuItem.getStatus();
-        status.setHref(Optional.ofNullable(category.getStatus())
-            .map(Category.CategoryStatus::getPermalink)
-            .orElse(null));
-        status.setDisplayName(Optional.ofNullable(category.getSpec())
-            .map(Category.CategorySpec::getDisplayName)
-            .orElse(null));
+        status.setHref(
+                Optional.ofNullable(category.getStatus())
+                        .map(Category.CategoryStatus::getPermalink)
+                        .orElse(null));
+        status.setDisplayName(
+                Optional.ofNullable(category.getSpec())
+                        .map(Category.CategorySpec::getDisplayName)
+                        .orElse(null));
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new MenuItem())
-            .build();
+        return builder.extension(new MenuItem()).build();
     }
 
     @EventListener
     Mono<Void> onCategoryUpdated(CategoryUpdatedEvent event) {
-        log.debug("Received CategoryUpdatedEvent for category {}",
-            event.getCategory().getMetadata().getName());
+        log.debug(
+                "Received CategoryUpdatedEvent for category {}",
+                event.getCategory().getMetadata().getName());
         var category = event.getCategory();
         return findMenuItemsByRef(Ref.of(category))
-            .doOnNext(MenuItemReconciler::requestUpdate)
-            .flatMap(reactiveClient::update)
-            .then();
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(reactiveClient::update)
+                .then();
     }
 
     @EventListener
@@ -180,20 +183,21 @@ class MenuItemReconciler implements Reconciler<Request> {
         log.debug("Received TagUpdatedEvent for tag {}", event.getTag().getMetadata().getName());
         var tag = event.getTag();
         return findMenuItemsByRef(Ref.of(tag))
-            .doOnNext(MenuItemReconciler::requestUpdate)
-            .flatMap(reactiveClient::update)
-            .then();
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(reactiveClient::update)
+                .then();
     }
 
     @EventListener
     Mono<Void> onSinglePageUpdated(SinglePageUpdatedEvent event) {
-        log.debug("Received SinglePageUpdatedEvent for single page {}",
-            event.getSinglePage().getMetadata().getName());
+        log.debug(
+                "Received SinglePageUpdatedEvent for single page {}",
+                event.getSinglePage().getMetadata().getName());
         var singlePage = event.getSinglePage();
         return findMenuItemsByRef(Ref.of(singlePage))
-            .doOnNext(MenuItemReconciler::requestUpdate)
-            .flatMap(reactiveClient::update)
-            .then();
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(reactiveClient::update)
+                .then();
     }
 
     @EventListener
@@ -201,9 +205,9 @@ class MenuItemReconciler implements Reconciler<Request> {
         log.debug("Received PostUpdatedEvent for post {}", event.getName());
         var postName = event.getName();
         return findMenuItemsByRef(Ref.of(postName, Post.GVK))
-            .doOnNext(MenuItemReconciler::requestUpdate)
-            .flatMap(reactiveClient::update)
-            .then();
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(reactiveClient::update)
+                .then();
     }
 
     @EventListener
@@ -211,15 +215,16 @@ class MenuItemReconciler implements Reconciler<Request> {
         log.debug("Received PostDeletedEvent for post {}", event.getName());
         var post = event.getPost();
         return findMenuItemsByRef(Ref.of(post))
-            .doOnNext(MenuItemReconciler::requestUpdate)
-            .flatMap(reactiveClient::update)
-            .then();
+                .doOnNext(MenuItemReconciler::requestUpdate)
+                .flatMap(reactiveClient::update)
+                .then();
     }
 
     private Flux<MenuItem> findMenuItemsByRef(Ref ref) {
-        var listOptions = ListOptions.builder()
-            .andQuery(Queries.equal("spec.targetRef", Ref.toIdentifier(ref)))
-            .build();
+        var listOptions =
+                ListOptions.builder()
+                        .andQuery(Queries.equal("spec.targetRef", Ref.toIdentifier(ref)))
+                        .build();
         return reactiveClient.listAll(MenuItem.class, listOptions, Sort.unsorted());
     }
 
@@ -232,10 +237,11 @@ class MenuItemReconciler implements Reconciler<Request> {
     }
 
     private static void resetStatus(MenuItem menuItem) {
-        Optional.ofNullable(menuItem.getStatus()).ifPresent(status -> {
-            status.setHref(null);
-            status.setDisplayName(null);
-        });
+        Optional.ofNullable(menuItem.getStatus())
+                .ifPresent(
+                        status -> {
+                            status.setHref(null);
+                            status.setDisplayName(null);
+                        });
     }
-
 }

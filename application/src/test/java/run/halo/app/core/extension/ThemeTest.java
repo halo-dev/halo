@@ -27,7 +27,6 @@ class ThemeTest {
         metadata.setName("test-theme");
         theme.setMetadata(metadata);
 
-
         Theme.ThemeSpec themeSpec = new Theme.ThemeSpec();
         theme.setSpec(themeSpec);
         themeSpec.setDisplayName("test-theme");
@@ -43,7 +42,8 @@ class ThemeTest {
         themeSpec.setDescription("test-description");
         themeSpec.setConfigMapName("test-config-map");
         themeSpec.setSettingName("test-setting");
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "spec": {
                         "displayName": "test-theme",
@@ -67,8 +67,8 @@ class ThemeTest {
                     }
                 }
                 """,
-            JsonUtils.objectToJson(theme),
-            true);
+                JsonUtils.objectToJson(theme),
+                true);
 
         themeSpec.setVersion("1.0.0");
         themeSpec.setRequires("2.0.0");
@@ -78,40 +78,42 @@ class ThemeTest {
 
     @Test
     void themeCustomTemplate() throws JSONException {
-        String themeYaml = """
-            apiVersion: theme.halo.run/v1alpha1
-            kind: Theme
-            metadata:
-              name: guqing-higan
-            spec:
-              displayName: higan
-              customTemplates:
-                post:
-                  - name: post-template-1
-                    description: description for post-template-1
-                    screenshot: foo.png
-                    file: post_template_1.html
-                  - name: post-template-2
-                    description: description for post-template-2
-                    screenshot: bar.png
-                    file: post_template_2.html
-                category:
-                  - name: category-template-1
-                    description: description for category-template-1
-                    screenshot: foo.png
-                    file: category_template_1.html
-                page:
-                  - name: page-template-1
-                    description: description for page-template-1
-                    screenshot: foo.png
-                    file: page_template_1.html
-            """;
+        String themeYaml =
+                """
+                apiVersion: theme.halo.run/v1alpha1
+                kind: Theme
+                metadata:
+                  name: guqing-higan
+                spec:
+                  displayName: higan
+                  customTemplates:
+                    post:
+                      - name: post-template-1
+                        description: description for post-template-1
+                        screenshot: foo.png
+                        file: post_template_1.html
+                      - name: post-template-2
+                        description: description for post-template-2
+                        screenshot: bar.png
+                        file: post_template_2.html
+                    category:
+                      - name: category-template-1
+                        description: description for category-template-1
+                        screenshot: foo.png
+                        file: category_template_1.html
+                    page:
+                      - name: page-template-1
+                        description: description for page-template-1
+                        screenshot: foo.png
+                        file: page_template_1.html
+                """;
         List<Unstructured> unstructuredList =
-            new YamlUnstructuredLoader(new InMemoryResource(themeYaml)).load();
+                new YamlUnstructuredLoader(new InMemoryResource(themeYaml)).load();
         assertThat(unstructuredList).hasSize(1);
         Theme theme = Unstructured.OBJECT_MAPPER.convertValue(unstructuredList.get(0), Theme.class);
         assertThat(theme).isNotNull();
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "post": [
                         {
@@ -143,7 +145,7 @@ class ThemeTest {
                         }]
                 }
                 """,
-            JsonUtils.objectToJson(theme.getSpec().getCustomTemplates()),
-            true);
+                JsonUtils.objectToJson(theme.getSpec().getCustomTemplates()),
+                true);
     }
 }

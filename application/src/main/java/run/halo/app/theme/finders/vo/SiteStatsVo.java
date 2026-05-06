@@ -24,12 +24,6 @@ public class SiteStatsVo {
     private Integer category;
 
     public static SiteStatsVo empty() {
-        return SiteStatsVo.builder()
-            .visit(0)
-            .upvote(0)
-            .comment(0)
-            .post(0)
-            .category(0)
-            .build();
+        return SiteStatsVo.builder().visit(0).upvote(0).comment(0).post(0).category(0).build();
     }
 }

@@ -78,10 +78,9 @@ import run.halo.app.theme.service.ThemeService;
 public class SystemSetupEndpoint {
     static final String SETUP_TEMPLATE = "setup";
     static final PropertyPlaceholderHelper PROPERTY_PLACEHOLDER_HELPER =
-        new PropertyPlaceholderHelper(
-            PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX,
-            PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX
-        );
+            new PropertyPlaceholderHelper(
+                    PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_PREFIX,
+                    PlaceholderConfigurerSupport.DEFAULT_PLACEHOLDER_SUFFIX);
 
     private final InitializationStateGetter initializationStateGetter;
     private final SystemConfigFetcher systemConfigFetcher;
@@ -99,52 +98,76 @@ public class SystemSetupEndpoint {
     RouterFunction<ServerResponse> setupPageRouter() {
         final var tag = "SystemV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET(path("/system/setup").and(accept(MediaType.TEXT_HTML)), this::setupPage,
-                builder -> builder.operationId("JumpToSetupPage")
-                    .description("Jump to setup page")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .content(Builder.contentBuilder()
-                            .mediaType(MediaType.TEXT_HTML_VALUE))
-                        .implementation(String.class)
-                    )
-            )
-            .POST("/system/setup", contentType(MediaType.APPLICATION_FORM_URLENCODED), this::setup,
-                builder -> builder
-                    .operationId("SetupSystem")
-                    .description("Setup system")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(SetupRequest.class))
-                        )
-                    )
-                    .response(responseBuilder()
-                        .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
-                        .implementation(Void.class)
-                    )
-            )
-            .before(HaloUtils.noCache())
-            .build();
+                .GET(
+                        path("/system/setup").and(accept(MediaType.TEXT_HTML)),
+                        this::setupPage,
+                        builder ->
+                                builder.operationId("JumpToSetupPage")
+                                        .description("Jump to setup page")
+                                        .tag(tag)
+                                        .response(
+                                                responseBuilder()
+                                                        .content(
+                                                                Builder.contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .TEXT_HTML_VALUE))
+                                                        .implementation(String.class)))
+                .POST(
+                        "/system/setup",
+                        contentType(MediaType.APPLICATION_FORM_URLENCODED),
+                        this::setup,
+                        builder ->
+                                builder.operationId("SetupSystem")
+                                        .description("Setup system")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                SetupRequest
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder()
+                                                        .responseCode(
+                                                                String.valueOf(
+                                                                        HttpStatus.NO_CONTENT
+                                                                                .value()))
+                                                        .implementation(Void.class)))
+                .before(HaloUtils.noCache())
+                .build();
     }
 
     private Mono<ServerResponse> setup(ServerRequest request) {
-        return initializationStateGetter.userInitialized()
-            .filter(initialized -> !initialized)
-            .flatMap(ignored -> request.bind(SetupRequest.class)
-                .flatMap(setupRequest -> {
-                    // validate it
-                    var bindingResult = validate(setupRequest, validator, request.exchange());
-                    if (bindingResult.hasErrors()) {
-                        return handleValidationErrors(bindingResult, request);
-                    }
-                    return doInitialization(setupRequest).then(handleSetupSuccessfully(request));
-                })
-            )
-            .switchIfEmpty(redirectToConsole());
+        return initializationStateGetter
+                .userInitialized()
+                .filter(initialized -> !initialized)
+                .flatMap(
+                        ignored ->
+                                request.bind(SetupRequest.class)
+                                        .flatMap(
+                                                setupRequest -> {
+                                                    // validate it
+                                                    var bindingResult =
+                                                            validate(
+                                                                    setupRequest,
+                                                                    validator,
+                                                                    request.exchange());
+                                                    if (bindingResult.hasErrors()) {
+                                                        return handleValidationErrors(
+                                                                bindingResult, request);
+                                                    }
+                                                    return doInitialization(setupRequest)
+                                                            .then(handleSetupSuccessfully(request));
+                                                }))
+                .switchIfEmpty(redirectToConsole());
     }
 
     private static Mono<ServerResponse> handleSetupSuccessfully(ServerRequest request) {
@@ -154,20 +177,19 @@ public class SystemSetupEndpoint {
         return ServerResponse.noContent().build();
     }
 
-    private Mono<ServerResponse> handleValidationErrors(BindingResult bindingResult,
-        ServerRequest request) {
+    private Mono<ServerResponse> handleValidationErrors(
+            BindingResult bindingResult, ServerRequest request) {
         if (isHtmlRequest(request)) {
             var model = bindingResult.getModel();
             model.put("usingH2database", usingH2database());
-            return ServerResponse.status(HttpStatus.BAD_REQUEST)
-                .render(SETUP_TEMPLATE, model);
+            return ServerResponse.status(HttpStatus.BAD_REQUEST).render(SETUP_TEMPLATE, model);
         }
         return Mono.error(new RequestBodyValidationException(bindingResult));
     }
 
     private static boolean isHtmlRequest(ServerRequest request) {
         return request.headers().accept().contains(MediaType.TEXT_HTML)
-            && !HaloUtils.isXhr(request.headers().asHttpHeaders());
+                && !HaloUtils.isXhr(request.headers().asHttpHeaders());
     }
 
     private static Mono<ServerResponse> redirectToConsole() {
@@ -175,46 +197,58 @@ public class SystemSetupEndpoint {
     }
 
     private Mono<Void> doInitialization(SetupRequest body) {
-        var superUserMono = superAdminInitializer.initialize(
-                SuperAdminInitializer.InitializationParam.builder()
-                    .username(body.getUsername())
-                    .password(body.getPassword())
-                    .email(body.getEmail())
-                    .build()
-            )
-            .subscribeOn(Schedulers.boundedElastic());
+        var superUserMono =
+                superAdminInitializer
+                        .initialize(
+                                SuperAdminInitializer.InitializationParam.builder()
+                                        .username(body.getUsername())
+                                        .password(body.getPassword())
+                                        .email(body.getEmail())
+                                        .build())
+                        .subscribeOn(Schedulers.boundedElastic());
 
-        var basicConfigMono = Mono.defer(() -> systemConfigFetcher.getConfigMap()
-                .flatMap(configMap -> {
-                    mergeToBasicConfig(body, configMap);
-                    return client.update(configMap);
-                })
-            )
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(t -> t instanceof OptimisticLockingFailureException)
-            )
-            .subscribeOn(Schedulers.boundedElastic())
-            .then(Mono.fromCallable(() -> {
-                eventPublisher.publishEvent(
-                    new ExternalUrlChangedEvent(this, URI.create(body.getExternalUrl()).toURL())
-                );
-                return null;
-            }));
+        var basicConfigMono =
+                Mono.defer(
+                                () ->
+                                        systemConfigFetcher
+                                                .getConfigMap()
+                                                .flatMap(
+                                                        configMap -> {
+                                                            mergeToBasicConfig(body, configMap);
+                                                            return client.update(configMap);
+                                                        }))
+                        .retryWhen(
+                                Retry.backoff(5, Duration.ofMillis(100))
+                                        .filter(
+                                                t ->
+                                                        t
+                                                                instanceof
+                                                                OptimisticLockingFailureException))
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .then(
+                                Mono.fromCallable(
+                                        () -> {
+                                            eventPublisher.publishEvent(
+                                                    new ExternalUrlChangedEvent(
+                                                            this,
+                                                            URI.create(body.getExternalUrl())
+                                                                    .toURL()));
+                                            return null;
+                                        }));
         return Mono.when(
-                basicConfigMono,
-                superUserMono,
-                initializeNecessaryData(body.getUsername()),
-                pluginService.installPresetPlugins(),
-                themeService.installPresetTheme()
-            )
-            .then(SystemState.upsetSystemState(client, state -> state.setIsSetup(true)));
+                        basicConfigMono,
+                        superUserMono,
+                        initializeNecessaryData(body.getUsername()),
+                        pluginService.installPresetPlugins(),
+                        themeService.installPresetTheme())
+                .then(SystemState.upsetSystemState(client, state -> state.setIsSetup(true)));
     }
 
     private Mono<Void> initializeNecessaryData(String username) {
         return loadPresetExtensions(username)
-            .concatMap(client::create)
-            .subscribeOn(Schedulers.boundedElastic())
-            .then();
+                .concatMap(client::create)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     private static void mergeToBasicConfig(SetupRequest body, ConfigMap configMap) {
@@ -232,20 +266,21 @@ public class SystemSetupEndpoint {
     }
 
     private Mono<ServerResponse> setupPage(ServerRequest request) {
-        return initializationStateGetter.userInitialized()
-            .flatMap(initialized -> {
-                if (initialized) {
-                    return redirectToConsole();
-                }
-                var setupRequest = new SetupRequest();
-                setupRequest.setExternalUrl(
-                    externalUrl.getURL(request.exchange().getRequest()).toString()
-                );
-                var bindingResult = new BeanPropertyBindingResult(setupRequest, "form");
-                var model = bindingResult.getModel();
-                model.put("usingH2database", usingH2database());
-                return ServerResponse.ok().render(SETUP_TEMPLATE, model);
-            });
+        return initializationStateGetter
+                .userInitialized()
+                .flatMap(
+                        initialized -> {
+                            if (initialized) {
+                                return redirectToConsole();
+                            }
+                            var setupRequest = new SetupRequest();
+                            setupRequest.setExternalUrl(
+                                    externalUrl.getURL(request.exchange().getRequest()).toString());
+                            var bindingResult = new BeanPropertyBindingResult(setupRequest, "form");
+                            var model = bindingResult.getModel();
+                            model.put("usingH2database", usingH2database());
+                            return ServerResponse.ok().render(SETUP_TEMPLATE, model);
+                        });
     }
 
     private boolean usingH2database() {
@@ -256,9 +291,9 @@ public class SystemSetupEndpoint {
         }
         var options = rcd.getConnectionFactoryOptions();
         return Optional.ofNullable(options.getValue(DRIVER))
-            .map(Object::toString)
-            .map("h2"::equalsIgnoreCase)
-            .orElse(false);
+                .map(Object::toString)
+                .map("h2"::equalsIgnoreCase)
+                .orElse(false);
     }
 
     @Data
@@ -267,19 +302,20 @@ public class SystemSetupEndpoint {
         @Schema(requiredMode = REQUIRED, minLength = 4, maxLength = 63)
         @NotBlank
         @Size(min = 4, max = 63)
-        @Pattern(regexp = ValidationUtils.NAME_REGEX,
-            message = "{validation.error.username.pattern}")
+        @Pattern(
+                regexp = ValidationUtils.NAME_REGEX,
+                message = "{validation.error.username.pattern}")
         private String username;
 
         @Schema(requiredMode = REQUIRED, minLength = 5, maxLength = 257)
         @NotBlank
-        @Pattern(regexp = ValidationUtils.PASSWORD_REGEX,
-            message = "{validation.error.password.pattern}")
+        @Pattern(
+                regexp = ValidationUtils.PASSWORD_REGEX,
+                message = "{validation.error.password.pattern}")
         @Size(min = 5, max = 257)
         private String password;
 
-        @Email
-        private String email;
+        @Email private String email;
 
         @NotBlank
         @Size(max = 80)
@@ -295,25 +331,29 @@ public class SystemSetupEndpoint {
 
     Flux<Unstructured> loadPresetExtensions(String username) {
         return Mono.fromCallable(
-                () -> {
-                    // read initial-data.yaml to string
-                    var classPathResource = new ClassPathResource("initial-data.yaml");
-                    String rawContent = StreamUtils.copyToString(classPathResource.getInputStream(),
-                        StandardCharsets.UTF_8);
-                    // build properties
-                    var properties = new Properties();
-                    properties.setProperty("username", username);
-                    properties.setProperty("timestamp", Instant.now().toString());
-                    // replace placeholders
-                    var processedContent =
-                        PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(rawContent, properties);
-                    // load yaml to unstructured
-                    var stringResource =
-                        new InMemoryResource(processedContent.getBytes(StandardCharsets.UTF_8));
-                    var loader = new YamlUnstructuredLoader(stringResource);
-                    return loader.load();
-                })
-            .flatMapMany(Flux::fromIterable)
-            .subscribeOn(Schedulers.boundedElastic());
+                        () -> {
+                            // read initial-data.yaml to string
+                            var classPathResource = new ClassPathResource("initial-data.yaml");
+                            String rawContent =
+                                    StreamUtils.copyToString(
+                                            classPathResource.getInputStream(),
+                                            StandardCharsets.UTF_8);
+                            // build properties
+                            var properties = new Properties();
+                            properties.setProperty("username", username);
+                            properties.setProperty("timestamp", Instant.now().toString());
+                            // replace placeholders
+                            var processedContent =
+                                    PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(
+                                            rawContent, properties);
+                            // load yaml to unstructured
+                            var stringResource =
+                                    new InMemoryResource(
+                                            processedContent.getBytes(StandardCharsets.UTF_8));
+                            var loader = new YamlUnstructuredLoader(stringResource);
+                            return loader.load();
+                        })
+                .flatMapMany(Flux::fromIterable)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }

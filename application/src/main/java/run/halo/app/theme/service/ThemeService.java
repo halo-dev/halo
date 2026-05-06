@@ -41,8 +41,8 @@ public interface ThemeService {
      */
     default Mono<String> fetchActivatedThemeName() {
         return fetchSystemSetting()
-            .mapNotNull(SystemSetting.Theme::getActive)
-            .filter(StringUtils::hasText);
+                .mapNotNull(SystemSetting.Theme::getActive)
+                .filter(StringUtils::hasText);
     }
 
     // TODO Migrate other useful methods in ThemeEndpoint in the future.

@@ -41,17 +41,13 @@ import run.halo.app.infra.utils.PathUtils;
 class PostPermalinkPolicyTest {
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("00");
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @Mock
-    private PostService postService;
+    @Mock private PostService postService;
 
     private PostPermalinkPolicy postPermalinkPolicy;
 
@@ -60,7 +56,7 @@ class PostPermalinkPolicyTest {
         lenient().when(externalUrlSupplier.get()).thenReturn(URI.create(""));
         lenient().when(postService.listCategories(any())).thenReturn(Flux.empty());
         postPermalinkPolicy =
-            new PostPermalinkPolicy(environmentFetcher, externalUrlSupplier, postService);
+                new PostPermalinkPolicy(environmentFetcher, externalUrlSupplier, postService);
     }
 
     @Test
@@ -80,13 +76,13 @@ class PostPermalinkPolicyTest {
 
         String permalink = postPermalinkPolicy.permalink(post);
         assertThat(permalink)
-            .isEqualTo(PathUtils.combinePath(year, month, day, post.getSpec().getSlug()));
+                .isEqualTo(PathUtils.combinePath(year, month, day, post.getSpec().getSlug()));
 
         // pattern {month}/{day}/{slug}
         annotations.put(Constant.PERMALINK_PATTERN_ANNO, "/{month}/{day}/{slug}");
         permalink = postPermalinkPolicy.permalink(post);
         assertThat(permalink)
-            .isEqualTo(PathUtils.combinePath(month, day, post.getSpec().getSlug()));
+                .isEqualTo(PathUtils.combinePath(month, day, post.getSpec().getSlug()));
 
         // pattern /?p={name}
         annotations.put(Constant.PERMALINK_PATTERN_ANNO, "/?p={name}");
@@ -117,7 +113,7 @@ class PostPermalinkPolicyTest {
 
         var category = createCategory("test-category", "test-category-slug");
         when(postService.listCategories(post.getSpec().getCategories()))
-            .thenReturn(Flux.just(category));
+                .thenReturn(Flux.just(category));
         var permalink = postPermalinkPolicy.permalink(post);
         assertThat(permalink).isEqualTo("/test-category-slug/test-post-slug");
     }

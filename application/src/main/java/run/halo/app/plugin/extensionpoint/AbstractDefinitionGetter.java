@@ -12,7 +12,7 @@ import run.halo.app.extension.controller.Reconciler;
 
 @RequiredArgsConstructor
 abstract class AbstractDefinitionGetter<E extends Extension>
-    implements Reconciler<Reconciler.Request>, DisposableBean {
+        implements Reconciler<Reconciler.Request>, DisposableBean {
 
     protected final ConcurrentMap<String, E> cache = new ConcurrentHashMap<>();
 
@@ -25,16 +25,13 @@ abstract class AbstractDefinitionGetter<E extends Extension>
     @Override
     @SuppressWarnings("unchecked")
     public Result reconcile(Request request) {
-        client.fetch((Class<E>) watchType.getClass(), request.name())
-            .ifPresent(this::putCache);
+        client.fetch((Class<E>) watchType.getClass(), request.name()).ifPresent(this::putCache);
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder.extension(watchType)
-            .syncAllOnStart(true)
-            .build();
+        return builder.extension(watchType).syncAllOnStart(true).build();
     }
 
     @Override

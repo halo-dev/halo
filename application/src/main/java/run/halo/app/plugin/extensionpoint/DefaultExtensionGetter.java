@@ -36,10 +36,10 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     @Override
     public <T extends ExtensionPoint> Flux<T> getExtensions(Class<T> extensionPoint) {
         return Flux.fromIterable(lookExtensions(extensionPoint))
-            .concatWith(
-                Flux.fromStream(() -> beanFactory.getBeanProvider(extensionPoint).orderedStream())
-            )
-            .sort(new AnnotationAwareOrderComparator());
+                .concatWith(
+                        Flux.fromStream(
+                                () -> beanFactory.getBeanProvider(extensionPoint).orderedStream()))
+                .sort(new AnnotationAwareOrderComparator());
     }
 
     @Override
@@ -57,45 +57,52 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     }
 
     @Override
-    public <T extends ExtensionPoint> Flux<T> getEnabledExtensions(
-        Class<T> extensionPoint) {
+    public <T extends ExtensionPoint> Flux<T> getEnabledExtensions(Class<T> extensionPoint) {
         return fetchExtensionPointDefinition(extensionPoint)
-            .flatMapMany(epd -> {
-                var epdName = epd.getMetadata().getName();
-                var type = epd.getSpec().getType();
-                if (type == ExtensionPointDefinition.ExtensionPointType.SINGLETON) {
-                    return getEnabledExtensions(epdName, extensionPoint).take(1);
-                }
-                // TODO If the type is sortable, may need to process the returned order.
-                return getEnabledExtensions(epdName, extensionPoint);
-            });
+                .flatMapMany(
+                        epd -> {
+                            var epdName = epd.getMetadata().getName();
+                            var type = epd.getSpec().getType();
+                            if (type == ExtensionPointDefinition.ExtensionPointType.SINGLETON) {
+                                return getEnabledExtensions(epdName, extensionPoint).take(1);
+                            }
+                            // TODO If the type is sortable, may need to process the returned order.
+                            return getEnabledExtensions(epdName, extensionPoint);
+                        });
     }
 
-    private <T extends ExtensionPoint> Flux<T> getEnabledExtensions(String epdName,
-        Class<T> extensionPoint) {
-        return systemConfigFetcher.fetch(ExtensionPointEnabled.GROUP, ExtensionPointEnabled.class)
-            .switchIfEmpty(Mono.fromSupplier(ExtensionPointEnabled::new))
-            .flatMapMany(enabled -> {
-                var extensionDefNames = enabled.getOrDefault(epdName, null);
-                if (extensionDefNames == null) {
-                    // get all extensions if not specified
-                    return Flux.defer(() -> getExtensions(extensionPoint));
-                }
-                var extensions = getExtensions(extensionPoint).cache();
-                return Flux.fromIterable(extensionDefNames)
-                    .flatMapSequential(extensionDefinitionGetter::get)
-                    .flatMapSequential(extensionDef -> {
-                        var className = extensionDef.getSpec().getClassName();
-                        return extensions.filter(
-                            extension -> Objects.equals(extension.getClass().getName(),
-                                className)
-                        );
-                    });
-            });
+    private <T extends ExtensionPoint> Flux<T> getEnabledExtensions(
+            String epdName, Class<T> extensionPoint) {
+        return systemConfigFetcher
+                .fetch(ExtensionPointEnabled.GROUP, ExtensionPointEnabled.class)
+                .switchIfEmpty(Mono.fromSupplier(ExtensionPointEnabled::new))
+                .flatMapMany(
+                        enabled -> {
+                            var extensionDefNames = enabled.getOrDefault(epdName, null);
+                            if (extensionDefNames == null) {
+                                // get all extensions if not specified
+                                return Flux.defer(() -> getExtensions(extensionPoint));
+                            }
+                            var extensions = getExtensions(extensionPoint).cache();
+                            return Flux.fromIterable(extensionDefNames)
+                                    .flatMapSequential(extensionDefinitionGetter::get)
+                                    .flatMapSequential(
+                                            extensionDef -> {
+                                                var className =
+                                                        extensionDef.getSpec().getClassName();
+                                                return extensions.filter(
+                                                        extension ->
+                                                                Objects.equals(
+                                                                        extension
+                                                                                .getClass()
+                                                                                .getName(),
+                                                                        className));
+                                            });
+                        });
     }
 
     private Mono<ExtensionPointDefinition> fetchExtensionPointDefinition(
-        Class<? extends ExtensionPoint> extensionPoint) {
+            Class<? extends ExtensionPoint> extensionPoint) {
         return extensionPointDefinitionGetter.getByClassName(extensionPoint.getName());
     }
 
@@ -107,8 +114,9 @@ public class DefaultExtensionGetter implements ExtensionGetter {
             if (startedPlugin.getPlugin() instanceof SpringPlugin springPlugin) {
                 var pluginApplicationContext = springPlugin.getApplicationContext();
                 try {
-                    pluginApplicationContext.getBeansOfType(type)
-                        .forEach((name, bean) -> beans.add(bean));
+                    pluginApplicationContext
+                            .getBeansOfType(type)
+                            .forEach((name, bean) -> beans.add(bean));
                 } catch (Throwable e) {
                     // Ignore
                     log.error("Error while looking for extensions of type {}", type, e);

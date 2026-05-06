@@ -16,7 +16,7 @@ import run.halo.app.infra.ui.WebSocketUtils;
  */
 public class RequestInfoFactory {
     public static final RequestInfoFactory INSTANCE =
-        new RequestInfoFactory(Set.of("api", "apis"), Set.of("api"));
+            new RequestInfoFactory(Set.of("api", "apis"), Set.of("api"));
 
     /**
      * without leading and trailing slashes.
@@ -37,8 +37,8 @@ public class RequestInfoFactory {
         this(apiPrefixes, grouplessApiPrefixes, Set.of("proxy", "watch"));
     }
 
-    public RequestInfoFactory(Set<String> apiPrefixes, Set<String> grouplessApiPrefixes,
-        Set<String> specialVerbs) {
+    public RequestInfoFactory(
+            Set<String> apiPrefixes, Set<String> grouplessApiPrefixes, Set<String> specialVerbs) {
         this.apiPrefixes = apiPrefixes;
         this.grouplessApiPrefixes = grouplessApiPrefixes;
         this.specialVerbs = specialVerbs;
@@ -92,7 +92,7 @@ public class RequestInfoFactory {
         // non-resource request default
         PathContainer path = request.getPath().pathWithinApplication();
         RequestInfo requestInfo =
-            new RequestInfo(false, path.value(), request.getMethod().name().toLowerCase());
+                new RequestInfo(false, path.value(), request.getMethod().name().toLowerCase());
 
         String[] currentParts = splitPath(path.value());
 
@@ -127,20 +127,22 @@ public class RequestInfoFactory {
         if (specialVerbs.contains(currentParts[0])) {
             if (currentParts.length < 2) {
                 throw new IllegalArgumentException(
-                    String.format("unable to determine kind and namespace from url, %s",
-                        request.getPath()));
+                        String.format(
+                                "unable to determine kind and namespace from url, %s",
+                                request.getPath()));
             }
             requestInfo.verb = currentParts[0];
             currentParts = Arrays.copyOfRange(currentParts, 1, currentParts.length);
         } else {
-            requestInfo.verb = switch (request.getMethod().name().toUpperCase()) {
-                case "POST" -> "create";
-                case "GET", "HEAD" -> "get";
-                case "PUT" -> "update";
-                case "PATCH" -> "patch";
-                case "DELETE" -> "delete";
-                default -> "";
-            };
+            requestInfo.verb =
+                    switch (request.getMethod().name().toUpperCase()) {
+                        case "POST" -> "create";
+                        case "GET", "HEAD" -> "get";
+                        case "PUT" -> "update";
+                        case "PATCH" -> "patch";
+                        case "DELETE" -> "delete";
+                        default -> "";
+                    };
         }
         // URL forms: /namespaces/{namespace}/{kind}/*, where parts are adjusted to be relative
         // to kind
@@ -175,8 +177,7 @@ public class RequestInfoFactory {
         requestInfo.parts = currentParts;
         // special verbs no subresources
         // parts look like: resource/resourceName/subresource/other/stuff/we/don't/interpret
-        if (requestInfo.parts.length >= 3 && !specialVerbs.contains(
-            requestInfo.verb)) {
+        if (requestInfo.parts.length >= 3 && !specialVerbs.contains(requestInfo.verb)) {
             requestInfo.subresource = requestInfo.parts[2];
             // if there is another step after the subresource name and it is not a known
             if (requestInfo.parts.length >= 4) {
@@ -193,8 +194,9 @@ public class RequestInfoFactory {
         }
 
         // has name and no subresource but verb=create, then this is a non-resource request
-        if (StringUtils.isNotBlank(requestInfo.name) && StringUtils.isBlank(requestInfo.subresource)
-            && "create".equals(requestInfo.verb)) {
+        if (StringUtils.isNotBlank(requestInfo.name)
+                && StringUtils.isBlank(requestInfo.subresource)
+                && "create".equals(requestInfo.verb)) {
             requestInfo.isResourceRequest = false;
         }
 
@@ -217,7 +219,7 @@ public class RequestInfoFactory {
             }
         }
         if ("list".equals(requestInfo.verb)
-            && WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
+                && WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
             requestInfo.verb = "watch";
         }
         return requestInfo;

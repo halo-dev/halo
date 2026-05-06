@@ -19,7 +19,7 @@ import run.halo.app.extension.Extension;
 class DefaultIndicesManager implements IndicesManager {
 
     private final ConcurrentMap<Class<? extends Extension>, Indices<? extends Extension>>
-        indicesMap;
+            indicesMap;
 
     DefaultIndicesManager() {
         indicesMap = new ConcurrentHashMap<>();
@@ -27,22 +27,26 @@ class DefaultIndicesManager implements IndicesManager {
 
     @Override
     public <E extends Extension> void add(Class<E> type, List<ValueIndexSpec<E, ?>> indexSpecs) {
-        indicesMap.computeIfAbsent(type, t -> {
-            var indices = new ArrayList<Index<E, ?>>();
-            // the default index specs should be added first in case of index overwriting
-            Stream.concat(this.<E>createDefaultIndexSpecs().stream(), indexSpecs.stream())
-                .distinct()
-                .forEach(indexSpec -> {
-                    if (indexSpec instanceof MultiValueIndexSpec<E, ?> spec) {
-                        indices.add(new MultiValueIndex<>(spec));
-                    } else if (indexSpec instanceof SingleValueIndexSpec<E, ?> spec) {
-                        indices.add(new SingleValueIndex<>(spec));
-                    }
-                    // ignore other implementations, should never happen
+        indicesMap.computeIfAbsent(
+                type,
+                t -> {
+                    var indices = new ArrayList<Index<E, ?>>();
+                    // the default index specs should be added first in case of index overwriting
+                    Stream.concat(this.<E>createDefaultIndexSpecs().stream(), indexSpecs.stream())
+                            .distinct()
+                            .forEach(
+                                    indexSpec -> {
+                                        if (indexSpec instanceof MultiValueIndexSpec<E, ?> spec) {
+                                            indices.add(new MultiValueIndex<>(spec));
+                                        } else if (indexSpec
+                                                instanceof SingleValueIndexSpec<E, ?> spec) {
+                                            indices.add(new SingleValueIndex<>(spec));
+                                        }
+                                        // ignore other implementations, should never happen
+                                    });
+                    indices.add(new LabelIndex<>());
+                    return new DefaultIndices<>(indices);
                 });
-            indices.add(new LabelIndex<>());
-            return new DefaultIndices<>(indices);
-        });
     }
 
     @Override
@@ -67,23 +71,24 @@ class DefaultIndicesManager implements IndicesManager {
     }
 
     private <E extends Extension> List<ValueIndexSpec<E, ?>> createDefaultIndexSpecs() {
-        var metadataNameSpec = IndexSpecs.<E, String>single("metadata.name", String.class)
-            .indexFunc(e -> e.getMetadata().getName())
-            .unique(true)
-            .nullable(false)
-            .build();
+        var metadataNameSpec =
+                IndexSpecs.<E, String>single("metadata.name", String.class)
+                        .indexFunc(e -> e.getMetadata().getName())
+                        .unique(true)
+                        .nullable(false)
+                        .build();
         var creationTimestampSpec =
-            IndexSpecs.<E, Instant>single("metadata.creationTimestamp", Instant.class)
-                .indexFunc(e -> e.getMetadata().getCreationTimestamp())
-                .unique(false)
-                .nullable(false)
-                .build();
+                IndexSpecs.<E, Instant>single("metadata.creationTimestamp", Instant.class)
+                        .indexFunc(e -> e.getMetadata().getCreationTimestamp())
+                        .unique(false)
+                        .nullable(false)
+                        .build();
         var deletionTimestampSpec =
-            IndexSpecs.<E, Instant>single("metadata.deletionTimestamp", Instant.class)
-                .indexFunc(e -> e.getMetadata().getDeletionTimestamp())
-                .unique(false)
-                .nullable(true)
-                .build();
+                IndexSpecs.<E, Instant>single("metadata.deletionTimestamp", Instant.class)
+                        .indexFunc(e -> e.getMetadata().getDeletionTimestamp())
+                        .unique(false)
+                        .nullable(true)
+                        .build();
         return List.of(metadataNameSpec, creationTimestampSpec, deletionTimestampSpec);
     }
 }

@@ -25,8 +25,7 @@ public interface SchemeManager {
     }
 
     <E extends Extension> void register(
-        Class<E> type, @Nullable Consumer<IndexSpecs<E>> specsConsumer
-    );
+            Class<E> type, @Nullable Consumer<IndexSpecs<E>> specsConsumer);
 
     void unregister(Scheme scheme);
 
@@ -38,13 +37,12 @@ public interface SchemeManager {
 
     default Optional<Scheme> fetch(GroupVersionKind gvk) {
         return schemes().stream()
-            .filter(scheme -> Objects.equals(scheme.groupVersionKind(), gvk))
-            .findFirst();
+                .filter(scheme -> Objects.equals(scheme.groupVersionKind(), gvk))
+                .findFirst();
     }
 
     default Scheme get(GroupVersionKind gvk) {
-        return fetch(gvk).orElseThrow(
-            () -> new SchemeNotFoundException(gvk));
+        return fetch(gvk).orElseThrow(() -> new SchemeNotFoundException(gvk));
     }
 
     default Scheme get(Class<? extends Extension> type) {
@@ -56,5 +54,4 @@ public interface SchemeManager {
         var gvk = ext.groupVersionKind();
         return get(gvk);
     }
-
 }

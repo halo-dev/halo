@@ -60,31 +60,39 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
     @Override
     public Mono<ServerHttpRequest> removeMatchingRequest(ServerWebExchange exchange) {
         return getRedirectUri(exchange)
-            .flatMap(redirectUri -> {
-                if (redirectUri.getFragment() != null) {
-                    var redirectUriInApplication =
-                        uriInApplication(exchange.getRequest(), redirectUri, false);
-                    var uriInApplication =
-                        uriInApplication(exchange.getRequest(), exchange.getRequest().getURI());
-                    // compare the path and query only
-                    if (!Objects.equals(redirectUriInApplication, uriInApplication)) {
-                        return Mono.empty();
-                    }
-                    // remove the exchange
-                    return exchange.getSession().map(WebSession::getAttributes)
-                        .doOnNext(attributes -> attributes.remove(this.sessionAttrName))
-                        .thenReturn(exchange.getRequest());
-                }
-                return super.removeMatchingRequest(exchange);
-            });
+                .flatMap(
+                        redirectUri -> {
+                            if (redirectUri.getFragment() != null) {
+                                var redirectUriInApplication =
+                                        uriInApplication(exchange.getRequest(), redirectUri, false);
+                                var uriInApplication =
+                                        uriInApplication(
+                                                exchange.getRequest(),
+                                                exchange.getRequest().getURI());
+                                // compare the path and query only
+                                if (!Objects.equals(redirectUriInApplication, uriInApplication)) {
+                                    return Mono.empty();
+                                }
+                                // remove the exchange
+                                return exchange.getSession()
+                                        .map(WebSession::getAttributes)
+                                        .doOnNext(
+                                                attributes ->
+                                                        attributes.remove(this.sessionAttrName))
+                                        .thenReturn(exchange.getRequest());
+                            }
+                            return super.removeMatchingRequest(exchange);
+                        });
     }
 
     private Mono<Void> saveRedirectUri(ServerWebExchange exchange, URI redirectUri) {
         var redirectUriInApplication = uriInApplication(exchange.getRequest(), redirectUri);
         return exchange.getSession()
-            .map(WebSession::getAttributes)
-            .doOnNext(attributes -> attributes.put(this.sessionAttrName, redirectUriInApplication))
-            .then();
+                .map(WebSession::getAttributes)
+                .doOnNext(
+                        attributes ->
+                                attributes.put(this.sessionAttrName, redirectUriInApplication))
+                .then();
     }
 
     public static String uriInApplication(ServerHttpRequest request, URI uri) {
@@ -92,26 +100,29 @@ public class HaloServerRequestCache extends WebSessionServerRequestCache {
     }
 
     public static String uriInApplication(
-        ServerHttpRequest request, URI uri, boolean appendFragment
-    ) {
+            ServerHttpRequest request, URI uri, boolean appendFragment) {
         var path = RequestPath.parse(uri, request.getPath().contextPath().value());
         var query = uri.getRawQuery();
         var fragment = uri.getRawFragment();
         return path.pathWithinApplication().value()
-            + (query == null ? "" : "?" + query)
-            + (fragment == null || !appendFragment ? "" : "#" + fragment);
+                + (query == null ? "" : "?" + query)
+                + (fragment == null || !appendFragment ? "" : "#" + fragment);
     }
 
     private static ServerWebExchangeMatcher createDefaultRequestMatcher() {
         var get = pathMatchers(HttpMethod.GET, "/**");
-        var notFavicon = new NegatedServerWebExchangeMatcher(
-            pathMatchers(
-                "/favicon.*", "/login/**", "/signup/**", "/password-reset/**", "/challenges/**",
-                "/oauth2/**", "/social/**"
-            ));
+        var notFavicon =
+                new NegatedServerWebExchangeMatcher(
+                        pathMatchers(
+                                "/favicon.*",
+                                "/login/**",
+                                "/signup/**",
+                                "/password-reset/**",
+                                "/challenges/**",
+                                "/oauth2/**",
+                                "/social/**"));
         var html = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         html.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
         return new AndServerWebExchangeMatcher(get, notFavicon, html);
     }
-
 }

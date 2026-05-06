@@ -17,8 +17,7 @@ public class PolicyReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Policy.class, request.name())
-            .ifPresent(this::checkOwnerLabel);
+        client.fetch(Policy.class, request.name()).ifPresent(this::checkOwnerLabel);
         return Result.doNotRetry();
     }
 
@@ -26,19 +25,19 @@ public class PolicyReconciler implements Reconciler<Reconciler.Request> {
         var policyName = policy.getMetadata().getName();
         var configMapName = policy.getSpec().getConfigMapName();
         client.fetch(ConfigMap.class, configMapName)
-            .ifPresent(configMap -> {
-                var labels = MetadataUtil.nullSafeLabels(configMap);
-                labels.put(Policy.POLICY_OWNER_LABEL, policyName);
-                client.update(configMap);
-            });
+                .ifPresent(
+                        configMap -> {
+                            var labels = MetadataUtil.nullSafeLabels(configMap);
+                            labels.put(Policy.POLICY_OWNER_LABEL, policyName);
+                            client.update(configMap);
+                        });
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Policy())
-            // sync on start for compatible with previous data
-            .syncAllOnStart(true)
-            .build();
+        return builder.extension(new Policy())
+                // sync on start for compatible with previous data
+                .syncAllOnStart(true)
+                .build();
     }
 }

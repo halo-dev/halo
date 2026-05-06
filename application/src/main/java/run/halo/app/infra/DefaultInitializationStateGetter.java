@@ -35,8 +35,7 @@ public class DefaultInitializationStateGetter implements InitializationStateGett
         if (userInitialized.get()) {
             return Mono.just(true);
         }
-        return hasUser()
-            .doOnNext(userInitialized::set);
+        return hasUser().doOnNext(userInitialized::set);
     }
 
     @Override
@@ -45,24 +44,22 @@ public class DefaultInitializationStateGetter implements InitializationStateGett
             return Mono.just(true);
         }
         return client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)
-            .map(config -> {
-                SystemState systemState = SystemState.deserialize(config);
-                return isTrue(systemState.getIsSetup());
-            })
-            .defaultIfEmpty(false)
-            .doOnNext(dataInitialized::set);
+                .map(
+                        config -> {
+                            SystemState systemState = SystemState.deserialize(config);
+                            return isTrue(systemState.getIsSetup());
+                        })
+                .defaultIfEmpty(false)
+                .doOnNext(dataInitialized::set);
     }
 
     private Mono<Boolean> hasUser() {
         var listOptions = new ListOptions();
-        listOptions.setLabelSelector(LabelSelector.builder()
-            .notEq(User.HIDDEN_USER_LABEL, "true")
-            .build()
-        );
-        listOptions.setFieldSelector(
-            FieldSelector.of(isNull("metadata.deletionTimestamp")));
+        listOptions.setLabelSelector(
+                LabelSelector.builder().notEq(User.HIDDEN_USER_LABEL, "true").build());
+        listOptions.setFieldSelector(FieldSelector.of(isNull("metadata.deletionTimestamp")));
         return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1))
-            .map(result -> result.getTotal() > 0)
-            .defaultIfEmpty(false);
+                .map(result -> result.getTotal() > 0)
+                .defaultIfEmpty(false);
     }
 }

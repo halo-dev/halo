@@ -15,8 +15,8 @@ public interface SubscriptionService {
      */
     Flux<Subscription> listByPerPage(String reasonType);
 
-    Mono<Void> remove(Subscription.Subscriber subscriber,
-        Subscription.InterestReason interestReasons);
+    Mono<Void> remove(
+            Subscription.Subscriber subscriber, Subscription.InterestReason interestReasons);
 
     Mono<Void> remove(Subscription.Subscriber subscriber);
 

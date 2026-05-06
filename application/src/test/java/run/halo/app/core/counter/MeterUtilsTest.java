@@ -33,60 +33,58 @@ class MeterUtilsTest {
     @Test
     void visitCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
-        MeterUtils.visitCounter(meterRegistry, "posts.content.halo.run/fake-post")
-            .increment();
+        MeterUtils.visitCounter(meterRegistry, "posts.content.halo.run/fake-post").increment();
         RequiredSearch requiredSearch = meterRegistry.get("posts.content.halo.run/fake-post");
         assertThat(requiredSearch.counter().count()).isEqualTo(1);
         Meter.Id id = requiredSearch.counter().getId();
         assertThat(id.getTag(MeterUtils.SCENE)).isEqualTo(MeterUtils.VISIT_SCENE);
         assertThat(id.getTag(MeterUtils.METRICS_COMMON_TAG.getKey()))
-            .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
+                .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
     }
 
     @Test
     void upvoteCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
-        MeterUtils.upvoteCounter(meterRegistry, "posts.content.halo.run/fake-post")
-            .increment(2);
+        MeterUtils.upvoteCounter(meterRegistry, "posts.content.halo.run/fake-post").increment(2);
         RequiredSearch requiredSearch = meterRegistry.get("posts.content.halo.run/fake-post");
         assertThat(requiredSearch.counter().count()).isEqualTo(2);
         Meter.Id id = requiredSearch.counter().getId();
         assertThat(id.getTag(MeterUtils.SCENE)).isEqualTo(MeterUtils.UPVOTE_SCENE);
         assertThat(id.getTag(MeterUtils.METRICS_COMMON_TAG.getKey()))
-            .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
+                .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
     }
 
     @Test
     void totalCommentCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         MeterUtils.totalCommentCounter(meterRegistry, "content.halo.run.posts.fake-post")
-            .increment(3);
+                .increment(3);
         RequiredSearch requiredSearch = meterRegistry.get("content.halo.run.posts.fake-post");
         assertThat(requiredSearch.counter().count()).isEqualTo(3);
         Meter.Id id = requiredSearch.counter().getId();
         assertThat(id.getTag(MeterUtils.SCENE)).isEqualTo(MeterUtils.TOTAL_COMMENT_SCENE);
         assertThat(id.getTag(MeterUtils.METRICS_COMMON_TAG.getKey()))
-            .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
+                .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
     }
 
     @Test
     void approvedCommentCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         MeterUtils.approvedCommentCounter(meterRegistry, "posts.content.halo.run/fake-post")
-            .increment(2);
+                .increment(2);
         RequiredSearch requiredSearch = meterRegistry.get("posts.content.halo.run/fake-post");
         assertThat(requiredSearch.counter().count()).isEqualTo(2);
         Meter.Id id = requiredSearch.counter().getId();
         assertThat(id.getTag(MeterUtils.SCENE)).isEqualTo(MeterUtils.APPROVED_COMMENT_SCENE);
         assertThat(id.getTag(MeterUtils.METRICS_COMMON_TAG.getKey()))
-            .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
+                .isEqualTo(MeterUtils.METRICS_COMMON_TAG.getValue());
     }
 
     @Test
     void isVisitCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter visitCounter =
-            MeterUtils.visitCounter(meterRegistry, "posts.content.halo.run/fake-post");
+                MeterUtils.visitCounter(meterRegistry, "posts.content.halo.run/fake-post");
         assertThat(MeterUtils.isVisitCounter(visitCounter)).isTrue();
     }
 
@@ -94,7 +92,7 @@ class MeterUtilsTest {
     void isUpvoteCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter upvoteCounter =
-            MeterUtils.upvoteCounter(meterRegistry, "posts.content.halo.run/fake-post");
+                MeterUtils.upvoteCounter(meterRegistry, "posts.content.halo.run/fake-post");
         assertThat(MeterUtils.isUpvoteCounter(upvoteCounter)).isTrue();
         assertThat(MeterUtils.isVisitCounter(upvoteCounter)).isFalse();
     }
@@ -103,7 +101,7 @@ class MeterUtilsTest {
     void isDownvoteCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter downvoteCounter =
-            MeterUtils.downvoteCounter(meterRegistry, "posts.content.halo.run/fake-post");
+                MeterUtils.downvoteCounter(meterRegistry, "posts.content.halo.run/fake-post");
         assertThat(MeterUtils.isDownvoteCounter(downvoteCounter)).isTrue();
         assertThat(MeterUtils.isVisitCounter(downvoteCounter)).isFalse();
     }
@@ -112,7 +110,7 @@ class MeterUtilsTest {
     void isTotalCommentCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter totalCommentCounter =
-            MeterUtils.totalCommentCounter(meterRegistry, "posts.content.halo.run/fake-post");
+                MeterUtils.totalCommentCounter(meterRegistry, "posts.content.halo.run/fake-post");
         assertThat(MeterUtils.isTotalCommentCounter(totalCommentCounter)).isTrue();
         assertThat(MeterUtils.isVisitCounter(totalCommentCounter)).isFalse();
     }
@@ -121,7 +119,8 @@ class MeterUtilsTest {
     void isApprovedCommentCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter approvedCommentCounter =
-            MeterUtils.approvedCommentCounter(meterRegistry, "posts.content.halo.run/fake-post");
+                MeterUtils.approvedCommentCounter(
+                        meterRegistry, "posts.content.halo.run/fake-post");
         assertThat(MeterUtils.isApprovedCommentCounter(approvedCommentCounter)).isTrue();
         assertThat(MeterUtils.isVisitCounter(approvedCommentCounter)).isFalse();
     }

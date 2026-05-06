@@ -57,19 +57,23 @@ public class CommentQuery extends SortableRequest {
         var builder = ListOptions.builder(super.toListOptions());
 
         Optional.ofNullable(getKeyword())
-            .filter(StringUtils::isNotBlank)
-            .ifPresent(keyword -> builder.andQuery(contains("spec.raw", keyword)));
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(keyword -> builder.andQuery(contains("spec.raw", keyword)));
 
         Optional.ofNullable(getOwnerName())
-            .filter(StringUtils::isNotBlank)
-            .ifPresent(ownerName -> {
-                var ownerKind = Optional.ofNullable(getOwnerKind())
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(User.KIND);
-                builder.andQuery(
-                    equal("spec.owner", Comment.CommentOwner.ownerIdentity(ownerKind, ownerName))
-                );
-            });
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(
+                        ownerName -> {
+                            var ownerKind =
+                                    Optional.ofNullable(getOwnerKind())
+                                            .filter(StringUtils::isNotBlank)
+                                            .orElse(User.KIND);
+                            builder.andQuery(
+                                    equal(
+                                            "spec.owner",
+                                            Comment.CommentOwner.ownerIdentity(
+                                                    ownerKind, ownerName)));
+                        });
 
         return builder.build();
     }
@@ -77,20 +81,23 @@ public class CommentQuery extends SortableRequest {
     public static void buildParameters(Builder builder) {
         IListRequest.buildParameters(builder);
         builder.parameter(QueryParamBuildUtil.sortParameter())
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("keyword")
-                .description("Comments filtered by keyword.")
-                .implementation(String.class))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("ownerKind")
-                .description("Commenter kind.")
-                .implementation(String.class))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("ownerName")
-                .description("Commenter name.")
-                .implementation(String.class));
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("keyword")
+                                .description("Comments filtered by keyword.")
+                                .implementation(String.class))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("ownerKind")
+                                .description("Commenter kind.")
+                                .implementation(String.class))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("ownerName")
+                                .description("Commenter name.")
+                                .implementation(String.class));
     }
 }

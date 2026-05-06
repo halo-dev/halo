@@ -35,18 +35,22 @@ public class RememberTokenCleaner {
      */
     @Scheduled(cron = "0 0 3 * * ?")
     public void cleanUpExpiredTokens() {
-        paginatedOperator.deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
-            .then().block(BLOCKING_TIMEOUT);
+        paginatedOperator
+                .deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
+                .then()
+                .block(BLOCKING_TIMEOUT);
         log.info("Expired remember me tokens have been cleaned up.");
     }
 
     ListOptions getExpiredTokensListOptions() {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            and(isNull("metadata.deletionTimestamp"),
-                lessThan("metadata.creationTimestamp", getExpirationThreshold().toString())
-            )
-        ));
+        listOptions.setFieldSelector(
+                FieldSelector.of(
+                        and(
+                                isNull("metadata.deletionTimestamp"),
+                                lessThan(
+                                        "metadata.creationTimestamp",
+                                        getExpirationThreshold().toString()))));
         return listOptions;
     }
 

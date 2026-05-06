@@ -40,23 +40,16 @@ import run.halo.app.extension.store.ExtensionStoreRepository;
 @AutoConfigureWebTestClient
 class ExtensionConfigurationTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
-    @Autowired
-    SchemeManager schemeManager;
+    @Autowired SchemeManager schemeManager;
 
-    @MockitoBean
-    RoleService roleService;
+    @MockitoBean RoleService roleService;
 
     @BeforeEach
     void setUp() {
         // disable authorization
-        var rule = new Role.PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .verbs("*")
-            .build();
+        var rule = new Role.PolicyRule.Builder().apiGroups("*").resources("*").verbs("*").build();
         var role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName("supper-role");
@@ -72,51 +65,62 @@ class ExtensionConfigurationTest {
     void cleanUp(@Autowired ExtensionStoreRepository repository) {
         var gvk = Scheme.buildFromType(FakeExtension.class).groupVersionKind();
         repository.deleteAll().block();
-        schemeManager.fetch(GroupVersionKind.fromExtension(FakeExtension.class))
-            .ifPresent(scheme -> schemeManager.unregister(scheme));
+        schemeManager
+                .fetch(GroupVersionKind.fromExtension(FakeExtension.class))
+                .ifPresent(scheme -> schemeManager.unregister(scheme));
     }
 
     @Test
     @WithMockUser
     void shouldReturnNotFoundWhenSchemeNotRegistered() {
         // unregister the Extension if necessary
-        schemeManager.fetch(Scheme.buildFromType(FakeExtension.class).groupVersionKind())
-            .ifPresent(schemeManager::unregister);
+        schemeManager
+                .fetch(Scheme.buildFromType(FakeExtension.class).groupVersionKind())
+                .ifPresent(schemeManager::unregister);
 
-        webClient.get()
-            .uri("/apis/fake.halo.run/v1alpha1/fakes")
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
-        webClient.get()
-            .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
-        webClient.post()
-            .uri("/apis/fake.halo.run/v1alpha1/fakes")
-            .bodyValue(new FakeExtension())
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient
+                .post()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes")
+                .bodyValue(new FakeExtension())
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
-        webClient.put()
-            .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
-            .bodyValue(new FakeExtension())
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient
+                .put()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
+                .bodyValue(new FakeExtension())
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
-        webClient.delete()
-            .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
-            .exchange()
-            .expectStatus().isNotFound();
+        webClient
+                .delete()
+                .uri("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 
     @Nested
     @DisplayName("After creating extension")
     class AfterCreatingExtension {
 
-        @Autowired
-        ExtensionClient extClient;
+        @Autowired ExtensionClient extClient;
 
         FakeExtension createdFake;
 
@@ -128,82 +132,118 @@ class ExtensionConfigurationTest {
             var fake = new FakeExtension();
             fake.setMetadata(metadata);
 
-            webClient.get()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes/{}", metadata.getName())
-                .exchange()
-                .expectStatus().isNotFound();
+            webClient
+                    .get()
+                    .uri("/apis/fake.halo.run/v1alpha1/fakes/{}", metadata.getName())
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
 
-            createdFake = webClient.post()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(fake)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectHeader().location("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
-                .expectBody(FakeExtension.class)
-                .consumeWith(result -> {
-                    var gotFake = result.getResponseBody();
-                    assertNotNull(gotFake);
-                    assertEquals("my-fake", gotFake.getMetadata().getName());
-                    assertNotNull(gotFake.getMetadata().getVersion());
-                    assertNotNull(gotFake.getMetadata().getCreationTimestamp());
-                })
-                .returnResult()
-                .getResponseBody();
+            createdFake =
+                    webClient
+                            .post()
+                            .uri("/apis/fake.halo.run/v1alpha1/fakes")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(fake)
+                            .exchange()
+                            .expectStatus()
+                            .isCreated()
+                            .expectHeader()
+                            .location("/apis/fake.halo.run/v1alpha1/fakes/my-fake")
+                            .expectBody(FakeExtension.class)
+                            .consumeWith(
+                                    result -> {
+                                        var gotFake = result.getResponseBody();
+                                        assertNotNull(gotFake);
+                                        assertEquals("my-fake", gotFake.getMetadata().getName());
+                                        assertNotNull(gotFake.getMetadata().getVersion());
+                                        assertNotNull(gotFake.getMetadata().getCreationTimestamp());
+                                    })
+                            .returnResult()
+                            .getResponseBody();
         }
 
         @Test
         @WithMockUser
         void shouldDeleteExtensionWhenSchemeRegistered() {
-            webClient.delete()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}",
-                    createdFake.getMetadata().getName())
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(FakeExtension.class)
-                .consumeWith(result -> {
-                    var deletedFake = result.getResponseBody();
-                    assertNotNull(deletedFake);
-                    assertNotNull(deletedFake.getMetadata().getDeletionTimestamp());
-                    assertTrue(deletedFake.getMetadata().getDeletionTimestamp()
-                        .isBefore(Instant.now()));
-                });
+            webClient
+                    .delete()
+                    .uri(
+                            "/apis/fake.halo.run/v1alpha1/fakes/{name}",
+                            createdFake.getMetadata().getName())
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .expectBody(FakeExtension.class)
+                    .consumeWith(
+                            result -> {
+                                var deletedFake = result.getResponseBody();
+                                assertNotNull(deletedFake);
+                                assertNotNull(deletedFake.getMetadata().getDeletionTimestamp());
+                                assertTrue(
+                                        deletedFake
+                                                .getMetadata()
+                                                .getDeletionTimestamp()
+                                                .isBefore(Instant.now()));
+                            });
         }
 
         @Test
         @WithMockUser
         void shouldListExtensionsWhenSchemeRegistered() {
-            webClient.get().uri("/apis/fake.halo.run/v1alpha1/fakes")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.items.length()").isEqualTo(1);
+            webClient
+                    .get()
+                    .uri("/apis/fake.halo.run/v1alpha1/fakes")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(1);
         }
 
         @Test
         @WithMockUser
         void shouldListExtensionsWithMatchedSelectors() {
-            webClient.get().uri(uriBuilder -> uriBuilder
-                    .path("/apis/fake.halo.run/v1alpha1/fakes")
-                    .queryParam("labelSelector", "label-key=label-value")
-                    .queryParam("fieldSelector", "name=my-fake")
-                    .build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.items.length()").isEqualTo(1);
+            webClient
+                    .get()
+                    .uri(
+                            uriBuilder ->
+                                    uriBuilder
+                                            .path("/apis/fake.halo.run/v1alpha1/fakes")
+                                            .queryParam("labelSelector", "label-key=label-value")
+                                            .queryParam("fieldSelector", "name=my-fake")
+                                            .build())
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(1);
         }
 
         @Test
         @WithMockUser
         void shouldListExtensionsWithMismatchedSelectors() {
-            webClient.get().uri(uriBuilder -> uriBuilder
-                    .path("/apis/fake.halo.run/v1alpha1/fakes")
-                    .queryParam("labelSelector", "label-key=invalid-label-value")
-                    .queryParam("fieldSelector", "name=invalid-name")
-                    .build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.items.length()").isEqualTo(0);
+            webClient
+                    .get()
+                    .uri(
+                            uriBuilder ->
+                                    uriBuilder
+                                            .path("/apis/fake.halo.run/v1alpha1/fakes")
+                                            .queryParam(
+                                                    "labelSelector",
+                                                    "label-key=invalid-label-value")
+                                            .queryParam("fieldSelector", "name=invalid-name")
+                                            .build())
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(0);
         }
 
         @Test
@@ -213,51 +253,60 @@ class ExtensionConfigurationTest {
             FakeExtension fakeToUpdate = getFakeExtension(name);
             fakeToUpdate.getMetadata().setLabels(Map.of("updated", "true"));
 
-            webClient.put()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
-                .bodyValue(fakeToUpdate)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(FakeExtension.class)
-                .consumeWith(result -> {
-                    var updatedFake = result.getResponseBody();
-                    assertNotNull(updatedFake);
-                    assertNotEquals(fakeToUpdate.getMetadata().getVersion(),
-                        updatedFake.getMetadata().getVersion());
-                    assertEquals(Map.of("updated", "true"),
-                        updatedFake.getMetadata().getLabels());
-                });
+            webClient
+                    .put()
+                    .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
+                    .bodyValue(fakeToUpdate)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .expectBody(FakeExtension.class)
+                    .consumeWith(
+                            result -> {
+                                var updatedFake = result.getResponseBody();
+                                assertNotNull(updatedFake);
+                                assertNotEquals(
+                                        fakeToUpdate.getMetadata().getVersion(),
+                                        updatedFake.getMetadata().getVersion());
+                                assertEquals(
+                                        Map.of("updated", "true"),
+                                        updatedFake.getMetadata().getLabels());
+                            });
         }
 
         @Test
         @WithMockUser
         void shouldGetExtensionWhenSchemeRegistered() {
             var name = createdFake.getMetadata().getName();
-            webClient.get()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(FakeExtension.class)
-                .consumeWith(result -> {
-                    var gotFake = result.getResponseBody();
-                    assertNotNull(gotFake);
-                    assertEquals(name, gotFake.getMetadata().getName());
-                    assertNotNull(gotFake.getMetadata().getVersion());
-                    assertNotNull(gotFake.getMetadata().getCreationTimestamp());
-                });
+            webClient
+                    .get()
+                    .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(FakeExtension.class)
+                    .consumeWith(
+                            result -> {
+                                var gotFake = result.getResponseBody();
+                                assertNotNull(gotFake);
+                                assertEquals(name, gotFake.getMetadata().getName());
+                                assertNotNull(gotFake.getMetadata().getVersion());
+                                assertNotNull(gotFake.getMetadata().getCreationTimestamp());
+                            });
         }
 
         FakeExtension getFakeExtension(String name) {
-            return webClient.get()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(FakeExtension.class)
-                .returnResult()
-                .getResponseBody();
+            return webClient
+                    .get()
+                    .uri("/apis/fake.halo.run/v1alpha1/fakes/{name}", name)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(FakeExtension.class)
+                    .returnResult()
+                    .getResponseBody();
         }
-
     }
-
 }

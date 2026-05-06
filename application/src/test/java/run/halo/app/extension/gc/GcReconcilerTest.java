@@ -33,26 +33,19 @@ import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 @ExtendWith(MockitoExtension.class)
 class GcReconcilerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    ReactiveExtensionStoreClient storeClient;
+    @Mock ReactiveExtensionStoreClient storeClient;
 
-    @Mock
-    ExtensionConverter converter;
+    @Mock ExtensionConverter converter;
 
-    @Mock
-    SchemeManager schemeManager;
+    @Mock SchemeManager schemeManager;
 
-    @Mock
-    IndexEngine indexEngine;
+    @Mock IndexEngine indexEngine;
 
-    @Mock
-    ReactiveTransactionManager txManager;
+    @Mock ReactiveTransactionManager txManager;
 
-    @InjectMocks
-    GcReconciler reconciler;
+    @InjectMocks GcReconciler reconciler;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +57,7 @@ class GcReconcilerTest {
     void shouldDoNothingIfExtensionNotFound() {
         var fake = createExtension();
         when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -78,7 +71,7 @@ class GcReconcilerTest {
         fake.getMetadata().setFinalizers(Set.of("fake-finalizer"));
         fake.getMetadata().setDeletionTimestamp(null);
         when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+                .thenReturn(Optional.of(fake));
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -92,7 +85,7 @@ class GcReconcilerTest {
         fake.getMetadata().setDeletionTimestamp(null);
         fake.getMetadata().setFinalizers(null);
         when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+                .thenReturn(Optional.of(fake));
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -106,7 +99,7 @@ class GcReconcilerTest {
         fake.getMetadata().setDeletionTimestamp(Instant.now());
         fake.getMetadata().setFinalizers(null);
         when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+                .thenReturn(Optional.of(fake));
 
         ExtensionStore store = new ExtensionStore();
         store.setName("fake-store-name");

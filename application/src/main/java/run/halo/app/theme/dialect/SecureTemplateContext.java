@@ -27,7 +27,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 class SecureTemplateContext implements ITemplateContext {
 
     private static final Set<String> DANGEROUS_VARIABLES =
-        Set.of(THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
+            Set.of(THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
 
     private final ITemplateContext delegate;
 
@@ -82,11 +82,10 @@ class SecureTemplateContext implements ITemplateContext {
 
     @Override
     public String getMessage(
-        Class<?> origin,
-        String key,
-        Object[] messageParameters,
-        boolean useAbsentMessageRepresentation
-    ) {
+            Class<?> origin,
+            String key,
+            Object[] messageParameters,
+            boolean useAbsentMessageRepresentation) {
         return delegate.getMessage(origin, key, messageParameters, useAbsentMessageRepresentation);
     }
 
@@ -125,10 +124,9 @@ class SecureTemplateContext implements ITemplateContext {
 
     @Override
     public Set<String> getVariableNames() {
-        return delegate.getVariableNames()
-            .stream()
-            .filter(name -> !DANGEROUS_VARIABLES.contains(name))
-            .collect(Collectors.toSet());
+        return delegate.getVariableNames().stream()
+                .filter(name -> !DANGEROUS_VARIABLES.contains(name))
+                .collect(Collectors.toSet());
     }
 
     @Override

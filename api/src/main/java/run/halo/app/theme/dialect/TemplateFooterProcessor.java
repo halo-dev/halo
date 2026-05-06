@@ -15,6 +15,9 @@ import reactor.core.publisher.Mono;
  */
 public interface TemplateFooterProcessor extends ExtensionPoint {
 
-    Mono<Void> process(ITemplateContext context, IProcessableElementTag tag,
-        IElementTagStructureHandler structureHandler, IModel model);
+    Mono<Void> process(
+            ITemplateContext context,
+            IProcessableElementTag tag,
+            IElementTagStructureHandler structureHandler,
+            IModel model);
 }

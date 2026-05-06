@@ -23,5 +23,4 @@ public interface HaloDocumentsProvider extends ExtensionPoint {
      * @return type of documents
      */
     String getType();
-
 }

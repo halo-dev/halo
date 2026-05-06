@@ -35,19 +35,23 @@ class LoginHandlerEnhancerImpl implements LoginHandlerEnhancer {
     private final UserLoginOrLogoutProcessing userLoginOrLogoutProcessing;
 
     @Override
-    public Mono<Void> onLoginSuccess(ServerWebExchange exchange,
-        Authentication successfulAuthentication) {
-        return rememberMeServices.loginSuccess(exchange, successfulAuthentication)
-            .then(deviceService.loginSuccess(exchange, successfulAuthentication))
-            .then(oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication))
-            .then(userLoginOrLogoutProcessing.loginProcessing(successfulAuthentication.getName()))
-            .then(parameterRequestCache.removeParameter(exchange, USERNAME_PARAMETER_NAME));
+    public Mono<Void> onLoginSuccess(
+            ServerWebExchange exchange, Authentication successfulAuthentication) {
+        return rememberMeServices
+                .loginSuccess(exchange, successfulAuthentication)
+                .then(deviceService.loginSuccess(exchange, successfulAuthentication))
+                .then(oauth2LoginHandlerEnhancer.loginSuccess(exchange, successfulAuthentication))
+                .then(
+                        userLoginOrLogoutProcessing.loginProcessing(
+                                successfulAuthentication.getName()))
+                .then(parameterRequestCache.removeParameter(exchange, USERNAME_PARAMETER_NAME));
     }
 
     @Override
-    public Mono<Void> onLoginFailure(ServerWebExchange exchange,
-        AuthenticationException exception) {
-        return parameterRequestCache.saveParameter(exchange, USERNAME_PARAMETER_NAME)
-            .then(rememberMeServices.loginFail(exchange));
+    public Mono<Void> onLoginFailure(
+            ServerWebExchange exchange, AuthenticationException exception) {
+        return parameterRequestCache
+                .saveParameter(exchange, USERNAME_PARAMETER_NAME)
+                .then(rememberMeServices.loginFail(exchange));
     }
 }

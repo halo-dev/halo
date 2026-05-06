@@ -33,39 +33,37 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
     @Override
     public Mono<SiteStatsVo> getStats() {
         return client.list(Counter.class, null, null)
-            .reduce(SiteStatsVo.empty(), (stats, counter) -> {
-                stats.setVisit(stats.getVisit() + counter.getVisit());
-                stats.setComment(stats.getComment() + counter.getApprovedComment());
-                stats.setUpvote(stats.getUpvote() + counter.getUpvote());
-                return stats;
-            })
-            .flatMap(siteStatsVo -> postCount()
-                .doOnNext(siteStatsVo::setPost)
-                .thenReturn(siteStatsVo)
-            )
-            .flatMap(siteStatsVo -> categoryCount()
-                .doOnNext(siteStatsVo::setCategory)
-                .thenReturn(siteStatsVo));
+                .reduce(
+                        SiteStatsVo.empty(),
+                        (stats, counter) -> {
+                            stats.setVisit(stats.getVisit() + counter.getVisit());
+                            stats.setComment(stats.getComment() + counter.getApprovedComment());
+                            stats.setUpvote(stats.getUpvote() + counter.getUpvote());
+                            return stats;
+                        })
+                .flatMap(
+                        siteStatsVo ->
+                                postCount().doOnNext(siteStatsVo::setPost).thenReturn(siteStatsVo))
+                .flatMap(
+                        siteStatsVo ->
+                                categoryCount()
+                                        .doOnNext(siteStatsVo::setCategory)
+                                        .thenReturn(siteStatsVo));
     }
 
     Mono<Integer> postCount() {
         var listOptions = new ListOptions();
-        listOptions.setLabelSelector(LabelSelector.builder()
-            .eq(Post.PUBLISHED_LABEL, "true")
-            .build());
-        var fieldQuery = and(
-            isNull("metadata.deletionTimestamp"),
-            equal("spec.deleted", "false")
-        );
+        listOptions.setLabelSelector(
+                LabelSelector.builder().eq(Post.PUBLISHED_LABEL, "true").build());
+        var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.deleted", "false"));
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
         return client.listBy(Post.class, listOptions, PageRequestImpl.ofSize(1))
-            .map(result -> (int) result.getTotal());
+                .map(result -> (int) result.getTotal());
     }
 
     Mono<Integer> categoryCount() {
         return client.listBy(Category.class, new ListOptions(), PageRequestImpl.ofSize(1))
-            .map(ListResult::getTotal)
-            .map(Long::intValue);
+                .map(ListResult::getTotal)
+                .map(Long::intValue);
     }
-
 }

@@ -14,16 +14,19 @@ public interface ExcerptGenerator extends ExtensionPoint {
     @Accessors(chain = true)
     class Context {
         private String raw;
+
         /**
          * html content.
          */
         private String content;
 
         private String rawType;
+
         /**
          * keywords in the content to help the excerpt generation more accurate.
          */
         private Set<String> keywords;
+
         /**
          * Max length of the generated excerpt.
          */

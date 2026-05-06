@@ -27,35 +27,40 @@ public class DefaultNotificationReasonEmitter implements NotificationReasonEmitt
     private final ReactiveExtensionClient client;
 
     @Override
-    public Mono<Void> emit(String reasonType,
-        Consumer<ReasonPayload.ReasonPayloadBuilder> builder) {
+    public Mono<Void> emit(
+            String reasonType, Consumer<ReasonPayload.ReasonPayloadBuilder> builder) {
         Assert.notNull(reasonType, "Reason type must not be empty.");
         var reason = createReason(reasonType, buildReasonPayload(builder));
-        return validateReason(reason)
-            .then(Mono.defer(() -> client.create(reason)))
-            .then();
+        return validateReason(reason).then(Mono.defer(() -> client.create(reason))).then();
     }
 
     Mono<Void> validateReason(Reason reason) {
         String reasonTypeName = reason.getSpec().getReasonType();
         return client.fetch(ReasonType.class, reasonTypeName)
-            .switchIfEmpty(Mono.error(new NotFoundException(
-                "ReasonType [" + reasonTypeName + "] not found, do you forget to register it?"))
-            )
-            .doOnNext(reasonType -> {
-                var valueMap = reason.getSpec().getAttributes();
-                nullSafeList(reasonType.getSpec().getProperties())
-                    .forEach(property -> {
-                        if (property.isOptional()) {
-                            return;
-                        }
-                        if (valueMap.get(property.getName()) == null) {
-                            throw new IllegalArgumentException(
-                                "Reason property [" + property.getName() + "] is required.");
-                        }
-                    });
-            })
-            .then();
+                .switchIfEmpty(
+                        Mono.error(
+                                new NotFoundException(
+                                        "ReasonType ["
+                                                + reasonTypeName
+                                                + "] not found, do you forget to register it?")))
+                .doOnNext(
+                        reasonType -> {
+                            var valueMap = reason.getSpec().getAttributes();
+                            nullSafeList(reasonType.getSpec().getProperties())
+                                    .forEach(
+                                            property -> {
+                                                if (property.isOptional()) {
+                                                    return;
+                                                }
+                                                if (valueMap.get(property.getName()) == null) {
+                                                    throw new IllegalArgumentException(
+                                                            "Reason property ["
+                                                                    + property.getName()
+                                                                    + "] is required.");
+                                                }
+                                            });
+                        })
+                .then();
     }
 
     <T> List<T> nullSafeList(List<T> t) {

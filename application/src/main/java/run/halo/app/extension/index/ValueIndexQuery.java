@@ -167,5 +167,4 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
      * @throws IllegalArgumentException if the key type is not String
      */
     Set<String> stringNotEndsWith(String suffix);
-
 }

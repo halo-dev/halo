@@ -49,12 +49,15 @@ public class PluginExtensionLoaderUtils {
         } catch (FileNotFoundException ignored) {
             // Ignore the exception only if extensions folder was not found.
         } catch (IOException e) {
-            throw new RuntimeException(String.format("""
-                Failed to get extension resources while resolving plugin setting \
-                in class loader %s.\
-                """, classLoader), e);
+            throw new RuntimeException(
+                    String.format(
+                            """
+                            Failed to get extension resources while resolving plugin setting \
+                            in class loader %s.\
+                            """,
+                            classLoader),
+                    e);
         }
         return new Resource[] {};
     }
-
 }

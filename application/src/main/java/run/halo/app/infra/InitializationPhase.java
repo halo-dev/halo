@@ -6,7 +6,6 @@ package run.halo.app.infra;
  * @author johnniang
  */
 public enum InitializationPhase {
-
     FIRST(Integer.MIN_VALUE),
 
     SCHEME(Integer.MIN_VALUE + 100),

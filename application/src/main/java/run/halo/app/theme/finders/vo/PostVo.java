@@ -33,14 +33,14 @@ public class PostVo extends ListedPostVo {
         Post.PostSpec spec = post.getSpec();
         Post.PostStatus postStatus = post.getStatusOrDefault();
         return PostVo.builder()
-            .metadata(post.getMetadata())
-            .spec(spec)
-            .status(postStatus)
-            .categories(List.of())
-            .tags(List.of())
-            .contributors(List.of())
-            .content(new ContentVo(null, null))
-            .build();
+                .metadata(post.getMetadata())
+                .spec(spec)
+                .status(postStatus)
+                .categories(List.of())
+                .tags(List.of())
+                .contributors(List.of())
+                .content(new ContentVo(null, null))
+                .build();
     }
 
     /**
@@ -48,15 +48,15 @@ public class PostVo extends ListedPostVo {
      */
     public static PostVo from(ListedPostVo postVo) {
         return builder()
-            .metadata(postVo.getMetadata())
-            .spec(postVo.getSpec())
-            .status(postVo.getStatus())
-            .categories(postVo.getCategories())
-            .tags(postVo.getTags())
-            .contributors(postVo.getContributors())
-            .owner(postVo.getOwner())
-            .stats(postVo.getStats())
-            .content(new ContentVo("", ""))
-            .build();
+                .metadata(postVo.getMetadata())
+                .spec(postVo.getSpec())
+                .status(postVo.getStatus())
+                .categories(postVo.getCategories())
+                .tags(postVo.getTags())
+                .contributors(postVo.getContributors())
+                .owner(postVo.getOwner())
+                .stats(postVo.getStats())
+                .content(new ContentVo("", ""))
+                .build();
     }
 }

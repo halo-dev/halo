@@ -20,11 +20,11 @@ import org.thymeleaf.standard.StandardDialect;
  * @since 2.0.0
  */
 public class HaloProcessorDialect extends AbstractProcessorDialect
-    implements IExpressionObjectDialect, IPostProcessorDialect {
+        implements IExpressionObjectDialect, IPostProcessorDialect {
     private static final String DIALECT_NAME = "haloThemeProcessorDialect";
 
     private static final IExpressionObjectFactory HALO_EXPRESSION_OBJECTS_FACTORY =
-        new HaloExpressionObjectFactory();
+            new HaloExpressionObjectFactory();
 
     public HaloProcessorDialect() {
         // We will set this dialect the same "dialect processor" precedence as

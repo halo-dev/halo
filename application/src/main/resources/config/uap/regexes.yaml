@@ -734,7 +734,7 @@ user_agent_parsers:
   # Odin Browser
   - regex: '(Odin)/(\d+)\.(\d+)\.(\d+)\.(\d+)'
     family_replacement: 'Odin'
-  
+
   # NetCast Smart TV
   - regex: '(Colt)/(\d+)\.(\d+)'
     family_replacement: 'NetCast Smart TV'

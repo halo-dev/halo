@@ -28,22 +28,23 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private SubscriptionServiceImpl subscriptionService;
+    @InjectMocks private SubscriptionServiceImpl subscriptionService;
 
     @Test
     void remove() {
         var i = new AtomicLong(1L);
-        when(client.delete(any(Subscription.class))).thenAnswer(invocation -> {
-            var subscription = (Subscription) invocation.getArgument(0);
-            if (i.get() != subscription.getMetadata().getVersion()) {
-                return Mono.error(new OptimisticLockingFailureException("fake-exception"));
-            }
-            return Mono.just(subscription);
-        });
+        when(client.delete(any(Subscription.class)))
+                .thenAnswer(
+                        invocation -> {
+                            var subscription = (Subscription) invocation.getArgument(0);
+                            if (i.get() != subscription.getMetadata().getVersion()) {
+                                return Mono.error(
+                                        new OptimisticLockingFailureException("fake-exception"));
+                            }
+                            return Mono.just(subscription);
+                        });
 
         var subscription = new Subscription();
         subscription.setMetadata(new Metadata());
@@ -51,19 +52,21 @@ class SubscriptionServiceImplTest {
         subscription.getMetadata().setVersion(0L);
 
         when(client.fetch(eq(Subscription.class), eq("fake-subscription")))
-            .thenAnswer(invocation -> {
-                if (i.incrementAndGet() > 3) {
-                    subscription.getMetadata().setVersion(i.get());
-                } else {
-                    subscription.getMetadata().setVersion(i.get() - 1);
-                }
-                return Mono.just(subscription);
-            });
+                .thenAnswer(
+                        invocation -> {
+                            if (i.incrementAndGet() > 3) {
+                                subscription.getMetadata().setVersion(i.get());
+                            } else {
+                                subscription.getMetadata().setVersion(i.get() - 1);
+                            }
+                            return Mono.just(subscription);
+                        });
 
-        subscriptionService.remove(subscription)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        subscriptionService
+                .remove(subscription)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
 
         // give version=0, but the real version is 1
         // give version=1, but the real version is 2

@@ -39,17 +39,23 @@ class PluginStartedListener {
     private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
         var name = unstructured.getMetadata().getName();
         return client.fetch(unstructured.groupVersionKind(), name)
-            .doOnNext(old -> unstructured.getMetadata().setVersion(old.getMetadata().getVersion()))
-            .map(ignored -> unstructured)
-            .flatMap(extension -> {
-                if (ExtensionUtil.hasDoNotOverwriteLabel(extension)) {
-                    log.debug("Skip updating extension {} due to do-not-overwrite label",
-                        extension.getMetadata().getName());
-                    return Mono.just(extension);
-                }
-                return client.update(extension);
-            })
-            .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
+                .doOnNext(
+                        old ->
+                                unstructured
+                                        .getMetadata()
+                                        .setVersion(old.getMetadata().getVersion()))
+                .map(ignored -> unstructured)
+                .flatMap(
+                        extension -> {
+                            if (ExtensionUtil.hasDoNotOverwriteLabel(extension)) {
+                                log.debug(
+                                        "Skip updating extension {} due to do-not-overwrite label",
+                                        extension.getMetadata().getName());
+                                return Mono.just(extension);
+                            }
+                            return client.update(extension);
+                        })
+                .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
     }
 
     @EventListener
@@ -66,31 +72,47 @@ class PluginStartedListener {
         var pluginName = pluginWrapper.getPluginId();
 
         client.get(Plugin.class, pluginName)
-            .flatMap(plugin -> Flux.fromStream(
-                    () -> {
-                        log.debug("Collecting extensions for plugin {}", pluginName);
-                        var resources = lookupExtensions(pluginWrapper.getPluginClassLoader());
-                        var loader = new YamlUnstructuredLoader(resources);
-                        var settingName = plugin.getSpec().getSettingName();
-                        // TODO The load method may be over memory consumption.
-                        return loader.load()
-                            .stream()
-                            .filter(isSetting(settingName).negate());
-                    })
-                .doOnNext(unstructured -> {
-                    var name = unstructured.getMetadata().getName();
-                    pluginApplicationContext
-                        .addExtensionMapping(unstructured.groupVersionKind(), name);
-                    var labels = unstructured.getMetadata().getLabels();
-                    if (labels == null) {
-                        labels = new HashMap<>();
-                        unstructured.getMetadata().setLabels(labels);
-                    }
-                    labels.put(PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
-                })
-                .flatMap(this::createOrUpdate)
-                .then()
-            )
-            .block(TIMEOUT);
+                .flatMap(
+                        plugin ->
+                                Flux.fromStream(
+                                                () -> {
+                                                    log.debug(
+                                                            "Collecting extensions for plugin {}",
+                                                            pluginName);
+                                                    var resources =
+                                                            lookupExtensions(
+                                                                    pluginWrapper
+                                                                            .getPluginClassLoader());
+                                                    var loader =
+                                                            new YamlUnstructuredLoader(resources);
+                                                    var settingName =
+                                                            plugin.getSpec().getSettingName();
+                                                    // TODO The load method may be over memory
+                                                    // consumption.
+                                                    return loader.load().stream()
+                                                            .filter(
+                                                                    isSetting(settingName)
+                                                                            .negate());
+                                                })
+                                        .doOnNext(
+                                                unstructured -> {
+                                                    var name = unstructured.getMetadata().getName();
+                                                    pluginApplicationContext.addExtensionMapping(
+                                                            unstructured.groupVersionKind(), name);
+                                                    var labels =
+                                                            unstructured.getMetadata().getLabels();
+                                                    if (labels == null) {
+                                                        labels = new HashMap<>();
+                                                        unstructured
+                                                                .getMetadata()
+                                                                .setLabels(labels);
+                                                    }
+                                                    labels.put(
+                                                            PLUGIN_NAME_LABEL_NAME,
+                                                            plugin.getMetadata().getName());
+                                                })
+                                        .flatMap(this::createOrUpdate)
+                                        .then())
+                .block(TIMEOUT);
     }
 }

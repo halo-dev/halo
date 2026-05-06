@@ -17,8 +17,12 @@ public class ThemeAlreadyExistsException extends ServerWebInputException {
      * @param themeName theme name must not be blank
      */
     public ThemeAlreadyExistsException(String themeName) {
-        super("Theme already exists.", null, null, "problemDetail.theme.install.alreadyExists",
-            new Object[] {themeName});
+        super(
+                "Theme already exists.",
+                null,
+                null,
+                "problemDetail.theme.install.alreadyExists",
+                new Object[] {themeName});
         setType(URI.create(Exceptions.THEME_ALREADY_EXISTS_TYPE));
         getBody().setProperty("themeName", themeName);
     }

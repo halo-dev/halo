@@ -16,10 +16,7 @@ public interface UserConnectionService {
      * @return Created user connection
      */
     Mono<UserConnection> createUserConnection(
-        String username,
-        String registrationId,
-        OAuth2User oauth2User
-    );
+            String username, String registrationId, OAuth2User oauth2User);
 
     /**
      * Update the user connection if present.
@@ -30,8 +27,7 @@ public interface UserConnectionService {
      * @return Updated user connection or empty
      */
     Mono<UserConnection> updateUserConnectionIfPresent(
-        String registrationId, OAuth2User oauth2User
-    );
+            String registrationId, OAuth2User oauth2User);
 
     /**
      * Remove user connection.
@@ -41,7 +37,6 @@ public interface UserConnectionService {
      * @return A list of user connections
      */
     Flux<UserConnection> removeUserConnection(String registrationId, String username);
-
 
     /**
      * Find user connection by provider user id.

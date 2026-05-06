@@ -69,42 +69,34 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
-    @Mock
-    SystemConfigFetcher environmentFetcher;
+    @Mock SystemConfigFetcher environmentFetcher;
 
-    @Mock
-    PasswordEncoder passwordEncoder;
+    @Mock PasswordEncoder passwordEncoder;
 
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+    @Mock ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    RoleService roleService;
+    @Mock RoleService roleService;
 
-    @Mock
-    ExtensionGetter extensionGetter;
+    @Mock ExtensionGetter extensionGetter;
 
-    @Mock
-    EmailVerificationService emailVerificationService;
+    @Mock EmailVerificationService emailVerificationService;
 
-    @Mock
-    ReactiveTransactionManager txManager;
+    @Mock ReactiveTransactionManager txManager;
 
-    @Mock
-    ReactiveSessionRegistry sessionRegistry;
+    @Mock ReactiveSessionRegistry sessionRegistry;
 
-    @InjectMocks
-    UserServiceImpl userService;
+    @InjectMocks UserServiceImpl userService;
 
     @Test
     void shouldThrowExceptionIfUserNotFoundInExtension() {
-        when(client.get(eq(User.class), eq("faker"))).thenReturn(
-            Mono.error(new ExtensionNotFoundException(fromExtension(User.class), "faker")));
-        StepVerifier.create(userService.getUser("faker"))
-            .verifyError(UserNotFoundException.class);
+        when(client.get(eq(User.class), eq("faker")))
+                .thenReturn(
+                        Mono.error(
+                                new ExtensionNotFoundException(
+                                        fromExtension(User.class), "faker")));
+        StepVerifier.create(userService.getUser("faker")).verifyError(UserNotFoundException.class);
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
     }
@@ -115,8 +107,8 @@ class UserServiceImplTest {
         when(client.get(User.class, "faker")).thenReturn(Mono.just(fakeUser));
 
         StepVerifier.create(userService.getUser("faker"))
-            .assertNext(user -> assertEquals(fakeUser, user))
-            .verifyComplete();
+                .assertNext(user -> assertEquals(fakeUser, user))
+                .verifyComplete();
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
     }
@@ -125,20 +117,22 @@ class UserServiceImplTest {
     void shouldFindUserByVerifiedEmail() {
         var fakeUser = createUser("fake-user", "fake-password");
         when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.just(fakeUser));
-        userService.findUserByVerifiedEmail("faker@halo.run")
-            .as(StepVerifier::create)
-            .expectNext(fakeUser)
-            .verifyComplete();
+                .thenReturn(Flux.just(fakeUser));
+        userService
+                .findUserByVerifiedEmail("faker@halo.run")
+                .as(StepVerifier::create)
+                .expectNext(fakeUser)
+                .verifyComplete();
     }
 
     @Test
     void shouldReturnEmptyIfNoUserWithVerifiedEmail() {
         when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.empty());
-        userService.findUserByVerifiedEmail("faker@halo.run")
-            .as(StepVerifier::create)
-            .verifyComplete();
+                .thenReturn(Flux.empty());
+        userService
+                .findUserByVerifiedEmail("faker@halo.run")
+                .as(StepVerifier::create)
+                .verifyComplete();
     }
 
     @Test
@@ -147,11 +141,12 @@ class UserServiceImplTest {
         var fakeUser2 = createUser("fake-user2", "fake-password");
         var ghost = createUser(UserService.GHOST_USER_NAME, "fake-password");
         when(client.listAll(eq(User.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.just(fakeUser1, fakeUser2, ghost));
-        userService.getUsersOrGhosts(List.of("fake-user1", "deleted-user", "fake-user2"))
-            .as(StepVerifier::create)
-            .expectNext(fakeUser1, ghost, fakeUser2)
-            .verifyComplete();
+                .thenReturn(Flux.just(fakeUser1, fakeUser2, ghost));
+        userService
+                .getUsersOrGhosts(List.of("fake-user1", "deleted-user", "fake-user2"))
+                .as(StepVerifier::create)
+                .expectNext(fakeUser1, ghost, fakeUser2)
+                .verifyComplete();
     }
 
     @Test
@@ -163,14 +158,17 @@ class UserServiceImplTest {
         when(client.update(eq(fakeUser))).thenReturn(Mono.just(fakeUser));
 
         StepVerifier.create(userService.updatePassword("faker", "new-fake-password"))
-            .expectNext(fakeUser)
-            .verifyComplete();
+                .expectNext(fakeUser)
+                .verifyComplete();
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
-        verify(client, times(1)).update(argThat(extension -> {
-            var user = (User) extension;
-            return "new-fake-password".equals(user.getSpec().getPassword());
-        }));
+        verify(client, times(1))
+                .update(
+                        argThat(
+                                extension -> {
+                                    var user = (User) extension;
+                                    return "new-fake-password".equals(user.getSpec().getPassword());
+                                }));
 
         verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
     }
@@ -184,23 +182,26 @@ class UserServiceImplTest {
             var oldUser = createUser("fake@password");
             var newUser = createUser("new@password");
 
-            when(client.get(User.class, "fake-user")).thenReturn(
-                Mono.just(oldUser));
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
             when(client.update(eq(oldUser))).thenReturn(Mono.just(newUser));
             when(passwordEncoder.matches("new@password", "fake@password")).thenReturn(false);
             when(passwordEncoder.encode("new@password")).thenReturn("encoded@new@password");
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
-                .expectNext(newUser)
-                .verifyComplete();
+                    .expectNext(newUser)
+                    .verifyComplete();
 
             verify(passwordEncoder).matches("new@password", "fake@password");
             verify(passwordEncoder).encode("new@password");
             verify(client).get(User.class, "fake-user");
-            verify(client).update(argThat(extension -> {
-                var user = (User) extension;
-                return "encoded@new@password".equals(user.getSpec().getPassword());
-            }));
+            verify(client)
+                    .update(
+                            argThat(
+                                    extension -> {
+                                        var user = (User) extension;
+                                        return "encoded@new@password"
+                                                .equals(user.getSpec().getPassword());
+                                    }));
             verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
         }
 
@@ -214,15 +215,19 @@ class UserServiceImplTest {
             when(passwordEncoder.encode("new@password")).thenReturn("encoded@new@password");
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
-                .expectNext(newUser)
-                .verifyComplete();
+                    .expectNext(newUser)
+                    .verifyComplete();
 
             verify(passwordEncoder, never()).matches("new@password", null);
             verify(passwordEncoder).encode("new@password");
-            verify(client).update(argThat(extension -> {
-                var user = (User) extension;
-                return "encoded@new@password".equals(user.getSpec().getPassword());
-            }));
+            verify(client)
+                    .update(
+                            argThat(
+                                    extension -> {
+                                        var user = (User) extension;
+                                        return "encoded@new@password"
+                                                .equals(user.getSpec().getPassword());
+                                    }));
             verify(client).get(User.class, "fake-user");
             verify(eventPublisher).publishEvent(any(PasswordChangedEvent.class));
         }
@@ -237,8 +242,8 @@ class UserServiceImplTest {
             when(passwordEncoder.matches("fake@password", "fake@password")).thenReturn(true);
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "fake@password"))
-                .expectNextCount(0)
-                .verifyComplete();
+                    .expectNextCount(0)
+                    .verifyComplete();
 
             verify(passwordEncoder, times(1)).matches("fake@password", "fake@password");
             verify(passwordEncoder, never()).encode(any());
@@ -250,11 +255,13 @@ class UserServiceImplTest {
         @Test
         void shouldThrowExceptionIfUserNotFound() {
             when(client.get(eq(User.class), eq("fake-user")))
-                .thenReturn(Mono.error(
-                    new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
+                    .thenReturn(
+                            Mono.error(
+                                    new ExtensionNotFoundException(
+                                            fromExtension(User.class), "fake-user")));
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new@password"))
-                .verifyError(UserNotFoundException.class);
+                    .verifyError(UserNotFoundException.class);
 
             verify(passwordEncoder, never()).matches(anyString(), anyString());
             verify(passwordEncoder, never()).encode(anyString());
@@ -265,13 +272,12 @@ class UserServiceImplTest {
         @Test
         void shouldThrowWhenPwdContainsInvalidChars() {
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
-                .expectError(UnsatisfiedAttributeValueException.class)
-                .verify();
+                    .expectError(UnsatisfiedAttributeValueException.class)
+                    .verify();
 
             verify(passwordEncoder, never()).encode(anyString());
             verify(client, never()).update(any());
         }
-
     }
 
     User createUser(String username, String password) {
@@ -295,27 +301,27 @@ class UserServiceImplTest {
         void setUp() {
             var tx = mock(ReactiveTransaction.class);
 
-            when(txManager.getReactiveTransaction(any()))
-                .thenReturn(Mono.just(tx));
+            when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
             when(txManager.commit(tx)).thenReturn(Mono.empty());
         }
 
         @Test
         void shouldGetNotFoundIfUserNotFound() {
             when(client.get(User.class, "invalid-user"))
-                .thenReturn(Mono.error(
-                    new ExtensionNotFoundException(fromExtension(User.class), "invalid-user"))
-                );
+                    .thenReturn(
+                            Mono.error(
+                                    new ExtensionNotFoundException(
+                                            fromExtension(User.class), "invalid-user")));
 
             when(roleService.listRoleBindings(any())).thenReturn(Flux.empty());
             when(client.create(isA(RoleBinding.class)))
-                .thenReturn(Mono.just(mock(RoleBinding.class)));
+                    .thenReturn(Mono.just(mock(RoleBinding.class)));
             when(sessionRegistry.getAllSessions("invalid-user")).thenReturn(Flux.empty());
 
             var grantRolesMono = userService.grantRoles("invalid-user", Set.of("fake-role"));
             StepVerifier.create(grantRolesMono)
-                .expectError(ExtensionNotFoundException.class)
-                .verify();
+                    .expectError(ExtensionNotFoundException.class)
+                    .verify();
 
             verify(client).get(User.class, "invalid-user");
         }
@@ -323,20 +329,17 @@ class UserServiceImplTest {
         @Test
         void shouldCreateRoleBindingIfNotExist() {
             var user = createUser("fake-password");
-            when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.just(user));
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             when(roleService.listRoleBindings(any(Subject.class))).thenReturn(Flux.empty());
-            when(client.create(isA(RoleBinding.class))).thenReturn(
-                Mono.just(mock(RoleBinding.class)));
+            when(client.create(isA(RoleBinding.class)))
+                    .thenReturn(Mono.just(mock(RoleBinding.class)));
             when(client.update(user)).thenReturn(Mono.just(user));
             var session = mock(ReactiveSessionInformation.class);
             when(session.invalidate()).thenReturn(Mono.empty());
             when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.just(session));
 
             var grantRolesMono = userService.grantRoles("fake-user", Set.of("fake-role"));
-            StepVerifier.create(grantRolesMono)
-                .expectNextCount(1)
-                .verifyComplete();
+            StepVerifier.create(grantRolesMono).expectNextCount(1).verifyComplete();
 
             verify(client).create(isA(RoleBinding.class));
         }
@@ -346,17 +349,17 @@ class UserServiceImplTest {
             var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
             when(roleService.listRoleBindings(any(Subject.class)))
-                .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
+                    .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.delete(isA(RoleBinding.class)))
-                .thenReturn(Mono.just(mock(RoleBinding.class)));
+                    .thenReturn(Mono.just(mock(RoleBinding.class)));
             when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.empty());
             var user = createUser("fake-password");
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
             when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
-                .expectNext(user)
-                .verifyComplete();
+                    .expectNext(user)
+                    .verifyComplete();
         }
 
         @Test
@@ -372,9 +375,9 @@ class UserServiceImplTest {
             var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
 
             when(roleService.listRoleBindings(any(Subject.class)))
-                .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
+                    .thenReturn(Flux.just(notProvidedRoleBinding, existingRoleBinding));
             when(client.update(isA(RoleBinding.class)))
-                .thenReturn(Mono.just(mock(RoleBinding.class)));
+                    .thenReturn(Mono.just(mock(RoleBinding.class)));
 
             when(sessionRegistry.getAllSessions("fake-user")).thenReturn(Flux.empty());
 
@@ -383,14 +386,13 @@ class UserServiceImplTest {
             when(client.update(user)).thenReturn(Mono.just(user));
 
             StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
-                // Because the roles are the same, so no need to update the existingRoleBinding
-                .expectNext(user)
-                .verifyComplete();
+                    // Because the roles are the same, so no need to update the existingRoleBinding
+                    .expectNext(user)
+                    .verifyComplete();
 
             verify(client).update(notProvidedRoleBinding);
         }
     }
-
 
     @Nested
     class SignUpTest {
@@ -399,38 +401,43 @@ class UserServiceImplTest {
         void signUpWhenRegistrationNotAllowed() {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(false);
-            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
-                eq(SystemSetting.User.class)))
-                .thenReturn(Mono.just(userSetting));
+            when(environmentFetcher.fetch(
+                            eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
 
             var signUpData = createSignUpData("fake-user", "fake-password");
 
-            userService.signUp(signUpData)
-                .as(StepVerifier::create)
-                .consumeErrorWith(e -> {
-                    assertInstanceOf(ServerWebInputException.class, e);
-                    assertTrue(e.getMessage().contains("registration is not allowed"));
-                })
-                .verify();
+            userService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .consumeErrorWith(
+                            e -> {
+                                assertInstanceOf(ServerWebInputException.class, e);
+                                assertTrue(e.getMessage().contains("registration is not allowed"));
+                            })
+                    .verify();
         }
 
         @Test
         void signUpWhenRegistrationDefaultRoleNotConfigured() {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(true);
-            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
-                eq(SystemSetting.User.class)))
-                .thenReturn(Mono.just(userSetting));
+            when(environmentFetcher.fetch(
+                            eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
 
             var signUpData = createSignUpData("fake-user", "fake-password");
 
-            userService.signUp(signUpData)
-                .as(StepVerifier::create)
-                .consumeErrorWith(e -> {
-                    assertInstanceOf(ServerWebInputException.class, e);
-                    assertTrue(e.getMessage().contains("default role is not configured"));
-                })
-                .verify();
+            userService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .consumeErrorWith(
+                            e -> {
+                                assertInstanceOf(ServerWebInputException.class, e);
+                                assertTrue(
+                                        e.getMessage().contains("default role is not configured"));
+                            })
+                    .verify();
         }
 
         @Test
@@ -438,20 +445,21 @@ class UserServiceImplTest {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(true);
             userSetting.setDefaultRole("fake-role");
-            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
-                eq(SystemSetting.User.class)))
-                .thenReturn(Mono.just(userSetting));
+            when(environmentFetcher.fetch(
+                            eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
             when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
             when(client.fetch(eq(User.class), eq("fake-user")))
-                .thenReturn(Mono.just(createFakeUser("test", "test")));
+                    .thenReturn(Mono.just(createFakeUser("test", "test")));
             when(extensionGetter.getExtensions(UserPreCreatingHandler.class))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.empty());
 
             var signUpData = createSignUpData("fake-user", "fake-password");
-            userService.signUp(signUpData)
-                .as(StepVerifier::create)
-                .expectError(DuplicateNameException.class)
-                .verify();
+            userService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .expectError(DuplicateNameException.class)
+                    .verify();
         }
 
         @Test
@@ -460,28 +468,32 @@ class UserServiceImplTest {
             userSetting.setAllowRegistration(true);
             userSetting.setMustVerifyEmailOnRegistration(true);
             userSetting.setDefaultRole("fake-role");
-            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
-                eq(SystemSetting.User.class)))
-                .thenReturn(Mono.just(userSetting));
+            when(environmentFetcher.fetch(
+                            eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
             when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
-            when(emailVerificationService.verifyRegisterVerificationCode("fake@example.com",
-                "fakeCode"))
-                .thenReturn(Mono.just(true));
+            when(emailVerificationService.verifyRegisterVerificationCode(
+                            "fake@example.com", "fakeCode"))
+                    .thenReturn(Mono.just(true));
             when(client.listAll(same(User.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.from(Mono.fromSupplier(() -> {
-                    var user = new User();
-                    user.setSpec(new User.UserSpec());
-                    user.getSpec().setEmailVerified(true);
-                    return user;
-                })));
+                    .thenReturn(
+                            Flux.from(
+                                    Mono.fromSupplier(
+                                            () -> {
+                                                var user = new User();
+                                                user.setSpec(new User.UserSpec());
+                                                user.getSpec().setEmailVerified(true);
+                                                return user;
+                                            })));
 
             var signUpData = createSignUpData("fake-user", "fake-password");
             signUpData.setEmail("fake@example.com");
             signUpData.setEmailCode("fakeCode");
-            userService.signUp(signUpData)
-                .as(StepVerifier::create)
-                .expectError(EmailAlreadyTakenException.class)
-                .verify();
+            userService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .expectError(EmailAlreadyTakenException.class)
+                    .verify();
         }
 
         @Test
@@ -489,12 +501,11 @@ class UserServiceImplTest {
             SystemSetting.User userSetting = new SystemSetting.User();
             userSetting.setAllowRegistration(true);
             userSetting.setDefaultRole("fake-role");
-            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
-                eq(SystemSetting.User.class)))
-                .thenReturn(Mono.just(userSetting));
+            when(environmentFetcher.fetch(
+                            eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
             when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
-            when(client.fetch(eq(User.class), eq("fake-user")))
-                .thenReturn(Mono.empty());
+            when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.empty());
 
             User fakeUser = createFakeUser("fake-user", "fake-password");
             var signUpData = createSignUpData("fake-user", "fake-password");
@@ -502,35 +513,49 @@ class UserServiceImplTest {
             when(client.fetch(eq(Role.class), anyString())).thenReturn(Mono.just(new Role()));
             when(client.create(any(User.class))).thenReturn(Mono.just(fakeUser));
             UserServiceImpl spyUserService = spy(userService);
-            doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"),
-                anySet());
+            doReturn(Mono.just(fakeUser))
+                    .when(spyUserService)
+                    .grantRoles(eq("fake-user"), anySet());
             when(extensionGetter.getExtensions(UserPreCreatingHandler.class))
-                .thenReturn(Flux.just(user -> {
-                    if (user.getMetadata().getAnnotations() == null) {
-                        user.getMetadata().setAnnotations(new HashMap<>());
-                    }
-                    user.getMetadata().getAnnotations()
-                        .put("pre.creating.handler.handled", "true");
-                    return Mono.empty();
-                }));
+                    .thenReturn(
+                            Flux.just(
+                                    user -> {
+                                        if (user.getMetadata().getAnnotations() == null) {
+                                            user.getMetadata().setAnnotations(new HashMap<>());
+                                        }
+                                        user.getMetadata()
+                                                .getAnnotations()
+                                                .put("pre.creating.handler.handled", "true");
+                                        return Mono.empty();
+                                    }));
             when(extensionGetter.getExtensions(UserPostCreatingHandler.class))
-                .thenReturn(Flux.just(user -> {
-                    assertEquals(fakeUser, user);
-                    return Mono.empty();
-                }));
+                    .thenReturn(
+                            Flux.just(
+                                    user -> {
+                                        assertEquals(fakeUser, user);
+                                        return Mono.empty();
+                                    }));
 
-            spyUserService.signUp(signUpData)
-                .as(StepVerifier::create)
-                .consumeNextWith(user -> {
-                    assertThat(user.getMetadata().getName()).isEqualTo("fake-user");
-                    assertThat(user.getSpec().getPassword()).isEqualTo("fake-password");
-                })
-                .verifyComplete();
+            spyUserService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            user -> {
+                                assertThat(user.getMetadata().getName()).isEqualTo("fake-user");
+                                assertThat(user.getSpec().getPassword()).isEqualTo("fake-password");
+                            })
+                    .verifyComplete();
 
-            verify(client).create(assertArg(u -> {
-                var handled = u.getMetadata().getAnnotations().get("pre.creating.handler.handled");
-                assertEquals("true", handled);
-            }));
+            verify(client)
+                    .create(
+                            assertArg(
+                                    u -> {
+                                        var handled =
+                                                u.getMetadata()
+                                                        .getAnnotations()
+                                                        .get("pre.creating.handler.handled");
+                                        assertEquals("true", handled);
+                                    }));
             verify(spyUserService).grantRoles(eq("fake-user"), anySet());
         }
 
@@ -557,16 +582,17 @@ class UserServiceImplTest {
         var user = new User();
         user.setSpec(new User.UserSpec());
         when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
-        userService.confirmPassword("fake-user", "fake-password")
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+        userService
+                .confirmPassword("fake-user", "fake-password")
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
 
         user.getSpec().setPassword("");
-        userService.confirmPassword("fake-user", "fake-password")
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+        userService
+                .confirmPassword("fake-user", "fake-password")
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
     }
-
 }

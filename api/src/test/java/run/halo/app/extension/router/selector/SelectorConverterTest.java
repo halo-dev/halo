@@ -15,28 +15,29 @@ class SelectorConverterTest {
 
     @Test
     void shouldConvertCorrectly() {
-        record TestCase(String selector, SelectorCriteria expected) {
-        }
+        record TestCase(String selector, SelectorCriteria expected) {}
 
         List.of(
-            new TestCase("", null),
-            new TestCase("name=value",
-                new SelectorCriteria("name", Equals, Set.of("value"))),
-            new TestCase("name!=value",
-                new SelectorCriteria("name", Operator.NotEquals, Set.of("value"))),
-            new TestCase("name",
-                new SelectorCriteria("name", Operator.Exist, Set.of())),
-            new TestCase("!name",
-                new SelectorCriteria("name", Operator.NotExist, Set.of())),
-            new TestCase("name",
-                new SelectorCriteria("name", Operator.Exist, Set.of())),
-            new TestCase("name!=",
-                new SelectorCriteria("name!=", Operator.Exist, Set.of())),
-            new TestCase("==",
-                new SelectorCriteria("==", Operator.Exist, Set.of()))
-        ).forEach(testCase -> {
-            log.debug("Testing: {}", testCase);
-            assertEquals(testCase.expected, converter.convert(testCase.selector));
-        });
+                        new TestCase("", null),
+                        new TestCase(
+                                "name=value",
+                                new SelectorCriteria("name", Equals, Set.of("value"))),
+                        new TestCase(
+                                "name!=value",
+                                new SelectorCriteria("name", Operator.NotEquals, Set.of("value"))),
+                        new TestCase(
+                                "name", new SelectorCriteria("name", Operator.Exist, Set.of())),
+                        new TestCase(
+                                "!name", new SelectorCriteria("name", Operator.NotExist, Set.of())),
+                        new TestCase(
+                                "name", new SelectorCriteria("name", Operator.Exist, Set.of())),
+                        new TestCase(
+                                "name!=", new SelectorCriteria("name!=", Operator.Exist, Set.of())),
+                        new TestCase("==", new SelectorCriteria("==", Operator.Exist, Set.of())))
+                .forEach(
+                        testCase -> {
+                            log.debug("Testing: {}", testCase);
+                            assertEquals(testCase.expected, converter.convert(testCase.selector));
+                        });
     }
 }

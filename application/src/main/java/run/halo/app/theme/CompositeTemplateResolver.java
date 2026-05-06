@@ -25,20 +25,18 @@ class CompositeTemplateResolver implements ITemplateResolver {
     private final List<ITemplateResolver> resolvers;
 
     public CompositeTemplateResolver(Collection<ITemplateResolver> resolvers) {
-        this.resolvers = Optional.ofNullable(resolvers).orElseGet(List::of)
-            .stream()
-            .distinct()
-            // we keep the same order comparison as
-            // org.thymeleaf.EngineConfiguration.TemplateResolverComparator
-            .sorted(comparing(ITemplateResolver::getOrder, nullsLast(naturalOrder())))
-            .toList();
+        this.resolvers =
+                Optional.ofNullable(resolvers).orElseGet(List::of).stream()
+                        .distinct()
+                        // we keep the same order comparison as
+                        // org.thymeleaf.EngineConfiguration.TemplateResolverComparator
+                        .sorted(comparing(ITemplateResolver::getOrder, nullsLast(naturalOrder())))
+                        .toList();
     }
 
     @Override
     public String getName() {
-        return resolvers.stream()
-            .map(ITemplateResolver::getName)
-            .collect(Collectors.joining(", "));
+        return resolvers.stream().map(ITemplateResolver::getName).collect(Collectors.joining(", "));
     }
 
     @Override
@@ -48,15 +46,22 @@ class CompositeTemplateResolver implements ITemplateResolver {
     }
 
     @Override
-    public TemplateResolution resolveTemplate(IEngineConfiguration configuration,
-        String ownerTemplate, String template, Map<String, Object> templateResolutionAttributes) {
+    public TemplateResolution resolveTemplate(
+            IEngineConfiguration configuration,
+            String ownerTemplate,
+            String template,
+            Map<String, Object> templateResolutionAttributes) {
         return resolvers.stream()
-            .map(resolver -> resolver.resolveTemplate(
-                configuration, ownerTemplate, template, templateResolutionAttributes)
-            )
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow(() -> new NotFoundException("Template " + template + " was not found."));
+                .map(
+                        resolver ->
+                                resolver.resolveTemplate(
+                                        configuration,
+                                        ownerTemplate,
+                                        template,
+                                        templateResolutionAttributes))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(
+                        () -> new NotFoundException("Template " + template + " was not found."));
     }
-
 }

@@ -38,17 +38,13 @@ import run.halo.app.infra.utils.JsonUtils;
 @ExtendWith(MockitoExtension.class)
 class DefaultSettingFetcherTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
     @MockitoBean
-    private final PluginContext pluginContext = PluginContext.builder()
-        .name("fake")
-        .configMapName("fake-config")
-        .build();
+    private final PluginContext pluginContext =
+            PluginContext.builder().name("fake").configMapName("fake-config").build();
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
     private DefaultReactiveSettingFetcher reactiveSettingFetcher;
     private DefaultSettingFetcher settingFetcher;
@@ -62,7 +58,7 @@ class DefaultSettingFetcherTest {
 
         ConfigMap configMap = buildConfigMap();
         when(client.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
-            .thenReturn(Mono.just(configMap));
+                .thenReturn(Mono.just(configMap));
     }
 
     @Test
@@ -88,14 +84,18 @@ class DefaultSettingFetcherTest {
         JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(values.get("sns")), true);
 
         ConfigMap configMap = buildConfigMap();
-        configMap.getData().put("sns", """
-            {
-                "email": "abc@example.com",
-                "github": "abc"
-            }
-            """);
+        configMap
+                .getData()
+                .put(
+                        "sns",
+                        """
+                        {
+                            "email": "abc@example.com",
+                            "github": "abc"
+                        }
+                        """);
         when(client.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
-            .thenReturn(Mono.just(configMap));
+                .thenReturn(Mono.just(configMap));
         when(client.update(configMap)).thenReturn(Mono.just(configMap));
         reactiveSettingFetcher.reconcile(new Reconciler.Request(pluginContext.getConfigMapName()));
 
@@ -106,8 +106,10 @@ class DefaultSettingFetcherTest {
         Map<String, JsonNode> updatedValues = settingFetcher.getValues();
         verify(client, times(3)).fetch(eq(ConfigMap.class), any());
         assertThat(updatedValues).hasSize(2);
-        JSONAssert.assertEquals(configMap.getData().get("sns"),
-            JsonUtils.objectToJson(updatedValues.get("sns")), true);
+        JSONAssert.assertEquals(
+                configMap.getData().get("sns"),
+                JsonUtils.objectToJson(updatedValues.get("sns")),
+                true);
 
         updatedValues = settingFetcher.getValues();
         assertThat(updatedValues).hasSize(2);
@@ -144,33 +146,39 @@ class DefaultSettingFetcherTest {
         configMap.setApiVersion("v1alpha1");
         var map = new HashMap<String, String>();
         map.put("sns", getSns());
-        map.put("basic", """
-            {
-                "color": "red",
-                "width": "100"
-            }
-            """);
+        map.put(
+                "basic",
+                """
+                {
+                    "color": "red",
+                    "width": "100"
+                }
+                """);
         configMap.setData(map);
         return configMap;
     }
 
     String getSns() {
         return """
-            {
-                "email": "example@example.com",
-                "github": "example",
-                "instagram": "123",
-                "twitter": "halo-dev",
-                "user": {
-                "name": "guqing",
-                "age": "18"
-                },
-                "nums": [1, 2, 3]
-            }
-            """;
+        {
+            "email": "example@example.com",
+            "github": "example",
+            "instagram": "123",
+            "twitter": "halo-dev",
+            "user": {
+            "name": "guqing",
+            "age": "18"
+            },
+            "nums": [1, 2, 3]
+        }
+        """;
     }
 
-    record Sns(String email, String github, String instagram, String twitter,
-               Map<String, Object> user, List<Integer> nums) {
-    }
+    record Sns(
+            String email,
+            String github,
+            String instagram,
+            String twitter,
+            Map<String, Object> user,
+            List<Integer> nums) {}
 }

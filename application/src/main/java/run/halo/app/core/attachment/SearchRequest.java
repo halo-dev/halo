@@ -31,46 +31,50 @@ public class SearchRequest extends SortableRequest {
     }
 
     public Optional<String> getKeyword() {
-        return Optional.ofNullable(queryParams.getFirst("keyword"))
-            .filter(StringUtils::hasText);
+        return Optional.ofNullable(queryParams.getFirst("keyword")).filter(StringUtils::hasText);
     }
 
     public Optional<Boolean> getUngrouped() {
         return Optional.ofNullable(queryParams.getFirst("ungrouped"))
-            .map(ungroupedStr -> getSharedInstance().convert(ungroupedStr, Boolean.class));
+                .map(ungroupedStr -> getSharedInstance().convert(ungroupedStr, Boolean.class));
     }
 
     public Optional<List<String>> getAccepts() {
         return Optional.ofNullable(queryParams.get("accepts"))
-            .filter(accepts -> !accepts.isEmpty()
-                && !accepts.contains("*")
-                && !accepts.contains("*/*")
-            );
+                .filter(
+                        accepts ->
+                                !accepts.isEmpty()
+                                        && !accepts.contains("*")
+                                        && !accepts.contains("*/*"));
     }
 
     public ListOptions toListOptions(List<String> hiddenGroups) {
         var builder = ListOptions.builder(super.toListOptions());
 
-        getKeyword().ifPresent(keyword -> {
-            builder.andQuery(contains("spec.displayName", keyword));
-        });
+        getKeyword()
+                .ifPresent(
+                        keyword -> {
+                            builder.andQuery(contains("spec.displayName", keyword));
+                        });
 
         getUngrouped()
-            .filter(ungrouped -> ungrouped)
-            .ifPresent(ungrouped -> builder.andQuery(isNull("spec.groupName")));
+                .filter(ungrouped -> ungrouped)
+                .ifPresent(ungrouped -> builder.andQuery(isNull("spec.groupName")));
 
         if (!CollectionUtils.isEmpty(hiddenGroups)) {
             builder.andQuery(or(isNull("spec.groupName"), not(in("spec.groupName", hiddenGroups))));
         }
 
-        getAccepts().flatMap(accepts -> accepts.stream()
-                .filter(StringUtils::hasText)
-                .map(accept -> accept.replace("/*", "/").toLowerCase())
-                .distinct()
-                .map(accept -> startsWith("spec.mediaType", accept))
-                .reduce(Queries::or)
-            )
-            .ifPresent(builder::andQuery);
+        getAccepts()
+                .flatMap(
+                        accepts ->
+                                accepts.stream()
+                                        .filter(StringUtils::hasText)
+                                        .map(accept -> accept.replace("/*", "/").toLowerCase())
+                                        .distinct()
+                                        .map(accept -> startsWith("spec.mediaType", accept))
+                                        .reduce(Queries::or))
+                .ifPresent(builder::andQuery);
 
         return builder.build();
     }
@@ -78,34 +82,37 @@ public class SearchRequest extends SortableRequest {
     public static void buildParameters(Builder builder) {
         IListRequest.buildParameters(builder);
         builder.parameter(QueryParamBuildUtil.sortParameter())
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("ungrouped")
-                .required(false)
-                .description("""
-                    Filter attachments without group. This parameter will ignore group \
-                    parameter.\
-                    """)
-                .implementation(Boolean.class))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("keyword")
-                .required(false)
-                .description("Keyword for searching.")
-                .implementation(String.class))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("accepts")
-                .required(false)
-                .description("Acceptable media types.")
-                .array(
-                    arraySchemaBuilder()
-                        .uniqueItems(true)
-                        .schema(schemaBuilder()
-                            .implementation(String.class)
-                            .example("image/*"))
-                )
-                .implementationArray(String.class)
-            );
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("ungrouped")
+                                .required(false)
+                                .description(
+                                        """
+                                        Filter attachments without group. This parameter will ignore group \
+                                        parameter.\
+                                        """)
+                                .implementation(Boolean.class))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("keyword")
+                                .required(false)
+                                .description("Keyword for searching.")
+                                .implementation(String.class))
+                .parameter(
+                        parameterBuilder()
+                                .in(ParameterIn.QUERY)
+                                .name("accepts")
+                                .required(false)
+                                .description("Acceptable media types.")
+                                .array(
+                                        arraySchemaBuilder()
+                                                .uniqueItems(true)
+                                                .schema(
+                                                        schemaBuilder()
+                                                                .implementation(String.class)
+                                                                .example("image/*")))
+                                .implementationArray(String.class));
     }
 }

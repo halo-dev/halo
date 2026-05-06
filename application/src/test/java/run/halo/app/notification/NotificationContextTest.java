@@ -24,13 +24,14 @@ class NotificationContextTest {
         payload.setHtmlBody("Html body");
 
         // Create a test subject
-        NotificationContext.Subject subject = NotificationContext.Subject.builder()
-            .apiVersion("v1")
-            .kind("test")
-            .name("test-name")
-            .title("Test Subject")
-            .url("https://example.com")
-            .build();
+        NotificationContext.Subject subject =
+                NotificationContext.Subject.builder()
+                        .apiVersion("v1")
+                        .kind("test")
+                        .name("test-name")
+                        .title("Test Subject")
+                        .url("https://example.com")
+                        .build();
 
         // Create a test message
         NotificationContext.Message message = new NotificationContext.Message();

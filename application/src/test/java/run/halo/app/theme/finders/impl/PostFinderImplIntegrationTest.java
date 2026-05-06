@@ -37,24 +37,22 @@ class PostFinderImplIntegrationTest {
 
     private TemplateEngine templateEngine;
 
-    @Mock
-    private PostPublicQueryService postPublicQueryService;
+    @Mock private PostPublicQueryService postPublicQueryService;
 
-    @InjectMocks
-    private PostFinderImpl postFinder;
+    @InjectMocks private PostFinderImpl postFinder;
 
-    @Mock
-    private TemplateResourceComputer templateResourceComputer;
+    @Mock private TemplateResourceComputer templateResourceComputer;
 
     @BeforeEach
     void setUp() {
         templateEngine = new SpringTemplateEngine();
-        templateEngine.setDialect(new SpringStandardDialect() {
-            @Override
-            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
-                return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
-            }
-        });
+        templateEngine.setDialect(
+                new SpringStandardDialect() {
+                    @Override
+                    public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                        return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
+                    }
+                });
         templateEngine.addTemplateResolver(new TestTemplateResolver(templateResourceComputer));
     }
 
@@ -64,25 +62,32 @@ class PostFinderImplIntegrationTest {
         context.setVariable("postFinder", postFinder);
 
         // empty param
-        when(templateResourceComputer.compute(eq("post"))).thenReturn(new StringTemplateResource("""
-            <span th:text="${postFinder.list({})}"></span>
-            """));
+        when(templateResourceComputer.compute(eq("post")))
+                .thenReturn(
+                        new StringTemplateResource(
+                                """
+                                <span th:text="${postFinder.list({})}"></span>
+                                """));
 
         when(postPublicQueryService.list(any(), any()))
-            .thenReturn(Mono.just(ListResult.emptyResult()));
+                .thenReturn(Mono.just(ListResult.emptyResult()));
 
         var result = templateEngine.process("post", context);
-        assertThat(result).isEqualToIgnoringWhitespace(
-            "<span>ListResult(page=0, size=0, total=0, items=[])</span>");
+        assertThat(result)
+                .isEqualToIgnoringWhitespace(
+                        "<span>ListResult(page=0, size=0, total=0, items=[])</span>");
 
-        when(templateResourceComputer.compute(eq("post"))).thenReturn(new StringTemplateResource("""
-            <span
-              th:each="post : ${postFinder.list({page: 1, size: 10, tagName: 'fake-tag',
-               ownerName: 'fake-owner', sort: {'spec.publishTime,desc',
-                'metadata.creationTimestamp,asc'}})}"
-            >
-            </span>
-            """));
+        when(templateResourceComputer.compute(eq("post")))
+                .thenReturn(
+                        new StringTemplateResource(
+                                """
+                                <span
+                                  th:each="post : ${postFinder.list({page: 1, size: 10, tagName: 'fake-tag',
+                                   ownerName: 'fake-owner', sort: {'spec.publishTime,desc',
+                                    'metadata.creationTimestamp,asc'}})}"
+                                >
+                                </span>
+                                """));
         result = templateEngine.process("post", context);
         assertThat(result).isEqualToIgnoringWhitespace("");
     }
@@ -95,9 +100,11 @@ class PostFinderImplIntegrationTest {
         }
 
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             return templateResourceComputer.compute(template);
         }
     }

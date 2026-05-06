@@ -37,5 +37,4 @@ public interface LoginParameterRequestCache {
      * @return a mono string or empty mono
      */
     Mono<String> getParameter(ServerWebExchange exchange, String parameterName);
-
 }

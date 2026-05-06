@@ -43,5 +43,4 @@ public interface IndexAttribute<E extends Extension, K extends Comparable<K>> {
      * @return true if single-valued, false otherwise
      */
     boolean singleValue();
-
 }

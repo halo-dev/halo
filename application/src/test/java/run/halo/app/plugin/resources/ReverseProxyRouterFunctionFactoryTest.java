@@ -40,17 +40,13 @@ import run.halo.app.plugin.PluginConst;
 @ExtendWith(MockitoExtension.class)
 class ReverseProxyRouterFunctionFactoryTest {
 
-    @Mock
-    private PluginManager pluginManager;
+    @Mock private PluginManager pluginManager;
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Spy
-    WebProperties webProperties = new WebProperties();
+    @Spy WebProperties webProperties = new WebProperties();
 
-    @InjectMocks
-    private ReverseProxyRouterFunctionFactory factory;
+    @InjectMocks private ReverseProxyRouterFunctionFactory factory;
 
     @Test
     void shouldProxyStaticResourceWithCacheControl() throws FileNotFoundException {
@@ -68,12 +64,18 @@ class ReverseProxyRouterFunctionFactoryTest {
         when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
         when(pluginManager.getPlugin("fakeA")).thenReturn(pluginWrapper);
 
-        webClient.get().uri("/plugins/fakeA/assets/static/test.txt")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().cacheControl(CacheControl.maxAge(Duration.ofDays(7)))
-            .expectHeader().value(HttpHeaders.LAST_MODIFIED, Assertions::assertNotNull)
-            .expectBody(String.class).isEqualTo("Fake content.");
+        webClient
+                .get()
+                .uri("/plugins/fakeA/assets/static/test.txt")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(7)))
+                .expectHeader()
+                .value(HttpHeaders.LAST_MODIFIED, Assertions::assertNotNull)
+                .expectBody(String.class)
+                .isEqualTo("Fake content.");
     }
 
     @Test
@@ -92,12 +94,18 @@ class ReverseProxyRouterFunctionFactoryTest {
         when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
         when(pluginManager.getPlugin("fakeA")).thenReturn(pluginWrapper);
 
-        webClient.get().uri("/plugins/fakeA/assets/static/test.txt")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().cacheControl(CacheControl.maxAge(Duration.ofDays(7)))
-            .expectHeader().lastModified(-1)
-            .expectBody(String.class).isEqualTo("Fake content.");
+        webClient
+                .get()
+                .uri("/plugins/fakeA/assets/static/test.txt")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(7)))
+                .expectHeader()
+                .lastModified(-1)
+                .expectBody(String.class)
+                .isEqualTo("Fake content.");
     }
 
     @Test
@@ -112,19 +120,22 @@ class ReverseProxyRouterFunctionFactoryTest {
         when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
         when(pluginManager.getPlugin("fakeA")).thenReturn(pluginWrapper);
 
-        webClient.get().uri("/plugins/fakeA/assets/static/non-existing-file.txt")
-            .exchange()
-            .expectHeader().cacheControl(CacheControl.empty())
-            .expectStatus().isNotFound();
+        webClient
+                .get()
+                .uri("/plugins/fakeA/assets/static/non-existing-file.txt")
+                .exchange()
+                .expectHeader()
+                .cacheControl(CacheControl.empty())
+                .expectStatus()
+                .isNotFound();
     }
 
     private ReverseProxy mockReverseProxy() {
-        var reverseProxyRule = new ReverseProxyRule("/static/**",
-            new FileReverseProxyProvider("static", ""));
+        var reverseProxyRule =
+                new ReverseProxyRule("/static/**", new FileReverseProxyProvider("static", ""));
         var reverseProxy = new ReverseProxy();
         var metadata = new Metadata();
-        metadata.setLabels(
-            Map.of(PluginConst.PLUGIN_NAME_LABEL_NAME, "fakeA"));
+        metadata.setLabels(Map.of(PluginConst.PLUGIN_NAME_LABEL_NAME, "fakeA"));
         reverseProxy.setMetadata(metadata);
         reverseProxy.setRules(List.of(reverseProxyRule));
         return reverseProxy;

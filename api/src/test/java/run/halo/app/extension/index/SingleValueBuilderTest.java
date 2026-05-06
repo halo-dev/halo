@@ -14,16 +14,16 @@ class SingleValueBuilderTest {
 
     @Test
     void throwIfNoNameProvided() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new SingleValueBuilder<FakeExtension, String>(null, String.class)
-        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new SingleValueBuilder<FakeExtension, String>(null, String.class));
     }
 
     @Test
     void throwIfNoKeyTypeProvided() {
-        assertThrows(IllegalArgumentException.class, () ->
-            new SingleValueBuilder<FakeExtension, String>("metadata.name", null)
-        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new SingleValueBuilder<FakeExtension, String>("metadata.name", null));
     }
 
     @Test
@@ -34,8 +34,9 @@ class SingleValueBuilderTest {
 
     @Test
     void shouldBuildCorrectly() {
-        var builder = new SingleValueBuilder<FakeExtension, String>("metadata.name", String.class)
-            .indexFunc(e -> e.getMetadata().getName());
+        var builder =
+                new SingleValueBuilder<FakeExtension, String>("metadata.name", String.class)
+                        .indexFunc(e -> e.getMetadata().getName());
         var indexSpec = builder.build();
         assertNotNull(indexSpec);
         assertInstanceOf(SingleValueIndexSpec.class, indexSpec);

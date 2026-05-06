@@ -10,10 +10,7 @@ public class DevPluginLoader extends DevelopmentPluginLoader {
 
     private final PluginProperties pluginProperties;
 
-    public DevPluginLoader(
-        PluginManager pluginManager,
-        PluginProperties pluginProperties
-    ) {
+    public DevPluginLoader(PluginManager pluginManager, PluginProperties pluginProperties) {
         super(pluginManager);
         this.pluginProperties = pluginProperties;
     }
@@ -23,14 +20,12 @@ public class DevPluginLoader extends DevelopmentPluginLoader {
         var classesDirectories = pluginProperties.getClassesDirectories();
         if (classesDirectories != null) {
             classesDirectories.forEach(
-                classesDirectory -> pluginClasspath.addClassesDirectories(classesDirectory)
-            );
+                    classesDirectory -> pluginClasspath.addClassesDirectories(classesDirectory));
         }
         var libDirectories = pluginProperties.getLibDirectories();
         if (libDirectories != null) {
             libDirectories.forEach(
-                libDirectory -> pluginClasspath.addJarsDirectories(libDirectory)
-            );
+                    libDirectory -> pluginClasspath.addJarsDirectories(libDirectory));
         }
         return super.loadPlugin(pluginPath, pluginDescriptor);
     }

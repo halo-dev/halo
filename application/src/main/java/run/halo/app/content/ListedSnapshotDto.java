@@ -33,10 +33,10 @@ public class ListedSnapshotDto {
      */
     public static ListedSnapshotDto from(Snapshot snapshot) {
         return new ListedSnapshotDto()
-            .setMetadata(snapshot.getMetadata())
-            .setSpec(new Spec()
-                .setOwner(snapshot.getSpec().getOwner())
-                .setModifyTime(snapshot.getSpec().getLastModifyTime())
-            );
+                .setMetadata(snapshot.getMetadata())
+                .setSpec(
+                        new Spec()
+                                .setOwner(snapshot.getSpec().getOwner())
+                                .setModifyTime(snapshot.getSpec().getLastModifyTime()));
     }
 }

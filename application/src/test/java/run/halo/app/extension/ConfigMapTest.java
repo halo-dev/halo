@@ -22,8 +22,7 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
 @ExtendWith(MockitoExtension.class)
 class ConfigMapTest {
 
-    @Mock
-    ExtensionClient extensionClient;
+    @Mock ExtensionClient extensionClient;
 
     @Test
     void configMapTest() {
@@ -46,14 +45,11 @@ class ConfigMapTest {
     @Test
     void putDataItem() {
         ConfigMap configMap = new ConfigMap();
-        configMap.putDataItem("k1", "v1")
-            .putDataItem("k2", "v2")
-            .putDataItem("k3", "v3");
+        configMap.putDataItem("k1", "v1").putDataItem("k2", "v2").putDataItem("k3", "v3");
 
         assertThat(configMap.getData()).isNotNull();
         assertThat(configMap.getData()).hasSize(3);
-        assertThat(configMap.getData()).isEqualTo(
-            Map.of("k1", "v1", "k2", "v2", "k3", "v3"));
+        assertThat(configMap.getData()).isEqualTo(Map.of("k1", "v1", "k2", "v2", "k3", "v3"));
     }
 
     @Test
@@ -78,22 +74,23 @@ class ConfigMapTest {
 
     @Test
     void yamlTest() {
-        String configMapYaml = """
-                apiVersion: v1alpha1
-                kind: ConfigMap
-                metadata:
-                  name: test-configmap
-                data:
-                  k1: v1
-                  k2: v2
-                  k3: v3
-            """;
+        String configMapYaml =
+                """
+                    apiVersion: v1alpha1
+                    kind: ConfigMap
+                    metadata:
+                      name: test-configmap
+                    data:
+                      k1: v1
+                      k2: v2
+                      k3: v3
+                """;
         List<Unstructured> unstructureds =
-            new YamlUnstructuredLoader(new InMemoryResource(configMapYaml)).load();
+                new YamlUnstructuredLoader(new InMemoryResource(configMapYaml)).load();
         assertThat(unstructureds).hasSize(1);
         Unstructured unstructured = unstructureds.get(0);
         ConfigMap configMap =
-            Unstructured.OBJECT_MAPPER.convertValue(unstructured, ConfigMap.class);
+                Unstructured.OBJECT_MAPPER.convertValue(unstructured, ConfigMap.class);
 
         assertThat(configMap.getData()).isEqualTo(Map.of("k1", "v1", "k2", "v2", "k3", "v3"));
         assertThat(configMap.getMetadata().getName()).isEqualTo("test-configmap");

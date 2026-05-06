@@ -11,8 +11,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "migration.halo.run", version = "v1alpha1", kind = "Backup",
-    plural = "backups", singular = "backup")
+@GVK(
+        group = "migration.halo.run",
+        version = "v1alpha1",
+        kind = "Backup",
+        plural = "backups",
+        singular = "backup")
 public class Backup extends AbstractExtension {
 
     private Spec spec = new Spec();
@@ -27,7 +31,6 @@ public class Backup extends AbstractExtension {
         private String format;
 
         private Instant expiresAt;
-
     }
 
     @Data
@@ -61,5 +64,4 @@ public class Backup extends AbstractExtension {
         SUCCEEDED,
         FAILED,
     }
-
 }

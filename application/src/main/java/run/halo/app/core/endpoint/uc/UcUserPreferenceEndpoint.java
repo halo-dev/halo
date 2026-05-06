@@ -53,102 +53,138 @@ class UcUserPreferenceEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "UserPreferenceV1alpha1Uc";
         return SpringdocRouteBuilder.route()
-            .GET(
-                "/user-preferences/{group}",
-                this::getMyPreference,
-                builder -> builder.operationId("getMyPreference")
-                    .tag(tag)
-                    .description("Get my preference by group.")
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .description("Group of user preference, e.g. `notification`.")
-                        .implementation(String.class)
-                        .required(true)
-                    )
-                    .response(responseBuilder().implementation(Object.class))
-            )
-            .PUT(
-                "/user-preferences/{group}",
-                this::updateMyPreference,
-                builder -> builder.operationId("updateMyPreference")
-                    .tag(tag)
-                    .description("Create or update my preference by group.")
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .description("Group of user preference, e.g. `notification`.")
-                        .implementation(String.class)
-                        .required(true)
-                    )
-                    .requestBody(Builder.requestBodyBuilder()
-                        .required(true)
-                        .implementation(Object.class))
-                    .response(responseBuilder()
-                        .description("No content, preference updated successfully.")
-                        .responseCode(String.valueOf(HttpStatus.NO_CONTENT.value()))
-                    )
-            )
-            .build();
+                .GET(
+                        "/user-preferences/{group}",
+                        this::getMyPreference,
+                        builder ->
+                                builder.operationId("getMyPreference")
+                                        .tag(tag)
+                                        .description("Get my preference by group.")
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("group")
+                                                        .description(
+                                                                "Group of user preference, e.g."
+                                                                        + " `notification`.")
+                                                        .implementation(String.class)
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(Object.class)))
+                .PUT(
+                        "/user-preferences/{group}",
+                        this::updateMyPreference,
+                        builder ->
+                                builder.operationId("updateMyPreference")
+                                        .tag(tag)
+                                        .description("Create or update my preference by group.")
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("group")
+                                                        .description(
+                                                                "Group of user preference, e.g."
+                                                                        + " `notification`.")
+                                                        .implementation(String.class)
+                                                        .required(true))
+                                        .requestBody(
+                                                Builder.requestBodyBuilder()
+                                                        .required(true)
+                                                        .implementation(Object.class))
+                                        .response(
+                                                responseBuilder()
+                                                        .description(
+                                                                "No content, preference updated"
+                                                                        + " successfully.")
+                                                        .responseCode(
+                                                                String.valueOf(
+                                                                        HttpStatus.NO_CONTENT
+                                                                                .value()))))
+                .build();
     }
 
     private Mono<ServerResponse> updateMyPreference(ServerRequest serverRequest) {
         var group = serverRequest.pathVariable("group");
         return authenticated()
-            .map(Authentication::getName)
-            .flatMap(username -> client.fetch(ConfigMap.class, PREFERENCE_PREFIX + username)
-                .switchIfEmpty(Mono.fromSupplier(() -> {
-                    var cm = new ConfigMap();
-                    cm.setMetadata(new Metadata());
-                    cm.getMetadata().setName(PREFERENCE_PREFIX + username);
-                    return cm;
-                }))
-            )
-            .flatMap(cm -> serverRequest.bodyToMono(JsonNode.class)
-                .switchIfEmpty(
-                    Mono.error(() -> new ServerWebInputException("Request body is required."))
-                )
-                .flatMap(jsonNode -> Mono.fromCallable(() -> {
-                    if (cm.getData() == null) {
-                        cm.setData(new HashMap<>());
-                    }
-                    var json = mapper.writeValueAsString(jsonNode);
-                    if (Objects.equals(json, cm.getData().get(group))) {
-                        return null;
-                    }
-                    cm.getData().put(group, json);
-                    return cm;
-                }))
-                .flatMap(extension -> {
-                    if (extension.getMetadata().getVersion() == null) {
-                        return client.create(extension);
-                    }
-                    return client.update(extension);
-                })
-                .defaultIfEmpty(cm)
-            )
-            .flatMap(cm -> ServerResponse.noContent().build());
+                .map(Authentication::getName)
+                .flatMap(
+                        username ->
+                                client.fetch(ConfigMap.class, PREFERENCE_PREFIX + username)
+                                        .switchIfEmpty(
+                                                Mono.fromSupplier(
+                                                        () -> {
+                                                            var cm = new ConfigMap();
+                                                            cm.setMetadata(new Metadata());
+                                                            cm.getMetadata()
+                                                                    .setName(
+                                                                            PREFERENCE_PREFIX
+                                                                                    + username);
+                                                            return cm;
+                                                        })))
+                .flatMap(
+                        cm ->
+                                serverRequest
+                                        .bodyToMono(JsonNode.class)
+                                        .switchIfEmpty(
+                                                Mono.error(
+                                                        () ->
+                                                                new ServerWebInputException(
+                                                                        "Request body is"
+                                                                                + " required.")))
+                                        .flatMap(
+                                                jsonNode ->
+                                                        Mono.fromCallable(
+                                                                () -> {
+                                                                    if (cm.getData() == null) {
+                                                                        cm.setData(new HashMap<>());
+                                                                    }
+                                                                    var json =
+                                                                            mapper
+                                                                                    .writeValueAsString(
+                                                                                            jsonNode);
+                                                                    if (Objects.equals(
+                                                                            json,
+                                                                            cm.getData()
+                                                                                    .get(group))) {
+                                                                        return null;
+                                                                    }
+                                                                    cm.getData().put(group, json);
+                                                                    return cm;
+                                                                }))
+                                        .flatMap(
+                                                extension -> {
+                                                    if (extension.getMetadata().getVersion()
+                                                            == null) {
+                                                        return client.create(extension);
+                                                    }
+                                                    return client.update(extension);
+                                                })
+                                        .defaultIfEmpty(cm))
+                .flatMap(cm -> ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> getMyPreference(ServerRequest serverRequest) {
         var group = serverRequest.pathVariable("group");
         return authenticated()
-            .map(Authentication::getName)
-            .flatMap(username -> client.fetch(ConfigMap.class, PREFERENCE_PREFIX + username))
-            .mapNotNull(ConfigMap::getData)
-            .mapNotNull(data -> data.get(group))
-            .flatMap(json -> Mono.fromCallable(() -> mapper.readTree(json)))
-            .switchIfEmpty(Mono.fromSupplier(mapper::nullNode))
-            .flatMap(jsonNode -> ServerResponse.ok().bodyValue(jsonNode));
+                .map(Authentication::getName)
+                .flatMap(username -> client.fetch(ConfigMap.class, PREFERENCE_PREFIX + username))
+                .mapNotNull(ConfigMap::getData)
+                .mapNotNull(data -> data.get(group))
+                .flatMap(json -> Mono.fromCallable(() -> mapper.readTree(json)))
+                .switchIfEmpty(Mono.fromSupplier(mapper::nullNode))
+                .flatMap(jsonNode -> ServerResponse.ok().bodyValue(jsonNode));
     }
 
     private Mono<Authentication> authenticated() {
         return ReactiveSecurityContextHolder.getContext()
-            .mapNotNull(SecurityContext::getAuthentication)
-            .filter(trustResolver::isAuthenticated)
-            .switchIfEmpty(Mono.error(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
-                "Anonymous user is not allowed to access user preference."
-            )));
+                .mapNotNull(SecurityContext::getAuthentication)
+                .filter(trustResolver::isAuthenticated)
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.FORBIDDEN,
+                                                "Anonymous user is not allowed to access user"
+                                                        + " preference.")));
     }
 
     @Override

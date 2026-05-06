@@ -39,28 +39,34 @@ class JsonExtensionTest {
 
         ext.getInternal().set("data", TextNode.valueOf("halo"));
 
-        JSONAssert.assertEquals("""
-            {
-              "apiVersion": "fake.halo.run/v1alpha",
-              "kind": "Fake",
-              "metadata": {
-                "name": "fake-name"
-              },
-              "data": "halo"
-            }""", objectMapper.writeValueAsString(ext), true);
+        JSONAssert.assertEquals(
+                """
+                {
+                  "apiVersion": "fake.halo.run/v1alpha",
+                  "kind": "Fake",
+                  "metadata": {
+                    "name": "fake-name"
+                  },
+                  "data": "halo"
+                }\
+                """,
+                objectMapper.writeValueAsString(ext),
+                true);
     }
 
     @Test
     void deserialize() throws JsonProcessingException {
-        var json = """
-            {
-              "apiVersion": "fake.halo.run/v1alpha1",
-              "kind": "Fake",
-              "metadata": {
-                "name": "faker"
-              },
-              "otherProperty": "otherPropertyValue"
-            }""";
+        var json =
+                """
+                {
+                  "apiVersion": "fake.halo.run/v1alpha1",
+                  "kind": "Fake",
+                  "metadata": {
+                    "name": "faker"
+                  },
+                  "otherProperty": "otherPropertyValue"
+                }\
+                """;
 
         var ext = objectMapper.readValue(json, JsonExtension.class);
 

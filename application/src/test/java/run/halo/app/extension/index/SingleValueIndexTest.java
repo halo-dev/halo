@@ -22,12 +22,9 @@ import run.halo.app.extension.Metadata;
 @ExtendWith(MockitoExtension.class)
 class SingleValueIndexTest {
 
-    @Mock
-    SingleValueIndexSpec<Fake, String> spec;
+    @Mock SingleValueIndexSpec<Fake, String> spec;
 
-    @InjectMocks
-    SingleValueIndex<Fake, String> index;
-
+    @InjectMocks SingleValueIndex<Fake, String> index;
 
     @Nested
     class NonNullAndUniqueTest {
@@ -38,10 +35,13 @@ class SingleValueIndexTest {
             lenient().when(spec.getKeyType()).thenReturn(String.class);
             lenient().when(spec.isNullable()).thenReturn(false);
             lenient().when(spec.isUnique()).thenReturn(true);
-            lenient().when(spec.getValue(any(Fake.class))).thenAnswer(invocation -> {
-                Fake fake = invocation.getArgument(0);
-                return fake.getStringValue();
-            });
+            lenient()
+                    .when(spec.getValue(any(Fake.class)))
+                    .thenAnswer(
+                            invocation -> {
+                                Fake fake = invocation.getArgument(0);
+                                return fake.getStringValue();
+                            });
         }
 
         @Test
@@ -103,7 +103,6 @@ class SingleValueIndexTest {
 
                 assertEquals(Set.of("fake"), index.equal("new-string"));
             }
-
 
             @Test
             void shouldRollbackUpdateCorrectly() {
@@ -374,9 +373,7 @@ class SingleValueIndexTest {
                 assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
                 assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
             }
-
         }
-
     }
 
     @Nested
@@ -388,10 +385,13 @@ class SingleValueIndexTest {
             lenient().when(spec.getKeyType()).thenReturn(String.class);
             lenient().when(spec.isNullable()).thenReturn(true);
             lenient().when(spec.isUnique()).thenReturn(false);
-            lenient().when(spec.getValue(any(Fake.class))).thenAnswer(invocation -> {
-                Fake fake = invocation.getArgument(0);
-                return fake.getStringValue();
-            });
+            lenient()
+                    .when(spec.getValue(any(Fake.class)))
+                    .thenAnswer(
+                            invocation -> {
+                                Fake fake = invocation.getArgument(0);
+                                return fake.getStringValue();
+                            });
         }
 
         @Test
@@ -696,7 +696,6 @@ class SingleValueIndexTest {
                 assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
                 assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
             }
-
         }
     }
 
@@ -712,6 +711,4 @@ class SingleValueIndexTest {
         fake.getMetadata().setName(name);
         return fake;
     }
-
 }
-

@@ -21,7 +21,6 @@ class DefaultSuperAdminInitializerTest {
 
         assertThat(admin.getMetadata()).isNotNull();
         assertThat(admin.getMetadata().getFinalizers()).isNotNull();
-        assertThat(admin.getMetadata().getFinalizers())
-            .contains(MetadataUtil.SYSTEM_FINALIZER);
+        assertThat(admin.getMetadata().getFinalizers()).contains(MetadataUtil.SYSTEM_FINALIZER);
     }
 }

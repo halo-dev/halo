@@ -37,54 +37,68 @@ public class UserNotifierEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "NotifierV1alpha1Uc";
         return SpringdocRouteBuilder.route()
-            .GET("/notifiers/{name}/receiver-config", this::fetchReceiverConfig,
-                builder -> builder.operationId("FetchReceiverConfig")
-                    .description("Fetch receiver config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .response(responseBuilder().implementation(Object.class))
-            )
-            .POST("/notifiers/{name}/receiver-config", this::saveReceiverConfig,
-                builder -> builder.operationId("SaveReceiverConfig")
-                    .description("Save receiver config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder().implementation(Object.class))
-                        )
-                    )
-                    .response(responseBuilder().implementation(Void.class))
-            )
-            .build();
+                .GET(
+                        "/notifiers/{name}/receiver-config",
+                        this::fetchReceiverConfig,
+                        builder ->
+                                builder.operationId("FetchReceiverConfig")
+                                        .description("Fetch receiver config of notifier")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Notifier name")
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(Object.class)))
+                .POST(
+                        "/notifiers/{name}/receiver-config",
+                        this::saveReceiverConfig,
+                        builder ->
+                                builder.operationId("SaveReceiverConfig")
+                                        .description("Save receiver config of notifier")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Notifier name")
+                                                        .required(true))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                Builder
+                                                                                        .schemaBuilder()
+                                                                                        .implementation(
+                                                                                                Object
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Void.class)))
+                .build();
     }
 
     private Mono<ServerResponse> fetchReceiverConfig(ServerRequest request) {
         var name = request.pathVariable("name");
-        return notifierConfigStore.fetchReceiverConfig(name)
-            .flatMap(config -> ServerResponse.ok().bodyValue(config));
+        return notifierConfigStore
+                .fetchReceiverConfig(name)
+                .flatMap(config -> ServerResponse.ok().bodyValue(config));
     }
 
     private Mono<ServerResponse> saveReceiverConfig(ServerRequest request) {
         var name = request.pathVariable("name");
         return request.bodyToMono(ObjectNode.class)
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("Request body must not be empty."))
-            )
-            .flatMap(jsonNode -> notifierConfigStore.saveReceiverConfig(name, jsonNode))
-            .then(ServerResponse.ok().build());
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "Request body must not be empty.")))
+                .flatMap(jsonNode -> notifierConfigStore.saveReceiverConfig(name, jsonNode))
+                .then(ServerResponse.ok().build());
     }
 
     @Override

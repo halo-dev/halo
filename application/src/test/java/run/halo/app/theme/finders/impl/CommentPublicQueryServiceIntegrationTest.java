@@ -41,14 +41,11 @@ import run.halo.app.infra.utils.JsonUtils;
 @SpringBootTest
 class CommentPublicQueryServiceIntegrationTest {
 
-    @Autowired
-    private SchemeManager schemeManager;
+    @Autowired private SchemeManager schemeManager;
 
-    @Autowired
-    private ReactiveExtensionClient client;
+    @Autowired private ReactiveExtensionClient client;
 
-    @Autowired
-    private ReactiveExtensionStoreClient storeClient;
+    @Autowired private ReactiveExtensionStoreClient storeClient;
 
     Mono<Extension> deleteImmediately(Extension extension) {
         var name = extension.getMetadata().getName();
@@ -56,81 +53,87 @@ class CommentPublicQueryServiceIntegrationTest {
 
         // delete from db
         var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);
-        return storeClient.delete(storeName, extension.getMetadata().getVersion())
-            .thenReturn(extension);
+        return storeClient
+                .delete(storeName, extension.getMetadata().getVersion())
+                .thenReturn(extension);
     }
 
     @Nested
     class CommentListTest {
         private final List<Comment> storedComments = commentsForStore();
 
-        @Autowired
-        private CommentPublicQueryServiceImpl commentPublicQueryService;
+        @Autowired private CommentPublicQueryServiceImpl commentPublicQueryService;
 
         @BeforeEach
         void setUp() {
             Flux.fromIterable(storedComments)
-                .flatMap(comment -> client.create(comment))
-                .as(StepVerifier::create)
-                .expectNextCount(storedComments.size())
-                .verifyComplete();
+                    .flatMap(comment -> client.create(comment))
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedComments.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(storedComments)
-                .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(storedComments.size())
-                .verifyComplete();
+                    .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedComments.size())
+                    .verifyComplete();
         }
 
         @Test
         void listWhenUserNotLogin() {
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .list(ref, 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(2);
+                                assertThat(listResult.getItems().size()).isEqualTo(2);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("comment-approved");
+                            })
+                    .verifyComplete();
         }
 
         @Test
         @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
         void listWhenUserIsAnonymous() {
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .list(ref, 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(2);
+                                assertThat(listResult.getItems().size()).isEqualTo(2);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("comment-approved");
+                            })
+                    .verifyComplete();
         }
 
         @Test
         @WithMockUser(username = "fake-user")
         void listWhenUserLoggedIn() {
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentPublicQueryService.list(ref, 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(3);
-                    assertThat(listResult.getItems().size()).isEqualTo(3);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("comment-approved");
-                    assertThat(listResult.getItems().get(1).getMetadata().getName())
-                        .isEqualTo("comment-approved-but-another-owner");
-                    assertThat(listResult.getItems().get(2).getMetadata().getName())
-                        .isEqualTo("comment-not-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .list(ref, 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(3);
+                                assertThat(listResult.getItems().size()).isEqualTo(3);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("comment-approved");
+                                assertThat(listResult.getItems().get(1).getMetadata().getName())
+                                        .isEqualTo("comment-approved-but-another-owner");
+                                assertThat(listResult.getItems().get(2).getMetadata().getName())
+                                        .isEqualTo("comment-not-approved");
+                            })
+                    .verifyComplete();
         }
 
         List<Comment> commentsForStore() {
@@ -149,33 +152,33 @@ class CommentPublicQueryServiceIntegrationTest {
             notApprovedWithAnonymous.getSpec().getOwner().setName(AnonymousUserConst.PRINCIPAL);
 
             Comment commentApprovedButAnotherOwner = fakeComment();
-            commentApprovedButAnotherOwner.getMetadata()
-                .setName("comment-approved-but-another-owner");
+            commentApprovedButAnotherOwner
+                    .getMetadata()
+                    .setName("comment-approved-but-another-owner");
             commentApprovedButAnotherOwner.getSpec().setApproved(true);
             commentApprovedButAnotherOwner.getSpec().getOwner().setName("another");
 
             Comment commentNotApprovedAndAnotherOwner = fakeComment();
-            commentNotApprovedAndAnotherOwner.getMetadata()
-                .setName("comment-not-approved-and-another");
+            commentNotApprovedAndAnotherOwner
+                    .getMetadata()
+                    .setName("comment-not-approved-and-another");
             commentNotApprovedAndAnotherOwner.getSpec().setApproved(false);
             commentNotApprovedAndAnotherOwner.getSpec().getOwner().setName("another");
 
             Comment notApprovedAndAnotherRef = fakeComment();
-            notApprovedAndAnotherRef.getMetadata()
-                .setName("comment-not-approved-and-another-ref");
+            notApprovedAndAnotherRef.getMetadata().setName("comment-not-approved-and-another-ref");
             notApprovedAndAnotherRef.getSpec().setApproved(false);
             Ref anotherRef =
-                Ref.of("another-fake-post", GroupVersionKind.fromExtension(Post.class));
+                    Ref.of("another-fake-post", GroupVersionKind.fromExtension(Post.class));
             notApprovedAndAnotherRef.getSpec().setSubjectRef(anotherRef);
 
             return List.of(
-                commentNotApproved,
-                commentApproved,
-                commentApprovedButAnotherOwner,
-                commentNotApprovedAndAnotherOwner,
-                notApprovedWithAnonymous,
-                notApprovedAndAnotherRef
-            );
+                    commentNotApproved,
+                    commentApproved,
+                    commentApprovedButAnotherOwner,
+                    commentNotApprovedAndAnotherOwner,
+                    notApprovedWithAnonymous,
+                    notApprovedAndAnotherRef);
         }
 
         Comment fakeComment() {
@@ -187,7 +190,7 @@ class CommentPublicQueryServiceIntegrationTest {
             comment.getSpec().setContent("fake-content");
             comment.getSpec().setHidden(false);
             comment.getSpec()
-                .setSubjectRef(Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
+                    .setSubjectRef(Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class)));
             Comment.CommentOwner commentOwner = new Comment.CommentOwner();
             commentOwner.setKind(User.KIND);
             commentOwner.setName("fake-user");
@@ -204,32 +207,36 @@ class CommentPublicQueryServiceIntegrationTest {
         @BeforeEach
         void setUp() {
             Flux.fromIterable(commentList)
-                .flatMap(comment -> client.create(comment))
-                .as(StepVerifier::create)
-                .expectNextCount(commentList.size())
-                .verifyComplete();
+                    .flatMap(comment -> client.create(comment))
+                    .as(StepVerifier::create)
+                    .expectNextCount(commentList.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(commentList)
-                .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(commentList.size())
-                .verifyComplete();
+                    .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(commentList.size())
+                    .verifyComplete();
         }
 
         @Test
         void sortTest() {
-            var comments = client.listAll(Comment.class, new ListOptions(),
-                    CommentPublicQueryServiceImpl.defaultCommentSort())
-                .collectList()
-                .block();
+            var comments =
+                    client.listAll(
+                                    Comment.class,
+                                    new ListOptions(),
+                                    CommentPublicQueryServiceImpl.defaultCommentSort())
+                            .collectList()
+                            .block();
             assertThat(comments).isNotNull();
 
-            var result = comments.stream()
-                .map(comment -> comment.getMetadata().getName())
-                .collect(Collectors.joining(", "));
+            var result =
+                    comments.stream()
+                            .map(comment -> comment.getMetadata().getName())
+                            .collect(Collectors.joining(", "));
             assertThat(result).isEqualTo("1, 2, 4, 3, 5, 6, 10, 14, 9, 8, 7, 11, 12, 13");
         }
 
@@ -263,8 +270,9 @@ class CommentPublicQueryServiceIntegrationTest {
             var comment13 = commentForCompare("13", now, false, 3);
             var comment14 = commentForCompare("14", now.plusSeconds(3), false, 3);
 
-            return List.of(comment1, comment2, comment3, comment4, comment5, comment6, comment7,
-                comment8, comment9, comment10, comment11, comment12, comment13, comment14);
+            return List.of(
+                    comment1, comment2, comment3, comment4, comment5, comment6, comment7, comment8,
+                    comment9, comment10, comment11, comment12, comment13, comment14);
         }
 
         Comment commentForCompare(String name, Instant creationTime, boolean top, int priority) {
@@ -282,135 +290,139 @@ class CommentPublicQueryServiceIntegrationTest {
     class ListReplyTest {
         private final List<Reply> storedReplies = mockRelies();
 
-        @Autowired
-        private CommentPublicQueryServiceImpl commentPublicQueryService;
+        @Autowired private CommentPublicQueryServiceImpl commentPublicQueryService;
 
         @BeforeEach
         void setUp() {
             // create comment
             var comment = createComment();
             client.create(comment)
-                .onErrorResume(DuplicateNameException.class, e -> Mono.just(comment))
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .verifyComplete();
+                    .onErrorResume(DuplicateNameException.class, e -> Mono.just(comment))
+                    .as(StepVerifier::create)
+                    .expectNextCount(1)
+                    .verifyComplete();
             Flux.fromIterable(storedReplies)
-                .flatMap(reply -> client.create(reply))
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(reply -> client.create(reply))
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(storedReplies)
-                .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(CommentPublicQueryServiceIntegrationTest.this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @Test
         void listWhenUserNotLogin() {
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .listReply("fake-comment", 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(2);
+                                assertThat(listResult.getItems().size()).isEqualTo(2);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("reply-approved");
+                            })
+                    .verifyComplete();
         }
 
         @Test
         @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
         void listWhenUserIsAnonymous() {
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(2);
-                    assertThat(listResult.getItems().size()).isEqualTo(2);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .listReply("fake-comment", 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(2);
+                                assertThat(listResult.getItems().size()).isEqualTo(2);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("reply-approved");
+                            })
+                    .verifyComplete();
         }
 
         @Test
         @WithMockUser(username = "fake-user")
         void listWhenUserLoggedIn() {
-            commentPublicQueryService.listReply("fake-comment", 1, 10)
-                .as(StepVerifier::create)
-                .consumeNextWith(listResult -> {
-                    assertThat(listResult.getTotal()).isEqualTo(3);
-                    assertThat(listResult.getItems().size()).isEqualTo(3);
-                    assertThat(listResult.getItems().get(0).getMetadata().getName())
-                        .isEqualTo("reply-approved");
-                    assertThat(listResult.getItems().get(1).getMetadata().getName())
-                        .isEqualTo("reply-approved-but-another-owner");
-                    assertThat(listResult.getItems().get(2).getMetadata().getName())
-                        .isEqualTo("reply-not-approved");
-                })
-                .verifyComplete();
+            commentPublicQueryService
+                    .listReply("fake-comment", 1, 10)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            listResult -> {
+                                assertThat(listResult.getTotal()).isEqualTo(3);
+                                assertThat(listResult.getItems().size()).isEqualTo(3);
+                                assertThat(listResult.getItems().get(0).getMetadata().getName())
+                                        .isEqualTo("reply-approved");
+                                assertThat(listResult.getItems().get(1).getMetadata().getName())
+                                        .isEqualTo("reply-approved-but-another-owner");
+                                assertThat(listResult.getItems().get(2).getMetadata().getName())
+                                        .isEqualTo("reply-not-approved");
+                            })
+                    .verifyComplete();
         }
 
         @Test
         void desensitizeReply() throws JSONException {
             var reply = createReply();
-            reply.getSpec().getOwner()
-                .setAnnotations(new HashMap<>() {
-                    {
-                        put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
-                    }
-                });
+            reply.getSpec()
+                    .getOwner()
+                    .setAnnotations(
+                            new HashMap<>() {
+                                {
+                                    put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                                }
+                            });
             reply.getSpec().setIpAddress("127.0.0.1");
 
             var result = commentPublicQueryService.toReplyVo(reply).block();
             result.getMetadata().setCreationTimestamp(null);
             var jsonObject = JsonUtils.jsonToObject(fakeReplyJson(), JsonNode.class);
-            ((ObjectNode) jsonObject.get("owner"))
-                .put("displayName", "已删除用户");
-            JSONAssert.assertEquals(jsonObject.toString(),
-                JsonUtils.objectToJson(result),
-                true);
+            ((ObjectNode) jsonObject.get("owner")).put("displayName", "已删除用户");
+            JSONAssert.assertEquals(jsonObject.toString(), JsonUtils.objectToJson(result), true);
         }
 
         String fakeReplyJson() {
             return """
-                    {
-                        "metadata":{
-                            "name":"fake-reply"
-                        },
-                        "spec":{
-                            "raw":"fake-raw",
-                            "content":"fake-content",
-                            "owner":{
-                                "kind":"User",
-                                "name":"",
-                                "displayName":"fake-display-name",
-                                "annotations":{
-                                    "email-hash": \
-                    "79783106d88279c6c8f94f1f4dec22bdb9f90a8d14c9d6c6628a11430e236cbf"
-                                }
-                            },
-                            "creationTime": "2024-03-11T06:23:42.923294424Z",
-                            "ipAddress":"",
-                            "hidden": false,
-                            "allowNotification": false,
-                            "top": false,
-                            "priority": 0,
-                            "commentName":"fake-comment"
-                        },
+                {
+                    "metadata":{
+                        "name":"fake-reply"
+                    },
+                    "spec":{
+                        "raw":"fake-raw",
+                        "content":"fake-content",
                         "owner":{
                             "kind":"User",
-                            "displayName":"fake-display-name"
+                            "name":"",
+                            "displayName":"fake-display-name",
+                            "annotations":{
+                                "email-hash": \
+                "79783106d88279c6c8f94f1f4dec22bdb9f90a8d14c9d6c6628a11430e236cbf"
+                            }
                         },
-                        "stats":{
-                            "upvote":0
-                        }
+                        "creationTime": "2024-03-11T06:23:42.923294424Z",
+                        "ipAddress":"",
+                        "hidden": false,
+                        "allowNotification": false,
+                        "top": false,
+                        "priority": 0,
+                        "commentName":"fake-comment"
+                    },
+                    "owner":{
+                        "kind":"User",
+                        "displayName":"fake-display-name"
+                    },
+                    "stats":{
+                        "upvote":0
                     }
-                """;
+                }
+            """;
         }
 
         private List<Reply> mockRelies() {
@@ -429,31 +441,29 @@ class CommentPublicQueryServiceIntegrationTest {
             notApprovedWithAnonymous.getSpec().getOwner().setName(AnonymousUserConst.PRINCIPAL);
 
             Reply approvedButAnotherOwner = createReply();
-            approvedButAnotherOwner.getMetadata()
-                .setName("reply-approved-but-another-owner");
+            approvedButAnotherOwner.getMetadata().setName("reply-approved-but-another-owner");
             approvedButAnotherOwner.getSpec().setApproved(true);
             approvedButAnotherOwner.getSpec().getOwner().setName("another");
 
             Reply notApprovedAndAnotherOwner = createReply();
-            notApprovedAndAnotherOwner.getMetadata()
-                .setName("reply-not-approved-and-another");
+            notApprovedAndAnotherOwner.getMetadata().setName("reply-not-approved-and-another");
             notApprovedAndAnotherOwner.getSpec().setApproved(false);
             notApprovedAndAnotherOwner.getSpec().getOwner().setName("another");
 
             Reply notApprovedAndAnotherCommentName = createReply();
-            notApprovedAndAnotherCommentName.getMetadata()
-                .setName("reply-approved-and-another-comment-name");
+            notApprovedAndAnotherCommentName
+                    .getMetadata()
+                    .setName("reply-approved-and-another-comment-name");
             notApprovedAndAnotherCommentName.getSpec().setApproved(false);
             notApprovedAndAnotherCommentName.getSpec().setCommentName("another-fake-comment");
 
             return List.of(
-                notApproved,
-                approved,
-                approvedButAnotherOwner,
-                notApprovedAndAnotherOwner,
-                notApprovedWithAnonymous,
-                notApprovedAndAnotherCommentName
-            );
+                    notApproved,
+                    approved,
+                    approvedButAnotherOwner,
+                    notApprovedAndAnotherOwner,
+                    notApprovedWithAnonymous,
+                    notApprovedAndAnotherCommentName);
         }
 
         Reply createReply() {
@@ -474,39 +484,41 @@ class CommentPublicQueryServiceIntegrationTest {
     }
 
     Comment createComment() {
-        return JsonUtils.jsonToObject("""
-              {
-                "spec": {
-                    "raw": "fake-raw",
-                    "content": "fake-content",
-                    "owner": {
-                        "kind": "User",
-                        "name": "fake-user"
+        return JsonUtils.jsonToObject(
+                """
+                  {
+                    "spec": {
+                        "raw": "fake-raw",
+                        "content": "fake-content",
+                        "owner": {
+                            "kind": "User",
+                            "name": "fake-user"
+                        },
+                        "userAgent": "",
+                        "ipAddress": "",
+                        "approvedTime": "2024-02-28T09:15:16.095Z",
+                        "creationTime": "2024-02-28T06:23:42.923294424Z",
+                        "priority": 0,
+                        "top": false,
+                        "allowNotification": false,
+                        "approved": true,
+                        "hidden": false,
+                        "subjectRef": {
+                            "group": "content.halo.run",
+                            "version": "v1alpha1",
+                            "kind": "SinglePage",
+                            "name": "67"
+                        },
+                        "lastReadTime": "2024-02-29T03:39:04.230Z"
                     },
-                    "userAgent": "",
-                    "ipAddress": "",
-                    "approvedTime": "2024-02-28T09:15:16.095Z",
-                    "creationTime": "2024-02-28T06:23:42.923294424Z",
-                    "priority": 0,
-                    "top": false,
-                    "allowNotification": false,
-                    "approved": true,
-                    "hidden": false,
-                    "subjectRef": {
-                        "group": "content.halo.run",
-                        "version": "v1alpha1",
-                        "kind": "SinglePage",
-                        "name": "67"
-                    },
-                    "lastReadTime": "2024-02-29T03:39:04.230Z"
-                },
-                "apiVersion": "content.halo.run/v1alpha1",
-                "kind": "Comment",
-                "metadata": {
-                    "name": "fake-comment",
-                    "creationTimestamp": "2024-02-28T06:23:42.923439037Z"
+                    "apiVersion": "content.halo.run/v1alpha1",
+                    "kind": "Comment",
+                    "metadata": {
+                        "name": "fake-comment",
+                        "creationTimestamp": "2024-02-28T06:23:42.923439037Z"
+                    }
                 }
-            }
-            """, Comment.class);
+                """,
+                Comment.class);
     }
 }

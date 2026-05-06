@@ -23,16 +23,18 @@ class WebExchangeMatchersTest {
         assertion(Set.of(APPLICATION_JSON), Set.of(APPLICATION_JSON, TEXT_HTML), true);
     }
 
-    void assertion(Set<MediaType> matchingMediaTypes,
-        Set<MediaType> acceptMediaTypes,
-        boolean expectMatch) {
+    void assertion(
+            Set<MediaType> matchingMediaTypes,
+            Set<MediaType> acceptMediaTypes,
+            boolean expectMatch) {
         var matcher = ignoringMediaTypeAll(matchingMediaTypes.toArray(new MediaType[0]));
-        MockServerHttpRequest request = MockServerHttpRequest.get("/fake")
-            .accept(acceptMediaTypes.toArray(new MediaType[0]))
-            .build();
+        MockServerHttpRequest request =
+                MockServerHttpRequest.get("/fake")
+                        .accept(acceptMediaTypes.toArray(new MediaType[0]))
+                        .build();
         var webExchange = MockServerWebExchange.from(request);
         StepVerifier.create(matcher.matches(webExchange))
-            .consumeNextWith(matchResult -> assertEquals(expectMatch, matchResult.isMatch()))
-            .verifyComplete();
+                .consumeNextWith(matchResult -> assertEquals(expectMatch, matchResult.isMatch()))
+                .verifyComplete();
     }
 }

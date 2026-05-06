@@ -24,14 +24,11 @@ import run.halo.app.infra.SystemConfigFetcher;
 @ExtendWith(MockitoExtension.class)
 class TagPermalinkPolicyTest {
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
     private TagPermalinkPolicy tagPermalinkPolicy;
 

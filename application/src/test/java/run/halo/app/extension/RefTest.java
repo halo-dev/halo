@@ -17,9 +17,11 @@ class RefTest {
         fake.setMetadata(metadata);
         assertTrue(Ref.groupKindEquals(Ref.of(fake), fromExtension(fake.getClass())));
         // has different version
-        assertTrue(Ref.groupKindEquals(Ref.of(fake),
-            fromAPIVersionAndKind("fake.halo.run/v11111111111", "Fake")));
-        assertFalse(Ref.groupKindEquals(Ref.of(fake),
-            fromAPIVersionAndKind("fake.halo.run/v1alpha1", "NotFake")));
+        assertTrue(
+                Ref.groupKindEquals(
+                        Ref.of(fake), fromAPIVersionAndKind("fake.halo.run/v11111111111", "Fake")));
+        assertFalse(
+                Ref.groupKindEquals(
+                        Ref.of(fake), fromAPIVersionAndKind("fake.halo.run/v1alpha1", "NotFake")));
     }
 }

@@ -41,18 +41,13 @@ import run.halo.app.infra.utils.JsonUtils;
 @ExtendWith(MockitoExtension.class)
 class ExtensionResourceInitializerTest {
 
-    @Mock
-    ReactiveExtensionClient extensionClient;
-    @Mock
-    HaloProperties haloProperties;
-    @Mock
-    ApplicationStartedEvent applicationStartedEvent;
+    @Mock ReactiveExtensionClient extensionClient;
+    @Mock HaloProperties haloProperties;
+    @Mock ApplicationStartedEvent applicationStartedEvent;
 
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+    @Mock ApplicationEventPublisher eventPublisher;
 
-    @InjectMocks
-    ExtensionResourceInitializer extensionResourceInitializer;
+    @InjectMocks ExtensionResourceInitializer extensionResourceInitializer;
 
     List<Path> dirsToClean;
 
@@ -63,8 +58,10 @@ class ExtensionResourceInitializerTest {
         Path tempDirectory = Files.createTempDirectory("extension-resource-initializer-test");
         dirsToClean.add(tempDirectory);
         Path multiDirectory =
-            Files.createDirectories(tempDirectory.resolve("a").resolve("b").resolve("c"));
-        Files.writeString(tempDirectory.resolve("hello.yml"), """
+                Files.createDirectories(tempDirectory.resolve("a").resolve("b").resolve("c"));
+        Files.writeString(
+                tempDirectory.resolve("hello.yml"),
+                """
                 kind: FakeExtension
                 apiVersion: v1
                 metadata:
@@ -72,14 +69,18 @@ class ExtensionResourceInitializerTest {
                 spec:
                   hello: world
                 """,
-            StandardCharsets.UTF_8);
+                StandardCharsets.UTF_8);
 
-        Files.writeString(multiDirectory.getParent().resolve("fake-1.txt"), """
+        Files.writeString(
+                multiDirectory.getParent().resolve("fake-1.txt"),
+                """
                 kind: FakeExtension
                 name: fake-extension
                 """,
-            StandardCharsets.UTF_8);
-        Files.writeString(multiDirectory.resolve("fake.yaml"), """
+                StandardCharsets.UTF_8);
+        Files.writeString(
+                multiDirectory.resolve("fake.yaml"),
+                """
                 kind: FakeExtension
                 apiVersion: v1
                 metadata:
@@ -87,13 +88,15 @@ class ExtensionResourceInitializerTest {
                 spec:
                   hello: world
                 """,
-            StandardCharsets.UTF_8);
+                StandardCharsets.UTF_8);
 
         // test file in directory
         Path secondTempDir = Files.createTempDirectory("extension-resource-file-test");
         dirsToClean.add(secondTempDir);
         Path filePath = secondTempDir.resolve("good.yml");
-        Files.writeString(filePath, """
+        Files.writeString(
+                filePath,
+                """
                 kind: FakeExtension
                 apiVersion: v1
                 metadata:
@@ -101,12 +104,14 @@ class ExtensionResourceInitializerTest {
                 spec:
                   key: value
                 """,
-            StandardCharsets.UTF_8);
+                StandardCharsets.UTF_8);
 
         when(haloProperties.getInitialExtensionLocations())
-            .thenReturn(Set.of("file:" + tempDirectory + "/**/*.yaml",
-                "file:" + tempDirectory + "/**/*.yml",
-                "file:" + filePath));
+                .thenReturn(
+                        Set.of(
+                                "file:" + tempDirectory + "/**/*.yaml",
+                                "file:" + tempDirectory + "/**/*.yml",
+                                "file:" + filePath));
     }
 
     @AfterEach
@@ -123,8 +128,7 @@ class ExtensionResourceInitializerTest {
         when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
         var argumentCaptor = ArgumentCaptor.forClass(Unstructured.class);
 
-        when(extensionClient.fetch(any(GroupVersionKind.class), any()))
-            .thenReturn(Mono.empty());
+        when(extensionClient.fetch(any(GroupVersionKind.class), any())).thenReturn(Mono.empty());
         when(extensionClient.create(any())).thenReturn(Mono.empty());
 
         extensionResourceInitializer.start();
@@ -134,39 +138,42 @@ class ExtensionResourceInitializerTest {
         List<Unstructured> values = argumentCaptor.getAllValues();
         assertThat(values).isNotNull();
         assertThat(values).hasSize(3);
-        JSONAssert.assertEquals("""
-            [
-                 {
-                     "kind": "FakeExtension",
-                     "apiVersion": "v1",
-                     "metadata": {
-                         "name": "config-file-is-ok"
+        JSONAssert.assertEquals(
+                """
+                [
+                     {
+                         "kind": "FakeExtension",
+                         "apiVersion": "v1",
+                         "metadata": {
+                             "name": "config-file-is-ok"
+                         },
+                         "spec": {
+                             "key": "value"
+                         }
                      },
-                     "spec": {
-                         "key": "value"
-                     }
-                 },
-                 {
-                     "kind": "FakeExtension",
-                     "apiVersion": "v1",
-                     "metadata": {
-                         "name": "fake-extension"
+                     {
+                         "kind": "FakeExtension",
+                         "apiVersion": "v1",
+                         "metadata": {
+                             "name": "fake-extension"
+                         },
+                         "spec": {
+                             "hello": "world"
+                         }
                      },
-                     "spec": {
-                         "hello": "world"
+                     {
+                         "kind": "FakeExtension",
+                         "apiVersion": "v1",
+                         "metadata": {
+                             "name": "fake-extension"
+                         },
+                         "spec": {
+                             "hello": "world"
+                         }
                      }
-                 },
-                 {
-                     "kind": "FakeExtension",
-                     "apiVersion": "v1",
-                     "metadata": {
-                         "name": "fake-extension"
-                     },
-                     "spec": {
-                         "hello": "world"
-                     }
-                 }
-            ]
-            """, JsonUtils.objectToJson(values), false);
+                ]
+                """,
+                JsonUtils.objectToJson(values),
+                false);
     }
 }

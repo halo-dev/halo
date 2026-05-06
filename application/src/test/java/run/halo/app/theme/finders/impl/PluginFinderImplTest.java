@@ -27,11 +27,9 @@ import org.pf4j.PluginWrapper;
 @ExtendWith(MockitoExtension.class)
 class PluginFinderImplTest {
 
-    @Mock
-    private PluginManager haloPluginManager;
+    @Mock private PluginManager haloPluginManager;
 
-    @InjectMocks
-    private PluginFinderImpl pluginFinder;
+    @InjectMocks private PluginFinderImpl pluginFinder;
 
     @Test
     void available() {
@@ -41,8 +39,7 @@ class PluginFinderImplTest {
         assertThat(available).isFalse();
 
         PluginWrapper mockPluginWrapper = Mockito.mock(PluginWrapper.class);
-        when(haloPluginManager.getPlugin(eq("fake-plugin")))
-            .thenReturn(mockPluginWrapper);
+        when(haloPluginManager.getPlugin(eq("fake-plugin"))).thenReturn(mockPluginWrapper);
 
         when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.RESOLVED);
         available = pluginFinder.available("fake-plugin");
@@ -58,14 +55,13 @@ class PluginFinderImplTest {
         when(haloPluginManager.getVersionManager()).thenReturn(new DefaultVersionManager());
 
         assertThatThrownBy(() -> pluginFinder.available("fake-plugin", null))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         boolean available = pluginFinder.available("fake-plugin", "1.0.0");
         assertThat(available).isFalse();
 
         PluginWrapper mockPluginWrapper = Mockito.mock(PluginWrapper.class);
-        when(haloPluginManager.getPlugin(eq("fake-plugin")))
-            .thenReturn(mockPluginWrapper);
+        when(haloPluginManager.getPlugin(eq("fake-plugin"))).thenReturn(mockPluginWrapper);
 
         when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
         var descriptor = mock(PluginDescriptor.class);

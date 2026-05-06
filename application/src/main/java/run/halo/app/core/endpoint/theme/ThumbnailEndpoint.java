@@ -40,77 +40,87 @@ public class ThumbnailEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "ThumbnailV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("/thumbnails/-/via-uri", this::getThumbnailByUri, builder -> {
-                builder.operationId("GetThumbnailByUri")
-                    .description("Get thumbnail by URI")
-                    .tag(tag)
-                    .response(responseBuilder().implementation(Resource.class))
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.QUERY)
-                        .name("uri")
-                        .description("The URI of the image")
-                        .required(true)
-                    )
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.QUERY)
-                        .name("size")
-
-                        .implementation(ThumbnailSize.class)
-                        .description("The size of the thumbnail")
-                        .required(true)
-                    )
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.QUERY)
-                        .name("width")
-                        .schema(Builder.schemaBuilder()
-                            .type("integer")
-                            .allowableValues(Arrays.stream(ThumbnailSize.allowedWidths())
-                                .map(String::valueOf)
-                                .toArray(String[]::new)
-                            )
-                        )
-                        .description("""
-                            The width of the thumbnail, if 'size' is not provided, this \
-                            parameter will be used to determine the size\
-                            """)
-                        .required(false)
-                    );
-            })
-            .build();
+                .GET(
+                        "/thumbnails/-/via-uri",
+                        this::getThumbnailByUri,
+                        builder -> {
+                            builder.operationId("GetThumbnailByUri")
+                                    .description("Get thumbnail by URI")
+                                    .tag(tag)
+                                    .response(responseBuilder().implementation(Resource.class))
+                                    .parameter(
+                                            parameterBuilder()
+                                                    .in(ParameterIn.QUERY)
+                                                    .name("uri")
+                                                    .description("The URI of the image")
+                                                    .required(true))
+                                    .parameter(
+                                            parameterBuilder()
+                                                    .in(ParameterIn.QUERY)
+                                                    .name("size")
+                                                    .implementation(ThumbnailSize.class)
+                                                    .description("The size of the thumbnail")
+                                                    .required(true))
+                                    .parameter(
+                                            parameterBuilder()
+                                                    .in(ParameterIn.QUERY)
+                                                    .name("width")
+                                                    .schema(
+                                                            Builder.schemaBuilder()
+                                                                    .type("integer")
+                                                                    .allowableValues(
+                                                                            Arrays.stream(
+                                                                                            ThumbnailSize
+                                                                                                    .allowedWidths())
+                                                                                    .map(
+                                                                                            String
+                                                                                                    ::valueOf)
+                                                                                    .toArray(
+                                                                                            String[]
+                                                                                                    ::new)))
+                                                    .description(
+                                                            """
+                                                            The width of the thumbnail, if 'size' is not provided, this \
+                                                            parameter will be used to determine the size\
+                                                            """)
+                                                    .required(false));
+                        })
+                .build();
     }
 
     private Mono<ServerResponse> getThumbnailByUri(ServerRequest request) {
-        var uri = request.queryParam("uri")
-            .filter(StringUtils::isNotBlank)
-            .map(HaloUtils::safeToUri);
+        var uri =
+                request.queryParam("uri").filter(StringUtils::isNotBlank).map(HaloUtils::safeToUri);
         if (uri.isEmpty()) {
             return Mono.error(
-                new ServerWebInputException("Required parameter 'uri' is missing or invalid")
-            );
+                    new ServerWebInputException("Required parameter 'uri' is missing or invalid"));
         }
-        var size = request.queryParam("size")
-            .filter(StringUtils::isNotBlank)
-            .flatMap(ThumbnailSize::optionalValueOf)
-            .or(() -> request.queryParam("width")
-                .filter(StringUtils::isNotBlank)
-                .map(ThumbnailSize::fromWidth)
-            );
+        var size =
+                request.queryParam("size")
+                        .filter(StringUtils::isNotBlank)
+                        .flatMap(ThumbnailSize::optionalValueOf)
+                        .or(
+                                () ->
+                                        request.queryParam("width")
+                                                .filter(StringUtils::isNotBlank)
+                                                .map(ThumbnailSize::fromWidth));
         if (size.isEmpty()) {
-            return Mono.error(new ServerWebInputException(
-                "Required parameter 'size' or 'width' is missing or invalid"
-            ));
+            return Mono.error(
+                    new ServerWebInputException(
+                            "Required parameter 'size' or 'width' is missing or invalid"));
         }
-        return thumbnailService.get(uri.get(), size.get())
-            .defaultIfEmpty(uri.get())
-            .flatMap(thumbnailLink -> ServerResponse.status(HttpStatus.FOUND)
-                .location(thumbnailLink)
-                .build()
-            );
+        return thumbnailService
+                .get(uri.get(), size.get())
+                .defaultIfEmpty(uri.get())
+                .flatMap(
+                        thumbnailLink ->
+                                ServerResponse.status(HttpStatus.FOUND)
+                                        .location(thumbnailLink)
+                                        .build());
     }
 
     @Override
     public GroupVersion groupVersion() {
         return new GroupVersion("api.storage.halo.run", "v1alpha1");
     }
-
 }

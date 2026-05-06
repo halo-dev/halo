@@ -30,42 +30,48 @@ import run.halo.app.infra.utils.JsonUtils;
 @ExtendWith(MockitoExtension.class)
 class UserNotificationPreferenceServiceImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private UserNotificationPreferenceServiceImpl userNotificationPreferenceService;
+    @InjectMocks private UserNotificationPreferenceServiceImpl userNotificationPreferenceService;
 
     @Test
     void getByUser() {
         var configMap = new ConfigMap();
-        configMap.setData(Map.of("notification",
-            "{\"reasonTypeNotifier\":{\"comment\":{\"notifiers\":[\"test-notifier\"]}}}"));
+        configMap.setData(
+                Map.of(
+                        "notification",
+                        "{\"reasonTypeNotifier\":{\"comment\":{\"notifiers\":[\"test-notifier\"]}}}"));
         when(client.fetch(ConfigMap.class, "user-preferences-guqing"))
-            .thenReturn(Mono.just(configMap));
-        userNotificationPreferenceService.getByUser("guqing")
-            .as(StepVerifier::create)
-            .consumeNextWith(preference -> {
-                assertThat(preference.getReasonTypeNotifier()).isNotNull();
-                assertThat(preference.getReasonTypeNotifier().get("comment")).isNotNull();
-                assertThat(preference.getReasonTypeNotifier().get("comment").getNotifiers())
-                    .containsExactly("test-notifier");
-            })
-            .verifyComplete();
+                .thenReturn(Mono.just(configMap));
+        userNotificationPreferenceService
+                .getByUser("guqing")
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        preference -> {
+                            assertThat(preference.getReasonTypeNotifier()).isNotNull();
+                            assertThat(preference.getReasonTypeNotifier().get("comment"))
+                                    .isNotNull();
+                            assertThat(
+                                            preference
+                                                    .getReasonTypeNotifier()
+                                                    .get("comment")
+                                                    .getNotifiers())
+                                    .containsExactly("test-notifier");
+                        })
+                .verifyComplete();
 
         verify(client).fetch(ConfigMap.class, "user-preferences-guqing");
     }
 
     @Test
     void getByUserWhenNotFound() {
-        when(client.fetch(ConfigMap.class, "user-preferences-guqing"))
-            .thenReturn(Mono.empty());
-        userNotificationPreferenceService.getByUser("guqing")
-            .as(StepVerifier::create)
-            .consumeNextWith(preference ->
-                assertThat(preference.getReasonTypeNotifier()).isNotNull()
-            )
-            .verifyComplete();
+        when(client.fetch(ConfigMap.class, "user-preferences-guqing")).thenReturn(Mono.empty());
+        userNotificationPreferenceService
+                .getByUser("guqing")
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        preference -> assertThat(preference.getReasonTypeNotifier()).isNotNull())
+                .verifyComplete();
 
         verify(client).fetch(ConfigMap.class, "user-preferences-guqing");
     }
@@ -73,17 +79,16 @@ class UserNotificationPreferenceServiceImplTest {
     @Test
     void getByUserWhenConfigDataNotFound() {
         when(client.fetch(ConfigMap.class, "user-preferences-guqing"))
-            .thenReturn(Mono.just(new ConfigMap()));
-        userNotificationPreferenceService.getByUser("guqing")
-            .as(StepVerifier::create)
-            .consumeNextWith(preference ->
-                assertThat(preference.getReasonTypeNotifier()).isNotNull()
-            )
-            .verifyComplete();
+                .thenReturn(Mono.just(new ConfigMap()));
+        userNotificationPreferenceService
+                .getByUser("guqing")
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        preference -> assertThat(preference.getReasonTypeNotifier()).isNotNull())
+                .verifyComplete();
 
         verify(client).fetch(ConfigMap.class, "user-preferences-guqing");
     }
-
 
     @Nested
     class UserNotificationPreferenceTest {
@@ -94,27 +99,30 @@ class UserNotificationPreferenceServiceImplTest {
             preference.getReasonTypeNotifier().put("comment", null);
             // key doesn't exist
             assertThat(preference.getReasonTypeNotifier().getNotifiers("comment"))
-                .containsExactly("default-email-notifier");
+                    .containsExactly("default-email-notifier");
 
             // key exists but the value is null
-            preference.getReasonTypeNotifier()
-                .put("comment", new UserNotificationPreference.NotifierSetting());
+            preference
+                    .getReasonTypeNotifier()
+                    .put("comment", new UserNotificationPreference.NotifierSetting());
             assertThat(preference.getReasonTypeNotifier().getNotifiers("comment")).isEmpty();
 
             // key exists and the value is not null
             preference.getReasonTypeNotifier().get("comment").setNotifiers(Set.of("test-notifier"));
             assertThat(preference.getReasonTypeNotifier().getNotifiers("comment"))
-                .containsExactly("test-notifier");
+                    .containsExactly("test-notifier");
         }
 
         @Test
         void toJson() throws JSONException {
             var preference = new UserNotificationPreference();
-            preference.getReasonTypeNotifier().put("comment",
-                new UserNotificationPreference.NotifierSetting());
+            preference
+                    .getReasonTypeNotifier()
+                    .put("comment", new UserNotificationPreference.NotifierSetting());
             preference.getReasonTypeNotifier().get("comment").setNotifiers(Set.of("test-notifier"));
 
-            JSONAssert.assertEquals("""
+            JSONAssert.assertEquals(
+                    """
                     {
                       "reasonTypeNotifier": {
                         "comment": {
@@ -125,15 +133,15 @@ class UserNotificationPreferenceServiceImplTest {
                       }
                     }
                     """,
-                JsonUtils.objectToJson(preference),
-                true);
+                    JsonUtils.objectToJson(preference),
+                    true);
         }
     }
 
     @Test
     void buildUserPreferenceConfigMapName() {
-        var preferenceConfigMapName = UserNotificationPreferenceServiceImpl
-            .buildUserPreferenceConfigMapName("guqing");
+        var preferenceConfigMapName =
+                UserNotificationPreferenceServiceImpl.buildUserPreferenceConfigMapName("guqing");
         assertEquals("user-preferences-guqing", preferenceConfigMapName);
     }
 }

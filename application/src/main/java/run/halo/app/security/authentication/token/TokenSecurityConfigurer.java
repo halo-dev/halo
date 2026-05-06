@@ -40,5 +40,4 @@ class TokenSecurityConfigurer implements SecurityConfigurer {
         filter.setAuthenticationFailureHandler(failureHandler);
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
-
 }

@@ -49,11 +49,13 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private Scheduler scheduler;
 
-    GcReconciler(ExtensionClient client,
-        ReactiveExtensionStoreClient storeClient,
-        ExtensionConverter converter,
-        SchemeManager schemeManager,
-        IndexEngine indexEngine, ReactiveTransactionManager transactionManager) {
+    GcReconciler(
+            ExtensionClient client,
+            ReactiveExtensionStoreClient storeClient,
+            ExtensionConverter converter,
+            SchemeManager schemeManager,
+            IndexEngine indexEngine,
+            ReactiveTransactionManager transactionManager) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
@@ -70,8 +72,8 @@ class GcReconciler implements Reconciler<GcRequest> {
         log.debug("Extension {} is being deleted", request);
         var scheme = schemeManager.get(request.gvk());
         client.fetch(scheme.type(), request.name())
-            .filter(deletable())
-            .ifPresent(extension -> doDelete(extension).blockOptional(Duration.ofSeconds(30)));
+                .filter(deletable())
+                .ifPresent(extension -> doDelete(extension).blockOptional(Duration.ofSeconds(30)));
         return null;
     }
 
@@ -79,28 +81,33 @@ class GcReconciler implements Reconciler<GcRequest> {
         var extensionStore = converter.convertTo(extension);
         var tx = TransactionalOperator.create(transactionManager);
 
-        return storeClient.delete(extensionStore.getName(), extensionStore.getVersion())
-            .flatMap(deleted -> Mono.fromRunnable(() -> indexEngine.delete(List.of(extension)))
-                .subscribeOn(this.scheduler)
-            )
-            .as(tx::transactional)
-            .then()
-            .doOnSuccess(ignored ->
-                log.info("Extension {}/{} was deleted", extension.groupVersionKind(), extension)
-            );
+        return storeClient
+                .delete(extensionStore.getName(), extensionStore.getVersion())
+                .flatMap(
+                        deleted ->
+                                Mono.fromRunnable(() -> indexEngine.delete(List.of(extension)))
+                                        .subscribeOn(this.scheduler))
+                .as(tx::transactional)
+                .then()
+                .doOnSuccess(
+                        ignored ->
+                                log.info(
+                                        "Extension {}/{} was deleted",
+                                        extension.groupVersionKind(),
+                                        extension));
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            "garbage-collector-controller",
-            this,
-            queue,
-            synchronizer,
-            Duration.ofMillis(500),
-            Duration.ofSeconds(1000),
-            // TODO Make it configurable
-            10);
+                "garbage-collector-controller",
+                this,
+                queue,
+                synchronizer,
+                Duration.ofMillis(500),
+                Duration.ofSeconds(1000),
+                // TODO Make it configurable
+                10);
     }
 
     @EventListener
@@ -109,7 +116,8 @@ class GcReconciler implements Reconciler<GcRequest> {
     }
 
     private Predicate<Extension> deletable() {
-        return extension -> CollectionUtils.isEmpty(extension.getMetadata().getFinalizers())
-            && extension.getMetadata().getDeletionTimestamp() != null;
+        return extension ->
+                CollectionUtils.isEmpty(extension.getMetadata().getFinalizers())
+                        && extension.getMetadata().getDeletionTimestamp() != null;
     }
 }

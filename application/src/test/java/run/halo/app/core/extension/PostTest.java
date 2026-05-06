@@ -14,11 +14,13 @@ class PostTest {
 
     @Test
     void staticIsPublishedTest() {
-        var test = (Function<Map<String, String>, Boolean>) (labels) -> {
-            var metadata = Mockito.mock(MetadataOperator.class);
-            when(metadata.getLabels()).thenReturn(labels);
-            return Post.isPublished(metadata);
-        };
+        var test =
+                (Function<Map<String, String>, Boolean>)
+                        (labels) -> {
+                            var metadata = Mockito.mock(MetadataOperator.class);
+                            when(metadata.getLabels()).thenReturn(labels);
+                            return Post.isPublished(metadata);
+                        };
         assertEquals(false, test.apply(Map.of()));
         assertEquals(false, test.apply(Map.of("content.halo.run/published", "false")));
         assertEquals(false, test.apply(Map.of("content.halo.run/published", "False")));

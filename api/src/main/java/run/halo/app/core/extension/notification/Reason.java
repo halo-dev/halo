@@ -24,12 +24,15 @@ import run.halo.app.notification.ReasonAttributes;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Reason", plural =
-    "reasons", singular = "reason")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "Reason",
+        plural = "reasons",
+        singular = "reason")
 public class Reason extends AbstractExtension {
 
-    @Schema
-    private Spec spec;
+    @Schema private Spec spec;
 
     @Data
     @Accessors(chain = true)
@@ -44,8 +47,10 @@ public class Reason extends AbstractExtension {
         @Schema(requiredMode = REQUIRED)
         private String author;
 
-        @Schema(implementation = ReasonAttributes.class, requiredMode = NOT_REQUIRED,
-            description = "Attributes used to transfer data")
+        @Schema(
+                implementation = ReasonAttributes.class,
+                requiredMode = NOT_REQUIRED,
+                description = "Attributes used to transfer data")
         private ReasonAttributes attributes;
     }
 

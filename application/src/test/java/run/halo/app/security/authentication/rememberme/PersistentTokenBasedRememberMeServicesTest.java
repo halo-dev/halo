@@ -46,23 +46,17 @@ import run.halo.app.security.device.DeviceService;
  */
 @ExtendWith(MockitoExtension.class)
 class PersistentTokenBasedRememberMeServicesTest {
-    @Mock
-    private CookieSignatureKeyResolver cookieSignatureKeyResolver;
+    @Mock private CookieSignatureKeyResolver cookieSignatureKeyResolver;
 
-    @Mock
-    private ReactiveUserDetailsService userDetailsService;
+    @Mock private ReactiveUserDetailsService userDetailsService;
 
-    @Mock
-    private RememberMeCookieResolver rememberMeCookieResolver;
+    @Mock private RememberMeCookieResolver rememberMeCookieResolver;
 
-    @Mock
-    private PersistentRememberMeTokenRepository tokenRepository;
+    @Mock private PersistentRememberMeTokenRepository tokenRepository;
 
-    @Mock
-    private DeviceService deviceService;
+    @Mock private DeviceService deviceService;
 
-    @Mock
-    private LoginParameterRequestCache parameterRequestCache;
+    @Mock private LoginParameterRequestCache parameterRequestCache;
 
     @InjectMocks
     private PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
@@ -72,15 +66,14 @@ class PersistentTokenBasedRememberMeServicesTest {
     @BeforeEach
     void setUp() {
         persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
-        lenient().when(rememberMeCookieResolver.getCookieMaxAge())
-            .thenReturn(Duration.ofDays(14));
+        lenient().when(rememberMeCookieResolver.getCookieMaxAge()).thenReturn(Duration.ofDays(14));
     }
 
     /**
      * Creates a test RememberMeToken with the given properties.
      */
-    private static RememberMeToken createTestToken(String series, String tokenValue,
-        String username, Instant lastUsed) {
+    private static RememberMeToken createTestToken(
+            String series, String tokenValue, String username, Instant lastUsed) {
         var token = new RememberMeToken();
         token.setMetadata(new Metadata());
         token.getMetadata().setName("test-token-" + series);
@@ -111,24 +104,29 @@ class PersistentTokenBasedRememberMeServicesTest {
         @Test
         void shouldThrowInvalidCookieExceptionWhenCookieTokensLengthIsNot2() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test"},
-                exchange).block())
-                .isInstanceOf(InvalidCookieException.class)
-                .hasMessage("Cookie token did not contain 2 tokens, but contained '[test]'");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(new String[] {"test"}, exchange)
+                                            .block())
+                    .isInstanceOf(InvalidCookieException.class)
+                    .hasMessage("Cookie token did not contain 2 tokens, but contained '[test]'");
         }
 
         @Test
         void shouldThrowRememberMeAuthenticationExceptionWhenNoPersistentTokenFound() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
-            when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.empty());
+            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.empty());
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "test-token"},
-                exchange).block()
-            ).isInstanceOf(RememberMeAuthenticationException.class)
-                .hasMessage("No persistent token found for series id: test-series");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "test-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(RememberMeAuthenticationException.class)
+                    .hasMessage("No persistent token found for series id: test-series");
         }
 
         @Test
@@ -136,15 +134,18 @@ class PersistentTokenBasedRememberMeServicesTest {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var storedToken = createTestToken("test-series", "stored-token", "test-user", NOW);
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.empty());
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "stored-token"},
-                exchange).block()
-            ).isInstanceOf(RememberMeAuthenticationException.class)
-                .hasMessage("Unable to determine device for remember-me authentication");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "stored-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(RememberMeAuthenticationException.class)
+                    .hasMessage("Unable to determine device for remember-me authentication");
         }
 
         @Test
@@ -153,15 +154,18 @@ class PersistentTokenBasedRememberMeServicesTest {
             var storedToken = createTestToken("test-series", "stored-token", "test-user", NOW);
             var device = createTestDevice("different-series");
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "stored-token"},
-                exchange).block()
-            ).isInstanceOf(RememberMeAuthenticationException.class)
-                .hasMessage("Remember-me series ID does not match current device's series ID");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "stored-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(RememberMeAuthenticationException.class)
+                    .hasMessage("Remember-me series ID does not match current device's series ID");
         }
 
         @Test
@@ -169,21 +173,23 @@ class PersistentTokenBasedRememberMeServicesTest {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var lastUsed = NOW.minusSeconds(11);
             var storedToken =
-                createTestToken("test-series", "correct-token", "test-user", lastUsed);
+                    createTestToken("test-series", "correct-token", "test-user", lastUsed);
             storedToken.getSpec().setPreviousTokenValue("previous-token");
             var device = createTestDevice("test-series");
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
-            when(tokenRepository.removeUserTokens(eq("test-user")))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(tokenRepository.removeUserTokens(eq("test-user"))).thenReturn(Mono.empty());
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "wrong-token"},
-                exchange).block()
-            ).isInstanceOf(CookieTheftException.class)
-                .hasMessageContaining("Invalid remember-me token (Series/token) mismatch");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "wrong-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(CookieTheftException.class)
+                    .hasMessageContaining("Invalid remember-me token (Series/token) mismatch");
 
             verify(tokenRepository).removeUserTokens(eq("test-user"));
         }
@@ -195,17 +201,19 @@ class PersistentTokenBasedRememberMeServicesTest {
             storedToken.getSpec().setPreviousTokenValue("different-previous-token");
             var device = createTestDevice("test-series");
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
-            when(tokenRepository.removeUserTokens(eq("test-user")))
-                .thenReturn(Mono.empty());
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(tokenRepository.removeUserTokens(eq("test-user"))).thenReturn(Mono.empty());
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "presented-token"},
-                exchange).block()
-            ).isInstanceOf(CookieTheftException.class)
-                .hasMessageContaining("Invalid remember-me token (Series/token) mismatch");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "presented-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(CookieTheftException.class)
+                    .hasMessageContaining("Invalid remember-me token (Series/token) mismatch");
 
             verify(tokenRepository).removeUserTokens(eq("test-user"));
         }
@@ -216,18 +224,19 @@ class PersistentTokenBasedRememberMeServicesTest {
             var storedToken = createTestToken("test-series", "rotated-token", "test-user", NOW);
             storedToken.getSpec().setPreviousTokenValue("old-token");
             var device = createTestDevice("test-series");
-            var userDetails = User.withUsername("test-user").password("password").roles("USER")
-                .build();
+            var userDetails =
+                    User.withUsername("test-user").password("password").roles("USER").build();
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
             when(userDetailsService.findByUsername(eq("test-user")))
-                .thenReturn(Mono.just(userDetails));
+                    .thenReturn(Mono.just(userDetails));
 
-            var result = persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "old-token"},
-                exchange).block();
+            var result =
+                    persistentTokenBasedRememberMeServices
+                            .processAutoLoginCookie(
+                                    new String[] {"test-series", "old-token"}, exchange)
+                            .block();
 
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
@@ -242,18 +251,20 @@ class PersistentTokenBasedRememberMeServicesTest {
             var storedToken = createTestToken("test-series", "test-token", "test-user", lastUsed);
             var device = createTestDevice("test-series");
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
             // Override the default 14-day max age to a shorter duration
-            when(rememberMeCookieResolver.getCookieMaxAge())
-                .thenReturn(Duration.ofSeconds(60));
+            when(rememberMeCookieResolver.getCookieMaxAge()).thenReturn(Duration.ofSeconds(60));
 
-            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "test-token"},
-                exchange).block()
-            ).isInstanceOf(InvalidCookieException.class)
-                .hasMessage("Remember-me login has expired");
+            assertThatThrownBy(
+                            () ->
+                                    persistentTokenBasedRememberMeServices
+                                            .processAutoLoginCookie(
+                                                    new String[] {"test-series", "test-token"},
+                                                    exchange)
+                                            .block())
+                    .isInstanceOf(InvalidCookieException.class)
+                    .hasMessage("Remember-me login has expired");
         }
 
         @Test
@@ -261,20 +272,21 @@ class PersistentTokenBasedRememberMeServicesTest {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var storedToken = createTestToken("test-series", "test-token", "test-user", NOW);
             var device = createTestDevice("test-series");
-            var userDetails = User.withUsername("test-user").password("password").roles("USER")
-                .build();
+            var userDetails =
+                    User.withUsername("test-user").password("password").roles("USER").build();
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
             when(tokenRepository.updateToken(any(RememberMeToken.class)))
-                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+                    .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
             when(userDetailsService.findByUsername(eq("test-user")))
-                .thenReturn(Mono.just(userDetails));
+                    .thenReturn(Mono.just(userDetails));
 
-            var result = persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "test-token"},
-                exchange).block();
+            var result =
+                    persistentTokenBasedRememberMeServices
+                            .processAutoLoginCookie(
+                                    new String[] {"test-series", "test-token"}, exchange)
+                            .block();
 
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
@@ -288,20 +300,22 @@ class PersistentTokenBasedRememberMeServicesTest {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var storedToken = createTestToken("test-series", "test-token", "test-user", NOW);
             var device = createTestDevice("test-series");
-            var userDetails = User.withUsername("test-user").password("password").roles("USER")
-                .build();
+            var userDetails =
+                    User.withUsername("test-user").password("password").roles("USER").build();
             when(tokenRepository.getTokenForSeries(eq("test-series")))
-                .thenReturn(Mono.just(storedToken));
-            when(deviceService.resolveCurrentDevice(exchange))
-                .thenReturn(Mono.just(device));
+                    .thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
             when(tokenRepository.updateToken(any(RememberMeToken.class)))
-                .thenReturn(Mono.error(new OptimisticLockingFailureException("concurrent update")));
+                    .thenReturn(
+                            Mono.error(new OptimisticLockingFailureException("concurrent update")));
             when(userDetailsService.findByUsername(eq("test-user")))
-                .thenReturn(Mono.just(userDetails));
+                    .thenReturn(Mono.just(userDetails));
 
-            var result = persistentTokenBasedRememberMeServices.processAutoLoginCookie(
-                new String[] {"test-series", "test-token"},
-                exchange).block();
+            var result =
+                    persistentTokenBasedRememberMeServices
+                            .processAutoLoginCookie(
+                                    new String[] {"test-series", "test-token"}, exchange)
+                            .block();
 
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
@@ -317,7 +331,7 @@ class PersistentTokenBasedRememberMeServicesTest {
         var authentication = new UsernamePasswordAuthenticationToken("test", "test");
 
         when(tokenRepository.createNewToken(any()))
-            .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+                .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         persistentTokenBasedRememberMeServices.onLoginSuccess(exchange, authentication).block();
 

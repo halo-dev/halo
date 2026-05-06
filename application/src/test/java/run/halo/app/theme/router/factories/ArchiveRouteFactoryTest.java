@@ -19,11 +19,9 @@ import run.halo.app.theme.finders.PostFinder;
  */
 @ExtendWith(MockitoExtension.class)
 class ArchiveRouteFactoryTest extends RouteFactoryTestSuite {
-    @Mock
-    private PostFinder postFinder;
+    @Mock private PostFinder postFinder;
 
-    @InjectMocks
-    private ArchiveRouteFactory archiveRouteFactory;
+    @InjectMocks private ArchiveRouteFactory archiveRouteFactory;
 
     @Test
     void create() {
@@ -31,36 +29,20 @@ class ArchiveRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = archiveRouteFactory.create(prefix);
         WebTestClient client = getWebTestClient(routerFunction);
 
-        client.get()
-            .uri(prefix)
-            .exchange()
-            .expectStatus().isOk();
+        client.get().uri(prefix).exchange().expectStatus().isOk();
+
+        client.get().uri(prefix + "/page/1").exchange().expectStatus().isOk();
+
+        client.get().uri(prefix + "/2022/09").exchange().expectStatus().isOk();
+
+        client.get().uri(prefix + "/2022/08/page/1").exchange().expectStatus().isOk();
 
         client.get()
-            .uri(prefix + "/page/1")
-            .exchange()
-            .expectStatus().isOk();
+                .uri(prefix + "/2022/8/page/1")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.NOT_FOUND);
 
-        client.get()
-            .uri(prefix + "/2022/09")
-            .exchange()
-            .expectStatus().isOk();
-
-        client.get()
-            .uri(prefix + "/2022/08/page/1")
-            .exchange()
-            .expectStatus().isOk();
-
-        client.get()
-            .uri(prefix + "/2022/8/page/1")
-            .exchange()
-            .expectStatus()
-            .isEqualTo(HttpStatus.NOT_FOUND);
-
-        client.get()
-            .uri("/nothing")
-            .exchange()
-            .expectStatus()
-            .isEqualTo(HttpStatus.NOT_FOUND);
+        client.get().uri("/nothing").exchange().expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

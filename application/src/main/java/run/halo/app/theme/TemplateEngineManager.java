@@ -50,10 +50,13 @@ public class TemplateEngineManager {
 
     private final ThemeResolver themeResolver;
 
-    public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
-        ExternalUrlSupplier externalUrlSupplier,
-        PluginManager pluginManager, ObjectProvider<ITemplateResolver> templateResolvers,
-        ObjectProvider<IDialect> dialects, ThemeResolver themeResolver) {
+    public TemplateEngineManager(
+            ThymeleafProperties thymeleafProperties,
+            ExternalUrlSupplier externalUrlSupplier,
+            PluginManager pluginManager,
+            ObjectProvider<ITemplateResolver> templateResolvers,
+            ObjectProvider<IDialect> dialects,
+            ThemeResolver themeResolver) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.pluginManager = pluginManager;
@@ -69,9 +72,10 @@ public class TemplateEngineManager {
     }
 
     public Mono<Void> clearCache(String themeName) {
-        return themeResolver.getThemeContext(themeName)
-            .doOnNext(themeContext -> engineCache.remove(buildCacheKey(themeContext)))
-            .then();
+        return themeResolver
+                .getThemeContext(themeName)
+                .doOnNext(themeContext -> engineCache.remove(buildCacheKey(themeContext)))
+                .then();
     }
 
     /**
@@ -81,8 +85,7 @@ public class TemplateEngineManager {
      * @param active from {@link #context}
      * @param context must not be null
      */
-    private record CacheKey(String name, boolean active, ThemeContext context) {
-    }
+    private record CacheKey(String name, boolean active, ThemeContext context) {}
 
     CacheKey buildCacheKey(ThemeContext context) {
         return new CacheKey(context.getName(), context.isActive(), context);
@@ -94,7 +97,7 @@ public class TemplateEngineManager {
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
         engine.setLinkBuilder(new ThemeLinkBuilder(cacheKey.context(), externalUrlSupplier));
         engine.setRenderHiddenMarkersBeforeCheckboxes(
-            thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
+                thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 
         var mainResolver = haloTemplateResolver();
         mainResolver.setPrefix(cacheKey.context().getPath().resolve("templates") + "/");
@@ -102,12 +105,13 @@ public class TemplateEngineManager {
         var pluginTemplateResolver = createPluginClassloaderTemplateResolver();
         engine.addTemplateResolver(pluginTemplateResolver);
         // replace StandardDialect with SpringStandardDialect
-        engine.setDialect(new SpringStandardDialect() {
-            @Override
-            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
-                return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
-            }
-        });
+        engine.setDialect(
+                new SpringStandardDialect() {
+                    @Override
+                    public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                        return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
+                    }
+                });
         engine.addDialect(new HaloProcessorDialect());
 
         templateResolvers.orderedStream().forEach(engine::addTemplateResolver);
@@ -115,7 +119,7 @@ public class TemplateEngineManager {
         // we collect all template resolvers and add them into composite template resolver
         // to control the resolution flow
         var compositeTemplateResolver =
-            new CompositeTemplateResolver(engine.getTemplateResolvers());
+                new CompositeTemplateResolver(engine.getTemplateResolvers());
         engine.setTemplateResolver(compositeTemplateResolver);
 
         dialects.orderedStream().forEach(engine::addDialect);

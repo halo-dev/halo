@@ -45,76 +45,67 @@ import run.halo.app.theme.finders.CommentPublicQueryService;
  */
 @ExtendWith(MockitoExtension.class)
 class CommentFinderEndpointTest {
-    @Mock
-    private CommentFinder commentFinder;
+    @Mock private CommentFinder commentFinder;
 
-    @Mock
-    private CommentPublicQueryService commentPublicQueryService;
+    @Mock private CommentPublicQueryService commentPublicQueryService;
 
-    @Mock
-    private CommentService commentService;
+    @Mock private CommentService commentService;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @Mock
-    private ReplyService replyService;
+    @Mock private ReplyService replyService;
 
-    @Mock
-    private RateLimiterRegistry rateLimiterRegistry;
+    @Mock private RateLimiterRegistry rateLimiterRegistry;
 
-    @InjectMocks
-    private CommentFinderEndpoint commentFinderEndpoint;
+    @InjectMocks private CommentFinderEndpoint commentFinderEndpoint;
 
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
         lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.empty());
-        webTestClient = WebTestClient
-            .bindToRouterFunction(commentFinderEndpoint.endpoint())
-            .build();
+        webTestClient =
+                WebTestClient.bindToRouterFunction(commentFinderEndpoint.endpoint()).build();
     }
 
     @Test
     void listComments() {
         when(commentPublicQueryService.list(any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
+                .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
 
         Ref ref = new Ref();
         ref.setGroup("content.halo.run");
         ref.setVersion("v1alpha1");
         ref.setKind("Post");
         ref.setName("test");
-        webTestClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/comments")
-                .queryParam("group", ref.getGroup())
-                .queryParam("version", ref.getVersion())
-                .queryParam("kind", ref.getKind())
-                .queryParam("name", ref.getName())
-                .queryParam("page", 1)
-                .queryParam("size", 10)
-                .build())
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .get()
+                .uri(
+                        uriBuilder ->
+                                uriBuilder
+                                        .path("/comments")
+                                        .queryParam("group", ref.getGroup())
+                                        .queryParam("version", ref.getVersion())
+                                        .queryParam("kind", ref.getKind())
+                                        .queryParam("name", ref.getName())
+                                        .queryParam("page", 1)
+                                        .queryParam("size", 10)
+                                        .build())
+                .exchange()
+                .expectStatus()
+                .isOk();
         ArgumentCaptor<Ref> refCaptor = ArgumentCaptor.forClass(Ref.class);
         verify(commentPublicQueryService, times(1))
-            .list(refCaptor.capture(), any(PageRequest.class));
+                .list(refCaptor.capture(), any(PageRequest.class));
         Ref value = refCaptor.getValue();
         assertThat(value).isEqualTo(ref);
     }
 
     @Test
     void getComment() {
-        when(commentPublicQueryService.getByName(any()))
-            .thenReturn(null);
+        when(commentPublicQueryService.getByName(any())).thenReturn(null);
 
-        webTestClient.get()
-            .uri("/comments/test-comment")
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient.get().uri("/comments/test-comment").exchange().expectStatus().isOk();
 
         verify(commentPublicQueryService, times(1)).getByName(eq("test-comment"));
     }
@@ -122,16 +113,20 @@ class CommentFinderEndpointTest {
     @Test
     void listCommentReplies() {
         when(commentPublicQueryService.listReply(any(), anyInt(), anyInt()))
-            .thenReturn(Mono.just(new ListResult<>(2, 20, 0, List.of())));
+                .thenReturn(Mono.just(new ListResult<>(2, 20, 0, List.of())));
 
-        webTestClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/comments/test-comment/reply")
-                .queryParam("page", 2)
-                .queryParam("size", 20)
-                .build())
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .get()
+                .uri(
+                        uriBuilder ->
+                                uriBuilder
+                                        .path("/comments/test-comment/reply")
+                                        .queryParam("page", 2)
+                                        .queryParam("size", 20)
+                                        .build())
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         verify(commentPublicQueryService, times(1)).listReply(eq("test-comment"), eq(2), eq(20));
     }
@@ -140,13 +135,14 @@ class CommentFinderEndpointTest {
     void createComment() {
         when(commentService.create(any())).thenReturn(Mono.empty());
 
-        RateLimiterConfig config = RateLimiterConfig.custom()
-            .limitForPeriod(10)
-            .limitRefreshPeriod(Duration.ofSeconds(1))
-            .timeoutDuration(Duration.ofSeconds(10))
-            .build();
-        RateLimiter rateLimiter = RateLimiter.of("comment-creation-from-ip-" + "0:0:0:0:0:0:0:0",
-            config);
+        RateLimiterConfig config =
+                RateLimiterConfig.custom()
+                        .limitForPeriod(10)
+                        .limitRefreshPeriod(Duration.ofSeconds(1))
+                        .timeoutDuration(Duration.ofSeconds(10))
+                        .build();
+        RateLimiter rateLimiter =
+                RateLimiter.of("comment-creation-from-ip-" + "0:0:0:0:0:0:0:0", config);
         when(rateLimiterRegistry.rateLimiter(anyString(), anyString())).thenReturn(rateLimiter);
 
         final CommentRequest commentRequest = new CommentRequest();
@@ -159,12 +155,13 @@ class CommentFinderEndpointTest {
         commentRequest.setContent("content");
         commentRequest.setRaw("raw");
         commentRequest.setAllowNotification(false);
-        webTestClient.post()
-            .uri("/comments")
-            .bodyValue(commentRequest)
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .post()
+                .uri("/comments")
+                .bodyValue(commentRequest)
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         verify(commentService, times(1)).create(captor.capture());
@@ -183,17 +180,18 @@ class CommentFinderEndpointTest {
         replyRequest.setContent("content");
         replyRequest.setAllowNotification(true);
 
-        when(rateLimiterRegistry.rateLimiter("comment-creation-from-ip-127.0.0.1",
-            "comment-creation"))
-            .thenReturn(RateLimiter.ofDefaults("comment-creation"));
+        when(rateLimiterRegistry.rateLimiter(
+                        "comment-creation-from-ip-127.0.0.1", "comment-creation"))
+                .thenReturn(RateLimiter.ofDefaults("comment-creation"));
 
-        webTestClient.post()
-            .uri("/comments/test-comment/reply")
-            .header("X-Forwarded-For", "127.0.0.1")
-            .bodyValue(replyRequest)
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webTestClient
+                .post()
+                .uri("/comments/test-comment/reply")
+                .header("X-Forwarded-For", "127.0.0.1")
+                .bodyValue(replyRequest)
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         ArgumentCaptor<Reply> captor = ArgumentCaptor.forClass(Reply.class);
         verify(replyService, times(1)).create(eq("test-comment"), captor.capture());
@@ -202,7 +200,7 @@ class CommentFinderEndpointTest {
         assertThat(value.getSpec().getUserAgent()).isNotNull();
         assertThat(value.getSpec().getQuoteReply()).isNull();
 
-        verify(rateLimiterRegistry).rateLimiter("comment-creation-from-ip-127.0.0.1",
-            "comment-creation");
+        verify(rateLimiterRegistry)
+                .rateLimiter("comment-creation-from-ip-127.0.0.1", "comment-creation");
     }
 }

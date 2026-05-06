@@ -34,16 +34,17 @@ class DuplicateMetaTagProcessorTest {
         assertThat(matcher.group(1)).isEqualTo("keywords");
 
         // multiple line breaks and other stuff
-        text = """
-            <meta content="全局 Head description" name="description" />
-            
-            <style>
-              .moment .momemt-content pre.notranslate {
-                background: #f3f3f3;
-                color: #444;
-              }
-            </style>
-            """;
+        text =
+                """
+                <meta content="全局 Head description" name="description" />
+
+                <style>
+                  .moment .momemt-content pre.notranslate {
+                    background: #f3f3f3;
+                    color: #444;
+                  }
+                </style>
+                """;
         matcher = DuplicateMetaTagProcessor.META_PATTERN.matcher(text);
         assertThat(matcher.find()).isTrue();
         assertThat(matcher.group(1)).isEqualTo("description");

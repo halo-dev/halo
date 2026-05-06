@@ -66,124 +66,141 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
         return convert(singlePage, singlePage.getSpec().getReleaseSnapshot());
     }
 
-    protected Mono<ContentVo> extendPageContent(SinglePage singlePage,
-        ContentWrapper wrapper) {
+    protected Mono<ContentVo> extendPageContent(SinglePage singlePage, ContentWrapper wrapper) {
         Assert.notNull(singlePage, "SinglePage must not be null");
         Assert.notNull(wrapper, "SinglePage content must not be null");
-        return extensionGetter.getEnabledExtensions(
-                ReactiveSinglePageContentHandler.class)
-            .reduce(Mono.fromSupplier(() -> SinglePageContentContext.builder()
-                    .singlePage(singlePage)
-                    .content(wrapper.getContent())
-                    .raw(wrapper.getRaw())
-                    .rawType(wrapper.getRawType())
-                    .build()
-                ),
-                (contentMono, handler) -> contentMono.flatMap(handler::handle)
-            )
-            .flatMap(Function.identity())
-            .map(pageContent -> ContentVo.builder()
-                .content(pageContent.getContent())
-                .raw(pageContent.getRaw())
-                .build()
-            );
+        return extensionGetter
+                .getEnabledExtensions(ReactiveSinglePageContentHandler.class)
+                .reduce(
+                        Mono.fromSupplier(
+                                () ->
+                                        SinglePageContentContext.builder()
+                                                .singlePage(singlePage)
+                                                .content(wrapper.getContent())
+                                                .raw(wrapper.getRaw())
+                                                .rawType(wrapper.getRawType())
+                                                .build()),
+                        (contentMono, handler) -> contentMono.flatMap(handler::handle))
+                .flatMap(Function.identity())
+                .map(
+                        pageContent ->
+                                ContentVo.builder()
+                                        .content(pageContent.getContent())
+                                        .raw(pageContent.getRaw())
+                                        .build());
     }
 
     @Override
     public Mono<ContentVo> getContent(String pageName) {
         return client.get(SinglePage.class, pageName)
-            .flatMap(singlePage -> {
-                String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
-                String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
-                return singlePageService.getContent(releaseSnapshot, baseSnapshot)
-                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
-            })
-            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build());
+                .flatMap(
+                        singlePage -> {
+                            String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
+                            String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
+                            return singlePageService
+                                    .getContent(releaseSnapshot, baseSnapshot)
+                                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
+                        })
+                .map(
+                        wrapper ->
+                                ContentVo.builder()
+                                        .content(wrapper.getContent())
+                                        .raw(wrapper.getRaw())
+                                        .build());
     }
 
     @Override
     public Mono<ListedSinglePageVo> convertToListedVo(SinglePage singlePage) {
         return Mono.fromSupplier(
-                () -> {
-                    ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);
-                    pageVo.setContributors(List.of());
-                    return pageVo;
-                })
-            .flatMap(this::populateStats)
-            .flatMap(this::populateContributors);
+                        () -> {
+                            ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);
+                            pageVo.setContributors(List.of());
+                            return pageVo;
+                        })
+                .flatMap(this::populateStats)
+                .flatMap(this::populateContributors);
     }
 
     @Override
-    public Mono<ListResult<ListedSinglePageVo>> listBy(ListOptions listOptions,
-        PageRequest pageRequest) {
+    public Mono<ListResult<ListedSinglePageVo>> listBy(
+            ListOptions listOptions, PageRequest pageRequest) {
         // rewrite list options
-        var rewroteListOptions = ListOptions.builder(listOptions)
-            .andQuery(notDeleting())
-            .andQuery(equal("spec.deleted", Boolean.FALSE.toString()))
-            .andQuery(equal("spec.visible", PUBLIC.name()))
-            .labelSelector()
-            .eq(PUBLISHED_LABEL, Boolean.TRUE.toString())
-            .end()
-            .build();
+        var rewroteListOptions =
+                ListOptions.builder(listOptions)
+                        .andQuery(notDeleting())
+                        .andQuery(equal("spec.deleted", Boolean.FALSE.toString()))
+                        .andQuery(equal("spec.visible", PUBLIC.name()))
+                        .labelSelector()
+                        .eq(PUBLISHED_LABEL, Boolean.TRUE.toString())
+                        .end()
+                        .build();
 
         // rewrite sort
-        var rewroteSort = pageRequest.getSort()
-            .and(Sort.by(
-                desc("spec.pinned"),
-                asc("spec.priority")
-            ));
+        var rewroteSort =
+                pageRequest.getSort().and(Sort.by(desc("spec.pinned"), asc("spec.priority")));
 
         var rewrotePageRequest =
-            PageRequestImpl.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), rewroteSort);
+                PageRequestImpl.of(
+                        pageRequest.getPageNumber(), pageRequest.getPageSize(), rewroteSort);
 
         return client.listBy(SinglePage.class, rewroteListOptions, rewrotePageRequest)
-            .flatMap(list -> Flux.fromStream(list.get())
-                .flatMapSequential(this::convertToListedVo)
-                .collectList()
-                .map(pageVos ->
-                    new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos)
-                )
-            );
+                .flatMap(
+                        list ->
+                                Flux.fromStream(list.get())
+                                        .flatMapSequential(this::convertToListedVo)
+                                        .collectList()
+                                        .map(
+                                                pageVos ->
+                                                        new ListResult<>(
+                                                                list.getPage(),
+                                                                list.getSize(),
+                                                                list.getTotal(),
+                                                                pageVos)));
     }
-
 
     Mono<SinglePageVo> convert(SinglePage singlePage, String snapshotName) {
         Assert.notNull(singlePage, "Single page must not be null");
         Assert.hasText(snapshotName, "Snapshot name must not be empty");
         return Mono.just(singlePage)
-            .map(page -> {
-                SinglePageVo pageVo = SinglePageVo.from(page);
-                pageVo.setContributors(List.of());
-                pageVo.setContent(ContentVo.empty());
-                return pageVo;
-            })
-            .flatMap(this::populateStats)
-            .flatMap(this::populateContributors)
-            .flatMap(page -> {
-                String baseSnapshot = page.getSpec().getBaseSnapshot();
-                return singlePageService.getContent(snapshotName, baseSnapshot)
-                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper))
-                    .doOnNext(page::setContent)
-                    .thenReturn(page);
-            })
-            .flatMap(page -> contributorFinder.getContributor(page.getSpec().getOwner())
-                .doOnNext(page::setOwner)
-                .thenReturn(page)
-            );
+                .map(
+                        page -> {
+                            SinglePageVo pageVo = SinglePageVo.from(page);
+                            pageVo.setContributors(List.of());
+                            pageVo.setContent(ContentVo.empty());
+                            return pageVo;
+                        })
+                .flatMap(this::populateStats)
+                .flatMap(this::populateContributors)
+                .flatMap(
+                        page -> {
+                            String baseSnapshot = page.getSpec().getBaseSnapshot();
+                            return singlePageService
+                                    .getContent(snapshotName, baseSnapshot)
+                                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper))
+                                    .doOnNext(page::setContent)
+                                    .thenReturn(page);
+                        })
+                .flatMap(
+                        page ->
+                                contributorFinder
+                                        .getContributor(page.getSpec().getOwner())
+                                        .doOnNext(page::setOwner)
+                                        .thenReturn(page));
     }
 
     <T extends ListedSinglePageVo> Mono<T> populateStats(T pageVo) {
         String name = pageVo.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(SinglePage.class, name))
-            .map(counter -> StatsVo.builder()
-                .visit(counter.getVisit())
-                .upvote(counter.getUpvote())
-                .comment(counter.getApprovedComment())
-                .build()
-            )
-            .doOnNext(pageVo::setStats)
-            .thenReturn(pageVo);
+        return counterService
+                .getByName(MeterUtils.nameOf(SinglePage.class, name))
+                .map(
+                        counter ->
+                                StatsVo.builder()
+                                        .visit(counter.getVisit())
+                                        .upvote(counter.getUpvote())
+                                        .comment(counter.getApprovedComment())
+                                        .build())
+                .doOnNext(pageVo::setStats)
+                .thenReturn(pageVo);
     }
 
     <T extends ListedSinglePageVo> Mono<T> populateContributors(T pageVo) {
@@ -191,9 +208,10 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
         if (CollectionUtils.isEmpty(names)) {
             return Mono.just(pageVo);
         }
-        return contributorFinder.getContributors(names)
-            .collectList()
-            .doOnNext(pageVo::setContributors)
-            .thenReturn(pageVo);
+        return contributorFinder
+                .getContributors(names)
+                .collectList()
+                .doOnNext(pageVo::setContributors)
+                .thenReturn(pageVo);
     }
 }

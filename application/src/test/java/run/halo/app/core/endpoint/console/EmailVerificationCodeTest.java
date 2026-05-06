@@ -40,43 +40,39 @@ class EmailVerificationCodeTest {
 
     WebTestClient webClient;
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
-    @Mock
-    EmailVerificationService emailVerificationService;
+    @Mock EmailVerificationService emailVerificationService;
 
-    @Mock
-    UserService userService;
+    @Mock UserService userService;
 
-    @Mock
-    RateLimiterRegistry rateLimiterRegistry;
+    @Mock RateLimiterRegistry rateLimiterRegistry;
 
-    @Mock
-    Validator validator;
+    @Mock Validator validator;
 
-    @InjectMocks
-    UserEndpoint endpoint;
+    @InjectMocks UserEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .apply(springSecurity())
-            .build();
+        webClient =
+                WebTestClient.bindToRouterFunction(endpoint.endpoint())
+                        .apply(springSecurity())
+                        .build();
     }
 
     @Test
     void sendEmailVerificationCode() {
-        var config = RateLimiterConfig.custom()
-            .limitRefreshPeriod(Duration.ofSeconds(10))
-            .limitForPeriod(1)
-            .build();
-        var sendCodeRateLimiter = RateLimiterRegistry.of(config)
-            .rateLimiter("send-email-verification-code-fake-user");
+        var config =
+                RateLimiterConfig.custom()
+                        .limitRefreshPeriod(Duration.ofSeconds(10))
+                        .limitForPeriod(1)
+                        .build();
+        var sendCodeRateLimiter =
+                RateLimiterRegistry.of(config)
+                        .rateLimiter("send-email-verification-code-fake-user");
         when(rateLimiterRegistry.rateLimiter(
-            "send-email-verification-code-fake-user",
-            "send-email-verification-code")
-        ).thenReturn(sendCodeRateLimiter);
+                        "send-email-verification-code-fake-user", "send-email-verification-code"))
+                .thenReturn(sendCodeRateLimiter);
 
         var user = new User();
         user.setMetadata(new Metadata());
@@ -84,35 +80,38 @@ class EmailVerificationCodeTest {
         user.setSpec(new User.UserSpec());
         user.getSpec().setEmail("hi@halo.run");
         when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
-            .thenReturn(Mono.empty());
-        webClient.post()
-            .uri("/users/-/send-email-verification-code")
-            .bodyValue(Map.of("email", "hi@halo.run"))
-            .exchange()
-            .expectStatus()
-            .isOk();
+                .thenReturn(Mono.empty());
+        webClient
+                .post()
+                .uri("/users/-/send-email-verification-code")
+                .bodyValue(Map.of("email", "hi@halo.run"))
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         // request again to trigger rate limit
-        webClient.post()
-            .uri("/users/-/send-email-verification-code")
-            .bodyValue(Map.of("email", "hi@halo.run"))
-            .exchange()
-            .expectStatus()
-            .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        webClient
+                .post()
+                .uri("/users/-/send-email-verification-code")
+                .bodyValue(Map.of("email", "hi@halo.run"))
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @Test
     void sendEmailVerificationCodeShouldRateLimitPerUserNotPerEmail() {
-        var config = RateLimiterConfig.custom()
-            .limitRefreshPeriod(Duration.ofSeconds(10))
-            .limitForPeriod(1)
-            .build();
-        var sendCodeRateLimiter = RateLimiterRegistry.of(config)
-            .rateLimiter("send-email-verification-code-fake-user");
+        var config =
+                RateLimiterConfig.custom()
+                        .limitRefreshPeriod(Duration.ofSeconds(10))
+                        .limitForPeriod(1)
+                        .build();
+        var sendCodeRateLimiter =
+                RateLimiterRegistry.of(config)
+                        .rateLimiter("send-email-verification-code-fake-user");
         when(rateLimiterRegistry.rateLimiter(
-            "send-email-verification-code-fake-user",
-            "send-email-verification-code")
-        ).thenReturn(sendCodeRateLimiter);
+                        "send-email-verification-code-fake-user", "send-email-verification-code"))
+                .thenReturn(sendCodeRateLimiter);
 
         var user = new User();
         user.setMetadata(new Metadata());
@@ -120,54 +119,57 @@ class EmailVerificationCodeTest {
         user.setSpec(new User.UserSpec());
         user.getSpec().setEmail("hi@halo.run");
         when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
         // first request with email A passes
-        webClient.post()
-            .uri("/users/-/send-email-verification-code")
-            .bodyValue(Map.of("email", "hi@halo.run"))
-            .exchange()
-            .expectStatus()
-            .isOk();
+        webClient
+                .post()
+                .uri("/users/-/send-email-verification-code")
+                .bodyValue(Map.of("email", "hi@halo.run"))
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         // second request with a different email B should also be rate-limited
         // because the limiter is per-user, not per-email
-        webClient.post()
-            .uri("/users/-/send-email-verification-code")
-            .bodyValue(Map.of("email", "another@halo.run"))
-            .exchange()
-            .expectStatus()
-            .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        webClient
+                .post()
+                .uri("/users/-/send-email-verification-code")
+                .bodyValue(Map.of("email", "another@halo.run"))
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @Test
     void verifyEmail() {
-        var config = RateLimiterConfig.custom()
-            .limitRefreshPeriod(Duration.ofSeconds(10))
-            .limitForPeriod(1)
-            .build();
+        var config =
+                RateLimiterConfig.custom()
+                        .limitRefreshPeriod(Duration.ofSeconds(10))
+                        .limitForPeriod(1)
+                        .build();
 
-        var verifyEmailRateLimiter = RateLimiterRegistry.of(config)
-            .rateLimiter("verify-email-fake-user");
+        var verifyEmailRateLimiter =
+                RateLimiterRegistry.of(config).rateLimiter("verify-email-fake-user");
         when(rateLimiterRegistry.rateLimiter("verify-email-fake-user", "verify-email"))
-            .thenReturn(verifyEmailRateLimiter);
+                .thenReturn(verifyEmailRateLimiter);
 
-        when(emailVerificationService.verify(anyString(), anyString()))
-            .thenReturn(Mono.empty());
-        when(userService.confirmPassword(anyString(), anyString()))
-            .thenReturn(Mono.just(true));
-        webClient.post()
-            .uri("/users/-/verify-email")
-            .bodyValue(Map.of("code", "fake-code-1", "password", "123456"))
-            .exchange()
-            .expectStatus()
-            .isOk();
+        when(emailVerificationService.verify(anyString(), anyString())).thenReturn(Mono.empty());
+        when(userService.confirmPassword(anyString(), anyString())).thenReturn(Mono.just(true));
+        webClient
+                .post()
+                .uri("/users/-/verify-email")
+                .bodyValue(Map.of("code", "fake-code-1", "password", "123456"))
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         // request again to trigger rate limit
-        webClient.post()
-            .uri("/users/-/verify-email")
-            .bodyValue(Map.of("code", "fake-code-2", "password", "123456"))
-            .exchange()
-            .expectStatus()
-            .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        webClient
+                .post()
+                .uri("/users/-/verify-email")
+                .bodyValue(Map.of("code", "fake-code-2", "password", "123456"))
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
     }
 }

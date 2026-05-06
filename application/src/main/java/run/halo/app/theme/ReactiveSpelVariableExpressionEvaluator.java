@@ -18,12 +18,12 @@ import run.halo.app.infra.utils.ReactiveUtils;
  * @since 2.0.0
  */
 public class ReactiveSpelVariableExpressionEvaluator
-    implements IStandardVariableExpressionEvaluator {
+        implements IStandardVariableExpressionEvaluator {
 
     private final IStandardVariableExpressionEvaluator delegate;
 
     public static final ReactiveSpelVariableExpressionEvaluator INSTANCE =
-        new ReactiveSpelVariableExpressionEvaluator();
+            new ReactiveSpelVariableExpressionEvaluator();
 
     public ReactiveSpelVariableExpressionEvaluator(IStandardVariableExpressionEvaluator delegate) {
         this.delegate = delegate;
@@ -34,16 +34,20 @@ public class ReactiveSpelVariableExpressionEvaluator
     }
 
     @Override
-    public Object evaluate(IExpressionContext context, IStandardVariableExpression expression,
-        StandardExpressionExecutionContext expContext) {
+    public Object evaluate(
+            IExpressionContext context,
+            IStandardVariableExpression expression,
+            StandardExpressionExecutionContext expContext) {
         var returnValue = delegate.evaluate(context, expression, expContext);
 
-        var contextView = (ContextView) Optional.ofNullable(context.getVariable(CONTEXT_VIEW_KEY))
-            .filter(ContextView.class::isInstance)
-            .orElse(null);
+        var contextView =
+                (ContextView)
+                        Optional.ofNullable(context.getVariable(CONTEXT_VIEW_KEY))
+                                .filter(ContextView.class::isInstance)
+                                .orElse(null);
 
         return Optional.ofNullable(returnValue)
-            .map(value -> ReactiveUtils.blockReactiveValue(value, contextView))
-            .orElse(null);
+                .map(value -> ReactiveUtils.blockReactiveValue(value, contextView))
+                .orElse(null);
     }
 }

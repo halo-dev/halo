@@ -52,52 +52,44 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 @ExtendWith(MockitoExtension.class)
 class PostFinderImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private CounterService counterService;
+    @Mock private CounterService counterService;
 
-    @Mock
-    private PostService postService;
+    @Mock private PostService postService;
 
-    @Mock
-    private CategoryFinder categoryFinder;
+    @Mock private CategoryFinder categoryFinder;
 
-    @Mock
-    private TagFinder tagFinder;
+    @Mock private TagFinder tagFinder;
 
-    @Mock
-    private ContributorFinder contributorFinder;
+    @Mock private ContributorFinder contributorFinder;
 
-    @Mock
-    private PostPublicQueryService publicQueryService;
+    @Mock private PostPublicQueryService publicQueryService;
 
-    @Mock
-    ReactiveQueryPostPredicateResolver postPredicateResolver;
+    @Mock ReactiveQueryPostPredicateResolver postPredicateResolver;
 
-    @InjectMocks
-    private PostFinderImpl postFinder;
+    @InjectMocks private PostFinderImpl postFinder;
 
     @Test
     void predicate() {
         Predicate<Post> predicate = new DefaultQueryPostPredicateResolver().getPredicate().block();
         assertThat(predicate).isNotNull();
 
-        List<String> strings = posts().stream().filter(predicate)
-            .map(post -> post.getMetadata().getName())
-            .toList();
+        List<String> strings =
+                posts().stream()
+                        .filter(predicate)
+                        .map(post -> post.getMetadata().getName())
+                        .toList();
         assertThat(strings).isEqualTo(List.of("post-1", "post-2", "post-6"));
     }
 
     @Test
     void archives() {
-        List<ListedPostVo> listedPostVos = postsForArchives().stream()
-            .map(ListedPostVo::from)
-            .toList();
+        List<ListedPostVo> listedPostVos =
+                postsForArchives().stream().map(ListedPostVo::from).toList();
         ListResult<ListedPostVo> listResult = new ListResult<>(1, 10, 3, listedPostVos);
         when(publicQueryService.list(any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(listResult));
+                .thenReturn(Mono.just(listResult));
 
         ListResult<PostArchiveVo> archives = postFinder.archives(1, 10).block();
         assertThat(archives).isNotNull();
@@ -120,10 +112,7 @@ class PostFinderImplTest {
         var listOptions = mock(ListOptions.class);
         when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
         when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(0L));
-        postFinder.random(10)
-            .as(StepVerifier::create)
-            .expectNext(List.of())
-            .verifyComplete();
+        postFinder.random(10).as(StepVerifier::create).expectNext(List.of()).verifyComplete();
     }
 
     @Test
@@ -131,23 +120,20 @@ class PostFinderImplTest {
         var listOptions = mock(ListOptions.class);
         when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
         when(client.countBy(Post.class, listOptions)).thenReturn(Mono.just(100L));
-        var posts = java.util.stream.IntStream.rangeClosed(1, 10)
-            .mapToObj(this::post)
-            .toList();
+        var posts = java.util.stream.IntStream.rangeClosed(1, 10).mapToObj(this::post).toList();
         when(client.listBy(same(Post.class), same(listOptions), isA(PageRequest.class)))
-            .thenReturn(Mono.just(new ListResult<>(0, 10, 100, posts)));
+                .thenReturn(Mono.just(new ListResult<>(0, 10, 100, posts)));
         var postVos = posts.stream().map(ListedPostVo::from).toList();
-        when(publicQueryService.convertToListedVos(anyList()))
-            .thenReturn(Mono.just(postVos));
+        when(publicQueryService.convertToListedVos(anyList())).thenReturn(Mono.just(postVos));
 
-        postFinder.random(10)
-            .as(StepVerifier::create)
-            .expectNext(postVos)
-            .verifyComplete();
+        postFinder.random(10).as(StepVerifier::create).expectNext(postVos).verifyComplete();
 
-        verify(publicQueryService).convertToListedVos(assertArg(items -> {
-            assertTrue(items.containsAll(posts));
-        }));
+        verify(publicQueryService)
+                .convertToListedVos(
+                        assertArg(
+                                items -> {
+                                    assertTrue(items.containsAll(posts));
+                                }));
     }
 
     List<Post> postsForArchives() {
@@ -245,8 +231,9 @@ class PostFinderImplTest {
             query.setSort(List.of("spec.publishTime,desc"));
             result = query.toPageRequest();
             assertThat(result.getSort())
-                .isEqualTo(Sort.by(Sort.Order.desc("spec.publishTime"))
-                    .and(PostFinderImpl.defaultSort()));
+                    .isEqualTo(
+                            Sort.by(Sort.Order.desc("spec.publishTime"))
+                                    .and(PostFinderImpl.defaultSort()));
         }
     }
 }

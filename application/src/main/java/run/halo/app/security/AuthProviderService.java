@@ -23,5 +23,4 @@ public interface AuthProviderService {
      * Return a list of enabled AuthProviders sorted by priority.
      */
     Flux<AuthProvider> getEnabledProviders();
-
 }

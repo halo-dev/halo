@@ -31,17 +31,13 @@ import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
 @ExtendWith(MockitoExtension.class)
 class DefaultControllerTest {
 
-    @Mock
-    RequestQueue<Request> queue;
+    @Mock RequestQueue<Request> queue;
 
-    @Mock
-    Reconciler<Request> reconciler;
+    @Mock Reconciler<Request> reconciler;
 
-    @Mock
-    RequestSynchronizer synchronizer;
+    @Mock RequestSynchronizer synchronizer;
 
-    @Mock
-    ExecutorService executor;
+    @Mock ExecutorService executor;
 
     Instant now = Instant.now();
 
@@ -60,8 +56,16 @@ class DefaultControllerTest {
     }
 
     DefaultController<Request> createController(int workerCount) {
-        return new DefaultController<>("fake-controller", reconciler, queue, synchronizer,
-            () -> now, minRetryAfter, maxRetryAfter, executor, workerCount);
+        return new DefaultController<>(
+                "fake-controller",
+                reconciler,
+                queue,
+                synchronizer,
+                () -> now,
+                minRetryAfter,
+                maxRetryAfter,
+                executor,
+                workerCount);
     }
 
     @Test
@@ -84,10 +88,11 @@ class DefaultControllerTest {
 
         @Test
         void shouldRunCorrectlyIfReconcilerReturnsNoReEnqueue() throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), Duration.ofSeconds(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"), Duration.ofSeconds(1), () -> now))
+                    .thenThrow(InterruptedException.class);
             when(reconciler.reconcile(any(Request.class))).thenReturn(new Result(false, null));
 
             controller.new Worker().run();
@@ -101,10 +106,11 @@ class DefaultControllerTest {
 
         @Test
         void shouldRunCorrectlyIfReconcilerReturnsReEnqueue() throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), Duration.ofSeconds(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"), Duration.ofSeconds(1), () -> now))
+                    .thenThrow(InterruptedException.class);
             when(queue.add(any())).thenReturn(true);
             when(reconciler.reconcile(any(Request.class))).thenReturn(new Result(true, null));
 
@@ -113,18 +119,23 @@ class DefaultControllerTest {
             verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
-            verify(queue, times(1)).add(argThat(de ->
-                de.getEntry().name().equals("fake-request")
-                    && de.getRetryAfter().equals(Duration.ofSeconds(2))));
+            verify(queue, times(1))
+                    .add(
+                            argThat(
+                                    de ->
+                                            de.getEntry().name().equals("fake-request")
+                                                    && de.getRetryAfter()
+                                                            .equals(Duration.ofSeconds(2))));
             verify(reconciler, times(1)).reconcile(any(Request.class));
         }
 
         @Test
         void shouldReRunIfReconcilerThrowException() throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), Duration.ofSeconds(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"), Duration.ofSeconds(1), () -> now))
+                    .thenThrow(InterruptedException.class);
             when(queue.add(any())).thenReturn(true);
             when(reconciler.reconcile(any(Request.class))).thenThrow(RuntimeException.class);
 
@@ -133,18 +144,23 @@ class DefaultControllerTest {
             verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
-            verify(queue, times(1)).add(argThat(de ->
-                de.getEntry().name().equals("fake-request")
-                    && de.getRetryAfter().equals(Duration.ofSeconds(2))));
+            verify(queue, times(1))
+                    .add(
+                            argThat(
+                                    de ->
+                                            de.getEntry().name().equals("fake-request")
+                                                    && de.getRetryAfter()
+                                                            .equals(Duration.ofSeconds(2))));
             verify(reconciler, times(1)).reconcile(any(Request.class));
         }
 
         @Test
         void canReRunIfReconcilerThrowRequeueException() throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), Duration.ofSeconds(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"), Duration.ofSeconds(1), () -> now))
+                    .thenThrow(InterruptedException.class);
             when(queue.add(any())).thenReturn(true);
             var expectException = new RequeueException(Result.requeue(Duration.ofSeconds(2)));
             when(reconciler.reconcile(any(Request.class))).thenThrow(expectException);
@@ -154,19 +170,24 @@ class DefaultControllerTest {
             verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue).done(any());
-            verify(queue).add(argThat(de ->
-                de.getEntry().name().equals("fake-request")
-                    && de.getRetryAfter().equals(Duration.ofSeconds(2))));
+            verify(queue)
+                    .add(
+                            argThat(
+                                    de ->
+                                            de.getEntry().name().equals("fake-request")
+                                                    && de.getRetryAfter()
+                                                            .equals(Duration.ofSeconds(2))));
             verify(reconciler).reconcile(any(Request.class));
         }
 
         @Test
         void doNotReRunIfReconcilerThrowsRequeueExceptionWithoutRequeue()
-            throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), Duration.ofSeconds(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+                throws InterruptedException {
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"), Duration.ofSeconds(1), () -> now))
+                    .thenThrow(InterruptedException.class);
             var expectException = new RequeueException(Result.doNotRetry());
             when(reconciler.reconcile(any(Request.class))).thenThrow(expectException);
 
@@ -182,10 +203,13 @@ class DefaultControllerTest {
 
         @Test
         void shouldSetMinRetryAfterWhenTakeZeroDelayedEntry() throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), minRetryAfter.minusMillis(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"),
+                                    minRetryAfter.minusMillis(1),
+                                    () -> now))
+                    .thenThrow(InterruptedException.class);
             when(queue.add(any())).thenReturn(true);
             when(reconciler.reconcile(any(Request.class))).thenReturn(new Result(true, null));
 
@@ -194,19 +218,25 @@ class DefaultControllerTest {
             verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
-            verify(queue, times(1)).add(argThat(de ->
-                de.getEntry().name().equals("fake-request")
-                    && de.getRetryAfter().equals(minRetryAfter)));
+            verify(queue, times(1))
+                    .add(
+                            argThat(
+                                    de ->
+                                            de.getEntry().name().equals("fake-request")
+                                                    && de.getRetryAfter().equals(minRetryAfter)));
             verify(reconciler, times(1)).reconcile(any(Request.class));
         }
 
         @Test
         void shouldSetMaxRetryAfterWhenTakeGreaterThanMaxRetryAfterDelayedEntry()
-            throws InterruptedException {
-            when(queue.take()).thenReturn(new DelayedEntry<>(
-                    new Request("fake-request"), maxRetryAfter.plusMillis(1), () -> now
-                ))
-                .thenThrow(InterruptedException.class);
+                throws InterruptedException {
+            when(queue.take())
+                    .thenReturn(
+                            new DelayedEntry<>(
+                                    new Request("fake-request"),
+                                    maxRetryAfter.plusMillis(1),
+                                    () -> now))
+                    .thenThrow(InterruptedException.class);
             when(queue.add(any())).thenReturn(true);
             when(reconciler.reconcile(any(Request.class))).thenReturn(new Result(true, null));
 
@@ -215,12 +245,14 @@ class DefaultControllerTest {
             verify(synchronizer, never()).start();
             verify(queue, times(2)).take();
             verify(queue, times(1)).done(any());
-            verify(queue, times(1)).add(argThat(de ->
-                de.getEntry().name().equals("fake-request")
-                    && de.getRetryAfter().equals(maxRetryAfter)));
+            verify(queue, times(1))
+                    .add(
+                            argThat(
+                                    de ->
+                                            de.getEntry().name().equals("fake-request")
+                                                    && de.getRetryAfter().equals(maxRetryAfter)));
             verify(reconciler, times(1)).reconcile(any(Request.class));
         }
-
     }
 
     @Test
@@ -241,9 +273,7 @@ class DefaultControllerTest {
 
     @Test
     void shouldDisposeCorrectlyIfNotShutdownInTime() throws InterruptedException {
-        when(executor.awaitTermination(anyLong(), any()))
-            .thenReturn(false)
-            .thenReturn(true);
+        when(executor.awaitTermination(anyLong(), any())).thenReturn(false).thenReturn(true);
 
         controller.dispose();
 
@@ -260,8 +290,8 @@ class DefaultControllerTest {
     @Test
     void shouldDisposeCorrectlyEvenIfTimeoutAwaitTermination() throws InterruptedException {
         when(executor.awaitTermination(anyLong(), any()))
-            .thenThrow(InterruptedException.class)
-            .thenReturn(true);
+                .thenThrow(InterruptedException.class)
+                .thenReturn(true);
 
         controller.dispose();
 
@@ -277,14 +307,19 @@ class DefaultControllerTest {
 
     @Test
     void shouldStartCorrectly() throws InterruptedException {
-        doAnswer(invocation -> {
-            // simulate starting synchronizer
-            invocation.getArgument(0, Runnable.class).run();
-            return null;
-        }).doAnswer(invocation -> {
-            // simulate starting worker
-            return null;
-        }).when(executor).execute(any(Runnable.class));
+        doAnswer(
+                        invocation -> {
+                            // simulate starting synchronizer
+                            invocation.getArgument(0, Runnable.class).run();
+                            return null;
+                        })
+                .doAnswer(
+                        invocation -> {
+                            // simulate starting worker
+                            return null;
+                        })
+                .when(executor)
+                .execute(any(Runnable.class));
 
         controller.start();
         assertTrue(controller.isStarted());

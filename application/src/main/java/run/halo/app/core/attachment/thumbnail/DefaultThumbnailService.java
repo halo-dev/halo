@@ -44,14 +44,15 @@ class DefaultThumbnailService implements ThumbnailService {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
-    public DefaultThumbnailService(ReactiveExtensionClient client,
-        ExternalUrlSupplier externalUrlSupplier) {
+    public DefaultThumbnailService(
+            ReactiveExtensionClient client, ExternalUrlSupplier externalUrlSupplier) {
         this.client = client;
         this.externalUrlSupplier = externalUrlSupplier;
-        this.thumbnailCache = Caffeine.newBuilder()
-            // TODO make it configurable
-            .maximumSize(10_000)
-            .build();
+        this.thumbnailCache =
+                Caffeine.newBuilder()
+                        // TODO make it configurable
+                        .maximumSize(10_000)
+                        .build();
     }
 
     @EventListener
@@ -77,12 +78,13 @@ class DefaultThumbnailService implements ThumbnailService {
             return;
         }
         Map<ThumbnailSize, URI> validThumbnails = new HashMap<>();
-        thumbnails.forEach((key, value) -> {
-            var size = ThumbnailSize.optionalValueOf(key);
-            if (size.isPresent() && StringUtils.hasText(value)) {
-                validThumbnails.put(size.get(), URI.create(value));
-            }
-        });
+        thumbnails.forEach(
+                (key, value) -> {
+                    var size = ThumbnailSize.optionalValueOf(key);
+                    if (size.isPresent() && StringUtils.hasText(value)) {
+                        validThumbnails.put(size.get(), URI.create(value));
+                    }
+                });
         if (validThumbnails.isEmpty()) {
             thumbnailCache.put(permalink, EMPTY_THUMBNAILS);
         } else {
@@ -103,36 +105,48 @@ class DefaultThumbnailService implements ThumbnailService {
             return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
         }
         // TODO Optimize concurrent requests for the same permalink
-        return Mono.deferContextual(contextView -> {
-            var externalUrl = ServerWebExchangeContextFilter.getExchange(contextView)
-                .map(exchange -> externalUrlSupplier.getURL(exchange.getRequest()))
-                .orElseGet(externalUrlSupplier::getRaw);
-            // check if the permalink is from local site
-            if (externalUrl != null
-                && Objects.equals(externalUrl.getAuthority(), encodedPermalink.getAuthority())) {
-                return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
-            }
-            var permalinkString = encodedPermalink.toASCIIString();
-            var thumbnails = thumbnailCache.getIfPresent(permalinkString);
-            if (thumbnails != null) {
-                return Mono.just(thumbnails);
-            }
-            // query from attachments
-            var listOptions = ListOptions.builder()
-                .andQuery(Queries.equal("status.permalink", permalinkString))
-                .build();
-            return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
-                .next()
-                // Here we allow concurrent updates
-                .doOnNext(this::updateCache)
-                .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
-                .switchIfEmpty(Mono.fromSupplier(() -> {
-                    // No attachment or no thumbnails, cache empty map to avoid cache miss again and
-                    // again.
-                    this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
-                    return EMPTY_THUMBNAILS;
-                }));
-        });
+        return Mono.deferContextual(
+                contextView -> {
+                    var externalUrl =
+                            ServerWebExchangeContextFilter.getExchange(contextView)
+                                    .map(
+                                            exchange ->
+                                                    externalUrlSupplier.getURL(
+                                                            exchange.getRequest()))
+                                    .orElseGet(externalUrlSupplier::getRaw);
+                    // check if the permalink is from local site
+                    if (externalUrl != null
+                            && Objects.equals(
+                                    externalUrl.getAuthority(), encodedPermalink.getAuthority())) {
+                        return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
+                    }
+                    var permalinkString = encodedPermalink.toASCIIString();
+                    var thumbnails = thumbnailCache.getIfPresent(permalinkString);
+                    if (thumbnails != null) {
+                        return Mono.just(thumbnails);
+                    }
+                    // query from attachments
+                    var listOptions =
+                            ListOptions.builder()
+                                    .andQuery(Queries.equal("status.permalink", permalinkString))
+                                    .build();
+                    return client.listAll(
+                                    Attachment.class, listOptions, ExtensionUtil.defaultSort())
+                            .next()
+                            // Here we allow concurrent updates
+                            .doOnNext(this::updateCache)
+                            .mapNotNull(
+                                    attachment -> this.thumbnailCache.getIfPresent(permalinkString))
+                            .switchIfEmpty(
+                                    Mono.fromSupplier(
+                                            () -> {
+                                                // No attachment or no thumbnails, cache empty map
+                                                // to avoid cache miss again and
+                                                // again.
+                                                this.thumbnailCache.put(
+                                                        permalinkString, EMPTY_THUMBNAILS);
+                                                return EMPTY_THUMBNAILS;
+                                            }));
+                });
     }
-
 }

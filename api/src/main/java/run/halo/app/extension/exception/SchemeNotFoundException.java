@@ -11,8 +11,11 @@ import run.halo.app.extension.GroupVersionKind;
 public class SchemeNotFoundException extends ExtensionException {
 
     public SchemeNotFoundException(GroupVersionKind gvk) {
-        super(HttpStatus.INTERNAL_SERVER_ERROR, "Scheme not found for " + gvk, null, null,
-            new Object[] {gvk});
+        super(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Scheme not found for " + gvk,
+                null,
+                null,
+                new Object[] {gvk});
     }
-
 }

@@ -1,6 +1,5 @@
 package run.halo.app.notification;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -32,14 +31,11 @@ import run.halo.app.infra.SystemSetting;
 @ExtendWith(MockitoExtension.class)
 class DefaultNotificationTemplateRenderTest {
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @InjectMocks
-    DefaultNotificationTemplateRender templateRender;
+    @InjectMocks DefaultNotificationTemplateRender templateRender;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -50,79 +46,84 @@ class DefaultNotificationTemplateRenderTest {
 
     @Test
     void render() {
-        final String template = """
-            亲爱的博主
+        final String template =
+                """
+                亲爱的博主
 
-              [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了您，
-              以下是回复的具体内容：
-              
-              [(${content})]
+                  [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了您，
+                  以下是回复的具体内容：
 
-            [(${site.title})]
-            [(${site.url})]
-            祝好！
-            查看原文：[(${commentSubjectUrl})]
-            """;
-        final var model = Map.<String, Object>of(
-            "replier", "guqing",
-            "isQuoteReply", true,
-            "quoteContent", "这是引用的内容",
-            "commentContent", "这是评论的内容",
-            "commentSubjectUrl", "/archives/1",
-            "content", "这是回复的内容"
-        );
+                  [(${content})]
+
+                [(${site.title})]
+                [(${site.url})]
+                祝好！
+                查看原文：[(${commentSubjectUrl})]
+                """;
+        final var model =
+                Map.<String, Object>of(
+                        "replier", "guqing",
+                        "isQuoteReply", true,
+                        "quoteContent", "这是引用的内容",
+                        "commentContent", "这是评论的内容",
+                        "commentSubjectUrl", "/archives/1",
+                        "content", "这是回复的内容");
 
         var basic = new SystemSetting.Basic();
         basic.setTitle("Halo");
         basic.setLogo("https://halo.run/logo");
         basic.setSubtitle("Halo");
         when(environmentFetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
-            .thenReturn(Mono.just(basic));
+                .thenReturn(Mono.just(basic));
 
-        templateRender.render(template, model)
-            .as(StepVerifier::create)
-            .consumeNextWith(render -> {
-                assertThat(render).isEqualTo("""
-                    亲爱的博主
+        templateRender
+                .render(template, model)
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        render -> {
+                            assertThat(render)
+                                    .isEqualTo(
+                                            """
+                                            亲爱的博主
 
-                      guqing 在评论“这是引用的内容”中回复了您，
-                      以下是回复的具体内容：
-                      
-                      这是回复的内容
-                       
-                    Halo
-                    http://localhost:8090
-                    祝好！
-                    查看原文：/archives/1
-                    """);
-            })
-            .verifyComplete();
+                                              guqing 在评论“这是引用的内容”中回复了您，
+                                              以下是回复的具体内容：
 
-        verify(environmentFetcher).fetch(eq(SystemSetting.Basic.GROUP),
-            eq(SystemSetting.Basic.class));
+                                              这是回复的内容
+
+                                            Halo
+                                            http://localhost:8090
+                                            祝好！
+                                            查看原文：/archives/1
+                                            """);
+                        })
+                .verifyComplete();
+
+        verify(environmentFetcher)
+                .fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class));
         verify(externalUrlSupplier).getRaw();
     }
 
     @Test
     void siteUrlTest() throws MalformedURLException {
         when(environmentFetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
-            .thenReturn(Mono.just(new SystemSetting.Basic()));
+                .thenReturn(Mono.just(new SystemSetting.Basic()));
 
         var template = "<a th:href=\"|${site.url}/uc/notifications|\">查看通知</a>";
         var expected = "<a href=\"http://localhost:8090/uc/notifications\">查看通知</a>";
 
         when(externalUrlSupplier.getRaw()).thenReturn(new URL("http://localhost:8090/"));
-        templateRender.render(template,
-                Map.of())
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .verifyComplete();
+        templateRender
+                .render(template, Map.of())
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .verifyComplete();
 
         when(externalUrlSupplier.getRaw()).thenReturn(new URL("http://localhost:8090"));
-        templateRender.render(template,
-                Map.of())
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .verifyComplete();
+        templateRender
+                .render(template, Map.of())
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .verifyComplete();
     }
 }

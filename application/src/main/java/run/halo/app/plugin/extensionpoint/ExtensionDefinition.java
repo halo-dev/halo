@@ -21,9 +21,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "plugin.halo.run", version = "v1alpha1",
-    kind = "ExtensionDefinition", singular = "extensiondefinition",
-    plural = "extensiondefinitions")
+@GVK(
+        group = "plugin.halo.run",
+        version = "v1alpha1",
+        kind = "ExtensionDefinition",
+        singular = "extensiondefinition",
+        plural = "extensiondefinitions")
 public class ExtensionDefinition extends AbstractExtension {
 
     @Schema(requiredMode = REQUIRED)

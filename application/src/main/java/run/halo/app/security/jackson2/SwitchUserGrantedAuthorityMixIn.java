@@ -36,18 +36,13 @@ import org.springframework.security.web.jackson2.WebServletJackson2Module;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.ANY,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE
-)
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class SwitchUserGrantedAuthorityMixIn {
 
     @JsonCreator
     SwitchUserGrantedAuthorityMixIn(
-        @JsonProperty("role") String role,
-        @JsonProperty("source") Authentication source
-    ) {
-    }
-
+            @JsonProperty("role") String role, @JsonProperty("source") Authentication source) {}
 }

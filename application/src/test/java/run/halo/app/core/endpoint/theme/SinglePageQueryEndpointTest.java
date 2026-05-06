@@ -29,11 +29,9 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 @ExtendWith(MockitoExtension.class)
 class SinglePageQueryEndpointTest {
 
-    @Mock
-    private SinglePageFinder singlePageFinder;
+    @Mock private SinglePageFinder singlePageFinder;
 
-    @InjectMocks
-    private SinglePageQueryEndpoint endpoint;
+    @InjectMocks private SinglePageQueryEndpoint endpoint;
 
     private WebTestClient webTestClient;
 
@@ -44,21 +42,25 @@ class SinglePageQueryEndpointTest {
 
     @Test
     void getByName() {
-        SinglePageVo singlePage = SinglePageVo.builder()
-            .metadata(metadata("fake-page"))
-            .spec(new SinglePage.SinglePageSpec())
-            .build();
+        SinglePageVo singlePage =
+                SinglePageVo.builder()
+                        .metadata(metadata("fake-page"))
+                        .spec(new SinglePage.SinglePageSpec())
+                        .build();
 
-        when(singlePageFinder.getByName(eq("fake-page")))
-            .thenReturn(Mono.just(singlePage));
+        when(singlePageFinder.getByName(eq("fake-page"))).thenReturn(Mono.just(singlePage));
 
-        webTestClient.get()
-            .uri("/singlepages/fake-page")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("fake-page");
+        webTestClient
+                .get()
+                .uri("/singlepages/fake-page")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("fake-page");
 
         verify(singlePageFinder).getByName("fake-page");
     }

@@ -54,19 +54,18 @@ public interface PostFinder {
 
     Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 
-    Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size,
-        String categoryName);
+    Mono<ListResult<ListedPostVo>> listByCategory(
+            @Nullable Integer page, @Nullable Integer size, String categoryName);
 
-    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size,
-        String tag);
+    Mono<ListResult<ListedPostVo>> listByTag(
+            @Nullable Integer page, @Nullable Integer size, String tag);
 
-    Mono<ListResult<ListedPostVo>> listByOwner(@Nullable Integer page, @Nullable Integer size,
-        String owner);
+    Mono<ListResult<ListedPostVo>> listByOwner(
+            @Nullable Integer page, @Nullable Integer size, String owner);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year, String month);
-
 }

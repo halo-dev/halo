@@ -18,16 +18,14 @@ import org.pf4j.PluginManager;
 @ExtendWith(MockitoExtension.class)
 class PluginClassloaderTemplateResolverTest {
 
-    @Mock
-    private PluginManager haloPluginManager;
+    @Mock private PluginManager haloPluginManager;
 
-    @InjectMocks
-    private PluginClassloaderTemplateResolver templateResolver;
+    @InjectMocks private PluginClassloaderTemplateResolver templateResolver;
 
     @Test
     void matchPluginTemplateWhenOwnerTemplateMatch() {
         var result =
-            templateResolver.matchPluginTemplate("plugin:fake-plugin:doc", "modules/layout");
+                templateResolver.matchPluginTemplate("plugin:fake-plugin:doc", "modules/layout");
         assertThat(result.matches()).isTrue();
         assertThat(result.pluginName()).isEqualTo("fake-plugin");
         assertThat(result.templateName()).isEqualTo("modules/layout");
@@ -36,15 +34,14 @@ class PluginClassloaderTemplateResolverTest {
 
     @Test
     void matchPluginTemplateWhenDoesNotMatch() {
-        var result =
-            templateResolver.matchPluginTemplate("doc", "modules/layout");
+        var result = templateResolver.matchPluginTemplate("doc", "modules/layout");
         assertThat(result.matches()).isFalse();
     }
 
     @Test
     void matchPluginTemplateWhenTemplateMatch() {
         var result =
-            templateResolver.matchPluginTemplate("doc", "plugin:fake-plugin:modules/layout");
+                templateResolver.matchPluginTemplate("doc", "plugin:fake-plugin:modules/layout");
         assertThat(result.matches()).isTrue();
         assertThat(result.pluginName()).isEqualTo("fake-plugin");
         assertThat(result.templateName()).isEqualTo("modules/layout");

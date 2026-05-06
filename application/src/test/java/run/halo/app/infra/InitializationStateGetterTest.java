@@ -29,20 +29,18 @@ import run.halo.app.extension.ReactiveExtensionClient;
  */
 @ExtendWith(MockitoExtension.class)
 class InitializationStateGetterTest {
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private DefaultInitializationStateGetter initializationStateGetter;
+    @InjectMocks private DefaultInitializationStateGetter initializationStateGetter;
 
     @Test
     void userInitialized() {
-        when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.empty());
-        initializationStateGetter.userInitialized()
-            .as(StepVerifier::create)
-            .expectNext(false)
-            .verifyComplete();
+        when(client.listBy(eq(User.class), any(), any(PageRequest.class))).thenReturn(Mono.empty());
+        initializationStateGetter
+                .userInitialized()
+                .as(StepVerifier::create)
+                .expectNext(false)
+                .verifyComplete();
 
         User user = new User();
         user.setMetadata(new Metadata());
@@ -53,11 +51,12 @@ class InitializationStateGetterTest {
         ListResult<User> listResult = new ListResult<>(List.of(user));
 
         when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(listResult));
-        initializationStateGetter.userInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+                .thenReturn(Mono.just(listResult));
+        initializationStateGetter
+                .userInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
     }
 
     @Test
@@ -67,17 +66,19 @@ class InitializationStateGetterTest {
         configMap.getMetadata().setName(SystemState.SYSTEM_STATES_CONFIGMAP);
         configMap.setData(Map.of("states", "{\"isSetup\":true}"));
         when(client.fetch(eq(ConfigMap.class), eq(SystemState.SYSTEM_STATES_CONFIGMAP)))
-            .thenReturn(Mono.just(configMap));
-        initializationStateGetter.dataInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+                .thenReturn(Mono.just(configMap));
+        initializationStateGetter
+                .dataInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
 
         // call again
-        initializationStateGetter.dataInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+        initializationStateGetter
+                .dataInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
         // execute only once
         verify(client).fetch(eq(ConfigMap.class), eq(SystemState.SYSTEM_STATES_CONFIGMAP));
     }

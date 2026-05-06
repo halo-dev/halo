@@ -51,38 +51,43 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
     @Override
     public Result reconcile(VotedEvent votedEvent) {
         String counterName =
-            MeterUtils.nameOf(votedEvent.getGroup(), votedEvent.getPlural(), votedEvent.getName());
+                MeterUtils.nameOf(
+                        votedEvent.getGroup(), votedEvent.getPlural(), votedEvent.getName());
         client.fetch(Counter.class, counterName)
-            .ifPresentOrElse(counter -> {
-                if (votedEvent instanceof UpvotedEvent) {
-                    Integer existingVote = ObjectUtils.defaultIfNull(counter.getUpvote(), 0);
-                    counter.setUpvote(existingVote + 1);
-                } else if (votedEvent instanceof DownvotedEvent) {
-                    Integer existingVote = ObjectUtils.defaultIfNull(counter.getDownvote(), 0);
-                    counter.setDownvote(existingVote + 1);
-                }
-                client.update(counter);
-            }, () -> {
-                Counter counter = Counter.emptyCounter(counterName);
-                if (votedEvent instanceof UpvotedEvent) {
-                    counter.setUpvote(1);
-                } else if (votedEvent instanceof DownvotedEvent) {
-                    counter.setDownvote(1);
-                }
-                client.create(counter);
-            });
+                .ifPresentOrElse(
+                        counter -> {
+                            if (votedEvent instanceof UpvotedEvent) {
+                                Integer existingVote =
+                                        ObjectUtils.defaultIfNull(counter.getUpvote(), 0);
+                                counter.setUpvote(existingVote + 1);
+                            } else if (votedEvent instanceof DownvotedEvent) {
+                                Integer existingVote =
+                                        ObjectUtils.defaultIfNull(counter.getDownvote(), 0);
+                                counter.setDownvote(existingVote + 1);
+                            }
+                            client.update(counter);
+                        },
+                        () -> {
+                            Counter counter = Counter.emptyCounter(counterName);
+                            if (votedEvent instanceof UpvotedEvent) {
+                                counter.setUpvote(1);
+                            } else if (votedEvent instanceof DownvotedEvent) {
+                                counter.setDownvote(1);
+                            }
+                            client.create(counter);
+                        });
         return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            votedEventQueue,
-            null,
-            Duration.ofMillis(300),
-            Duration.ofMinutes(5));
+                this.getClass().getName(),
+                this,
+                votedEventQueue,
+                null,
+                Duration.ofMillis(300),
+                Duration.ofMinutes(5));
     }
 
     @Override
@@ -126,23 +131,24 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
             votedEventQueue.addImmediately(event);
         }
 
-        private boolean checkSubject(
-            GroupPluralName groupPluralName) {
-            Optional<Scheme> schemeOptional = schemeManager.schemes().stream()
-                .filter(scheme -> {
-                    GroupVersionKind gvk = scheme.groupVersionKind();
-                    return scheme.plural().equals(groupPluralName.plural())
-                        && gvk.group().equals(groupPluralName.group());
-                })
-                .findFirst();
-            return schemeOptional.map(
-                    scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
-                        .isPresent()
-                )
-                .orElse(false);
+        private boolean checkSubject(GroupPluralName groupPluralName) {
+            Optional<Scheme> schemeOptional =
+                    schemeManager.schemes().stream()
+                            .filter(
+                                    scheme -> {
+                                        GroupVersionKind gvk = scheme.groupVersionKind();
+                                        return scheme.plural().equals(groupPluralName.plural())
+                                                && gvk.group().equals(groupPluralName.group());
+                                    })
+                            .findFirst();
+            return schemeOptional
+                    .map(
+                            scheme ->
+                                    client.fetch(scheme.groupVersionKind(), groupPluralName.name())
+                                            .isPresent())
+                    .orElse(false);
         }
 
-        record GroupPluralName(String group, String plural, String name) {
-        }
+        record GroupPluralName(String group, String plural, String name) {}
     }
 }

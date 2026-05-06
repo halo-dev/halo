@@ -33,8 +33,10 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
     static final Pattern META_PATTERN = Pattern.compile("<meta[^>]+?name=\"([^\"]+)\"[^>]*>\\n*");
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(
+            ITemplateContext context,
+            IModel model,
+            IElementModelStructureHandler structureHandler) {
         IModel newModel = context.getModelFactory().createModel();
 
         Map<String, IndexedModel> uniqueMetaTags = new LinkedHashMap<>();
@@ -51,14 +53,13 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
                     String nameAttribute = matcher.group(1);
                     // create a new text node to replace the original text node
                     // replace multiple line breaks with one line break
-                    IText metaTagNode = context.getModelFactory()
-                        .createText(tagLine.replaceAll("\\n+", "\n"));
+                    IText metaTagNode =
+                            context.getModelFactory().createText(tagLine.replaceAll("\\n+", "\n"));
                     uniqueMetaTags.put(nameAttribute, new IndexedModel(i, metaTagNode));
                     text = text.replace(tagLine, "");
                 }
                 // put the rest of the text into the other model
-                IText otherText = context.getModelFactory()
-                    .createText(text);
+                IText otherText = context.getModelFactory().createText(text);
                 otherModel.add(new IndexedModel(i, otherText));
                 continue;
             }
@@ -76,15 +77,15 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
         }
 
         otherModel.addAll(uniqueMetaTags.values());
-        otherModel.stream().sorted(Comparator.comparing(IndexedModel::index))
-            .map(IndexedModel::templateEvent)
-            .forEach(newModel::add);
+        otherModel.stream()
+                .sorted(Comparator.comparing(IndexedModel::index))
+                .map(IndexedModel::templateEvent)
+                .forEach(newModel::add);
 
         model.reset();
         model.addModel(newModel);
         return Mono.empty();
     }
 
-    record IndexedModel(int index, ITemplateEvent templateEvent) {
-    }
+    record IndexedModel(int index, ITemplateEvent templateEvent) {}
 }

@@ -19,5 +19,4 @@ class StringUnknownKeyConverter implements Converter<String, UnknownKey> {
     public UnknownKey convert(String source) {
         return new UnknownKey(source);
     }
-
 }

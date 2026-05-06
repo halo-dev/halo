@@ -27,15 +27,16 @@ public class ThemeConfiguration {
 
     @Bean
     SpringSecurityDialect springSecurityDialect(
-        ServerSecurityContextRepository securityContextRepository,
-        ObjectProvider<MethodSecurityExpressionHandler> expressionHandler) {
+            ServerSecurityContextRepository securityContextRepository,
+            ObjectProvider<MethodSecurityExpressionHandler> expressionHandler) {
         return new HaloSpringSecurityDialect(securityContextRepository, expressionHandler);
     }
 
     @Bean
-    @ConditionalOnProperty(name = "halo.theme.generator-meta-disabled",
-        havingValue = "false",
-        matchIfMissing = true)
+    @ConditionalOnProperty(
+            name = "halo.theme.generator-meta-disabled",
+            havingValue = "false",
+            matchIfMissing = true)
     TemplateHeadProcessor generatorMetaProcessor(ObjectProvider<BuildProperties> buildProperties) {
         return new GeneratorMetaProcessor(buildProperties);
     }

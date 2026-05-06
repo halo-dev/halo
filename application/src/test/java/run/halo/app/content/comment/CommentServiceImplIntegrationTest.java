@@ -44,17 +44,13 @@ class CommentServiceImplIntegrationTest {
     class CommentRemoveTest {
         private final List<Comment> storedComments = createComments(350);
 
-        @Autowired
-        private SchemeManager schemeManager;
+        @Autowired private SchemeManager schemeManager;
 
-        @MockitoSpyBean
-        private ReactiveExtensionClient reactiveClient;
+        @MockitoSpyBean private ReactiveExtensionClient reactiveClient;
 
-        @Autowired
-        private ReactiveExtensionStoreClient storeClient;
+        @Autowired private ReactiveExtensionStoreClient storeClient;
 
-        @MockitoSpyBean
-        private CommentServiceImpl commentService;
+        @MockitoSpyBean private CommentServiceImpl commentService;
 
         Mono<Extension> deleteImmediately(Extension extension) {
             var name = extension.getMetadata().getName();
@@ -62,45 +58,49 @@ class CommentServiceImplIntegrationTest {
 
             // delete from db
             var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);
-            return storeClient.delete(storeName, extension.getMetadata().getVersion())
-                .thenReturn(extension);
+            return storeClient
+                    .delete(storeName, extension.getMetadata().getVersion())
+                    .thenReturn(extension);
         }
 
         @BeforeEach
         void setUp() {
             Flux.fromIterable(storedComments)
-                .flatMap(post -> reactiveClient.create(post))
-                .as(StepVerifier::create)
-                .expectNextCount(storedComments.size())
-                .verifyComplete();
+                    .flatMap(post -> reactiveClient.create(post))
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedComments.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(storedComments)
-                .flatMap(this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(storedComments.size())
-                .verifyComplete();
+                    .flatMap(this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedComments.size())
+                    .verifyComplete();
         }
 
         @Test
         void commentBatchDeletionTest() {
-            Ref ref = Ref.of("67",
-                GroupVersionKind.fromAPIVersionAndKind("content.halo.run/v1alpha1", "SinglePage"));
-            commentService.removeBySubject(ref)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            Ref ref =
+                    Ref.of(
+                            "67",
+                            GroupVersionKind.fromAPIVersionAndKind(
+                                    "content.halo.run/v1alpha1", "SinglePage"));
+            commentService.removeBySubject(ref).as(StepVerifier::create).verifyComplete();
 
             verify(reactiveClient, times(storedComments.size())).delete(any(Comment.class));
             verify(commentService, times(2)).listCommentsByRef(eq(ref), any());
 
-            commentService.listCommentsByRef(ref, PageRequestImpl.ofSize(1))
-                .as(StepVerifier::create)
-                .consumeNextWith(result -> {
-                    assertThat(result.getTotal()).isEqualTo(0);
-                })
-                .verifyComplete();
+            commentService
+                    .listCommentsByRef(ref, PageRequestImpl.ofSize(1))
+                    .as(StepVerifier::create)
+                    .consumeNextWith(
+                            result -> {
+                                assertThat(result.getTotal()).isEqualTo(0);
+                            })
+                    .verifyComplete();
         }
 
         List<Comment> createComments(int size) {
@@ -115,38 +115,40 @@ class CommentServiceImplIntegrationTest {
     }
 
     Comment createComment() {
-        return JsonUtils.jsonToObject("""
-              {
-                "spec": {
-                    "raw": "fake-raw",
-                    "content": "fake-content",
-                    "owner": {
-                        "kind": "User",
-                        "name": "fake-user"
+        return JsonUtils.jsonToObject(
+                """
+                  {
+                    "spec": {
+                        "raw": "fake-raw",
+                        "content": "fake-content",
+                        "owner": {
+                            "kind": "User",
+                            "name": "fake-user"
+                        },
+                        "userAgent": "",
+                        "ipAddress": "",
+                        "approvedTime": "2024-02-28T09:15:16.095Z",
+                        "creationTime": "2024-02-28T06:23:42.923294424Z",
+                        "priority": 0,
+                        "top": false,
+                        "allowNotification": false,
+                        "approved": true,
+                        "hidden": false,
+                        "subjectRef": {
+                            "group": "content.halo.run",
+                            "version": "v1alpha1",
+                            "kind": "SinglePage",
+                            "name": "67"
+                        },
+                        "lastReadTime": "2024-02-29T03:39:04.230Z"
                     },
-                    "userAgent": "",
-                    "ipAddress": "",
-                    "approvedTime": "2024-02-28T09:15:16.095Z",
-                    "creationTime": "2024-02-28T06:23:42.923294424Z",
-                    "priority": 0,
-                    "top": false,
-                    "allowNotification": false,
-                    "approved": true,
-                    "hidden": false,
-                    "subjectRef": {
-                        "group": "content.halo.run",
-                        "version": "v1alpha1",
-                        "kind": "SinglePage",
-                        "name": "67"
-                    },
-                    "lastReadTime": "2024-02-29T03:39:04.230Z"
-                },
-                "apiVersion": "content.halo.run/v1alpha1",
-                "kind": "Comment",
-                "metadata": {
-                    "generateName": "comment-"
+                    "apiVersion": "content.halo.run/v1alpha1",
+                    "kind": "Comment",
+                    "metadata": {
+                        "generateName": "comment-"
+                    }
                 }
-            }
-            """, Comment.class);
+                """,
+                Comment.class);
     }
 }

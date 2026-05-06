@@ -52,5 +52,4 @@ public interface SpringPluginManager extends PluginManager {
      * @return a list of really started plugins. Immutable.
      */
     List<PluginWrapper> startedPlugins();
-
 }

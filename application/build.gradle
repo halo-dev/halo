@@ -17,6 +17,7 @@ plugins {
     alias(libs.plugins.checksum)
     alias(libs.plugins.springdoc.openapi)
     alias(libs.plugins.versions)
+    alias(libs.plugins.spotless)
 }
 
 group = 'run.halo.app'
@@ -253,4 +254,10 @@ tasks.register('publishToAllRegistries') {
     group = 'publishing'
     description = 'Build and publish the Docker image to all configured registries.'
     dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub')
+}
+
+spotless {
+    java {
+        googleJavaFormat().aosp().reflowLongStrings().skipJavadocFormatting()
+    }
 }

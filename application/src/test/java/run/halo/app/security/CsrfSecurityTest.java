@@ -11,19 +11,18 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @AutoConfigureWebTestClient
 class CsrfSecurityTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
     @Test
     void shouldNotCheckCsrfForPatAuthentication() {
-        webClient.post()
-            .uri("/fake")
-            .headers(headers -> headers.setBearerAuth("pat_invalid"))
-            .exchange()
-            .expectStatus()
-            .isUnauthorized()
-            .expectHeader()
-            .exists(HttpHeaders.WWW_AUTHENTICATE);
+        webClient
+                .post()
+                .uri("/fake")
+                .headers(headers -> headers.setBearerAuth("pat_invalid"))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized()
+                .expectHeader()
+                .exists(HttpHeaders.WWW_AUTHENTICATE);
     }
-
 }

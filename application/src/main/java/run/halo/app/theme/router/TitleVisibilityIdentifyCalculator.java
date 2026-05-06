@@ -22,11 +22,9 @@ public class TitleVisibilityIdentifyCalculator {
     public String calculateTitle(String title, Post.VisibleEnum visibleEnum, Locale locale) {
         Assert.notNull(title, "Title must not be null");
         if (Post.VisibleEnum.PRIVATE.equals(visibleEnum)) {
-            String identify = messageSource.getMessage(
-                "title.visibility.identification.private",
-                null,
-                "",
-                locale);
+            String identify =
+                    messageSource.getMessage(
+                            "title.visibility.identification.private", null, "", locale);
             return title + identify;
         }
         return title;

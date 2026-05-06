@@ -103,105 +103,114 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         var events = new LinkedHashSet<ApplicationEvent>();
         client.fetch(Post.class, request.name())
-            .ifPresent(post -> {
-                if (ExtensionOperator.isDeleted(post)) {
-                    removeFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
-                    unPublishPost(post, events);
-                    events.add(new PostDeletedEvent(this, post));
-                    cleanUpResources(post);
-                    // update post to be able to be collected by gc collector.
-                    client.update(post);
-                    // fire event after updating post
-                    events.forEach(eventPublisher::publishEvent);
-                    return;
-                }
-                addFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
+                .ifPresent(
+                        post -> {
+                            if (ExtensionOperator.isDeleted(post)) {
+                                removeFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
+                                unPublishPost(post, events);
+                                events.add(new PostDeletedEvent(this, post));
+                                cleanUpResources(post);
+                                // update post to be able to be collected by gc collector.
+                                client.update(post);
+                                // fire event after updating post
+                                events.forEach(eventPublisher::publishEvent);
+                                return;
+                            }
+                            addFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
 
-                populateLabels(post, events);
+                            populateLabels(post, events);
 
-                schedulePublishIfNecessary(post);
+                            schedulePublishIfNecessary(post);
 
-                subscribeNewCommentNotification(post);
+                            subscribeNewCommentNotification(post);
 
-                var status = post.getStatus();
-                if (status == null) {
-                    status = new Post.PostStatus();
-                    post.setStatus(status);
-                }
+                            var status = post.getStatus();
+                            if (status == null) {
+                                status = new Post.PostStatus();
+                                post.setStatus(status);
+                            }
 
-                if (post.isPublished() && post.getSpec().getPublishTime() == null) {
-                    post.getSpec().setPublishTime(Instant.now());
-                }
+                            if (post.isPublished() && post.getSpec().getPublishTime() == null) {
+                                post.getSpec().setPublishTime(Instant.now());
+                            }
 
-                // calculate the sha256sum
-                var configSha256sum = Hashing.sha256().hashString(post.getSpec().toString(), UTF_8)
-                    .toString();
+                            // calculate the sha256sum
+                            var configSha256sum =
+                                    Hashing.sha256()
+                                            .hashString(post.getSpec().toString(), UTF_8)
+                                            .toString();
 
-                var annotations = nullSafeAnnotations(post);
-                var oldConfigChecksum = annotations.get(Constant.CHECKSUM_CONFIG_ANNO);
-                if (!Objects.equals(oldConfigChecksum, configSha256sum)) {
-                    // if the checksum doesn't match
-                    events.add(new PostUpdatedEvent(this, post.getMetadata().getName()));
-                    annotations.put(Constant.CHECKSUM_CONFIG_ANNO, configSha256sum);
-                }
+                            var annotations = nullSafeAnnotations(post);
+                            var oldConfigChecksum = annotations.get(Constant.CHECKSUM_CONFIG_ANNO);
+                            if (!Objects.equals(oldConfigChecksum, configSha256sum)) {
+                                // if the checksum doesn't match
+                                events.add(
+                                        new PostUpdatedEvent(this, post.getMetadata().getName()));
+                                annotations.put(Constant.CHECKSUM_CONFIG_ANNO, configSha256sum);
+                            }
 
-                if (shouldUnPublish(post)) {
-                    unPublishPost(post, events);
-                } else {
-                    publishPost(post, events);
-                }
+                            if (shouldUnPublish(post)) {
+                                unPublishPost(post, events);
+                            } else {
+                                publishPost(post, events);
+                            }
 
-                if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
-                    // only set the permalink pattern if not present
-                    var permalinkPattern = postPermalinkPolicy.pattern();
-                    annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
-                }
-                status.setPermalink(postPermalinkPolicy.permalink(post));
-                if (status.getPhase() == null) {
-                    status.setPhase(PostPhase.DRAFT.toString());
-                }
+                            if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+                                // only set the permalink pattern if not present
+                                var permalinkPattern = postPermalinkPolicy.pattern();
+                                annotations.put(Constant.PERMALINK_PATTERN_ANNO, permalinkPattern);
+                            }
+                            status.setPermalink(postPermalinkPolicy.permalink(post));
+                            if (status.getPhase() == null) {
+                                status.setPhase(PostPhase.DRAFT.toString());
+                            }
 
-                var excerpt = post.getSpec().getExcerpt();
-                if (excerpt == null) {
-                    excerpt = new Post.Excerpt();
-                }
-                var isAutoGenerate = defaultIfNull(excerpt.getAutoGenerate(), true);
-                if (isAutoGenerate) {
-                    status.setExcerpt(getExcerpt(post));
-                } else {
-                    status.setExcerpt(excerpt.getRaw());
-                }
+                            var excerpt = post.getSpec().getExcerpt();
+                            if (excerpt == null) {
+                                excerpt = new Post.Excerpt();
+                            }
+                            var isAutoGenerate = defaultIfNull(excerpt.getAutoGenerate(), true);
+                            if (isAutoGenerate) {
+                                status.setExcerpt(getExcerpt(post));
+                            } else {
+                                status.setExcerpt(excerpt.getRaw());
+                            }
 
-                var ref = Ref.of(post);
-                // handle contributors
-                var headSnapshot = post.getSpec().getHeadSnapshot();
-                var contributors = listSnapshots(ref)
-                    .stream()
-                    .map(snapshot -> {
-                        Set<String> usernames = snapshot.getSpec().getContributors();
-                        return Objects.requireNonNullElseGet(usernames,
-                            () -> new HashSet<String>());
-                    })
-                    .flatMap(Set::stream)
-                    .distinct()
-                    .sorted()
-                    .toList();
-                status.setContributors(contributors);
+                            var ref = Ref.of(post);
+                            // handle contributors
+                            var headSnapshot = post.getSpec().getHeadSnapshot();
+                            var contributors =
+                                    listSnapshots(ref).stream()
+                                            .map(
+                                                    snapshot -> {
+                                                        Set<String> usernames =
+                                                                snapshot.getSpec()
+                                                                        .getContributors();
+                                                        return Objects.requireNonNullElseGet(
+                                                                usernames,
+                                                                () -> new HashSet<String>());
+                                                    })
+                                            .flatMap(Set::stream)
+                                            .distinct()
+                                            .sorted()
+                                            .toList();
+                            status.setContributors(contributors);
 
-                // update in progress status
-                status.setInProgress(
-                    !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
+                            // update in progress status
+                            status.setInProgress(
+                                    !StringUtils.equals(
+                                            headSnapshot, post.getSpec().getReleaseSnapshot()));
 
-                computeHiddenState(post);
+                            computeHiddenState(post);
 
-                // version + 1 is required to truly equal version
-                // as a version will be incremented after the update
-                status.setObservedVersion(post.getMetadata().getVersion() + 1);
-                client.update(post);
+                            // version + 1 is required to truly equal version
+                            // as a version will be incremented after the update
+                            status.setObservedVersion(post.getMetadata().getVersion() + 1);
+                            client.update(post);
 
-                // fire event after updating post
-                events.forEach(eventPublisher::publishEvent);
-            });
+                            // fire event after updating post
+                            events.forEach(eventPublisher::publishEvent);
+                        });
         return Result.doNotRetry();
     }
 
@@ -211,10 +220,14 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             post.getStatusOrDefault().setHideFromList(false);
             return;
         }
-        var hidden = categories.stream()
-            .anyMatch(categoryName -> categoryService.isCategoryHidden(categoryName)
-                .blockOptional(BLOCKING_TIMEOUT).orElse(false)
-            );
+        var hidden =
+                categories.stream()
+                        .anyMatch(
+                                categoryName ->
+                                        categoryService
+                                                .isCategoryHidden(categoryName)
+                                                .blockOptional(BLOCKING_TIMEOUT)
+                                                .orElse(false));
         post.getStatusOrDefault().setHideFromList(hidden);
     }
 
@@ -253,12 +266,14 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Post())
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(Queries.equal(Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
-                .build())
-            .build();
+        return builder.extension(new Post())
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .andQuery(
+                                        Queries.equal(
+                                                Post.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                                .build())
+                .build();
     }
 
     void schedulePublishIfNecessary(Post post) {
@@ -278,8 +293,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             // update post changes before requeue
             client.update(post);
 
-            throw new RequeueException(Result.requeue(Duration.between(now, publishTime)),
-                "Requeue for scheduled publish.");
+            throw new RequeueException(
+                    Result.requeue(Duration.between(now, publishTime)),
+                    "Requeue for scheduled publish.");
         }
     }
 
@@ -290,7 +306,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
         interestReason.setExpression(
-            "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
+                "props.postOwner == '%s'".formatted(post.getSpec().getOwner()));
         notificationCenter.subscribe(subscriber, interestReason).block(BLOCKING_TIMEOUT);
     }
 
@@ -302,8 +318,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
         var annotations = post.getMetadata().getAnnotations();
         var lastReleaseSnapshot = annotations.get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
-        if (post.isPublished()
-            && Objects.equals(expectReleaseSnapshot, lastReleaseSnapshot)) {
+        if (post.isPublished() && Objects.equals(expectReleaseSnapshot, lastReleaseSnapshot)) {
             // If the release snapshot is not change
             return;
         }
@@ -311,27 +326,31 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         // validate the release snapshot
         var snapshot = client.fetch(Snapshot.class, expectReleaseSnapshot);
         if (snapshot.isEmpty()) {
-            Condition condition = Condition.builder()
-                .type(PostPhase.FAILED.name())
-                .reason("SnapshotNotFound")
-                .message(
-                    String.format("Snapshot [%s] not found for publish", expectReleaseSnapshot))
-                .status(ConditionStatus.FALSE)
-                .lastTransitionTime(Instant.now())
-                .build();
+            Condition condition =
+                    Condition.builder()
+                            .type(PostPhase.FAILED.name())
+                            .reason("SnapshotNotFound")
+                            .message(
+                                    String.format(
+                                            "Snapshot [%s] not found for publish",
+                                            expectReleaseSnapshot))
+                            .status(ConditionStatus.FALSE)
+                            .lastTransitionTime(Instant.now())
+                            .build();
             status.getConditionsOrDefault().addAndEvictFIFO(condition);
             status.setPhase(PostPhase.FAILED.name());
             return;
         }
         annotations.put(Post.LAST_RELEASED_SNAPSHOT_ANNO, expectReleaseSnapshot);
         status.setPhase(PostPhase.PUBLISHED.toString());
-        var condition = Condition.builder()
-            .type(PostPhase.PUBLISHED.name())
-            .reason("Published")
-            .message("Post published successfully.")
-            .lastTransitionTime(Instant.now())
-            .status(ConditionStatus.TRUE)
-            .build();
+        var condition =
+                Condition.builder()
+                        .type(PostPhase.PUBLISHED.name())
+                        .reason("Published")
+                        .message("Post published successfully.")
+                        .lastTransitionTime(Instant.now())
+                        .status(ConditionStatus.TRUE)
+                        .build();
         status.getConditionsOrDefault().addAndEvictFIFO(condition);
         var labels = post.getMetadata().getLabels();
         labels.put(Post.PUBLISHED_LABEL, Boolean.TRUE.toString());
@@ -373,15 +392,18 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         commentService.removeBySubject(ref).block(BLOCKING_TIMEOUT);
 
         // delete counter
-        counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
-            .block(BLOCKING_TIMEOUT);
+        counterService
+                .deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
+                .block(BLOCKING_TIMEOUT);
     }
 
     private String getExcerpt(Post post) {
         Optional<ContentWrapper> contentWrapper =
-            postService.getContent(post.getSpec().getReleaseSnapshot(),
-                    post.getSpec().getBaseSnapshot())
-                .blockOptional(BLOCKING_TIMEOUT);
+                postService
+                        .getContent(
+                                post.getSpec().getReleaseSnapshot(),
+                                post.getSpec().getBaseSnapshot())
+                        .blockOptional(BLOCKING_TIMEOUT);
         if (contentWrapper.isEmpty()) {
             return StringUtils.EMPTY;
         }
@@ -405,34 +427,44 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         var keywords = new HashSet<>(tags);
         keywords.add(post.getSpec().getTitle());
 
-        var context = new ExcerptGenerator.Context()
-            .setRaw(content.getRaw())
-            .setContent(content.getContent())
-            .setRawType(content.getRawType())
-            .setKeywords(keywords)
-            .setMaxLength(160);
-        return extensionGetter.getEnabledExtension(ExcerptGenerator.class)
-            .defaultIfEmpty(new DefaultExcerptGenerator())
-            .flatMap(generator -> generator.generate(context))
-            .onErrorResume(Throwable.class, e -> {
-                log.error("Failed to generate excerpt for post [{}]",
-                    post.getMetadata().getName(), e);
-                return Mono.empty();
-            })
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElse(StringUtils.EMPTY);
+        var context =
+                new ExcerptGenerator.Context()
+                        .setRaw(content.getRaw())
+                        .setContent(content.getContent())
+                        .setRawType(content.getRawType())
+                        .setKeywords(keywords)
+                        .setMaxLength(160);
+        return extensionGetter
+                .getEnabledExtension(ExcerptGenerator.class)
+                .defaultIfEmpty(new DefaultExcerptGenerator())
+                .flatMap(generator -> generator.generate(context))
+                .onErrorResume(
+                        Throwable.class,
+                        e -> {
+                            log.error(
+                                    "Failed to generate excerpt for post [{}]",
+                                    post.getMetadata().getName(),
+                                    e);
+                            return Mono.empty();
+                        })
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElse(StringUtils.EMPTY);
     }
 
     private Set<String> listTagDisplayNames(Post post) {
         return Optional.ofNullable(post.getSpec().getTags())
-            .map(tags -> client.listAll(Tag.class, ListOptions.builder()
-                .fieldQuery(in("metadata.name", tags))
-                .build(), Sort.unsorted())
-            )
-            .stream()
-            .flatMap(List::stream)
-            .map(tag -> tag.getSpec().getDisplayName())
-            .collect(Collectors.toSet());
+                .map(
+                        tags ->
+                                client.listAll(
+                                        Tag.class,
+                                        ListOptions.builder()
+                                                .fieldQuery(in("metadata.name", tags))
+                                                .build(),
+                                        Sort.unsorted()))
+                .stream()
+                .flatMap(List::stream)
+                .map(tag -> tag.getSpec().getDisplayName())
+                .collect(Collectors.toSet());
     }
 
     static class DefaultExcerptGenerator implements ExcerptGenerator {
@@ -446,8 +478,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     List<Snapshot> listSnapshots(Ref ref) {
         var snapshotListOptions = new ListOptions();
-        snapshotListOptions.setFieldSelector(FieldSelector.of(
-            Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
+        snapshotListOptions.setFieldSelector(
+                FieldSelector.of(Queries.equal("spec.subjectRef", Snapshot.toSubjectRefKey(ref))));
         return client.listAll(Snapshot.class, snapshotListOptions, Sort.unsorted());
     }
 }

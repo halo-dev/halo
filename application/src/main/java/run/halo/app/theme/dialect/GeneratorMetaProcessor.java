@@ -23,21 +23,30 @@ public class GeneratorMetaProcessor implements TemplateHeadProcessor {
     private final String generatorValue;
 
     public GeneratorMetaProcessor(ObjectProvider<BuildProperties> buildProperties) {
-        this.generatorValue = "Halo " + buildProperties.stream().findFirst()
-            .map(BuildProperties::getVersion)
-            .orElse("Unknown");
+        this.generatorValue =
+                "Halo "
+                        + buildProperties.stream()
+                                .findFirst()
+                                .map(BuildProperties::getVersion)
+                                .orElse("Unknown");
     }
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
-        return Mono.fromRunnable(() -> {
-            var modelFactory = context.getModelFactory();
-            var generatorMeta = modelFactory.createStandaloneElementTag("meta",
-                Map.of("name", "generator", "content", generatorValue),
-                DOUBLE, false, true);
-            model.add(generatorMeta);
-        });
+    public Mono<Void> process(
+            ITemplateContext context,
+            IModel model,
+            IElementModelStructureHandler structureHandler) {
+        return Mono.fromRunnable(
+                () -> {
+                    var modelFactory = context.getModelFactory();
+                    var generatorMeta =
+                            modelFactory.createStandaloneElementTag(
+                                    "meta",
+                                    Map.of("name", "generator", "content", generatorValue),
+                                    DOUBLE,
+                                    false,
+                                    true);
+                    model.add(generatorMeta);
+                });
     }
-
 }

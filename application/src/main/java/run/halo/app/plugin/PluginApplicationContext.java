@@ -28,8 +28,10 @@ public class PluginApplicationContext extends AnnotationConfigApplicationContext
 
     private final SpringPluginManager pluginManager;
 
-    public PluginApplicationContext(String pluginId, SpringPluginManager pluginManager,
-        DefaultListableBeanFactory beanFactory) {
+    public PluginApplicationContext(
+            String pluginId,
+            SpringPluginManager pluginManager,
+            DefaultListableBeanFactory beanFactory) {
         super(beanFactory);
         this.pluginId = pluginId;
         this.pluginManager = pluginManager;
@@ -68,7 +70,7 @@ public class PluginApplicationContext extends AnnotationConfigApplicationContext
     static class GvkExtensionMapping {
         private final StampedLock sl = new StampedLock();
         private final MultiValueMap<GroupVersionKind, String> extensionNamesMapping =
-            new LinkedMultiValueMap<>();
+                new LinkedMultiValueMap<>();
 
         public void addAllExtensionMapping(GroupVersionKind gvk, List<String> extensionNames) {
             long stamp = sl.writeLock();
@@ -117,7 +119,7 @@ public class PluginApplicationContext extends AnnotationConfigApplicationContext
     @Override
     protected void publishEvent(Object event, ResolvableType typeHint) {
         if (event instanceof ApplicationEvent applicationEvent
-            && AnnotationUtils.findAnnotation(event.getClass(), SharedEvent.class) != null) {
+                && AnnotationUtils.findAnnotation(event.getClass(), SharedEvent.class) != null) {
             // publish event via root context
             var delegateEvent = new PluginSharedEventDelegator(this, applicationEvent);
             pluginManager.getRootContext().publishEvent(delegateEvent);

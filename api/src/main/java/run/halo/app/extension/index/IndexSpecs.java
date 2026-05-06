@@ -46,9 +46,7 @@ public interface IndexSpecs<E extends Extension> {
      * @return a MultiValueBuilder for the specified index spec
      */
     static <E extends Extension, K extends Comparable<K>> MultiValueIndexSpecBuilder<E, K> multi(
-        String name,
-        Class<K> keyType
-    ) {
+            String name, Class<K> keyType) {
         return new MultiValueBuilder<>(name, keyType);
     }
 
@@ -62,10 +60,7 @@ public interface IndexSpecs<E extends Extension> {
      * @return a SingleValueBuilder for the specified index spec.
      */
     static <E extends Extension, K extends Comparable<K>> SingleValueIndexSpecBuilder<E, K> single(
-        String name,
-        Class<K> keyType
-    ) {
+            String name, Class<K> keyType) {
         return new SingleValueBuilder<>(name, keyType);
     }
-
 }

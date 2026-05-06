@@ -34,22 +34,27 @@ public class ReplyEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "ReplyV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("replies", this::listReplies, builder -> {
-                    builder.operationId("ListReplies")
-                        .description("List replies.")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(ListedReply.class))
-                        );
-                    ReplyQuery.buildParameters(builder);
-                }
-            )
-            .build();
+                .GET(
+                        "replies",
+                        this::listReplies,
+                        builder -> {
+                            builder.operationId("ListReplies")
+                                    .description("List replies.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    ListedReply.class)));
+                            ReplyQuery.buildParameters(builder);
+                        })
+                .build();
     }
 
     Mono<ServerResponse> listReplies(ServerRequest request) {
         ReplyQuery replyQuery = new ReplyQuery(request.exchange());
-        return replyService.list(replyQuery)
-            .flatMap(listedReplies -> ServerResponse.ok().bodyValue(listedReplies));
+        return replyService
+                .list(replyQuery)
+                .flatMap(listedReplies -> ServerResponse.ok().bodyValue(listedReplies));
     }
 }

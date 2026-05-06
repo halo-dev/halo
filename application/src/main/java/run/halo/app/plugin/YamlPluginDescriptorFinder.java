@@ -33,8 +33,7 @@ class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     @Override
     public boolean isApplicable(Path pluginPath) {
         return Files.exists(pluginPath)
-            && (Files.isDirectory(pluginPath)
-            || FileUtils.isJarFile(pluginPath));
+                && (Files.isDirectory(pluginPath) || FileUtils.isJarFile(pluginPath));
     }
 
     @Override
@@ -49,19 +48,24 @@ class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
         var author = spec.getAuthor();
         var provider = (author == null ? StringUtils.EMPTY : author.getName());
 
-        var defaultPluginDescriptor = new DefaultPluginDescriptor(pluginId,
-            spec.getDescription(),
-            BasePlugin.class.getName(),
-            spec.getVersion(),
-            spec.getRequires(),
-            provider,
-            joinLicense(spec.getLicense()));
+        var defaultPluginDescriptor =
+                new DefaultPluginDescriptor(
+                        pluginId,
+                        spec.getDescription(),
+                        BasePlugin.class.getName(),
+                        spec.getVersion(),
+                        spec.getRequires(),
+                        provider,
+                        joinLicense(spec.getLicense()));
         // add dependencies
-        spec.getPluginDependencies().forEach((pluginDepName, versionRequire) -> {
-            PluginDependency dependency =
-                new PluginDependency(String.format("%s@%s", pluginDepName, versionRequire));
-            defaultPluginDescriptor.addDependency(dependency);
-        });
+        spec.getPluginDependencies()
+                .forEach(
+                        (pluginDepName, versionRequire) -> {
+                            PluginDependency dependency =
+                                    new PluginDependency(
+                                            String.format("%s@%s", pluginDepName, versionRequire));
+                            defaultPluginDescriptor.addDependency(dependency);
+                        });
         return defaultPluginDescriptor;
     }
 
@@ -69,8 +73,6 @@ class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
         if (CollectionUtils.isEmpty(licenses)) {
             return StringUtils.EMPTY;
         }
-        return licenses.stream()
-            .map(Plugin.License::getName)
-            .collect(Collectors.joining(","));
+        return licenses.stream().map(Plugin.License::getName).collect(Collectors.joining(","));
     }
 }

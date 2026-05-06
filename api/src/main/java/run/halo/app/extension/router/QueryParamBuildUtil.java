@@ -14,14 +14,14 @@ public class QueryParamBuildUtil {
 
     public static org.springdoc.core.fn.builders.parameter.Builder sortParameter() {
         return parameterBuilder()
-            .in(ParameterIn.QUERY)
-            .name("sort")
-            .required(false)
-            .description("""
-                Sorting criteria in the format: property,(asc|desc). \
-                Default sort order is ascending. Multiple sort criteria are supported.\
-                """)
-            .array(arraySchemaBuilder().schema(schemaBuilder().type("string")));
+                .in(ParameterIn.QUERY)
+                .name("sort")
+                .required(false)
+                .description(
+                        """
+                        Sorting criteria in the format: property,(asc|desc). \
+                        Default sort order is ascending. Multiple sort criteria are supported.\
+                        """)
+                .array(arraySchemaBuilder().schema(schemaBuilder().type("string")));
     }
-
 }

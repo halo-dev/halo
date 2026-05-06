@@ -44,5 +44,4 @@ public interface ExtensionGetter {
      * @return a bunch of extension points.
      */
     <T extends ExtensionPoint> List<T> getExtensionList(Class<T> extensionPointClass);
-
 }

@@ -34,7 +34,8 @@ public record GroupVersion(String group, String version) {
             case 1 -> new GroupVersion("", apiVersion);
             case 2 -> new GroupVersion(groupVersion[0], groupVersion[1]);
             default ->
-                throw new IllegalArgumentException("Unexpected APIVersion string: " + apiVersion);
+                    throw new IllegalArgumentException(
+                            "Unexpected APIVersion string: " + apiVersion);
         };
     }
 }

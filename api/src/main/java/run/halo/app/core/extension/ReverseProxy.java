@@ -16,14 +16,16 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "plugin.halo.run", kind = "ReverseProxy", version = "v1alpha1",
-    plural = "reverseproxies", singular = "reverseproxy")
+@GVK(
+        group = "plugin.halo.run",
+        kind = "ReverseProxy",
+        version = "v1alpha1",
+        plural = "reverseproxies",
+        singular = "reverseproxy")
 public class ReverseProxy extends AbstractExtension {
     private List<ReverseProxyRule> rules;
 
-    public record ReverseProxyRule(String path, FileReverseProxyProvider file) {
-    }
+    public record ReverseProxyRule(String path, FileReverseProxyProvider file) {}
 
-    public record FileReverseProxyProvider(String directory, String filename) {
-    }
+    public record FileReverseProxyProvider(String directory, String filename) {}
 }

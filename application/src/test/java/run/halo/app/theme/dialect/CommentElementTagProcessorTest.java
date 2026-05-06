@@ -43,17 +43,13 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @ExtendWith(MockitoExtension.class)
 class CommentElementTagProcessorTest {
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    private ExtensionGetter extensionGetter;
+    @Mock private ExtensionGetter extensionGetter;
 
-    @Mock
-    private ObjectProvider<ExtensionGetter>  extensionGetterProvider;
+    @Mock private ObjectProvider<ExtensionGetter> extensionGetterProvider;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
     private TemplateEngine templateEngine;
 
@@ -63,10 +59,11 @@ class CommentElementTagProcessorTest {
         templateEngine = new TemplateEngine();
         templateEngine.setDialects(Set.of(haloProcessorDialect, new SpringStandardDialect()));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
-        lenient().when(applicationContext.getBean(eq(ExtensionGetter.class)))
-            .thenReturn(extensionGetter);
+        lenient()
+                .when(applicationContext.getBean(eq(ExtensionGetter.class)))
+                .thenReturn(extensionGetter);
         when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenReturn(extensionGetterProvider);
+                .thenReturn(extensionGetterProvider);
         when(extensionGetterProvider.getIfUnique()).thenReturn(null);
     }
 
@@ -75,44 +72,49 @@ class CommentElementTagProcessorTest {
         Context context = getContext();
 
         when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(environmentFetcher);
+                .thenReturn(environmentFetcher);
         var commentSetting = mock(SystemSetting.Comment.class);
-        when(environmentFetcher.fetchComment())
-            .thenReturn(Mono.just(commentSetting));
+        when(environmentFetcher.fetchComment()).thenReturn(Mono.just(commentSetting));
         when(commentSetting.getEnable()).thenReturn(true);
 
         when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
-            .thenReturn(Flux.empty());
+                .thenReturn(Flux.empty());
         String result = templateEngine.process("commentWidget", context);
-        assertThat(result).isEqualTo("""
-            <!DOCTYPE html>
-            <html lang="en">
-              <body>
-                <p>comment widget:</p>
-               \s
-              </body>
-            </html>
-            """);
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        <!DOCTYPE html>
+                        <html lang="en">
+                          <body>
+                            <p>comment widget:</p>
+                           \s
+                          </body>
+                        </html>
+                        """);
 
         when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
-            .thenReturn(Flux.just(new DefaultCommentWidget()));
+                .thenReturn(Flux.just(new DefaultCommentWidget()));
         result = templateEngine.process("commentWidget", context);
-        assertThat(result).isEqualTo("""
-            <!DOCTYPE html>
-            <html lang="en">
-              <body>
-                <p>comment widget:</p>
-                <p>Comment in default widget</p>
-              </body>
-            </html>
-            """);
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        <!DOCTYPE html>
+                        <html lang="en">
+                          <body>
+                            <p>comment widget:</p>
+                            <p>Comment in default widget</p>
+                          </body>
+                        </html>
+                        """);
     }
 
     static class DefaultCommentWidget implements CommentWidget {
 
         @Override
-        public void render(ITemplateContext context, IProcessableElementTag tag,
-            IElementTagStructureHandler structureHandler) {
+        public void render(
+                ITemplateContext context,
+                IProcessableElementTag tag,
+                IElementTagStructureHandler structureHandler) {
             structureHandler.replaceWith("<p>Comment in default widget</p>", false);
         }
     }
@@ -120,16 +122,18 @@ class CommentElementTagProcessorTest {
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             if (template.equals("commentWidget")) {
                 return new StringTemplateResource(commentWidget());
             }
@@ -138,14 +142,14 @@ class CommentElementTagProcessorTest {
 
         private String commentWidget() {
             return """
-                <!DOCTYPE html>
-                <html lang="en">
-                  <body>
-                    <p>comment widget:</p>
-                    <halo:comment/>
-                  </body>
-                </html>
-                """;
+            <!DOCTYPE html>
+            <html lang="en">
+              <body>
+                <p>comment widget:</p>
+                <halo:comment/>
+              </body>
+            </html>
+            """;
         }
     }
 }

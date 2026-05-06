@@ -26,14 +26,14 @@ public class DelegateExtensionClient implements ExtensionClient {
     }
 
     @Override
-    public <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator) {
+    public <E extends Extension> List<E> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator) {
         return client.list(type, predicate, comparator).collectList().block(TIMEOUT);
     }
 
     @Override
-    public <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size) {
+    public <E extends Extension> ListResult<E> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size) {
         return client.list(type, predicate, comparator, page, size).block(TIMEOUT);
     }
 
@@ -43,26 +43,26 @@ public class DelegateExtensionClient implements ExtensionClient {
     }
 
     @Override
-    public <E extends Extension> List<String> listAllNames(Class<E> type, ListOptions options,
-        Sort sort) {
+    public <E extends Extension> List<String> listAllNames(
+            Class<E> type, ListOptions options, Sort sort) {
         return client.listAllNames(type, options, sort).collectList().block(TIMEOUT);
     }
 
     @Override
-    public <E extends Extension> List<String> listTopNames(Class<E> type, ListOptions options,
-        Sort sort, int topN) {
+    public <E extends Extension> List<String> listTopNames(
+            Class<E> type, ListOptions options, Sort sort, int topN) {
         return client.listTopNames(type, options, sort, topN).collectList().block(TIMEOUT);
     }
 
     @Override
-    public <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options,
-        PageRequest page) {
+    public <E extends Extension> ListResult<E> listBy(
+            Class<E> type, ListOptions options, PageRequest page) {
         return client.listBy(type, options, page).block(TIMEOUT);
     }
 
     @Override
-    public <E extends Extension> ListResult<String> listNamesBy(Class<E> type, ListOptions options,
-        PageRequest page) {
+    public <E extends Extension> ListResult<String> listNamesBy(
+            Class<E> type, ListOptions options, PageRequest page) {
         return client.listNamesBy(type, options, page).block(TIMEOUT);
     }
 

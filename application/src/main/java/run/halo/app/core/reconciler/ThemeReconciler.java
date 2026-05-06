@@ -68,10 +68,12 @@ class ThemeReconciler implements Reconciler<Request> {
     private final SystemVersionSupplier systemVersionSupplier;
     private final TemplateEngineManager templateEngineManager;
 
-    private RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
-        .backOff(new FixedBackOff(300, 20))
-        .predicate(IllegalStateException.class::isInstance)
-        .build());
+    private RetryTemplate retryTemplate =
+            new RetryTemplate(
+                    RetryPolicy.builder()
+                            .backOff(new FixedBackOff(300, 20))
+                            .predicate(IllegalStateException.class::isInstance)
+                            .build());
 
     /**
      * Set retry template. Only for testing purpose.
@@ -85,29 +87,28 @@ class ThemeReconciler implements Reconciler<Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Theme.class, request.name())
-            .ifPresent(theme -> {
-                if (isDeleted(theme)) {
-                    if (removeFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME))) {
-                        cleanUpResources(theme);
-                        client.update(theme);
-                    }
-                    return;
-                }
-                addFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME));
+                .ifPresent(
+                        theme -> {
+                            if (isDeleted(theme)) {
+                                if (removeFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                    cleanUpResources(theme);
+                                    client.update(theme);
+                                }
+                                return;
+                            }
+                            addFinalizers(theme.getMetadata(), Set.of(FINALIZER_NAME));
 
-                reloadThemeExtensions(theme);
-                themeSettingDefaultConfig(theme);
-                reconcileStatus(theme);
-                client.update(theme);
-            });
+                            reloadThemeExtensions(theme);
+                            themeSettingDefaultConfig(theme);
+                            reconcileStatus(theme);
+                            client.update(theme);
+                        });
         return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Theme())
-            .build();
+        return builder.extension(new Theme()).build();
     }
 
     private void reloadThemeExtensions(Theme theme) {
@@ -115,24 +116,31 @@ class ThemeReconciler implements Reconciler<Request> {
         var currentThemeRoot = this.themeRoot.get().resolve(themeName);
         var extensions = ThemeUtils.loadThemeResources(currentThemeRoot);
         extensions.stream()
-            .filter(e -> ExtensionWhitelist.of(theme).isAllowed(e))
-            .forEach(e -> {
-                populateThemeNameLabel(e, themeName);
-                client.fetch(e.groupVersionKind(), e.getMetadata().getName())
-                    .ifPresentOrElse(
-                        existing -> {
-                            e.getMetadata().setVersion(existing.getMetadata().getVersion());
-                            log.debug("Updating extension [{}] for theme [{}]",
-                                e.getMetadata().getName(), themeName);
-                            client.update(e);
-                        },
-                        () -> {
-                            log.debug("Creating extension [{}] for theme [{}]",
-                                e.getMetadata().getName(), themeName);
-                            client.create(e);
-                        }
-                    );
-            });
+                .filter(e -> ExtensionWhitelist.of(theme).isAllowed(e))
+                .forEach(
+                        e -> {
+                            populateThemeNameLabel(e, themeName);
+                            client.fetch(e.groupVersionKind(), e.getMetadata().getName())
+                                    .ifPresentOrElse(
+                                            existing -> {
+                                                e.getMetadata()
+                                                        .setVersion(
+                                                                existing.getMetadata()
+                                                                        .getVersion());
+                                                log.debug(
+                                                        "Updating extension [{}] for theme [{}]",
+                                                        e.getMetadata().getName(),
+                                                        themeName);
+                                                client.update(e);
+                                            },
+                                            () -> {
+                                                log.debug(
+                                                        "Creating extension [{}] for theme [{}]",
+                                                        e.getMetadata().getName(),
+                                                        themeName);
+                                                client.create(e);
+                                            });
+                        });
     }
 
     private static void populateThemeNameLabel(Unstructured unstructured, String themeName) {
@@ -155,12 +163,13 @@ class ThemeReconciler implements Reconciler<Request> {
         status.setLocation(themePath.toAbsolutePath().toString());
 
         status.setPhase(Theme.ThemePhase.READY);
-        var conditionBuilder = Condition.builder()
-            .type(Theme.ThemePhase.READY.name())
-            .status(ConditionStatus.TRUE)
-            .reason(Theme.ThemePhase.READY.name())
-            .message(StringUtils.EMPTY)
-            .lastTransitionTime(Instant.now());
+        var conditionBuilder =
+                Condition.builder()
+                        .type(Theme.ThemePhase.READY.name())
+                        .status(ConditionStatus.TRUE)
+                        .reason(Theme.ThemePhase.READY.name())
+                        .message(StringUtils.EMPTY)
+                        .lastTransitionTime(Instant.now());
 
         // Check if this theme version is match requires param.
         var normalVersion = systemVersionSupplier.get().toStableVersion().toString();
@@ -168,12 +177,14 @@ class ThemeReconciler implements Reconciler<Request> {
         if (!VersionUtils.satisfiesRequires(normalVersion, requires)) {
             status.setPhase(Theme.ThemePhase.FAILED);
             conditionBuilder
-                .type(Theme.ThemePhase.FAILED.name())
-                .status(ConditionStatus.FALSE)
-                .reason("UnsatisfiedRequiresVersion")
-                .message(String.format(
-                    "Theme requires a minimum system version of [%s], and you have [%s].",
-                    requires, normalVersion));
+                    .type(Theme.ThemePhase.FAILED.name())
+                    .status(ConditionStatus.FALSE)
+                    .reason("UnsatisfiedRequiresVersion")
+                    .message(
+                            String.format(
+                                    "Theme requires a minimum system version of [%s], and you have"
+                                            + " [%s].",
+                                    requires, normalVersion));
         }
         Theme.nullSafeConditionList(theme).addAndEvictFIFO(conditionBuilder.build());
     }
@@ -203,12 +214,16 @@ class ThemeReconciler implements Reconciler<Request> {
         if (StringUtils.isNotBlank(settingName)) {
             client.fetch(Setting.class, settingName).ifPresent(client::delete);
             try {
-                retryTemplate.execute(() -> {
-                    client.fetch(Setting.class, settingName).ifPresent(setting -> {
-                        throw new IllegalStateException("Waiting for setting to be deleted.");
-                    });
-                    return null;
-                });
+                retryTemplate.execute(
+                        () -> {
+                            client.fetch(Setting.class, settingName)
+                                    .ifPresent(
+                                            setting -> {
+                                                throw new IllegalStateException(
+                                                        "Waiting for setting to be deleted.");
+                                            });
+                            return null;
+                        });
             } catch (RetryException e) {
                 throw Exceptions.propagate(e);
             }
@@ -226,23 +241,28 @@ class ThemeReconciler implements Reconciler<Request> {
         }
 
         try {
-            retryTemplate.execute(() -> {
-                var annotationSettings = listAnnotationSettingsByThemeName(themeName);
-                if (annotationSettings.isEmpty()) {
-                    return null;
-                }
-                throw new IllegalStateException("Waiting for annotation settings to be deleted.");
-            });
+            retryTemplate.execute(
+                    () -> {
+                        var annotationSettings = listAnnotationSettingsByThemeName(themeName);
+                        if (annotationSettings.isEmpty()) {
+                            return null;
+                        }
+                        throw new IllegalStateException(
+                                "Waiting for annotation settings to be deleted.");
+                    });
         } catch (RetryException e) {
             throw Exceptions.propagate(e);
         }
     }
 
     private List<AnnotationSetting> listAnnotationSettingsByThemeName(String themeName) {
-        return client.list(AnnotationSetting.class, annotationSetting -> {
-            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-            return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
-        }, null);
+        return client.list(
+                AnnotationSetting.class,
+                annotationSetting -> {
+                    Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
+                    return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
+                },
+                null);
     }
 
     private void deleteThemeFiles(Theme theme) {
@@ -267,8 +287,7 @@ class ThemeReconciler implements Reconciler<Request> {
         }
 
         public boolean isAllowed(Unstructured unstructured) {
-            return this.rules.stream()
-                .anyMatch(rule -> rule.matches(unstructured));
+            return this.rules.stream().anyMatch(rule -> rule.matches(unstructured));
         }
 
         private Set<AllowedExtension> getRules(Theme theme) {
@@ -307,8 +326,9 @@ class ThemeReconciler implements Reconciler<Request> {
         public boolean matches(Unstructured unstructured) {
             var groupVersionKind = unstructured.groupVersionKind();
             return this.apiGroup.equals(groupVersionKind.group())
-                && this.kind.equals(groupVersionKind.kind())
-                && (this.name == null || this.name.equals(unstructured.getMetadata().getName()));
+                    && this.kind.equals(groupVersionKind.kind())
+                    && (this.name == null
+                            || this.name.equals(unstructured.getMetadata().getName()));
         }
     }
 }

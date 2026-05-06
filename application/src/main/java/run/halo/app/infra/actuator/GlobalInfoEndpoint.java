@@ -22,5 +22,4 @@ class GlobalInfoEndpoint {
     public Mono<GlobalInfo> globalInfo() {
         return globalInfoService.getGlobalInfo();
     }
-
 }

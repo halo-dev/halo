@@ -31,33 +31,33 @@ import run.halo.app.theme.finders.vo.MenuVo;
 @ExtendWith(MockitoExtension.class)
 class MenuFinderImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private MenuFinderImpl menuFinder;
+    @InjectMocks private MenuFinderImpl menuFinder;
 
     @Test
     void listAsTree() {
         Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
         Mockito.when(client.list(eq(Menu.class), eq(null), eq(null)))
-            .thenReturn(Flux.fromIterable(tuple.getT1()));
+                .thenReturn(Flux.fromIterable(tuple.getT1()));
         Mockito.when(client.list(eq(MenuItem.class), eq(null), any()))
-            .thenReturn(Flux.fromIterable(tuple.getT2()));
+                .thenReturn(Flux.fromIterable(tuple.getT2()));
 
         List<MenuVo> menuVos = menuFinder.listAsTree().collectList().block();
-        assertThat(visualizeTree(menuVos)).isEqualTo("""
-            D
-            └── E
-                ├── A
-                │   └── B
-                └── C
-            X
-            └── G
-            Y
-            └── F
-                └── H
-            """);
+        assertThat(visualizeTree(menuVos))
+                .isEqualTo(
+                        """
+                        D
+                        └── E
+                            ├── A
+                            │   └── B
+                            └── C
+                        X
+                        └── G
+                        Y
+                        └── F
+                            └── H
+                        """);
     }
 
     /**
@@ -93,8 +93,9 @@ class MenuFinderImplTest {
         MenuItem itemB = menuItem("B", null);
         MenuItem itemC = menuItem("C", null);
         MenuItem itemH = menuItem("H", null);
-        return Tuples.of(List.of(menuD, menuX, menuY),
-            List.of(itemE, itemG, itemF, itemA, itemB, itemC, itemH));
+        return Tuples.of(
+                List.of(menuD, menuX, menuY),
+                List.of(itemE, itemG, itemF, itemA, itemB, itemC, itemH));
     }
 
     LinkedHashSet<String> of(String... names) {

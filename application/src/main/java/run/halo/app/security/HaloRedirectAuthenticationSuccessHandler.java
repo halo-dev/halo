@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 public class HaloRedirectAuthenticationSuccessHandler
-    implements ServerAuthenticationSuccessHandler {
+        implements ServerAuthenticationSuccessHandler {
 
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
@@ -32,23 +32,21 @@ public class HaloRedirectAuthenticationSuccessHandler
     }
 
     @Override
-    public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
-        Authentication authentication) {
+    public Mono<Void> onAuthenticationSuccess(
+            WebFilterExchange webFilterExchange, Authentication authentication) {
         var request = webFilterExchange.getExchange().getRequest();
-        var redirectUriQuery = request.getQueryParams()
-            .getFirst("redirect_uri");
+        var redirectUriQuery = request.getQueryParams().getFirst("redirect_uri");
         if (redirectUriQuery == null || redirectUriQuery.isBlank()) {
             return redirectStrategy.sendRedirect(webFilterExchange.getExchange(), location);
         }
         var redirectUri = uriInApplication(request, URI.create(redirectUriQuery));
         if (log.isDebugEnabled()) {
             log.debug(
-                "Redirecting to: {} after switching to {}",
-                redirectUri, authentication.getName()
-            );
+                    "Redirecting to: {} after switching to {}",
+                    redirectUri,
+                    authentication.getName());
         }
         return redirectStrategy.sendRedirect(
-            webFilterExchange.getExchange(), URI.create(redirectUri)
-        );
+                webFilterExchange.getExchange(), URI.create(redirectUri));
     }
 }

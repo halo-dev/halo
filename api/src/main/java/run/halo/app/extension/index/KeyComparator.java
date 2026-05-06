@@ -102,8 +102,8 @@ class KeyComparator implements Comparator<String> {
         return compareFractionalPart(a, b, pointA + 1, pointB + 1);
     }
 
-    private int compareIntegerPart(String a, String b, int startA, int startB, int pointA,
-        int pointB) {
+    private int compareIntegerPart(
+            String a, String b, int startA, int startB, int pointA, int pointB) {
         int i = startA;
         int j = startB;
 
@@ -127,8 +127,10 @@ class KeyComparator implements Comparator<String> {
     }
 
     private int compareFractionalPart(String a, String b, int i, int j) {
-        while (i < a.length() && j < b.length()
-            && Character.isDigit(a.charAt(i)) && Character.isDigit(b.charAt(j))) {
+        while (i < a.length()
+                && j < b.length()
+                && Character.isDigit(a.charAt(i))
+                && Character.isDigit(b.charAt(j))) {
             if (a.charAt(i) != b.charAt(j)) {
                 return Character.compare(a.charAt(i), b.charAt(j));
             }
@@ -163,8 +165,8 @@ class KeyComparator implements Comparator<String> {
     }
 
     private int moveIndexToNextNonDigit(String s, int index) {
-        while (index < s.length() && (Character.isDigit(s.charAt(index))
-            || s.charAt(index) == '.')) {
+        while (index < s.length()
+                && (Character.isDigit(s.charAt(index)) || s.charAt(index) == '.')) {
             index++;
         }
         return index;

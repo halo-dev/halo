@@ -33,13 +33,13 @@ public class EmailNotifier implements ReactiveNotifier {
     private final NotificationTemplateRender notificationTemplateRender;
     private final EmailSenderHelper emailSenderHelper;
     private final AtomicReference<Pair<EmailSenderConfig, JavaMailSender>>
-        emailSenderConfigPairRef = new AtomicReference<>();
+            emailSenderConfigPairRef = new AtomicReference<>();
 
     @Override
     public Mono<Void> notify(NotificationContext context) {
         JsonNode senderConfig = context.getSenderConfig();
         var emailSenderConfig =
-            JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
+                JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
 
         if (!emailSenderConfig.isEnable()) {
             log.debug("Email notifier is disabled, skip sending email.");
@@ -52,70 +52,98 @@ public class EmailNotifier implements ReactiveNotifier {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(recipient);
         var payload = context.getMessage().getPayload();
-        return subscriberEmailResolver.resolve(subscriber)
-            .flatMap(toEmail -> {
-                if (StringUtils.isBlank(toEmail)) {
-                    log.debug("Cannot resolve email for subscriber: [{}], skip sending email.",
-                        subscriber);
-                    return Mono.empty();
-                }
-                var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
-                    .doOnNext(footer -> {
-                        if (StringUtils.isNotBlank(payload.getHtmlBody())) {
-                            payload.setHtmlBody(payload.getHtmlBody() + "\n" + footer);
-                        }
-                    });
-                var rawMono = appendRawBodyFooter(payload.getAttributes())
-                    .doOnNext(footer -> {
-                        if (StringUtils.isNotBlank(payload.getRawBody())) {
-                            payload.setRawBody(payload.getRawBody() + "\n" + footer);
-                        }
-                    });
-                return Mono.when(htmlMono, rawMono)
-                    .thenReturn(toEmail);
-            })
-            .map(toEmail -> getMimeMessagePreparator(toEmail, emailSenderConfig, payload))
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(javaMailSender::send)
-            .then();
+        return subscriberEmailResolver
+                .resolve(subscriber)
+                .flatMap(
+                        toEmail -> {
+                            if (StringUtils.isBlank(toEmail)) {
+                                log.debug(
+                                        "Cannot resolve email for subscriber: [{}], skip sending"
+                                                + " email.",
+                                        subscriber);
+                                return Mono.empty();
+                            }
+                            var htmlMono =
+                                    appendHtmlBodyFooter(payload.getAttributes())
+                                            .doOnNext(
+                                                    footer -> {
+                                                        if (StringUtils.isNotBlank(
+                                                                payload.getHtmlBody())) {
+                                                            payload.setHtmlBody(
+                                                                    payload.getHtmlBody()
+                                                                            + "\n"
+                                                                            + footer);
+                                                        }
+                                                    });
+                            var rawMono =
+                                    appendRawBodyFooter(payload.getAttributes())
+                                            .doOnNext(
+                                                    footer -> {
+                                                        if (StringUtils.isNotBlank(
+                                                                payload.getRawBody())) {
+                                                            payload.setRawBody(
+                                                                    payload.getRawBody()
+                                                                            + "\n"
+                                                                            + footer);
+                                                        }
+                                                    });
+                            return Mono.when(htmlMono, rawMono).thenReturn(toEmail);
+                        })
+                .map(toEmail -> getMimeMessagePreparator(toEmail, emailSenderConfig, payload))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(javaMailSender::send)
+                .then();
     }
 
-    private MimeMessagePreparator getMimeMessagePreparator(String toEmail,
-        EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
-        return emailSenderHelper.createMimeMessagePreparator(emailSenderConfig, toEmail,
-            payload.getTitle(),
-            payload.getRawBody(), payload.getHtmlBody());
+    private MimeMessagePreparator getMimeMessagePreparator(
+            String toEmail,
+            EmailSenderConfig emailSenderConfig,
+            NotificationContext.MessagePayload payload) {
+        return emailSenderHelper.createMimeMessagePreparator(
+                emailSenderConfig,
+                toEmail,
+                payload.getTitle(),
+                payload.getRawBody(),
+                payload.getHtmlBody());
     }
 
     JavaMailSender getJavaMailSender(EmailSenderConfig emailSenderConfig) {
-        return emailSenderConfigPairRef.updateAndGet(pair -> {
-            if (pair != null && pair.getFirst().equals(emailSenderConfig)) {
-                return pair;
-            }
-            return Pair.of(emailSenderConfig,
-                emailSenderHelper.createJavaMailSender(emailSenderConfig));
-        }).getSecond();
+        return emailSenderConfigPairRef
+                .updateAndGet(
+                        pair -> {
+                            if (pair != null && pair.getFirst().equals(emailSenderConfig)) {
+                                return pair;
+                            }
+                            return Pair.of(
+                                    emailSenderConfig,
+                                    emailSenderHelper.createJavaMailSender(emailSenderConfig));
+                        })
+                .getSecond();
     }
 
     Mono<String> appendRawBodyFooter(ReasonAttributes attributes) {
-        return notificationTemplateRender.render("""
-            ---
-            如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
-            [(${site.title})]
-            """, attributes);
+        return notificationTemplateRender.render(
+                """
+                ---
+                如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
+                [(${site.title})]
+                """,
+                attributes);
     }
 
     Mono<String> appendHtmlBodyFooter(ReasonAttributes attributes) {
-        return notificationTemplateRender.render("""
-            <div class="footer" style="font-size: 12px; color: #666;">
-            <a th:href="${site.url}" th:text="${site.title}"></a>
-            <p class="unsubscribe">
-            &mdash;<br />请勿直接回复此邮件，
-            <a th:href="|${site.url}/uc/notifications|">查看通知</a>
-            或
-            <a th:href="${unsubscribeUrl}">取消订阅</a>。
-            </p>
-            </div>
-            """, attributes);
+        return notificationTemplateRender.render(
+                """
+                <div class="footer" style="font-size: 12px; color: #666;">
+                <a th:href="${site.url}" th:text="${site.title}"></a>
+                <p class="unsubscribe">
+                &mdash;<br />请勿直接回复此邮件，
+                <a th:href="|${site.url}/uc/notifications|">查看通知</a>
+                或
+                <a th:href="${unsubscribeUrl}">取消订阅</a>。
+                </p>
+                </div>
+                """,
+                attributes);
     }
 }

@@ -37,19 +37,20 @@ public class JwtProperties {
     /**
      * Location of the file containing the public key used to verify a JWT.
      */
-    @NotNull
-    private Resource publicKeyLocation;
+    @NotNull private Resource publicKeyLocation;
 
-    @NotNull
-    private Resource privateKeyLocation;
+    @NotNull private Resource privateKeyLocation;
 
     private final RSAPrivateKey privateKey;
 
     private final RSAPublicKey publicKey;
 
-    public JwtProperties(String issuerUri, SignatureAlgorithm jwsAlgorithm,
-        Resource publicKeyLocation,
-        Resource privateKeyLocation) throws IOException {
+    public JwtProperties(
+            String issuerUri,
+            SignatureAlgorithm jwsAlgorithm,
+            Resource publicKeyLocation,
+            Resource privateKeyLocation)
+            throws IOException {
         this.issuerUri = issuerUri;
         this.jwsAlgorithm = jwsAlgorithm;
         if (jwsAlgorithm == null) {
@@ -58,7 +59,7 @@ public class JwtProperties {
         this.publicKeyLocation = publicKeyLocation;
         this.privateKeyLocation = privateKeyLocation;
 
-        //TODO initialize private and public keys at first startup.
+        // TODO initialize private and public keys at first startup.
         this.privateKey = this.readPrivateKey();
         this.publicKey = this.readPublicKey();
     }
@@ -107,13 +108,12 @@ public class JwtProperties {
         String key = "halo.security.oauth2.jwt.public-key-location";
         Assert.notNull(this.publicKeyLocation, "PublicKeyLocation must not be null");
         if (!this.publicKeyLocation.exists()) {
-            throw new InvalidConfigurationPropertyValueException(key, this.publicKeyLocation,
-                "Public key location does not exist");
+            throw new InvalidConfigurationPropertyValueException(
+                    key, this.publicKeyLocation, "Public key location does not exist");
         }
         try (InputStream inputStream = this.publicKeyLocation.getInputStream()) {
             String source = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-            return RsaKeyConverters.x509()
-                .convert(new ByteArrayInputStream(source.getBytes()));
+            return RsaKeyConverters.x509().convert(new ByteArrayInputStream(source.getBytes()));
         }
     }
 
@@ -121,13 +121,12 @@ public class JwtProperties {
         String key = "halo.security.oauth2.jwt.private-key-location";
         Assert.notNull(this.privateKeyLocation, "PrivateKeyLocation must not be null");
         if (!this.privateKeyLocation.exists()) {
-            throw new InvalidConfigurationPropertyValueException(key, this.privateKeyLocation,
-                "Private key location does not exist");
+            throw new InvalidConfigurationPropertyValueException(
+                    key, this.privateKeyLocation, "Private key location does not exist");
         }
         try (InputStream inputStream = this.privateKeyLocation.getInputStream()) {
             String source = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-            return RsaKeyConverters.pkcs8()
-                .convert(new ByteArrayInputStream(source.getBytes()));
+            return RsaKeyConverters.pkcs8().convert(new ByteArrayInputStream(source.getBytes()));
         }
     }
 }

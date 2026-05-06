@@ -29,9 +29,8 @@ class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<Sch
 
     private final Watcher watcher;
 
-    GcSynchronizer(ExtensionClient client,
-        RequestQueue<GcRequest> queue,
-        SchemeManager schemeManager) {
+    GcSynchronizer(
+            ExtensionClient client, RequestQueue<GcRequest> queue, SchemeManager schemeManager) {
         this.client = client;
         this.schemeManager = schemeManager;
         this.watcher = new GcWatcher(queue);
@@ -67,15 +66,15 @@ class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<Sch
         this.started = true;
         client.watch(watcher);
         schemeManager.schemes().stream()
-            .map(Scheme::type)
-            .forEach(type -> listDeleted(type).forEach(watcher::onDelete));
+                .map(Scheme::type)
+                .forEach(type -> listDeleted(type).forEach(watcher::onDelete));
     }
 
     <E extends Extension> List<E> listDeleted(Class<E> type) {
-        var options = new ListOptions()
-            .setFieldSelector(
-                FieldSelector.of(not(isNull("metadata.deletionTimestamp")))
-            );
+        var options =
+                new ListOptions()
+                        .setFieldSelector(
+                                FieldSelector.of(not(isNull("metadata.deletionTimestamp"))));
         // TODO Refine with scrolling query
         return client.listAll(type, options, Sort.by(Sort.Order.asc("metadata.creationTimestamp")));
     }

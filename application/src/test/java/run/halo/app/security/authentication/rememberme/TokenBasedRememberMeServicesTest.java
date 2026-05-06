@@ -24,11 +24,9 @@ import reactor.test.StepVerifier;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class TokenBasedRememberMeServicesTest {
 
-    @Mock
-    CookieSignatureKeyResolver cookieSignatureKeyResolver;
+    @Mock CookieSignatureKeyResolver cookieSignatureKeyResolver;
 
-    @InjectMocks
-    private TokenBasedRememberMeServices tokenBasedRememberMeServices;
+    @InjectMocks private TokenBasedRememberMeServices tokenBasedRememberMeServices;
 
     @Test
     void retrieveUserName() {
@@ -45,42 +43,61 @@ class TokenBasedRememberMeServicesTest {
     void makeTokenSignatureTest() {
         when(cookieSignatureKeyResolver.resolveSigningKey()).thenReturn(Mono.just("fake-key"));
         var expireMs = 1716435187323L;
-        tokenBasedRememberMeServices.makeTokenSignature(expireMs, "fake-user", "pwd-1",
-                TokenBasedRememberMeServices.DEFAULT_ALGORITHM)
-            .as(StepVerifier::create)
-            .expectNext("29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7")
-            .verifyComplete();
+        tokenBasedRememberMeServices
+                .makeTokenSignature(
+                        expireMs,
+                        "fake-user",
+                        "pwd-1",
+                        TokenBasedRememberMeServices.DEFAULT_ALGORITHM)
+                .as(StepVerifier::create)
+                .expectNext("29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7")
+                .verifyComplete();
     }
 
     @Test
     void encodeCookieTest() {
         var expireMs = 1716435187323L;
-        var cookieTokens = new String[] {"fake-user", Long.toString(expireMs),
-            TokenBasedRememberMeServices.DEFAULT_ALGORITHM,
-            "29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7"};
+        var cookieTokens =
+                new String[] {
+                    "fake-user",
+                    Long.toString(expireMs),
+                    TokenBasedRememberMeServices.DEFAULT_ALGORITHM,
+                    "29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7"
+                };
         var encode = tokenBasedRememberMeServices.encodeCookie(cookieTokens);
         assertThat(encode)
-            .isEqualTo("ZmFrZS11c2VyOjE3MTY0MzUxODczMjM6U0hBLTI1NjoyOWYxYzdjY2JiNDg5NzQxMz"
-                + "kyZDI3YmE1YzMwZjMwZDA1Yzc5ZWU2NjI4OWI2ZDZkYTViNDMxYmJhOTlhMGM3");
+                .isEqualTo(
+                        "ZmFrZS11c2VyOjE3MTY0MzUxODczMjM6U0hBLTI1NjoyOWYxYzdjY2JiNDg5NzQxMz"
+                                + "kyZDI3YmE1YzMwZjMwZDA1Yzc5ZWU2NjI4OWI2ZDZkYTViNDMxYmJhOTlhMGM3");
     }
 
     @Test
     void decodeCookieTest() {
-        var cookieValue = "YWRtaW46MTcxODk2NDE3NDgwODpTSEE"
-            + "tMjU2OmNkOTM0ZTAyZWQ4NGJmMzc1ZTA4MmE1OWU4YTA3NTNiMzA3ODg1MjZmYzA3Yjgy"
-            + "YzVmY2Y3YmJiYzdjYzRkNWU";
+        var cookieValue =
+                "YWRtaW46MTcxODk2NDE3NDgwODpTSEE"
+                        + "tMjU2OmNkOTM0ZTAyZWQ4NGJmMzc1ZTA4MmE1OWU4YTA3NTNiMzA3ODg1MjZmYzA3Yjgy"
+                        + "YzVmY2Y3YmJiYzdjYzRkNWU";
         // 123 % 4 = 3, so we need to add 1 '=' to make it a multiple of 4 for
         // spring-security/gh-15127
         assertThat(cookieValue.length()).isEqualTo(123);
         var cookie = tokenBasedRememberMeServices.decodeCookie(cookieValue);
-        assertThat(cookie).containsExactly("admin", "1718964174808", "SHA-256",
-            "cd934e02ed84bf375e082a59e8a0753b30788526fc07b82c5fcf7bbbc7cc4d5e");
+        assertThat(cookie)
+                .containsExactly(
+                        "admin",
+                        "1718964174808",
+                        "SHA-256",
+                        "cd934e02ed84bf375e082a59e8a0753b30788526fc07b82c5fcf7bbbc7cc4d5e");
 
-        cookieValue = "ZmFrZS11c2VyOjE3MTY0MzUxODczMjM6U0hBLTI1NjoyOWYxYzdjY2JiNDg5NzQxMz"
-            + "kyZDI3YmE1YzMwZjMwZDA1Yzc5ZWU2NjI4OWI2ZDZkYTViNDMxYmJhOTlhMGM3";
+        cookieValue =
+                "ZmFrZS11c2VyOjE3MTY0MzUxODczMjM6U0hBLTI1NjoyOWYxYzdjY2JiNDg5NzQxMz"
+                        + "kyZDI3YmE1YzMwZjMwZDA1Yzc5ZWU2NjI4OWI2ZDZkYTViNDMxYmJhOTlhMGM3";
         assertThat(cookieValue.length()).isEqualTo(128);
         cookie = tokenBasedRememberMeServices.decodeCookie(cookieValue);
-        assertThat(cookie).containsExactly("fake-user", "1716435187323", "SHA-256",
-            "29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7");
+        assertThat(cookie)
+                .containsExactly(
+                        "fake-user",
+                        "1716435187323",
+                        "SHA-256",
+                        "29f1c7ccbb489741392d27ba5c30f30d05c79ee66289b6d6da5b431bba99a0c7");
     }
 }

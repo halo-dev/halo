@@ -14,8 +14,7 @@ public class AttachmentProperties {
 
     private List<ResourceMapping> resourceMappings = new LinkedList<>();
 
-    @Valid
-    @NestedConfigurationProperty
+    @Valid @NestedConfigurationProperty
     private final ThumbnailProperties thumbnail = new ThumbnailProperties();
 
     @Data
@@ -38,7 +37,6 @@ public class AttachmentProperties {
         @PositiveOrZero
         @Max(1)
         private Double quality;
-
     }
 
     @Data
@@ -53,6 +51,5 @@ public class AttachmentProperties {
          * The location is a relative path to attachments folder in working directory.
          */
         private List<String> locations;
-
     }
 }

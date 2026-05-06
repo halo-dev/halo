@@ -33,37 +33,43 @@ class InitializeRedirectionWebFilter implements WebFilter {
 
     private final InitializationStateGetter initializationStateGetter;
 
-    @Getter
-    private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
+    @Getter private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     InitializeRedirectionWebFilter(InitializationStateGetter initializationStateGetter) {
         this.initializationStateGetter = initializationStateGetter;
 
         var html = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         html.setIgnoredMediaTypes(Set.of(MediaType.ALL));
-        this.redirectMatcher = new AndServerWebExchangeMatcher(
-            pathMatchers(HttpMethod.GET, "/", "/console/**", "/uc/**", "/login", "/signup"),
-            html
-        );
+        this.redirectMatcher =
+                new AndServerWebExchangeMatcher(
+                        pathMatchers(
+                                HttpMethod.GET, "/", "/console/**", "/uc/**", "/login", "/signup"),
+                        html);
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return redirectMatcher.matches(exchange)
-            .flatMap(matched -> {
-                if (!matched.isMatch()) {
-                    return chain.filter(exchange);
-                }
-                return initializationStateGetter.userInitialized()
-                    .defaultIfEmpty(false)
-                    .flatMap(initialized -> {
-                        if (initialized) {
-                            return chain.filter(exchange);
-                        }
-                        // Redirect to set up page if system is not initialized.
-                        return redirectStrategy.sendRedirect(exchange, location);
-                    });
-            });
+        return redirectMatcher
+                .matches(exchange)
+                .flatMap(
+                        matched -> {
+                            if (!matched.isMatch()) {
+                                return chain.filter(exchange);
+                            }
+                            return initializationStateGetter
+                                    .userInitialized()
+                                    .defaultIfEmpty(false)
+                                    .flatMap(
+                                            initialized -> {
+                                                if (initialized) {
+                                                    return chain.filter(exchange);
+                                                }
+                                                // Redirect to set up page if system is not
+                                                // initialized.
+                                                return redirectStrategy.sendRedirect(
+                                                        exchange, location);
+                                            });
+                        });
     }
 
     public void setRedirectStrategy(ServerRedirectStrategy redirectStrategy) {

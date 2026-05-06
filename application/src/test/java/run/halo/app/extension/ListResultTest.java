@@ -20,10 +20,12 @@ class ListResultTest {
     @Test
     void generateGenericClass() {
         var fakeListClass =
-            ListResult.generateGenericClass(Scheme.buildFromType(FakeExtension.class));
+                ListResult.generateGenericClass(Scheme.buildFromType(FakeExtension.class));
         assertTrue(ListResult.class.isAssignableFrom(fakeListClass));
-        assertSame(FakeExtension.class, ((ParameterizedType) fakeListClass.getGenericSuperclass())
-            .getActualTypeArguments()[0]);
+        assertSame(
+                FakeExtension.class,
+                ((ParameterizedType) fakeListClass.getGenericSuperclass())
+                        .getActualTypeArguments()[0]);
         assertEquals("FakeList", fakeListClass.getSimpleName());
     }
 
@@ -31,8 +33,10 @@ class ListResultTest {
     void generateGenericClassForClassParam() {
         var fakeListClass = ListResult.generateGenericClass(FakeExtension.class);
         assertTrue(ListResult.class.isAssignableFrom(fakeListClass));
-        assertSame(FakeExtension.class, ((ParameterizedType) fakeListClass.getGenericSuperclass())
-            .getActualTypeArguments()[0]);
+        assertSame(
+                FakeExtension.class,
+                ((ParameterizedType) fakeListClass.getGenericSuperclass())
+                        .getActualTypeArguments()[0]);
         assertEquals("FakeExtensionList", fakeListClass.getSimpleName());
     }
 
@@ -72,52 +76,54 @@ class ListResultTest {
     @Test
     void serializationTest() throws JsonProcessingException {
         var result = new ListResult<>(1, 10, 100, List.of("a", "b", "c"));
-        var json = JsonMapper.builder()
-            .build()
-            .writeValueAsString(result);
-        JSONAssert.assertEquals("""
-            {
-              "page": 1,
-              "size": 10,
-              "total": 100,
-              "items": [
-                "a",
-                "b",
-                "c"
-              ],
-              "first": true,
-              "last": false,
-              "hasNext": true,
-              "hasPrevious": false,
-              "totalPages": 10
-            }
-            """, json, true);
+        var json = JsonMapper.builder().build().writeValueAsString(result);
+        JSONAssert.assertEquals(
+                """
+                {
+                  "page": 1,
+                  "size": 10,
+                  "total": 100,
+                  "items": [
+                    "a",
+                    "b",
+                    "c"
+                  ],
+                  "first": true,
+                  "last": false,
+                  "hasNext": true,
+                  "hasPrevious": false,
+                  "totalPages": 10
+                }
+                """,
+                json,
+                true);
     }
 
     @Test
     void deserializationTest() throws JsonProcessingException {
-        var json = """
-            {
-              "page": 2,
-              "size": 10,
-              "total": 100,
-              "items": [
-                "a",
-                "b",
-                "c"
-              ],
-              "first": false,
-              "last": false,
-              "hasNext": true,
-              "hasPrevious": true,
-              "totalPages": 10
-            }
-            """;
-        var result = JsonMapper.builder()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .build()
-            .readValue(json, new TypeReference<ListResult<String>>() {
-            });
+        var json =
+                """
+                {
+                  "page": 2,
+                  "size": 10,
+                  "total": 100,
+                  "items": [
+                    "a",
+                    "b",
+                    "c"
+                  ],
+                  "first": false,
+                  "last": false,
+                  "hasNext": true,
+                  "hasPrevious": true,
+                  "totalPages": 10
+                }
+                """;
+        var result =
+                JsonMapper.builder()
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .build()
+                        .readValue(json, new TypeReference<ListResult<String>>() {});
         assertEquals(2, result.getPage());
         assertEquals(100, result.getTotal());
         assertEquals(10, result.getTotalPages());

@@ -13,8 +13,7 @@ import run.halo.app.plugin.SharedEvent;
 @SharedEvent
 public class UserLogoutEvent extends ApplicationEvent {
 
-    @Getter
-    private final User user;
+    @Getter private final User user;
 
     public UserLogoutEvent(Object source, User user) {
         super(source);

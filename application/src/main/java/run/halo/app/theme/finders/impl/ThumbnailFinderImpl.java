@@ -19,10 +19,9 @@ public class ThumbnailFinderImpl implements ThumbnailFinder {
     @Override
     public Mono<String> gen(String uriStr, String size) {
         return Mono.fromCallable(() -> URI.create(uriStr))
-            .flatMap(uri -> thumbnailService.get(uri, ThumbnailSize.fromName(size)))
-            .map(URI::toASCIIString)
-            .onErrorComplete(IllegalArgumentException.class)
-            .defaultIfEmpty(uriStr);
+                .flatMap(uri -> thumbnailService.get(uri, ThumbnailSize.fromName(size)))
+                .map(URI::toASCIIString)
+                .onErrorComplete(IllegalArgumentException.class)
+                .defaultIfEmpty(uriStr);
     }
-
 }

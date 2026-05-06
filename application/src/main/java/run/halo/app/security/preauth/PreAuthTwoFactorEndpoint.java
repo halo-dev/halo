@@ -24,13 +24,16 @@ class PreAuthTwoFactorEndpoint {
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthTwoFactorEndpoints(GlobalInfoService globalInfoService) {
         return RouterFunctions.route()
-            .GET("/challenges/two-factor/totp",
-                request -> ServerResponse.ok().render("challenges/two-factor/totp", Map.of(
-                    "globalInfo", globalInfoService.getGlobalInfo()
-                ))
-            )
-            .before(HaloUtils.noCache())
-            .build();
+                .GET(
+                        "/challenges/two-factor/totp",
+                        request ->
+                                ServerResponse.ok()
+                                        .render(
+                                                "challenges/two-factor/totp",
+                                                Map.of(
+                                                        "globalInfo",
+                                                        globalInfoService.getGlobalInfo())))
+                .before(HaloUtils.noCache())
+                .build();
     }
-
 }

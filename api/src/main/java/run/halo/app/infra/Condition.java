@@ -30,9 +30,12 @@ public class Condition {
      * example: Ready, Initialized.
      * maxLength: 316.
      */
-    @Schema(requiredMode = REQUIRED, maxLength = 316,
-        pattern = "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?("
-            + "([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$")
+    @Schema(
+            requiredMode = REQUIRED,
+            maxLength = 316,
+            pattern =
+                    "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?("
+                            + "([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$")
     private String type;
 
     /**
@@ -58,8 +61,7 @@ public class Condition {
     /**
      * Unique, one-word, CamelCase reason for the condition's last transition.
      */
-    @Schema(maxLength = 1024,
-        pattern = "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$")
+    @Schema(maxLength = 1024, pattern = "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$")
     @Builder.Default
     private String reason = "";
 }

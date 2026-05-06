@@ -13,8 +13,7 @@ import lombok.Data;
 @Data
 public class BackupFile {
 
-    @JsonIgnore
-    private Path path;
+    @JsonIgnore private Path path;
 
     /**
      * Filename of backup file.
@@ -30,5 +29,4 @@ public class BackupFile {
      * Last modified time of backup file.
      */
     private Instant lastModifiedTime;
-
 }

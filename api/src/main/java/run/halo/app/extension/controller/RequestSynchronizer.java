@@ -32,14 +32,14 @@ public class RequestSynchronizer implements Synchronizer<Request> {
 
     private final ListOptions listOptions;
 
-    @Getter
-    private volatile boolean started = false;
+    @Getter private volatile boolean started = false;
 
-    public RequestSynchronizer(boolean syncAllOnStart,
-        ExtensionClient client,
-        Extension extension,
-        Watcher watcher,
-        ListOptions listOptions) {
+    public RequestSynchronizer(
+            boolean syncAllOnStart,
+            ExtensionClient client,
+            Extension extension,
+            Watcher watcher,
+            ListOptions listOptions) {
         this.syncAllOnStart = syncAllOnStart;
         this.client = client;
         this.type = extension.getClass();
@@ -64,9 +64,10 @@ public class RequestSynchronizer implements Synchronizer<Request> {
             names.forEach(name -> watcher.onAdd(new Request(name)));
             while (names.size() == batchSize) {
                 var lastName = names.getLast();
-                var augmentedOptions = ListOptions.builder(listOptions)
-                    .andQuery(Queries.greaterThan("metadata.name", lastName))
-                    .build();
+                var augmentedOptions =
+                        ListOptions.builder(listOptions)
+                                .andQuery(Queries.greaterThan("metadata.name", lastName))
+                                .build();
                 names = client.listTopNames(type, augmentedOptions, sort, batchSize);
                 names.forEach(name -> watcher.onAdd(new Request(name)));
             }

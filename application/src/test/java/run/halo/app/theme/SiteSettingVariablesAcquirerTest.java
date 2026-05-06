@@ -31,17 +31,13 @@ import run.halo.app.theme.finders.vo.SiteSettingVo;
  */
 @ExtendWith(MockitoExtension.class)
 public class SiteSettingVariablesAcquirerTest {
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @Mock
-    private SystemVersionSupplier systemVersionSupplier;
+    @Mock private SystemVersionSupplier systemVersionSupplier;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @InjectMocks
-    private SiteSettingVariablesAcquirer siteSettingVariablesAcquirer;
+    @InjectMocks private SiteSettingVariablesAcquirer siteSettingVariablesAcquirer;
 
     @Test
     void acquireWhenExternalUrlSet() throws MalformedURLException {
@@ -50,20 +46,20 @@ public class SiteSettingVariablesAcquirerTest {
         when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
         when(environmentFetcher.getConfig()).thenReturn(Mono.just(Map.of()));
 
-        siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
-            .as(StepVerifier::create)
-            .consumeNextWith(result -> {
-                assertThat(result).containsKey("site");
-                assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
-                var site = (SiteSettingVo) result.get("site");
-                assertThat(site)
-                    .extracting(SiteSettingVo::url)
-                    .isEqualTo(url);
-                assertThat(site)
-                    .extracting(SiteSettingVo::version)
-                    .isEqualTo("0.0.0-alpha.1");
-            })
-            .verifyComplete();
+        siteSettingVariablesAcquirer
+                .acquire(mock(ServerWebExchange.class))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        result -> {
+                            assertThat(result).containsKey("site");
+                            assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
+                            var site = (SiteSettingVo) result.get("site");
+                            assertThat(site).extracting(SiteSettingVo::url).isEqualTo(url);
+                            assertThat(site)
+                                    .extracting(SiteSettingVo::version)
+                                    .isEqualTo("0.0.0-alpha.1");
+                        })
+                .verifyComplete();
         verify(externalUrlSupplier).getURL(any());
     }
 }

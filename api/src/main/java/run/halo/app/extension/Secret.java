@@ -50,5 +50,4 @@ public class Secret extends AbstractExtension {
      * The stringData field is never output when reading from the API.
      */
     private Map<String, String> stringData;
-
 }

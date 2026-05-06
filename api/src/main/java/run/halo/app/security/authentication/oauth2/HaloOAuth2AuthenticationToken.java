@@ -19,11 +19,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  */
 public class HaloOAuth2AuthenticationToken extends AbstractAuthenticationToken {
 
-    @Getter
-    private final UserDetails userDetails;
+    @Getter private final UserDetails userDetails;
 
-    @Getter
-    private final OAuth2AuthenticationToken original;
+    @Getter private final OAuth2AuthenticationToken original;
 
     /**
      * Constructs an {@code HaloOAuth2AuthenticationToken} using {@link UserDetails} and original
@@ -32,8 +30,8 @@ public class HaloOAuth2AuthenticationToken extends AbstractAuthenticationToken {
      * @param userDetails the {@link UserDetails}
      * @param original the original {@link OAuth2AuthenticationToken}
      */
-    public HaloOAuth2AuthenticationToken(UserDetails userDetails,
-        OAuth2AuthenticationToken original) {
+    public HaloOAuth2AuthenticationToken(
+            UserDetails userDetails, OAuth2AuthenticationToken original) {
         super(combineAuthorities(userDetails, original));
         this.userDetails = userDetails;
         this.original = original;
@@ -49,9 +47,9 @@ public class HaloOAuth2AuthenticationToken extends AbstractAuthenticationToken {
     public Collection<GrantedAuthority> getAuthorities() {
         var originalAuthorities = super.getAuthorities();
         var userDetailsAuthorities = getUserDetails().getAuthorities();
-        var authorities = new ArrayList<GrantedAuthority>(
-            originalAuthorities.size() + userDetailsAuthorities.size()
-        );
+        var authorities =
+                new ArrayList<GrantedAuthority>(
+                        originalAuthorities.size() + userDetailsAuthorities.size());
         authorities.addAll(originalAuthorities);
         authorities.addAll(userDetailsAuthorities);
         return Collections.unmodifiableList(authorities);
@@ -76,21 +74,19 @@ public class HaloOAuth2AuthenticationToken extends AbstractAuthenticationToken {
      * @return an authenticated {@link HaloOAuth2AuthenticationToken}
      */
     public static HaloOAuth2AuthenticationToken authenticated(
-        UserDetails userDetails, OAuth2AuthenticationToken original
-    ) {
+            UserDetails userDetails, OAuth2AuthenticationToken original) {
         return new HaloOAuth2AuthenticationToken(userDetails, original);
     }
 
     private static Collection<? extends GrantedAuthority> combineAuthorities(
-        UserDetails userDetails, OAuth2AuthenticationToken original) {
+            UserDetails userDetails, OAuth2AuthenticationToken original) {
         var userDetailsAuthorities = userDetails.getAuthorities();
         var originalAuthorities = original.getAuthorities();
-        var authorities = new ArrayList<GrantedAuthority>(
-            originalAuthorities.size() + userDetailsAuthorities.size()
-        );
+        var authorities =
+                new ArrayList<GrantedAuthority>(
+                        originalAuthorities.size() + userDetailsAuthorities.size());
         authorities.addAll(originalAuthorities);
         authorities.addAll(userDetailsAuthorities);
         return Collections.unmodifiableList(authorities);
     }
-
 }

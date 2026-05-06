@@ -82,5 +82,4 @@ public class SpringComponentsFinder extends AbstractExtensionFinder {
             entries.computeIfAbsent(pluginId, id -> readPluginStorage(event.getPlugin()));
         }
     }
-
 }

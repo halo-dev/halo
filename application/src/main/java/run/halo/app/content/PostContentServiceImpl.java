@@ -25,34 +25,38 @@ public class PostContentServiceImpl extends AbstractContentService implements Po
     @Override
     public Mono<ContentWrapper> getHeadContent(String postName) {
         return client.get(Post.class, postName)
-            .flatMap(post -> {
-                var headSnapshot = post.getSpec().getHeadSnapshot();
-                return super.getContent(headSnapshot, post.getSpec().getBaseSnapshot());
-            });
+                .flatMap(
+                        post -> {
+                            var headSnapshot = post.getSpec().getHeadSnapshot();
+                            return super.getContent(headSnapshot, post.getSpec().getBaseSnapshot());
+                        });
     }
 
     @Override
     public Mono<ContentWrapper> getReleaseContent(String postName) {
         return client.get(Post.class, postName)
-            .flatMap(post -> {
-                var releaseSnapshot = post.getSpec().getReleaseSnapshot();
-                return super.getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
-            });
+                .flatMap(
+                        post -> {
+                            var releaseSnapshot = post.getSpec().getReleaseSnapshot();
+                            return super.getContent(
+                                    releaseSnapshot, post.getSpec().getBaseSnapshot());
+                        });
     }
 
     @Override
     public Mono<ContentWrapper> getSpecifiedContent(String postName, String snapshotName) {
         return client.get(Post.class, postName)
-            .flatMap(post -> {
-                var baseSnapshot = post.getSpec().getBaseSnapshot();
-                return super.getContent(snapshotName, baseSnapshot);
-            });
+                .flatMap(
+                        post -> {
+                            var baseSnapshot = post.getSpec().getBaseSnapshot();
+                            return super.getContent(snapshotName, baseSnapshot);
+                        });
     }
 
     @Override
     public Flux<String> listSnapshots(String postName) {
         return client.get(Post.class, postName)
-            .flatMapMany(page -> listSnapshotsBy(Ref.of(page)))
-            .map(snapshot -> snapshot.getMetadata().getName());
+                .flatMapMany(page -> listSnapshotsBy(Ref.of(page)))
+                .map(snapshot -> snapshot.getMetadata().getName());
     }
 }

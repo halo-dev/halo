@@ -39,11 +39,10 @@ class ThemeLocaleContextResolverTest {
     @Test
     public void resolveTimeZone() {
         TimeZoneAwareLocaleContext localeContext =
-            (TimeZoneAwareLocaleContext) this.resolver.resolveLocaleContext(
-                exchangeTimeZone(CHINA));
+                (TimeZoneAwareLocaleContext)
+                        this.resolver.resolveLocaleContext(exchangeTimeZone(CHINA));
         assertThat(localeContext.getTimeZone()).isNotNull();
-        assertThat(localeContext.getTimeZone())
-            .isEqualTo(TimeZone.getTimeZone("America/Adak"));
+        assertThat(localeContext.getTimeZone()).isEqualTo(TimeZone.getTimeZone("America/Adak"));
         assertThat(localeContext.getLocale()).isNotNull();
         assertThat(localeContext.getLocale().getLanguage()).isEqualTo("en");
     }
@@ -51,28 +50,28 @@ class ThemeLocaleContextResolverTest {
     @Test
     public void resolve() {
         assertThat(this.resolver.resolveLocaleContext(exchange(CANADA)).getLocale())
-            .isEqualTo(CANADA);
+                .isEqualTo(CANADA);
         assertThat(this.resolver.resolveLocaleContext(exchange(US, CANADA)).getLocale())
-            .isEqualTo(US);
+                .isEqualTo(US);
     }
 
     @Test
     public void resolveFromParam() {
         assertThat(this.resolver.resolveLocaleContext(exchangeForParam("en")).getLocale())
-            .isEqualTo(ENGLISH);
+                .isEqualTo(ENGLISH);
         assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh")).getLocale())
-            .isEqualTo(CHINESE);
+                .isEqualTo(CHINESE);
         assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh-CN")).getLocale())
-            .isEqualTo(CHINA);
+                .isEqualTo(CHINA);
         assertThat(this.resolver.resolveLocaleContext(exchangeForParam("zh-cn")).getLocale())
-            .isEqualTo(CHINA);
+                .isEqualTo(CHINA);
     }
 
     @Test
     public void resolvePreferredSupported() {
         this.resolver.setSupportedLocales(Collections.singletonList(CANADA));
-        assertThat(this.resolver.resolveLocaleContext(exchange(US, CANADA)).getLocale()).isEqualTo(
-            CANADA);
+        assertThat(this.resolver.resolveLocaleContext(exchange(US, CANADA)).getLocale())
+                .isEqualTo(CANADA);
     }
 
     @Test
@@ -85,32 +84,29 @@ class ThemeLocaleContextResolverTest {
     public void resolvePreferredNotSupportedWithDefault() {
         this.resolver.setSupportedLocales(Arrays.asList(US, JAPAN));
         this.resolver.setDefaultLocale(JAPAN);
-        assertThat(this.resolver.resolveLocaleContext(exchange(KOREA)).getLocale()).isEqualTo(
-            JAPAN);
+        assertThat(this.resolver.resolveLocaleContext(exchange(KOREA)).getLocale())
+                .isEqualTo(JAPAN);
     }
 
     @Test
     public void resolvePreferredAgainstLanguageOnly() {
         this.resolver.setSupportedLocales(Collections.singletonList(ENGLISH));
-        assertThat(
-            this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale()).isEqualTo(
-            ENGLISH);
+        assertThat(this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale())
+                .isEqualTo(ENGLISH);
     }
 
     @Test
     public void resolvePreferredAgainstCountryIfPossible() {
         this.resolver.setSupportedLocales(Arrays.asList(ENGLISH, UK));
-        assertThat(
-            this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale()).isEqualTo(
-            UK);
+        assertThat(this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale())
+                .isEqualTo(UK);
     }
 
     @Test
     public void resolvePreferredAgainstLanguageWithMultipleSupportedLocales() {
         this.resolver.setSupportedLocales(Arrays.asList(GERMAN, US));
-        assertThat(
-            this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale()).isEqualTo(
-            GERMAN);
+        assertThat(this.resolver.resolveLocaleContext(exchange(GERMANY, US, UK)).getLocale())
+                .isEqualTo(GERMAN);
     }
 
     @Test
@@ -132,7 +128,7 @@ class ThemeLocaleContextResolverTest {
     @Test
     public void resolveEmptyAcceptLanguageHeader() {
         MockServerHttpRequest request =
-            MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "").build();
+                MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "").build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isNull();
     }
@@ -142,7 +138,7 @@ class ThemeLocaleContextResolverTest {
         this.resolver.setDefaultLocale(US);
 
         MockServerHttpRequest request =
-            MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "").build();
+                MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "").build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isEqualTo(US);
     }
@@ -150,7 +146,7 @@ class ThemeLocaleContextResolverTest {
     @Test
     public void resolveInvalidAcceptLanguageHeader() {
         MockServerHttpRequest request =
-            MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "en_US").build();
+                MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "en_US").build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isNull();
     }
@@ -160,7 +156,7 @@ class ThemeLocaleContextResolverTest {
         this.resolver.setDefaultLocale(US);
 
         MockServerHttpRequest request =
-            MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "en_US").build();
+                MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "en_US").build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isEqualTo(US);
     }
@@ -179,9 +175,8 @@ class ThemeLocaleContextResolverTest {
 
     @Test
     void resolveUnderminedLocale() {
-        var request = MockServerHttpRequest.get("/")
-            .header(HttpHeaders.ACCEPT_LANGUAGE, "und")
-            .build();
+        var request =
+                MockServerHttpRequest.get("/").header(HttpHeaders.ACCEPT_LANGUAGE, "und").build();
         var exchange = MockServerWebExchange.from(request);
 
         assertThat(this.resolver.resolveLocaleContext(exchange).getLocale()).isNull();
@@ -189,18 +184,18 @@ class ThemeLocaleContextResolverTest {
 
     private ServerWebExchange exchange(Locale... locales) {
         return MockServerWebExchange.from(
-            MockServerHttpRequest.get("").acceptLanguageAsLocales(locales));
+                MockServerHttpRequest.get("").acceptLanguageAsLocales(locales));
     }
 
     private ServerWebExchange exchangeTimeZone(Locale... locales) {
         return MockServerWebExchange.from(
-            MockServerHttpRequest.get("").acceptLanguageAsLocales(locales)
-                .cookie(new HttpCookie(TIME_ZONE_COOKIE_NAME, "America/Adak"))
-                .cookie(new HttpCookie(LANGUAGE_COOKIE_NAME, "en")));
+                MockServerHttpRequest.get("")
+                        .acceptLanguageAsLocales(locales)
+                        .cookie(new HttpCookie(TIME_ZONE_COOKIE_NAME, "America/Adak"))
+                        .cookie(new HttpCookie(LANGUAGE_COOKIE_NAME, "en")));
     }
 
     private ServerWebExchange exchangeForParam(String language) {
-        return MockServerWebExchange.from(
-            MockServerHttpRequest.get("/index?language=" + language));
+        return MockServerWebExchange.from(MockServerHttpRequest.get("/index?language=" + language));
     }
 }

@@ -21,7 +21,7 @@ class HaloConfigurationTest {
 
         @Test
         void shouldNotCreateLuceneSearchEngineBean(
-            @Autowired ObjectProvider<SearchEngine> searchEngines) {
+                @Autowired ObjectProvider<SearchEngine> searchEngines) {
             var searchEngine = searchEngines.getIfAvailable();
             assertNull(searchEngine);
         }
@@ -34,11 +34,10 @@ class HaloConfigurationTest {
 
         @Test
         void shouldCreateLuceneSearchEngineBean(
-            @Autowired ObjectProvider<SearchEngine> searchEngines) {
+                @Autowired ObjectProvider<SearchEngine> searchEngines) {
             var searchEngine = searchEngines.getIfAvailable();
             assertNotNull(searchEngine);
             assertInstanceOf(LuceneSearchEngine.class, searchEngine);
         }
     }
-
 }

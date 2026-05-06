@@ -34,5 +34,4 @@ public interface ExternalLinkProcessor {
      * @return processed URI or original URI
      */
     Mono<URI> processLink(URI uri);
-
 }

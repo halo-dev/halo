@@ -28,35 +28,15 @@ public class SystemSetting {
 
     @Builder
     public record Attachment(
-
-        @Nullable
-        UploadOptions console,
-
-        @Nullable
-        UploadOptions uc,
-
-        @Nullable
-        UploadOptions comment,
-
-        @Nullable
-        UploadOptions avatar
-
-    ) {
+            @Nullable UploadOptions console,
+            @Nullable UploadOptions uc,
+            @Nullable UploadOptions comment,
+            @Nullable UploadOptions avatar) {
 
         public static final String GROUP = "attachment";
 
         @Builder
-        public record UploadOptions(
-
-            @Nullable
-            String groupName,
-
-            @NotBlank
-            String policyName
-
-        ) {
-        }
-
+        public record UploadOptions(@Nullable String groupName, @NotBlank String policyName) {}
     }
 
     @Data
@@ -110,8 +90,8 @@ public class SystemSetting {
         @JsonIgnore
         public Optional<Locale> useSystemLocale() {
             return Optional.ofNullable(language)
-                .filter(StringUtils::isNotBlank)
-                .map(Locale::forLanguageTag);
+                    .filter(StringUtils::isNotBlank)
+                    .map(Locale::forLanguageTag);
         }
     }
 
@@ -179,7 +159,6 @@ public class SystemSetting {
         public static final String GROUP = "authProvider";
 
         private List<AuthProviderState> states;
-
     }
 
     @Data
@@ -197,7 +176,6 @@ public class SystemSetting {
     public static class ExtensionPointEnabled extends LinkedHashMap<String, LinkedHashSet<String>> {
 
         public static final String GROUP = "extensionPointEnabled";
-
     }
 
     @SuppressWarnings("removal")

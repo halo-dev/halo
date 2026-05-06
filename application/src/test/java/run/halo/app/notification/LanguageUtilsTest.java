@@ -33,15 +33,18 @@ class LanguageUtilsTest {
         assertThat(languages).isEqualTo(List.of("default", "en", "en_US"));
 
         languages =
-            LanguageUtils.computeLangFromLocale(Locale.forLanguageTag("en-US-x-lvariant-POSIX"));
+                LanguageUtils.computeLangFromLocale(
+                        Locale.forLanguageTag("en-US-x-lvariant-POSIX"));
         assertThat(languages).isEqualTo(List.of("default", "en", "en_US", "en_US-POSIX"));
     }
 
     @Test
     void computeLangFromLocaleWhenLanguageIsEmpty() {
-        assertThatThrownBy(() -> {
-            LanguageUtils.computeLangFromLocale(Locale.forLanguageTag(""));
-        }).isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Locale \"\" cannot be used as it does not specify a language.");
+        assertThatThrownBy(
+                        () -> {
+                            LanguageUtils.computeLangFromLocale(Locale.forLanguageTag(""));
+                        })
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Locale \"\" cannot be used as it does not specify a language.");
     }
 }

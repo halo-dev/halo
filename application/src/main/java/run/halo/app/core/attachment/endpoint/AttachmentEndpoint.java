@@ -46,83 +46,118 @@ public class AttachmentEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "AttachmentV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST("/attachments/upload", contentType(MediaType.MULTIPART_FORM_DATA),
-                request -> request.body(BodyExtractors.toMultipartData())
-                    .map(UploadRequest::new)
-                    .flatMap(uploadReq -> {
-                        var policyName = uploadReq.getPolicyName();
-                        var groupName = uploadReq.getGroupName();
-                        var filePart = uploadReq.getFile();
-                        return attachmentService.upload(policyName,
-                            groupName,
-                            filePart.filename(),
-                            filePart.content(),
-                            filePart.headers().getContentType());
-                    })
-                    .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
-                builder -> builder
-                    .operationId("UploadAttachment")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(schemaBuilder().implementation(IUploadRequest.class))
-                        ))
-                    .response(responseBuilder().implementation(Attachment.class))
-                    .build())
-            .POST("/attachments/-/upload-from-url", contentType(MediaType.APPLICATION_JSON),
-                request -> request.bodyToMono(UploadFromUrlRequest.class)
-                    .flatMap(uploadFromUrlRequest -> {
-                        var url = uploadFromUrlRequest.url();
-                        var policyName = uploadFromUrlRequest.policyName();
-                        var groupName = uploadFromUrlRequest.groupName();
-                        var fileName = uploadFromUrlRequest.filename();
-                        return attachmentService.uploadFromUrl(url, policyName,
-                            groupName, fileName);
-                    })
-                    .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
-                builder -> builder
-                    .operationId("ExternalTransferAttachment")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(UploadFromUrlRequest.class))
-                        ))
-                    .response(responseBuilder().implementation(Attachment.class))
-                    .build()
-            )
-            .GET("/attachments", this::search,
-                builder -> {
-                    builder
-                        .operationId("SearchAttachments")
-                        .tag(tag)
-                        .response(
-                            responseBuilder().implementation(generateGenericClass(Attachment.class))
-                        );
-                    SearchRequest.buildParameters(builder);
-                }
-            )
-            .build();
+                .POST(
+                        "/attachments/upload",
+                        contentType(MediaType.MULTIPART_FORM_DATA),
+                        request ->
+                                request.body(BodyExtractors.toMultipartData())
+                                        .map(UploadRequest::new)
+                                        .flatMap(
+                                                uploadReq -> {
+                                                    var policyName = uploadReq.getPolicyName();
+                                                    var groupName = uploadReq.getGroupName();
+                                                    var filePart = uploadReq.getFile();
+                                                    return attachmentService.upload(
+                                                            policyName,
+                                                            groupName,
+                                                            filePart.filename(),
+                                                            filePart.content(),
+                                                            filePart.headers().getContentType());
+                                                })
+                                        .flatMap(
+                                                attachment ->
+                                                        ServerResponse.ok().bodyValue(attachment)),
+                        builder ->
+                                builder.operationId("UploadAttachment")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .MULTIPART_FORM_DATA_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                IUploadRequest
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder().implementation(Attachment.class))
+                                        .build())
+                .POST(
+                        "/attachments/-/upload-from-url",
+                        contentType(MediaType.APPLICATION_JSON),
+                        request ->
+                                request.bodyToMono(UploadFromUrlRequest.class)
+                                        .flatMap(
+                                                uploadFromUrlRequest -> {
+                                                    var url = uploadFromUrlRequest.url();
+                                                    var policyName =
+                                                            uploadFromUrlRequest.policyName();
+                                                    var groupName =
+                                                            uploadFromUrlRequest.groupName();
+                                                    var fileName = uploadFromUrlRequest.filename();
+                                                    return attachmentService.uploadFromUrl(
+                                                            url, policyName, groupName, fileName);
+                                                })
+                                        .flatMap(
+                                                attachment ->
+                                                        ServerResponse.ok().bodyValue(attachment)),
+                        builder ->
+                                builder.operationId("ExternalTransferAttachment")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                UploadFromUrlRequest
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder().implementation(Attachment.class))
+                                        .build())
+                .GET(
+                        "/attachments",
+                        this::search,
+                        builder -> {
+                            builder.operationId("SearchAttachments")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            generateGenericClass(
+                                                                    Attachment.class)));
+                            SearchRequest.buildParameters(builder);
+                        })
+                .build();
     }
 
     Mono<ServerResponse> search(ServerRequest request) {
         var searchRequest = new SearchRequest(request);
-        return attachmentLister.listBy(searchRequest)
-            .flatMap(listResult -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(listResult)
-            );
+        return attachmentLister
+                .listBy(searchRequest)
+                .flatMap(
+                        listResult ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(listResult));
     }
 
-    public record UploadFromUrlRequest(@Schema(requiredMode = REQUIRED) URL url,
-                                       @Schema(requiredMode = REQUIRED, description = "Storage "
-                                           + "policy name") String policyName,
-                                       @Schema(description = "The name of the group to which the "
-                                           + "attachment belongs") String groupName,
-                                       @Schema(description = "Custom file name") String filename) {
+    public record UploadFromUrlRequest(
+            @Schema(requiredMode = REQUIRED) URL url,
+            @Schema(requiredMode = REQUIRED, description = "Storage " + "policy name")
+                    String policyName,
+            @Schema(description = "The name of the group to which the " + "attachment belongs")
+                    String groupName,
+            @Schema(description = "Custom file name") String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");
@@ -145,7 +180,6 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
         @Schema(description = "The name of the group to which the attachment belongs")
         String getGroupName();
-
     }
 
     public record UploadRequest(MultiValueMap<String, Part> formData) implements IUploadRequest {

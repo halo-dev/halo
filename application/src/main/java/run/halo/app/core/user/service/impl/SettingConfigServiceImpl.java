@@ -32,27 +32,31 @@ class SettingConfigServiceImpl implements SettingConfigService {
         Assert.notNull(configMapName, "Config map name must not be null");
         Assert.notNull(configJsonData, "Config json data must not be null");
         var data = SettingUtils.settingConfigJsonToMap(configJsonData);
-        return Mono.defer(() -> client.fetch(ConfigMap.class, configMapName)
-                .flatMap(persisted -> {
-                    persisted.setData(data);
-                    return client.update(persisted);
-                }))
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance)
-            )
-            .switchIfEmpty(Mono.defer(() -> {
-                var configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(configMapName);
-                configMap.setData(data);
-                return client.create(configMap);
-            }))
-            .then();
+        return Mono.defer(
+                        () ->
+                                client.fetch(ConfigMap.class, configMapName)
+                                        .flatMap(
+                                                persisted -> {
+                                                    persisted.setData(data);
+                                                    return client.update(persisted);
+                                                }))
+                .retryWhen(
+                        Retry.backoff(5, Duration.ofMillis(100))
+                                .filter(OptimisticLockingFailureException.class::isInstance))
+                .switchIfEmpty(
+                        Mono.defer(
+                                () -> {
+                                    var configMap = new ConfigMap();
+                                    configMap.setMetadata(new Metadata());
+                                    configMap.getMetadata().setName(configMapName);
+                                    configMap.setData(data);
+                                    return client.create(configMap);
+                                }))
+                .then();
     }
 
     @Override
     public Mono<ObjectNode> fetchConfig(String configMapName) {
-        return client.fetch(ConfigMap.class, configMapName)
-            .map(SettingUtils::settingConfigToJson);
+        return client.fetch(ConfigMap.class, configMapName).map(SettingUtils::settingConfigToJson);
     }
 }

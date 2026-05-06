@@ -20,11 +20,9 @@ import run.halo.app.extension.store.ExtensionStore;
 @ExtendWith(MockitoExtension.class)
 class JsonExtensionConverterTest {
 
-    @InjectMocks
-    JSONExtensionConverter converter;
+    @InjectMocks JSONExtensionConverter converter;
 
-    @Mock
-    SchemeManager schemeManager;
+    @Mock SchemeManager schemeManager;
 
     ObjectMapper objectMapper = Unstructured.OBJECT_MAPPER;
 
@@ -67,8 +65,9 @@ class JsonExtensionConverterTest {
         store.setVersion(20L);
         store.setData("{".getBytes());
 
-        assertThrows(ExtensionConvertException.class,
-            () -> converter.convertFrom(FakeExtension.class, store));
+        assertThrows(
+                ExtensionConvertException.class,
+                () -> converter.convertFrom(FakeExtension.class, store));
     }
 
     @Test

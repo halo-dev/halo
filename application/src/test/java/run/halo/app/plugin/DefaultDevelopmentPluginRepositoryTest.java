@@ -20,8 +20,7 @@ class DefaultDevelopmentPluginRepositoryTest {
 
     private PluginRepository developmentPluginRepository;
 
-    @TempDir
-    private Path tempDir;
+    @TempDir private Path tempDir;
 
     @BeforeEach
     void setUp() {

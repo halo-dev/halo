@@ -11,7 +11,7 @@ import org.springframework.web.server.ServerWebInputException;
 public class PluginAlreadyExistsException extends ServerWebInputException {
 
     public static final String PLUGIN_ALREADY_EXISTS_TYPE =
-        "https://halo.run/probs/plugin-alreay-exists";
+            "https://halo.run/probs/plugin-alreay-exists";
 
     public PluginAlreadyExistsException(String pluginName) {
         super("Plugin already exists.", null, null, null, new Object[] {pluginName});

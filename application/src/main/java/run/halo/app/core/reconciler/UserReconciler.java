@@ -53,20 +53,22 @@ public class UserReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(User.class, request.name()).ifPresent(user -> {
-            if (isDeleted(user)) {
-                deleteUserConnections(request.name());
-                removeFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
-                client.update(user);
-                return;
-            }
-            addFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
-            ensureRoleNamesAnno(user);
-            updatePermalink(user);
-            handleAvatar(user);
-            checkVerifiedEmail(user);
-            client.update(user);
-        });
+        client.fetch(User.class, request.name())
+                .ifPresent(
+                        user -> {
+                            if (isDeleted(user)) {
+                                deleteUserConnections(request.name());
+                                removeFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
+                                client.update(user);
+                                return;
+                            }
+                            addFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
+                            ensureRoleNamesAnno(user);
+                            updatePermalink(user);
+                            handleAvatar(user);
+                            checkVerifiedEmail(user);
+                            client.update(user);
+                        });
         return new Result(false, null);
     }
 
@@ -85,27 +87,26 @@ public class UserReconciler implements Reconciler<Request> {
     }
 
     private Boolean checkEmailInUse(String username, String email) {
-        return userService.listByEmail(email)
-            .filter(existUser -> existUser.getSpec().isEmailVerified())
-            .filter(existUser -> !existUser.getMetadata().getName().equals(username))
-            .hasElements()
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElse(false);
+        return userService
+                .listByEmail(email)
+                .filter(existUser -> existUser.getSpec().isEmailVerified())
+                .filter(existUser -> !existUser.getMetadata().getName().equals(username))
+                .hasElements()
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElse(false);
     }
 
     private void handleAvatar(User user) {
-        var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
-            .orElseGet(HashMap::new);
+        var annotations =
+                Optional.ofNullable(user.getMetadata().getAnnotations()).orElseGet(HashMap::new);
         user.getMetadata().setAnnotations(annotations);
 
         var avatarAttachmentName = annotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO);
-        var oldAvatarAttachmentName =
-            annotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO);
+        var oldAvatarAttachmentName = annotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO);
         // remove old avatar if needed
         if (StringUtils.isNotBlank(oldAvatarAttachmentName)
-            && !StringUtils.equals(avatarAttachmentName, oldAvatarAttachmentName)) {
-            client.fetch(Attachment.class, oldAvatarAttachmentName)
-                .ifPresent(client::delete);
+                && !StringUtils.equals(avatarAttachmentName, oldAvatarAttachmentName)) {
+            client.fetch(Attachment.class, oldAvatarAttachmentName).ifPresent(client::delete);
             annotations.remove(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO);
         }
 
@@ -118,43 +119,47 @@ public class UserReconciler implements Reconciler<Request> {
             return;
         }
         client.fetch(Attachment.class, avatarAttachmentName)
-            .flatMap(attachment -> attachmentService.getPermalink(attachment)
-                .blockOptional(BLOCKING_TIMEOUT)
-            )
-            .map(URI::toString)
-            .ifPresentOrElse(avatar -> {
-                if (!Objects.equals(avatar, spec.getAvatar())) {
-                    log.info(
-                        "Update avatar for user({}) to {}",
-                        user.getMetadata().getName(), avatar
-                    );
-                }
-                spec.setAvatar(avatar);
-                // reset last avatar
-                annotations.put(
-                    User.LAST_AVATAR_ATTACHMENT_NAME_ANNO,
-                    avatarAttachmentName
-                );
-            }, () -> {
-                throw new RequeueException(
-                    new Result(true, null),
-                    "Avatar permalink(%s) is not available yet."
-                        .formatted(avatarAttachmentName)
-                );
-            });
+                .flatMap(
+                        attachment ->
+                                attachmentService
+                                        .getPermalink(attachment)
+                                        .blockOptional(BLOCKING_TIMEOUT))
+                .map(URI::toString)
+                .ifPresentOrElse(
+                        avatar -> {
+                            if (!Objects.equals(avatar, spec.getAvatar())) {
+                                log.info(
+                                        "Update avatar for user({}) to {}",
+                                        user.getMetadata().getName(),
+                                        avatar);
+                            }
+                            spec.setAvatar(avatar);
+                            // reset last avatar
+                            annotations.put(
+                                    User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, avatarAttachmentName);
+                        },
+                        () -> {
+                            throw new RequeueException(
+                                    new Result(true, null),
+                                    "Avatar permalink(%s) is not available yet."
+                                            .formatted(avatarAttachmentName));
+                        });
     }
 
     private void ensureRoleNamesAnno(User user) {
-        roleService.getRolesByUsername(user.getMetadata().getName())
-            .collectList()
-            .map(JsonUtils::objectToJson)
-            .doOnNext(roleNamesJson -> {
-                var annotations = Optional.ofNullable(user.getMetadata().getAnnotations())
-                    .orElseGet(HashMap::new);
-                user.getMetadata().setAnnotations(annotations);
-                annotations.put(User.ROLE_NAMES_ANNO, roleNamesJson);
-            })
-            .block(BLOCKING_TIMEOUT);
+        roleService
+                .getRolesByUsername(user.getMetadata().getName())
+                .collectList()
+                .map(JsonUtils::objectToJson)
+                .doOnNext(
+                        roleNamesJson -> {
+                            var annotations =
+                                    Optional.ofNullable(user.getMetadata().getAnnotations())
+                                            .orElseGet(HashMap::new);
+                            user.getMetadata().setAnnotations(annotations);
+                            annotations.put(User.ROLE_NAMES_ANNO, roleNamesJson);
+                        })
+                .block(BLOCKING_TIMEOUT);
     }
 
     private void updatePermalink(User user) {
@@ -163,16 +168,15 @@ public class UserReconciler implements Reconciler<Request> {
             // anonymous user is not allowed to have permalink
             return;
         }
-        var status = Optional.ofNullable(user.getStatus())
-            .orElseGet(User.UserStatus::new);
+        var status = Optional.ofNullable(user.getStatus()).orElseGet(User.UserStatus::new);
         user.setStatus(status);
         status.setPermalink(getUserPermalink(user));
     }
 
     private String getUserPermalink(User user) {
         return UriComponentsBuilder.fromUri(externalUrlSupplier.get())
-            .pathSegment("authors", user.getMetadata().getName())
-            .toUriString();
+                .pathSegment("authors", user.getMetadata().getName())
+                .toUriString();
     }
 
     void deleteUserConnections(String username) {
@@ -185,17 +189,12 @@ public class UserReconciler implements Reconciler<Request> {
     }
 
     List<UserConnection> listConnectionsByUsername(String username) {
-        var listOptions = ListOptions.builder()
-            .andQuery(equal("spec.username", username))
-            .build();
+        var listOptions = ListOptions.builder().andQuery(equal("spec.username", username)).build();
         return client.listAll(UserConnection.class, listOptions, defaultSort());
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new User())
-            .build();
+        return builder.extension(new User()).build();
     }
-
 }

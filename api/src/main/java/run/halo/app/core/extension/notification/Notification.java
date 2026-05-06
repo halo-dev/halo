@@ -27,12 +27,15 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Notification", plural =
-    "notifications", singular = "notification")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "Notification",
+        plural = "notifications",
+        singular = "notification")
 public class Notification extends AbstractExtension {
 
-    @Schema
-    private NotificationSpec spec;
+    @Schema private NotificationSpec spec;
 
     @Data
     public static class NotificationSpec {

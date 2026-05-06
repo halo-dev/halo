@@ -25,46 +25,66 @@ public enum HttpSecurityUtils {
      */
     public static HttpClient secureHttpClient() {
         return HttpClient.create()
-            .followRedirect(false)
-            .responseTimeout(Duration.ofSeconds(10))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .resolvedAddressesSelector((config, resolvedAddresses) -> resolvedAddresses.stream()
-                .filter(address -> address instanceof InetSocketAddress)
-                .map(address -> (InetSocketAddress) address)
-                .filter(inetSocketAddress -> !isBlocked(inetSocketAddress.getAddress()))
-                .toList()
-            );
+                .followRedirect(false)
+                .responseTimeout(Duration.ofSeconds(10))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .resolvedAddressesSelector(
+                        (config, resolvedAddresses) ->
+                                resolvedAddresses.stream()
+                                        .filter(address -> address instanceof InetSocketAddress)
+                                        .map(address -> (InetSocketAddress) address)
+                                        .filter(
+                                                inetSocketAddress ->
+                                                        !isBlocked(inetSocketAddress.getAddress()))
+                                        .toList());
     }
 
     public static ExchangeFilterFunction maxResponseSizeFilter(long maxByteCount) {
-        return (request, next) -> next.exchange(request)
-            .map(response -> response.mutate()
-                .body(body -> {
-                    var countDown = new AtomicLong(maxByteCount);
-                    return body.handle((buffer, sink) -> {
-                        long remainder = countDown.addAndGet(-buffer.readableByteCount());
-                        if (remainder < 0) {
-                            DataBufferUtils.release(buffer);
-                            sink.error(new DataBufferLimitException(
-                                "Response body exceeds the maximum allowed size of "
-                                    + maxByteCount + " bytes"
-                            ));
-                        } else {
-                            sink.next(buffer);
-                        }
-                    });
-                })
-                .build());
+        return (request, next) ->
+                next.exchange(request)
+                        .map(
+                                response ->
+                                        response.mutate()
+                                                .body(
+                                                        body -> {
+                                                            var countDown =
+                                                                    new AtomicLong(maxByteCount);
+                                                            return body.handle(
+                                                                    (buffer, sink) -> {
+                                                                        long remainder =
+                                                                                countDown.addAndGet(
+                                                                                        -buffer
+                                                                                                .readableByteCount());
+                                                                        if (remainder < 0) {
+                                                                            DataBufferUtils.release(
+                                                                                    buffer);
+                                                                            sink.error(
+                                                                                    new DataBufferLimitException(
+                                                                                            "Response"
+                                                                                                + " body"
+                                                                                                + " exceeds"
+                                                                                                + " the maximum"
+                                                                                                + " allowed"
+                                                                                                + " size"
+                                                                                                + " of "
+                                                                                                    + maxByteCount
+                                                                                                    + " bytes"));
+                                                                        } else {
+                                                                            sink.next(buffer);
+                                                                        }
+                                                                    });
+                                                        })
+                                                .build());
     }
 
     static boolean isBlocked(InetAddress address) {
         return address.isAnyLocalAddress()
-            || address.isLoopbackAddress()
-            || address.isLinkLocalAddress()
-            || address.isSiteLocalAddress()
-            || address.isMulticastAddress()
-            || isSpecialUseIpv4(address)
-            || isUniqueLocalIpv6(address);
+                || address.isLoopbackAddress()
+                || address.isLinkLocalAddress()
+                || address.isSiteLocalAddress()
+                || address.isMulticastAddress()
+                || isSpecialUseIpv4(address)
+                || isUniqueLocalIpv6(address);
     }
 
     static boolean isSpecialUseIpv4(InetAddress address) {
@@ -77,14 +97,14 @@ public enum HttpSecurityUtils {
 
         // Used for "self-identification" during boot-up or to represent the default route.
         return first == 0
-            // Shared Address Space for Carrier-Grade NAT (CGN), often used by ISPs to share one
-            // public IP among many subscribers.
-            || (first == 100 && second >= 64 && second <= 127)
-            // Benchmarking and performance testing between subnets.
-            || (first == 198 && (second == 18 || second == 19))
-            // Reserved (formerly Class E) for future or experimental use and should not be used
-            // in typical configurations.
-            || first >= 240;
+                // Shared Address Space for Carrier-Grade NAT (CGN), often used by ISPs to share one
+                // public IP among many subscribers.
+                || (first == 100 && second >= 64 && second <= 127)
+                // Benchmarking and performance testing between subnets.
+                || (first == 198 && (second == 18 || second == 19))
+                // Reserved (formerly Class E) for future or experimental use and should not be used
+                // in typical configurations.
+                || first >= 240;
     }
 
     static boolean isUniqueLocalIpv6(InetAddress address) {
@@ -93,5 +113,4 @@ public enum HttpSecurityUtils {
         }
         return (inet6Address.getAddress()[0] & 0xfe) == 0xfc;
     }
-
 }

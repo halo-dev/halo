@@ -32,56 +32,69 @@ public class AuthProviderEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "AuthProviderV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("auth-providers", this::listAuthProviders,
-                builder -> builder.operationId("listAuthProviders")
-                    .description("Lists all auth providers")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementationArray(ListedAuthProvider.class))
-            )
-            .PUT("auth-providers/{name}/enable", this::enableAuthProvider,
-                builder -> builder.operationId("enableAuthProvider")
-                    .description("Enables an auth provider")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(AuthProvider.class))
-            )
-            .PUT("auth-providers/{name}/disable", this::disableAuthProvider,
-                builder -> builder.operationId("disableAuthProvider")
-                    .description("Disables an auth provider")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(AuthProvider.class))
-            )
-            .build();
+                .GET(
+                        "auth-providers",
+                        this::listAuthProviders,
+                        builder ->
+                                builder.operationId("listAuthProviders")
+                                        .description("Lists all auth providers")
+                                        .tag(tag)
+                                        .response(
+                                                responseBuilder()
+                                                        .implementationArray(
+                                                                ListedAuthProvider.class)))
+                .PUT(
+                        "auth-providers/{name}/enable",
+                        this::enableAuthProvider,
+                        builder ->
+                                builder.operationId("enableAuthProvider")
+                                        .description("Enables an auth provider")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(
+                                                responseBuilder()
+                                                        .implementation(AuthProvider.class)))
+                .PUT(
+                        "auth-providers/{name}/disable",
+                        this::disableAuthProvider,
+                        builder ->
+                                builder.operationId("disableAuthProvider")
+                                        .description("Disables an auth provider")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(
+                                                responseBuilder()
+                                                        .implementation(AuthProvider.class)))
+                .build();
     }
 
     private Mono<ServerResponse> enableAuthProvider(ServerRequest request) {
         String name = request.pathVariable("name");
-        return authProviderService.enable(name)
-            .flatMap(authProvider -> ServerResponse.ok().bodyValue(authProvider));
+        return authProviderService
+                .enable(name)
+                .flatMap(authProvider -> ServerResponse.ok().bodyValue(authProvider));
     }
 
     private Mono<ServerResponse> disableAuthProvider(ServerRequest request) {
         String name = request.pathVariable("name");
-        return authProviderService.disable(name)
-            .flatMap(authProvider -> ServerResponse.ok().bodyValue(authProvider));
+        return authProviderService
+                .disable(name)
+                .flatMap(authProvider -> ServerResponse.ok().bodyValue(authProvider));
     }
 
     Mono<ServerResponse> listAuthProviders(ServerRequest request) {
-        return authProviderService.listAll()
-            .flatMap(providers -> ServerResponse.ok().bodyValue(providers));
+        return authProviderService
+                .listAll()
+                .flatMap(providers -> ServerResponse.ok().bodyValue(providers));
     }
 }

@@ -17,21 +17,25 @@ class ThemeContextTest {
     @Test
     void constructorBuilderTest() throws JSONException {
         var path = Path.of("/tmp/themes/testTheme");
-        var testTheme = ThemeContext.builder()
-            .name("testTheme")
-            .path(path)
-            .active(true)
-            .version("1.0.0")
-            .build();
+        var testTheme =
+                ThemeContext.builder()
+                        .name("testTheme")
+                        .path(path)
+                        .active(true)
+                        .version("1.0.0")
+                        .build();
         var got = JsonUtils.objectToJson(testTheme);
-        var expect = String.format("""
-                {
-                    "name": "testTheme",
-                    "path": "%s",
-                    "active": true,
-                    "version": "1.0.0"
-                }
-                """, path.toUri());
+        var expect =
+                String.format(
+                        """
+                        {
+                            "name": "testTheme",
+                            "path": "%s",
+                            "active": true,
+                            "version": "1.0.0"
+                        }
+                        """,
+                        path.toUri());
         JSONAssert.assertEquals(expect, got, false);
     }
 }

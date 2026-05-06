@@ -29,26 +29,19 @@ import run.halo.app.theme.finders.vo.TagVo;
  */
 @ExtendWith(MockitoExtension.class)
 class TagPostRouteFactoryTest extends RouteFactoryTestSuite {
-    @Mock
-    private ReactiveExtensionClient client;
-    @Mock
-    private TagFinder tagFinder;
-    @Mock
-    private PostFinder postFinder;
+    @Mock private ReactiveExtensionClient client;
+    @Mock private TagFinder tagFinder;
+    @Mock private PostFinder postFinder;
 
-    @InjectMocks
-    TagPostRouteFactory tagPostRouteFactory;
+    @InjectMocks TagPostRouteFactory tagPostRouteFactory;
 
     @Test
     void create() {
         when(client.listBy(eq(Tag.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(ListResult.emptyResult()));
+                .thenReturn(Mono.just(ListResult.emptyResult()));
         WebTestClient webTestClient = getWebTestClient(tagPostRouteFactory.create("/new-tags"));
 
-        webTestClient.get()
-            .uri("/new-tags/tag-slug-1")
-            .exchange()
-            .expectStatus().isNotFound();
+        webTestClient.get().uri("/new-tags/tag-slug-1").exchange().expectStatus().isNotFound();
 
         Tag tag = new Tag();
         tag.setMetadata(new Metadata());
@@ -56,17 +49,11 @@ class TagPostRouteFactoryTest extends RouteFactoryTestSuite {
         tag.setSpec(new Tag.TagSpec());
         tag.getSpec().setSlug("tag-slug-2");
         when(client.listBy(eq(Tag.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(new ListResult<>(List.of(tag))));
+                .thenReturn(Mono.just(new ListResult<>(List.of(tag))));
         when(tagFinder.getByName(eq(tag.getMetadata().getName())))
-            .thenReturn(Mono.just(TagVo.from(tag)));
-        webTestClient.get()
-            .uri("/new-tags/tag-slug-2")
-            .exchange()
-            .expectStatus().isOk();
+                .thenReturn(Mono.just(TagVo.from(tag)));
+        webTestClient.get().uri("/new-tags/tag-slug-2").exchange().expectStatus().isOk();
 
-        webTestClient.get()
-            .uri("/new-tags/tag-slug-2/page/1")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/new-tags/tag-slug-2/page/1").exchange().expectStatus().isOk();
     }
 }

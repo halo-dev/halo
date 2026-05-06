@@ -39,67 +39,86 @@ class ConsoleUserEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "UserV1alpha1Console";
-        return RouterFunctions.nest(RequestPredicates.path("/users"), SpringdocRouteBuilder.route()
-            .POST("/{username}/disable", this::handleDisableUser, ops -> {
-                ops.operationId("DisableUser")
-                    .tag(tag)
-                    .description("Disable user by username")
-                    .parameter(Builder.parameterBuilder()
-                        .name("username")
-                        .in(ParameterIn.PATH)
-                        .description("Username")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(User.class)
-                        .description("The user has been disabled.")
-                    );
-            })
-            .POST("/{username}/enable", this::handleEnableUser, ops -> {
-                ops.operationId("EnableUser")
-                    .tag(tag)
-                    .description("Enable user by username")
-                    .parameter(Builder.parameterBuilder()
-                        .name("username")
-                        .in(ParameterIn.PATH)
-                        .description("Username")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(User.class)
-                        .description("The user has been enabled.")
-                    );
-            })
-            .build());
+        return RouterFunctions.nest(
+                RequestPredicates.path("/users"),
+                SpringdocRouteBuilder.route()
+                        .POST(
+                                "/{username}/disable",
+                                this::handleDisableUser,
+                                ops -> {
+                                    ops.operationId("DisableUser")
+                                            .tag(tag)
+                                            .description("Disable user by username")
+                                            .parameter(
+                                                    Builder.parameterBuilder()
+                                                            .name("username")
+                                                            .in(ParameterIn.PATH)
+                                                            .description("Username")
+                                                            .required(true)
+                                                            .implementation(String.class))
+                                            .response(
+                                                    responseBuilder()
+                                                            .implementation(User.class)
+                                                            .description(
+                                                                    "The user has been disabled."));
+                                })
+                        .POST(
+                                "/{username}/enable",
+                                this::handleEnableUser,
+                                ops -> {
+                                    ops.operationId("EnableUser")
+                                            .tag(tag)
+                                            .description("Enable user by username")
+                                            .parameter(
+                                                    Builder.parameterBuilder()
+                                                            .name("username")
+                                                            .in(ParameterIn.PATH)
+                                                            .description("Username")
+                                                            .required(true)
+                                                            .implementation(String.class))
+                                            .response(
+                                                    responseBuilder()
+                                                            .implementation(User.class)
+                                                            .description(
+                                                                    "The user has been enabled."));
+                                })
+                        .build());
     }
 
     private Mono<ServerResponse> handleEnableUser(ServerRequest request) {
-        return userService.enable(request.pathVariable("username"))
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("The user was not found or has been enabled."))
-            )
-            .flatMap(user -> ServerResponse.ok().bodyValue(user));
+        return userService
+                .enable(request.pathVariable("username"))
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "The user was not found or has been enabled.")))
+                .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
     private Mono<ServerResponse> handleDisableUser(ServerRequest request) {
         var username = request.pathVariable("username");
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName)
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("The current user is not authenticated."))
-            )
-            .filter(currentUsername -> !Objects.equals(currentUsername, username))
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "The user is the current user, can't disable it."
-            )))
-            .then(Mono.defer(() -> userService.disable(username)))
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("The user was not found or has been disabled."))
-            )
-            .flatMap(user -> ServerResponse.ok().bodyValue(user));
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getName)
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "The current user is not authenticated.")))
+                .filter(currentUsername -> !Objects.equals(currentUsername, username))
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "The user is the current user, can't disable it.")))
+                .then(Mono.defer(() -> userService.disable(username)))
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "The user was not found or has been disabled.")))
+                .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
     @Override

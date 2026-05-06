@@ -35,9 +35,8 @@ public class PluginAutoConfiguration {
 
     @Bean
     public PluginRequestMappingHandlerMapping pluginRequestMappingHandlerMapping(
-        @Qualifier("webFluxContentTypeResolver")
-        RequestedContentTypeResolver requestedContentTypeResolver
-    ) {
+            @Qualifier("webFluxContentTypeResolver")
+                    RequestedContentTypeResolver requestedContentTypeResolver) {
         PluginRequestMappingHandlerMapping mapping = new PluginRequestMappingHandlerMapping();
         mapping.setContentTypeResolver(requestedContentTypeResolver);
         mapping.setOrder(-1);
@@ -45,43 +44,59 @@ public class PluginAutoConfiguration {
     }
 
     @Bean
-    public SpringPluginManager pluginManager(ApplicationContext context,
-        SystemVersionSupplier systemVersionSupplier,
-        PluginProperties pluginProperties,
-        PluginsRootGetter pluginsRootGetter) throws FileNotFoundException, URISyntaxException {
+    public SpringPluginManager pluginManager(
+            ApplicationContext context,
+            SystemVersionSupplier systemVersionSupplier,
+            PluginProperties pluginProperties,
+            PluginsRootGetter pluginsRootGetter)
+            throws FileNotFoundException, URISyntaxException {
         return new HaloPluginManager(
-            context, pluginProperties, systemVersionSupplier, pluginsRootGetter
-        );
+                context, pluginProperties, systemVersionSupplier, pluginsRootGetter);
     }
 
     @Bean
-    public RouterFunction<ServerResponse> pluginJsBundleRoute(PluginManager pluginManager,
-        WebProperties webProperties) {
+    public RouterFunction<ServerResponse> pluginJsBundleRoute(
+            PluginManager pluginManager, WebProperties webProperties) {
         var cacheProperties = webProperties.getResources().getCache();
         return RouterFunctions.route()
-            .GET("/plugins/{name}/assets/console/{*resource}", request -> {
-                String pluginName = request.pathVariable("name");
-                String fileName = request.pathVariable("resource");
+                .GET(
+                        "/plugins/{name}/assets/console/{*resource}",
+                        request -> {
+                            String pluginName = request.pathVariable("name");
+                            String fileName = request.pathVariable("resource");
 
-                var jsBundle = getJsBundleResource(pluginManager, pluginName, fileName);
-                if (jsBundle == null || !jsBundle.exists()) {
-                    return ServerResponse.notFound().build();
-                }
-                var useLastModified = cacheProperties.isUseLastModified();
-                var bodyBuilder = ServerResponse.ok()
-                    .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
-                try {
-                    if (useLastModified) {
-                        var lastModified = Instant.ofEpochMilli(jsBundle.lastModified());
-                        return request.checkNotModified(lastModified)
-                            .switchIfEmpty(Mono.defer(() -> bodyBuilder.lastModified(lastModified)
-                                .body(BodyInserters.fromResource(jsBundle))));
-                    }
-                    return bodyBuilder.body(BodyInserters.fromResource(jsBundle));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .build();
+                            var jsBundle = getJsBundleResource(pluginManager, pluginName, fileName);
+                            if (jsBundle == null || !jsBundle.exists()) {
+                                return ServerResponse.notFound().build();
+                            }
+                            var useLastModified = cacheProperties.isUseLastModified();
+                            var bodyBuilder =
+                                    ServerResponse.ok()
+                                            .cacheControl(
+                                                    cacheProperties
+                                                            .getCachecontrol()
+                                                            .toHttpCacheControl());
+                            try {
+                                if (useLastModified) {
+                                    var lastModified =
+                                            Instant.ofEpochMilli(jsBundle.lastModified());
+                                    return request.checkNotModified(lastModified)
+                                            .switchIfEmpty(
+                                                    Mono.defer(
+                                                            () ->
+                                                                    bodyBuilder
+                                                                            .lastModified(
+                                                                                    lastModified)
+                                                                            .body(
+                                                                                    BodyInserters
+                                                                                            .fromResource(
+                                                                                                    jsBundle))));
+                                }
+                                return bodyBuilder.body(BodyInserters.fromResource(jsBundle));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                .build();
     }
 }

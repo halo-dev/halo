@@ -59,5 +59,4 @@ public class PluginProperties {
      * Runtime Mode：development/deployment.
      */
     private RuntimeMode runtimeMode = RuntimeMode.DEPLOYMENT;
-
 }

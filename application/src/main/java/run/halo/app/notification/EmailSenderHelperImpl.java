@@ -50,11 +50,15 @@ public class EmailSenderHelperImpl implements EmailSenderHelper {
     }
 
     @Override
-    public MimeMessagePreparator createMimeMessagePreparator(EmailSenderConfig senderConfig,
-        String toEmail, String subject, String raw, String html) {
+    public MimeMessagePreparator createMimeMessagePreparator(
+            EmailSenderConfig senderConfig,
+            String toEmail,
+            String subject,
+            String raw,
+            String html) {
         return mimeMessage -> {
             MimeMessageHelper helper =
-                new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+                    new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setFrom(senderConfig.getSender(), senderConfig.getDisplayName());
 
             helper.setSubject(subject);

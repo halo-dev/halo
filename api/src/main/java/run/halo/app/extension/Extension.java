@@ -17,7 +17,9 @@ public interface Extension extends ExtensionOperator, Comparable<Extension> {
         if (getMetadata() == null) {
             return -1;
         }
-        return Objects.compare(getMetadata().getName(), another.getMetadata().getName(),
-            Comparator.naturalOrder());
+        return Objects.compare(
+                getMetadata().getName(),
+                another.getMetadata().getName(),
+                Comparator.naturalOrder());
     }
 }

@@ -19,12 +19,16 @@ import run.halo.app.infra.utils.GenericClassUtils;
 @Data
 public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
 
-    @Schema(description = "Page number, starts from 1. If not set or equal to 0, it means no "
-        + "pagination.", requiredMode = REQUIRED)
+    @Schema(
+            description =
+                    "Page number, starts from 1. If not set or equal to 0, it means no "
+                            + "pagination.",
+            requiredMode = REQUIRED)
     private final int page;
 
-    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Size of each page. If not set or equal to 0, it means no pagination.",
+            requiredMode = REQUIRED)
     private final int size;
 
     @Schema(description = "Total elements.", requiredMode = REQUIRED)
@@ -35,10 +39,10 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
 
     @JsonCreator
     public ListResult(
-        @JsonProperty("page") int page,
-        @JsonProperty("size") int size,
-        @JsonProperty("total") long total,
-        @JsonProperty("items") List<T> items) {
+            @JsonProperty("page") int page,
+            @JsonProperty("size") int size,
+            @JsonProperty("total") long total,
+            @JsonProperty("items") List<T> items) {
         Assert.isTrue(total >= 0, "Total elements must be greater than or equal to 0");
         if (page < 0) {
             page = 0;
@@ -59,20 +63,23 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         this(0, 0, items.size(), items);
     }
 
-    @Schema(description = "Indicates whether current page is the first page.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Indicates whether current page is the first page.",
+            requiredMode = REQUIRED)
     public boolean isFirst() {
         return !hasPrevious();
     }
 
-    @Schema(description = "Indicates whether current page is the last page.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Indicates whether current page is the last page.",
+            requiredMode = REQUIRED)
     public boolean isLast() {
         return !hasNext();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Indicates whether current page has previous page.",
+            requiredMode = REQUIRED)
     @JsonProperty("hasNext")
     public boolean hasNext() {
         if (page <= 0) {
@@ -81,8 +88,9 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return page < getTotalPages();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Indicates whether current page has previous page.",
+            requiredMode = REQUIRED)
     @JsonProperty("hasPrevious")
     public boolean hasPrevious() {
         return page > 1;
@@ -107,12 +115,13 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      * @return generic ListResult class.
      */
     public static Class<?> generateGenericClass(Scheme scheme) {
-        return GenericClassUtils.generateConcreteClass(ListResult.class,
-            scheme.type(),
-            () -> {
-                var pkgName = scheme.type().getPackageName();
-                return pkgName + '.' + scheme.groupVersionKind().kind() + "List";
-            });
+        return GenericClassUtils.generateConcreteClass(
+                ListResult.class,
+                scheme.type(),
+                () -> {
+                    var pkgName = scheme.type().getPackageName();
+                    return pkgName + '.' + scheme.groupVersionKind().kind() + "List";
+                });
     }
 
     /**
@@ -123,8 +132,8 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      * @return generic ListResult class.
      */
     public static <T> Class<?> generateGenericClass(Class<T> type) {
-        return GenericClassUtils.generateConcreteClass(ListResult.class, type,
-            () -> type.getName() + "List");
+        return GenericClassUtils.generateConcreteClass(
+                ListResult.class, type, () -> type.getName() + "List");
     }
 
     public static <T> ListResult<T> emptyResult() {
@@ -156,8 +165,8 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      */
     public static <T> Optional<T> first(ListResult<T> listResult) {
         return Optional.ofNullable(listResult)
-            .map(ListResult::getItems)
-            .map(list -> list.isEmpty() ? null : list.get(0));
+                .map(ListResult::getItems)
+                .map(list -> list.isEmpty() ? null : list.get(0));
     }
 
     @Override

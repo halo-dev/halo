@@ -32,8 +32,10 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
 
     private final ReactiveExtensionClient extensionClient;
 
-    public PluginDevelopmentInitializer(PluginManager pluginManager,
-        PluginProperties pluginProperties, ReactiveExtensionClient extensionClient) {
+    public PluginDevelopmentInitializer(
+            PluginManager pluginManager,
+            PluginProperties pluginProperties,
+            ReactiveExtensionClient extensionClient) {
         this.pluginManager = pluginManager;
         this.pluginProperties = pluginProperties;
         this.extensionClient = extensionClient;
@@ -50,19 +52,27 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
     private void createFixedPluginIfNecessary() {
         for (Path path : pluginProperties.getFixedPluginPath()) {
             Plugin plugin = new YamlPluginFinder().find(path);
-            extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
-                .flatMap(persistent -> {
-                    plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
-                    nullSafeAnnotations(plugin).put(PluginConst.RUNTIME_MODE_ANNO, "dev");
-                    return extensionClient.update(plugin);
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    nullSafeAnnotations(plugin).put(PluginConst.RUNTIME_MODE_ANNO, "dev");
-                    return extensionClient.create(plugin);
-                }))
-                .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                    .filter(t -> t instanceof OptimisticLockingFailureException))
-                .block(BLOCKING_TIMEOUT);
+            extensionClient
+                    .fetch(Plugin.class, plugin.getMetadata().getName())
+                    .flatMap(
+                            persistent -> {
+                                plugin.getMetadata()
+                                        .setVersion(persistent.getMetadata().getVersion());
+                                nullSafeAnnotations(plugin)
+                                        .put(PluginConst.RUNTIME_MODE_ANNO, "dev");
+                                return extensionClient.update(plugin);
+                            })
+                    .switchIfEmpty(
+                            Mono.defer(
+                                    () -> {
+                                        nullSafeAnnotations(plugin)
+                                                .put(PluginConst.RUNTIME_MODE_ANNO, "dev");
+                                        return extensionClient.create(plugin);
+                                    }))
+                    .retryWhen(
+                            Retry.backoff(10, Duration.ofMillis(100))
+                                    .filter(t -> t instanceof OptimisticLockingFailureException))
+                    .block(BLOCKING_TIMEOUT);
         }
     }
 }

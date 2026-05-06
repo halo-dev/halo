@@ -27,7 +27,6 @@ public class RememberMeTokenRevoker {
     @Async
     @EventListener(PasswordChangedEvent.class)
     public void onPasswordChanged(PasswordChangedEvent event) {
-        tokenRepository.removeUserTokens(event.getUsername())
-            .block(BLOCKING_TIMEOUT);
+        tokenRepository.removeUserTokens(event.getUsername()).block(BLOCKING_TIMEOUT);
     }
 }

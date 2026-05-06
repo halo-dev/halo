@@ -5,6 +5,7 @@ plugins {
     id 'jacoco'
     alias(libs.plugins.lombok)
     alias(libs.plugins.versions)
+    alias(libs.plugins.spotless)
 }
 
 group = 'run.halo.app'
@@ -147,4 +148,10 @@ tasks.named('jacocoTestReport') {
 
 tasks.named('uploadBundle') {
     mustRunAfter project(':platform:application').tasks.named('uploadBundle')
+}
+
+spotless {
+    java {
+        googleJavaFormat().aosp().reflowLongStrings().skipJavadocFormatting()
+    }
 }

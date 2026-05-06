@@ -17,8 +17,7 @@ public class SearchOption {
     /**
      * Search keyword.
      */
-    @NotBlank
-    private String keyword;
+    @NotBlank private String keyword;
 
     /**
      * Limit of result.

@@ -19,13 +19,14 @@ class SystemSettingTest {
 
         @Test
         void deserializeTest() {
-            var json = """
-                    {
-                      "run.halo.app.search.post.PostSearchService": [
-                        "run.halo.app.search.post.LucenePostSearchService"
-                      ]
-                    }
-                """;
+            var json =
+                    """
+                        {
+                          "run.halo.app.search.post.PostSearchService": [
+                            "run.halo.app.search.post.LucenePostSearchService"
+                          ]
+                        }
+                    """;
 
             var enabled = JsonUtils.jsonToObject(json, ExtensionPointEnabled.class);
             assertTrue(enabled.containsKey("run.halo.app.search.post.PostSearchService"));
@@ -35,9 +36,11 @@ class SystemSettingTest {
     @Test
     void shouldGetConfigFromJson() {
         var configMap = new ConfigMap();
-        configMap.putDataItem("comment", """
-            {"enable": true}
-            """);
+        configMap.putDataItem(
+                "comment",
+                """
+                {"enable": true}
+                """);
         var comment = SystemSetting.get(configMap.getData(), Comment.GROUP, Comment.class);
         assertTrue(comment.getEnable());
     }

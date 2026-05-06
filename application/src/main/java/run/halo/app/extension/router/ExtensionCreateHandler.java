@@ -27,13 +27,24 @@ class ExtensionCreateHandler implements CreateHandler {
     @Override
     public Mono<ServerResponse> handle(ServerRequest request) {
         return request.bodyToMono(Unstructured.class)
-            .switchIfEmpty(Mono.error(() -> new ExtensionConvertException(
-                "Cannot read body to " + scheme.groupVersionKind())))
-            .flatMap(client::create)
-            .flatMap(createdExt -> ServerResponse
-                .created(URI.create(pathPattern() + "/" + createdExt.getMetadata().getName()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createdExt));
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ExtensionConvertException(
+                                                "Cannot read body to "
+                                                        + scheme.groupVersionKind())))
+                .flatMap(client::create)
+                .flatMap(
+                        createdExt ->
+                                ServerResponse.created(
+                                                URI.create(
+                                                        pathPattern()
+                                                                + "/"
+                                                                + createdExt
+                                                                        .getMetadata()
+                                                                        .getName()))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(createdExt));
     }
 
     @Override

@@ -20,8 +20,7 @@ public class Stats {
 
     private Integer approvedComment;
 
-    public Stats() {
-    }
+    public Stats() {}
 
     @Builder
     public Stats(Integer visit, Integer upvote, Integer totalComment, Integer approvedComment) {
@@ -32,11 +31,6 @@ public class Stats {
     }
 
     public static Stats empty() {
-        return Stats.builder()
-            .visit(0)
-            .upvote(0)
-            .totalComment(0)
-            .approvedComment(0)
-            .build();
+        return Stats.builder().visit(0).upvote(0).totalComment(0).approvedComment(0).build();
     }
 }

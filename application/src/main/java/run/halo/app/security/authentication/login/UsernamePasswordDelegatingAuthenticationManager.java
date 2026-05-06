@@ -9,14 +9,15 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 @Slf4j
 public class UsernamePasswordDelegatingAuthenticationManager
-    implements ReactiveAuthenticationManager {
+        implements ReactiveAuthenticationManager {
 
     private final ExtensionGetter extensionGetter;
 
     private final ReactiveAuthenticationManager defaultAuthenticationManager;
 
-    public UsernamePasswordDelegatingAuthenticationManager(ExtensionGetter extensionGetter,
-        ReactiveAuthenticationManager defaultAuthenticationManager) {
+    public UsernamePasswordDelegatingAuthenticationManager(
+            ExtensionGetter extensionGetter,
+            ReactiveAuthenticationManager defaultAuthenticationManager) {
         this.extensionGetter = extensionGetter;
         this.defaultAuthenticationManager = defaultAuthenticationManager;
     }
@@ -24,20 +25,26 @@ public class UsernamePasswordDelegatingAuthenticationManager
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return extensionGetter
-            .getEnabledExtensions(UsernamePasswordAuthenticationManager.class)
-            .next()
-            .flatMap(authenticationManager -> authenticationManager.authenticate(authentication)
-                .doOnError(t -> log.error(
-                    "failed to authenticate with {}, fallback to default username password "
-                        + "authentication.", authenticationManager.getClass(), t)
-                )
-                .onErrorResume(
-                    t -> !(t instanceof AuthenticationException),
-                    t -> Mono.empty()
-                )
-            )
-            .switchIfEmpty(
-                Mono.defer(() -> defaultAuthenticationManager.authenticate(authentication))
-            );
+                .getEnabledExtensions(UsernamePasswordAuthenticationManager.class)
+                .next()
+                .flatMap(
+                        authenticationManager ->
+                                authenticationManager
+                                        .authenticate(authentication)
+                                        .doOnError(
+                                                t ->
+                                                        log.error(
+                                                                "failed to authenticate with {},"
+                                                                        + " fallback to default"
+                                                                        + " username password "
+                                                                        + "authentication.",
+                                                                authenticationManager.getClass(),
+                                                                t))
+                                        .onErrorResume(
+                                                t -> !(t instanceof AuthenticationException),
+                                                t -> Mono.empty()))
+                .switchIfEmpty(
+                        Mono.defer(
+                                () -> defaultAuthenticationManager.authenticate(authentication)));
     }
 }

@@ -36,7 +36,7 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
 
     public static final String DEFAULT_CATEGORY = "default";
     private static final String DEFAULT_PERMALINK_PATTERN =
-        SystemSetting.ThemeRouteRules.empty().getPost();
+            SystemSetting.ThemeRouteRules.empty().getPost();
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("00");
 
     private final SystemConfigFetcher environmentFetcher;
@@ -47,15 +47,17 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
     public String permalink(Post post) {
         Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
         String permalinkPattern =
-            annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PATTERN);
+                annotations.getOrDefault(
+                        Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PATTERN);
         return createPermalink(post, permalinkPattern);
     }
 
     public String pattern() {
-        return environmentFetcher.fetchRouteRules()
-            .map(PatternUtils::normalizePostPattern)
-            .defaultIfEmpty(DEFAULT_PERMALINK_PATTERN)
-            .block(BLOCKING_TIMEOUT);
+        return environmentFetcher
+                .fetchRouteRules()
+                .map(PatternUtils::normalizePostPattern)
+                .defaultIfEmpty(DEFAULT_PERMALINK_PATTERN)
+                .block(BLOCKING_TIMEOUT);
     }
 
     private String createPermalink(Post post, String pattern) {
@@ -71,19 +73,18 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
         properties.put("month", NUMBER_FORMAT.format(zonedDateTime.getMonthValue()));
         properties.put("day", NUMBER_FORMAT.format(zonedDateTime.getDayOfMonth()));
 
-        var categorySlug = postService.listCategories(post.getSpec().getCategories())
-            .next()
-            .blockOptional(BLOCKING_TIMEOUT)
-            .map(category -> category.getSpec().getSlug())
-            .orElse(DEFAULT_CATEGORY);
+        var categorySlug =
+                postService
+                        .listCategories(post.getSpec().getCategories())
+                        .next()
+                        .blockOptional(BLOCKING_TIMEOUT)
+                        .map(category -> category.getSpec().getSlug())
+                        .orElse(DEFAULT_CATEGORY);
         properties.put("categorySlug", categorySlug);
 
         String simplifiedPattern = PathUtils.simplifyPathPattern(pattern);
         String permalink =
-            PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(simplifiedPattern, properties);
-        return externalUrlSupplier.get()
-            .resolve(permalink)
-            .normalize()
-            .toString();
+                PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(simplifiedPattern, properties);
+        return externalUrlSupplier.get().resolve(permalink).normalize().toString();
     }
 }

@@ -45,9 +45,8 @@ class RoleBindingTest {
     void subjectToStringTest() {
         assertEquals("User/fake-name", createSubject("fake-name", "", "User").toString());
         assertEquals(
-            "fake.group/User/fake-name",
-            createSubject("fake-name", "fake.group", "User").toString()
-        );
+                "fake.group/User/fake-name",
+                createSubject("fake-name", "fake.group", "User").toString());
     }
 
     RoleBinding.Subject createSubject(String name, String apiGroup, String kind) {

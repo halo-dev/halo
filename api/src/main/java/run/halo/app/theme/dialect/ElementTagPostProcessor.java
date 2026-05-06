@@ -34,8 +34,5 @@ public interface ElementTagPostProcessor extends ExtensionPoint {
      * or empty mono if not support.
      */
     Mono<IProcessableElementTag> process(
-        ITemplateContext context,
-        final IProcessableElementTag tag
-    );
-
+            ITemplateContext context, final IProcessableElementTag tag);
 }

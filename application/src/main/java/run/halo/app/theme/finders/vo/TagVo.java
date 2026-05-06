@@ -35,10 +35,10 @@ public class TagVo implements ExtensionVoOperator {
         Tag.TagSpec spec = tag.getSpec();
         Tag.TagStatus status = tag.getStatusOrDefault();
         return TagVo.builder()
-            .metadata(tag.getMetadata())
-            .spec(spec)
-            .status(status)
-            .postCount(defaultIfNull(status.getVisiblePostCount(), 0))
-            .build();
+                .metadata(tag.getMetadata())
+                .spec(spec)
+                .status(status)
+                .postCount(defaultIfNull(status.getVisiblePostCount(), 0))
+                .build();
     }
 }

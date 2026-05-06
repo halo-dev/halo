@@ -39,65 +39,71 @@ public class StatsEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "SystemV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("stats", this::getStats, builder -> builder.operationId("getStats")
-                .description("Get stats.")
-                .tag(tag)
-                .response(responseBuilder()
-                    .implementation(DashboardStats.class)
-                )
-            )
-            .build();
+                .GET(
+                        "stats",
+                        this::getStats,
+                        builder ->
+                                builder.operationId("getStats")
+                                        .description("Get stats.")
+                                        .tag(tag)
+                                        .response(
+                                                responseBuilder()
+                                                        .implementation(DashboardStats.class)))
+                .build();
     }
 
     Mono<ServerResponse> getStats(ServerRequest request) {
         var stats = DashboardStats.emptyStats();
-        Mono<Void> setFromCounters = client.listAll(
-                Counter.class, ListOptions.builder().build(), Sort.unsorted()
-            )
-            .doOnNext(counter -> {
-                var visit = counter.getVisit();
-                if (visit != null) {
-                    stats.setVisits(stats.getVisits() + visit);
-                }
-                var totalComment = counter.getTotalComment();
-                if (totalComment != null) {
-                    stats.setComments(stats.getComments() + totalComment);
-                }
-                var approvedComment = counter.getApprovedComment();
-                if (approvedComment != null) {
-                    stats.setApprovedComments(
-                        stats.getApprovedComments() + approvedComment
-                    );
-                }
-                var upvote = counter.getUpvote();
-                if (upvote != null) {
-                    stats.setUpvotes(stats.getUpvotes() + upvote);
-                }
-            })
-            .then();
+        Mono<Void> setFromCounters =
+                client.listAll(Counter.class, ListOptions.builder().build(), Sort.unsorted())
+                        .doOnNext(
+                                counter -> {
+                                    var visit = counter.getVisit();
+                                    if (visit != null) {
+                                        stats.setVisits(stats.getVisits() + visit);
+                                    }
+                                    var totalComment = counter.getTotalComment();
+                                    if (totalComment != null) {
+                                        stats.setComments(stats.getComments() + totalComment);
+                                    }
+                                    var approvedComment = counter.getApprovedComment();
+                                    if (approvedComment != null) {
+                                        stats.setApprovedComments(
+                                                stats.getApprovedComments() + approvedComment);
+                                    }
+                                    var upvote = counter.getUpvote();
+                                    if (upvote != null) {
+                                        stats.setUpvotes(stats.getUpvotes() + upvote);
+                                    }
+                                })
+                        .then();
 
-        Mono<Void> setUsers = client.countBy(User.class, ListOptions.builder()
-                .labelSelector()
-                .notEq(User.HIDDEN_USER_LABEL, "true")
-                .end()
-                .andQuery(isNull("metadata.deletionTimestamp"))
-                .build()
-            )
-            .doOnNext(stats::setUsers)
-            .then();
-        Mono<Void> setPosts = client.countBy(Post.class, ListOptions.builder()
-                .andQuery(and(
-                    isNull("metadata.deletionTimestamp"),
-                    equal("spec.deleted", "false")
-                ))
-                .build()
-            )
-            .doOnNext(stats::setPosts)
-            .then();
+        Mono<Void> setUsers =
+                client.countBy(
+                                User.class,
+                                ListOptions.builder()
+                                        .labelSelector()
+                                        .notEq(User.HIDDEN_USER_LABEL, "true")
+                                        .end()
+                                        .andQuery(isNull("metadata.deletionTimestamp"))
+                                        .build())
+                        .doOnNext(stats::setUsers)
+                        .then();
+        Mono<Void> setPosts =
+                client.countBy(
+                                Post.class,
+                                ListOptions.builder()
+                                        .andQuery(
+                                                and(
+                                                        isNull("metadata.deletionTimestamp"),
+                                                        equal("spec.deleted", "false")))
+                                        .build())
+                        .doOnNext(stats::setPosts)
+                        .then();
 
         return Mono.when(setFromCounters, setUsers, setPosts)
-            .thenReturn(stats)
-            .flatMap(body -> ServerResponse.ok().bodyValue(body));
+                .thenReturn(stats)
+                .flatMap(body -> ServerResponse.ok().bodyValue(body));
     }
 
     @Data

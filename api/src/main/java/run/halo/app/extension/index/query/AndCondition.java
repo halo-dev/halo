@@ -18,5 +18,4 @@ record AndCondition(Condition left, Condition right) implements Condition {
     public String toString() {
         return "(" + left + " AND " + right + ")";
     }
-
 }

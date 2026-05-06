@@ -23,5 +23,4 @@ public interface TransactionalOperation {
      * Rolls back the operation.
      */
     void rollback();
-
 }

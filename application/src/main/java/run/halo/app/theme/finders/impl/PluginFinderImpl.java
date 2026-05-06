@@ -40,7 +40,8 @@ public class PluginFinderImpl implements PluginFinder {
         }
         var pluginWrapper = pluginManager.getPlugin(pluginName);
         var pluginVersion = pluginWrapper.getDescriptor().getVersion();
-        return pluginManager.getVersionManager()
-            .checkVersionConstraint(pluginVersion, requiresVersion);
+        return pluginManager
+                .getVersionManager()
+                .checkVersionConstraint(pluginVersion, requiresVersion);
     }
 }

@@ -6,8 +6,7 @@ import lombok.Data;
 @Data
 public class ThemeProperties {
 
-    @Valid
-    private final Initializer initializer = new Initializer();
+    @Valid private final Initializer initializer = new Initializer();
 
     /**
      * Indicates whether the generator meta needs to be disabled.
@@ -20,7 +19,5 @@ public class ThemeProperties {
         private boolean disabled = false;
 
         private String location = "classpath:themes/theme-earth.zip";
-
     }
-
 }

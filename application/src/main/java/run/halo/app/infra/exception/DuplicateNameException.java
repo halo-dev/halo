@@ -17,8 +17,11 @@ public class DuplicateNameException extends ResponseStatusException {
         this(reason, cause, null, null);
     }
 
-    public DuplicateNameException(String reason, Throwable cause, String messageDetailCode,
-        Object[] messageDetailArguments) {
+    public DuplicateNameException(
+            String reason,
+            Throwable cause,
+            String messageDetailCode,
+            Object[] messageDetailArguments) {
         super(HttpStatus.BAD_REQUEST, reason, cause, messageDetailCode, messageDetailArguments);
     }
 }

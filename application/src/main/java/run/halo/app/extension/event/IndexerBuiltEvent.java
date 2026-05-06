@@ -9,12 +9,10 @@ import run.halo.app.extension.Scheme;
  */
 public class IndexerBuiltEvent extends ApplicationEvent {
 
-    @Getter
-    private final Scheme scheme;
+    @Getter private final Scheme scheme;
 
     public IndexerBuiltEvent(Object source, Scheme scheme) {
         super(source);
         this.scheme = scheme;
     }
-
 }

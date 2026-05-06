@@ -20,21 +20,22 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "NotificationTemplate",
-    plural = "notificationtemplates", singular = "notificationtemplate")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "NotificationTemplate",
+        plural = "notificationtemplates",
+        singular = "notificationtemplate")
 public class NotificationTemplate extends AbstractExtension {
 
-    @Schema
-    private Spec spec;
+    @Schema private Spec spec;
 
     @Data
     @Schema(name = "NotificationTemplateSpec")
     public static class Spec {
-        @Schema
-        private ReasonSelector reasonSelector;
+        @Schema private ReasonSelector reasonSelector;
 
-        @Schema
-        private Template template;
+        @Schema private Template template;
     }
 
     @Data

@@ -28,5 +28,4 @@ class HttpSecurityUtilsTest {
     void isBlockedTest(String host, boolean isBlocked) throws Exception {
         assertEquals(isBlocked, HttpSecurityUtils.isBlocked(InetAddress.getByName(host)));
     }
-
 }

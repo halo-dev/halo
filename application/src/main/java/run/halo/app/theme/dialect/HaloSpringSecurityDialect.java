@@ -41,15 +41,16 @@ import run.halo.app.security.authorization.AuthorityUtils;
 public class HaloSpringSecurityDialect extends SpringSecurityDialect implements InitializingBean {
 
     private static final String SECURITY_CONTEXT_EXECUTION_ATTRIBUTE_NAME =
-        "ThymeleafReactiveModelAdditions:"
-            + SpringSecurityContextUtils.SECURITY_CONTEXT_MODEL_ATTRIBUTE_NAME;
+            "ThymeleafReactiveModelAdditions:"
+                    + SpringSecurityContextUtils.SECURITY_CONTEXT_MODEL_ATTRIBUTE_NAME;
 
     private final ServerSecurityContextRepository securityContextRepository;
 
     private final ObjectProvider<MethodSecurityExpressionHandler> expressionHandler;
 
-    public HaloSpringSecurityDialect(ServerSecurityContextRepository securityContextRepository,
-        ObjectProvider<MethodSecurityExpressionHandler> expressionHandler) {
+    public HaloSpringSecurityDialect(
+            ServerSecurityContextRepository securityContextRepository,
+            ObjectProvider<MethodSecurityExpressionHandler> expressionHandler) {
         this.securityContextRepository = securityContextRepository;
         this.expressionHandler = expressionHandler;
     }
@@ -63,14 +64,17 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
         // We have to build an anonymous authentication token here because the token won't be saved
         // into repository during anonymous authentication.
         var anonymousAuthentication =
-            new AnonymousAuthenticationToken(
-                "fallback", PRINCIPAL, createAuthorityList(AuthorityUtils.ROLE_PREFIX + Role)
-            );
+                new AnonymousAuthenticationToken(
+                        "fallback",
+                        PRINCIPAL,
+                        createAuthorityList(AuthorityUtils.ROLE_PREFIX + Role));
         var anonymousSecurityContext = new SecurityContextImpl(anonymousAuthentication);
 
         final Function<ServerWebExchange, Object> secCtxInitializer =
-            exchange -> securityContextRepository.load(exchange)
-                .defaultIfEmpty(anonymousSecurityContext);
+                exchange ->
+                        securityContextRepository
+                                .load(exchange)
+                                .defaultIfEmpty(anonymousSecurityContext);
 
         // Just overwrite the value of the attribute
         getExecutionAttributes().put(SECURITY_CONTEXT_EXECUTION_ATTRIBUTE_NAME, secCtxInitializer);
@@ -79,24 +83,25 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
     @Override
     public Set<IProcessor> getProcessors(String dialectPrefix) {
         LinkedHashSet<IProcessor> processors = new LinkedHashSet<>();
-        processors.add(
-            new HaloAuthorizeAttrProcessor(TemplateMode.HTML, dialectPrefix, ATTR_NAME)
-        );
+        processors.add(new HaloAuthorizeAttrProcessor(TemplateMode.HTML, dialectPrefix, ATTR_NAME));
         processors.addAll(super.getProcessors(dialectPrefix));
         return processors;
     }
 
     public class HaloAuthorizeAttrProcessor
-        extends AbstractStandardConditionalVisibilityTagProcessor {
+            extends AbstractStandardConditionalVisibilityTagProcessor {
 
-        protected HaloAuthorizeAttrProcessor(TemplateMode templateMode, String dialectPrefix,
-            String attrName) {
+        protected HaloAuthorizeAttrProcessor(
+                TemplateMode templateMode, String dialectPrefix, String attrName) {
             super(templateMode, dialectPrefix, attrName, ATTR_PRECEDENCE - 10);
         }
 
         @Override
-        protected boolean isVisible(ITemplateContext context, IProcessableElementTag tag,
-            AttributeName attributeName, String attributeValue) {
+        protected boolean isVisible(
+                ITemplateContext context,
+                IProcessableElementTag tag,
+                AttributeName attributeName,
+                String attributeValue) {
 
             final String attrValue = (attributeValue == null ? null : attributeValue.trim());
 
@@ -111,10 +116,11 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
             }
 
             // resolve expr
-            var expr = Optional.of(attributeValue)
-                .filter(v -> v.startsWith("${") && v.endsWith("}"))
-                .map(v -> v.substring(2, v.length() - 1))
-                .orElse(attributeValue);
+            var expr =
+                    Optional.of(attributeValue)
+                            .filter(v -> v.startsWith("${") && v.endsWith("}"))
+                            .map(v -> v.substring(2, v.length() - 1))
+                            .orElse(attributeValue);
 
             var expressionHandler = HaloSpringSecurityDialect.this.expressionHandler.getIfUnique();
             if (expressionHandler == null) {
@@ -124,19 +130,20 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
 
             var expression = expressionHandler.getExpressionParser().parseExpression(expr);
 
-            var methodInvocation = MethodInvocationUtils.createFromClass(this,
-                HaloAuthorizeAttrProcessor.class,
-                "dummyAuthorize",
-                new Class[] {Authentication.class},
-                new Object[] {authentication}
-            );
+            var methodInvocation =
+                    MethodInvocationUtils.createFromClass(
+                            this,
+                            HaloAuthorizeAttrProcessor.class,
+                            "dummyAuthorize",
+                            new Class[] {Authentication.class},
+                            new Object[] {authentication});
             var evaluationContext =
-                expressionHandler.createEvaluationContext(authentication, methodInvocation);
+                    expressionHandler.createEvaluationContext(authentication, methodInvocation);
 
             var expressionObjects = context.getExpressionObjects();
-            var wrappedEvolutionContext = SpringVersionSpecificUtils.wrapEvaluationContext(
-                evaluationContext, expressionObjects
-            );
+            var wrappedEvolutionContext =
+                    SpringVersionSpecificUtils.wrapEvaluationContext(
+                            evaluationContext, expressionObjects);
 
             return ExpressionUtils.evaluateAsBoolean(expression, wrappedEvolutionContext);
         }
@@ -150,6 +157,5 @@ public class HaloSpringSecurityDialect extends SpringSecurityDialect implements 
         public Boolean dummyAuthorize(Authentication authentication) {
             throw new UnsupportedOperationException("Should not be called");
         }
-
     }
 }

@@ -27,11 +27,9 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @ExtendWith(MockitoExtension.class)
 class ReactiveExtensionPaginatedOperatorImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @InjectMocks
-    private ReactiveExtensionPaginatedOperatorImpl service;
+    @InjectMocks private ReactiveExtensionPaginatedOperatorImpl service;
 
     @Nested
     class ListTest {
@@ -48,21 +46,29 @@ class ReactiveExtensionPaginatedOperatorImplTest {
             Instant otherNow = now.plusSeconds(1000);
             items.addAll(generateItems(90, otherNow));
 
-            when(client.listBy(any(), any(), any())).thenAnswer(invocation -> {
-                PageRequest pageRequest = invocation.getArgument(2);
-                int pageNumber = pageRequest.getPageNumber();
-                var list = ListResult.subList(items, pageNumber, pageRequest.getPageSize());
-                var result = new ListResult<>(pageNumber, pageRequest.getPageSize(),
-                    items.size(), list);
-                return Mono.just(result);
-            });
+            when(client.listBy(any(), any(), any()))
+                    .thenAnswer(
+                            invocation -> {
+                                PageRequest pageRequest = invocation.getArgument(2);
+                                int pageNumber = pageRequest.getPageNumber();
+                                var list =
+                                        ListResult.subList(
+                                                items, pageNumber, pageRequest.getPageSize());
+                                var result =
+                                        new ListResult<>(
+                                                pageNumber,
+                                                pageRequest.getPageSize(),
+                                                items.size(),
+                                                list);
+                                return Mono.just(result);
+                            });
         }
 
         @Test
         public void listTest() {
             StepVerifier.create(service.list(FakeExtension.class, new ListOptions()))
-                .expectNextCount(900)
-                .verifyComplete();
+                    .expectNextCount(900)
+                    .verifyComplete();
         }
     }
 

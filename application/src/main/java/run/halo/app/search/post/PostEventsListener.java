@@ -27,9 +27,9 @@ public class PostEventsListener {
     private final ReactiveExtensionClient client;
 
     public PostEventsListener(
-        ApplicationEventPublisher publisher,
-        PostService postService,
-        ReactiveExtensionClient client) {
+            ApplicationEventPublisher publisher,
+            PostService postService,
+            ReactiveExtensionClient client) {
         this.publisher = publisher;
         this.postService = postService;
         this.client = client;
@@ -47,25 +47,28 @@ public class PostEventsListener {
 
     private Mono<Void> addOrUpdateOrDelete(String postName) {
         return client.fetch(Post.class, postName)
-            .flatMap(post -> {
-                if (ExtensionUtil.isDeleted(post)) {
-                    // if the post is deleted permanently, delete it.
-                    return Mono.fromRunnable(() -> delete(postName));
-                }
-                // convert the post into halo document and add it to the search engine.
-                return postService.getReleaseContent(post)
-                    .map(content -> convert(post, content))
-                    .doOnNext(haloDoc -> publisher.publishEvent(
-                        new HaloDocumentAddRequestEvent(this, List.of(haloDoc))
-                    ));
-            })
-            .then();
+                .flatMap(
+                        post -> {
+                            if (ExtensionUtil.isDeleted(post)) {
+                                // if the post is deleted permanently, delete it.
+                                return Mono.fromRunnable(() -> delete(postName));
+                            }
+                            // convert the post into halo document and add it to the search engine.
+                            return postService
+                                    .getReleaseContent(post)
+                                    .map(content -> convert(post, content))
+                                    .doOnNext(
+                                            haloDoc ->
+                                                    publisher.publishEvent(
+                                                            new HaloDocumentAddRequestEvent(
+                                                                    this, List.of(haloDoc))));
+                        })
+                .then();
     }
 
     private void delete(String postName) {
         publisher.publishEvent(
-            new HaloDocumentDeleteRequestEvent(this, List.of(POST_DOCUMENT_TYPE + '-' + postName))
-        );
+                new HaloDocumentDeleteRequestEvent(
+                        this, List.of(POST_DOCUMENT_TYPE + '-' + postName)));
     }
-
 }

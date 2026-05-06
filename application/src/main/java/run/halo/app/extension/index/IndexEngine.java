@@ -49,8 +49,7 @@ public interface IndexEngine {
      * @return the list result of extension names
      */
     <E extends Extension> ListResult<String> retrieve(
-        Class<E> type, @Nullable ListOptions options, PageRequest page
-    );
+            Class<E> type, @Nullable ListOptions options, PageRequest page);
 
     /**
      * Retrieve all extension names from the index.
@@ -62,8 +61,7 @@ public interface IndexEngine {
      * @return the iterable of extension names
      */
     <E extends Extension> Iterable<String> retrieveAll(
-        Class<E> type, @Nullable ListOptions options, @Nullable Sort sort
-    );
+            Class<E> type, @Nullable ListOptions options, @Nullable Sort sort);
 
     /**
      * Retrieve top N extension names from the index.
@@ -76,8 +74,7 @@ public interface IndexEngine {
      * @return the iterable of extension names
      */
     <E extends Extension> Iterable<String> retrieveTopN(
-        Class<E> type, @Nullable ListOptions options, @Nullable Sort sort, int topN
-    );
+            Class<E> type, @Nullable ListOptions options, @Nullable Sort sort, int topN);
 
     /**
      * Count the number of extensions in the index.
@@ -95,5 +92,4 @@ public interface IndexEngine {
      * @return the indices manager
      */
     IndicesManager getIndicesManager();
-
 }

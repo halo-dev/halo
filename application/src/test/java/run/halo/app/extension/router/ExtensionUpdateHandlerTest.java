@@ -35,8 +35,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class ExtensionUpdateHandlerTest {
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -58,9 +57,10 @@ class ExtensionUpdateHandlerTest {
         unstructured.setApiVersion("fake.halo.run/v1alpha1");
         unstructured.setKind("Fake");
 
-        var serverRequest = MockServerRequest.builder()
-            .pathVariable("name", "my-fake")
-            .body(Mono.just(unstructured));
+        var serverRequest =
+                MockServerRequest.builder()
+                        .pathVariable("name", "my-fake")
+                        .body(Mono.just(unstructured));
         // when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.just(fake));
         when(client.update(eq(unstructured))).thenReturn(Mono.just(unstructured));
 
@@ -69,33 +69,33 @@ class ExtensionUpdateHandlerTest {
         var responseMono = updateHandler.handle(serverRequest);
 
         StepVerifier.create(responseMono)
-            .assertNext(response -> {
-                assertEquals(HttpStatus.OK, response.statusCode());
-                assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
-                assertTrue(response instanceof EntityResponse<?>);
-                assertEquals(unstructured, ((EntityResponse<?>) response).entity());
-            })
-            .verifyComplete();
+                .assertNext(
+                        response -> {
+                            assertEquals(HttpStatus.OK, response.statusCode());
+                            assertEquals(
+                                    MediaType.APPLICATION_JSON,
+                                    response.headers().getContentType());
+                            assertTrue(response instanceof EntityResponse<?>);
+                            assertEquals(unstructured, ((EntityResponse<?>) response).entity());
+                        })
+                .verifyComplete();
         // verify(client, times(1)).fetch(eq(FakeExtension.class), eq("my-fake"));
         verify(client, times(1)).update(eq(unstructured));
     }
 
     @Test
     void shouldReturnErrorWhenNoBodyProvided() {
-        var serverRequest = MockServerRequest.builder()
-            .pathVariable("name", "my-fake")
-            .body(Mono.empty());
+        var serverRequest =
+                MockServerRequest.builder().pathVariable("name", "my-fake").body(Mono.empty());
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         var responseMono = updateHandler.handle(serverRequest);
-        StepVerifier.create(responseMono)
-            .verifyError(ServerWebInputException.class);
+        StepVerifier.create(responseMono).verifyError(ServerWebInputException.class);
     }
 
     @Test
     void shouldReturnErrorWhenNoNameProvided() {
-        var serverRequest = MockServerRequest.builder()
-            .body(Mono.empty());
+        var serverRequest = MockServerRequest.builder().body(Mono.empty());
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         assertThrows(IllegalArgumentException.class, () -> updateHandler.handle(serverRequest));
@@ -110,20 +110,24 @@ class ExtensionUpdateHandlerTest {
         unstructured.setApiVersion("fake.halo.run/v1alpha1");
         unstructured.setKind("Fake");
 
-        var serverRequest = MockServerRequest.builder()
-            .pathVariable("name", "my-fake")
-            .body(Mono.just(unstructured));
+        var serverRequest =
+                MockServerRequest.builder()
+                        .pathVariable("name", "my-fake")
+                        .body(Mono.just(unstructured));
         doThrow(ExtensionNotFoundException.class).when(client).update(any());
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         var responseMono = updateHandler.handle(serverRequest);
 
-        StepVerifier.create(responseMono)
-            .verifyError(ExtensionNotFoundException.class);
+        StepVerifier.create(responseMono).verifyError(ExtensionNotFoundException.class);
 
-        verify(client, times(1)).update(
-            argThat(extension -> Objects.equals("my-fake", extension.getMetadata().getName())));
+        verify(client, times(1))
+                .update(
+                        argThat(
+                                extension ->
+                                        Objects.equals(
+                                                "my-fake", extension.getMetadata().getName())));
         verify(client, times(0)).fetch(same(FakeExtension.class), anyString());
     }
 }

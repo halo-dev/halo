@@ -38,21 +38,24 @@ public class NotificationTrigger implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Reason.class, request.name()).ifPresent(reason -> {
-            if (ExtensionUtil.isDeleted(reason)) {
-                if (removeFinalizers(reason.getMetadata(), Set.of(TRIGGERED_FINALIZER))) {
-                    client.update(reason);
-                    log.info("Cleaned up notification reason {}", request.name());
-                }
-                return;
-            }
-            if (addFinalizers(reason.getMetadata(), Set.of(TRIGGERED_FINALIZER))) {
-                // notifier
-                onNewReasonReceived(reason);
-            }
-            // cleanup reason after notified
-            client.delete(reason);
-        });
+        client.fetch(Reason.class, request.name())
+                .ifPresent(
+                        reason -> {
+                            if (ExtensionUtil.isDeleted(reason)) {
+                                if (removeFinalizers(
+                                        reason.getMetadata(), Set.of(TRIGGERED_FINALIZER))) {
+                                    client.update(reason);
+                                    log.info("Cleaned up notification reason {}", request.name());
+                                }
+                                return;
+                            }
+                            if (addFinalizers(reason.getMetadata(), Set.of(TRIGGERED_FINALIZER))) {
+                                // notifier
+                                onNewReasonReceived(reason);
+                            }
+                            // cleanup reason after notified
+                            client.delete(reason);
+                        });
         return Result.doNotRetry();
     }
 
@@ -65,9 +68,6 @@ public class NotificationTrigger implements Reconciler<Reconciler.Request> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Reason())
-            .workerCount(10)
-            .build();
+        return builder.extension(new Reason()).workerCount(10).build();
     }
 }

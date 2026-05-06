@@ -23,13 +23,7 @@ class PatternUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "",
-        " ",
-        "/",
-        " /",
-        "/ "
-    })
+    @ValueSource(strings = {"", " ", "/", " /", "/ "})
     void shouldThrowExceptionWhen(String pattern) {
         assertThrows(IllegalArgumentException.class, () -> PatternUtils.normalizePattern(pattern));
     }
@@ -42,18 +36,20 @@ class PatternUtilsTest {
         "archives/{slug}, blog/archives, /categories, /blog/archives/{slug}",
         "categories/{slug}, /archives, blog/categories, /blog/categories/{slug}",
         """
-            /archives/{year}/{month}/{slug}/, /blog/archives/, /categories, \
-            /blog/archives/{year}/{month}/{slug}""",
+        /archives/{year}/{month}/{slug}/, /blog/archives/, /categories, \
+        /blog/archives/{year}/{month}/{slug}\
+        """,
         """
-            /categories/{category}/{slug}/, /archives, /blog/categories/, \
-            /blog/categories/{category}/{slug}""",
+        /categories/{category}/{slug}/, /archives, /blog/categories/, \
+        /blog/categories/{category}/{slug}\
+        """,
         """
-            /archives/categories/{slug}, /blog/archives, /blog/categories, \
-            /blog/archives/categories/{slug}""",
+        /archives/categories/{slug}, /blog/archives, /blog/categories, \
+        /blog/archives/categories/{slug}\
+        """,
     })
     void normalizePostPatternTest(
-        String postPattern, String archivesPattern, String categoriesPattern, String expected
-    ) {
+            String postPattern, String archivesPattern, String categoriesPattern, String expected) {
         var rules = new ThemeRouteRules();
         rules.setPost(postPattern);
         rules.setArchives(archivesPattern);
@@ -61,6 +57,4 @@ class PatternUtilsTest {
         var result = PatternUtils.normalizePostPattern(rules);
         assertEquals(expected, result);
     }
-
-
 }

@@ -30,11 +30,12 @@ import run.halo.app.extension.Metadata;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = GROUP,
-    version = VERSION,
-    kind = KIND,
-    plural = "rolebindings",
-    singular = "rolebinding")
+@GVK(
+        group = GROUP,
+        version = VERSION,
+        kind = KIND,
+        plural = "rolebindings",
+        singular = "rolebinding")
 public class RoleBinding extends AbstractExtension {
 
     public static final String GROUP = "";
@@ -109,15 +110,17 @@ public class RoleBinding extends AbstractExtension {
         String apiGroup;
 
         public static Predicate<Subject> isUser(String username) {
-            return subject -> User.KIND.equals(subject.getKind())
-                && User.GROUP.equals(subject.getApiGroup())
-                && username.equals(subject.getName());
+            return subject ->
+                    User.KIND.equals(subject.getKind())
+                            && User.GROUP.equals(subject.getApiGroup())
+                            && username.equals(subject.getName());
         }
 
         public static Predicate<Subject> containsUser(Set<String> usernames) {
-            return subject -> User.KIND.equals(subject.getKind())
-                && User.GROUP.equals(subject.apiGroup)
-                && usernames.contains(subject.getName());
+            return subject ->
+                    User.KIND.equals(subject.getKind())
+                            && User.GROUP.equals(subject.apiGroup)
+                            && usernames.contains(subject.getName());
         }
 
         @Override
@@ -156,14 +159,15 @@ public class RoleBinding extends AbstractExtension {
     }
 
     public static Predicate<RoleBinding> containsUser(String username) {
-        return ExtensionOperator.<RoleBinding>isNotDeleted().and(
-            binding -> binding.getSubjects().stream()
-                .anyMatch(Subject.isUser(username)));
+        return ExtensionOperator.<RoleBinding>isNotDeleted()
+                .and(binding -> binding.getSubjects().stream().anyMatch(Subject.isUser(username)));
     }
 
     public static Predicate<RoleBinding> containsUser(Set<String> usernames) {
         return ExtensionOperator.<RoleBinding>isNotDeleted()
-            .and(binding -> binding.getSubjects().stream()
-                .anyMatch(Subject.containsUser(usernames)));
+                .and(
+                        binding ->
+                                binding.getSubjects().stream()
+                                        .anyMatch(Subject.containsUser(usernames)));
     }
 }

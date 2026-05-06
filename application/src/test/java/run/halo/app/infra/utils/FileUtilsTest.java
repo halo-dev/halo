@@ -24,8 +24,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 
 class FileUtilsTest {
 
-    @TempDir
-    Path tempDirectory;
+    @TempDir Path tempDirectory;
 
     @Nested
     class DirectoryTraversalTest {
@@ -39,14 +38,14 @@ class FileUtilsTest {
 
         @Test
         void traversalTestWhenFailure() {
-            assertThrows(AccessDeniedException.class,
-                () -> checkDirectoryTraversal("/etc/", "/etc/../tmp"));
-            assertThrows(AccessDeniedException.class,
-                () -> checkDirectoryTraversal("/etc/", "/../tmp"));
-            assertThrows(AccessDeniedException.class,
-                () -> checkDirectoryTraversal("/etc/", "/tmp"));
+            assertThrows(
+                    AccessDeniedException.class,
+                    () -> checkDirectoryTraversal("/etc/", "/etc/../tmp"));
+            assertThrows(
+                    AccessDeniedException.class, () -> checkDirectoryTraversal("/etc/", "/../tmp"));
+            assertThrows(
+                    AccessDeniedException.class, () -> checkDirectoryTraversal("/etc/", "/tmp"));
         }
-
     }
 
     @Nested
@@ -54,8 +53,9 @@ class FileUtilsTest {
 
         @Test
         void zipFolderAndUnzip() throws IOException, URISyntaxException {
-            var uri = requireNonNull(getClass().getClassLoader().getResource("folder-to-zip"))
-                .toURI();
+            var uri =
+                    requireNonNull(getClass().getClassLoader().getResource("folder-to-zip"))
+                            .toURI();
             var zipPath = tempDirectory.resolve("example.zip");
             zip(Paths.get(uri), zipPath);
 
@@ -71,8 +71,9 @@ class FileUtilsTest {
 
         @Test
         void jarFolderAndUnzip() throws IOException, URISyntaxException {
-            var uri = requireNonNull(getClass().getClassLoader().getResource("folder-to-zip"))
-                .toURI();
+            var uri =
+                    requireNonNull(getClass().getClassLoader().getResource("folder-to-zip"))
+                            .toURI();
             var zipPath = tempDirectory.resolve("example.zip");
             jar(Paths.get(uri), zipPath);
 
@@ -87,32 +88,28 @@ class FileUtilsTest {
 
         @Test
         void zipFolderIfNoSuchFolder() {
-            assertThrows(NoSuchFileException.class, () ->
-                zip(Paths.get("no-such-folder"), tempDirectory.resolve("example.zip")));
+            assertThrows(
+                    NoSuchFileException.class,
+                    () -> zip(Paths.get("no-such-folder"), tempDirectory.resolve("example.zip")));
         }
 
         @Test
         void jarFolderIfNoSuchFolder() {
-            assertThrows(NoSuchFileException.class, () ->
-                jar(Paths.get("no-such-folder"), tempDirectory.resolve("example.zip")));
+            assertThrows(
+                    NoSuchFileException.class,
+                    () -> jar(Paths.get("no-such-folder"), tempDirectory.resolve("example.zip")));
         }
-
     }
 
     @Test
     void deleteFileSilentlyTest() throws IOException {
-        StepVerifier.create(deleteFileSilently(null))
-            .expectNext(false)
-            .verifyComplete();
+        StepVerifier.create(deleteFileSilently(null)).expectNext(false).verifyComplete();
 
-        StepVerifier.create(deleteFileSilently(tempDirectory))
-            .expectNext(false)
-            .verifyComplete();
+        StepVerifier.create(deleteFileSilently(tempDirectory)).expectNext(false).verifyComplete();
 
         StepVerifier.create(
-                deleteFileSilently(Files.createFile(tempDirectory.resolve("for-deleting"))))
-            .expectNext(true)
-            .verifyComplete();
+                        deleteFileSilently(Files.createFile(tempDirectory.resolve("for-deleting"))))
+                .expectNext(true)
+                .verifyComplete();
     }
-
 }

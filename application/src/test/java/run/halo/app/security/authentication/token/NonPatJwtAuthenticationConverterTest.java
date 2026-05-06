@@ -21,38 +21,34 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 class NonPatJwtAuthenticationConverterTest {
 
-    @InjectMocks
-    NonPatJwtAuthenticationConverter converter;
+    @InjectMocks NonPatJwtAuthenticationConverter converter;
 
-    @Mock
-    Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate;
+    @Mock Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate;
 
     @Test
     void shouldNotConvertIfJwtIsPat() {
-        var jwt = Jwt.withTokenValue("token")
-            .claim("pat_name", "test-pat")
-            .header("alg", "none")
-            .build();
+        var jwt =
+                Jwt.withTokenValue("token")
+                        .claim("pat_name", "test-pat")
+                        .header("alg", "none")
+                        .build();
         requireNonNull(converter.convert(jwt))
-            .as(StepVerifier::create)
-            .expectError(InvalidBearerTokenException.class)
-            .verify();
+                .as(StepVerifier::create)
+                .expectError(InvalidBearerTokenException.class)
+                .verify();
         verify(delegate, never()).convert(jwt);
     }
 
     @Test
     void shouldConvertJwtCorrectly() {
-        var jwt = Jwt.withTokenValue("token")
-            .claim("a", "b")
-            .header("alg", "none")
-            .build();
+        var jwt = Jwt.withTokenValue("token").claim("a", "b").header("alg", "none").build();
 
         var expectToken = mock(AbstractAuthenticationToken.class);
         when(delegate.convert(jwt)).thenReturn(Mono.just(expectToken));
 
         requireNonNull(converter.convert(jwt))
-            .as(StepVerifier::create)
-            .expectNext(expectToken)
-            .verifyComplete();
+                .as(StepVerifier::create)
+                .expectNext(expectToken)
+                .verifyComplete();
     }
 }

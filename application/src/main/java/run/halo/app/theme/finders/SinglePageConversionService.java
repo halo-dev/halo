@@ -56,5 +56,4 @@ public interface SinglePageConversionService {
     Mono<ListedSinglePageVo> convertToListedVo(SinglePage singlePage);
 
     Mono<ListResult<ListedSinglePageVo>> listBy(ListOptions listOptions, PageRequest pageRequest);
-
 }

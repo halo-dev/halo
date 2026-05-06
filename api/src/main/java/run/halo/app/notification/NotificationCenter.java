@@ -26,8 +26,8 @@ public interface NotificationCenter {
      * @param reason interest reason to subscribe
      * @return a subscription
      */
-    Mono<Subscription> subscribe(Subscription.Subscriber subscriber,
-        Subscription.InterestReason reason);
+    Mono<Subscription> subscribe(
+            Subscription.Subscriber subscriber, Subscription.InterestReason reason);
 
     /**
      * Unsubscribes by the given subject.

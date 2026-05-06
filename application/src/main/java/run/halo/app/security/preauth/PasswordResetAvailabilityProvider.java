@@ -26,5 +26,4 @@ public interface PasswordResetAvailabilityProvider {
      * @return true if supports, false otherwise
      */
     boolean support(String name);
-
 }

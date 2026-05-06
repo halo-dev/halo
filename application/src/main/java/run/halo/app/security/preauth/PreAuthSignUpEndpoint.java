@@ -58,11 +58,12 @@ class PreAuthSignUpEndpoint {
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    PreAuthSignUpEndpoint(GlobalInfoService globalInfoService,
-        Validator validator,
-        UserService userService,
-        EmailVerificationService emailVerificationService,
-        RateLimiterRegistry rateLimiterRegistry) {
+    PreAuthSignUpEndpoint(
+            GlobalInfoService globalInfoService,
+            Validator validator,
+            UserService userService,
+            EmailVerificationService emailVerificationService,
+            RateLimiterRegistry rateLimiterRegistry) {
         this.globalInfoService = globalInfoService;
         this.validator = validator;
         this.userService = userService;
@@ -73,102 +74,183 @@ class PreAuthSignUpEndpoint {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthSignUpEndpoints() {
-        return RouterFunctions.nest(path("/signup"), RouterFunctions.route()
-            .GET("", request -> {
-                var signUpData = new SignUpData();
-                var bindingResult = new BeanPropertyBindingResult(signUpData, "form");
-                var model = bindingResult.getModel();
-                model.put("globalInfo", globalInfoService.getGlobalInfo());
-                return ServerResponse.ok().render("signup", model);
-            })
-            .POST(
-                "",
-                contentType(APPLICATION_FORM_URLENCODED),
-                request -> request.bind(SignUpData.class)
-                    .flatMap(signUpData -> {
-                        // sign up
-                        var bindingResult = validate(signUpData, validator, request.exchange());
-                        var model = bindingResult.getModel();
-                        model.put("globalInfo", globalInfoService.getGlobalInfo());
-                        if (bindingResult.hasErrors()) {
-                            return ServerResponse.ok().render("signup", model);
-                        }
-                        return userService.signUp(signUpData)
-                            .flatMap(user -> ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create("/login?signup"))
-                                .build()
-                            )
-                            .doOnError(t -> {
-                                model.put("error", "unknown");
-                                model.put("errorMessage", t.getMessage());
-                            })
-                            .doOnError(EmailVerificationFailed.class,
-                                e -> {
-                                    bindingResult.addError(new FieldError("form",
-                                        "emailCode",
-                                        signUpData.getEmailCode(),
-                                        true,
-                                        new String[] {"signup.error.email-code.invalid"},
-                                        null,
-                                        "Invalid Email Code"));
-                                }
-                            )
-                            .doOnError(EmailAlreadyTakenException.class, e -> {
-                                bindingResult.addError(new FieldError("form",
-                                    "email",
-                                    signUpData.getEmail(),
-                                    true,
-                                    new String[] {"signup.error.email.already-taken"},
-                                    null,
-                                    "Email Already Taken"));
-                            })
-                            .doOnError(RateLimitExceededException.class,
-                                e -> model.put("error", "rate-limit-exceeded")
-                            )
-                            .doOnError(DuplicateNameException.class,
-                                e -> model.put("error", "duplicate-username")
-                            )
-                            .doOnError(RestrictedNameException.class,
-                                e -> model.put("error", "restricted-username")
-                            )
-                            .onErrorResume(e -> ServerResponse.ok().render("signup", model));
-                    })
-            )
-            .POST("/send-email-code", contentType(APPLICATION_JSON),
-                request -> request.bodyToMono(SendEmailCodeBody.class)
-                    .flatMap(body -> {
-                        var bindingResult = validate(body, "body", validator, request.exchange());
-                        if (bindingResult.hasErrors()) {
-                            return Mono.error(new RequestBodyValidationException(bindingResult));
-                        }
-                        var email = body.getEmail();
-                        return emailVerificationService.sendRegisterVerificationCode(email)
-                            .transformDeferred(
-                                rateLimiterForSendingEmailCode(request.exchange().getRequest())
-                            )
-                            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
-                    })
-                    .then(ServerResponse.accepted().build())
-            )
-            .before(HaloUtils.noCache())
-            .build());
+        return RouterFunctions.nest(
+                path("/signup"),
+                RouterFunctions.route()
+                        .GET(
+                                "",
+                                request -> {
+                                    var signUpData = new SignUpData();
+                                    var bindingResult =
+                                            new BeanPropertyBindingResult(signUpData, "form");
+                                    var model = bindingResult.getModel();
+                                    model.put("globalInfo", globalInfoService.getGlobalInfo());
+                                    return ServerResponse.ok().render("signup", model);
+                                })
+                        .POST(
+                                "",
+                                contentType(APPLICATION_FORM_URLENCODED),
+                                request ->
+                                        request.bind(SignUpData.class)
+                                                .flatMap(
+                                                        signUpData -> {
+                                                            // sign up
+                                                            var bindingResult =
+                                                                    validate(
+                                                                            signUpData,
+                                                                            validator,
+                                                                            request.exchange());
+                                                            var model = bindingResult.getModel();
+                                                            model.put(
+                                                                    "globalInfo",
+                                                                    globalInfoService
+                                                                            .getGlobalInfo());
+                                                            if (bindingResult.hasErrors()) {
+                                                                return ServerResponse.ok()
+                                                                        .render("signup", model);
+                                                            }
+                                                            return userService
+                                                                    .signUp(signUpData)
+                                                                    .flatMap(
+                                                                            user ->
+                                                                                    ServerResponse
+                                                                                            .status(
+                                                                                                    HttpStatus
+                                                                                                            .FOUND)
+                                                                                            .location(
+                                                                                                    URI
+                                                                                                            .create(
+                                                                                                                    "/login?signup"))
+                                                                                            .build())
+                                                                    .doOnError(
+                                                                            t -> {
+                                                                                model.put(
+                                                                                        "error",
+                                                                                        "unknown");
+                                                                                model.put(
+                                                                                        "errorMessage",
+                                                                                        t
+                                                                                                .getMessage());
+                                                                            })
+                                                                    .doOnError(
+                                                                            EmailVerificationFailed
+                                                                                    .class,
+                                                                            e -> {
+                                                                                bindingResult
+                                                                                        .addError(
+                                                                                                new FieldError(
+                                                                                                        "form",
+                                                                                                        "emailCode",
+                                                                                                        signUpData
+                                                                                                                .getEmailCode(),
+                                                                                                        true,
+                                                                                                        new String
+                                                                                                                [] {
+                                                                                                            "signup.error.email-code.invalid"
+                                                                                                        },
+                                                                                                        null,
+                                                                                                        "Invalid"
+                                                                                                            + " Email"
+                                                                                                            + " Code"));
+                                                                            })
+                                                                    .doOnError(
+                                                                            EmailAlreadyTakenException
+                                                                                    .class,
+                                                                            e -> {
+                                                                                bindingResult
+                                                                                        .addError(
+                                                                                                new FieldError(
+                                                                                                        "form",
+                                                                                                        "email",
+                                                                                                        signUpData
+                                                                                                                .getEmail(),
+                                                                                                        true,
+                                                                                                        new String
+                                                                                                                [] {
+                                                                                                            "signup.error.email.already-taken"
+                                                                                                        },
+                                                                                                        null,
+                                                                                                        "Email"
+                                                                                                            + " Already"
+                                                                                                            + " Taken"));
+                                                                            })
+                                                                    .doOnError(
+                                                                            RateLimitExceededException
+                                                                                    .class,
+                                                                            e ->
+                                                                                    model.put(
+                                                                                            "error",
+                                                                                            "rate-limit-exceeded"))
+                                                                    .doOnError(
+                                                                            DuplicateNameException
+                                                                                    .class,
+                                                                            e ->
+                                                                                    model.put(
+                                                                                            "error",
+                                                                                            "duplicate-username"))
+                                                                    .doOnError(
+                                                                            RestrictedNameException
+                                                                                    .class,
+                                                                            e ->
+                                                                                    model.put(
+                                                                                            "error",
+                                                                                            "restricted-username"))
+                                                                    .onErrorResume(
+                                                                            e ->
+                                                                                    ServerResponse
+                                                                                            .ok()
+                                                                                            .render(
+                                                                                                    "signup",
+                                                                                                    model));
+                                                        }))
+                        .POST(
+                                "/send-email-code",
+                                contentType(APPLICATION_JSON),
+                                request ->
+                                        request.bodyToMono(SendEmailCodeBody.class)
+                                                .flatMap(
+                                                        body -> {
+                                                            var bindingResult =
+                                                                    validate(
+                                                                            body,
+                                                                            "body",
+                                                                            validator,
+                                                                            request.exchange());
+                                                            if (bindingResult.hasErrors()) {
+                                                                return Mono.error(
+                                                                        new RequestBodyValidationException(
+                                                                                bindingResult));
+                                                            }
+                                                            var email = body.getEmail();
+                                                            return emailVerificationService
+                                                                    .sendRegisterVerificationCode(
+                                                                            email)
+                                                                    .transformDeferred(
+                                                                            rateLimiterForSendingEmailCode(
+                                                                                    request.exchange()
+                                                                                            .getRequest()))
+                                                                    .onErrorMap(
+                                                                            RequestNotPermitted
+                                                                                    .class,
+                                                                            RateLimitExceededException
+                                                                                    ::new);
+                                                        })
+                                                .then(ServerResponse.accepted().build()))
+                        .before(HaloUtils.noCache())
+                        .build());
     }
 
     private <T> RateLimiterOperator<T> rateLimiterForSendingEmailCode(ServerHttpRequest request) {
         var clientIp = IpAddressUtils.getClientIp(request);
         var rateLimiterKey = "send-email-code-for-signing-up-from-" + clientIp;
         var rateLimiter =
-            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
+                rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
         return RateLimiterOperator.of(rateLimiter);
     }
-
 
     @Data
     public static class SendEmailCodeBody {
 
-        @Email
-        @NotBlank
-        String email;
-
+        @Email @NotBlank String email;
     }
 }

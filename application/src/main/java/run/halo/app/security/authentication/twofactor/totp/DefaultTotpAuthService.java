@@ -71,11 +71,15 @@ public class DefaultTotpAuthService implements TotpAuthService {
                     keyStore.store(os, password);
                 }
             }
-            return new AesBytesEncryptor(secretKey,
-                KeyGenerators.secureRandom(32),
-                AesBytesEncryptor.CipherAlgorithm.GCM);
-        } catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException
-                 | UnrecoverableEntryException e) {
+            return new AesBytesEncryptor(
+                    secretKey,
+                    KeyGenerators.secureRandom(32),
+                    AesBytesEncryptor.CipherAlgorithm.GCM);
+        } catch (IOException
+                | KeyStoreException
+                | CertificateException
+                | NoSuchAlgorithmException
+                | UnrecoverableEntryException e) {
             throw new RuntimeException("Failed to initialize AesBytesEncryptor", e);
         }
     }

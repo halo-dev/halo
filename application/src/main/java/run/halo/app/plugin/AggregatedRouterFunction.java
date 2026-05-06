@@ -22,8 +22,7 @@ public class AggregatedRouterFunction implements RouterFunction<ServerResponse> 
 
     public AggregatedRouterFunction(ObjectProvider<CustomEndpoint> customEndpoints) {
         var builder = new CustomEndpointsBuilder();
-        customEndpoints.orderedStream()
-            .forEach(builder::add);
+        customEndpoints.orderedStream().forEach(builder::add);
         this.aggregated = builder.build();
     }
 

@@ -18,6 +18,6 @@ import reactor.core.publisher.Mono;
 @FunctionalInterface
 public interface TemplateHeadProcessor extends ExtensionPoint {
 
-    Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler);
+    Mono<Void> process(
+            ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler);
 }

@@ -22,14 +22,11 @@ import org.springframework.context.Lifecycle;
 @ExtendWith(MockitoExtension.class)
 class SharedEventDispatcherTest {
 
-    @Mock
-    SpringPluginManager pluginManager;
+    @Mock SpringPluginManager pluginManager;
 
-    @Mock
-    ApplicationEventPublisher publisher;
+    @Mock ApplicationEventPublisher publisher;
 
-    @InjectMocks
-    SharedEventDispatcher dispatcher;
+    @InjectMocks SharedEventDispatcher dispatcher;
 
     @Test
     void shouldNotDispatchEventIfNotSharedEvent() {
@@ -42,7 +39,7 @@ class SharedEventDispatcherTest {
         var pw = mock(PluginWrapper.class);
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
         var context =
-            mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
+                mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
         when(((Lifecycle) context).isRunning()).thenReturn(true);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
@@ -59,7 +56,7 @@ class SharedEventDispatcherTest {
         var pw = mock(PluginWrapper.class);
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
         var context =
-            mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
+                mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
         when(((Lifecycle) context).isRunning()).thenReturn(false);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
@@ -94,7 +91,6 @@ class SharedEventDispatcherTest {
         public FakeEvent(Object source) {
             super(source);
         }
-
     }
 
     @SharedEvent
@@ -103,6 +99,5 @@ class SharedEventDispatcherTest {
         public FakeSharedEvent(Object source) {
             super(source);
         }
-
     }
 }

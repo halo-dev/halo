@@ -91,7 +91,7 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     private static final String FINALIZER_NAME = "plugin-protection";
 
     private static final Set<String> UNUSED_ANNOTATIONS =
-        Set.of("plugin.halo.run/dependents-snapshot");
+            Set.of("plugin.halo.run/dependents-snapshot");
 
     private final ExtensionClient client;
 
@@ -103,9 +103,9 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
     private final ConcurrentMap<String, Disposable> pluginStartTasks = new ConcurrentHashMap<>();
 
-    private Scheduler scheduler = Schedulers.newBoundedElastic(
-        1, Schedulers.DEFAULT_BOUNDED_ELASTIC_QUEUESIZE, "plugin-starter"
-    );
+    private Scheduler scheduler =
+            Schedulers.newBoundedElastic(
+                    1, Schedulers.DEFAULT_BOUNDED_ELASTIC_QUEUESIZE, "plugin-starter");
 
     private Clock clock = Clock.systemUTC();
 
@@ -138,78 +138,82 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     @Override
     public Result reconcile(Request request) {
         return client.fetch(Plugin.class, request.name())
-            .map(plugin -> {
-                if (ExtensionUtil.isDeleted(plugin)) {
-                    if (!checkDependents(plugin)) {
-                        client.update(plugin);
-                        // Check dependents every 10 seconds
-                        return Result.requeue(Duration.ofSeconds(10));
-                    }
-                    // CleanUp resources and remove finalizer.
-                    if (removeFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME))) {
-                        cleanupResources(plugin);
-                        syncPluginState(plugin);
-                        client.update(plugin);
-                    }
-                    return Result.doNotRetry();
-                }
-                addFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME));
-                removeUnusedAnnotations(plugin);
+                .map(
+                        plugin -> {
+                            if (ExtensionUtil.isDeleted(plugin)) {
+                                if (!checkDependents(plugin)) {
+                                    client.update(plugin);
+                                    // Check dependents every 10 seconds
+                                    return Result.requeue(Duration.ofSeconds(10));
+                                }
+                                // CleanUp resources and remove finalizer.
+                                if (removeFinalizers(
+                                        plugin.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                    cleanupResources(plugin);
+                                    syncPluginState(plugin);
+                                    client.update(plugin);
+                                }
+                                return Result.doNotRetry();
+                            }
+                            addFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME));
+                            removeUnusedAnnotations(plugin);
 
-                var status = plugin.getStatus();
-                if (status == null) {
-                    status = new Plugin.PluginStatus();
-                    plugin.setStatus(status);
-                }
-                if (status.getPhase() == null) {
-                    // reset phase to pending
-                    status.setPhase(Plugin.Phase.PENDING);
-                }
-                // init condition list if not exists
-                if (status.getConditions() == null) {
-                    status.setConditions(new ConditionList());
-                }
+                            var status = plugin.getStatus();
+                            if (status == null) {
+                                status = new Plugin.PluginStatus();
+                                plugin.setStatus(status);
+                            }
+                            if (status.getPhase() == null) {
+                                // reset phase to pending
+                                status.setPhase(Plugin.Phase.PENDING);
+                            }
+                            // init condition list if not exists
+                            if (status.getConditions() == null) {
+                                status.setConditions(new ConditionList());
+                            }
 
-                var steps = new LinkedList<Supplier<Result>>();
-                steps.add(() -> resolveLoadLocation(plugin));
-                steps.add(() -> loadOrReload(plugin));
-                steps.add(() -> createOrUpdateSetting(plugin));
-                steps.add(() -> createOrUpdateReverseProxy(plugin));
-                steps.add(() -> resolveStaticResources(plugin));
-                if (requestToEnable(plugin)) {
-                    steps.add(() -> enablePlugin(plugin));
-                } else {
-                    steps.add(() -> disablePlugin(plugin));
-                }
+                            var steps = new LinkedList<Supplier<Result>>();
+                            steps.add(() -> resolveLoadLocation(plugin));
+                            steps.add(() -> loadOrReload(plugin));
+                            steps.add(() -> createOrUpdateSetting(plugin));
+                            steps.add(() -> createOrUpdateReverseProxy(plugin));
+                            steps.add(() -> resolveStaticResources(plugin));
+                            if (requestToEnable(plugin)) {
+                                steps.add(() -> enablePlugin(plugin));
+                            } else {
+                                steps.add(() -> disablePlugin(plugin));
+                            }
 
-                Result result = null;
-                try {
-                    for (var step : steps) {
-                        result = step.get();
-                        if (result != null) {
-                            break;
-                        }
-                    }
-                    return result;
-                } catch (Throwable e) {
-                    status.getConditions().addAndEvictFIFO(Condition.builder()
-                        .type(ConditionType.READY)
-                        .status(ConditionStatus.FALSE)
-                        .reason(ConditionReason.SYSTEM_ERROR)
-                        .message(e.getMessage())
-                        .lastTransitionTime(clock.instant())
-                        .build());
-                    status.setPhase(Plugin.Phase.UNKNOWN);
-                    throw e;
-                } finally {
-                    var pw = pluginManager.getPlugin(plugin.getMetadata().getName());
-                    if (pw != null) {
-                        status.setLastProbeState(pw.getPluginState());
-                    }
-                    client.update(plugin);
-                }
-            })
-            .orElseGet(Result::doNotRetry);
+                            Result result = null;
+                            try {
+                                for (var step : steps) {
+                                    result = step.get();
+                                    if (result != null) {
+                                        break;
+                                    }
+                                }
+                                return result;
+                            } catch (Throwable e) {
+                                status.getConditions()
+                                        .addAndEvictFIFO(
+                                                Condition.builder()
+                                                        .type(ConditionType.READY)
+                                                        .status(ConditionStatus.FALSE)
+                                                        .reason(ConditionReason.SYSTEM_ERROR)
+                                                        .message(e.getMessage())
+                                                        .lastTransitionTime(clock.instant())
+                                                        .build());
+                                status.setPhase(Plugin.Phase.UNKNOWN);
+                                throw e;
+                            } finally {
+                                var pw = pluginManager.getPlugin(plugin.getMetadata().getName());
+                                if (pw != null) {
+                                    status.setLastProbeState(pw.getPluginState());
+                                }
+                                client.update(plugin);
+                            }
+                        })
+                .orElseGet(Result::doNotRetry);
     }
 
     private void removeUnusedAnnotations(Plugin plugin) {
@@ -226,16 +230,19 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             return true;
         }
         var status = plugin.statusNonNull();
-        var condition = Condition.builder()
-            .type(ConditionType.PROGRESSING)
-            .status(ConditionStatus.UNKNOWN)
-            .reason(ConditionReason.WAIT_FOR_DEPENDENTS_DELETED)
-            .message(
-                "The plugin has dependents %s, please delete them first."
-                    .formatted(dependents.stream().map(PluginWrapper::getPluginId).toList())
-            )
-            .lastTransitionTime(clock.instant())
-            .build();
+        var condition =
+                Condition.builder()
+                        .type(ConditionType.PROGRESSING)
+                        .status(ConditionStatus.UNKNOWN)
+                        .reason(ConditionReason.WAIT_FOR_DEPENDENTS_DELETED)
+                        .message(
+                                "The plugin has dependents %s, please delete them first."
+                                        .formatted(
+                                                dependents.stream()
+                                                        .map(PluginWrapper::getPluginId)
+                                                        .toList()))
+                        .lastTransitionTime(clock.instant())
+                        .build();
         var conditions = nullSafeConditions(status);
         removeConditionBy(conditions, ConditionType.INITIALIZED);
         removeConditionBy(conditions, ConditionType.READY);
@@ -279,22 +286,32 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var reverseProxyName = buildReverseProxyName(pluginName);
         log.info("Deleting reverse proxy {} for plugin {}", reverseProxyName, pluginName);
         client.fetch(ReverseProxy.class, reverseProxyName)
-            .ifPresent(reverseProxy -> {
-                client.delete(reverseProxy);
-                throw new RequeueException(Result.requeue(null),
-                    String.format("""
-                        Waiting for reverse proxy %s to be deleted.""", reverseProxyName)
-                );
-            });
+                .ifPresent(
+                        reverseProxy -> {
+                            client.delete(reverseProxy);
+                            throw new RequeueException(
+                                    Result.requeue(null),
+                                    String.format(
+                                            """
+                                            Waiting for reverse proxy %s to be deleted.\
+                                            """,
+                                            reverseProxyName));
+                        });
         var settingName = plugin.getSpec().getSettingName();
         if (StringUtils.isNotBlank(settingName)) {
             log.info("Deleting settings {} for plugin {}", settingName, pluginName);
             client.fetch(Setting.class, settingName)
-                .ifPresent(setting -> {
-                    client.delete(setting);
-                    throw new RequeueException(Result.requeue(null), String.format("""
-                        Waiting for setting %s to be deleted.""", settingName));
-                });
+                    .ifPresent(
+                            setting -> {
+                                client.delete(setting);
+                                throw new RequeueException(
+                                        Result.requeue(null),
+                                        String.format(
+                                                """
+                                                Waiting for setting %s to be deleted.\
+                                                """,
+                                                settingName));
+                            });
         }
         if (pluginManager.getPlugin(pluginName) != null) {
             log.info("Deleting plugin {} in plugin manager.", pluginName);
@@ -312,32 +329,38 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var status = plugin.getStatus();
 
         // check if the parent plugin is started
-        var unstartedDependencies = pluginService.getRequiredDependencies(plugin, pw ->
-            pw == null || !PluginState.STARTED.equals(pw.getPluginState())
-        );
+        var unstartedDependencies =
+                pluginService.getRequiredDependencies(
+                        plugin,
+                        pw -> pw == null || !PluginState.STARTED.equals(pw.getPluginState()));
         var conditions = status.getConditions();
         if (!CollectionUtils.isEmpty(unstartedDependencies)) {
             removeConditionBy(conditions, ConditionType.READY);
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.PROGRESSING)
-                .status(ConditionStatus.UNKNOWN)
-                .reason(ConditionReason.WAIT_FOR_DEPENDENCIES_STARTED)
-                .message("Wait for parent plugins " + unstartedDependencies + " to be started")
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.PROGRESSING)
+                            .status(ConditionStatus.UNKNOWN)
+                            .reason(ConditionReason.WAIT_FOR_DEPENDENCIES_STARTED)
+                            .message(
+                                    "Wait for parent plugins "
+                                            + unstartedDependencies
+                                            + " to be started")
+                            .lastTransitionTime(clock.instant())
+                            .build());
             status.setPhase(Plugin.Phase.UNKNOWN);
             return Result.requeue(Duration.ofSeconds(5));
         }
 
         var current = pluginManager.getPlugin(pluginName);
         if (current == null) {
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.READY)
-                .status(ConditionStatus.FALSE)
-                .reason(ConditionReason.START_ERROR)
-                .message("Plugin " + pluginName + " is not loaded.")
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.READY)
+                            .status(ConditionStatus.FALSE)
+                            .reason(ConditionReason.START_ERROR)
+                            .message("Plugin " + pluginName + " is not loaded.")
+                            .lastTransitionTime(clock.instant())
+                            .build());
             status.setPhase(Plugin.Phase.FAILED);
             removeStartTaskIfPresent(pluginName);
             return Result.doNotRetry();
@@ -346,13 +369,14 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         if (pluginState.isStarted()) {
             removeConditionBy(conditions, ConditionType.PROGRESSING);
             status.setLastStartTime(clock.instant());
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.READY)
-                .status(ConditionStatus.TRUE)
-                .reason(ConditionReason.STARTED)
-                .message("Started successfully")
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.READY)
+                            .status(ConditionStatus.TRUE)
+                            .reason(ConditionReason.STARTED)
+                            .message("Started successfully")
+                            .lastTransitionTime(clock.instant())
+                            .build());
             status.setPhase(Plugin.Phase.STARTED);
             removeStartTaskIfPresent(pluginName);
             requestToReloadPluginsOptionallyDependentOn(pluginName);
@@ -363,46 +387,51 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             log.debug("Error occurred when starting plugin {}", pluginName, t);
             var writer = new StringWriter();
             t.printStackTrace(new PrintWriter(writer));
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.READY)
-                .status(ConditionStatus.FALSE)
-                .reason(ConditionReason.START_ERROR)
-                .message(writer.toString())
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.READY)
+                            .status(ConditionStatus.FALSE)
+                            .reason(ConditionReason.START_ERROR)
+                            .message(writer.toString())
+                            .lastTransitionTime(clock.instant())
+                            .build());
             status.setPhase(Plugin.Phase.FAILED);
             removeStartTaskIfPresent(pluginName);
             return Result.doNotRetry();
         }
         if (!Plugin.Phase.STARTING.equals(status.getPhase())) {
-            pluginStartTasks.compute(pluginName, (name, old) -> {
-                if (old != null && !old.isDisposed()) {
-                    log.info("Cancelling old starting task for plugin {}.", name);
-                    old.dispose();
-                    log.info("Cancelled old starting task for plugin {}.", name);
-                }
-                return scheduler.schedule(() -> {
-                    log.info("Starting plugin {} in background thread.", name);
-                    try {
-                        var state = pluginManager.startPlugin(name);
-                        log.info("Plugin {} started with state {}.", name, state);
-                    } catch (Throwable t) {
-                        var pluginWrapper = pluginManager.getPlugin(name);
-                        if (pluginWrapper != null) {
-                            pluginWrapper.setPluginState(PluginState.FAILED);
-                            pluginWrapper.setFailedException(t);
+            pluginStartTasks.compute(
+                    pluginName,
+                    (name, old) -> {
+                        if (old != null && !old.isDisposed()) {
+                            log.info("Cancelling old starting task for plugin {}.", name);
+                            old.dispose();
+                            log.info("Cancelled old starting task for plugin {}.", name);
                         }
-                    }
-                });
-            });
+                        return scheduler.schedule(
+                                () -> {
+                                    log.info("Starting plugin {} in background thread.", name);
+                                    try {
+                                        var state = pluginManager.startPlugin(name);
+                                        log.info("Plugin {} started with state {}.", name, state);
+                                    } catch (Throwable t) {
+                                        var pluginWrapper = pluginManager.getPlugin(name);
+                                        if (pluginWrapper != null) {
+                                            pluginWrapper.setPluginState(PluginState.FAILED);
+                                            pluginWrapper.setFailedException(t);
+                                        }
+                                    }
+                                });
+                    });
             status.setPhase(Plugin.Phase.STARTING);
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.PROGRESSING)
-                .status(ConditionStatus.TRUE)
-                .reason(ConditionReason.STARTING)
-                .message("Starting plugin " + pluginName)
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.PROGRESSING)
+                            .status(ConditionStatus.TRUE)
+                            .reason(ConditionReason.STARTING)
+                            .message("Starting plugin " + pluginName)
+                            .lastTransitionTime(clock.instant())
+                            .build());
         } else {
             log.debug("Plugin {} is starting...", pluginName);
         }
@@ -410,21 +439,21 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     }
 
     void requestToReloadPluginsOptionallyDependentOn(String pluginName) {
-        var startedPlugins = pluginManager.startedPlugins()
-            .stream()
-            .map(PluginWrapper::getDescriptor)
-            .toList();
+        var startedPlugins =
+                pluginManager.startedPlugins().stream().map(PluginWrapper::getDescriptor).toList();
         var resolver = new OptionalDependentResolver(startedPlugins);
         var dependents = resolver.getOptionalDependents(pluginName);
         for (String dependentName : dependents) {
             client.fetch(Plugin.class, dependentName)
-                .ifPresent(childPlugin -> {
-                    var annotations = MetadataUtil.nullSafeAnnotations(childPlugin);
-                    // loadLocation never be null for started plugins
-                    annotations.put(RELOAD_ANNO,
-                        childPlugin.getStatus().getLoadLocation().toString());
-                    client.update(childPlugin);
-                });
+                    .ifPresent(
+                            childPlugin -> {
+                                var annotations = MetadataUtil.nullSafeAnnotations(childPlugin);
+                                // loadLocation never be null for started plugins
+                                annotations.put(
+                                        RELOAD_ANNO,
+                                        childPlugin.getStatus().getLoadLocation().toString());
+                                client.update(childPlugin);
+                            });
         }
     }
 
@@ -433,21 +462,25 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var status = plugin.getStatus();
         if (pluginManager.getPlugin(pluginName) != null) {
             // check if the plugin has children
-            var dependents = pluginManager.getDependents(pluginName)
-                .stream()
-                .filter(pw -> PluginState.STARTED.equals(pw.getPluginState()))
-                .map(PluginWrapper::getPluginId)
-                .toList();
+            var dependents =
+                    pluginManager.getDependents(pluginName).stream()
+                            .filter(pw -> PluginState.STARTED.equals(pw.getPluginState()))
+                            .map(PluginWrapper::getPluginId)
+                            .toList();
             var conditions = status.getConditions();
             if (!CollectionUtils.isEmpty(dependents)) {
                 removeConditionBy(conditions, ConditionType.READY);
-                conditions.addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.PROGRESSING)
-                    .status(ConditionStatus.UNKNOWN)
-                    .reason(ConditionReason.WAIT_FOR_DEPENDENTS_DISABLED)
-                    .message("Wait for children plugins " + dependents + " to be disabled")
-                    .lastTransitionTime(clock.instant())
-                    .build());
+                conditions.addAndEvictFIFO(
+                        Condition.builder()
+                                .type(ConditionType.PROGRESSING)
+                                .status(ConditionStatus.UNKNOWN)
+                                .reason(ConditionReason.WAIT_FOR_DEPENDENTS_DISABLED)
+                                .message(
+                                        "Wait for children plugins "
+                                                + dependents
+                                                + " to be disabled")
+                                .lastTransitionTime(clock.instant())
+                                .build());
                 status.setPhase(Plugin.Phase.DISABLING);
                 return Result.requeue(Duration.ofSeconds(1));
             }
@@ -457,25 +490,27 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 pluginManager.disablePlugin(pluginName);
             } catch (Throwable e) {
                 log.error("Error occurred when disabling plugin {}", pluginName, e);
-                conditions.addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.READY)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.DISABLE_ERROR)
-                    .message(e.getMessage())
-                    .lastTransitionTime(clock.instant())
-                    .build());
+                conditions.addAndEvictFIFO(
+                        Condition.builder()
+                                .type(ConditionType.READY)
+                                .status(ConditionStatus.FALSE)
+                                .reason(ConditionReason.DISABLE_ERROR)
+                                .message(e.getMessage())
+                                .lastTransitionTime(clock.instant())
+                                .build());
                 status.setPhase(Plugin.Phase.FAILED);
                 return Result.doNotRetry();
             }
         }
         var conditions = plugin.getStatus().getConditions();
         removeConditionBy(conditions, ConditionType.PROGRESSING);
-        conditions.addAndEvictFIFO(Condition.builder()
-            .type(ConditionType.READY)
-            .status(ConditionStatus.TRUE)
-            .reason(ConditionReason.DISABLED)
-            .lastTransitionTime(clock.instant())
-            .build());
+        conditions.addAndEvictFIFO(
+                Condition.builder()
+                        .type(ConditionType.READY)
+                        .status(ConditionStatus.TRUE)
+                        .reason(ConditionReason.DISABLED)
+                        .lastTransitionTime(clock.instant())
+                        .build());
         plugin.statusNonNull().setPhase(Plugin.Phase.DISABLED);
         return null;
     }
@@ -506,12 +541,13 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                     logo = new URL(specLogo).toString();
                 } catch (MalformedURLException ignored) {
                     // indicate the logo is a path
-                    logo = UriComponentsBuilder.newInstance()
-                        .pathSegment("plugins", pluginName, "assets")
-                        .path(specLogo)
-                        .queryParam("version", pluginVersion)
-                        .build(true)
-                        .toString();
+                    logo =
+                            UriComponentsBuilder.newInstance()
+                                    .pathSegment("plugins", pluginName, "assets")
+                                    .path(specLogo)
+                                    .queryParam("version", pluginVersion)
+                                    .build(true)
+                                    .toString();
                 }
             }
             status.setLogo(logo);
@@ -524,19 +560,21 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var entryRes = resLoader.getResource("classpath:console/main.js");
         var cssRes = resLoader.getResource("classpath:console/style.css");
         if (entryRes.exists()) {
-            var entry = UriComponentsBuilder.newInstance()
-                .pathSegment("plugins", pluginName, "assets", "console", "main.js")
-                .queryParam("version", pluginVersion)
-                .build(true)
-                .toString();
+            var entry =
+                    UriComponentsBuilder.newInstance()
+                            .pathSegment("plugins", pluginName, "assets", "console", "main.js")
+                            .queryParam("version", pluginVersion)
+                            .build(true)
+                            .toString();
             status.setEntry(entry);
         }
         if (cssRes.exists()) {
-            var stylesheet = UriComponentsBuilder.newInstance()
-                .pathSegment("plugins", pluginName, "assets", "console", "style.css")
-                .queryParam("version", pluginVersion)
-                .build(true)
-                .toString();
+            var stylesheet =
+                    UriComponentsBuilder.newInstance()
+                            .pathSegment("plugins", pluginName, "assets", "console", "style.css")
+                            .queryParam("version", pluginVersion)
+                            .build(true)
+                            .toString();
             status.setStylesheet(stylesheet);
         }
         return null;
@@ -562,13 +600,17 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 var dependents = requestToUnloadChildren(pluginName);
                 if (!CollectionUtils.isEmpty(dependents)) {
                     removeConditionBy(conditions, ConditionType.READY);
-                    conditions.addAndEvictFIFO(Condition.builder()
-                        .type(ConditionType.PROGRESSING)
-                        .status(ConditionStatus.UNKNOWN)
-                        .reason(ConditionReason.WAIT_FOR_DEPENDENTS_UNLOADED)
-                        .message("Wait for children plugins " + dependents + "to be unloaded")
-                        .lastTransitionTime(clock.instant())
-                        .build());
+                    conditions.addAndEvictFIFO(
+                            Condition.builder()
+                                    .type(ConditionType.PROGRESSING)
+                                    .status(ConditionStatus.UNKNOWN)
+                                    .reason(ConditionReason.WAIT_FOR_DEPENDENTS_UNLOADED)
+                                    .message(
+                                            "Wait for children plugins "
+                                                    + dependents
+                                                    + "to be unloaded")
+                                    .lastTransitionTime(clock.instant())
+                                    .build());
                     plugin.getStatus().setPhase(Plugin.Phase.UNKNOWN);
                     // wait for children plugins unloaded
                     // retry after 1 second
@@ -590,13 +632,15 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             if (requestToUnload) {
                 // skip loading and wait for removing the annotation by other plugins.
                 var status = plugin.getStatus();
-                status.getConditions().addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.REQUEST_TO_UNLOAD)
-                    .message("Request to unload by " + requestToUnloadBy)
-                    .lastTransitionTime(clock.instant())
-                    .build());
+                status.getConditions()
+                        .addAndEvictFIFO(
+                                Condition.builder()
+                                        .type(ConditionType.INITIALIZED)
+                                        .status(ConditionStatus.FALSE)
+                                        .reason(ConditionReason.REQUEST_TO_UNLOAD)
+                                        .message("Request to unload by " + requestToUnloadBy)
+                                        .lastTransitionTime(clock.instant())
+                                        .build());
                 return Result.doNotRetry();
             }
 
@@ -606,20 +650,25 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         }
 
         // check dependencies before loading
-        var unresolvedParentPlugins = pluginService.getRequiredDependencies(plugin,
-            pw -> pw == null || pluginManager.getUnresolvedPlugins().contains(pw)
-        );
+        var unresolvedParentPlugins =
+                pluginService.getRequiredDependencies(
+                        plugin,
+                        pw -> pw == null || pluginManager.getUnresolvedPlugins().contains(pw));
         if (!unresolvedParentPlugins.isEmpty()) {
             // requeue if the parent plugin is not loaded yet.
             removeConditionBy(conditions, ConditionType.INITIALIZED);
             removeConditionBy(conditions, ConditionType.READY);
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.PROGRESSING)
-                .status(ConditionStatus.UNKNOWN)
-                .reason(ConditionReason.WAIT_FOR_DEPENDENCIES_LOADED)
-                .message("Wait for parent plugins " + unresolvedParentPlugins + " to be loaded")
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.PROGRESSING)
+                            .status(ConditionStatus.UNKNOWN)
+                            .reason(ConditionReason.WAIT_FOR_DEPENDENCIES_LOADED)
+                            .message(
+                                    "Wait for parent plugins "
+                                            + unresolvedParentPlugins
+                                            + " to be loaded")
+                            .lastTransitionTime(clock.instant())
+                            .build());
             plugin.getStatus().setPhase(Plugin.Phase.UNKNOWN);
             return Result.requeue(Duration.ofSeconds(1));
         }
@@ -630,20 +679,22 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             pluginManager.loadPlugin(Paths.get(loadLocation));
             plugin.getStatus().setPhase(Plugin.Phase.RESOLVED);
             log.info("Loaded plugin {} from {}", pluginName, loadLocation);
-            conditions.addAndEvictFIFO(Condition.builder()
-                .type(ConditionType.INITIALIZED)
-                .status(ConditionStatus.TRUE)
-                .reason(ConditionReason.LOADED)
-                .lastTransitionTime(clock.instant())
-                .build());
+            conditions.addAndEvictFIFO(
+                    Condition.builder()
+                            .type(ConditionType.INITIALIZED)
+                            .status(ConditionStatus.TRUE)
+                            .reason(ConditionReason.LOADED)
+                            .lastTransitionTime(clock.instant())
+                            .build());
         }
 
         return null;
     }
 
     private Result createOrUpdateSetting(Plugin plugin) {
-        log.info("Initializing setting and config map for plugin {}",
-            plugin.getMetadata().getName());
+        log.info(
+                "Initializing setting and config map for plugin {}",
+                plugin.getMetadata().getName());
         var settingName = plugin.getSpec().getSettingName();
         if (StringUtils.isBlank(settingName)) {
             // do nothing if no setting name provided.
@@ -654,24 +705,32 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var p = pluginManager.getPlugin(pluginName);
         var resources = lookupExtensions(p.getPluginClassLoader());
         var loader = new YamlUnstructuredLoader(resources);
-        var setting = loader.load().stream()
-            .filter(isSetting(settingName))
-            .findFirst()
-            .map(u -> Unstructured.OBJECT_MAPPER.convertValue(u, Setting.class))
-            .orElseThrow(() -> new IllegalStateException(String.format("""
-                    Setting name %s was provided but setting extension \
-                    was not found in plugin %s.""",
-                settingName, pluginName)));
+        var setting =
+                loader.load().stream()
+                        .filter(isSetting(settingName))
+                        .findFirst()
+                        .map(u -> Unstructured.OBJECT_MAPPER.convertValue(u, Setting.class))
+                        .orElseThrow(
+                                () ->
+                                        new IllegalStateException(
+                                                String.format(
+                                                        """
+                                                        Setting name %s was provided but setting extension \
+                                                        was not found in plugin %s.\
+                                                        """,
+                                                        settingName, pluginName)));
 
         client.fetch(Setting.class, settingName)
-            .ifPresentOrElse(oldSetting -> {
-                // overwrite the setting
-                var version = oldSetting.getMetadata().getVersion();
-                setting.getMetadata().setVersion(version);
-                // TODO Remove this line in the future
-                removeFinalizers(setting.getMetadata(), Set.of("plugin-protector"));
-                client.update(setting);
-            }, () -> client.create(setting));
+                .ifPresentOrElse(
+                        oldSetting -> {
+                            // overwrite the setting
+                            var version = oldSetting.getMetadata().getVersion();
+                            setting.getMetadata().setVersion(version);
+                            // TODO Remove this line in the future
+                            removeFinalizers(setting.getMetadata(), Set.of("plugin-protector"));
+                            client.update(setting);
+                        },
+                        () -> client.create(setting));
 
         log.info("Initialized setting {} for plugin {}", settingName, pluginName);
 
@@ -684,14 +743,16 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var defaultConfigMap = SettingUtils.populateDefaultConfig(setting, configMapName);
 
         client.fetch(ConfigMap.class, configMapName)
-            .ifPresentOrElse(configMap -> {
-                // merge data
-                var oldData = configMap.getData();
-                var defaultData = defaultConfigMap.getData();
-                var mergedData = SettingUtils.mergePatch(oldData, defaultData);
-                configMap.setData(mergedData);
-                client.update(configMap);
-            }, () -> client.create(defaultConfigMap));
+                .ifPresentOrElse(
+                        configMap -> {
+                            // merge data
+                            var oldData = configMap.getData();
+                            var defaultData = defaultConfigMap.getData();
+                            var mergedData = SettingUtils.mergePatch(oldData, defaultData);
+                            configMap.setData(mergedData);
+                            client.update(configMap);
+                        },
+                        () -> client.create(defaultConfigMap));
         log.info("Initialized config map {} for plugin {}", configMapName, pluginName);
         return null;
     }
@@ -706,57 +767,71 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         var status = plugin.statusNonNull();
         if (isDevelopmentMode(plugin)) {
             if (!isInDevEnvironment()) {
-                status.getConditions().addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.INVALID_RUNTIME_MODE)
-                    .message("""
-                        Cannot run the plugin with development mode in non-development environment.\
-                        """)
-                    .lastTransitionTime(clock.instant())
-                    .build());
+                status.getConditions()
+                        .addAndEvictFIFO(
+                                Condition.builder()
+                                        .type(ConditionType.INITIALIZED)
+                                        .status(ConditionStatus.FALSE)
+                                        .reason(ConditionReason.INVALID_RUNTIME_MODE)
+                                        .message(
+                                                """
+                                                Cannot run the plugin with development mode in non-development environment.\
+                                                """)
+                                        .lastTransitionTime(clock.instant())
+                                        .build());
                 status.setPhase(Plugin.Phase.UNKNOWN);
                 return Result.doNotRetry();
             }
             log.debug("Plugin {} is in development mode", pluginName);
             if (StringUtils.isBlank(pluginPathAnno)) {
-                status.getConditions().addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.PLUGIN_PATH_NOT_SET)
-                    .message("""
-                        Plugin path annotation is not set. \
-                        Please set plugin path annotation "%s" in development mode.\
-                        """.formatted(PLUGIN_PATH))
-                    .build());
+                status.getConditions()
+                        .addAndEvictFIFO(
+                                Condition.builder()
+                                        .type(ConditionType.INITIALIZED)
+                                        .status(ConditionStatus.FALSE)
+                                        .reason(ConditionReason.PLUGIN_PATH_NOT_SET)
+                                        .message(
+                                                """
+                                                Plugin path annotation is not set. \
+                                                Please set plugin path annotation "%s" in development mode.\
+                                                """
+                                                        .formatted(PLUGIN_PATH))
+                                        .build());
                 return Result.doNotRetry();
             }
             try {
                 var loadLocation = ResourceUtils.getURL(pluginPathAnno).toURI();
                 if (!Objects.equals(status.getLoadLocation(), loadLocation)) {
-                    log.debug("Populated load location {} for plugin {} from annotation {}",
-                        loadLocation, pluginName, pluginPathAnno);
+                    log.debug(
+                            "Populated load location {} for plugin {} from annotation {}",
+                            loadLocation,
+                            pluginName,
+                            pluginPathAnno);
                     status.setLoadLocation(loadLocation);
                     status.setPhase(Plugin.Phase.RESOLVED);
-                    status.getConditions().addAndEvictFIFO(Condition.builder()
-                        .type(ConditionType.INITIALIZED)
-                        .status(ConditionStatus.TRUE)
-                        .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
-                        .lastTransitionTime(clock.instant())
-                        .build());
-                    log.debug("Populated load location {} for plugin {}",
-                        status.getLoadLocation(), pluginName
-                    );
+                    status.getConditions()
+                            .addAndEvictFIFO(
+                                    Condition.builder()
+                                            .type(ConditionType.INITIALIZED)
+                                            .status(ConditionStatus.TRUE)
+                                            .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
+                                            .lastTransitionTime(clock.instant())
+                                            .build());
+                    log.debug(
+                            "Populated load location {} for plugin {}",
+                            status.getLoadLocation(),
+                            pluginName);
                 }
             } catch (URISyntaxException | FileNotFoundException e) {
                 // TODO Refactor this using event in the future.
-                var condition = Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.INVALID_PLUGIN_PATH)
-                    .message("Invalid plugin path " + pluginPathAnno + " configured.")
-                    .lastTransitionTime(clock.instant())
-                    .build();
+                var condition =
+                        Condition.builder()
+                                .type(ConditionType.INITIALIZED)
+                                .status(ConditionStatus.FALSE)
+                                .reason(ConditionReason.INVALID_PLUGIN_PATH)
+                                .message("Invalid plugin path " + pluginPathAnno + " configured.")
+                                .lastTransitionTime(clock.instant())
+                                .build();
                 status.getConditions().addAndEvictFIFO(condition);
                 status.setPhase(Plugin.Phase.UNKNOWN);
                 return Result.doNotRetry();
@@ -764,18 +839,23 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         } else {
             // reset annotation PLUGIN_PATH in non-dev mode
             var pluginFilename = generateFileName(plugin);
-            var pluginRoot = pluginManager.getPluginsRoots().stream()
-                .filter(root -> Files.exists(root.resolve(pluginFilename)))
-                .findFirst()
-                .orElse(null);
+            var pluginRoot =
+                    pluginManager.getPluginsRoots().stream()
+                            .filter(root -> Files.exists(root.resolve(pluginFilename)))
+                            .findFirst()
+                            .orElse(null);
             if (pluginRoot == null) {
-                var condition = Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.FALSE)
-                    .reason(ConditionReason.INVALID_PLUGIN_PATH)
-                    .message("Cannot find plugin file " + pluginFilename + " in plugins roots.")
-                    .lastTransitionTime(clock.instant())
-                    .build();
+                var condition =
+                        Condition.builder()
+                                .type(ConditionType.INITIALIZED)
+                                .status(ConditionStatus.FALSE)
+                                .reason(ConditionReason.INVALID_PLUGIN_PATH)
+                                .message(
+                                        "Cannot find plugin file "
+                                                + pluginFilename
+                                                + " in plugins roots.")
+                                .lastTransitionTime(clock.instant())
+                                .build();
                 status.getConditions().addAndEvictFIFO(condition);
                 status.setPhase(Plugin.Phase.UNKNOWN);
                 return Result.doNotRetry();
@@ -788,32 +868,46 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             var newLoadLocation = pluginPath.toUri();
             if (oldLoadLocation != null && !Objects.equals(oldLoadLocation, newLoadLocation)) {
                 // delete the old load location
-                log.info("Deleting old plugin file {} for plugin {}, and new load location is {}.",
-                    oldLoadLocation, pluginName, newLoadLocation);
+                log.info(
+                        "Deleting old plugin file {} for plugin {}, and new load location is {}.",
+                        oldLoadLocation,
+                        pluginName,
+                        newLoadLocation);
                 try {
                     var deleted = Files.deleteIfExists(Path.of(oldLoadLocation));
                     if (deleted) {
-                        log.info("Deleted old plugin file {} for plugin {}.",
-                            oldLoadLocation, pluginName);
+                        log.info(
+                                "Deleted old plugin file {} for plugin {}.",
+                                oldLoadLocation,
+                                pluginName);
                     }
                 } catch (IOException e) {
-                    log.warn("Failed to delete old plugin file {} for plugin {}",
-                        oldLoadLocation, pluginName, e);
+                    log.warn(
+                            "Failed to delete old plugin file {} for plugin {}",
+                            oldLoadLocation,
+                            pluginName,
+                            e);
                 } catch (FileSystemNotFoundException e) {
                     log.warn(
-                        "Failed to delete old plugin file {} for plugin {}: File system not found.",
-                        oldLoadLocation, pluginName, e);
+                            "Failed to delete old plugin file {} for plugin {}: File system not"
+                                    + " found.",
+                            oldLoadLocation,
+                            pluginName,
+                            e);
                 }
                 status.setPhase(Plugin.Phase.RESOLVED);
-                status.getConditions().addAndEvictFIFO(Condition.builder()
-                    .type(ConditionType.INITIALIZED)
-                    .status(ConditionStatus.TRUE)
-                    .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
-                    .lastTransitionTime(clock.instant())
-                    .build());
-                log.debug("Populated load location {} for plugin {}",
-                    status.getLoadLocation(), pluginName
-                );
+                status.getConditions()
+                        .addAndEvictFIFO(
+                                Condition.builder()
+                                        .type(ConditionType.INITIALIZED)
+                                        .status(ConditionStatus.TRUE)
+                                        .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
+                                        .lastTransitionTime(clock.instant())
+                                        .build());
+                log.debug(
+                        "Populated load location {} for plugin {}",
+                        status.getLoadLocation(),
+                        pluginName);
             }
             status.setLoadLocation(newLoadLocation);
         }
@@ -822,21 +916,20 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Plugin())
-            .syncAllOnStart(true)
-            .build();
+        return builder.extension(new Plugin()).syncAllOnStart(true).build();
     }
 
     private void removeStartTaskIfPresent(String pluginName) {
-        pluginStartTasks.computeIfPresent(pluginName, (name, disposable) -> {
-            if (!disposable.isDisposed()) {
-                log.info("Cancelling starting task for plugin {}.", name);
-                disposable.dispose();
-                log.info("Cancelled starting task for plugin {}.", name);
-            }
-            return null;
-        });
+        pluginStartTasks.computeIfPresent(
+                pluginName,
+                (name, disposable) -> {
+                    if (!disposable.isDisposed()) {
+                        log.info("Cancelling starting task for plugin {}.", name);
+                        disposable.dispose();
+                        log.info("Cancelled starting task for plugin {}.", name);
+                    }
+                    return null;
+                });
     }
 
     private Result createOrUpdateReverseProxy(Plugin plugin) {
@@ -853,17 +946,21 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
         String logo = plugin.getSpec().getLogo();
         if (StringUtils.isNotBlank(logo) && !PathUtils.isAbsoluteUri(logo)) {
-            ReverseProxy.ReverseProxyRule logoRule = new ReverseProxy.ReverseProxyRule(logo,
-                new ReverseProxy.FileReverseProxyProvider(null, logo));
+            ReverseProxy.ReverseProxyRule logoRule =
+                    new ReverseProxy.ReverseProxyRule(
+                            logo, new ReverseProxy.FileReverseProxyProvider(null, logo));
             reverseProxy.getRules().add(logoRule);
         }
 
         client.fetch(ReverseProxy.class, reverseProxyName)
-            .ifPresentOrElse(persisted -> {
-                reverseProxy.getMetadata()
-                    .setVersion(persisted.getMetadata().getVersion());
-                client.update(reverseProxy);
-            }, () -> client.create(reverseProxy));
+                .ifPresentOrElse(
+                        persisted -> {
+                            reverseProxy
+                                    .getMetadata()
+                                    .setVersion(persisted.getMetadata().getVersion());
+                            client.update(reverseProxy);
+                        },
+                        () -> client.create(reverseProxy));
         return null;
     }
 
@@ -877,43 +974,47 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
 
     private List<String> requestToUnloadChildren(String pluginName) {
         // get all dependencies
-        var dependents = pluginManager.getDependents(pluginName)
-            .stream()
-            .map(PluginWrapper::getPluginId)
-            .toList();
+        var dependents =
+                pluginManager.getDependents(pluginName).stream()
+                        .map(PluginWrapper::getPluginId)
+                        .toList();
         // request all dependents to reload.
-        dependents.forEach(dependent -> client.fetch(Plugin.class, dependent)
-            .ifPresent(childPlugin -> {
-                var labels = childPlugin.getMetadata().getLabels();
-                if (labels == null) {
-                    labels = new HashMap<>();
-                    childPlugin.getMetadata().setLabels(labels);
-                }
-                var label = labels.get(REQUEST_TO_UNLOAD_LABEL);
-                if (!pluginName.equals(label)) {
-                    labels.put(REQUEST_TO_UNLOAD_LABEL, pluginName);
-                    client.update(childPlugin);
-                }
-            }));
+        dependents.forEach(
+                dependent ->
+                        client.fetch(Plugin.class, dependent)
+                                .ifPresent(
+                                        childPlugin -> {
+                                            var labels = childPlugin.getMetadata().getLabels();
+                                            if (labels == null) {
+                                                labels = new HashMap<>();
+                                                childPlugin.getMetadata().setLabels(labels);
+                                            }
+                                            var label = labels.get(REQUEST_TO_UNLOAD_LABEL);
+                                            if (!pluginName.equals(label)) {
+                                                labels.put(REQUEST_TO_UNLOAD_LABEL, pluginName);
+                                                client.update(childPlugin);
+                                            }
+                                        }));
         return dependents;
     }
 
     private void cancelUnloadRequest(String pluginName) {
         // remove label REQUEST_TO_UNLOAD_LABEL
         // TODO Use index mechanism
-        Predicate<Plugin> filter = aplugin -> {
-            var labels = aplugin.getMetadata().getLabels();
-            return labels != null && pluginName.equals(labels.get(REQUEST_TO_UNLOAD_LABEL));
-        };
+        Predicate<Plugin> filter =
+                aplugin -> {
+                    var labels = aplugin.getMetadata().getLabels();
+                    return labels != null && pluginName.equals(labels.get(REQUEST_TO_UNLOAD_LABEL));
+                };
 
         client.list(Plugin.class, filter, null)
-            .forEach(aplugin -> {
-                var labels = aplugin.getMetadata().getLabels();
-                if (labels != null && labels.remove(REQUEST_TO_UNLOAD_LABEL) != null) {
-                    client.update(aplugin);
-                }
-            });
-
+                .forEach(
+                        aplugin -> {
+                            var labels = aplugin.getMetadata().getLabels();
+                            if (labels != null && labels.remove(REQUEST_TO_UNLOAD_LABEL) != null) {
+                                client.update(aplugin);
+                            }
+                        });
     }
 
     private static void removeConditionBy(ConditionList conditions, String type) {
@@ -959,5 +1060,4 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         public static final String INVALID_RUNTIME_MODE = "InvalidRuntimeMode";
         public static final String PLUGIN_PATH_NOT_SET = "PluginPathNotSet";
     }
-
 }

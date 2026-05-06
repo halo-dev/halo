@@ -16,5 +16,4 @@ public interface CustomEndpoint {
     default GroupVersion groupVersion() {
         return GroupVersion.parseAPIVersion("api.console.halo.run/v1alpha1");
     }
-
 }

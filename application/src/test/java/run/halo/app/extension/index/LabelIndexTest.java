@@ -22,8 +22,7 @@ import run.halo.app.extension.Metadata;
 @ExtendWith(MockitoExtension.class)
 class LabelIndexTest {
 
-    @InjectMocks
-    LabelIndex<Fake> index;
+    @InjectMocks LabelIndex<Fake> index;
 
     @Nested
     class IndexOperationTests {
@@ -164,12 +163,11 @@ class LabelIndexTest {
     }
 
     @GVK(
-        group = "fake.halo.app",
-        version = "v1",
-        kind = "Fake",
-        singular = "fake",
-        plural = "fakes"
-    )
+            group = "fake.halo.app",
+            version = "v1",
+            kind = "Fake",
+            singular = "fake",
+            plural = "fakes")
     @Data
     @EqualsAndHashCode(callSuper = true)
     static class Fake extends AbstractExtension {

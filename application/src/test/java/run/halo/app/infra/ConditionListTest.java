@@ -37,7 +37,8 @@ class ConditionListTest {
         conditionList.addFirst(condition("type2", "message2", "reason2", ConditionStatus.FALSE));
         conditionList.addFirst(condition("type3", "message3", "reason3", ConditionStatus.FALSE));
 
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 [
                     {
                         "type": "type3",
@@ -59,17 +60,18 @@ class ConditionListTest {
                     }
                 ]
                 """,
-            JsonUtils.objectToJson(conditionList),
-            true);
+                JsonUtils.objectToJson(conditionList),
+                true);
         assertThat(conditionList.size()).isEqualTo(3);
 
         conditionList.addAndEvictFIFO(
-            condition("type4", "message4", "reason4", ConditionStatus.FALSE), 1);
+                condition("type4", "message4", "reason4", ConditionStatus.FALSE), 1);
 
         assertThat(conditionList.size()).isEqualTo(1);
 
         // json serialize test.
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 [
                     {
                         "type": "type4",
@@ -79,7 +81,8 @@ class ConditionListTest {
                     }
                 ]
                 """,
-            JsonUtils.objectToJson(conditionList), true);
+                JsonUtils.objectToJson(conditionList),
+                true);
     }
 
     @Test
@@ -110,9 +113,9 @@ class ConditionListTest {
     void test() {
         ConditionList conditionList = new ConditionList();
         conditionList.addAndEvictFIFO(
-            condition("type", "message", "reason", ConditionStatus.FALSE));
+                condition("type", "message", "reason", ConditionStatus.FALSE));
         conditionList.addAndEvictFIFO(
-            condition("type2", "message2", "reason2", ConditionStatus.FALSE));
+                condition("type2", "message2", "reason2", ConditionStatus.FALSE));
 
         Iterator<Condition> iterator = conditionList.iterator();
         assertThat(iterator.next().getType()).isEqualTo("type2");
@@ -121,26 +124,27 @@ class ConditionListTest {
 
     @Test
     void deserialization() {
-        String s = """
-            [{
-                "type": "type3",
-                "status": "FALSE",
-                "message": "message3",
-                "reason": "reason3"
-            },
-            {
-                "type": "type2",
-                "status": "FALSE",
-                "message": "message2",
-                "reason": "reason2"
-            },
-            {
-                "type": "type",
-                "status": "FALSE",
-                "message": "message",
-                "reason": "reason"
-            }]
-            """;
+        String s =
+                """
+                [{
+                    "type": "type3",
+                    "status": "FALSE",
+                    "message": "message3",
+                    "reason": "reason3"
+                },
+                {
+                    "type": "type2",
+                    "status": "FALSE",
+                    "message": "message2",
+                    "reason": "reason2"
+                },
+                {
+                    "type": "type",
+                    "status": "FALSE",
+                    "message": "message",
+                    "reason": "reason"
+                }]
+                """;
         ConditionList conditions = JsonUtils.jsonToObject(s, ConditionList.class);
         assertThat(conditions.peek().getType()).isEqualTo("type3");
     }
@@ -148,19 +152,21 @@ class ConditionListTest {
     @Test
     void shouldNotAddIfTypeIsSame() {
         var conditions = new ConditionList();
-        var condition = Condition.builder()
-            .type("type")
-            .status(ConditionStatus.TRUE)
-            .reason("reason")
-            .message("message")
-            .build();
+        var condition =
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.TRUE)
+                        .reason("reason")
+                        .message("message")
+                        .build();
 
-        var anotherCondition = Condition.builder()
-            .type("type")
-            .status(ConditionStatus.FALSE)
-            .reason("another reason")
-            .message("another message")
-            .build();
+        var anotherCondition =
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.FALSE)
+                        .reason("another reason")
+                        .message("another message")
+                        .build();
 
         conditions.addAndEvictFIFO(condition);
         conditions.addAndEvictFIFO(anotherCondition);
@@ -173,24 +179,22 @@ class ConditionListTest {
         var now = Instant.now();
         var conditions = new ConditionList();
         conditions.addAndEvictFIFO(
-            Condition.builder()
-                .type("type")
-                .status(ConditionStatus.TRUE)
-                .reason("reason")
-                .message("message")
-                .lastTransitionTime(now)
-                .build()
-        );
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.TRUE)
+                        .reason("reason")
+                        .message("message")
+                        .lastTransitionTime(now)
+                        .build());
 
         conditions.addAndEvictFIFO(
-            Condition.builder()
-                .type("type")
-                .status(ConditionStatus.TRUE)
-                .reason("reason")
-                .message("message")
-                .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
-                .build()
-        );
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.TRUE)
+                        .reason("reason")
+                        .message("message")
+                        .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
+                        .build());
 
         assertEquals(1, conditions.size());
         // make sure the last transition time was not modified.
@@ -202,31 +206,29 @@ class ConditionListTest {
         var now = Instant.now();
         var conditions = new ConditionList();
         conditions.addAndEvictFIFO(
-            Condition.builder()
-                .type("type")
-                .status(ConditionStatus.TRUE)
-                .reason("reason")
-                .message("message")
-                .lastTransitionTime(now)
-                .build()
-        );
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.TRUE)
+                        .reason("reason")
+                        .message("message")
+                        .lastTransitionTime(now)
+                        .build());
 
         conditions.addAndEvictFIFO(
-            Condition.builder()
-                .type("type")
-                .status(ConditionStatus.FALSE)
-                .reason("reason")
-                .message("message")
-                .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
-                .build()
-        );
+                Condition.builder()
+                        .type("type")
+                        .status(ConditionStatus.FALSE)
+                        .reason("reason")
+                        .message("message")
+                        .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
+                        .build());
 
         assertEquals(1, conditions.size());
         assertEquals(now.plus(Duration.ofSeconds(1)), conditions.peek().getLastTransitionTime());
     }
 
-    private Condition condition(String type, String message, String reason,
-        ConditionStatus status) {
+    private Condition condition(
+            String type, String message, String reason, ConditionStatus status) {
         Condition condition = new Condition();
         condition.setType(type);
         condition.setMessage(message);

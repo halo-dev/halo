@@ -13,8 +13,12 @@ import run.halo.app.extension.Metadata;
  * @since 2.0.0
  */
 @Data
-@GVK(group = "metrics.halo.run", version = "v1alpha1", kind = "Counter", plural = "counters",
-    singular = "counter")
+@GVK(
+        group = "metrics.halo.run",
+        version = "v1alpha1",
+        kind = "Counter",
+        plural = "counters",
+        singular = "counter")
 @EqualsAndHashCode(callSuper = true)
 public class Counter extends AbstractExtension {
 

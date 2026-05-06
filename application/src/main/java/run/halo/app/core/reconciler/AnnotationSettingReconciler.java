@@ -31,24 +31,25 @@ public class AnnotationSettingReconciler implements Reconciler<Reconciler.Reques
     }
 
     private void populateDefaultLabels(String name) {
-        client.fetch(AnnotationSetting.class, name).ifPresent(annotationSetting -> {
-            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-            String oldTargetRef = labels.get(AnnotationSetting.TARGET_REF_LABEL);
+        client.fetch(AnnotationSetting.class, name)
+                .ifPresent(
+                        annotationSetting -> {
+                            Map<String, String> labels =
+                                    MetadataUtil.nullSafeLabels(annotationSetting);
+                            String oldTargetRef = labels.get(AnnotationSetting.TARGET_REF_LABEL);
 
-            GroupKind targetRef = annotationSetting.getSpec().getTargetRef();
-            String targetRefLabel = targetRef.group() + "/" + targetRef.kind();
-            labels.put(AnnotationSetting.TARGET_REF_LABEL, targetRefLabel);
+                            GroupKind targetRef = annotationSetting.getSpec().getTargetRef();
+                            String targetRefLabel = targetRef.group() + "/" + targetRef.kind();
+                            labels.put(AnnotationSetting.TARGET_REF_LABEL, targetRefLabel);
 
-            if (!StringUtils.equals(oldTargetRef, targetRefLabel)) {
-                client.update(annotationSetting);
-            }
-        });
+                            if (!StringUtils.equals(oldTargetRef, targetRefLabel)) {
+                                client.update(annotationSetting);
+                            }
+                        });
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new AnnotationSetting())
-            .build();
+        return builder.extension(new AnnotationSetting()).build();
     }
 }

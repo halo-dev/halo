@@ -32,10 +32,8 @@ public interface AttachmentHandler extends ExtensionPoint {
      * @param ttl indicates how long the URL is alive.
      * @return shared URL which could be accessed publicly. Might be relative URL.
      */
-    default Mono<URI> getSharedURL(Attachment attachment,
-        Policy policy,
-        ConfigMap configMap,
-        Duration ttl) {
+    default Mono<URI> getSharedURL(
+            Attachment attachment, Policy policy, ConfigMap configMap, Duration ttl) {
         return Mono.empty();
     }
 
@@ -51,9 +49,7 @@ public interface AttachmentHandler extends ExtensionPoint {
      * @param configMap contains configuration needed by handler.
      * @return permalink representing a unique attachment. Might be relative URL.
      */
-    default Mono<URI> getPermalink(Attachment attachment,
-        Policy policy,
-        ConfigMap configMap) {
+    default Mono<URI> getPermalink(Attachment attachment, Policy policy, ConfigMap configMap) {
         return Mono.empty();
     }
 
@@ -65,9 +61,8 @@ public interface AttachmentHandler extends ExtensionPoint {
      * @param configMap the config map
      * @return a map of thumbnail sizes to their respective URIs
      */
-    default Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(Attachment attachment,
-        Policy policy,
-        ConfigMap configMap) {
+    default Mono<Map<ThumbnailSize, URI>> getThumbnailLinks(
+            Attachment attachment, Policy policy, ConfigMap configMap) {
         return Mono.empty();
     }
 
@@ -88,7 +83,6 @@ public interface AttachmentHandler extends ExtensionPoint {
         default Group group() {
             return null;
         }
-
     }
 
     interface DeleteContext {
@@ -98,5 +92,4 @@ public interface AttachmentHandler extends ExtensionPoint {
 
         ConfigMap configMap();
     }
-
 }

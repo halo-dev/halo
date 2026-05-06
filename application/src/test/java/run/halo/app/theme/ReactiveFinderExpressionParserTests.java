@@ -43,14 +43,11 @@ import run.halo.app.theme.dialect.HaloProcessorDialect;
  */
 @ExtendWith(MockitoExtension.class)
 public class ReactiveFinderExpressionParserTests {
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    private ObjectProvider<ExtensionGetter> extensionGetterProvider;
+    @Mock private ObjectProvider<ExtensionGetter> extensionGetterProvider;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
     private TemplateEngine templateEngine;
 
@@ -58,20 +55,26 @@ public class ReactiveFinderExpressionParserTests {
     void setUp() {
         HaloProcessorDialect haloProcessorDialect = new HaloProcessorDialect();
         templateEngine = new TemplateEngine();
-        templateEngine.setDialects(Set.of(haloProcessorDialect, new SpringStandardDialect() {
-            @Override
-            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
-                return new ReactiveSpelVariableExpressionEvaluator();
-            }
-        }));
+        templateEngine.setDialects(
+                Set.of(
+                        haloProcessorDialect,
+                        new SpringStandardDialect() {
+                            @Override
+                            public IStandardVariableExpressionEvaluator
+                                    getVariableExpressionEvaluator() {
+                                return new ReactiveSpelVariableExpressionEvaluator();
+                            }
+                        }));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
-        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(environmentFetcher);
+        lenient()
+                .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
+                .thenReturn(environmentFetcher);
         when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenReturn(extensionGetterProvider);
+                .thenReturn(extensionGetterProvider);
         when(extensionGetterProvider.getIfUnique()).thenReturn(null);
-        lenient().when(environmentFetcher.fetchComment())
-            .thenReturn(Mono.just(new SystemSetting.Comment()));
+        lenient()
+                .when(environmentFetcher.fetchComment())
+                .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
@@ -80,23 +83,25 @@ public class ReactiveFinderExpressionParserTests {
         context.setVariable("target", new TestReactiveFinder());
         context.setVariable("genericMap", Map.of("key", "value"));
         String result = templateEngine.process("javascriptInline", context);
-        assertThat(result).isEqualTo("""
-            <p>value</p>
-            <p>ruibaby</p>
-            <p>guqing</p>
-            <p>bar</p>
-            <script>
-                var genericValue = "value";
-                var name = "guqing";
-                var names = ["guqing","johnniang","ruibaby"];
-                var users = [{"name":"guqing"},{"name":"ruibaby"},{"name":"johnniang"}];
-                var userListItem = "guqing";
-                var objectJsonNodeFlux = [{"name":"guqing"}];
-                var objectJsonNodeFluxChain = "guqing";
-                var mapMono = "bar";
-                var arrayNodeMono = "bar";
-            </script>
-            """);
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        <p>value</p>
+                        <p>ruibaby</p>
+                        <p>guqing</p>
+                        <p>bar</p>
+                        <script>
+                            var genericValue = "value";
+                            var name = "guqing";
+                            var names = ["guqing","johnniang","ruibaby"];
+                            var users = [{"name":"guqing"},{"name":"ruibaby"},{"name":"johnniang"}];
+                            var userListItem = "guqing";
+                            var objectJsonNodeFlux = [{"name":"guqing"}];
+                            var objectJsonNodeFluxChain = "guqing";
+                            var mapMono = "bar";
+                            var arrayNodeMono = "bar";
+                        </script>
+                        """);
     }
 
     static class TestReactiveFinder {
@@ -110,8 +115,7 @@ public class ReactiveFinderExpressionParserTests {
 
         public Flux<TestUser> users() {
             return Flux.just(
-                new TestUser("guqing"), new TestUser("ruibaby"), new TestUser("johnniang")
-            );
+                    new TestUser("guqing"), new TestUser("ruibaby"), new TestUser("johnniang"));
         }
 
         public Flux<JsonNode> objectJsonNodeFlux() {
@@ -131,40 +135,41 @@ public class ReactiveFinderExpressionParserTests {
         }
     }
 
-    record TestUser(String name) {
-    }
+    record TestUser(String name) {}
 
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
-            return new StringTemplateResource("""
-                <p th:text="${genericMap.key}"></p>
-                <p th:text="${target.users[1].name}"></p>
-                <p th:text="${target.objectJsonNodeFlux[0].name}"></p>
-                <p th:text="${target.arrayNodeMono.get(0).foo}"></p>
-                <script th:inline="javascript">
-                    var genericValue = /*[[${genericMap.key}]]*/;
-                    var name = /*[[${target.getName()}]]*/;
-                    var names = /*[[${target.names()}]]*/;
-                    var users = /*[[${target.users()}]]*/;
-                    var userListItem = /*[[${target.users[0].name}]]*/;
-                    var objectJsonNodeFlux = /*[[${target.objectJsonNodeFlux()}]]*/;
-                    var objectJsonNodeFluxChain = /*[[${target.objectJsonNodeFlux[0].name}]]*/;
-                    var mapMono = /*[[${target.mapMono.foo}]]*/;
-                    var arrayNodeMono = /*[[${target.arrayNodeMono.get(0).foo}]]*/;
-                </script>
-                """);
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
+            return new StringTemplateResource(
+                    """
+                    <p th:text="${genericMap.key}"></p>
+                    <p th:text="${target.users[1].name}"></p>
+                    <p th:text="${target.objectJsonNodeFlux[0].name}"></p>
+                    <p th:text="${target.arrayNodeMono.get(0).foo}"></p>
+                    <script th:inline="javascript">
+                        var genericValue = /*[[${genericMap.key}]]*/;
+                        var name = /*[[${target.getName()}]]*/;
+                        var names = /*[[${target.names()}]]*/;
+                        var users = /*[[${target.users()}]]*/;
+                        var userListItem = /*[[${target.users[0].name}]]*/;
+                        var objectJsonNodeFlux = /*[[${target.objectJsonNodeFlux()}]]*/;
+                        var objectJsonNodeFluxChain = /*[[${target.objectJsonNodeFlux[0].name}]]*/;
+                        var mapMono = /*[[${target.mapMono.foo}]]*/;
+                        var arrayNodeMono = /*[[${target.arrayNodeMono.get(0).foo}]]*/;
+                    </script>
+                    """);
         }
-
     }
 }

@@ -36,53 +36,67 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "NotifierV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("/notifiers/{name}/sender-config", this::fetchSenderConfig,
-                builder -> builder.operationId("FetchSenderConfig")
-                    .description("Fetch sender config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .response(responseBuilder().implementation(Object.class))
-            )
-            .POST("/notifiers/{name}/sender-config", this::saveSenderConfig,
-                builder -> builder.operationId("SaveSenderConfig")
-                    .description("Save sender config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder().implementation(Object.class))
-                        )
-                    )
-                    .response(responseBuilder().implementation(Void.class))
-            )
-            .build();
+                .GET(
+                        "/notifiers/{name}/sender-config",
+                        this::fetchSenderConfig,
+                        builder ->
+                                builder.operationId("FetchSenderConfig")
+                                        .description("Fetch sender config of notifier")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Notifier name")
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(Object.class)))
+                .POST(
+                        "/notifiers/{name}/sender-config",
+                        this::saveSenderConfig,
+                        builder ->
+                                builder.operationId("SaveSenderConfig")
+                                        .description("Save sender config of notifier")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Notifier name")
+                                                        .required(true))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                Builder
+                                                                                        .schemaBuilder()
+                                                                                        .implementation(
+                                                                                                Object
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Void.class)))
+                .build();
     }
 
     private Mono<ServerResponse> fetchSenderConfig(ServerRequest request) {
         var name = request.pathVariable("name");
-        return notifierConfigStore.fetchSenderConfig(name)
-            .flatMap(config -> ServerResponse.ok().bodyValue(config));
+        return notifierConfigStore
+                .fetchSenderConfig(name)
+                .flatMap(config -> ServerResponse.ok().bodyValue(config));
     }
 
     private Mono<ServerResponse> saveSenderConfig(ServerRequest request) {
         var name = request.pathVariable("name");
         return request.bodyToMono(ObjectNode.class)
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("Request body must not be empty."))
-            )
-            .flatMap(jsonNode -> notifierConfigStore.saveSenderConfig(name, jsonNode))
-            .then(ServerResponse.ok().build());
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "Request body must not be empty.")))
+                .flatMap(jsonNode -> notifierConfigStore.saveSenderConfig(name, jsonNode))
+                .then(ServerResponse.ok().build());
     }
 }

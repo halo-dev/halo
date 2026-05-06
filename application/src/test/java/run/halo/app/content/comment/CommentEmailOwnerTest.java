@@ -17,8 +17,9 @@ class CommentEmailOwnerTest {
     @Test
     void constructorTest() throws JSONException {
         CommentEmailOwner commentEmailOwner =
-            new CommentEmailOwner("example@example.com", "avatar", "displayName", "website");
-        JSONAssert.assertEquals("""
+                new CommentEmailOwner("example@example.com", "avatar", "displayName", "website");
+        JSONAssert.assertEquals(
+                """
                 {
                     "email": "example@example.com",
                     "avatar": "avatar",
@@ -26,16 +27,17 @@ class CommentEmailOwnerTest {
                     "website": "website"
                 }
                 """,
-            JsonUtils.objectToJson(commentEmailOwner),
-            true);
+                JsonUtils.objectToJson(commentEmailOwner),
+                true);
     }
 
     @Test
     void toCommentOwner() throws JSONException {
         CommentEmailOwner commentEmailOwner =
-            new CommentEmailOwner("example@example.com", "avatar", "displayName", "website");
+                new CommentEmailOwner("example@example.com", "avatar", "displayName", "website");
         Comment.CommentOwner commentOwner = commentEmailOwner.toCommentOwner();
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "kind": "Email",
                     "name": "example@example.com",
@@ -46,7 +48,7 @@ class CommentEmailOwnerTest {
                     }
                 }
                 """,
-            JsonUtils.objectToJson(commentOwner),
-            true);
+                JsonUtils.objectToJson(commentOwner),
+                true);
     }
 }

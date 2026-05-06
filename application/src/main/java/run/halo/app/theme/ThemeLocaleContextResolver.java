@@ -29,42 +29,41 @@ public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolve
 
     public static final String TIME_ZONE_COOKIE_NAME = "time_zone";
 
-
     @Override
     public LocaleContext resolveLocaleContext(ServerWebExchange exchange) {
         var request = exchange.getRequest();
-        var locale = getLocaleFromQueryParameter(request)
-            .or(() -> getLocaleFromCookie(request))
-            .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
-            .orElseGet(() -> super.resolveLocaleContext(exchange).getLocale());
+        var locale =
+                getLocaleFromQueryParameter(request)
+                        .or(() -> getLocaleFromCookie(request))
+                        .or(() -> UserLocaleRequestAttributeWriteFilter.getUserLocale(request))
+                        .orElseGet(() -> super.resolveLocaleContext(exchange).getLocale());
 
         if (LocaleUtils.isLanguageUndetermined(locale)) {
             locale = null;
         }
 
-        var timeZone = getTimeZoneFromCookie(request)
-            .orElseGet(TimeZone::getDefault);
+        var timeZone = getTimeZoneFromCookie(request).orElseGet(TimeZone::getDefault);
 
         return new SimpleTimeZoneAwareLocaleContext(locale, timeZone);
     }
 
     private Optional<Locale> getLocaleFromCookie(ServerHttpRequest request) {
         return Optional.ofNullable(request.getCookies().getFirst(LANGUAGE_COOKIE_NAME))
-            .map(HttpCookie::getValue)
-            .filter(StringUtils::isNotBlank)
-            .map(Locale::forLanguageTag);
+                .map(HttpCookie::getValue)
+                .filter(StringUtils::isNotBlank)
+                .map(Locale::forLanguageTag);
     }
 
     private Optional<Locale> getLocaleFromQueryParameter(ServerHttpRequest request) {
         return Optional.ofNullable(request.getQueryParams().getFirst(LANGUAGE_PARAMETER_NAME))
-            .filter(StringUtils::isNotBlank)
-            .map(Locale::forLanguageTag);
+                .filter(StringUtils::isNotBlank)
+                .map(Locale::forLanguageTag);
     }
 
     private Optional<TimeZone> getTimeZoneFromCookie(ServerHttpRequest request) {
         return Optional.ofNullable(request.getCookies().getFirst(TIME_ZONE_COOKIE_NAME))
-            .map(HttpCookie::getValue)
-            .filter(StringUtils::isNotBlank)
-            .map(TimeZone::getTimeZone);
+                .map(HttpCookie::getValue)
+                .filter(StringUtils::isNotBlank)
+                .map(TimeZone::getTimeZone);
     }
 }

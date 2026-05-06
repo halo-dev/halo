@@ -8,8 +8,8 @@ public class PermalinkRuleChangedEvent extends ApplicationEvent {
     private final String oldRule;
     private final String rule;
 
-    public PermalinkRuleChangedEvent(Object source, DefaultTemplateEnum template,
-        String oldRule, String rule) {
+    public PermalinkRuleChangedEvent(
+            Object source, DefaultTemplateEnum template, String oldRule, String rule) {
         super(source);
         this.template = template;
         this.oldRule = oldRule;

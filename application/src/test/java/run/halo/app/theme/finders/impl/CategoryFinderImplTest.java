@@ -47,11 +47,9 @@ import run.halo.app.theme.finders.vo.CategoryVo;
 @ExtendWith(MockitoExtension.class)
 class CategoryFinderImplTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private CategoryService categoryService;
+    @Mock private CategoryService categoryService;
 
     private CategoryFinderImpl categoryFinder;
 
@@ -63,11 +61,11 @@ class CategoryFinderImplTest {
 
     @Test
     void getByName() throws JSONException {
-        when(client.fetch(eq(Category.class), eq("hello")))
-            .thenReturn(Mono.just(category()));
+        when(client.fetch(eq(Category.class), eq("hello"))).thenReturn(Mono.just(category()));
         CategoryVo categoryVo = categoryFinder.getByName("hello").block();
         categoryVo.getMetadata().setCreationTimestamp(null);
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                      "metadata": {
                          "name": "hello",
@@ -91,48 +89,47 @@ class CategoryFinderImplTest {
                      }
                 }
                 """,
-            JsonUtils.objectToJson(categoryVo),
-            true);
+                JsonUtils.objectToJson(categoryVo),
+                true);
     }
 
     @Test
     void getByNames() {
         // categories sorted by default comparator: c3, c2, hello
-        var sortedCategories = categories().stream()
-            .sorted(CategoryFinderImpl.defaultComparator())
-            .toList();
+        var sortedCategories =
+                categories().stream().sorted(CategoryFinderImpl.defaultComparator()).toList();
         when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(sortedCategories));
+                .thenReturn(Flux.fromIterable(sortedCategories));
 
         // request in a specific order that differs from natural sort: hello, c3, c2
-        var result = categoryFinder.getByNames(List.of("hello", "c3", "c2"))
-            .collectList()
-            .block();
+        var result = categoryFinder.getByNames(List.of("hello", "c3", "c2")).collectList().block();
         assertThat(result).hasSize(3);
-        assertThat(result.stream()
-            .map(vo -> vo.getMetadata().getName())
-            .toList())
-            .isEqualTo(List.of("hello", "c3", "c2"));
+        assertThat(result.stream().map(vo -> vo.getMetadata().getName()).toList())
+                .isEqualTo(List.of("hello", "c3", "c2"));
     }
 
     @Test
     void list() {
-        ListResult<Category> categories = new ListResult<>(1, 10, 3,
-            categories().stream()
-                .sorted(CategoryFinderImpl.defaultComparator())
-                .toList());
+        ListResult<Category> categories =
+                new ListResult<>(
+                        1,
+                        10,
+                        3,
+                        categories().stream()
+                                .sorted(CategoryFinderImpl.defaultComparator())
+                                .toList());
         when(client.listBy(eq(Category.class), any(ListOptions.class), any(PageRequest.class)))
-            .thenReturn(Mono.just(categories));
+                .thenReturn(Mono.just(categories));
         ListResult<CategoryVo> list = categoryFinder.list(1, 10).block();
         assertThat(list.getItems()).hasSize(3);
         assertThat(list.get().map(categoryVo -> categoryVo.getMetadata().getName()).toList())
-            .isEqualTo(List.of("c3", "c2", "hello"));
+                .isEqualTo(List.of("c3", "c2", "hello"));
     }
 
     @Test
     void listAsTree() {
         when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(categoriesForTree()));
+                .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         assertThat(treeVos).hasSize(1);
     }
@@ -140,7 +137,7 @@ class CategoryFinderImplTest {
     @Test
     void listSubTreeByName() {
         when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(categoriesForTree()));
+                .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree("E").collectList().block();
         assertThat(treeVos.get(0).getMetadata().getName()).isEqualTo("E");
         assertThat(treeVos.get(0).getChildren()).hasSize(2);
@@ -156,18 +153,20 @@ class CategoryFinderImplTest {
     @Test
     void listAsTreeMore() {
         when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(moreCategories()));
+                .thenReturn(Flux.fromIterable(moreCategories()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         String s = visualizeTree(treeVos);
-        assertThat(s).isEqualTo("""
-            全部 (7)
-            ├── FIT2CLOUD (4)
-            │   ├── DataEase (0)
-            │   ├── Halo (2)
-            │   ├── MeterSphere (0)
-            │   └── JumpServer (0)
-            └── 默认分类 (3)
-            """);
+        assertThat(s)
+                .isEqualTo(
+                        """
+                        全部 (7)
+                        ├── FIT2CLOUD (4)
+                        │   ├── DataEase (0)
+                        │   ├── Halo (2)
+                        │   ├── MeterSphere (0)
+                        │   └── JumpServer (0)
+                        └── 默认分类 (3)
+                        """);
     }
 
     @Nested
@@ -210,52 +209,52 @@ class CategoryFinderImplTest {
         void setUp() throws IOException {
             var file = ResourceUtils.getFile("classpath:categories/independent-post-count.json");
             var json = Files.readString(file.toPath());
-            categories = JsonUtils.jsonToObject(json, new TypeReference<>() {
-            });
+            categories = JsonUtils.jsonToObject(json, new TypeReference<>() {});
         }
 
         @Test
         void computePostCountFromTree() {
             when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.fromIterable(categories));
-            var treeVos = categoryFinder.listAsTree("全部")
-                .collectList().block();
+                    .thenReturn(Flux.fromIterable(categories));
+            var treeVos = categoryFinder.listAsTree("全部").collectList().block();
             assertThat(treeVos).hasSize(1);
             String s = visualizeTree(treeVos.get(0).getChildren());
-            assertThat(s).isEqualTo("""
-                全部 (84)
-                ├── AnotherRootChild (51)
-                │   ├── Child1 (19)
-                │   │   ├── SubChild1 (6)
-                │   │   │   ├── DeepNode1 (1)
-                │   │   │   └── DeepNode2 (2)
-                │   │   │       └── DeeperNode (1)
-                │   │   └── SubChild2 (5)
-                │   │       └── DeepNode3 (4) (Independent)
-                │   │           ├── DeepNode4 (1)
-                │   │           └── DeepNode5 (1)
-                │   └── Child2 (12)
-                │       └── IndependentSubNode (24) (Independent)
-                │           ├── SubNode3 (6)
-                │           └── SubNode4 (6)
-                └── FIT2CLOUD (33)
-                    ├── DataEase (18)
-                    │   ├── SubNode1 (8)
-                    │   │   ├── Leaf1 (2)
-                    │   │   └── Leaf2 (2)
-                    │   └── SubNode2 (12) (Independent)
-                    │       ├── IndependentChild1 (3)
-                    │       └── IndependentChild2 (3)
-                    └── IndependentNode (10) (Independent)
-                        ├── IndependentChild3 (2)
-                        └── IndependentChild4 (3)
-                """);
+            assertThat(s)
+                    .isEqualTo(
+                            """
+                            全部 (84)
+                            ├── AnotherRootChild (51)
+                            │   ├── Child1 (19)
+                            │   │   ├── SubChild1 (6)
+                            │   │   │   ├── DeepNode1 (1)
+                            │   │   │   └── DeepNode2 (2)
+                            │   │   │       └── DeeperNode (1)
+                            │   │   └── SubChild2 (5)
+                            │   │       └── DeepNode3 (4) (Independent)
+                            │   │           ├── DeepNode4 (1)
+                            │   │           └── DeepNode5 (1)
+                            │   └── Child2 (12)
+                            │       └── IndependentSubNode (24) (Independent)
+                            │           ├── SubNode3 (6)
+                            │           └── SubNode4 (6)
+                            └── FIT2CLOUD (33)
+                                ├── DataEase (18)
+                                │   ├── SubNode1 (8)
+                                │   │   ├── Leaf1 (2)
+                                │   │   └── Leaf2 (2)
+                                │   └── SubNode2 (12) (Independent)
+                                │       ├── IndependentChild1 (3)
+                                │       └── IndependentChild2 (3)
+                                └── IndependentNode (10) (Independent)
+                                    ├── IndependentChild3 (2)
+                                    └── IndependentChild4 (3)
+                            """);
         }
 
         @Test
         void getBreadcrumbsTest() {
             when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.fromIterable(categories));
+                    .thenReturn(Flux.fromIterable(categories));
             // first level
             var breadcrumbs = categoryFinder.getBreadcrumbs("全部").collectList().block();
             assertThat(toNames(breadcrumbs)).containsSequence("全部");
@@ -266,17 +265,23 @@ class CategoryFinderImplTest {
 
             // more levels
             breadcrumbs = categoryFinder.getBreadcrumbs("DeepNode5").collectList().block();
-            assertThat(toNames(breadcrumbs)).containsSequence("全部", "AnotherRootChild", "Child1",
-                "SubChild2", "DeepNode3", "DeepNode5");
+            assertThat(toNames(breadcrumbs))
+                    .containsSequence(
+                            "全部",
+                            "AnotherRootChild",
+                            "Child1",
+                            "SubChild2",
+                            "DeepNode3",
+                            "DeepNode5");
 
             breadcrumbs = categoryFinder.getBreadcrumbs("IndependentChild4").collectList().block();
-            assertThat(toNames(breadcrumbs)).containsSequence("全部", "FIT2CLOUD",
-                "IndependentNode",
-                "IndependentChild4");
+            assertThat(toNames(breadcrumbs))
+                    .containsSequence("全部", "FIT2CLOUD", "IndependentNode", "IndependentChild4");
 
             breadcrumbs = categoryFinder.getBreadcrumbs("SubNode4").collectList().block();
-            assertThat(toNames(breadcrumbs)).containsSequence("全部", "AnotherRootChild", "Child2",
-                "IndependentSubNode", "SubNode4");
+            assertThat(toNames(breadcrumbs))
+                    .containsSequence(
+                            "全部", "AnotherRootChild", "Child2", "IndependentSubNode", "SubNode4");
 
             // not exist
             breadcrumbs = categoryFinder.getBreadcrumbs("not-exist").collectList().block();
@@ -285,31 +290,31 @@ class CategoryFinderImplTest {
 
         @Test
         void getBreadcrumbsForHiddenTest() {
-            Map<String, Category> categoryMap = categories.stream()
-                .collect(
-                    Collectors.toMap(item -> item.getMetadata().getName(), Function.identity()));
+            Map<String, Category> categoryMap =
+                    categories.stream()
+                            .collect(
+                                    Collectors.toMap(
+                                            item -> item.getMetadata().getName(),
+                                            Function.identity()));
             var category = categoryMap.get("IndependentNode");
             category.getSpec().setHideFromList(true);
             when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.fromIterable(categoryMap.values()));
+                    .thenReturn(Flux.fromIterable(categoryMap.values()));
 
             when(categoryService.isCategoryHidden(eq("IndependentChild4")))
-                .thenReturn(Mono.just(true));
+                    .thenReturn(Mono.just(true));
 
-            var breadcrumbs = categoryFinder.getBreadcrumbs("IndependentChild4")
-                .collectList().block();
-            assertThat(toNames(breadcrumbs)).containsSequence("全部", "FIT2CLOUD",
-                "IndependentNode",
-                "IndependentChild4");
+            var breadcrumbs =
+                    categoryFinder.getBreadcrumbs("IndependentChild4").collectList().block();
+            assertThat(toNames(breadcrumbs))
+                    .containsSequence("全部", "FIT2CLOUD", "IndependentNode", "IndependentChild4");
         }
 
         static List<String> toNames(List<CategoryVo> categories) {
             if (categories == null) {
                 return List.of();
             }
-            return categories.stream()
-                .map(category -> category.getMetadata().getName())
-                .toList();
+            return categories.stream().map(category -> category.getMetadata().getName()).toList();
         }
     }
 
@@ -365,17 +370,19 @@ class CategoryFinderImplTest {
         Category.CategorySpec categorySpec = new Category.CategorySpec();
         categorySpec.setSlug("/");
         categorySpec.setDisplayName("全部");
-        Integer postCount = categoryTreeVos.stream()
-            .map(CategoryTreeVo::getPostCount)
-            .filter(Objects::nonNull)
-            .reduce(Integer::sum)
-            .orElse(0);
-        CategoryTreeVo root = CategoryTreeVo.builder()
-            .spec(categorySpec)
-            .postCount(postCount)
-            .children(categoryTreeVos)
-            .metadata(new Metadata())
-            .build();
+        Integer postCount =
+                categoryTreeVos.stream()
+                        .map(CategoryTreeVo::getPostCount)
+                        .filter(Objects::nonNull)
+                        .reduce(Integer::sum)
+                        .orElse(0);
+        CategoryTreeVo root =
+                CategoryTreeVo.builder()
+                        .spec(categorySpec)
+                        .postCount(postCount)
+                        .children(categoryTreeVos)
+                        .metadata(new Metadata())
+                        .build();
         StringBuilder stringBuilder = new StringBuilder();
         root.print(stringBuilder, "", "");
         return stringBuilder.toString();
@@ -416,175 +423,175 @@ class CategoryFinderImplTest {
 
     private List<Category> moreCategories() {
         // see also https://github.com/halo-dev/halo/issues/2643
-        String s = """
-            [
-               {
-                  "spec":{
-                     "displayName":"默认分类",
-                     "slug":"default",
-                     "description":"这是你的默认分类，如不需要，删除即可。",
-                     "cover":"",
-                     "template":"",
-                     "priority":1,
-                     "children":[
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/default",
-                     "postCount":3,
-                     "visiblePostCount":3
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "name":"76514a40-6ef1-4ed9-b58a-e26945bde3ca",
-                     "version":16,
-                     "creationTimestamp":"2022-10-08T06:17:47.589181Z"
-                  }
-               },
-               {
-                  "spec":{
-                     "displayName":"MeterSphere",
-                     "slug":"metersphere",
-                     "description":"",
-                     "cover":"",
-                     "template":"",
-                     "priority":2,
-                     "children":[
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/metersphere",
-                     "postCount":0,
-                     "visiblePostCount":0
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "finalizers":[
-                        "category-protection"
-                     ],
-                     "name":"acf09686-d5a7-4227-ba8c-3aeff063f12f",
-                     "version":13,
-                     "creationTimestamp":"2022-10-08T06:32:36.650974Z"
-                  }
-               },
-               {
-                  "spec":{
-                     "displayName":"DataEase",
-                     "slug":"dataease",
-                     "description":"",
-                     "cover":"",
-                     "template":"",
-                     "priority":0,
-                     "children":[
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/dataease",
-                     "postCount":0,
-                     "visiblePostCount":0
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "finalizers":[
-                        "category-protection"
-                     ],
-                     "name":"bd95f914-22fc-4de5-afcc-a9ffba2f6401",
-                     "version":13,
-                     "creationTimestamp":"2022-10-08T06:32:53.353838Z"
-                  }
-               },
-               {
-                  "spec":{
-                     "displayName":"FIT2CLOUD",
-                     "slug":"fit2cloud",
-                     "description":"",
-                     "cover":"",
-                     "template":"",
-                     "priority":0,
-                     "children":[
-                        "bd95f914-22fc-4de5-afcc-a9ffba2f6401",
-                        "e1150fd9-4512-453c-9186-f8de9c156c3d",
-                        "acf09686-d5a7-4227-ba8c-3aeff063f12f",
-                        "ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
-                        "non-existent-children-name"
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/fit2cloud",
-                     "postCount":2,
-                     "visiblePostCount":2
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "finalizers":[
-                        "category-protection"
-                     ],
-                     "name":"c25c17ae-4a7b-43c5-a424-76950b9622cd",
-                     "version":14,
-                     "creationTimestamp":"2022-10-08T06:32:27.802025Z"
-                  }
-               },
-               {
-                  "spec":{
-                     "displayName":"Halo",
-                     "slug":"halo",
-                     "description":"",
-                     "cover":"",
-                     "template":"",
-                     "priority":1,
-                     "children":[
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/halo",
-                     "postCount":2,
-                     "visiblePostCount":2
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "finalizers":[
-                        "category-protection"
-                     ],
-                     "name":"e1150fd9-4512-453c-9186-f8de9c156c3d",
-                     "version":15,
-                     "creationTimestamp":"2022-10-08T06:32:42.991788Z"
-                  }
-               },
-               {
-                  "spec":{
-                     "displayName":"JumpServer",
-                     "slug":"jumpserver",
-                     "description":"",
-                     "cover":"",
-                     "template":"",
-                     "priority":3,
-                     "children":[
-                     ]
-                  },
-                  "status":{
-                     "permalink":"/categories/jumpserver",
-                     "postCount":0,
-                     "visiblePostCount":0
-                  },
-                  "apiVersion":"content.halo.run/v1alpha1",
-                  "kind":"Category",
-                  "metadata":{
-                     "finalizers":[
-                        "category-protection"
-                     ],
-                     "name":"ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
-                     "version":13,
-                     "creationTimestamp":"2022-10-08T06:33:00.557435Z"
-                  }
-               }
-            ]
-            """;
-        return JsonUtils.jsonToObject(s, new TypeReference<>() {
-        });
+        String s =
+                """
+                [
+                   {
+                      "spec":{
+                         "displayName":"默认分类",
+                         "slug":"default",
+                         "description":"这是你的默认分类，如不需要，删除即可。",
+                         "cover":"",
+                         "template":"",
+                         "priority":1,
+                         "children":[
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/default",
+                         "postCount":3,
+                         "visiblePostCount":3
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "name":"76514a40-6ef1-4ed9-b58a-e26945bde3ca",
+                         "version":16,
+                         "creationTimestamp":"2022-10-08T06:17:47.589181Z"
+                      }
+                   },
+                   {
+                      "spec":{
+                         "displayName":"MeterSphere",
+                         "slug":"metersphere",
+                         "description":"",
+                         "cover":"",
+                         "template":"",
+                         "priority":2,
+                         "children":[
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/metersphere",
+                         "postCount":0,
+                         "visiblePostCount":0
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "finalizers":[
+                            "category-protection"
+                         ],
+                         "name":"acf09686-d5a7-4227-ba8c-3aeff063f12f",
+                         "version":13,
+                         "creationTimestamp":"2022-10-08T06:32:36.650974Z"
+                      }
+                   },
+                   {
+                      "spec":{
+                         "displayName":"DataEase",
+                         "slug":"dataease",
+                         "description":"",
+                         "cover":"",
+                         "template":"",
+                         "priority":0,
+                         "children":[
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/dataease",
+                         "postCount":0,
+                         "visiblePostCount":0
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "finalizers":[
+                            "category-protection"
+                         ],
+                         "name":"bd95f914-22fc-4de5-afcc-a9ffba2f6401",
+                         "version":13,
+                         "creationTimestamp":"2022-10-08T06:32:53.353838Z"
+                      }
+                   },
+                   {
+                      "spec":{
+                         "displayName":"FIT2CLOUD",
+                         "slug":"fit2cloud",
+                         "description":"",
+                         "cover":"",
+                         "template":"",
+                         "priority":0,
+                         "children":[
+                            "bd95f914-22fc-4de5-afcc-a9ffba2f6401",
+                            "e1150fd9-4512-453c-9186-f8de9c156c3d",
+                            "acf09686-d5a7-4227-ba8c-3aeff063f12f",
+                            "ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
+                            "non-existent-children-name"
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/fit2cloud",
+                         "postCount":2,
+                         "visiblePostCount":2
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "finalizers":[
+                            "category-protection"
+                         ],
+                         "name":"c25c17ae-4a7b-43c5-a424-76950b9622cd",
+                         "version":14,
+                         "creationTimestamp":"2022-10-08T06:32:27.802025Z"
+                      }
+                   },
+                   {
+                      "spec":{
+                         "displayName":"Halo",
+                         "slug":"halo",
+                         "description":"",
+                         "cover":"",
+                         "template":"",
+                         "priority":1,
+                         "children":[
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/halo",
+                         "postCount":2,
+                         "visiblePostCount":2
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "finalizers":[
+                            "category-protection"
+                         ],
+                         "name":"e1150fd9-4512-453c-9186-f8de9c156c3d",
+                         "version":15,
+                         "creationTimestamp":"2022-10-08T06:32:42.991788Z"
+                      }
+                   },
+                   {
+                      "spec":{
+                         "displayName":"JumpServer",
+                         "slug":"jumpserver",
+                         "description":"",
+                         "cover":"",
+                         "template":"",
+                         "priority":3,
+                         "children":[
+                         ]
+                      },
+                      "status":{
+                         "permalink":"/categories/jumpserver",
+                         "postCount":0,
+                         "visiblePostCount":0
+                      },
+                      "apiVersion":"content.halo.run/v1alpha1",
+                      "kind":"Category",
+                      "metadata":{
+                         "finalizers":[
+                            "category-protection"
+                         ],
+                         "name":"ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
+                         "version":13,
+                         "creationTimestamp":"2022-10-08T06:33:00.557435Z"
+                      }
+                   }
+                ]
+                """;
+        return JsonUtils.jsonToObject(s, new TypeReference<>() {});
     }
 }

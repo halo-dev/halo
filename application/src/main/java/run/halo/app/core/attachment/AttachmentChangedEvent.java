@@ -11,12 +11,10 @@ import run.halo.app.core.extension.attachment.Attachment;
  */
 public class AttachmentChangedEvent extends ApplicationEvent {
 
-    @Getter
-    private final Attachment attachment;
+    @Getter private final Attachment attachment;
 
     public AttachmentChangedEvent(Object source, Attachment attachment) {
         super(source);
         this.attachment = attachment;
     }
-
 }

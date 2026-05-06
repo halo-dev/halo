@@ -25,18 +25,17 @@ import run.halo.app.extension.Watcher;
 @ExtendWith(MockitoExtension.class)
 class RequestSynchronizerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    Watcher watcher;
+    @Mock Watcher watcher;
 
     RequestSynchronizer synchronizer;
 
     @BeforeEach
     void setUp() {
         synchronizer =
-            new RequestSynchronizer(true, client, new FakeExtension(), watcher, new ListOptions());
+                new RequestSynchronizer(
+                        true, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
     }
@@ -44,8 +43,11 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenSyncingAllOnStart() {
         when(client.listTopNames(
-            eq(FakeExtension.class), isA(ListOptions.class), isA(Sort.class), any(Integer.class))
-        ).thenReturn(List.of("fake-01", "fake-02"));
+                        eq(FakeExtension.class),
+                        isA(ListOptions.class),
+                        isA(Sort.class),
+                        any(Integer.class)))
+                .thenReturn(List.of("fake-01", "fake-02"));
 
         synchronizer.start();
 
@@ -58,7 +60,8 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenNotSyncingAllOnStart() {
         synchronizer =
-            new RequestSynchronizer(false, client, new FakeExtension(), watcher, new ListOptions());
+                new RequestSynchronizer(
+                        false, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
 
@@ -94,5 +97,4 @@ class RequestSynchronizerTest {
         verify(watcher, times(0)).onAdd(isA(Reconciler.Request.class));
         verify(client, times(0)).watch(any());
     }
-
 }

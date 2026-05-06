@@ -15,8 +15,11 @@ public abstract class PluginDependencyException extends ServerWebInputException 
         super(reason, null, cause);
     }
 
-    protected PluginDependencyException(String reason, Throwable cause,
-        String messageDetailCode, Object[] messageDetailArguments) {
+    protected PluginDependencyException(
+            String reason,
+            Throwable cause,
+            String messageDetailCode,
+            Object[] messageDetailArguments) {
         super(reason, null, cause, messageDetailCode, messageDetailArguments);
     }
 
@@ -39,13 +42,12 @@ public abstract class PluginDependencyException extends ServerWebInputException 
             setType(URI.create(TYPE));
             getBody().setProperty("dependencies", dependencies);
         }
-
     }
 
     public static class WrongVersionsException extends PluginDependencyException {
 
         public static final String TYPE =
-            "https://halo.run/probs/plugin-dependencies-with-wrong-versions";
+                "https://halo.run/probs/plugin-dependencies-with-wrong-versions";
 
         public WrongVersionsException(List<WrongDependencyVersion> versions) {
             super("Dependencies have wrong version.", null, null, new Object[] {versions});

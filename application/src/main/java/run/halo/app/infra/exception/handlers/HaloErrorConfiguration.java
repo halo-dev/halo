@@ -36,17 +36,17 @@ public class HaloErrorConfiguration {
     @Bean
     @Order(-1)
     ErrorWebExceptionHandler errorWebExceptionHandler(
-        ErrorAttributes errorAttributes,
-        WebProperties webProperties,
-        ObjectProvider<ViewResolver> viewResolvers,
-        ServerCodecConfigurer serverCodecConfigurer,
-        ApplicationContext applicationContext
-    ) {
-        var exceptionHandler = new HaloErrorWebExceptionHandler(
-            errorAttributes,
-            webProperties.getResources(),
-            webProperties.getError(),
-            applicationContext);
+            ErrorAttributes errorAttributes,
+            WebProperties webProperties,
+            ObjectProvider<ViewResolver> viewResolvers,
+            ServerCodecConfigurer serverCodecConfigurer,
+            ApplicationContext applicationContext) {
+        var exceptionHandler =
+                new HaloErrorWebExceptionHandler(
+                        errorAttributes,
+                        webProperties.getResources(),
+                        webProperties.getError(),
+                        applicationContext);
         exceptionHandler.setViewResolvers(viewResolvers.orderedStream().toList());
         exceptionHandler.setMessageWriters(serverCodecConfigurer.getWriters());
         exceptionHandler.setMessageReaders(serverCodecConfigurer.getReaders());

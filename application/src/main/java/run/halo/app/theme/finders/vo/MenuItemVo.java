@@ -52,11 +52,11 @@ public class MenuItemVo implements VisualizableTreeNode<MenuItemVo>, ExtensionVo
     public static MenuItemVo from(MenuItem menuItem) {
         MenuItem.MenuItemStatus status = menuItem.getStatus();
         return MenuItemVo.builder()
-            .metadata(menuItem.getMetadata())
-            .spec(menuItem.getSpec())
-            .status(status)
-            .children(List.of())
-            .build();
+                .metadata(menuItem.getMetadata())
+                .spec(menuItem.getSpec())
+                .status(status)
+                .children(List.of())
+                .build();
     }
 
     @Override

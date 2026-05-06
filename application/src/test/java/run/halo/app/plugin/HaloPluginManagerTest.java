@@ -18,23 +18,17 @@ import run.halo.app.infra.SystemVersionSupplier;
 @ExtendWith(MockitoExtension.class)
 class HaloPluginManagerTest {
 
-    @Mock
-    PluginProperties pluginProperties;
+    @Mock PluginProperties pluginProperties;
 
-    @Mock
-    SystemVersionSupplier systemVersionSupplier;
+    @Mock SystemVersionSupplier systemVersionSupplier;
 
-    @Mock
-    PluginsRootGetter pluginsRootGetter;
+    @Mock PluginsRootGetter pluginsRootGetter;
 
-    @Mock
-    ApplicationContext rootContext;
+    @Mock ApplicationContext rootContext;
 
-    @InjectMocks
-    HaloPluginManager pluginManager;
+    @InjectMocks HaloPluginManager pluginManager;
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @Test
     void shouldGetDependentsWhilePluginsNotResolved() throws Exception {
@@ -58,6 +52,4 @@ class HaloPluginManagerTest {
         var dependents = pluginManager.getDependents("fake-plugin");
         assertTrue(dependents.isEmpty());
     }
-
-
 }

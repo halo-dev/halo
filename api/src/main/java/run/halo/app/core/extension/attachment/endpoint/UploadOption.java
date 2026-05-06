@@ -11,18 +11,16 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 
 @Builder
-public record UploadOption(FilePart file,
-                           Policy policy,
-                           ConfigMap configMap,
-                           @Nullable Group group) implements AttachmentHandler.UploadContext {
+public record UploadOption(FilePart file, Policy policy, ConfigMap configMap, @Nullable Group group)
+        implements AttachmentHandler.UploadContext {
 
-    public static UploadOption from(String filename,
-        Flux<DataBuffer> content,
-        MediaType mediaType,
-        Policy policy,
-        ConfigMap configMap) {
+    public static UploadOption from(
+            String filename,
+            Flux<DataBuffer> content,
+            MediaType mediaType,
+            Policy policy,
+            ConfigMap configMap) {
         var filePart = new SimpleFilePart(filename, content, mediaType);
         return new UploadOption(filePart, policy, configMap, null);
     }
-
 }

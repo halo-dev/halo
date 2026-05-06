@@ -23,21 +23,25 @@ public class ContentWrapper {
         String baseSnapshotName = baseSnapshot.getMetadata().getName();
         if (StringUtils.equals(patchSnapshot.getMetadata().getName(), baseSnapshotName)) {
             return ContentWrapper.builder()
+                    .snapshotName(patchSnapshot.getMetadata().getName())
+                    .raw(patchSnapshot.getSpec().getRawPatch())
+                    .content(patchSnapshot.getSpec().getContentPatch())
+                    .rawType(patchSnapshot.getSpec().getRawType())
+                    .build();
+        }
+        String patchedContent =
+                PatchUtils.applyPatch(
+                        baseSnapshot.getSpec().getContentPatch(),
+                        patchSnapshot.getSpec().getContentPatch());
+        String patchedRaw =
+                PatchUtils.applyPatch(
+                        baseSnapshot.getSpec().getRawPatch(),
+                        patchSnapshot.getSpec().getRawPatch());
+        return ContentWrapper.builder()
                 .snapshotName(patchSnapshot.getMetadata().getName())
-                .raw(patchSnapshot.getSpec().getRawPatch())
-                .content(patchSnapshot.getSpec().getContentPatch())
+                .raw(patchedRaw)
+                .content(patchedContent)
                 .rawType(patchSnapshot.getSpec().getRawType())
                 .build();
-        }
-        String patchedContent = PatchUtils.applyPatch(baseSnapshot.getSpec().getContentPatch(),
-            patchSnapshot.getSpec().getContentPatch());
-        String patchedRaw = PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(),
-            patchSnapshot.getSpec().getRawPatch());
-        return ContentWrapper.builder()
-            .snapshotName(patchSnapshot.getMetadata().getName())
-            .raw(patchedRaw)
-            .content(patchedContent)
-            .rawType(patchSnapshot.getSpec().getRawType())
-            .build();
     }
 }

@@ -30,20 +30,19 @@ import run.halo.app.extension.Metadata;
 @ExtendWith(MockitoExtension.class)
 class AttachmentEndpointTest {
 
-    @Mock
-    AttachmentLister attachmentLister;
+    @Mock AttachmentLister attachmentLister;
 
-    @Mock
-    AttachmentService attachmentService;
+    @Mock AttachmentService attachmentService;
 
     WebTestClient webClient;
 
     @BeforeEach
     void setUp() {
         var endpoint = new AttachmentEndpoint(attachmentService, attachmentLister);
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .apply(springSecurity())
-            .build();
+        webClient =
+                WebTestClient.bindToRouterFunction(endpoint.endpoint())
+                        .apply(springSecurity())
+                        .build();
     }
 
     @Nested
@@ -57,36 +56,41 @@ class AttachmentEndpointTest {
             attachment.setMetadata(metadata);
 
             when(attachmentService.upload(
-                eq("fake-policy"),
-                eq("fake-group"),
-                eq("fake-filename"),
-                any(),
-                eq(MediaType.TEXT_PLAIN)
-            )).thenReturn(Mono.just(attachment));
+                            eq("fake-policy"),
+                            eq("fake-group"),
+                            eq("fake-filename"),
+                            any(),
+                            eq(MediaType.TEXT_PLAIN)))
+                    .thenReturn(Mono.just(attachment));
 
             var builder = new MultipartBodyBuilder();
             builder.part("policyName", "fake-policy");
             builder.part("groupName", "fake-group");
             builder.part("file", "mock-file-content")
-                .contentType(MediaType.TEXT_PLAIN)
-                .filename("fake-filename");
-            webClient.post().uri("/attachments/upload")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .bodyValue(builder.build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Attachment.class)
-                .isEqualTo(attachment);
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .filename("fake-filename");
+            webClient
+                    .post()
+                    .uri("/attachments/upload")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .bodyValue(builder.build())
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(Attachment.class)
+                    .isEqualTo(attachment);
         }
 
         @Test
         void shouldResponseErrorIfNoBodyProvided() {
-            webClient.post().uri("/attachments/upload")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .exchange()
-                .expectStatus().is5xxServerError();
+            webClient
+                    .post()
+                    .uri("/attachments/upload")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .exchange()
+                    .expectStatus()
+                    .is5xxServerError();
         }
-
     }
 
     @Nested
@@ -97,23 +101,21 @@ class AttachmentEndpointTest {
             when(attachmentLister.listBy(any())).thenReturn(Mono.just(ListResult.emptyResult()));
 
             webClient
-                .get()
-                .uri("/attachments")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("items.length()").isEqualTo(0);
+                    .get()
+                    .uri("/attachments")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("items.length()")
+                    .isEqualTo(0);
         }
 
         @Test
         void searchAttachmentWhenGroupIsEmpty() {
             when(attachmentLister.listBy(any())).thenReturn(Mono.just(ListResult.emptyResult()));
 
-            webClient
-                .get()
-                .uri("/attachments")
-                .exchange()
-                .expectStatus().isOk();
+            webClient.get().uri("/attachments").exchange().expectStatus().isOk();
 
             verify(attachmentLister).listBy(any());
         }
@@ -124,13 +126,14 @@ class AttachmentEndpointTest {
         @Test
         void shouldResponseErrorIfNoPermalinkProvided() {
             webClient
-                .mutateWith(mockUser("fake-user").password("fake-password"))
-                .post()
-                .uri("/attachments/-/upload-from-url")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("policyName", "fake-policy"))
-                .exchange()
-                .expectStatus().isBadRequest();
+                    .mutateWith(mockUser("fake-user").password("fake-password"))
+                    .post()
+                    .uri("/attachments/-/upload-from-url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of("policyName", "fake-policy"))
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
         }
 
         @Test
@@ -144,20 +147,23 @@ class AttachmentEndpointTest {
 
             var url = URI.create("http://localhost:8090/fake-url.jpg").toURL();
             when(attachmentService.uploadFromUrl(url, "fake-policy", null, null))
-                .thenReturn(Mono.just(attachment));
-            var fakeValue =
-                Map.of("policyName", "fake-policy", "url", url.toString());
-            webClient.post()
-                .uri("/attachments/-/upload-from-url")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(fakeValue)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.metadata.name").isEqualTo("fake-attachment")
-                .jsonPath("$.spec.ownerName").isEqualTo("fake-user")
-                .jsonPath("$.spec.policyName").isEqualTo("fake-policy");
-
+                    .thenReturn(Mono.just(attachment));
+            var fakeValue = Map.of("policyName", "fake-policy", "url", url.toString());
+            webClient
+                    .post()
+                    .uri("/attachments/-/upload-from-url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(fakeValue)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.metadata.name")
+                    .isEqualTo("fake-attachment")
+                    .jsonPath("$.spec.ownerName")
+                    .isEqualTo("fake-user")
+                    .jsonPath("$.spec.policyName")
+                    .isEqualTo("fake-policy");
         }
     }
 }

@@ -1,6 +1,5 @@
 package run.halo.app.theme.dialect;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Nested;
@@ -17,19 +16,20 @@ class InjectionExcluderProcessorTest {
     @Nested
     class PageInjectionExcluderTest {
         final InjectionExcluderProcessor.PageInjectionExcluder pageInjectionExcluder =
-            new InjectionExcluderProcessor.PageInjectionExcluder();
+                new InjectionExcluderProcessor.PageInjectionExcluder();
 
         @Test
         void excludeTest() {
-            var cases = new String[] {
-                "login",
-                "signup",
-                "logout",
-                "password-reset/email/reset",
-                "error/404",
-                "error/500",
-                "challenges/totp"
-            };
+            var cases =
+                    new String[] {
+                        "login",
+                        "signup",
+                        "logout",
+                        "password-reset/email/reset",
+                        "error/404",
+                        "error/500",
+                        "challenges/totp"
+                    };
 
             for (String templateName : cases) {
                 assertThat(pageInjectionExcluder.isExcluded(templateName)).isTrue();
@@ -38,21 +38,22 @@ class InjectionExcluderProcessorTest {
 
         @Test
         void shouldNotExcludeTest() {
-            var cases = new String[] {
-                "index",
-                "post",
-                "page",
-                "category",
-                "tag",
-                "archive",
-                "search",
-                "feed",
-                "sitemap",
-                "robots",
-                "custom",
-                "error",
-                "login.html",
-            };
+            var cases =
+                    new String[] {
+                        "index",
+                        "post",
+                        "page",
+                        "category",
+                        "tag",
+                        "archive",
+                        "search",
+                        "feed",
+                        "sitemap",
+                        "robots",
+                        "custom",
+                        "error",
+                        "login.html",
+                    };
 
             for (String templateName : cases) {
                 assertThat(pageInjectionExcluder.isExcluded(templateName)).isFalse();

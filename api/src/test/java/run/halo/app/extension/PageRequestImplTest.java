@@ -9,9 +9,7 @@ import org.springframework.data.domain.Sort;
 class PageRequestImplTest {
 
     @ParameterizedTest
-    @ValueSource(
-        ints = {0, -1, -10, -100, -1000, -10000}
-    )
+    @ValueSource(ints = {0, -1, -10, -100, -1000, -10000})
     void shouldBeCompatibleZeroAndNegativePageNumber(int pageNumber) {
         var page = new PageRequestImpl(pageNumber, 10, Sort.unsorted());
         assertEquals(1, page.getPageNumber());
@@ -19,13 +17,10 @@ class PageRequestImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(
-        ints = {0, -1, -10, -100, -1000, -10000}
-    )
+    @ValueSource(ints = {0, -1, -10, -100, -1000, -10000})
     void shouldBeCompatibleNegativePageSize(int size) {
         var page = new PageRequestImpl(10, size, Sort.unsorted());
         assertEquals(10, page.getPageNumber());
         assertEquals(PageRequestImpl.MAX_SIZE, page.getPageSize());
     }
-
 }

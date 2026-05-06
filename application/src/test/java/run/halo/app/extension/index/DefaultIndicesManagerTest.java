@@ -17,17 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DefaultIndicesManagerTest {
 
-    @Mock
-    SingleValueIndexSpec<Fake, String> singleValueIndexSpec;
+    @Mock SingleValueIndexSpec<Fake, String> singleValueIndexSpec;
 
-    @Mock
-    MultiValueIndexSpec<Fake, String> multiValueIndexSpec;
+    @Mock MultiValueIndexSpec<Fake, String> multiValueIndexSpec;
 
-    @Mock
-    SingleValueIndexSpec<Fake, Long> duplicateNameIndexSpec;
+    @Mock SingleValueIndexSpec<Fake, Long> duplicateNameIndexSpec;
 
-    @InjectMocks
-    DefaultIndicesManager indicesManager;
+    @InjectMocks DefaultIndicesManager indicesManager;
 
     @BeforeEach
     void setUp() {
@@ -73,5 +69,4 @@ class DefaultIndicesManagerTest {
         indicesManager.remove(Fake.class);
         assertThrows(IllegalArgumentException.class, () -> indicesManager.get(Fake.class));
     }
-
 }

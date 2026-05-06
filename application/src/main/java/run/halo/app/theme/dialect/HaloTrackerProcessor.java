@@ -23,7 +23,7 @@ import run.halo.app.infra.utils.PathUtils;
 public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
     public static final String SKIP_TRACKER =
-        HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
+            HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
 
     private final ExternalUrlSupplier externalUrlGetter;
 
@@ -32,8 +32,10 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     }
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(
+            ITemplateContext context,
+            IModel model,
+            IElementModelStructureHandler structureHandler) {
         // Check if tracker should be skipped
         var isSkip = (Boolean) context.getVariable(SKIP_TRACKER);
         if (BooleanUtils.isTrue(isSkip)) {
@@ -42,12 +44,13 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
         final IModelFactory modelFactory = context.getModelFactory();
         return Mono.just(getTrackerScript(context))
-            .filter(StringUtils::isNotBlank)
-            .map(trackerScript -> {
-                model.add(modelFactory.createText(trackerScript));
-                return trackerScript;
-            })
-            .then();
+                .filter(StringUtils::isNotBlank)
+                .map(
+                        trackerScript -> {
+                            model.add(modelFactory.createText(trackerScript));
+                            return trackerScript;
+                        })
+                .then();
     }
 
     private String getTrackerScript(ITemplateContext context) {
@@ -67,7 +70,8 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     private String trackerScript(String externalUrl, String group, String plural, String name) {
         String jsSrc = PathUtils.combinePath(externalUrl, "/halo-tracker.js");
         return """
-            <script async defer src="%s" data-group="%s" data-plural="%s" data-name="%s"></script>
-            """.formatted(jsSrc, group, plural, name);
+        <script async defer src="%s" data-group="%s" data-plural="%s" data-name="%s"></script>
+        """
+                .formatted(jsSrc, group, plural, name);
     }
 }

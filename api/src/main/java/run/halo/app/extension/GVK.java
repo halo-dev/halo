@@ -38,5 +38,4 @@ public @interface GVK {
      * @return singular name of Extension.
      */
     String singular();
-
 }

@@ -64,7 +64,7 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     private static final int BATCH_SIZE = 100;
 
     private static final String BACKUP_STORE_PREFIX =
-        ExtensionStoreUtil.buildStoreNamePrefix(Scheme.buildFromType(Backup.class)) + "/";
+            ExtensionStoreUtil.buildStoreNamePrefix(Scheme.buildFromType(Backup.class)) + "/";
 
     private final ExtensionStoreRepository repository;
 
@@ -76,30 +76,29 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
 
     private final R2dbcEntityTemplate entityTemplate;
 
-    private final Set<String> excludes = Set.of(
-        "**/.git/**",
-        "**/node_modules/**",
-        "backups/**",
-        "db/**",
-        "logs/**",
-        "indices/**",
-        "docker-compose.yaml",
-        "docker-compose.yml",
-        "mysql/**",
-        "mysqlBackup/**",
-        "**/.idea/**",
-        "**/.vscode/**",
-        "attachments/thumbnails/**"
-    );
+    private final Set<String> excludes =
+            Set.of(
+                    "**/.git/**",
+                    "**/node_modules/**",
+                    "backups/**",
+                    "db/**",
+                    "logs/**",
+                    "indices/**",
+                    "docker-compose.yaml",
+                    "docker-compose.yml",
+                    "mysql/**",
+                    "mysqlBackup/**",
+                    "**/.idea/**",
+                    "**/.vscode/**",
+                    "attachments/thumbnails/**");
 
-    private final ObjectMapper objectMapper = JsonMapper.builder()
-        .defaultPrettyPrinter(new MinimalPrettyPrinter())
-        .build();
+    private final ObjectMapper objectMapper =
+            JsonMapper.builder().defaultPrettyPrinter(new MinimalPrettyPrinter()).build();
 
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-        .ofPattern("yyyyMMddHHmmss")
-        .withLocale(Locale.getDefault())
-        .withZone(ZoneId.systemDefault());
+    private final DateTimeFormatter dateTimeFormatter =
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
 
     private final Scheduler scheduler = Schedulers.newBoundedElastic(10, 1_00, "migration-worker");
 
@@ -118,105 +117,116 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     @Override
     public Mono<Void> backup(Backup backup) {
         return Mono.usingWhen(
-            createTempDir("halo-full-backup-", scheduler),
-            tempDir -> backupExtensions(tempDir)
-                .then(Mono.defer(() -> backupWorkDir(tempDir)))
-                .then(Mono.defer(() -> packageBackup(tempDir, backup))),
-            tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
-        );
+                createTempDir("halo-full-backup-", scheduler),
+                tempDir ->
+                        backupExtensions(tempDir)
+                                .then(Mono.defer(() -> backupWorkDir(tempDir)))
+                                .then(Mono.defer(() -> packageBackup(tempDir, backup))),
+                tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler));
     }
 
     @Override
     public Mono<Resource> download(Backup backup) {
-        return Mono.create(sink -> {
-            var status = backup.getStatus();
-            if (!Backup.Phase.SUCCEEDED.equals(status.getPhase()) || status.getFilename() == null) {
-                sink.error(new ServerWebInputException("Current backup is not downloadable."));
-                return;
-            }
-            var backupFile = getBackupsRoot().resolve(status.getFilename());
-            var resource = new FileSystemResource(backupFile);
-            if (!resource.exists()) {
-                sink.error(
-                    new NotFoundException("problemDetail.migration.backup.notFound",
-                        new Object[] {},
-                        "Backup file doesn't exist or deleted."));
-                return;
-            }
-            sink.success(resource);
-        });
+        return Mono.create(
+                sink -> {
+                    var status = backup.getStatus();
+                    if (!Backup.Phase.SUCCEEDED.equals(status.getPhase())
+                            || status.getFilename() == null) {
+                        sink.error(
+                                new ServerWebInputException("Current backup is not downloadable."));
+                        return;
+                    }
+                    var backupFile = getBackupsRoot().resolve(status.getFilename());
+                    var resource = new FileSystemResource(backupFile);
+                    if (!resource.exists()) {
+                        sink.error(
+                                new NotFoundException(
+                                        "problemDetail.migration.backup.notFound",
+                                        new Object[] {},
+                                        "Backup file doesn't exist or deleted."));
+                        return;
+                    }
+                    sink.success(resource);
+                });
     }
 
     @Override
     public Mono<Void> restore(Publisher<DataBuffer> content) {
         var tx = TransactionalOperator.create(txManager);
         return Mono.usingWhen(
-            createTempDir("halo-restore-", scheduler),
-            tempDir -> unpackBackup(content, tempDir)
-                .then(Mono.defer(() ->
-                    // This step skips index verification such as unique index.
-                    // In order to avoid index conflicts after recovery or
-                    // OptimisticLockingFailureException when updating the same record,
-                    // so we need to truncate all extension stores before saving(create or
-                    // update).
-                    repository.deleteAll()
-                        .then(restoreExtensions(tempDir))
-                        .as(tx::transactional)
-                ))
-                .then(Mono.defer(() -> restoreWorkdir(tempDir))),
-            tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
-        );
+                createTempDir("halo-restore-", scheduler),
+                tempDir ->
+                        unpackBackup(content, tempDir)
+                                .then(
+                                        Mono.defer(
+                                                () ->
+                                                        // This step skips index verification such
+                                                        // as unique index.
+                                                        // In order to avoid index conflicts after
+                                                        // recovery or
+                                                        // OptimisticLockingFailureException when
+                                                        // updating the same record,
+                                                        // so we need to truncate all extension
+                                                        // stores before saving(create or
+                                                        // update).
+                                                        repository
+                                                                .deleteAll()
+                                                                .then(restoreExtensions(tempDir))
+                                                                .as(tx::transactional)))
+                                .then(Mono.defer(() -> restoreWorkdir(tempDir))),
+                tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler));
     }
 
     @Override
     public Mono<Void> cleanup(Backup backup) {
-        return Mono.<Void>create(sink -> {
-            var status = backup.getStatus();
-            if (status == null || !StringUtils.hasText(status.getFilename())) {
-                sink.success();
-                return;
-            }
-            var filename = status.getFilename();
-            var backupsRoot = getBackupsRoot();
-            var backupFile = backupsRoot.resolve(filename);
-            try {
-                checkDirectoryTraversal(backupsRoot, backupFile);
-                deleteIfExists(backupFile);
-                sink.success();
-            } catch (IOException e) {
-                sink.error(e);
-            }
-        }).subscribeOn(scheduler);
+        return Mono.<Void>create(
+                        sink -> {
+                            var status = backup.getStatus();
+                            if (status == null || !StringUtils.hasText(status.getFilename())) {
+                                sink.success();
+                                return;
+                            }
+                            var filename = status.getFilename();
+                            var backupsRoot = getBackupsRoot();
+                            var backupFile = backupsRoot.resolve(filename);
+                            try {
+                                checkDirectoryTraversal(backupsRoot, backupFile);
+                                deleteIfExists(backupFile);
+                                sink.success();
+                            } catch (IOException e) {
+                                sink.error(e);
+                            }
+                        })
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Flux<BackupFile> getBackupFiles() {
-        return Flux.using(
-                () -> Files.list(getBackupsRoot()),
-                Flux::fromStream,
-                BaseStream::close
-            )
-            .filter(Files::isRegularFile)
-            .filter(Files::isReadable)
-            .filter(path -> isExtension(path.getFileName().toString(), "zip"))
-            .map(this::toBackupFile)
-            .sort(comparing(BackupFile::getLastModifiedTime).reversed()
-                .thenComparing(BackupFile::getFilename)
-            )
-            .subscribeOn(this.scheduler);
+        return Flux.using(() -> Files.list(getBackupsRoot()), Flux::fromStream, BaseStream::close)
+                .filter(Files::isRegularFile)
+                .filter(Files::isReadable)
+                .filter(path -> isExtension(path.getFileName().toString(), "zip"))
+                .map(this::toBackupFile)
+                .sort(
+                        comparing(BackupFile::getLastModifiedTime)
+                                .reversed()
+                                .thenComparing(BackupFile::getFilename))
+                .subscribeOn(this.scheduler);
     }
 
     @Override
     public Mono<BackupFile> getBackupFile(String filename) {
-        return Mono.fromCallable(() -> {
-            var backupsRoot = getBackupsRoot();
-            var backupFilePath = backupsRoot.resolve(filename);
-            checkDirectoryTraversal(backupsRoot, backupFilePath);
-            if (Files.notExists(backupFilePath)) {
-                return null;
-            }
-            return toBackupFile(backupFilePath);
-        }).subscribeOn(this.scheduler);
+        return Mono.fromCallable(
+                        () -> {
+                            var backupsRoot = getBackupsRoot();
+                            var backupFilePath = backupsRoot.resolve(filename);
+                            checkDirectoryTraversal(backupsRoot, backupFilePath);
+                            if (Files.notExists(backupFilePath)) {
+                                return null;
+                            }
+                            return toBackupFile(backupFilePath);
+                        })
+                .subscribeOn(this.scheduler);
     }
 
     private BackupFile toBackupFile(Path path) {
@@ -233,17 +243,19 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     }
 
     private Mono<Void> restoreWorkdir(Path backupRoot) {
-        return Mono.<Void>create(sink -> {
-            try {
-                var workdir = backupRoot.resolve("workdir");
-                if (Files.exists(workdir)) {
-                    copyRecursively(workdir, haloProperties.getWorkDir());
-                }
-                sink.success();
-            } catch (IOException e) {
-                sink.error(e);
-            }
-        }).subscribeOn(scheduler);
+        return Mono.<Void>create(
+                        sink -> {
+                            try {
+                                var workdir = backupRoot.resolve("workdir");
+                                if (Files.exists(workdir)) {
+                                    copyRecursively(workdir, haloProperties.getWorkDir());
+                                }
+                                sink.success();
+                            } catch (IOException e) {
+                                sink.error(e);
+                            }
+                        })
+                .subscribeOn(scheduler);
     }
 
     private Mono<Void> restoreExtensions(Path backupRoot) {
@@ -254,29 +266,39 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         var reader = objectMapper.readerFor(ExtensionStore.class);
         var total = new AtomicInteger(0);
         return Mono.<Void, MappingIterator<ExtensionStore>>using(
-                () -> reader.readValues(extensionsPath.toFile()),
-                itr -> Flux.fromIterable(() -> itr)
-                    // reset version
-                    .filter(Predicate.not(MigrationServiceImpl::isInBlocklist))
-                    .doOnNext(extensionStore -> extensionStore.setVersion(null))
-                    .buffer(100)
-                    .flatMap(repository::saveAll)
-                    .doOnNext(store -> {
-                        var t = total.incrementAndGet();
-                        if (t % BATCH_SIZE == 0) {
-                            log.info("Restored {} extension stores so far...", t);
-                        }
-                        if (log.isDebugEnabled()) {
-                            log.debug("Restored extension store: {}", store.getName());
-                        }
-                    })
-                    .then()
-                    .doOnSuccess(ignored -> log.info(
-                        "Extension stores restore completed, total {} record(s) restored.",
-                        total.get())
-                    ),
-                FileUtils::closeQuietly)
-            .subscribeOn(scheduler);
+                        () -> reader.readValues(extensionsPath.toFile()),
+                        itr ->
+                                Flux.fromIterable(() -> itr)
+                                        // reset version
+                                        .filter(Predicate.not(MigrationServiceImpl::isInBlocklist))
+                                        .doOnNext(extensionStore -> extensionStore.setVersion(null))
+                                        .buffer(100)
+                                        .flatMap(repository::saveAll)
+                                        .doOnNext(
+                                                store -> {
+                                                    var t = total.incrementAndGet();
+                                                    if (t % BATCH_SIZE == 0) {
+                                                        log.info(
+                                                                "Restored {} extension stores so"
+                                                                        + " far...",
+                                                                t);
+                                                    }
+                                                    if (log.isDebugEnabled()) {
+                                                        log.debug(
+                                                                "Restored extension store: {}",
+                                                                store.getName());
+                                                    }
+                                                })
+                                        .then()
+                                        .doOnSuccess(
+                                                ignored ->
+                                                        log.info(
+                                                                "Extension stores restore"
+                                                                        + " completed, total {}"
+                                                                        + " record(s) restored.",
+                                                                total.get())),
+                        FileUtils::closeQuietly)
+                .subscribeOn(scheduler);
     }
 
     private Mono<Void> unpackBackup(Publisher<DataBuffer> content, Path target) {
@@ -285,69 +307,104 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
 
     private Mono<Void> packageBackup(Path baseDir, Backup backup) {
         return Mono.fromCallable(
-            () -> {
-                var backupsFolder = getBackupsRoot();
-                Files.createDirectories(backupsFolder);
-                var backupName = backup.getMetadata().getName();
-                var startTimestamp = backup.getStatus().getStartTimestamp();
-                var timePart = this.dateTimeFormatter.format(startTimestamp);
-                var backupFile = backupsFolder.resolve(timePart + '-' + backupName + ".zip");
-                FileUtils.zip(baseDir, backupFile);
-                backup.getStatus().setFilename(backupFile.getFileName().toString());
-                backup.getStatus().setSize(Files.size(backupFile));
-                return backupsFolder;
-            }
-        ).subscribeOn(scheduler).then();
+                        () -> {
+                            var backupsFolder = getBackupsRoot();
+                            Files.createDirectories(backupsFolder);
+                            var backupName = backup.getMetadata().getName();
+                            var startTimestamp = backup.getStatus().getStartTimestamp();
+                            var timePart = this.dateTimeFormatter.format(startTimestamp);
+                            var backupFile =
+                                    backupsFolder.resolve(timePart + '-' + backupName + ".zip");
+                            FileUtils.zip(baseDir, backupFile);
+                            backup.getStatus().setFilename(backupFile.getFileName().toString());
+                            backup.getStatus().setSize(Files.size(backupFile));
+                            return backupsFolder;
+                        })
+                .subscribeOn(scheduler)
+                .then();
     }
 
     private Mono<Void> backupWorkDir(Path baseDir) {
-        return Mono.fromCallable(() -> {
-            var workdirPath = Files.createDirectory(baseDir.resolve("workdir"));
-            copyRecursively(haloProperties.getWorkDir(), workdirPath, excludes);
-            return workdirPath;
-        }).subscribeOn(scheduler).then();
+        return Mono.fromCallable(
+                        () -> {
+                            var workdirPath = Files.createDirectory(baseDir.resolve("workdir"));
+                            copyRecursively(haloProperties.getWorkDir(), workdirPath, excludes);
+                            return workdirPath;
+                        })
+                .subscribeOn(scheduler)
+                .then();
     }
 
     private Mono<Void> backupExtensions(Path baseDir) {
         var total = new AtomicInteger(0);
         var excludes = new AtomicInteger(0);
         return Mono.fromCallable(() -> Files.createFile(baseDir.resolve("extensions.data")))
-            .subscribeOn(scheduler)
-            .flatMap(extensionsPath -> Mono.usingWhen(
-                Mono.fromCallable(
-                        () -> objectMapper.writerFor(ExtensionStore.class)
-                            .writeValuesAsArray(extensionsPath.toFile())
-                    )
-                    .subscribeOn(scheduler),
-                seqWriter -> fetchAllExtensionStores(BATCH_SIZE)
-                    .filter(extensionStore -> {
-                        if (isInBlocklist(extensionStore)) {
-                            excludes.incrementAndGet();
-                            return false;
-                        }
-                        return true;
-                    })
-                    .buffer(100)
-                    .publishOn(scheduler)
-                    .concatMap(stores -> Mono.fromCallable(() -> {
-                        total.addAndGet(stores.size());
-                        seqWriter.writeAll(stores);
-                        log.debug("Backed up {} extension stores so far...", total.get());
-                        return null;
-                    }))
-                    .then()
-                    .doOnSuccess(ignored -> log.info(
-                        """
-                            Extension stores backup completed, total {} record(s) backed up, \
-                            {} record(s) excluded.""",
-                        total.get(), excludes.get()
-                    )),
-                seqWriter -> Mono.fromCallable(() -> {
-                    seqWriter.flush();
-                    FileUtils.closeQuietly(seqWriter);
-                    return null;
-                }).subscribeOn(scheduler)
-            ));
+                .subscribeOn(scheduler)
+                .flatMap(
+                        extensionsPath ->
+                                Mono.usingWhen(
+                                        Mono.fromCallable(
+                                                        () ->
+                                                                objectMapper
+                                                                        .writerFor(
+                                                                                ExtensionStore
+                                                                                        .class)
+                                                                        .writeValuesAsArray(
+                                                                                extensionsPath
+                                                                                        .toFile()))
+                                                .subscribeOn(scheduler),
+                                        seqWriter ->
+                                                fetchAllExtensionStores(BATCH_SIZE)
+                                                        .filter(
+                                                                extensionStore -> {
+                                                                    if (isInBlocklist(
+                                                                            extensionStore)) {
+                                                                        excludes.incrementAndGet();
+                                                                        return false;
+                                                                    }
+                                                                    return true;
+                                                                })
+                                                        .buffer(100)
+                                                        .publishOn(scheduler)
+                                                        .concatMap(
+                                                                stores ->
+                                                                        Mono.fromCallable(
+                                                                                () -> {
+                                                                                    total.addAndGet(
+                                                                                            stores
+                                                                                                    .size());
+                                                                                    seqWriter
+                                                                                            .writeAll(
+                                                                                                    stores);
+                                                                                    log.debug(
+                                                                                            "Backed"
+                                                                                                + " up {}"
+                                                                                                + " extension"
+                                                                                                + " stores"
+                                                                                                + " so far...",
+                                                                                            total
+                                                                                                    .get());
+                                                                                    return null;
+                                                                                }))
+                                                        .then()
+                                                        .doOnSuccess(
+                                                                ignored ->
+                                                                        log.info(
+                                                                                """
+                                                                                Extension stores backup completed, total {} record(s) backed up, \
+                                                                                {} record(s) excluded.\
+                                                                                """,
+                                                                                total.get(),
+                                                                                excludes.get())),
+                                        seqWriter ->
+                                                Mono.fromCallable(
+                                                                () -> {
+                                                                    seqWriter.flush();
+                                                                    FileUtils.closeQuietly(
+                                                                            seqWriter);
+                                                                    return null;
+                                                                })
+                                                        .subscribeOn(scheduler)));
     }
 
     private Flux<ExtensionStore> fetchAllExtensionStores(int batchSize) {
@@ -355,10 +412,11 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
         txDefinition.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         txDefinition.setReadOnly(true);
         var tx = TransactionalOperator.create(txManager, txDefinition);
-        return entityTemplate.select(ExtensionStore.class)
-            .withFetchSize(batchSize)
-            .all()
-            .as(tx::transactional);
+        return entityTemplate
+                .select(ExtensionStore.class)
+                .withFetchSize(batchSize)
+                .all()
+                .as(tx::transactional);
     }
 
     @Override

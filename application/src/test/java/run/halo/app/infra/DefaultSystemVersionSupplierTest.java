@@ -19,15 +19,12 @@ import org.springframework.boot.info.BuildProperties;
  * @author guqing
  * @since 2.0.0
  */
-
 @ExtendWith(MockitoExtension.class)
 class DefaultSystemVersionSupplierTest {
 
-    @InjectMocks
-    private DefaultSystemVersionSupplier systemVersionSupplier;
+    @InjectMocks private DefaultSystemVersionSupplier systemVersionSupplier;
 
-    @Mock
-    ObjectProvider<BuildProperties> buildPropertiesProvider;
+    @Mock ObjectProvider<BuildProperties> buildPropertiesProvider;
 
     @Test
     void getWhenBuildPropertiesNotSet() {

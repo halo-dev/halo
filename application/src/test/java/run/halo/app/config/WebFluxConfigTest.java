@@ -47,14 +47,11 @@ import run.halo.app.extension.Metadata;
 @AutoConfigureWebTestClient
 class WebFluxConfigTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
-    @MockitoSpyBean
-    RoleService roleService;
+    @MockitoSpyBean RoleService roleService;
 
-    @LocalServerPort
-    int port;
+    @LocalServerPort int port;
 
     @Nested
     class WebSocketSupportTest {
@@ -65,24 +62,32 @@ class WebFluxConfigTest {
             var metadata = new Metadata();
             metadata.setName("fake-role");
             role.setMetadata(metadata);
-            role.setRules(List.of(new Role.PolicyRule.Builder()
-                .apiGroups("fake.halo.run")
-                .verbs("watch")
-                .resources("resources")
-                .build()));
+            role.setRules(
+                    List.of(
+                            new Role.PolicyRule.Builder()
+                                    .apiGroups("fake.halo.run")
+                                    .verbs("watch")
+                                    .resources("resources")
+                                    .build()));
             when(roleService.listDependenciesFlux(Set.of("anonymous"))).thenReturn(Flux.just(role));
             var webSocketClient = new ReactorNettyWebSocketClient();
-            webSocketClient.execute(
-                    URI.create("ws://localhost:" + port + "/apis/fake.halo.run/v1alpha1/resources"),
-                    session -> {
-                        var send = session.send(Flux.just(session.textMessage("halo")));
-                        var receive = session.receive().map(WebSocketMessage::getPayloadAsText)
-                            .next()
-                            .doOnNext(message -> assertEquals("HALO", message));
-                        return send.and(receive);
-                    })
-                .as(StepVerifier::create)
-                .verifyComplete();
+            webSocketClient
+                    .execute(
+                            URI.create(
+                                    "ws://localhost:"
+                                            + port
+                                            + "/apis/fake.halo.run/v1alpha1/resources"),
+                            session -> {
+                                var send = session.send(Flux.just(session.textMessage("halo")));
+                                var receive =
+                                        session.receive()
+                                                .map(WebSocketMessage::getPayloadAsText)
+                                                .next()
+                                                .doOnNext(message -> assertEquals("HALO", message));
+                                return send.and(receive);
+                            })
+                    .as(StepVerifier::create)
+                    .verifyComplete();
         }
 
         @TestConfiguration
@@ -92,7 +97,6 @@ class WebFluxConfigTest {
             WebSocketEndpoint fakeWebSocketEndpoint() {
                 return new FakeWebSocketEndpoint();
             }
-
         }
 
         static class FakeWebSocketEndpoint implements WebSocketEndpoint {
@@ -110,15 +114,17 @@ class WebFluxConfigTest {
             @Override
             public WebSocketHandler handler() {
                 return session -> {
-                    var messages = session.receive()
-                        .map(message -> session.textMessage(
-                            message.getPayloadAsText().toUpperCase())
-                        );
+                    var messages =
+                            session.receive()
+                                    .map(
+                                            message ->
+                                                    session.textMessage(
+                                                            message.getPayloadAsText()
+                                                                    .toUpperCase()));
                     return session.send(messages).then(session.close());
                 };
             }
         }
-
     }
 
     @Nested
@@ -126,59 +132,68 @@ class WebFluxConfigTest {
 
         @WithMockUser
         @ParameterizedTest
-        @ValueSource(strings = {
-            "/console",
-            "/console/index",
-            "/console/index.html",
-            "/console/dashboard",
-            "/console/fake"
-        })
+        @ValueSource(
+                strings = {
+                    "/console",
+                    "/console/index",
+                    "/console/index.html",
+                    "/console/dashboard",
+                    "/console/fake"
+                })
         void shouldRequestConsoleIndex(String uri) {
-            webClient.get().uri(uri)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).value(StringStartsWith.startsWith("console index"));
+            webClient
+                    .get()
+                    .uri(uri)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .value(StringStartsWith.startsWith("console index"));
         }
 
         @WithMockUser
         @ParameterizedTest
-        @ValueSource(strings = {
-            "/uc",
-            "/uc/index",
-            "/uc/index.html",
-            "/uc/profile",
-            "/uc/fake"
-        })
+        @ValueSource(strings = {"/uc", "/uc/index", "/uc/index.html", "/uc/profile", "/uc/fake"})
         void shouldRequestUcIndex(String uri) {
-            webClient.get().uri(uri)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).value(StringStartsWith.startsWith("uc index"));
+            webClient
+                    .get()
+                    .uri(uri)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .value(StringStartsWith.startsWith("uc index"));
         }
 
         @Test
         void shouldRedirectToLoginPageIfUnauthenticated() {
-            webClient.get().uri("/console")
-                .exchange()
-                .expectStatus().isFound()
-                .expectHeader().location("/login?authentication_required");
+            webClient
+                    .get()
+                    .uri("/console")
+                    .exchange()
+                    .expectStatus()
+                    .isFound()
+                    .expectHeader()
+                    .location("/login?authentication_required");
         }
 
         @Test
         @WithMockUser
         void shouldRequestUiAssetsCorrectly() {
-            webClient.get().uri("/ui-assets/fake.txt")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).value(StringStartsWith.startsWith("fake."));
+            webClient
+                    .get()
+                    .uri("/ui-assets/fake.txt")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .value(StringStartsWith.startsWith("fake."));
         }
 
         @Test
         @WithMockUser
         void shouldResponseNotFoundWhenAssetsNotExist() {
-            webClient.get().uri("/ui-assets/not-found.txt")
-                .exchange()
-                .expectStatus().isNotFound();
+            webClient.get().uri("/ui-assets/not-found.txt").exchange().expectStatus().isNotFound();
         }
     }
 
@@ -187,12 +202,14 @@ class WebFluxConfigTest {
 
         @Test
         void shouldRespond404WhenThemeResourceNotFound() {
-            webClient.get().uri("/themes/fake-theme/assets/favicon.ico")
-                .exchange()
-                .expectStatus().isNotFound();
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/assets/favicon.ico")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
         }
     }
-
 
     @Nested
     class ServerWebExchangeContextFilterTest {
@@ -203,24 +220,25 @@ class WebFluxConfigTest {
             @Bean
             RouterFunction<ServerResponse> assertServerWebExchangeRoute() {
                 return RouterFunctions.route()
-                    .GET("/assert-server-web-exchange",
-                        request -> Mono.deferContextual(contextView -> {
-                            var exchange = ServerWebExchangeContextFilter.getExchange(contextView);
-                            assertTrue(exchange.isPresent());
-                            return ServerResponse.ok().build();
-                        }))
-                    .build();
+                        .GET(
+                                "/assert-server-web-exchange",
+                                request ->
+                                        Mono.deferContextual(
+                                                contextView -> {
+                                                    var exchange =
+                                                            ServerWebExchangeContextFilter
+                                                                    .getExchange(contextView);
+                                                    assertTrue(exchange.isPresent());
+                                                    return ServerResponse.ok().build();
+                                                }))
+                        .build();
             }
-
         }
 
         @Test
         void shouldGetExchangeFromContextView() {
-            webClient.get().uri("/assert-server-web-exchange")
-                .exchange()
-                .expectStatus().isOk();
+            webClient.get().uri("/assert-server-web-exchange").exchange().expectStatus().isOk();
         }
-
     }
 
     @Nested
@@ -232,19 +250,21 @@ class WebFluxConfigTest {
             @Bean
             RouterFunction<ServerResponse> urlHandlerFilterTestRoute() {
                 return RouterFunctions.route()
-                    .GET("/fake", request -> ServerResponse.ok().bodyValue("ok"))
-                    .build();
+                        .GET("/fake", request -> ServerResponse.ok().bodyValue("ok"))
+                        .build();
             }
-
         }
 
         @Test
         void shouldHandleUrlWithTrailingSlash() {
-            webClient.get().uri("/fake/")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("ok");
+            webClient
+                    .get()
+                    .uri("/fake/")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .isEqualTo("ok");
         }
-
     }
 }

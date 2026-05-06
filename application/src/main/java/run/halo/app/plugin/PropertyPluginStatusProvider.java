@@ -21,15 +21,19 @@ public class PropertyPluginStatusProvider implements PluginStatusProvider {
     private final List<String> disabledPlugins;
 
     public PropertyPluginStatusProvider(PluginProperties pluginProperties) {
-        this.enabledPlugins = pluginProperties.getEnabledPlugins() != null
-            ? Arrays.asList(pluginProperties.getEnabledPlugins()) : new ArrayList<>();
-        this.disabledPlugins = pluginProperties.getDisabledPlugins() != null
-            ? Arrays.asList(pluginProperties.getDisabledPlugins()) : new ArrayList<>();
+        this.enabledPlugins =
+                pluginProperties.getEnabledPlugins() != null
+                        ? Arrays.asList(pluginProperties.getEnabledPlugins())
+                        : new ArrayList<>();
+        this.disabledPlugins =
+                pluginProperties.getDisabledPlugins() != null
+                        ? Arrays.asList(pluginProperties.getDisabledPlugins())
+                        : new ArrayList<>();
     }
 
     public static boolean isPropertySet(PluginProperties pluginProperties) {
         return !ArrayUtils.isEmpty(pluginProperties.getEnabledPlugins())
-            && !ArrayUtils.isEmpty(pluginProperties.getDisabledPlugins());
+                && !ArrayUtils.isEmpty(pluginProperties.getDisabledPlugins());
     }
 
     @Override

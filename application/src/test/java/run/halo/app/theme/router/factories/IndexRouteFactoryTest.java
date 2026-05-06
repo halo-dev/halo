@@ -18,35 +18,21 @@ import run.halo.app.theme.finders.PostFinder;
  */
 @ExtendWith(MockitoExtension.class)
 class IndexRouteFactoryTest extends RouteFactoryTestSuite {
-    @Mock
-    private PostFinder postFinder;
+    @Mock private PostFinder postFinder;
 
-    @InjectMocks
-    private IndexRouteFactory indexRouteFactory;
+    @InjectMocks private IndexRouteFactory indexRouteFactory;
 
     @Test
     void create() {
         RouterFunction<ServerResponse> routerFunction = indexRouteFactory.create("/");
         WebTestClient webTestClient = getWebTestClient(routerFunction);
 
-        webTestClient.get()
-            .uri("/")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/").exchange().expectStatus().isOk();
 
-        webTestClient.get()
-            .uri("/page/1")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/page/1").exchange().expectStatus().isOk();
 
-        webTestClient.get()
-            .uri("/page/abc")
-            .exchange()
-            .expectStatus().isNotFound();
+        webTestClient.get().uri("/page/abc").exchange().expectStatus().isNotFound();
 
-        webTestClient.get()
-            .uri("/page/2f")
-            .exchange()
-            .expectStatus().isNotFound();
+        webTestClient.get().uri("/page/2f").exchange().expectStatus().isNotFound();
     }
 }

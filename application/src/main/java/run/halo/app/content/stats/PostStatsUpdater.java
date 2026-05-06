@@ -20,8 +20,7 @@ import run.halo.app.infra.InitializationPhase;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
-public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsRequest>,
-    SmartLifecycle {
+public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsRequest>, SmartLifecycle {
 
     private volatile boolean running = false;
 
@@ -37,23 +36,26 @@ public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsReques
 
     @Override
     public Result reconcile(StatsRequest request) {
-        client.fetch(Post.class, request.postName()).ifPresent(post -> {
-            var annotations = MetadataUtil.nullSafeAnnotations(post);
-            annotations.put(Post.STATS_ANNO, JsonUtils.objectToJson(request.stats()));
-            client.update(post);
-        });
+        client.fetch(Post.class, request.postName())
+                .ifPresent(
+                        post -> {
+                            var annotations = MetadataUtil.nullSafeAnnotations(post);
+                            annotations.put(
+                                    Post.STATS_ANNO, JsonUtils.objectToJson(request.stats()));
+                            client.update(post);
+                        });
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            queue,
-            null,
-            Duration.ofMillis(100),
-            Duration.ofMinutes(10));
+                this.getClass().getName(),
+                this,
+                queue,
+                null,
+                Duration.ofMillis(100),
+                Duration.ofMinutes(10));
     }
 
     @Override
@@ -81,16 +83,16 @@ public class PostStatsUpdater implements Reconciler<PostStatsUpdater.StatsReques
     @EventListener(PostStatsChangedEvent.class)
     public void onReplyEvent(PostStatsChangedEvent event) {
         var counter = event.getCounter();
-        var stats = Stats.builder()
-            .visit(counter.getVisit())
-            .upvote(counter.getUpvote())
-            .totalComment(counter.getTotalComment())
-            .approvedComment(counter.getApprovedComment())
-            .build();
+        var stats =
+                Stats.builder()
+                        .visit(counter.getVisit())
+                        .upvote(counter.getUpvote())
+                        .totalComment(counter.getTotalComment())
+                        .approvedComment(counter.getApprovedComment())
+                        .build();
         var request = new StatsRequest(event.getPostName(), stats);
         queue.addImmediately(request);
     }
 
-    public record StatsRequest(String postName, Stats stats) {
-    }
+    public record StatsRequest(String postName, Stats stats) {}
 }

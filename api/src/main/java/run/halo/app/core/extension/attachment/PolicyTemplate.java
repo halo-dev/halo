@@ -13,8 +13,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
-    plural = "policytemplates", singular = "policytemplate")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = KIND,
+        plural = "policytemplates",
+        singular = "policytemplate")
 public class PolicyTemplate extends AbstractExtension {
 
     public static final String KIND = "PolicyTemplate";
@@ -28,7 +32,5 @@ public class PolicyTemplate extends AbstractExtension {
 
         @Schema(requiredMode = REQUIRED)
         private String settingName;
-
     }
-
 }

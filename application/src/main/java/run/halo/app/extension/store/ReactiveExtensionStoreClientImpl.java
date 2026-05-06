@@ -46,33 +46,31 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
         Assert.hasText(prefix, "Prefix must not be blank");
 
         prefix = Strings.CS.appendIfMissing(prefix, "/");
-        return entityOperations.select(ExtensionStore.class)
-            .withFetchSize(fetchSize)
-            .matching(Query.query(
-                        Criteria.where("name").like(prefix + "%")
-                    )
-                    .sort(Sort.by(Sort.Direction.ASC, "name"))
-            )
-            .all();
+        return entityOperations
+                .select(ExtensionStore.class)
+                .withFetchSize(fetchSize)
+                .matching(
+                        Query.query(Criteria.where("name").like(prefix + "%"))
+                                .sort(Sort.by(Sort.Direction.ASC, "name")))
+                .all();
     }
 
     @Override
     public Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable) {
         Assert.hasText(prefix, "Prefix must not be blank");
 
-        var q = Query.query(
-            Criteria.where("name").like(prefix + "%")
-        ).sort(Sort.by(Sort.Direction.ASC, "name"));
-        var getItems = entityOperations.select(ExtensionStore.class)
-            .matching(q.with(pageable))
-            .all()
-            .collectList();
-        var getCount = entityOperations.select(ExtensionStore.class)
-            .matching(q)
-            .count();
+        var q =
+                Query.query(Criteria.where("name").like(prefix + "%"))
+                        .sort(Sort.by(Sort.Direction.ASC, "name"));
+        var getItems =
+                entityOperations
+                        .select(ExtensionStore.class)
+                        .matching(q.with(pageable))
+                        .all()
+                        .collectList();
+        var getCount = entityOperations.select(ExtensionStore.class).matching(q).count();
         return getItems.flatMap(
-            items -> ReactivePageableExecutionUtils.getPage(items, pageable, getCount)
-        );
+                items -> ReactivePageableExecutionUtils.getPage(items, pageable, getCount));
     }
 
     @Override
@@ -87,22 +85,17 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
             criteria = criteria.and(Criteria.where("name").greaterThan(nameCursor));
         }
         var q = Query.query(criteria).sort(Sort.by(Sort.Direction.ASC, "name"));
-        return entityOperations.select(ExtensionStore.class)
-            .matching(q.limit(limit))
-            .all();
+        return entityOperations.select(ExtensionStore.class).matching(q.limit(limit)).all();
     }
 
     @Override
     public Mono<Long> countByNamePrefix(String prefix) {
         Assert.hasText(prefix, "Prefix must not be blank");
 
-        var q = Query.query(
-                Criteria.where("name").like(prefix + "%")
-            )
-            .sort(Sort.by(Sort.Direction.ASC, "name"));
-        return entityOperations.select(ExtensionStore.class)
-            .matching(q)
-            .count();
+        var q =
+                Query.query(Criteria.where("name").like(prefix + "%"))
+                        .sort(Sort.by(Sort.Direction.ASC, "name"));
+        return entityOperations.select(ExtensionStore.class).matching(q).count();
     }
 
     @Override
@@ -111,11 +104,13 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
             return Flux.empty();
         }
         // Keep the order of names efficiently
-        var orderMap = IntStream.range(0, names.size())
-            .boxed()
-            .collect(Collectors.toMap(names::get, Function.identity(), (a, b) -> a));
-        return repository.findByNameIn(names)
-            .sort(Comparator.comparingInt(es -> orderMap.get(es.getName())));
+        var orderMap =
+                IntStream.range(0, names.size())
+                        .boxed()
+                        .collect(Collectors.toMap(names::get, Function.identity(), (a, b) -> a));
+        return repository
+                .findByNameIn(names)
+                .sort(Comparator.comparingInt(es -> orderMap.get(es.getName())));
     }
 
     @Override
@@ -125,9 +120,11 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
 
     @Override
     public Mono<ExtensionStore> create(String name, byte[] data) {
-        return repository.save(new ExtensionStore(name, data))
-            .onErrorMap(DuplicateKeyException.class,
-                t -> new DuplicateNameException("Duplicate name detected.", t));
+        return repository
+                .save(new ExtensionStore(name, data))
+                .onErrorMap(
+                        DuplicateKeyException.class,
+                        t -> new DuplicateNameException("Duplicate name detected.", t));
     }
 
     @Override
@@ -137,11 +134,13 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
 
     @Override
     public Mono<ExtensionStore> delete(String name, Long version) {
-        return repository.findById(name)
-            .flatMap(extensionStore -> {
-                // reset the version
-                extensionStore.setVersion(version);
-                return repository.delete(extensionStore).thenReturn(extensionStore);
-            });
+        return repository
+                .findById(name)
+                .flatMap(
+                        extensionStore -> {
+                            // reset the version
+                            extensionStore.setVersion(version);
+                            return repository.delete(extensionStore).thenReturn(extensionStore);
+                        });
     }
 }

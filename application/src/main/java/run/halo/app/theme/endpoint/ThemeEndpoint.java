@@ -82,288 +82,394 @@ public class ThemeEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "ThemeV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST("themes/install", contentType(MediaType.MULTIPART_FORM_DATA),
-                this::install, builder -> builder.operationId("InstallTheme")
-                    .description("Install a theme by uploading a zip file.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(InstallRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .POST("themes/-/install-from-uri", this::installFromUri,
-                builder -> builder.operationId("InstallThemeFromUri")
-                    .description("Install a theme from uri.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(InstallFromUriRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .POST("themes/{name}/upgrade-from-uri", this::upgradeFromUri,
-                builder -> builder.operationId("UpgradeThemeFromUri")
-                    .description("Upgrade a theme from uri.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .required(true)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder()
-                                .implementation(UpgradeFromUriRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .POST("themes/{name}/upgrade", this::upgrade,
-                builder -> builder.operationId("UpgradeTheme")
-                    .description("Upgrade theme")
-                    .tag(tag)
-                    .parameter(parameterBuilder().in(ParameterIn.PATH).name("name").required(true))
-                    .requestBody(requestBodyBuilder().required(true)
-                        .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(schemaBuilder().implementation(UpgradeRequest.class))))
-                    .build())
-            .PUT("themes/{name}/reload", this::reloadTheme,
-                builder -> builder.operationId("Reload")
-                    .description("Reload theme setting.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .PUT("themes/{name}/reset-config", this::resetSettingConfig,
-                builder -> builder.operationId("ResetThemeConfig")
-                    .description("Reset the configMap of theme setting.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(ConfigMap.class))
-            )
-            .PUT("themes/{name}/json-config", this::updateThemeJsonConfig,
-                builder -> builder.operationId("updateThemeJsonConfig")
-                    .description("Update the configMap of theme setting.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(schemaBuilder().implementation(Object.class))))
-                    .response(responseBuilder()
-                        .responseCode(String.valueOf(NO_CONTENT.value()))
-                        .implementation(Void.class))
-            )
-            .PUT("themes/{name}/activation", this::activateTheme,
-                builder -> builder.operationId("activateTheme")
-                    .description("Activate a theme by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .PUT("/themes/{name}/invalidate-cache", this::invalidateCache,
-                builder -> builder.operationId("InvalidateCache")
-                    .description("Invalidate theme template cache.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .responseCode(String.valueOf(NO_CONTENT.value()))
-                    )
-            )
-            .GET("themes", this::listThemes,
-                builder -> {
-                    builder.operationId("ListThemes")
-                        .description("List themes.")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(Theme.class)));
-                    ThemeQuery.buildParameters(builder);
-                }
-            )
-            .GET("themes/-/activation", this::fetchActivatedTheme,
-                builder -> builder.operationId("fetchActivatedTheme")
-                    .description("Fetch the activated theme.")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementation(Theme.class))
-            )
-            .GET("themes/{name}/setting", this::fetchThemeSetting,
-                builder -> builder.operationId("fetchThemeSetting")
-                    .description("Fetch setting of theme.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder()
-                        .implementation(Setting.class))
-            )
-            .GET("themes/{name}/json-config", this::fetchThemeJsonConfig,
-                builder -> builder.operationId("fetchThemeJsonConfig")
-                    .description(
-                        "Fetch converted json config of theme by configured configMapName.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("name")
-                        .in(ParameterIn.PATH)
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder().implementation(Object.class))
-            )
-            .build();
+                .POST(
+                        "themes/install",
+                        contentType(MediaType.MULTIPART_FORM_DATA),
+                        this::install,
+                        builder ->
+                                builder.operationId("InstallTheme")
+                                        .description("Install a theme by uploading a zip file.")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .MULTIPART_FORM_DATA_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                InstallRequest
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .POST(
+                        "themes/-/install-from-uri",
+                        this::installFromUri,
+                        builder ->
+                                builder.operationId("InstallThemeFromUri")
+                                        .description("Install a theme from uri.")
+                                        .tag(tag)
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                InstallFromUriRequest
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .POST(
+                        "themes/{name}/upgrade-from-uri",
+                        this::upgradeFromUri,
+                        builder ->
+                                builder.operationId("UpgradeThemeFromUri")
+                                        .description("Upgrade a theme from uri.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .required(true))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                UpgradeFromUriRequest
+                                                                                                        .class))))
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .POST(
+                        "themes/{name}/upgrade",
+                        this::upgrade,
+                        builder ->
+                                builder.operationId("UpgradeTheme")
+                                        .description("Upgrade theme")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .required(true))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .MULTIPART_FORM_DATA_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                UpgradeRequest
+                                                                                                        .class))))
+                                        .build())
+                .PUT(
+                        "themes/{name}/reload",
+                        this::reloadTheme,
+                        builder ->
+                                builder.operationId("Reload")
+                                        .description("Reload theme setting.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .PUT(
+                        "themes/{name}/reset-config",
+                        this::resetSettingConfig,
+                        builder ->
+                                builder.operationId("ResetThemeConfig")
+                                        .description("Reset the configMap of theme setting.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(
+                                                responseBuilder().implementation(ConfigMap.class)))
+                .PUT(
+                        "themes/{name}/json-config",
+                        this::updateThemeJsonConfig,
+                        builder ->
+                                builder.operationId("updateThemeJsonConfig")
+                                        .description("Update the configMap of theme setting.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .requestBody(
+                                                requestBodyBuilder()
+                                                        .required(true)
+                                                        .content(
+                                                                contentBuilder()
+                                                                        .mediaType(
+                                                                                MediaType
+                                                                                        .APPLICATION_JSON_VALUE)
+                                                                        .schema(
+                                                                                schemaBuilder()
+                                                                                        .implementation(
+                                                                                                Object
+                                                                                                        .class))))
+                                        .response(
+                                                responseBuilder()
+                                                        .responseCode(
+                                                                String.valueOf(NO_CONTENT.value()))
+                                                        .implementation(Void.class)))
+                .PUT(
+                        "themes/{name}/activation",
+                        this::activateTheme,
+                        builder ->
+                                builder.operationId("activateTheme")
+                                        .description("Activate a theme by name.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .PUT(
+                        "/themes/{name}/invalidate-cache",
+                        this::invalidateCache,
+                        builder ->
+                                builder.operationId("InvalidateCache")
+                                        .description("Invalidate theme template cache.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(
+                                                responseBuilder()
+                                                        .responseCode(
+                                                                String.valueOf(
+                                                                        NO_CONTENT.value()))))
+                .GET(
+                        "themes",
+                        this::listThemes,
+                        builder -> {
+                            builder.operationId("ListThemes")
+                                    .description("List themes.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    Theme.class)));
+                            ThemeQuery.buildParameters(builder);
+                        })
+                .GET(
+                        "themes/-/activation",
+                        this::fetchActivatedTheme,
+                        builder ->
+                                builder.operationId("fetchActivatedTheme")
+                                        .description("Fetch the activated theme.")
+                                        .tag(tag)
+                                        .response(responseBuilder().implementation(Theme.class)))
+                .GET(
+                        "themes/{name}/setting",
+                        this::fetchThemeSetting,
+                        builder ->
+                                builder.operationId("fetchThemeSetting")
+                                        .description("Fetch setting of theme.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(responseBuilder().implementation(Setting.class)))
+                .GET(
+                        "themes/{name}/json-config",
+                        this::fetchThemeJsonConfig,
+                        builder ->
+                                builder.operationId("fetchThemeJsonConfig")
+                                        .description(
+                                                "Fetch converted json config of theme by configured"
+                                                        + " configMapName.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .name("name")
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .implementation(String.class))
+                                        .response(responseBuilder().implementation(Object.class)))
+                .build();
     }
 
     private Mono<ServerResponse> fetchThemeJsonConfig(ServerRequest request) {
         return themeNameInPathVariableOrActivated(request)
-            .flatMap(themeName -> client.fetch(Theme.class, themeName))
-            .mapNotNull(theme -> theme.getSpec().getConfigMapName())
-            .flatMap(settingConfigService::fetchConfig)
-            .flatMap(json -> ServerResponse.ok().bodyValue(json));
+                .flatMap(themeName -> client.fetch(Theme.class, themeName))
+                .mapNotNull(theme -> theme.getSpec().getConfigMapName())
+                .flatMap(settingConfigService::fetchConfig)
+                .flatMap(json -> ServerResponse.ok().bodyValue(json));
     }
 
     private Mono<ServerResponse> updateThemeJsonConfig(ServerRequest request) {
         final var themeName = request.pathVariable("name");
         return client.fetch(Theme.class, themeName)
-            .doOnNext(theme -> {
-                String configMapName = theme.getSpec().getConfigMapName();
-                if (StringUtils.isBlank(configMapName)) {
-                    throw new ServerWebInputException(
-                        "Unable to complete the request because the theme configMapName is blank.");
-                }
-            })
-            .flatMap(theme -> {
-                final var configMapName = theme.getSpec().getConfigMapName();
-                return request.bodyToMono(ObjectNode.class)
-                    .switchIfEmpty(
-                        Mono.error(new ServerWebInputException("Required request body is missing")))
-                    .flatMap(configJsonData ->
-                        settingConfigService.upsertConfig(configMapName, configJsonData));
-            })
-            .then(ServerResponse.noContent().build());
+                .doOnNext(
+                        theme -> {
+                            String configMapName = theme.getSpec().getConfigMapName();
+                            if (StringUtils.isBlank(configMapName)) {
+                                throw new ServerWebInputException(
+                                        "Unable to complete the request because the theme"
+                                                + " configMapName is blank.");
+                            }
+                        })
+                .flatMap(
+                        theme -> {
+                            final var configMapName = theme.getSpec().getConfigMapName();
+                            return request.bodyToMono(ObjectNode.class)
+                                    .switchIfEmpty(
+                                            Mono.error(
+                                                    new ServerWebInputException(
+                                                            "Required request body is missing")))
+                                    .flatMap(
+                                            configJsonData ->
+                                                    settingConfigService.upsertConfig(
+                                                            configMapName, configJsonData));
+                        })
+                .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> invalidateCache(ServerRequest request) {
         final var name = request.pathVariable("name");
         return client.get(Theme.class, name)
-            .flatMap(theme -> templateEngineManager.clearCache(name))
-            .then(ServerResponse.noContent().build());
+                .flatMap(theme -> templateEngineManager.clearCache(name))
+                .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
         final var name = request.pathVariable("name");
-        var content = request.bodyToMono(UpgradeFromUriRequest.class)
-            .map(UpgradeFromUriRequest::uri)
-            .flatMapMany(urlDataBufferFetcher::fetch);
+        var content =
+                request.bodyToMono(UpgradeFromUriRequest.class)
+                        .map(UpgradeFromUriRequest::uri)
+                        .flatMapMany(urlDataBufferFetcher::fetch);
 
-        return themeService.upgrade(name, content)
-            .flatMap((updatedTheme) ->
-                templateEngineManager.clearCache(updatedTheme.getMetadata().getName())
-                    .thenReturn(updatedTheme)
-            )
-            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+        return themeService
+                .upgrade(name, content)
+                .flatMap(
+                        (updatedTheme) ->
+                                templateEngineManager
+                                        .clearCache(updatedTheme.getMetadata().getName())
+                                        .thenReturn(updatedTheme))
+                .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
     }
 
     private Mono<ServerResponse> installFromUri(ServerRequest request) {
-        var content = request.bodyToMono(InstallFromUriRequest.class)
-            .map(InstallFromUriRequest::uri)
-            .flatMapMany(urlDataBufferFetcher::fetch);
+        var content =
+                request.bodyToMono(InstallFromUriRequest.class)
+                        .map(InstallFromUriRequest::uri)
+                        .flatMapMany(urlDataBufferFetcher::fetch);
 
-        return themeService.install(content)
-            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+        return themeService.install(content).flatMap(theme -> ServerResponse.ok().bodyValue(theme));
     }
 
     private Mono<ServerResponse> activateTheme(ServerRequest request) {
         final var activatedThemeName = request.pathVariable("name");
         return client.fetch(Theme.class, activatedThemeName)
-            .switchIfEmpty(Mono.error(new NotFoundException("Theme not found.")))
-            .flatMap(theme -> themeService.fetchSystemSetting()
-                .flatMap(themeSetting -> {
-                    // update active theme config
-                    themeSetting.setActive(activatedThemeName);
-                    return systemEnvironmentFetcher.getConfigMap()
-                        .filter(configMap -> configMap.getData() != null)
-                        .map(configMap -> {
-                            var themeConfigJson = JsonUtils.objectToJson(themeSetting);
-                            configMap.getData()
-                                .put(SystemSetting.Theme.GROUP, themeConfigJson);
-                            return configMap;
-                        });
-                })
-                .flatMap(client::update)
-                .retryWhen(Retry.backoff(5, Duration.ofMillis(300))
-                    .filter(OptimisticLockingFailureException.class::isInstance)
-                )
-                .thenReturn(theme)
-            )
-            .flatMap(activatedTheme -> ServerResponse.ok().bodyValue(activatedTheme));
+                .switchIfEmpty(Mono.error(new NotFoundException("Theme not found.")))
+                .flatMap(
+                        theme ->
+                                themeService
+                                        .fetchSystemSetting()
+                                        .flatMap(
+                                                themeSetting -> {
+                                                    // update active theme config
+                                                    themeSetting.setActive(activatedThemeName);
+                                                    return systemEnvironmentFetcher
+                                                            .getConfigMap()
+                                                            .filter(
+                                                                    configMap ->
+                                                                            configMap.getData()
+                                                                                    != null)
+                                                            .map(
+                                                                    configMap -> {
+                                                                        var themeConfigJson =
+                                                                                JsonUtils
+                                                                                        .objectToJson(
+                                                                                                themeSetting);
+                                                                        configMap
+                                                                                .getData()
+                                                                                .put(
+                                                                                        SystemSetting
+                                                                                                .Theme
+                                                                                                .GROUP,
+                                                                                        themeConfigJson);
+                                                                        return configMap;
+                                                                    });
+                                                })
+                                        .flatMap(client::update)
+                                        .retryWhen(
+                                                Retry.backoff(5, Duration.ofMillis(300))
+                                                        .filter(
+                                                                OptimisticLockingFailureException
+                                                                                .class
+                                                                        ::isInstance))
+                                        .thenReturn(theme))
+                .flatMap(activatedTheme -> ServerResponse.ok().bodyValue(activatedTheme));
     }
 
     private Mono<ServerResponse> fetchActivatedTheme(ServerRequest request) {
-        var activatedTheme = themeService.fetchActivatedTheme()
-            .switchIfEmpty(
-                Mono.error(() -> new NotFoundException("Activated theme not found or not set"))
-            );
+        var activatedTheme =
+                themeService
+                        .fetchActivatedTheme()
+                        .switchIfEmpty(
+                                Mono.error(
+                                        () ->
+                                                new NotFoundException(
+                                                        "Activated theme not found or not set")));
         return ServerResponse.ok().body(activatedTheme, Theme.class);
     }
 
     private Mono<ServerResponse> fetchThemeSetting(ServerRequest request) {
         return themeNameInPathVariableOrActivated(request)
-            .flatMap(name -> client.fetch(Theme.class, name))
-            .mapNotNull(theme -> theme.getSpec().getSettingName())
-            .flatMap(settingName -> client.fetch(Setting.class, settingName))
-            .flatMap(setting -> ServerResponse.ok().bodyValue(setting));
+                .flatMap(name -> client.fetch(Theme.class, name))
+                .mapNotNull(theme -> theme.getSpec().getSettingName())
+                .flatMap(settingName -> client.fetch(Setting.class, settingName))
+                .flatMap(setting -> ServerResponse.ok().bodyValue(setting));
     }
 
     private Mono<String> themeNameInPathVariableOrActivated(ServerRequest request) {
         Assert.notNull(request, "request must not be null.");
         var themeName = request.pathVariable("name");
         if ("-".equals(themeName)) {
-            return themeService.fetchActivatedThemeName()
-                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                    "No activated theme found, unable to proceed the request."
-                )));
+            return themeService
+                    .fetchActivatedThemeName()
+                    .switchIfEmpty(
+                            Mono.error(
+                                    () ->
+                                            new ServerWebInputException(
+                                                    "No activated theme found, unable to proceed"
+                                                            + " the request.")));
         }
         return Mono.just(themeName);
     }
@@ -380,12 +486,13 @@ public class ThemeEndpoint implements CustomEndpoint {
 
         public static void buildParameters(Builder builder) {
             IListRequest.buildParameters(builder);
-            builder.parameter(parameterBuilder()
-                .name("uninstalled")
-                .description("Whether to list uninstalled themes.")
-                .in(ParameterIn.QUERY)
-                .implementation(Boolean.class)
-                .required(false));
+            builder.parameter(
+                    parameterBuilder()
+                            .name("uninstalled")
+                            .description("Whether to list uninstalled themes.")
+                            .in(ParameterIn.QUERY)
+                            .implementation(Boolean.class)
+                            .required(false));
         }
     }
 
@@ -393,23 +500,24 @@ public class ThemeEndpoint implements CustomEndpoint {
     Mono<ServerResponse> listThemes(ServerRequest request) {
         MultiValueMap<String, String> queryParams = request.queryParams();
         ThemeQuery query = new ThemeQuery(queryParams);
-        return Mono.defer(() -> {
-            if (query.getUninstalled()) {
-                return listUninstalled(query);
-            }
-            return client.list(Theme.class, null, null, query.getPage(), query.getSize());
-        }).flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
+        return Mono.defer(
+                        () -> {
+                            if (query.getUninstalled()) {
+                                return listUninstalled(query);
+                            }
+                            return client.list(
+                                    Theme.class, null, null, query.getPage(), query.getSize());
+                        })
+                .flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
     }
 
     public interface IUpgradeRequest {
 
         @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
         FilePart getFile();
-
     }
 
-    public record UpgradeFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
-    }
+    public record UpgradeFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {}
 
     public static class UpgradeRequest implements IUpgradeRequest {
 
@@ -430,59 +538,71 @@ public class ThemeEndpoint implements CustomEndpoint {
             }
             return filePart;
         }
-
     }
 
     private Mono<ServerResponse> upgrade(ServerRequest request) {
         // validate the theme first
         var name = request.pathVariable("name");
         return request.multipartData()
-            .map(UpgradeRequest::new)
-            .map(UpgradeRequest::getFile)
-            .flatMap(filePart -> themeService.upgrade(name, filePart.content()))
-            .flatMap((updatedTheme) ->
-                templateEngineManager.clearCache(updatedTheme.getMetadata().getName())
-                    .thenReturn(updatedTheme))
-            .flatMap(updatedTheme -> ServerResponse.ok().bodyValue(updatedTheme));
+                .map(UpgradeRequest::new)
+                .map(UpgradeRequest::getFile)
+                .flatMap(filePart -> themeService.upgrade(name, filePart.content()))
+                .flatMap(
+                        (updatedTheme) ->
+                                templateEngineManager
+                                        .clearCache(updatedTheme.getMetadata().getName())
+                                        .thenReturn(updatedTheme))
+                .flatMap(updatedTheme -> ServerResponse.ok().bodyValue(updatedTheme));
     }
 
     Mono<ListResult<Theme>> listUninstalled(ThemeQuery query) {
         Path path = themeRoot.get();
         return ThemeUtils.listAllThemesFromThemeDir(path)
-            .collectList()
-            .flatMap(this::filterUnInstalledThemes)
-            .map(themes -> {
-                Integer page = query.getPage();
-                Integer size = query.getSize();
-                List<Theme> subList = ListResult.subList(themes, page, size);
-                return new ListResult<>(page, size, themes.size(), subList);
-            });
+                .collectList()
+                .flatMap(this::filterUnInstalledThemes)
+                .map(
+                        themes -> {
+                            Integer page = query.getPage();
+                            Integer size = query.getSize();
+                            List<Theme> subList = ListResult.subList(themes, page, size);
+                            return new ListResult<>(page, size, themes.size(), subList);
+                        });
     }
 
     private Mono<List<Theme>> filterUnInstalledThemes(List<Theme> allThemes) {
         return client.list(Theme.class, null, null)
-            .map(theme -> theme.getMetadata().getName())
-            .collectList()
-            .map(installed -> allThemes.stream()
-                .filter(theme -> !installed.contains(theme.getMetadata().getName()))
-                .toList()
-            );
+                .map(theme -> theme.getMetadata().getName())
+                .collectList()
+                .map(
+                        installed ->
+                                allThemes.stream()
+                                        .filter(
+                                                theme ->
+                                                        !installed.contains(
+                                                                theme.getMetadata().getName()))
+                                        .toList());
     }
 
     Mono<ServerResponse> reloadTheme(ServerRequest request) {
         String name = request.pathVariable("name");
-        return themeService.reloadTheme(name)
-            .flatMap(theme -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(theme));
+        return themeService
+                .reloadTheme(name)
+                .flatMap(
+                        theme ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(theme));
     }
 
     Mono<ServerResponse> resetSettingConfig(ServerRequest request) {
         String name = request.pathVariable("name");
-        return themeService.resetSettingConfig(name)
-            .flatMap(theme -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(theme));
+        return themeService
+                .resetSettingConfig(name)
+                .flatMap(
+                        theme ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(theme));
     }
 
     @Schema(name = "ThemeInstallRequest", types = "object")
@@ -500,25 +620,23 @@ public class ThemeEndpoint implements CustomEndpoint {
             Part part = multipartData.getFirst("file");
             if (!(part instanceof FilePart file)) {
                 throw new ServerWebInputException(
-                    "Invalid parameter of file, binary data is required");
+                        "Invalid parameter of file, binary data is required");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
                 throw new ServerWebInputException(
-                    "Invalid file type, only zip format is supported");
+                        "Invalid file type, only zip format is supported");
             }
             return file;
         }
     }
 
-    public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
-    }
+    public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {}
 
     Mono<ServerResponse> install(ServerRequest request) {
         return request.multipartData()
-            .map(InstallRequest::new)
-            .map(InstallRequest::getFile)
-            .flatMap(filePart -> themeService.install(filePart.content()))
-            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+                .map(InstallRequest::new)
+                .map(InstallRequest::getFile)
+                .flatMap(filePart -> themeService.install(filePart.content()))
+                .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
     }
-
 }

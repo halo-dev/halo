@@ -43,5 +43,4 @@ public interface SearchEngine extends ExtensionPoint {
      * @return search result of halo documents
      */
     SearchResult search(SearchOption option);
-
 }

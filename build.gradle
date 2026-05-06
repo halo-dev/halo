@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.spotless)
+}
+
+spotless {
+    format 'misc', {
+        target fileTree(project.rootDir) {
+            include '**/*.gradle', '**/*.xml', '**/*.yml', '**/*.yaml', '**/*.properties'
+            exclude 'build/**', '.gradle/**', '**/node_modules/**',
+                    '**/buildSrc/build/**', '**/.idea/**'
+        }
+        trimTrailingWhitespace()
+        leadingTabsToSpaces(4)
+        endWithNewline()
+    }
+}

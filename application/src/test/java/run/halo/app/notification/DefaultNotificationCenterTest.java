@@ -42,32 +42,23 @@ import run.halo.app.infra.SystemSetting;
 @ExtendWith(MockitoExtension.class)
 class DefaultNotificationCenterTest {
 
-    @Mock
-    private ReactiveExtensionClient client;
+    @Mock private ReactiveExtensionClient client;
 
-    @Mock
-    private ReasonNotificationTemplateSelector notificationTemplateSelector;
+    @Mock private ReasonNotificationTemplateSelector notificationTemplateSelector;
 
-    @Mock
-    private UserNotificationPreferenceService userNotificationPreferenceService;
+    @Mock private UserNotificationPreferenceService userNotificationPreferenceService;
 
-    @Mock
-    private NotificationTemplateRender notificationTemplateRender;
+    @Mock private NotificationTemplateRender notificationTemplateRender;
 
-    @Mock
-    private NotificationSender notificationSender;
+    @Mock private NotificationSender notificationSender;
 
-    @Mock
-    private RecipientResolver recipientResolver;
+    @Mock private RecipientResolver recipientResolver;
 
-    @Mock
-    private SubscriptionService subscriptionService;
+    @Mock private SubscriptionService subscriptionService;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
-    @InjectMocks
-    private DefaultNotificationCenter notificationCenter;
+    @InjectMocks private DefaultNotificationCenter notificationCenter;
 
     @Test
     public void testNotify() {
@@ -88,8 +79,7 @@ class DefaultNotificationCenterTest {
         var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
         when(recipientResolver.resolve(reason)).thenReturn(Flux.just(subscriber));
 
-        doReturn(Mono.empty()).when(spyNotificationCenter)
-            .dispatchNotification(eq(reason), any());
+        doReturn(Mono.empty()).when(spyNotificationCenter).dispatchNotification(eq(reason), any());
 
         spyNotificationCenter.notify(reason).block();
 
@@ -131,8 +121,7 @@ class DefaultNotificationCenterTest {
 
         var reason = subscription.getSpec().getReason();
 
-        doReturn(Mono.empty())
-            .when(spyNotificationCenter).unsubscribe(eq(subscriber), eq(reason));
+        doReturn(Mono.empty()).when(spyNotificationCenter).unsubscribe(eq(subscriber), eq(reason));
 
         when(client.create(any(Subscription.class))).thenReturn(Mono.empty());
 
@@ -144,8 +133,7 @@ class DefaultNotificationCenterTest {
     @Test
     public void testGetNotifiersBySubscriber() {
         UserNotificationPreference preference = new UserNotificationPreference();
-        when(userNotificationPreferenceService.getByUser(any()))
-            .thenReturn(Mono.just(preference));
+        when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.just(preference));
 
         var reason = new Reason();
         reason.setMetadata(new Metadata());
@@ -154,14 +142,16 @@ class DefaultNotificationCenterTest {
         reason.getSpec().setReasonType("new-reply-on-comment");
         var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
 
-        notificationCenter.getNotifiersBySubscriber(subscriber, reason)
-            .collectList()
-            .as(StepVerifier::create)
-            .consumeNextWith(notifiers -> {
-                assertThat(notifiers).hasSize(1);
-                assertThat(notifiers.get(0)).isEqualTo("default-email-notifier");
-            })
-            .verifyComplete();
+        notificationCenter
+                .getNotifiersBySubscriber(subscriber, reason)
+                .collectList()
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        notifiers -> {
+                            assertThat(notifiers).hasSize(1);
+                            assertThat(notifiers.get(0)).isEqualTo("default-email-notifier");
+                        })
+                .verifyComplete();
 
         verify(userNotificationPreferenceService).getByUser(eq(subscriber.name()));
     }
@@ -171,15 +161,17 @@ class DefaultNotificationCenterTest {
         var spyNotificationCenter = spy(notificationCenter);
 
         doReturn(Flux.just("email-notifier"))
-            .when(spyNotificationCenter).getNotifiersBySubscriber(any(), any());
+                .when(spyNotificationCenter)
+                .getNotifiersBySubscriber(any(), any());
 
         NotifierDescriptor notifierDescriptor = mock(NotifierDescriptor.class);
         when(client.fetch(eq(NotifierDescriptor.class), eq("email-notifier")))
-            .thenReturn(Mono.just(notifierDescriptor));
+                .thenReturn(Mono.just(notifierDescriptor));
 
         var notificationElement = mock(DefaultNotificationCenter.NotificationElement.class);
         doReturn(Mono.just(notificationElement))
-            .when(spyNotificationCenter).prepareNotificationElement(any(), any(), any());
+                .when(spyNotificationCenter)
+                .prepareNotificationElement(any(), any(), any());
 
         doReturn(Mono.empty()).when(spyNotificationCenter).sendNotification(any());
 
@@ -192,8 +184,9 @@ class DefaultNotificationCenterTest {
         var subscription = createSubscriptions().get(0);
         var subscriptionName = subscription.getMetadata().getName();
         var subscriber =
-            new Subscriber(UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
-                subscriptionName);
+                new Subscriber(
+                        UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
+                        subscriptionName);
         spyNotificationCenter.dispatchNotification(reason, subscriber).block();
 
         verify(client).fetch(eq(NotifierDescriptor.class), eq("email-notifier"));
@@ -206,14 +199,15 @@ class DefaultNotificationCenterTest {
         var spyNotificationCenter = spy(notificationCenter);
 
         doReturn(Mono.just(Locale.getDefault()))
-            .when(spyNotificationCenter).getLocaleFromSubscriber(any());
+                .when(spyNotificationCenter)
+                .getLocaleFromSubscriber(any());
 
         var notificationContent = mock(DefaultNotificationCenter.NotificationContent.class);
         doReturn(Mono.just(notificationContent))
-            .when(spyNotificationCenter).inferenceTemplate(any(), any(), any());
+                .when(spyNotificationCenter)
+                .inferenceTemplate(any(), any(), any());
 
-        spyNotificationCenter.prepareNotificationElement(any(), any(), any())
-            .block();
+        spyNotificationCenter.prepareNotificationElement(any(), any(), any()).block();
 
         verify(spyNotificationCenter).getLocaleFromSubscriber(any());
         verify(spyNotificationCenter).inferenceTemplate(any(), any(), any());
@@ -224,11 +218,10 @@ class DefaultNotificationCenterTest {
         var spyNotificationCenter = spy(notificationCenter);
 
         var context = mock(NotificationContext.class);
-        doReturn(Mono.just(context))
-            .when(spyNotificationCenter).notificationContextFrom(any());
+        doReturn(Mono.just(context)).when(spyNotificationCenter).notificationContextFrom(any());
 
         when(notificationSender.sendNotification(eq("fake-notifier-ext"), any()))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
 
         var element = mock(DefaultNotificationCenter.NotificationElement.class);
         var mockDescriptor = mock(NotifierDescriptor.class);
@@ -252,8 +245,9 @@ class DefaultNotificationCenterTest {
 
         var subscriptionName = subscription.getMetadata().getName();
         var subscriber =
-            new Subscriber(UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
-                subscriptionName);
+                new Subscriber(
+                        UserIdentity.of(subscription.getSpec().getSubscriber().getName()),
+                        subscriptionName);
         when(client.fetch(eq(User.class), eq(subscriber.name()))).thenReturn(Mono.just(user));
         when(element.subscriber()).thenReturn(subscriber);
 
@@ -287,9 +281,11 @@ class DefaultNotificationCenterTest {
         var reasonTypeName = reason.getSpec().getReasonType();
 
         doReturn(Mono.just(reasonType))
-            .when(spyNotificationCenter).getReasonType(eq(reasonTypeName));
+                .when(spyNotificationCenter)
+                .getReasonType(eq(reasonTypeName));
         doReturn(Mono.just("fake-unsubscribe-url"))
-            .when(spyNotificationCenter).getUnsubscribeUrl(anyString());
+                .when(spyNotificationCenter)
+                .getUnsubscribeUrl(anyString());
 
         final var locale = Locale.CHINESE;
 
@@ -305,10 +301,9 @@ class DefaultNotificationCenterTest {
         template.getSpec().getReasonSelector().setReasonType(reasonTypeName);
         template.getSpec().getReasonSelector().setLanguage(locale.getLanguage());
 
-        when(notificationTemplateRender.render(anyString(), any()))
-            .thenReturn(Mono.empty());
+        when(notificationTemplateRender.render(anyString(), any())).thenReturn(Mono.empty());
         when(notificationTemplateSelector.select(eq(reasonTypeName), any()))
-            .thenReturn(Mono.just(template));
+                .thenReturn(Mono.just(template));
 
         var subscriber = new Subscriber(UserIdentity.anonymousWithEmail("A"), "fake-name");
 
@@ -323,9 +318,10 @@ class DefaultNotificationCenterTest {
         var subscription = mock(Subscriber.class);
 
         when(environmentFetcher.getBasic()).thenReturn(Mono.just(new SystemSetting.Basic()));
-        notificationCenter.getLocaleFromSubscriber(subscription)
-            .as(StepVerifier::create)
-            .expectNext(Locale.getDefault())
-            .verifyComplete();
+        notificationCenter
+                .getLocaleFromSubscriber(subscription)
+                .as(StepVerifier::create)
+                .expectNext(Locale.getDefault())
+                .verifyComplete();
     }
 }

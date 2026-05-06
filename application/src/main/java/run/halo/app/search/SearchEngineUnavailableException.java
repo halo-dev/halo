@@ -12,5 +12,4 @@ public class SearchEngineUnavailableException extends ServerWebInputException {
     public SearchEngineUnavailableException() {
         super("Search Engine is unavailable.");
     }
-
 }

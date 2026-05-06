@@ -17,20 +17,22 @@ public class ThemeContextBasedVariablesAcquirer implements ViewContextBasedVaria
     private final ThemeFinder themeFinder;
     private final ThemeResolver themeResolver;
 
-    public ThemeContextBasedVariablesAcquirer(ThemeFinder themeFinder,
-        ThemeResolver themeResolver) {
+    public ThemeContextBasedVariablesAcquirer(
+            ThemeFinder themeFinder, ThemeResolver themeResolver) {
         this.themeFinder = themeFinder;
         this.themeResolver = themeResolver;
     }
 
     @Override
     public Mono<Map<String, Object>> acquire(ServerWebExchange exchange) {
-        return themeResolver.getTheme(exchange)
-            .flatMap(themeContext -> {
-                String name = themeContext.getName();
-                return themeFinder.getByName(name);
-            })
-            .map(themeVo -> Map.<String, Object>of("theme", themeVo))
-            .defaultIfEmpty(Map.of());
+        return themeResolver
+                .getTheme(exchange)
+                .flatMap(
+                        themeContext -> {
+                            String name = themeContext.getName();
+                            return themeFinder.getByName(name);
+                        })
+                .map(themeVo -> Map.<String, Object>of("theme", themeVo))
+                .defaultIfEmpty(Map.of());
     }
 }

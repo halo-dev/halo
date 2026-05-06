@@ -31,17 +31,20 @@ public class TagsRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
-        return RouterFunctions
-            .route(GET(StringUtils.prependIfMissing(prefix, "/"))
-                .and(accept(MediaType.TEXT_HTML)), handlerFunction());
+        return RouterFunctions.route(
+                GET(StringUtils.prependIfMissing(prefix, "/")).and(accept(MediaType.TEXT_HTML)),
+                handlerFunction());
     }
 
     private HandlerFunction<ServerResponse> handlerFunction() {
-        return request -> ServerResponse.ok()
-            .render(DefaultTemplateEnum.TAGS.getValue(),
-                Map.of("tags", tagFinder.listAll(),
-                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.TAGS.getValue()
-                )
-            );
+        return request ->
+                ServerResponse.ok()
+                        .render(
+                                DefaultTemplateEnum.TAGS.getValue(),
+                                Map.of(
+                                        "tags",
+                                        tagFinder.listAll(),
+                                        ModelConst.TEMPLATE_ID,
+                                        DefaultTemplateEnum.TAGS.getValue()));
     }
 }

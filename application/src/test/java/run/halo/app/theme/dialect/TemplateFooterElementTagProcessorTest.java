@@ -43,14 +43,11 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  */
 @ExtendWith(MockitoExtension.class)
 class TemplateFooterElementTagProcessorTest {
-    @Mock
-    private ApplicationContext applicationContext;
+    @Mock private ApplicationContext applicationContext;
 
-    @Mock
-    ExtensionGetter extensionGetter;
+    @Mock ExtensionGetter extensionGetter;
 
-    @Mock
-    private SystemConfigFetcher fetcher;
+    @Mock private SystemConfigFetcher fetcher;
 
     private TemplateEngine templateEngine;
 
@@ -63,50 +60,62 @@ class TemplateFooterElementTagProcessorTest {
 
         SystemSetting.CodeInjection codeInjection = new SystemSetting.CodeInjection();
         codeInjection.setFooter(
-            "<p>Powered by <a href=\"https://www.halo.run\" target=\"_blank\">Halo</a></p>");
-        lenient().when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
-            eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
+                "<p>Powered by <a href=\"https://www.halo.run\" target=\"_blank\">Halo</a></p>");
+        lenient()
+                .when(
+                        fetcher.fetch(
+                                eq(SystemSetting.CodeInjection.GROUP),
+                                eq(SystemSetting.CodeInjection.class)))
+                .thenReturn(Mono.just(codeInjection));
 
-        lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenAnswer(invocation -> {
-                var objectProvider = mock(ObjectProvider.class);
-                when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
-                return objectProvider;
-            });
-        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(fetcher);
+        lenient()
+                .when(applicationContext.getBeanProvider(ExtensionGetter.class))
+                .thenAnswer(
+                        invocation -> {
+                            var objectProvider = mock(ObjectProvider.class);
+                            when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                            return objectProvider;
+                        });
+        lenient()
+                .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
+                .thenReturn(fetcher);
     }
 
     @Test
     void footerProcessorTest() {
         when(extensionGetter.getExtensions(TemplateFooterProcessor.class))
-            .thenReturn(Flux.just(new FakeFooterCodeInjection()));
+                .thenReturn(Flux.just(new FakeFooterCodeInjection()));
 
         String result = templateEngine.process("fake-template", getContext());
         // footer injected code is not processable
-        assertThat(result).isEqualToIgnoringWhitespace("""
-            <p>Powered by <a href="https://www.halo.run" target="_blank">Halo</a></p>
-            <div>© 2024 guqing's blog</div>
-            <div th:text="${footerText}"></div>
-            """);
+        assertThat(result)
+                .isEqualToIgnoringWhitespace(
+                        """
+                        <p>Powered by <a href="https://www.halo.run" target="_blank">Halo</a></p>
+                        <div>© 2024 guqing's blog</div>
+                        <div th:text="${footerText}"></div>
+                        """);
     }
 
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class MockTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
-            return new StringTemplateResource("""
-                <halo:footer />
-                """);
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
+            return new StringTemplateResource(
+                    """
+                    <halo:footer />
+                    """);
         }
     }
 
@@ -122,8 +131,11 @@ class TemplateFooterElementTagProcessorTest {
     static class FakeFooterCodeInjection implements TemplateFooterProcessor {
 
         @Override
-        public Mono<Void> process(ITemplateContext context, IProcessableElementTag tag,
-            IElementTagStructureHandler structureHandler, IModel model) {
+        public Mono<Void> process(
+                ITemplateContext context,
+                IProcessableElementTag tag,
+                IElementTagStructureHandler structureHandler,
+                IModel model) {
             var factory = context.getModelFactory();
             // regular footer text
             var copyRight = factory.createText("<div>© 2024 guqing's blog</div>");

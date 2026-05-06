@@ -11,8 +11,7 @@ import run.halo.app.extension.Scheme;
  */
 public class SchemeRemovedEvent extends ApplicationEvent {
 
-    @Getter
-    private final Scheme scheme;
+    @Getter private final Scheme scheme;
 
     public SchemeRemovedEvent(Object source, Scheme scheme) {
         super(source);

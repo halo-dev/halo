@@ -15,13 +15,13 @@ class AuthorityUtilsTest {
 
     @Test
     void authoritiesToRolesTest() {
-        var authorities = List.of(
-            new SimpleGrantedAuthority("ROLE_admin"),
-            new SimpleGrantedAuthority("ROLE_owner"),
-            new SimpleGrantedAuthority("ROLE_manager"),
-            new SimpleGrantedAuthority("faker"),
-            new SimpleGrantedAuthority("SCOPE_system:read")
-        );
+        var authorities =
+                List.of(
+                        new SimpleGrantedAuthority("ROLE_admin"),
+                        new SimpleGrantedAuthority("ROLE_owner"),
+                        new SimpleGrantedAuthority("ROLE_manager"),
+                        new SimpleGrantedAuthority("faker"),
+                        new SimpleGrantedAuthority("SCOPE_system:read"));
 
         var roles = authoritiesToRoles(authorities);
 
@@ -34,5 +34,4 @@ class AuthorityUtilsTest {
         assertTrue(containsSuperRole(Set.of("super-role", "admin")));
         assertFalse(containsSuperRole(Set.of("admin")));
     }
-
 }

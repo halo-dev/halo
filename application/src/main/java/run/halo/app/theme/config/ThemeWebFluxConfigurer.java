@@ -27,8 +27,7 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
 
     private final WebProperties.Resources resourcesProperties;
 
-    public ThemeWebFluxConfigurer(ThemeRootGetter themeRootGetter,
-        WebProperties webProperties) {
+    public ThemeWebFluxConfigurer(ThemeRootGetter themeRootGetter, WebProperties webProperties) {
         this.themeRootGetter = themeRootGetter;
         this.resourcesProperties = webProperties.getResources();
     }
@@ -41,11 +40,11 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
         }
         var useLastModified = resourcesProperties.getCache().isUseLastModified();
         registry.addResourceHandler("/themes/{themeName}/assets/{*resourcePaths}")
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new ThemePathResourceResolver(themeRootGetter.get()));
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new ThemePathResourceResolver(themeRootGetter.get()));
     }
 
     /**
@@ -63,13 +62,16 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
         }
 
         @Override
-        protected Mono<Resource> resolveResourceInternal(ServerWebExchange exchange,
-            String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
+        protected Mono<Resource> resolveResourceInternal(
+                ServerWebExchange exchange,
+                String requestPath,
+                List<? extends Resource> locations,
+                ResourceResolverChain chain) {
             if (exchange == null) {
                 return Mono.empty();
             }
             Map<String, String> requiredAttribute =
-                exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+                    exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             var themeName = requiredAttribute.get("themeName");
             var resourcePaths = requiredAttribute.get("resourcePaths");
 
@@ -87,10 +89,11 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
         }
 
         @Override
-        protected Mono<String> resolveUrlPathInternal(String resourceUrlPath,
-            List<? extends Resource> locations, ResourceResolverChain chain) {
+        protected Mono<String> resolveUrlPathInternal(
+                String resourceUrlPath,
+                List<? extends Resource> locations,
+                ResourceResolverChain chain) {
             throw new UnsupportedOperationException();
         }
-
     }
 }

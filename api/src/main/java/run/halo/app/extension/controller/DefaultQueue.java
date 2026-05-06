@@ -57,8 +57,11 @@ public class DefaultQueue<R> implements RequestQueue<R> {
             }
             log.debug("Adding request {} after {}", entry.getEntry(), entry.getRetryAfter());
             if (entry.getRetryAfter().compareTo(minDelay) < 0) {
-                log.warn("Request {} will be retried after {} ms, but minimum delay is {} ms",
-                    entry.getEntry(), entry.getRetryAfter().toMillis(), minDelay.toMillis());
+                log.warn(
+                        "Request {} will be retried after {} ms, but minimum delay is {} ms",
+                        entry.getEntry(),
+                        entry.getRetryAfter().toMillis(),
+                        minDelay.toMillis());
                 entry = new DelayedEntry<>(entry.getEntry(), minDelay, nowSupplier);
             }
             if (dirty.contains(entry.getEntry())) {
@@ -93,7 +96,7 @@ public class DefaultQueue<R> implements RequestQueue<R> {
         try {
             if (isDisposed()) {
                 throw new InterruptedException(
-                    "Queue has been disposed. Cannot take any elements now");
+                        "Queue has been disposed. Cannot take any elements now");
             }
             processing.add(entry.getEntry());
             dirty.remove(entry.getEntry());
@@ -155,5 +158,4 @@ public class DefaultQueue<R> implements RequestQueue<R> {
         }
         return Optional.empty();
     }
-
 }

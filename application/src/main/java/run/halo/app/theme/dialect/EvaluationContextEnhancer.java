@@ -47,11 +47,14 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
     }
 
     @Override
-    public void doProcessTemplateStart(ITemplateContext context, ITemplateStart templateStart,
-        ITemplateBoundariesStructureHandler structureHandler) {
-        var evluationContextObject = context.getVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME
-        );
+    public void doProcessTemplateStart(
+            ITemplateContext context,
+            ITemplateStart templateStart,
+            ITemplateBoundariesStructureHandler structureHandler) {
+        var evluationContextObject =
+                context.getVariable(
+                        ThymeleafEvaluationContext
+                                .THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
         if (evluationContextObject instanceof ThymeleafEvaluationContext evaluationContext) {
             evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
             ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
@@ -60,8 +63,10 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
     }
 
     @Override
-    public void doProcessTemplateEnd(ITemplateContext context, ITemplateEnd templateEnd,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateEnd(
+            ITemplateContext context,
+            ITemplateEnd templateEnd,
+            ITemplateBoundariesStructureHandler structureHandler) {
         // nothing to do
     }
 
@@ -69,8 +74,7 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      * A {@link PropertyAccessor} that wraps the original {@link ReflectivePropertyAccessor} and
      * blocks the reactive value.
      */
-    private static class ReactiveReflectivePropertyAccessor
-        extends ReflectivePropertyAccessor {
+    private static class ReactiveReflectivePropertyAccessor extends ReflectivePropertyAccessor {
         private final ReflectivePropertyAccessor delegate;
 
         private ReactiveReflectivePropertyAccessor(ReflectivePropertyAccessor delegate) {
@@ -79,7 +83,7 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
 
         @Override
         public boolean canRead(EvaluationContext context, Object target, String name)
-            throws AccessException {
+                throws AccessException {
             if (target == null) {
                 // For backward compatibility
                 return true;
@@ -89,31 +93,32 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
 
         @Override
         public TypedValue read(EvaluationContext context, Object target, String name)
-            throws AccessException {
+                throws AccessException {
             if (target == null) {
                 // For backward compatibility
                 return TypedValue.NULL;
             }
             var typedValue = delegate.read(context, target, name);
             return Optional.of(typedValue)
-                .filter(tv ->
-                    Objects.nonNull(tv.getValue())
-                        && Objects.nonNull(tv.getTypeDescriptor())
-                        && ReactiveUtils.isReactiveType(tv.getTypeDescriptor().getType())
-                )
-                .map(tv -> new TypedValue(ReactiveUtils.blockReactiveValue(tv.getValue())))
-                .orElse(typedValue);
+                    .filter(
+                            tv ->
+                                    Objects.nonNull(tv.getValue())
+                                            && Objects.nonNull(tv.getTypeDescriptor())
+                                            && ReactiveUtils.isReactiveType(
+                                                    tv.getTypeDescriptor().getType()))
+                    .map(tv -> new TypedValue(ReactiveUtils.blockReactiveValue(tv.getValue())))
+                    .orElse(typedValue);
         }
 
         @Override
         public boolean canWrite(EvaluationContext context, Object target, String name)
-            throws AccessException {
+                throws AccessException {
             return delegate.canWrite(context, target, name);
         }
 
         @Override
         public void write(EvaluationContext context, Object target, String name, Object newValue)
-            throws AccessException {
+                throws AccessException {
             delegate.write(context, target, name, newValue);
         }
 
@@ -123,8 +128,8 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         }
 
         @Override
-        public PropertyAccessor createOptimalAccessor(EvaluationContext context, Object target,
-            String name) {
+        public PropertyAccessor createOptimalAccessor(
+                EvaluationContext context, Object target, String name) {
             var optimalAccessor = delegate.createOptimalAccessor(context, target, name);
             if (optimalAccessor instanceof CompilablePropertyAccessor optimalPropertyAccessor) {
                 if (ReactiveUtils.isReactiveType(optimalPropertyAccessor.getPropertyType())) {
@@ -136,16 +141,20 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         }
 
         static void wrap(ThymeleafEvaluationContext evaluationContext) {
-            var wrappedPropertyAccessors = evaluationContext.getPropertyAccessors()
-                .stream()
-                .map(propertyAccessor -> {
-                    if (propertyAccessor instanceof ReflectivePropertyAccessor reflectiveAccessor) {
-                        return new ReactiveReflectivePropertyAccessor(reflectiveAccessor);
-                    }
-                    return propertyAccessor;
-                })
-                // make the list mutable
-                .collect(Collectors.toCollection(ArrayList::new));
+            var wrappedPropertyAccessors =
+                    evaluationContext.getPropertyAccessors().stream()
+                            .map(
+                                    propertyAccessor -> {
+                                        if (propertyAccessor
+                                                instanceof
+                                                ReflectivePropertyAccessor reflectiveAccessor) {
+                                            return new ReactiveReflectivePropertyAccessor(
+                                                    reflectiveAccessor);
+                                        }
+                                        return propertyAccessor;
+                                    })
+                            // make the list mutable
+                            .collect(Collectors.toCollection(ArrayList::new));
             evaluationContext.setPropertyAccessors(wrappedPropertyAccessors);
         }
 
@@ -158,7 +167,6 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         public int hashCode() {
             return delegate.hashCode();
         }
-
     }
 
     /**
@@ -169,29 +177,34 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      * @param templateContext the template context
      */
     private record ReactiveMethodResolver(MethodResolver delegate, ITemplateContext templateContext)
-        implements MethodResolver {
+            implements MethodResolver {
 
         @Override
         @Nullable
-        public MethodExecutor resolve(EvaluationContext context, Object targetObject, String name,
-            List<TypeDescriptor> argumentTypes) throws AccessException {
+        public MethodExecutor resolve(
+                EvaluationContext context,
+                Object targetObject,
+                String name,
+                List<TypeDescriptor> argumentTypes)
+                throws AccessException {
             var executor = delegate.resolve(context, targetObject, name, argumentTypes);
             return Optional.ofNullable(executor)
-                .map(methodExecutor -> new ReactiveMethodExecutor(methodExecutor, templateContext))
-                .orElse(null);
+                    .map(
+                            methodExecutor ->
+                                    new ReactiveMethodExecutor(methodExecutor, templateContext))
+                    .orElse(null);
         }
 
         static void wrap(ThymeleafEvaluationContext evaluationContext, ITemplateContext context) {
-            var wrappedMethodResolvers = evaluationContext.getMethodResolvers()
-                .stream()
-                .<MethodResolver>map(
-                    methodResolver -> new ReactiveMethodResolver(methodResolver, context)
-                )
-                // make the list mutable
-                .collect(Collectors.toCollection(ArrayList::new));
+            var wrappedMethodResolvers =
+                    evaluationContext.getMethodResolvers().stream()
+                            .<MethodResolver>map(
+                                    methodResolver ->
+                                            new ReactiveMethodResolver(methodResolver, context))
+                            // make the list mutable
+                            .collect(Collectors.toCollection(ArrayList::new));
             evaluationContext.setMethodResolvers(wrappedMethodResolvers);
         }
-
     }
 
     /**
@@ -202,30 +215,33 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      * @param templateContext the template context
      */
     private record ReactiveMethodExecutor(MethodExecutor delegate, ITemplateContext templateContext)
-        implements MethodExecutor {
+            implements MethodExecutor {
 
         @Override
         public TypedValue execute(EvaluationContext context, Object target, Object... arguments)
-            throws AccessException {
+                throws AccessException {
             var typedValue = delegate.execute(context, target, arguments);
             return Optional.of(typedValue)
-                .filter(tv ->
-                    Objects.nonNull(tv.getValue())
-                        && Objects.nonNull(tv.getTypeDescriptor())
-                        && ReactiveUtils.isReactiveType(tv.getTypeDescriptor().getType())
-                )
-                .map(tv -> {
-                    var contextView = (ContextView) Optional.ofNullable(
-                            templateContext.getVariable(CONTEXT_VIEW_KEY)
-                        )
-                        .filter(ContextView.class::isInstance)
-                        .orElse(null);
-                    return new TypedValue(
-                        ReactiveUtils.blockReactiveValue(tv.getValue(), contextView)
-                    );
-                })
-                .orElse(typedValue);
+                    .filter(
+                            tv ->
+                                    Objects.nonNull(tv.getValue())
+                                            && Objects.nonNull(tv.getTypeDescriptor())
+                                            && ReactiveUtils.isReactiveType(
+                                                    tv.getTypeDescriptor().getType()))
+                    .map(
+                            tv -> {
+                                var contextView =
+                                        (ContextView)
+                                                Optional.ofNullable(
+                                                                templateContext.getVariable(
+                                                                        CONTEXT_VIEW_KEY))
+                                                        .filter(ContextView.class::isInstance)
+                                                        .orElse(null);
+                                return new TypedValue(
+                                        ReactiveUtils.blockReactiveValue(
+                                                tv.getValue(), contextView));
+                            })
+                    .orElse(typedValue);
         }
-
     }
 }

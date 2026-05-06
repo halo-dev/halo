@@ -68,19 +68,14 @@ class ExtensionUtilTest {
         when(metadata.getLabels()).thenReturn(null);
         assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "false")
-        );
+        when(metadata.getLabels())
+                .thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "false"));
         assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true")
-        );
+        when(metadata.getLabels()).thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true"));
         assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "TrUe")
-        );
+        when(metadata.getLabels()).thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "TrUe"));
         assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
     }
 }

@@ -38,8 +38,8 @@ public class SinglePageFinderImpl implements SinglePageFinder {
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
         return client.get(SinglePage.class, pageName)
-            .filterWhen(page -> queryPredicate().map(predicate -> predicate.test(page)))
-            .flatMap(singlePagePublicQueryService::convertToVo);
+                .filterWhen(page -> queryPredicate().map(predicate -> predicate.test(page)))
+                .flatMap(singlePagePublicQueryService::convertToVo);
     }
 
     @Override
@@ -50,28 +50,29 @@ public class SinglePageFinderImpl implements SinglePageFinder {
     @Override
     public Mono<ListResult<ListedSinglePageVo>> list(Integer page, Integer size) {
         return singlePagePublicQueryService.listBy(
-            new ListOptions(),
-            PageRequestImpl.of(page, size)
-        );
+                new ListOptions(), PageRequestImpl.of(page, size));
     }
 
     Mono<Predicate<SinglePage>> queryPredicate() {
-        Predicate<SinglePage> predicate = page -> page.isPublished()
-            && Objects.equals(false, page.getSpec().getDeleted());
+        Predicate<SinglePage> predicate =
+                page -> page.isPublished() && Objects.equals(false, page.getSpec().getDeleted());
         Predicate<SinglePage> visiblePredicate =
-            page -> Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
+                page -> Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
         return currentUserName()
-            .map(username -> predicate.and(
-                visiblePredicate.or(page -> username.equals(page.getSpec().getOwner())))
-            )
-            .defaultIfEmpty(predicate.and(visiblePredicate));
+                .map(
+                        username ->
+                                predicate.and(
+                                        visiblePredicate.or(
+                                                page ->
+                                                        username.equals(
+                                                                page.getSpec().getOwner()))))
+                .defaultIfEmpty(predicate.and(visiblePredicate));
     }
 
     Mono<String> currentUserName() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName)
-            .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
     }
-
 }

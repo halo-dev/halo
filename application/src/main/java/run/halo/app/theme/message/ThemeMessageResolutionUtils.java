@@ -34,7 +34,7 @@ public class ThemeMessageResolutionUtils {
 
     @Nullable
     private static Reader messageReader(String messageResourceName, ThemeContext theme)
-        throws FileNotFoundException {
+            throws FileNotFoundException {
         var themePath = theme.getPath();
         File messageFile = themePath.resolve(messageResourceName).toFile();
         if (!messageFile.exists()) {
@@ -44,8 +44,8 @@ public class ThemeMessageResolutionUtils {
         return new BufferedReader(new InputStreamReader(new BufferedInputStream(inputStream)));
     }
 
-    public static Map<String, String> resolveMessagesForTemplate(final Locale locale,
-        ThemeContext theme) {
+    public static Map<String, String> resolveMessagesForTemplate(
+            final Locale locale, ThemeContext theme) {
 
         // Compute all the resource names we should use: *_gl_ES-gheada.properties, *_gl_ES
         // .properties, _gl.properties...
@@ -54,8 +54,7 @@ public class ThemeMessageResolutionUtils {
         // (e.g. a value for gl_ES will have more precedence than a value for gl). So we will
         // iterate these resource
         // names from less specific to more specific.
-        final List<String>
-            messageResourceNames = computeMessageResourceNamesFromBase(locale);
+        final List<String> messageResourceNames = computeMessageResourceNamesFromBase(locale);
 
         // Build the combined messages
         Map<String, String> combinedMessages = null;
@@ -65,7 +64,7 @@ public class ThemeMessageResolutionUtils {
                 if (messageResourceReader != null) {
 
                     final Properties messageProperties =
-                        readMessagesResource(messageResourceReader);
+                            readMessagesResource(messageResourceReader);
                     if (messageProperties != null && !messageProperties.isEmpty()) {
 
                         if (combinedMessages == null) {
@@ -73,13 +72,12 @@ public class ThemeMessageResolutionUtils {
                         }
 
                         for (final Map.Entry<Object, Object> propertyEntry :
-                            messageProperties.entrySet()) {
-                            combinedMessages.put((String) propertyEntry.getKey(),
-                                (String) propertyEntry.getValue());
+                                messageProperties.entrySet()) {
+                            combinedMessages.put(
+                                    (String) propertyEntry.getKey(),
+                                    (String) propertyEntry.getValue());
                         }
-
                     }
-
                 }
 
             } catch (final IOException ignored) {
@@ -100,31 +98,35 @@ public class ThemeMessageResolutionUtils {
 
         if (StringUtils.isEmptyOrWhitespace(locale.getLanguage())) {
             throw new TemplateProcessingException(
-                "Locale \"" + locale + "\" "
-                    + "cannot be used as it does not specify a language.");
+                    "Locale \""
+                            + locale
+                            + "\" "
+                            + "cannot be used as it does not specify a language.");
         }
 
         resourceNames.add(getResourceName("default"));
         resourceNames.add(getResourceName(locale.getLanguage()));
 
         if (!StringUtils.isEmptyOrWhitespace(locale.getCountry())) {
-            resourceNames.add(
-                getResourceName(locale.getLanguage() + "_" + locale.getCountry()));
+            resourceNames.add(getResourceName(locale.getLanguage() + "_" + locale.getCountry()));
         }
 
         if (!StringUtils.isEmptyOrWhitespace(locale.getVariant())) {
-            resourceNames.add(getResourceName(
-                locale.getLanguage() + "_" + locale.getCountry() + "-" + locale.getVariant()));
+            resourceNames.add(
+                    getResourceName(
+                            locale.getLanguage()
+                                    + "_"
+                                    + locale.getCountry()
+                                    + "-"
+                                    + locale.getVariant()));
         }
 
         return resourceNames;
-
     }
 
     private static String getResourceName(String name) {
         return LOCATION + "/" + name + PROPERTIES_FILE_EXTENSION;
     }
-
 
     private static Properties readMessagesResource(final Reader propertiesReader) {
         if (propertiesReader == null) {
@@ -141,5 +143,4 @@ public class ThemeMessageResolutionUtils {
         // ignore errors closing
         return properties;
     }
-
 }

@@ -25,5 +25,4 @@ public interface PluginConst {
     static String assetsRoutePrefix(String pluginName) {
         return "/plugins/" + pluginName + "/assets/";
     }
-
 }

@@ -29,7 +29,8 @@ public class LabelSelectorConverter implements Converter<SelectorCriteria, Label
                 return Queries.labelIn(criteria.key(), defaultIfNull(criteria.values(), Set.of()));
             }
             default ->
-                throw new IllegalArgumentException("Unsupported operator: " + criteria.operator());
+                    throw new IllegalArgumentException(
+                            "Unsupported operator: " + criteria.operator());
         }
     }
 

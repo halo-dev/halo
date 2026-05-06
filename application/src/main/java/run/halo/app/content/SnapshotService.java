@@ -10,10 +10,8 @@ public interface SnapshotService {
 
     Mono<Snapshot> getPatchedBy(String snapshotName, String baseSnapshotName);
 
-    Mono<Snapshot> patchAndCreate(Snapshot snapshot,
-        @Nullable Snapshot baseSnapshot, Content content);
+    Mono<Snapshot> patchAndCreate(
+            Snapshot snapshot, @Nullable Snapshot baseSnapshot, Content content);
 
-    Mono<Snapshot> patchAndUpdate(Snapshot snapshot,
-        Snapshot baseSnapshot, Content content);
-
+    Mono<Snapshot> patchAndUpdate(Snapshot snapshot, Snapshot baseSnapshot, Content content);
 }

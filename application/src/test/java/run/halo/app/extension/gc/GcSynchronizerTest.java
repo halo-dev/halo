@@ -16,14 +16,11 @@ import run.halo.app.extension.SchemeManager;
 @ExtendWith(MockitoExtension.class)
 class GcSynchronizerTest {
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @Mock
-    SchemeManager schemeManager;
+    @Mock SchemeManager schemeManager;
 
-    @InjectMocks
-    GcSynchronizer synchronizer;
+    @InjectMocks GcSynchronizer synchronizer;
 
     @Test
     void shouldStartNormally() {

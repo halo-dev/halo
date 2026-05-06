@@ -8,8 +8,7 @@ class AbstractExtensionTest {
 
     @Test
     void groupVersionKind() {
-        var extension = new AbstractExtension() {
-        };
+        var extension = new AbstractExtension() {};
         extension.setApiVersion("fake.halo.run/v1alpha1");
         extension.setKind("Fake");
         var gvk = extension.groupVersionKind();
@@ -19,8 +18,7 @@ class AbstractExtensionTest {
 
     @Test
     void testGroupVersionKind() {
-        var extension = new AbstractExtension() {
-        };
+        var extension = new AbstractExtension() {};
         extension.groupVersionKind(new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"));
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
@@ -29,8 +27,7 @@ class AbstractExtensionTest {
 
     @Test
     void metadata() {
-        var extension = new AbstractExtension() {
-        };
+        var extension = new AbstractExtension() {};
         Metadata metadata = new Metadata();
         metadata.setName("fake");
         extension.setMetadata(metadata);
@@ -40,8 +37,7 @@ class AbstractExtensionTest {
 
     @Test
     void testMetadata() {
-        var extension = new AbstractExtension() {
-        };
+        var extension = new AbstractExtension() {};
 
         Metadata metadata = new Metadata();
         metadata.setName("fake");

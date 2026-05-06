@@ -40,69 +40,79 @@ public class PostQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "PostV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("posts", this::listPosts,
-                builder -> {
-                    builder.operationId("queryPosts")
-                        .description("Lists posts.")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(ListedPostVo.class))
-                        );
-                    PostPublicQuery.buildParameters(builder);
-                }
-            )
-            .GET("posts/{name}", this::getPostByName,
-                builder -> builder.operationId("queryPostByName")
-                    .description("Gets a post by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Post name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(PostVo.class)
-                    )
-            )
-            .GET("posts/{name}/navigation", this::getPostNavigationByName,
-                builder -> builder.operationId("queryPostNavigationByName")
-                    .description("Gets a post navigation by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Post name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(NavigationPostVo.class)
-                    )
-            )
-            .build();
+                .GET(
+                        "posts",
+                        this::listPosts,
+                        builder -> {
+                            builder.operationId("queryPosts")
+                                    .description("Lists posts.")
+                                    .tag(tag)
+                                    .response(
+                                            responseBuilder()
+                                                    .implementation(
+                                                            ListResult.generateGenericClass(
+                                                                    ListedPostVo.class)));
+                            PostPublicQuery.buildParameters(builder);
+                        })
+                .GET(
+                        "posts/{name}",
+                        this::getPostByName,
+                        builder ->
+                                builder.operationId("queryPostByName")
+                                        .description("Gets a post by name.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Post name")
+                                                        .required(true))
+                                        .response(responseBuilder().implementation(PostVo.class)))
+                .GET(
+                        "posts/{name}/navigation",
+                        this::getPostNavigationByName,
+                        builder ->
+                                builder.operationId("queryPostNavigationByName")
+                                        .description("Gets a post navigation by name.")
+                                        .tag(tag)
+                                        .parameter(
+                                                parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .name("name")
+                                                        .description("Post name")
+                                                        .required(true))
+                                        .response(
+                                                responseBuilder()
+                                                        .implementation(NavigationPostVo.class)))
+                .build();
     }
 
     private Mono<ServerResponse> getPostNavigationByName(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return postFinder.cursor(name)
-            .flatMap(result -> ServerResponse.ok().bodyValue(result));
+        return postFinder.cursor(name).flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     private Mono<ServerResponse> getPostByName(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return postFinder.getByName(name)
-            .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found")))
-            .flatMap(post -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(post)
-            );
+        return postFinder
+                .getByName(name)
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found")))
+                .flatMap(
+                        post ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(post));
     }
 
     private Mono<ServerResponse> listPosts(ServerRequest request) {
         PostPublicQuery query = new PostPublicQuery(request.exchange());
-        return postPublicQueryService.list(query.toListOptions(), query.toPageRequest())
-            .flatMap(result -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return postPublicQueryService
+                .list(query.toListOptions(), query.toPageRequest())
+                .flatMap(
+                        result ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result));
     }
 
     @Override

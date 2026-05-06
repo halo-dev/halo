@@ -38,23 +38,30 @@ public class RecipientResolverImpl implements RecipientResolver {
     @Override
     public Flux<Subscriber> resolve(Reason reason) {
         var reasonType = reason.getSpec().getReasonType();
-        return subscriptionService.listByPerPage(reasonType)
-            .filter(this::isNotDisabled)
-            .filter(subscription -> {
-                var interestReason = subscription.getSpec().getReason();
-                if (hasSubject(interestReason)) {
-                    return subjectMatch(subscription, reason.getSpec().getSubject());
-                } else if (StringUtils.isNotBlank(interestReason.getExpression())) {
-                    return expressionMatch(subscription.getMetadata().getName(),
-                        interestReason.getExpression(), reason);
-                }
-                return false;
-            })
-            .map(subscription -> {
-                var id = UserIdentity.of(subscription.getSpec().getSubscriber().getName());
-                return new Subscriber(id, subscription.getMetadata().getName());
-            })
-            .distinct(Subscriber::name);
+        return subscriptionService
+                .listByPerPage(reasonType)
+                .filter(this::isNotDisabled)
+                .filter(
+                        subscription -> {
+                            var interestReason = subscription.getSpec().getReason();
+                            if (hasSubject(interestReason)) {
+                                return subjectMatch(subscription, reason.getSpec().getSubject());
+                            } else if (StringUtils.isNotBlank(interestReason.getExpression())) {
+                                return expressionMatch(
+                                        subscription.getMetadata().getName(),
+                                        interestReason.getExpression(),
+                                        reason);
+                            }
+                            return false;
+                        })
+                .map(
+                        subscription -> {
+                            var id =
+                                    UserIdentity.of(
+                                            subscription.getSpec().getSubscriber().getName());
+                            return new Subscriber(id, subscription.getMetadata().getName());
+                        })
+                .distinct(Subscriber::name);
     }
 
     boolean hasSubject(Subscription.InterestReason interestReason) {
@@ -63,15 +70,15 @@ public class RecipientResolverImpl implements RecipientResolver {
 
     boolean expressionMatch(String subscriptionName, String expressionStr, Reason reason) {
         try {
-            Expression expression =
-                expressionParser.parseExpression(expressionStr);
-            var result = expression.getValue(evaluationContext,
-                exprRootObject(reason),
-                Boolean.class);
+            Expression expression = expressionParser.parseExpression(expressionStr);
+            var result =
+                    expression.getValue(evaluationContext, exprRootObject(reason), Boolean.class);
             return BooleanUtils.isTrue(result);
         } catch (ParseException | EvaluationException e) {
-            log.debug("Failed to parse or evaluate expression for subscription [{}], skip it.",
-                subscriptionName, Throwables.getRootCause(e));
+            log.debug(
+                    "Failed to parse or evaluate expression for subscription [{}], skip it.",
+                    subscriptionName,
+                    Throwables.getRootCause(e));
             return false;
         }
     }
@@ -106,11 +113,10 @@ public class RecipientResolverImpl implements RecipientResolver {
 
     EvaluationContext createEvaluationContext() {
         return SimpleEvaluationContext.forPropertyAccessors(
-                DataBindingPropertyAccessor.forReadOnlyAccess(),
-                new MapAccessor(),
-                new JsonPropertyAccessor()
-            )
-            .withConversionService(DefaultConversionService.getSharedInstance())
-            .build();
+                        DataBindingPropertyAccessor.forReadOnlyAccess(),
+                        new MapAccessor(),
+                        new JsonPropertyAccessor())
+                .withConversionService(DefaultConversionService.getSharedInstance())
+                .build();
     }
 }

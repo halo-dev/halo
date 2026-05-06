@@ -29,14 +29,15 @@ public class UserVo implements ExtensionVoOperator {
      */
     public static UserVo from(User user) {
         User.UserStatus statusCopy =
-            JsonUtils.deepCopy(ObjectUtils.defaultIfNull(user.getStatus(), new User.UserStatus()));
+                JsonUtils.deepCopy(
+                        ObjectUtils.defaultIfNull(user.getStatus(), new User.UserStatus()));
 
         User.UserSpec userSpecCopy = JsonUtils.deepCopy(user.getSpec());
         userSpecCopy.setPassword("[PROTECTED]");
         return UserVo.builder()
-            .metadata(user.getMetadata())
-            .spec(userSpecCopy)
-            .status(statusCopy)
-            .build();
+                .metadata(user.getMetadata())
+                .spec(userSpecCopy)
+                .status(statusCopy)
+                .build();
     }
 }

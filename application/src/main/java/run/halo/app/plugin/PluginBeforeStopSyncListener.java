@@ -49,35 +49,58 @@ class PluginBeforeStopSyncListener {
     private Mono<Void> cleanUpPluginExtensionResources(PluginApplicationContext context) {
         var gvkExtensionNames = context.extensionNamesMapping();
         return Flux.fromIterable(gvkExtensionNames.entrySet())
-            .flatMap(entry -> Flux.fromIterable(entry.getValue())
-                .flatMap(extensionName -> client.fetch(entry.getKey(), extensionName)
-                    .onErrorComplete(SchemeNotFoundException.class)
-                    .filter(e -> !ExtensionUtil.hasDoNotOverwriteLabel(e))
-                    .flatMap(client::delete)
-                    .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                        .filter(OptimisticLockingFailureException.class::isInstance)
-                    )
-                )
-                .flatMap(e -> waitForDeleted(e.groupVersionKind(), e.getMetadata().getName())))
-            .then();
+                .flatMap(
+                        entry ->
+                                Flux.fromIterable(entry.getValue())
+                                        .flatMap(
+                                                extensionName ->
+                                                        client.fetch(entry.getKey(), extensionName)
+                                                                .onErrorComplete(
+                                                                        SchemeNotFoundException
+                                                                                .class)
+                                                                .filter(
+                                                                        e ->
+                                                                                !ExtensionUtil
+                                                                                        .hasDoNotOverwriteLabel(
+                                                                                                e))
+                                                                .flatMap(client::delete)
+                                                                .retryWhen(
+                                                                        Retry.backoff(
+                                                                                        10,
+                                                                                        Duration
+                                                                                                .ofMillis(
+                                                                                                        100))
+                                                                                .filter(
+                                                                                        OptimisticLockingFailureException
+                                                                                                        .class
+                                                                                                ::isInstance)))
+                                        .flatMap(
+                                                e ->
+                                                        waitForDeleted(
+                                                                e.groupVersionKind(),
+                                                                e.getMetadata().getName())))
+                .then();
     }
 
     private Mono<Void> waitForDeleted(GroupVersionKind gvk, String name) {
         return client.fetch(gvk, name)
-            .flatMap(e -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("Wait for {}/{} deleted", gvk, name);
-                }
-                return Mono.error(new IllegalStateException("Wait for extension deleted"));
-            })
-            .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                .filter(IllegalStateException.class::isInstance)
-            )
-            .then()
-            .doOnSuccess(v -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("{}/{} was deleted successfully.", gvk, name);
-                }
-            });
+                .flatMap(
+                        e -> {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Wait for {}/{} deleted", gvk, name);
+                            }
+                            return Mono.error(
+                                    new IllegalStateException("Wait for extension deleted"));
+                        })
+                .retryWhen(
+                        Retry.backoff(10, Duration.ofMillis(100))
+                                .filter(IllegalStateException.class::isInstance))
+                .then()
+                .doOnSuccess(
+                        v -> {
+                            if (log.isDebugEnabled()) {
+                                log.debug("{}/{} was deleted successfully.", gvk, name);
+                            }
+                        });
     }
 }

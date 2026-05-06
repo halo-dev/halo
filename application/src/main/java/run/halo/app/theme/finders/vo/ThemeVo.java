@@ -27,8 +27,7 @@ public class ThemeVo implements ExtensionVoOperator {
 
     Theme.ThemeSpec spec;
 
-    @With
-    JsonNode config;
+    @With JsonNode config;
 
     /**
      * Convert {@link Theme} to {@link ThemeVo}.
@@ -38,9 +37,9 @@ public class ThemeVo implements ExtensionVoOperator {
      */
     public static ThemeVo from(Theme theme) {
         return ThemeVo.builder()
-            .metadata(theme.getMetadata())
-            .spec(theme.getSpec())
-            .config(null)
-            .build();
+                .metadata(theme.getMetadata())
+                .spec(theme.getSpec())
+                .config(null)
+                .build();
     }
 }

@@ -50,32 +50,35 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
 
     @Override
     public <E extends Extension> void insert(Iterable<E> extensions) {
-        extensions.forEach(extension -> {
-            // get indices manager
-            var indices = indicesManager.get((Class<E>) extension.getClass());
-            indices.insert(extension);
-        });
+        extensions.forEach(
+                extension -> {
+                    // get indices manager
+                    var indices = indicesManager.get((Class<E>) extension.getClass());
+                    indices.insert(extension);
+                });
     }
 
     @Override
     public <E extends Extension> void update(Iterable<E> extensions) {
-        extensions.forEach(extension -> {
-            var indices = indicesManager.get((Class<E>) extension.getClass());
-            indices.update(extension);
-        });
+        extensions.forEach(
+                extension -> {
+                    var indices = indicesManager.get((Class<E>) extension.getClass());
+                    indices.update(extension);
+                });
     }
 
     @Override
     public <E extends Extension> void delete(Iterable<E> extensions) {
-        extensions.forEach(extension -> {
-            var indices = indicesManager.get((Class<E>) extension.getClass());
-            indices.delete(extension);
-        });
+        extensions.forEach(
+                extension -> {
+                    var indices = indicesManager.get((Class<E>) extension.getClass());
+                    indices.delete(extension);
+                });
     }
 
     @Override
     public <E extends Extension> ListResult<String> retrieve(
-        Class<E> type, ListOptions options, PageRequest page) {
+            Class<E> type, ListOptions options, PageRequest page) {
         if (options == null) {
             options = ListOptions.builder().build();
         }
@@ -94,35 +97,28 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         if (limit <= 0) {
             // return all results for backward compatibility
             var finalResult = result.stream().sorted(comparator).toList();
-            return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, finalResult
-            );
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
         }
         if (offset >= total) {
             return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, new LinkedList<>()
-            );
+                    page.getPageNumber(), page.getPageSize(), total, new LinkedList<>());
         }
         if (offset + limit > total) {
             limit = total - offset;
         }
         var n = offset + limit;
         if (n > 1000) {
-            var finalResult = result.stream().sorted(comparator)
-                .skip(offset)
-                .limit(limit)
-                .toList();
-            return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, finalResult
-            );
+            var finalResult = result.stream().sorted(comparator).skip(offset).limit(limit).toList();
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
         }
         var pq = new PriorityQueue<>(n, comparator.reversed());
-        result.forEach(primaryKey -> {
-            pq.offer(primaryKey);
-            if (pq.size() > n) {
-                pq.poll();
-            }
-        });
+        result.forEach(
+                primaryKey -> {
+                    pq.offer(primaryKey);
+                    if (pq.size() > n) {
+                        pq.poll();
+                    }
+                });
         var finalResult = new LinkedList<String>();
         while (!pq.isEmpty()) {
             finalResult.addFirst(pq.poll());
@@ -132,15 +128,12 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             }
         }
         pq.clear();
-        return new ListResult<>(
-            page.getPageNumber(), page.getPageSize(), total, finalResult
-        );
+        return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
     }
-
 
     @Override
     public <E extends Extension> Iterable<String> retrieveAll(
-        Class<E> type, ListOptions options, Sort sort) {
+            Class<E> type, ListOptions options, Sort sort) {
         if (options == null) {
             options = ListOptions.builder().build();
         }
@@ -163,7 +156,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
 
     @Override
     public <E extends Extension> Iterable<String> retrieveTopN(
-        Class<E> type, ListOptions options, Sort sort, int topN) {
+            Class<E> type, ListOptions options, Sort sort, int topN) {
         Assert.isTrue(topN > 0, "topN must be greater than 0");
         if (options == null) {
             options = ListOptions.builder().build();
@@ -180,12 +173,13 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         var comparator = buildComparator(sort, indices);
         // make sure using reversed comparator to get top N
         var pq = new PriorityQueue<>(topN + 1, comparator.reversed());
-        result.forEach(primaryKey -> {
-            pq.offer(primaryKey);
-            if (pq.size() > topN) {
-                pq.poll();
-            }
-        });
+        result.forEach(
+                primaryKey -> {
+                    pq.offer(primaryKey);
+                    if (pq.size() > topN) {
+                        pq.poll();
+                    }
+                });
         var finalResult = new LinkedList<String>();
         while (!pq.isEmpty()) {
             finalResult.addFirst(pq.poll());
@@ -211,52 +205,51 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     private <E extends Extension> Comparator<String> buildComparator(
-        Sort sort, Indices<E> indices
-    ) {
+            Sort sort, Indices<E> indices) {
         return sort.stream()
-            .map(order -> buildComparator(order, indices))
-            .reduce(Comparator::thenComparing)
-            .orElseGet(Comparator::naturalOrder);
+                .map(order -> buildComparator(order, indices))
+                .reduce(Comparator::thenComparing)
+                .orElseGet(Comparator::naturalOrder);
     }
 
     private <K extends Comparable<K>, E extends Extension> Comparator<String> buildComparator(
-        Sort.Order order, Indices<E> indices
-    ) {
+            Sort.Order order, Indices<E> indices) {
         var index = indices.<K>getIndex(order.getProperty());
         Comparator<String> comparator;
         if (index instanceof MultiValueIndex<E, K> multiValueIndex) {
-            comparator = (left, right) -> {
-                var leftKeys = multiValueIndex.getKeys(left);
-                var rightKeys = multiValueIndex.getKeys(right);
-                // null first by default
-                if (CollectionUtils.isEmpty(leftKeys)) {
-                    return CollectionUtils.isEmpty(rightKeys) ? 0 : -1;
-                }
-                if (CollectionUtils.isEmpty(rightKeys)) {
-                    return 1;
-                }
-                // compare the first key
-                K leftKey = leftKeys.iterator().next();
-                K rightKey = rightKeys.iterator().next();
-                return Comparator.<K>naturalOrder().compare(leftKey, rightKey);
-            };
+            comparator =
+                    (left, right) -> {
+                        var leftKeys = multiValueIndex.getKeys(left);
+                        var rightKeys = multiValueIndex.getKeys(right);
+                        // null first by default
+                        if (CollectionUtils.isEmpty(leftKeys)) {
+                            return CollectionUtils.isEmpty(rightKeys) ? 0 : -1;
+                        }
+                        if (CollectionUtils.isEmpty(rightKeys)) {
+                            return 1;
+                        }
+                        // compare the first key
+                        K leftKey = leftKeys.iterator().next();
+                        K rightKey = rightKeys.iterator().next();
+                        return Comparator.<K>naturalOrder().compare(leftKey, rightKey);
+                    };
         } else if (index instanceof SingleValueIndex<E, K> singleValueIndex) {
-            comparator = (left, right) -> {
-                K leftKey = singleValueIndex.getKey(left);
-                K rightKey = singleValueIndex.getKey(right);
-                // null first by default
-                if (leftKey == null) {
-                    return rightKey == null ? 0 : -1;
-                }
-                if (rightKey == null) {
-                    return 1;
-                }
-                return leftKey.compareTo(rightKey);
-            };
+            comparator =
+                    (left, right) -> {
+                        K leftKey = singleValueIndex.getKey(left);
+                        K rightKey = singleValueIndex.getKey(right);
+                        // null first by default
+                        if (leftKey == null) {
+                            return rightKey == null ? 0 : -1;
+                        }
+                        if (rightKey == null) {
+                            return 1;
+                        }
+                        return leftKey.compareTo(rightKey);
+                    };
         } else {
             throw new UnsupportedOperationException(
-                "Unsupported index type for sorting: " + index.getClass()
-            );
+                    "Unsupported index type for sorting: " + index.getClass());
         }
         if (order.isDescending()) {
             comparator = comparator.reversed();

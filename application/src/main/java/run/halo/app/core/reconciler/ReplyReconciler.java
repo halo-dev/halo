@@ -38,56 +38,62 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Reply.class, request.name())
-            .ifPresent(reply -> {
-                if (reply.getMetadata().getDeletionTimestamp() != null) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return;
-                }
-                if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
-                    replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
-                    client.update(reply);
-                    eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
-                }
+                .ifPresent(
+                        reply -> {
+                            if (reply.getMetadata().getDeletionTimestamp() != null) {
+                                cleanUpResourcesAndRemoveFinalizer(request.name());
+                                return;
+                            }
+                            if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(
+                                        reply);
+                                client.update(reply);
+                                eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
+                            }
 
-                if (reply.getSpec().getCreationTime() == null) {
-                    reply.getSpec().setCreationTime(
-                        defaultIfNull(reply.getSpec().getApprovedTime(),
-                            reply.getMetadata().getCreationTimestamp()
-                        )
-                    );
-                }
+                            if (reply.getSpec().getCreationTime() == null) {
+                                reply.getSpec()
+                                        .setCreationTime(
+                                                defaultIfNull(
+                                                        reply.getSpec().getApprovedTime(),
+                                                        reply.getMetadata()
+                                                                .getCreationTimestamp()));
+                            }
 
-                // version + 1 is required to truly equal version
-                // as a version will be incremented after the update
-                reply.getStatus().setObservedVersion(reply.getMetadata().getVersion() + 1);
+                            // version + 1 is required to truly equal version
+                            // as a version will be incremented after the update
+                            reply.getStatus()
+                                    .setObservedVersion(reply.getMetadata().getVersion() + 1);
 
-                client.update(reply);
+                            client.update(reply);
 
-                eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
-            });
+                            eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
+                        });
         return new Result(false, null);
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String replyName) {
-        client.fetch(Reply.class, replyName).ifPresent(reply -> {
-            if (reply.getMetadata().getFinalizers() != null) {
-                reply.getMetadata().getFinalizers().remove(FINALIZER_NAME);
-            }
-            client.update(reply);
+        client.fetch(Reply.class, replyName)
+                .ifPresent(
+                        reply -> {
+                            if (reply.getMetadata().getFinalizers() != null) {
+                                reply.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+                            }
+                            client.update(reply);
 
-            // on reply removing
-            eventPublisher.publishEvent(new ReplyDeletedEvent(this, reply));
-        });
+                            // on reply removing
+                            eventPublisher.publishEvent(new ReplyDeletedEvent(this, reply));
+                        });
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var extension = new Reply();
-        return builder
-            .extension(extension)
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
-                .build())
-            .build();
+        return builder.extension(extension)
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .andQuery(equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                                .build())
+                .build();
     }
 }

@@ -27,17 +27,13 @@ import run.halo.app.extension.index.IndicesManager;
 @ExtendWith(MockitoExtension.class)
 class DefaultSchemeManagerTest {
 
-    @Mock
-    IndicesManager indicesManager;
+    @Mock IndicesManager indicesManager;
 
-    @Mock
-    IndexEngine indexEngine;
+    @Mock IndexEngine indexEngine;
 
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+    @Mock ApplicationEventPublisher eventPublisher;
 
-    @InjectMocks
-    DefaultSchemeManager schemeManager;
+    @InjectMocks DefaultSchemeManager schemeManager;
 
     @BeforeEach
     void setUp() {
@@ -46,11 +42,11 @@ class DefaultSchemeManagerTest {
 
     @Test
     void shouldThrowExceptionWhenNoGvkAnnotation() {
-        class WithoutGvkExtension extends AbstractExtension {
-        }
+        class WithoutGvkExtension extends AbstractExtension {}
 
-        assertThrows(IllegalArgumentException.class,
-            () -> schemeManager.register(WithoutGvkExtension.class));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> schemeManager.register(WithoutGvkExtension.class));
     }
 
     @Test
@@ -120,15 +116,18 @@ class DefaultSchemeManagerTest {
     void shouldReturnCopyOnWriteList() {
         schemeManager.register(FakeExtension.class);
         var schemes = schemeManager.schemes();
-        schemes.forEach(scheme -> {
-            // make sure concurrent modification won't happen
-            schemeManager.register(FooExtension.class);
-        });
+        schemes.forEach(
+                scheme -> {
+                    // make sure concurrent modification won't happen
+                    schemeManager.register(FooExtension.class);
+                });
     }
 
-    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Foo",
-        plural = "foos", singular = "foo")
-    static class FooExtension extends AbstractExtension {
-    }
+    @GVK(
+            group = "fake.halo.run",
+            version = "v1alpha1",
+            kind = "Foo",
+            plural = "foos",
+            singular = "foo")
+    static class FooExtension extends AbstractExtension {}
 }
-

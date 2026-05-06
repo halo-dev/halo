@@ -22,5 +22,4 @@ public class PluginsRootGetterImpl implements PluginsRootGetter {
     public Path get() {
         return haloProperties.getWorkDir().resolve("plugins");
     }
-
 }

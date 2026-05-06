@@ -18,14 +18,11 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 @ExtendWith(MockitoExtension.class)
 class SearchServiceImplTest {
 
-    @Mock
-    Validator validator;
+    @Mock Validator validator;
 
-    @Mock
-    ExtensionGetter extensionGetter;
+    @Mock ExtensionGetter extensionGetter;
 
-    @InjectMocks
-    SearchServiceImpl searchService;
+    @InjectMocks SearchServiceImpl searchService;
 
     @Test
     void shouldThrowValidationErrorIfOptionIsInvalid() {
@@ -36,10 +33,11 @@ class SearchServiceImplTest {
         when(errors.hasErrors()).thenReturn(true);
         when(validator.validateObject(option)).thenReturn(errors);
 
-        searchService.search(option)
-            .as(StepVerifier::create)
-            .expectError(RequestBodyValidationException.class)
-            .verify();
+        searchService
+                .search(option)
+                .as(StepVerifier::create)
+                .expectError(RequestBodyValidationException.class)
+                .verify();
     }
 
     @Test
@@ -53,10 +51,11 @@ class SearchServiceImplTest {
 
         when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.empty());
 
-        searchService.search(option)
-            .as(StepVerifier::create)
-            .expectError(SearchEngineUnavailableException.class)
-            .verify();
+        searchService
+                .search(option)
+                .as(StepVerifier::create)
+                .expectError(SearchEngineUnavailableException.class)
+                .verify();
     }
 
     @Test
@@ -69,15 +68,19 @@ class SearchServiceImplTest {
         when(validator.validateObject(option)).thenReturn(errors);
 
         when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenAnswer(invocation -> Mono.fromSupplier(() -> {
-                var searchEngine = mock(SearchEngine.class);
-                when(searchEngine.available()).thenReturn(false);
-                return searchEngine;
-            }));
+                .thenAnswer(
+                        invocation ->
+                                Mono.fromSupplier(
+                                        () -> {
+                                            var searchEngine = mock(SearchEngine.class);
+                                            when(searchEngine.available()).thenReturn(false);
+                                            return searchEngine;
+                                        }));
 
-        searchService.search(option)
-            .as(StepVerifier::create)
-            .expectError(SearchEngineUnavailableException.class);
+        searchService
+                .search(option)
+                .as(StepVerifier::create)
+                .expectError(SearchEngineUnavailableException.class);
     }
 
     @Test
@@ -91,16 +94,21 @@ class SearchServiceImplTest {
 
         var searchResult = mock(SearchResult.class);
         when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenAnswer(invocation -> Mono.fromSupplier(() -> {
-                var searchEngine = mock(SearchEngine.class);
-                when(searchEngine.available()).thenReturn(true);
-                when(searchEngine.search(option)).thenReturn(searchResult);
-                return searchEngine;
-            }));
+                .thenAnswer(
+                        invocation ->
+                                Mono.fromSupplier(
+                                        () -> {
+                                            var searchEngine = mock(SearchEngine.class);
+                                            when(searchEngine.available()).thenReturn(true);
+                                            when(searchEngine.search(option))
+                                                    .thenReturn(searchResult);
+                                            return searchEngine;
+                                        }));
 
-        searchService.search(option)
-            .as(StepVerifier::create)
-            .expectNext(searchResult)
-            .verifyComplete();
+        searchService
+                .search(option)
+                .as(StepVerifier::create)
+                .expectNext(searchResult)
+                .verifyComplete();
     }
 }

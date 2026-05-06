@@ -18,8 +18,8 @@ public class UrlContextListResult<T> extends ListResult<T> {
     private final String nextUrl;
     private final String prevUrl;
 
-    public UrlContextListResult(int page, int size, long total, List<T> items, String nextUrl,
-        String prevUrl) {
+    public UrlContextListResult(
+            int page, int size, long total, List<T> items, String nextUrl, String prevUrl) {
         super(page, size, total, items);
         this.nextUrl = nextUrl;
         this.prevUrl = prevUrl;

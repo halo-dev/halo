@@ -49,9 +49,9 @@ public class IpAddressUtils {
         }
         var remoteAddress = request.getRemoteAddress();
         return remoteAddress == null || remoteAddress.isUnresolved()
-            ? UNKNOWN : remoteAddress.getAddress().getHostAddress();
+                ? UNKNOWN
+                : remoteAddress.getAddress().getHostAddress();
     }
-
 
     /**
      * Gets the ip address from request.
@@ -67,5 +67,4 @@ public class IpAddressUtils {
             return UNKNOWN;
         }
     }
-
 }

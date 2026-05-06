@@ -27,21 +27,25 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
         if (!isSameAsPost(request.name())) {
             return Result.doNotRetry();
         }
-        client.fetch(Counter.class, request.name()).ifPresent(counter -> {
-            eventPublisher.publishEvent(new PostStatsChangedEvent(this, counter));
-        });
+        client.fetch(Counter.class, request.name())
+                .ifPresent(
+                        counter -> {
+                            eventPublisher.publishEvent(new PostStatsChangedEvent(this, counter));
+                        });
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var extension = new Counter();
-        return builder
-            .extension(extension)
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(startsWith("metadata.name", MeterUtils.nameOf(Post.class, "")))
-                .build())
-            .build();
+        return builder.extension(extension)
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .andQuery(
+                                        startsWith(
+                                                "metadata.name", MeterUtils.nameOf(Post.class, "")))
+                                .build())
+                .build();
     }
 
     static boolean isSameAsPost(String name) {

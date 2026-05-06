@@ -18,8 +18,7 @@ import run.halo.app.search.SearchService;
 @SpringBootTest
 class DefaultPluginApplicationContextFactoryTest {
 
-    @MockitoSpyBean
-    SpringPluginManager pluginManager;
+    @MockitoSpyBean SpringPluginManager pluginManager;
 
     DefaultPluginApplicationContextFactory factory;
 
@@ -34,10 +33,11 @@ class DefaultPluginApplicationContextFactoryTest {
         when(pw.getPluginClassLoader()).thenReturn(this.getClass().getClassLoader());
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
         var sp = (SpringPlugin) plugin;
-        var pluginContext = new PluginContext.PluginContextBuilder()
-            .name("fake-plugin")
-            .version("1.0.0")
-            .build();
+        var pluginContext =
+                new PluginContext.PluginContextBuilder()
+                        .name("fake-plugin")
+                        .version("1.0.0")
+                        .build();
         when(sp.getPluginContext()).thenReturn(pluginContext);
         when(pw.getPlugin()).thenReturn(plugin);
         when(pluginManager.getPlugin("fake-plugin")).thenReturn(pw);
@@ -50,5 +50,4 @@ class DefaultPluginApplicationContextFactoryTest {
         assertNotNull(context.getBeanProvider(PluginsRootGetter.class).getIfUnique());
         // TODO Add more assertions here.
     }
-
 }

@@ -83,8 +83,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    ServerResponse.Context context(CodecConfigurer codec,
-        ViewResolutionResultHandler resultHandler) {
+    ServerResponse.Context context(
+            CodecConfigurer codec, ViewResolutionResultHandler resultHandler) {
         return new ServerResponse.Context() {
             @Override
             public List<HttpMessageWriter<?>> messageWriters() {
@@ -123,57 +123,61 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Bean
     RouterFunction<ServerResponse> uiPageEndpoints() {
-        var consolePagePredicate = path("/console/**")
-            .and(accept(MediaType.TEXT_HTML))
-            .and(new WebSocketRequestPredicate().negate());
+        var consolePagePredicate =
+                path("/console/**")
+                        .and(accept(MediaType.TEXT_HTML))
+                        .and(new WebSocketRequestPredicate().negate());
 
-        var ucPagePredicate = path("/uc/**")
-            .and(accept(MediaType.TEXT_HTML))
-            .and(new WebSocketRequestPredicate().negate());
+        var ucPagePredicate =
+                path("/uc/**")
+                        .and(accept(MediaType.TEXT_HTML))
+                        .and(new WebSocketRequestPredicate().negate());
 
         var consolePageHtml = applicationContext.getResource("classpath:/ui/console.html");
 
         var ucPageHtml = applicationContext.getResource("classpath:/ui/uc.html");
 
         return RouterFunctions.route()
-            .GET(consolePagePredicate,
-                request -> ServerResponse.ok()
-                    .cacheControl(CacheControl.noStore())
-                    .bodyValue(consolePageHtml)
-            )
-            .GET(ucPagePredicate,
-                request -> ServerResponse.ok()
-                    .cacheControl(CacheControl.noStore())
-                    .bodyValue(ucPageHtml)
-            )
-            .build();
+                .GET(
+                        consolePagePredicate,
+                        request ->
+                                ServerResponse.ok()
+                                        .cacheControl(CacheControl.noStore())
+                                        .bodyValue(consolePageHtml))
+                .GET(
+                        ucPagePredicate,
+                        request ->
+                                ServerResponse.ok()
+                                        .cacheControl(CacheControl.noStore())
+                                        .bodyValue(ucPageHtml))
+                .build();
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = attachmentRootGetter.get();
         var resourceProperties = webProperties.getResources();
-        var cacheControl = resourceProperties.getCache()
-            .getCachecontrol()
-            .toHttpCacheControl();
+        var cacheControl = resourceProperties.getCache().getCachecontrol().toHttpCacheControl();
         if (cacheControl == null) {
             cacheControl = CacheControl.empty();
         }
         final var useLastModified = resourceProperties.getCache().isUseLastModified();
 
         // Mandatory resource mapping
-        var uploadRegistration = registry.addResourceHandler("/upload/**")
-            .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
-            .setUseLastModified(useLastModified)
-            .setCacheControl(cacheControl);
+        var uploadRegistration =
+                registry.addResourceHandler("/upload/**")
+                        .addResourceLocations(
+                                FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
+                        .setUseLastModified(useLastModified)
+                        .setCacheControl(cacheControl);
 
         registry.addResourceHandler("/ui-assets/**")
-            .addResourceLocations("classpath:/ui/ui-assets/")
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
+                .addResourceLocations("classpath:/ui/ui-assets/")
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
 
         // Additional resource mappings
         var staticResources = haloProp.getAttachment().getResourceMappings();
@@ -182,9 +186,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
             if (Objects.equals(staticResource.getPathPattern(), "/upload/**")) {
                 registration = uploadRegistration;
             } else {
-                registration = registry.addResourceHandler(staticResource.getPathPattern())
-                    .setCacheControl(cacheControl)
-                    .setUseLastModified(useLastModified);
+                registration =
+                        registry.addResourceHandler(staticResource.getPathPattern())
+                                .setCacheControl(cacheControl)
+                                .setUseLastModified(useLastModified);
             }
             for (String location : staticResource.getLocations()) {
                 var path = attachmentsRoot.resolve(location);
@@ -199,20 +204,19 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
         var haloStaticPath = haloProp.getWorkDir().resolve("static");
         registry.addResourceHandler("/**")
-            .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")
-            .addResourceLocations(resourceProperties.getStaticLocations())
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
+                .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")
+                .addResourceLocations(resourceProperties.getStaticLocations())
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
     }
 
     private void applyThumbnailChain(ResourceHandlerRegistration registration) {
-        registration.resourceChain(false)
-            .addTransformer(
-                new ThumbnailResourceTransformer(localThumbnailService)
-            );
+        registration
+                .resourceChain(false)
+                .addTransformer(new ThumbnailResourceTransformer(localThumbnailService));
     }
 
     /**
@@ -258,8 +262,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     UrlHandlerFilter urlHandlerFilter() {
-        return UrlHandlerFilter
-            .trailingSlashHandler("/**").mutateRequest()
-            .build();
+        return UrlHandlerFilter.trailingSlashHandler("/**").mutateRequest().build();
     }
 }

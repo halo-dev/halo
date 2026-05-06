@@ -38,5 +38,4 @@ public interface EmailPasswordRecoveryService {
     Mono<Void> changePassword(String newPassword, String token);
 
     Mono<ResetToken> getValidResetToken(String token);
-
 }

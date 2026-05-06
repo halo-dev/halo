@@ -8,8 +8,7 @@ public interface Reconciler<R> {
 
     Controller setupWith(ControllerBuilder builder);
 
-    record Request(String name) {
-    }
+    record Request(String name) {}
 
     record Result(boolean reEnqueue, Duration retryAfter) {
 

@@ -24,36 +24,36 @@ import run.halo.app.theme.ThemeResolver;
 @AutoConfigureWebTestClient
 class GeneratorMetaProcessorTest {
 
-    @Autowired
-    WebTestClient webClient;
+    @Autowired WebTestClient webClient;
 
-    @MockitoBean
-    InitializationStateGetter initializationStateGetter;
+    @MockitoBean InitializationStateGetter initializationStateGetter;
 
-    @MockitoBean
-    ThemeResolver themeResolver;
+    @MockitoBean ThemeResolver themeResolver;
 
     @BeforeEach
     void setUp() throws FileNotFoundException, URISyntaxException {
         when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
-        var themeContext = ThemeContext.builder()
-            .name("default")
-            .path(Path.of(ResourceUtils.getURL("classpath:themes/default").toURI()))
-            .active(true)
-            .build();
+        var themeContext =
+                ThemeContext.builder()
+                        .name("default")
+                        .path(Path.of(ResourceUtils.getURL("classpath:themes/default").toURI()))
+                        .active(true)
+                        .build();
         when(themeResolver.getTheme(any(ServerWebExchange.class)))
-            .thenReturn(Mono.just(themeContext));
+                .thenReturn(Mono.just(themeContext));
     }
 
     @Test
     void requestIndexPage() {
-        webClient.get().uri("/")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .consumeWith(System.out::println)
-            .xpath("/html/head/meta[@name=\"generator\"][starts-with(@content, \"Halo \")]")
-            .exists();
+        webClient
+                .get()
+                .uri("/")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .xpath("/html/head/meta[@name=\"generator\"][starts-with(@content, \"Halo \")]")
+                .exists();
     }
-
 }

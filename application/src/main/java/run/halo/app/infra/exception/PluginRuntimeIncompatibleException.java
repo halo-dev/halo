@@ -13,11 +13,10 @@ import org.springframework.web.server.ServerErrorException;
 public class PluginRuntimeIncompatibleException extends ServerErrorException {
 
     private static final URI TYPE =
-        URI.create("https://www.halo.run/probs/plugin-runtime-incompatible");
+            URI.create("https://www.halo.run/probs/plugin-runtime-incompatible");
 
     public PluginRuntimeIncompatibleException(Throwable cause) {
         super("Incompatible plugin detected.", cause);
         setType(TYPE);
     }
-
 }

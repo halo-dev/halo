@@ -25,17 +25,17 @@ public class PluginControllerManager {
 
     @EventListener
     public void onApplicationEvent(SpringPluginStartedEvent event) {
-        event.getSpringPlugin().getApplicationContext()
-            .<Reconciler<Reconciler.Request>>getBeanProvider(
-                forClassWithGenerics(Reconciler.class, Reconciler.Request.class))
-            .orderedStream()
-            .forEach(this::start);
+        event.getSpringPlugin()
+                .getApplicationContext()
+                .<Reconciler<Reconciler.Request>>getBeanProvider(
+                        forClassWithGenerics(Reconciler.class, Reconciler.Request.class))
+                .orderedStream()
+                .forEach(this::start);
     }
 
     @EventListener
     public void onApplicationEvent(SpringPluginStoppingEvent event) throws Exception {
-        controllers.values()
-            .forEach(Disposable::dispose);
+        controllers.values().forEach(Disposable::dispose);
         controllers.clear();
     }
 
@@ -45,5 +45,4 @@ public class PluginControllerManager {
         controllers.put(reconciler.getClass().getName(), controller);
         controller.start();
     }
-
 }

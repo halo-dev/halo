@@ -23,18 +23,16 @@ import run.halo.app.infra.SystemConfigFetcher;
 @ExtendWith(MockitoExtension.class)
 class CategoryPermalinkPolicyTest {
 
-    @Mock
-    private ExternalUrlSupplier externalUrlSupplier;
+    @Mock private ExternalUrlSupplier externalUrlSupplier;
 
-    @Mock
-    private SystemConfigFetcher environmentFetcher;
+    @Mock private SystemConfigFetcher environmentFetcher;
 
     private CategoryPermalinkPolicy categoryPermalinkPolicy;
 
     @BeforeEach
     void setUp() {
         categoryPermalinkPolicy =
-            new CategoryPermalinkPolicy(externalUrlSupplier, environmentFetcher);
+                new CategoryPermalinkPolicy(externalUrlSupplier, environmentFetcher);
     }
 
     @Test

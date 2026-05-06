@@ -39,7 +39,7 @@ import run.halo.app.plugin.event.PluginStartedEvent;
  */
 @Slf4j
 class HaloPluginManager extends DefaultPluginManager
-    implements SpringPluginManager, InitializingBean {
+        implements SpringPluginManager, InitializingBean {
 
     private final ApplicationContext rootContext;
 
@@ -51,10 +51,11 @@ class HaloPluginManager extends DefaultPluginManager
 
     private final SystemVersionSupplier systemVersionSupplier;
 
-    public HaloPluginManager(ApplicationContext rootContext,
-        PluginProperties pluginProperties,
-        SystemVersionSupplier systemVersionSupplier,
-        PluginsRootGetter pluginsRootGetter) {
+    public HaloPluginManager(
+            ApplicationContext rootContext,
+            PluginProperties pluginProperties,
+            SystemVersionSupplier systemVersionSupplier,
+            PluginsRootGetter pluginsRootGetter) {
         this.pluginProperties = pluginProperties;
         this.rootContext = rootContext;
         this.pluginsRootGetter = pluginsRootGetter;
@@ -122,14 +123,12 @@ class HaloPluginManager extends DefaultPluginManager
 
     @Override
     protected PluginRepository createPluginRepository() {
-        var developmentPluginRepository =
-            new DefaultDevelopmentPluginRepository(getPluginsRoots());
-        developmentPluginRepository
-            .setFixedPaths(pluginProperties.getFixedPluginPath());
+        var developmentPluginRepository = new DefaultDevelopmentPluginRepository(getPluginsRoots());
+        developmentPluginRepository.setFixedPaths(pluginProperties.getFixedPluginPath());
         return new CompoundPluginRepository()
-            .add(developmentPluginRepository, this::isDevelopment)
-            .add(new JarPluginRepository(getPluginsRoots()))
-            .add(new DefaultPluginRepository(getPluginsRoots()));
+                .add(developmentPluginRepository, this::isDevelopment)
+                .add(new JarPluginRepository(getPluginsRoots()))
+                .add(new DefaultPluginRepository(getPluginsRoots()));
     }
 
     @Override
@@ -140,15 +139,13 @@ class HaloPluginManager extends DefaultPluginManager
     @Override
     public void startPlugins() {
         throw new UnsupportedOperationException(
-            "The operation of starting all plugins is not supported."
-        );
+                "The operation of starting all plugins is not supported.");
     }
 
     @Override
     public void stopPlugins() {
         throw new UnsupportedOperationException(
-            "The operation of stopping all plugins is not supported."
-        );
+                "The operation of stopping all plugins is not supported.");
     }
 
     @Override
@@ -183,11 +180,10 @@ class HaloPluginManager extends DefaultPluginManager
 
     @Override
     public List<PluginWrapper> startedPlugins() {
-        return List.copyOf(super.getStartedPlugins())
-            .stream()
-            // Make sure the plugin is really started
-            .filter(p -> p.getPluginState().isStarted())
-            .toList();
+        return List.copyOf(super.getStartedPlugins()).stream()
+                // Make sure the plugin is really started
+                .filter(p -> p.getPluginState().isStarted())
+                .toList();
     }
 
     /**
@@ -204,12 +200,15 @@ class HaloPluginManager extends DefaultPluginManager
                 var plugin = event.getPlugin().getPlugin();
                 if (plugin instanceof SpringPlugin springPlugin) {
                     try {
-                        springPlugin.getApplicationContext()
-                            .publishEvent(new PluginStartedEvent(this));
+                        springPlugin
+                                .getApplicationContext()
+                                .publishEvent(new PluginStartedEvent(this));
                     } catch (Throwable t) {
                         var pluginId = event.getPlugin().getPluginId();
-                        log.warn("Error while publishing plugin started event for plugin {}",
-                            pluginId, t);
+                        log.warn(
+                                "Error while publishing plugin started event for plugin {}",
+                                pluginId,
+                                t);
                     }
                 }
             }

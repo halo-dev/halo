@@ -29,16 +29,24 @@ class ExtensionUpdateHandler implements UpdateHandler {
     public Mono<ServerResponse> handle(ServerRequest request) {
         String name = request.pathVariable("name");
         return request.bodyToMono(Unstructured.class)
-            .filter(unstructured -> unstructured.getMetadata() != null
-                && StringUtils.hasText(unstructured.getMetadata().getName())
-                && Objects.equals(unstructured.getMetadata().getName(), name))
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "Cannot read body to " + scheme.groupVersionKind())))
-            .flatMap(client::update)
-            .flatMap(updated -> ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(updated));
+                .filter(
+                        unstructured ->
+                                unstructured.getMetadata() != null
+                                        && StringUtils.hasText(unstructured.getMetadata().getName())
+                                        && Objects.equals(
+                                                unstructured.getMetadata().getName(), name))
+                .switchIfEmpty(
+                        Mono.error(
+                                () ->
+                                        new ServerWebInputException(
+                                                "Cannot read body to "
+                                                        + scheme.groupVersionKind())))
+                .flatMap(client::update)
+                .flatMap(
+                        updated ->
+                                ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(updated));
     }
 
     @Override

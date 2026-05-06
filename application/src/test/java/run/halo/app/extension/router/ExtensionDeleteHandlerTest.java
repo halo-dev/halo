@@ -32,8 +32,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class ExtensionDeleteHandlerTest {
 
-    @Mock
-    ReactiveExtensionClient client;
+    @Mock ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -55,9 +54,10 @@ class ExtensionDeleteHandlerTest {
         unstructured.setApiVersion("fake.halo.run/v1alpha1");
         unstructured.setKind("Fake");
 
-        var serverRequest = MockServerRequest.builder()
-            .pathVariable("name", "my-fake")
-            .body(Mono.just(unstructured));
+        var serverRequest =
+                MockServerRequest.builder()
+                        .pathVariable("name", "my-fake")
+                        .body(Mono.just(unstructured));
         when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.just(fake));
         when(client.delete(eq(fake))).thenReturn(Mono.just(fake));
 
@@ -66,13 +66,16 @@ class ExtensionDeleteHandlerTest {
         var responseMono = deleteHandler.handle(serverRequest);
 
         StepVerifier.create(responseMono)
-            .assertNext(response -> {
-                assertEquals(HttpStatus.OK, response.statusCode());
-                assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
-                assertTrue(response instanceof EntityResponse<?>);
-                assertEquals(fake, ((EntityResponse<?>) response).entity());
-            })
-            .verifyComplete();
+                .assertNext(
+                        response -> {
+                            assertEquals(HttpStatus.OK, response.statusCode());
+                            assertEquals(
+                                    MediaType.APPLICATION_JSON,
+                                    response.headers().getContentType());
+                            assertTrue(response instanceof EntityResponse<?>);
+                            assertEquals(fake, ((EntityResponse<?>) response).entity());
+                        })
+                .verifyComplete();
         verify(client, times(1)).get(eq(FakeExtension.class), eq("my-fake"));
         verify(client, times(1)).delete(any());
         verify(client, times(0)).update(any());
@@ -80,8 +83,7 @@ class ExtensionDeleteHandlerTest {
 
     @Test
     void shouldReturnErrorWhenNoNameProvided() {
-        var serverRequest = MockServerRequest.builder()
-            .body(Mono.empty());
+        var serverRequest = MockServerRequest.builder().body(Mono.empty());
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
         assertThrows(IllegalArgumentException.class, () -> deleteHandler.handle(serverRequest));
@@ -89,19 +91,18 @@ class ExtensionDeleteHandlerTest {
 
     @Test
     void shouldReturnErrorWhenExtensionNotFound() {
-        var serverRequest = MockServerRequest.builder()
-            .pathVariable("name", "my-fake")
-            .build();
-        when(client.get(FakeExtension.class, "my-fake")).thenReturn(
-            Mono.error(
-                new ExtensionNotFoundException(fromExtension(FakeExtension.class), "my-fake")));
+        var serverRequest = MockServerRequest.builder().pathVariable("name", "my-fake").build();
+        when(client.get(FakeExtension.class, "my-fake"))
+                .thenReturn(
+                        Mono.error(
+                                new ExtensionNotFoundException(
+                                        fromExtension(FakeExtension.class), "my-fake")));
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
         var responseMono = deleteHandler.handle(serverRequest);
 
-        StepVerifier.create(responseMono)
-            .verifyError(ExtensionNotFoundException.class);
+        StepVerifier.create(responseMono).verifyError(ExtensionNotFoundException.class);
 
         verify(client, times(1)).get(same(FakeExtension.class), anyString());
         verify(client, times(0)).update(any());

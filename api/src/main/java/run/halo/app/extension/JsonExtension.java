@@ -87,18 +87,18 @@ public class JsonExtension implements Extension {
     public static class ObjectNodeExtensionSerializer extends JsonSerializer<JsonExtension> {
 
         @Override
-        public void serialize(JsonExtension value, JsonGenerator gen,
-            SerializerProvider serializers) throws IOException {
+        public void serialize(
+                JsonExtension value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
             gen.writeTree(value.objectNode);
         }
     }
 
-    public static class ObjectNodeExtensionDeSerializer
-        extends JsonDeserializer<JsonExtension> {
+    public static class ObjectNodeExtensionDeSerializer extends JsonDeserializer<JsonExtension> {
 
         @Override
         public JsonExtension deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException {
+                throws IOException {
             var mapper = (ObjectMapper) p.getCodec();
             var treeNode = mapper.readTree(p);
             return new JsonExtension(mapper, (ObjectNode) treeNode);
@@ -169,15 +169,13 @@ public class JsonExtension implements Extension {
         @Override
         public Map<String, String> getLabels() {
             var labelsNode = objectNode.get("labels");
-            return objectMapper.convertValue(labelsNode, new TypeReference<>() {
-            });
+            return objectMapper.convertValue(labelsNode, new TypeReference<>() {});
         }
 
         @Override
         public Map<String, String> getAnnotations() {
             var annotationsNode = objectNode.get("annotations");
-            return objectMapper.convertValue(annotationsNode, new TypeReference<>() {
-            });
+            return objectMapper.convertValue(annotationsNode, new TypeReference<>() {});
         }
 
         @Override
@@ -198,8 +196,8 @@ public class JsonExtension implements Extension {
 
         @Override
         public Set<String> getFinalizers() {
-            return objectMapper.convertValue(objectNode.get("finalizers"), new TypeReference<>() {
-            });
+            return objectMapper.convertValue(
+                    objectNode.get("finalizers"), new TypeReference<>() {});
         }
 
         @Override

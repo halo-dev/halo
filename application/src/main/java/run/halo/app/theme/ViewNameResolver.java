@@ -12,9 +12,8 @@ import reactor.core.publisher.Mono;
  * @since 2.10.2
  */
 public interface ViewNameResolver {
-    Mono<String> resolveViewNameOrDefault(ServerWebExchange exchange, String name,
-        String defaultName);
+    Mono<String> resolveViewNameOrDefault(
+            ServerWebExchange exchange, String name, String defaultName);
 
-    Mono<String> resolveViewNameOrDefault(ServerRequest request, String name,
-        String defaultName);
+    Mono<String> resolveViewNameOrDefault(ServerRequest request, String name, String defaultName);
 }

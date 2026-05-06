@@ -63,71 +63,88 @@ public class CategoryPostRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
-        return RouterFunctions.route(GET(PathUtils.combinePath(prefix, "/{slug}"))
-            .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page:\\d+}")))
-            .and(accept(MediaType.TEXT_HTML)), handlerFunction());
+        return RouterFunctions.route(
+                GET(PathUtils.combinePath(prefix, "/{slug}"))
+                        .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page:\\d+}")))
+                        .and(accept(MediaType.TEXT_HTML)),
+                handlerFunction());
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             String slug = request.pathVariable("slug");
             return fetchBySlug(slug)
-                .flatMap(categoryVo -> {
-                    Map<String, Object> model = new HashMap<>();
-                    model.put("name", categoryVo.getMetadata().getName());
-                    model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORY.getValue());
-                    model.put("posts",
-                        postListByCategoryName(categoryVo.getMetadata().getName(), request));
-                    model.put("category", categoryVo);
-                    model.put(
-                        Constant.META_DESCRIPTION_VARIABLE_NAME,
-                        categoryVo.getSpec().getDescription()
-                    );
-                    String template = categoryVo.getSpec().getTemplate();
-                    return viewNameResolver.resolveViewNameOrDefault(request, template,
-                            DefaultTemplateEnum.CATEGORY.getValue())
-                        .flatMap(viewName -> ServerResponse.ok().render(viewName, model));
-                })
-                .switchIfEmpty(
-                    Mono.error(new NotFoundException("Category not found with slug: " + slug)));
+                    .flatMap(
+                            categoryVo -> {
+                                Map<String, Object> model = new HashMap<>();
+                                model.put("name", categoryVo.getMetadata().getName());
+                                model.put(
+                                        ModelConst.TEMPLATE_ID,
+                                        DefaultTemplateEnum.CATEGORY.getValue());
+                                model.put(
+                                        "posts",
+                                        postListByCategoryName(
+                                                categoryVo.getMetadata().getName(), request));
+                                model.put("category", categoryVo);
+                                model.put(
+                                        Constant.META_DESCRIPTION_VARIABLE_NAME,
+                                        categoryVo.getSpec().getDescription());
+                                String template = categoryVo.getSpec().getTemplate();
+                                return viewNameResolver
+                                        .resolveViewNameOrDefault(
+                                                request,
+                                                template,
+                                                DefaultTemplateEnum.CATEGORY.getValue())
+                                        .flatMap(
+                                                viewName ->
+                                                        ServerResponse.ok()
+                                                                .render(viewName, model));
+                            })
+                    .switchIfEmpty(
+                            Mono.error(
+                                    new NotFoundException(
+                                            "Category not found with slug: " + slug)));
         };
     }
 
     Mono<CategoryVo> fetchBySlug(String slug) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            and(
-                equal("spec.slug", slug),
-                isNull("metadata.deletionTimestamp")
-            )
-        ));
+        listOptions.setFieldSelector(
+                FieldSelector.of(
+                        and(equal("spec.slug", slug), isNull("metadata.deletionTimestamp"))));
         return client.listBy(Category.class, listOptions, PageRequestImpl.ofSize(1))
-            .mapNotNull(result -> ListResult.first(result)
-                .map(CategoryVo::from)
-                .orElse(null)
-            );
+                .mapNotNull(result -> ListResult.first(result).map(CategoryVo::from).orElse(null));
     }
 
-    private Mono<UrlContextListResult<ListedPostVo>> postListByCategoryName(String name,
-        ServerRequest request) {
+    private Mono<UrlContextListResult<ListedPostVo>> postListByCategoryName(
+            String name, ServerRequest request) {
         String path = request.path();
         int pageNum = pageNumInPathVariable(request);
         return configuredPageSize(environmentFetcher, SystemSetting.Post::getCategoryPageSize)
-            .flatMap(pageSize -> postFinder.listByCategory(pageNum, pageSize, name))
-            .doOnNext(list -> list.forEach(postVo -> postVo.getSpec().setTitle(
-                    titleVisibilityIdentifyCalculator.calculateTitle(
-                        postVo.getSpec().getTitle(),
-                        postVo.getSpec().getVisible(),
-                        localeContextResolver.resolveLocaleContext(request.exchange())
-                            .getLocale()
-                    )
-                )
-            ))
-            .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
-                .listResult(list)
-                .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
-                .prevUrl(PageUrlUtils.prevPageUrl(path))
-                .build()
-            );
+                .flatMap(pageSize -> postFinder.listByCategory(pageNum, pageSize, name))
+                .doOnNext(
+                        list ->
+                                list.forEach(
+                                        postVo ->
+                                                postVo.getSpec()
+                                                        .setTitle(
+                                                                titleVisibilityIdentifyCalculator
+                                                                        .calculateTitle(
+                                                                                postVo.getSpec()
+                                                                                        .getTitle(),
+                                                                                postVo.getSpec()
+                                                                                        .getVisible(),
+                                                                                localeContextResolver
+                                                                                        .resolveLocaleContext(
+                                                                                                request
+                                                                                                        .exchange())
+                                                                                        .getLocale()))))
+                .map(
+                        list ->
+                                new UrlContextListResult.Builder<ListedPostVo>()
+                                        .listResult(list)
+                                        .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
+                                        .prevUrl(PageUrlUtils.prevPageUrl(path))
+                                        .build());
     }
 }

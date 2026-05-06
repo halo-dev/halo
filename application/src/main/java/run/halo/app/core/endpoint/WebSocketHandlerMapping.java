@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.ui.WebSocketUtils;
 
 public class WebSocketHandlerMapping extends AbstractHandlerMapping
-    implements WebSocketEndpointManager, InitializingBean {
+        implements WebSocketEndpointManager, InitializingBean {
 
     private final BiMap<PathPattern, WebSocketEndpoint> endpointMap;
 
@@ -36,7 +36,7 @@ public class WebSocketHandlerMapping extends AbstractHandlerMapping
     public Mono<WebSocketHandler> getHandlerInternal(ServerWebExchange exchange) {
         var request = exchange.getRequest();
         if (!HttpMethod.GET.equals(request.getMethod())
-            || !WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
+                || !WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
             // skip getting handler if the request is not a WebSocket.
             return Mono.empty();
         }
@@ -71,7 +71,7 @@ public class WebSocketHandlerMapping extends AbstractHandlerMapping
             exchange.getAttributes().put(BEST_MATCHING_HANDLER_ATTRIBUTE, handler);
 
             ServerRequestObservationContext.findCurrent(exchange.getAttributes())
-                .ifPresent(context -> context.setPathPattern(pattern.toString()));
+                    .ifPresent(context -> context.setPathPattern(pattern.toString()));
 
             var pathWithinMapping = pattern.extractPathWithinPattern(pathContainer);
             exchange.getAttributes().put(PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, pathWithinMapping);
@@ -79,7 +79,7 @@ public class WebSocketHandlerMapping extends AbstractHandlerMapping
             var matchInfo = pattern.matchAndExtract(pathContainer);
             Assert.notNull(matchInfo, "Expect a match");
             exchange.getAttributes()
-                .put(URI_TEMPLATE_VARIABLES_ATTRIBUTE, matchInfo.getUriVariables());
+                    .put(URI_TEMPLATE_VARIABLES_ATTRIBUTE, matchInfo.getUriVariables());
             return Mono.just(handler);
         } catch (Exception e) {
             return Mono.error(e);
@@ -96,14 +96,15 @@ public class WebSocketHandlerMapping extends AbstractHandlerMapping
         var lock = rwLock.writeLock();
         lock.lock();
         try {
-            endpoints.forEach(endpoint -> {
-                var urlPath = endpoint.urlPath();
-                urlPath = StringUtils.prependIfMissing(urlPath, "/");
-                var groupVersion = endpoint.groupVersion();
-                var parser = getPathPatternParser();
-                var pattern = parser.parse("/apis/" + groupVersion + urlPath);
-                endpointMap.put(pattern, endpoint);
-            });
+            endpoints.forEach(
+                    endpoint -> {
+                        var urlPath = endpoint.urlPath();
+                        urlPath = StringUtils.prependIfMissing(urlPath, "/");
+                        var groupVersion = endpoint.groupVersion();
+                        var parser = getPathPatternParser();
+                        var pattern = parser.parse("/apis/" + groupVersion + urlPath);
+                        endpointMap.put(pattern, endpoint);
+                    });
         } finally {
             lock.unlock();
         }
@@ -126,9 +127,11 @@ public class WebSocketHandlerMapping extends AbstractHandlerMapping
 
     @Override
     public void afterPropertiesSet() {
-        var endpoints = obtainApplicationContext().getBeanProvider(WebSocketEndpoint.class)
-            .orderedStream()
-            .toList();
+        var endpoints =
+                obtainApplicationContext()
+                        .getBeanProvider(WebSocketEndpoint.class)
+                        .orderedStream()
+                        .toList();
         register(endpoints);
     }
 

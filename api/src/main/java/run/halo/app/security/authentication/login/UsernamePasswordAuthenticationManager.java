@@ -13,6 +13,4 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
  * @since 2.8
  */
 public interface UsernamePasswordAuthenticationManager
-    extends ReactiveAuthenticationManager, ExtensionPoint {
-
-}
+        extends ReactiveAuthenticationManager, ExtensionPoint {}

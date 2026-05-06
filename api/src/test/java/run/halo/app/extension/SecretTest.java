@@ -49,16 +49,17 @@ class SecretTest {
 
     @Test
     void deserializeYamlWithStringData() throws JsonProcessingException {
-        String s = """
-            apiVersion: v1alpha1
-            kind: Secret
-            metadata:
-              name: secret-basic-auth
-            type: halo.run/basic-auth
-            stringData:
-              username: admin
-              password: t0p-Secret
-            """;
+        String s =
+                """
+                apiVersion: v1alpha1
+                kind: Secret
+                metadata:
+                  name: secret-basic-auth
+                type: halo.run/basic-auth
+                stringData:
+                  username: admin
+                  password: t0p-Secret
+                """;
         Secret secret = new YAMLMapper().readValue(s, Secret.class);
         assertThat(secret.getMetadata().getName()).isEqualTo("secret-basic-auth");
         assertThat(secret.getType()).isEqualTo("halo.run/basic-auth");
@@ -68,17 +69,17 @@ class SecretTest {
 
     private String testJsonString() {
         return """
-            {
-                "apiVersion": "v1alpha1",
-                "kind": "Secret",
-                "metadata": {
-                    "name": "test-secret"
-                },
-                "type": "Opaque",
-                "data": {
-                    "password": "YWRtaW4="
-                }
+        {
+            "apiVersion": "v1alpha1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "test-secret"
+            },
+            "type": "Opaque",
+            "data": {
+                "password": "YWRtaW4="
             }
-            """;
+        }
+        """;
     }
 }

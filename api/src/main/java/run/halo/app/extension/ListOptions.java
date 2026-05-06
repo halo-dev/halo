@@ -42,10 +42,11 @@ public class ListOptions {
         }
         var labelSelector = getLabelSelector();
         if (labelSelector != null) {
-            var labelCondition = labelSelector.getConditions().stream()
-                .map(Function.<Condition>identity())
-                .reduce(Condition::and)
-                .orElse(null);
+            var labelCondition =
+                    labelSelector.getConditions().stream()
+                            .map(Function.<Condition>identity())
+                            .reduce(Condition::and)
+                            .orElse(null);
             if (labelCondition != null) {
                 if (condition == null) {
                     condition = labelCondition;
@@ -71,16 +72,16 @@ public class ListOptions {
         @SuppressWarnings("removal")
         private @Nullable Query query;
 
-        public ListOptionsBuilder() {
-        }
+        public ListOptionsBuilder() {}
 
         /**
          * Create a new list options builder with the given list options.
          */
         public ListOptionsBuilder(ListOptions listOptions) {
             if (listOptions.getLabelSelector() != null) {
-                this.labelSelectorBuilder = new LabelSelectorBuilder(
-                    listOptions.getLabelSelector().getConditions(), this);
+                this.labelSelectorBuilder =
+                        new LabelSelectorBuilder(
+                                listOptions.getLabelSelector().getConditions(), this);
             }
             if (listOptions.getFieldSelector() != null) {
                 this.query = listOptions.getFieldSelector().query();
@@ -114,8 +115,7 @@ public class ListOptions {
             } else {
                 if (!(this.query instanceof Condition currentCondition)) {
                     throw new IllegalArgumentException(
-                        "Current query must be an instance of Condition"
-                    );
+                            "Current query must be an instance of Condition");
                 }
                 this.query = currentCondition.and(condition);
             }
@@ -134,8 +134,7 @@ public class ListOptions {
             } else {
                 if (!(this.query instanceof Condition currentCondition)) {
                     throw new IllegalArgumentException(
-                        "Current query must be an instance of Condition"
-                    );
+                            "Current query must be an instance of Condition");
                 }
                 this.query = currentCondition.or(condition);
             }
@@ -158,11 +157,11 @@ public class ListOptions {
     }
 
     public static class LabelSelectorBuilder
-        extends LabelSelector.LabelSelectorBuilder<LabelSelectorBuilder> {
+            extends LabelSelector.LabelSelectorBuilder<LabelSelectorBuilder> {
         private final ListOptionsBuilder listOptionsBuilder;
 
-        public LabelSelectorBuilder(List<LabelCondition> conditions,
-            ListOptionsBuilder listOptionsBuilder) {
+        public LabelSelectorBuilder(
+                List<LabelCondition> conditions, ListOptionsBuilder listOptionsBuilder) {
             super(conditions);
             this.listOptionsBuilder = listOptionsBuilder;
         }

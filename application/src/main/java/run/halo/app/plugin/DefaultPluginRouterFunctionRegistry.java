@@ -21,7 +21,7 @@ import run.halo.app.infra.exception.PluginRuntimeIncompatibleException;
  */
 @Component
 public class DefaultPluginRouterFunctionRegistry
-    implements RouterFunction<ServerResponse>, PluginRouterFunctionRegistry {
+        implements RouterFunction<ServerResponse>, PluginRouterFunctionRegistry {
 
     private final Collection<RouterFunction<ServerResponse>> routerFunctions;
 
@@ -33,20 +33,25 @@ public class DefaultPluginRouterFunctionRegistry
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         var secureRequest = new SecureServerRequest(request);
         return Flux.fromIterable(this.routerFunctions)
-            .concatMap(routerFunction -> {
-                // wrap the handler function
-                return routerFunction.route(secureRequest)
-                    .map(hf -> (HandlerFunction<ServerResponse>)
-                        serverRequest -> {
-                            try {
-                                return hf.handle(secureRequest);
-                            } catch (LinkageError le) {
-                                return Mono.error(new PluginRuntimeIncompatibleException(le));
-                            }
-                        }
-                    );
-            })
-            .next();
+                .concatMap(
+                        routerFunction -> {
+                            // wrap the handler function
+                            return routerFunction
+                                    .route(secureRequest)
+                                    .map(
+                                            hf ->
+                                                    (HandlerFunction<ServerResponse>)
+                                                            serverRequest -> {
+                                                                try {
+                                                                    return hf.handle(secureRequest);
+                                                                } catch (LinkageError le) {
+                                                                    return Mono.error(
+                                                                            new PluginRuntimeIncompatibleException(
+                                                                                    le));
+                                                                }
+                                                            });
+                        })
+                .next();
     }
 
     @Override

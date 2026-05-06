@@ -46,9 +46,9 @@ import run.halo.app.theme.finders.SinglePageFinder;
 @Component
 @RequiredArgsConstructor
 public class SinglePageRoute
-    implements RouterFunction<ServerResponse>, Reconciler<Reconciler.Request>, DisposableBean {
+        implements RouterFunction<ServerResponse>, Reconciler<Reconciler.Request>, DisposableBean {
     private Map<NameSlugPair, HandlerFunction<ServerResponse>> quickRouteMap =
-        new ConcurrentHashMap<>();
+            new ConcurrentHashMap<>();
 
     private final ExtensionClient client;
 
@@ -63,8 +63,8 @@ public class SinglePageRoute
     @Override
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return Flux.fromIterable(routerFunctions())
-            .concatMap(routerFunction -> routerFunction.route(request))
-            .next();
+                .concatMap(routerFunction -> routerFunction.route(request))
+                .next();
     }
 
     /**
@@ -83,14 +83,16 @@ public class SinglePageRoute
 
     private List<RouterFunction<ServerResponse>> routerFunctions() {
         return quickRouteMap.keySet().stream()
-            .map(nameSlugPair -> {
-                var routePath = singlePageRoute(nameSlugPair.slug());
-                return RouterFunctions.route(methods(HttpMethod.GET)
-                        .and(exactPath(routePath))
-                        .and(RequestPredicates.accept(MediaType.TEXT_HTML)),
-                    handlerFunction(nameSlugPair.name()));
-            })
-            .collect(Collectors.toList());
+                .map(
+                        nameSlugPair -> {
+                            var routePath = singlePageRoute(nameSlugPair.slug());
+                            return RouterFunctions.route(
+                                    methods(HttpMethod.GET)
+                                            .and(exactPath(routePath))
+                                            .and(RequestPredicates.accept(MediaType.TEXT_HTML)),
+                                    handlerFunction(nameSlugPair.name()));
+                        })
+                .collect(Collectors.toList());
     }
 
     private RequestPredicate exactPath(String path) {
@@ -104,31 +106,31 @@ public class SinglePageRoute
     @Override
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
-            .ifPresent(page -> {
-                var nameSlugPair = NameSlugPair.from(page);
-                if (ExtensionOperator.isDeleted(page)) {
-                    quickRouteMap.remove(nameSlugPair);
-                    return;
-                }
-                if (BooleanUtils.isTrue(page.getSpec().getDeleted())) {
-                    quickRouteMap.remove(nameSlugPair);
-                } else {
-                    // put new one
-                    if (page.isPublished()) {
-                        quickRouteMap.put(nameSlugPair, handlerFunction(request.name()));
-                    } else {
-                        quickRouteMap.remove(nameSlugPair);
-                    }
-                }
-            });
+                .ifPresent(
+                        page -> {
+                            var nameSlugPair = NameSlugPair.from(page);
+                            if (ExtensionOperator.isDeleted(page)) {
+                                quickRouteMap.remove(nameSlugPair);
+                                return;
+                            }
+                            if (BooleanUtils.isTrue(page.getSpec().getDeleted())) {
+                                quickRouteMap.remove(nameSlugPair);
+                            } else {
+                                // put new one
+                                if (page.isPublished()) {
+                                    quickRouteMap.put(
+                                            nameSlugPair, handlerFunction(request.name()));
+                                } else {
+                                    quickRouteMap.remove(nameSlugPair);
+                                }
+                            }
+                        });
         return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new SinglePage())
-            .build();
+        return builder.extension(new SinglePage()).build();
     }
 
     @Override
@@ -147,24 +149,33 @@ public class SinglePageRoute
     }
 
     HandlerFunction<ServerResponse> handlerFunction(String name) {
-        return request -> singlePageFinder.getByName(name)
-            .doOnNext(singlePageVo -> {
-                titleVisibilityIdentifyCalculator.calculateTitle(
-                    singlePageVo.getSpec().getTitle(),
-                    singlePageVo.getSpec().getVisible(),
-                    localeContextResolver.resolveLocaleContext(request.exchange())
-                        .getLocale()
-                );
-            })
-            .flatMap(singlePageVo -> {
-                Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
-                String template = singlePageVo.getSpec().getTemplate();
-                return viewNameResolver.resolveViewNameOrDefault(request, template,
-                        DefaultTemplateEnum.SINGLE_PAGE.getValue())
-                    .flatMap(viewName -> ServerResponse.ok().render(viewName, model));
-            })
-            .switchIfEmpty(
-                Mono.error(new NotFoundException("Single page not found"))
-            );
+        return request ->
+                singlePageFinder
+                        .getByName(name)
+                        .doOnNext(
+                                singlePageVo -> {
+                                    titleVisibilityIdentifyCalculator.calculateTitle(
+                                            singlePageVo.getSpec().getTitle(),
+                                            singlePageVo.getSpec().getVisible(),
+                                            localeContextResolver
+                                                    .resolveLocaleContext(request.exchange())
+                                                    .getLocale());
+                                })
+                        .flatMap(
+                                singlePageVo -> {
+                                    Map<String, Object> model =
+                                            ModelMapUtils.singlePageModel(singlePageVo);
+                                    String template = singlePageVo.getSpec().getTemplate();
+                                    return viewNameResolver
+                                            .resolveViewNameOrDefault(
+                                                    request,
+                                                    template,
+                                                    DefaultTemplateEnum.SINGLE_PAGE.getValue())
+                                            .flatMap(
+                                                    viewName ->
+                                                            ServerResponse.ok()
+                                                                    .render(viewName, model));
+                                })
+                        .switchIfEmpty(Mono.error(new NotFoundException("Single page not found")));
     }
 }

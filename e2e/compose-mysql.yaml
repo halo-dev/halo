@@ -31,7 +31,7 @@ services:
     image: mysql:8.1.0
     container_name: mysql
     restart: on-failure:3
-    command: 
+    command:
       - --default-authentication-plugin=caching_sha2_password
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_general_ci

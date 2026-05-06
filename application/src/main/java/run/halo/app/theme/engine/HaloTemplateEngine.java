@@ -38,20 +38,32 @@ public class HaloTemplateEngine extends SpringWebFluxTemplateEngine {
     }
 
     @Override
-    public Publisher<DataBuffer> processStream(String template, Set<String> markupSelectors,
-        IContext context, DataBufferFactory bufferFactory,
-        MediaType mediaType, Charset charset, int responseMaxChunkSizeBytes) {
-        var publisher = super.processStream(template, markupSelectors, context, bufferFactory,
-            mediaType, charset, responseMaxChunkSizeBytes);
+    public Publisher<DataBuffer> processStream(
+            String template,
+            Set<String> markupSelectors,
+            IContext context,
+            DataBufferFactory bufferFactory,
+            MediaType mediaType,
+            Charset charset,
+            int responseMaxChunkSizeBytes) {
+        var publisher =
+                super.processStream(
+                        template,
+                        markupSelectors,
+                        context,
+                        bufferFactory,
+                        mediaType,
+                        charset,
+                        responseMaxChunkSizeBytes);
         // We have to subscribe on blocking thread, because some blocking operations will be present
         // while processing.
         if (publisher instanceof Mono<DataBuffer> mono) {
             return mono.subscribeOn(Schedulers.boundedElastic())
-                .doOnError(Exception.class, e -> this.logTemplateError(e, template));
+                    .doOnError(Exception.class, e -> this.logTemplateError(e, template));
         }
         if (publisher instanceof Flux<DataBuffer> flux) {
             return flux.subscribeOn(Schedulers.boundedElastic())
-                .doOnError(Exception.class, e -> this.logTemplateError(e, template));
+                    .doOnError(Exception.class, e -> this.logTemplateError(e, template));
         }
         return publisher;
     }

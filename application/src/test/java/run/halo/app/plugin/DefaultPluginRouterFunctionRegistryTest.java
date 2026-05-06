@@ -21,8 +21,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @ExtendWith(MockitoExtension.class)
 class DefaultPluginRouterFunctionRegistryTest {
 
-    @InjectMocks
-    DefaultPluginRouterFunctionRegistry routerFunctionRegistry;
+    @InjectMocks DefaultPluginRouterFunctionRegistry routerFunctionRegistry;
 
     @Test
     void shouldRegisterRouterFunction() {
@@ -30,5 +29,4 @@ class DefaultPluginRouterFunctionRegistryTest {
         routerFunctionRegistry.register(Set.of(routerFunction));
         assertEquals(Set.of(routerFunction), routerFunctionRegistry.getRouterFunctions());
     }
-
 }

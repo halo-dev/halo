@@ -39,11 +39,12 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             var path = PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
             var uriComponents = UriComponentsBuilder.fromUriString(path).build();
             if (StringUtils.isNotBlank(theme.getVersion())
-                && uriComponents.getQueryParams().isEmpty()
-                && !isDirectoryPath(link)) {
+                    && uriComponents.getQueryParams().isEmpty()
+                    && !isDirectoryPath(link)) {
                 return UriComponentsBuilder.fromUriString(path)
-                    .queryParam("v", theme.getVersion())
-                    .build().toString();
+                        .queryParam("v", theme.getVersion())
+                        .build()
+                        .toString();
             }
             return path;
         }
@@ -54,8 +55,9 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
         }
 
         return UriComponentsBuilder.fromUriString(link)
-            .queryParam(ThemeContext.THEME_PREVIEW_PARAM_NAME, theme.getName())
-            .build().toString();
+                .queryParam(ThemeContext.THEME_PREVIEW_PARAM_NAME, theme.getName())
+                .build()
+                .toString();
     }
 
     static boolean linkInSite(URI externalUri, String link) {

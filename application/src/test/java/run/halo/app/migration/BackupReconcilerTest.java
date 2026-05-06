@@ -35,14 +35,11 @@ import run.halo.app.extension.controller.Reconciler;
 @ExtendWith(MockitoExtension.class)
 class BackupReconcilerTest {
 
-    @Mock
-    MigrationService migrationService;
+    @Mock MigrationService migrationService;
 
-    @Mock
-    ExtensionClient client;
+    @Mock ExtensionClient client;
 
-    @InjectMocks
-    BackupReconciler reconciler;
+    @InjectMocks BackupReconciler reconciler;
 
     @Test
     void whenFreshBackupIsComing() {
@@ -51,11 +48,14 @@ class BackupReconcilerTest {
         backup.getSpec().setFormat("zip");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
-        when(migrationService.backup(backup)).thenReturn(Mono.fromRunnable(() -> {
-            var status = backup.getStatus();
-            status.setFilename("fake-backup-filename");
-            status.setSize(1024L);
-        }));
+        when(migrationService.backup(backup))
+                .thenReturn(
+                        Mono.fromRunnable(
+                                () -> {
+                                    var status = backup.getStatus();
+                                    status.setFilename("fake-backup-filename");
+                                    status.setSize(1024L);
+                                }));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -174,8 +174,8 @@ class BackupReconcilerTest {
         backup.getSpec().setFormat("zip");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
-        when(migrationService.backup(backup)).thenReturn(
-            Mono.error(Exceptions.propagate(new InterruptedException())));
+        when(migrationService.backup(backup))
+                .thenReturn(Mono.error(Exceptions.propagate(new InterruptedException())));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -204,7 +204,7 @@ class BackupReconcilerTest {
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
         when(migrationService.backup(backup))
-            .thenReturn(Mono.error(Exceptions.propagate(new IOException("File not found"))));
+                .thenReturn(Mono.error(Exceptions.propagate(new IOException("File not found"))));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -246,5 +246,4 @@ class BackupReconcilerTest {
         backup.setMetadata(metadata);
         return backup;
     }
-
 }

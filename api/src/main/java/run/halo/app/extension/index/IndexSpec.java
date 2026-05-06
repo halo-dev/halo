@@ -18,7 +18,7 @@ import run.halo.app.extension.Extension;
 @Accessors(chain = true)
 @Deprecated(forRemoval = true, since = "2.22.0")
 public class IndexSpec<E extends Extension, K extends Comparable<K>>
-    implements ValueIndexSpec<E, K> {
+        implements ValueIndexSpec<E, K> {
 
     private String name;
 
@@ -72,16 +72,19 @@ public class IndexSpec<E extends Extension, K extends Comparable<K>>
     public ValueIndexSpec<E, K> normalize() {
         if (this.indexFunc.singleValue()) {
             return IndexSpecs.<E, K>single(name, getKeyType())
-                .unique(unique)
-                .indexFunc(e -> {
-                    var values = getValues(e);
-                    return CollectionUtils.isEmpty(values) ? null : values.iterator().next();
-                })
-                .build();
+                    .unique(unique)
+                    .indexFunc(
+                            e -> {
+                                var values = getValues(e);
+                                return CollectionUtils.isEmpty(values)
+                                        ? null
+                                        : values.iterator().next();
+                            })
+                    .build();
         }
         return IndexSpecs.<E, K>multi(name, getKeyType())
-            .unique(unique)
-            .indexFunc(this::getValues)
-            .build();
+                .unique(unique)
+                .indexFunc(this::getValues)
+                .build();
     }
 }

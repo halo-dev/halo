@@ -40,8 +40,8 @@ public class VersionUtils {
     public static boolean checkVersionConstraint(String version, String constraint) {
         try {
             return StringUtils.isBlank(constraint)
-                || "*".equals(constraint)
-                || Version.parse(version).satisfies(constraint);
+                    || "*".equals(constraint)
+                    || Version.parse(version).satisfies(constraint);
         } catch (Exception e) {
             throw new ServerWebInputException("Illegal requires version expression.", null, e);
         }

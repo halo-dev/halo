@@ -50,7 +50,7 @@ public record UserIdentity(String name) {
     public Optional<String> getEmail() {
         if (isAnonymous()) {
             return Optional.of(name().substring(name().indexOf(SEPARATOR) + 1))
-                .filter(StringUtils::isNotBlank);
+                    .filter(StringUtils::isNotBlank);
         }
         return Optional.empty();
     }

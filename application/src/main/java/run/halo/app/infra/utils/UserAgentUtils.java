@@ -18,15 +18,14 @@ public enum UserAgentUtils {
     private static final Parser PARSER;
 
     static {
-        var regexesResource = new ClassPathResource(
-            "config/uap/regexes.yaml", UserAgentUtils.class.getClassLoader()
-        );
+        var regexesResource =
+                new ClassPathResource(
+                        "config/uap/regexes.yaml", UserAgentUtils.class.getClassLoader());
         try {
             PARSER = new Parser(regexesResource.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(
-                "Failed to load regexes.yaml during UserAgent Parser initialization", e
-            );
+                    "Failed to load regexes.yaml during UserAgent Parser initialization", e);
         }
     }
 

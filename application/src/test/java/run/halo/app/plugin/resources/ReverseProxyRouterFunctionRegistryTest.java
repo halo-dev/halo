@@ -28,14 +28,11 @@ import run.halo.app.plugin.PluginRouterFunctionRegistry;
 @ExtendWith(MockitoExtension.class)
 class ReverseProxyRouterFunctionRegistryTest {
 
-    @InjectMocks
-    ReverseProxyRouterFunctionRegistry registry;
+    @InjectMocks ReverseProxyRouterFunctionRegistry registry;
 
-    @Mock
-    ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
+    @Mock ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
 
-    @Mock
-    PluginRouterFunctionRegistry pluginRouterFunctionRegistry;
+    @Mock PluginRouterFunctionRegistry pluginRouterFunctionRegistry;
 
     @Test
     void register() {
@@ -69,8 +66,7 @@ class ReverseProxyRouterFunctionRegistryTest {
         when(mock.getMetadata()).thenReturn(metadata);
         RouterFunction<ServerResponse> routerFunction = request -> Mono.empty();
 
-        when(reverseProxyRouterFunctionFactory.create(any(), any()))
-            .thenReturn(routerFunction);
+        when(reverseProxyRouterFunctionFactory.create(any(), any())).thenReturn(routerFunction);
         return mock;
     }
 }

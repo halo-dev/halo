@@ -8,6 +8,4 @@ import java.util.HashMap;
  * @author guqing
  * @since 2.10.0
  */
-public class ReasonAttributes extends HashMap<String, Object> {
-
-}
+public class ReasonAttributes extends HashMap<String, Object> {}

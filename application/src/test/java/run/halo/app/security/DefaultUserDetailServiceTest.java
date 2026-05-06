@@ -33,14 +33,11 @@ import run.halo.app.infra.exception.UserNotFoundException;
 @ExtendWith(MockitoExtension.class)
 class DefaultUserDetailServiceTest {
 
-    @Mock
-    UserService userService;
+    @Mock UserService userService;
 
-    @Mock
-    RoleService roleService;
+    @Mock RoleService roleService;
 
-    @InjectMocks
-    DefaultUserDetailService userDetailService;
+    @InjectMocks DefaultUserDetailService userDetailService;
 
     @Test
     void shouldUpdatePasswordSuccessfully() {
@@ -48,16 +45,15 @@ class DefaultUserDetailServiceTest {
 
         var user = new run.halo.app.core.extension.User();
 
-        when(userService.updatePassword("faker", "new-fake-password")).thenReturn(
-            Mono.just(user)
-        );
+        when(userService.updatePassword("faker", "new-fake-password")).thenReturn(Mono.just(user));
 
         var userDetailsMono = userDetailService.updatePassword(fakeUser, "new-fake-password");
 
         StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .assertNext(userDetails -> assertEquals("new-fake-password", userDetails.getPassword()))
-            .verifyComplete();
+                .expectSubscription()
+                .assertNext(
+                        userDetails -> assertEquals("new-fake-password", userDetails.getPassword()))
+                .verifyComplete();
 
         verify(userService, times(1)).updatePassword(eq("faker"), eq("new-fake-password"));
     }
@@ -67,16 +63,15 @@ class DefaultUserDetailServiceTest {
         var fakeUser = createFakeUserDetails();
 
         var exception = new RuntimeException("failed to update password");
-        when(userService.updatePassword("faker", "new-fake-password")).thenReturn(
-            Mono.error(exception)
-        );
+        when(userService.updatePassword("faker", "new-fake-password"))
+                .thenReturn(Mono.error(exception));
 
         var userDetailsMono = userDetailService.updatePassword(fakeUser, "new-fake-password");
 
         StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .expectErrorMatches(throwable -> throwable == exception)
-            .verify();
+                .expectSubscription()
+                .expectErrorMatches(throwable -> throwable == exception)
+                .verify();
         verify(userService, times(1)).updatePassword(eq("faker"), eq("new-fake-password"));
     }
 
@@ -90,15 +85,19 @@ class DefaultUserDetailServiceTest {
         var userDetailsMono = userDetailService.findByUsername("faker");
 
         StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .assertNext(gotUser -> {
-                assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
-                assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(
-                    Set.of("ROLE_fake-role", "ROLE_authenticated", "ROLE_anonymous"),
-                    authorityListToSet(gotUser.getAuthorities()));
-            })
-            .verifyComplete();
+                .expectSubscription()
+                .assertNext(
+                        gotUser -> {
+                            assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
+                            assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
+                            assertEquals(
+                                    Set.of(
+                                            "ROLE_fake-role",
+                                            "ROLE_authenticated",
+                                            "ROLE_anonymous"),
+                                    authorityListToSet(gotUser.getAuthorities()));
+                        })
+                .verifyComplete();
     }
 
     @Test
@@ -106,13 +105,15 @@ class DefaultUserDetailServiceTest {
         var fakeUser = createFakeUser();
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
-        userDetailService.findByUsername("faker")
-            .as(StepVerifier::create)
-            .assertNext(userDetails -> {
-                assertInstanceOf(HaloUserDetails.class, userDetails);
-                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
-            })
-            .verifyComplete();
+        userDetailService
+                .findByUsername("faker")
+                .as(StepVerifier::create)
+                .assertNext(
+                        userDetails -> {
+                            assertInstanceOf(HaloUserDetails.class, userDetails);
+                            assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+                        })
+                .verifyComplete();
     }
 
     @Test
@@ -121,13 +122,15 @@ class DefaultUserDetailServiceTest {
         fakeUser.getSpec().setTwoFactorAuthEnabled(true);
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
-        userDetailService.findByUsername("faker")
-            .as(StepVerifier::create)
-            .assertNext(userDetails -> {
-                assertInstanceOf(HaloUserDetails.class, userDetails);
-                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
-            })
-            .verifyComplete();
+        userDetailService
+                .findByUsername("faker")
+                .as(StepVerifier::create)
+                .assertNext(
+                        userDetails -> {
+                            assertInstanceOf(HaloUserDetails.class, userDetails);
+                            assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+                        })
+                .verifyComplete();
     }
 
     @Test
@@ -137,13 +140,15 @@ class DefaultUserDetailServiceTest {
         fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
-        userDetailService.findByUsername("faker")
-            .as(StepVerifier::create)
-            .assertNext(userDetails -> {
-                assertInstanceOf(HaloUserDetails.class, userDetails);
-                assertTrue(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
-            })
-            .verifyComplete();
+        userDetailService
+                .findByUsername("faker")
+                .as(StepVerifier::create)
+                .assertNext(
+                        userDetails -> {
+                            assertInstanceOf(HaloUserDetails.class, userDetails);
+                            assertTrue(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+                        })
+                .verifyComplete();
     }
 
     @Test
@@ -154,13 +159,15 @@ class DefaultUserDetailServiceTest {
         fakeUser.getSpec().setTotpEncryptedSecret("fake-totp-encrypted-secret");
         when(userService.getUser("faker")).thenReturn(Mono.just(fakeUser));
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
-        userDetailService.findByUsername("faker")
-            .as(StepVerifier::create)
-            .assertNext(userDetails -> {
-                assertInstanceOf(HaloUserDetails.class, userDetails);
-                assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
-            })
-            .verifyComplete();
+        userDetailService
+                .findByUsername("faker")
+                .as(StepVerifier::create)
+                .assertNext(
+                        userDetails -> {
+                            assertInstanceOf(HaloUserDetails.class, userDetails);
+                            assertFalse(((HaloUserDetails) userDetails).isTwoFactorAuthEnabled());
+                        })
+                .verifyComplete();
     }
 
     @Test
@@ -171,27 +178,26 @@ class DefaultUserDetailServiceTest {
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.empty());
 
         StepVerifier.create(userDetailService.findByUsername("faker"))
-            .expectSubscription()
-            .assertNext(gotUser -> {
-                assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
-                assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(
-                    Set.of("ROLE_anonymous", "ROLE_authenticated"),
-                    authorityListToSet(gotUser.getAuthorities()));
-            })
-            .verifyComplete();
+                .expectSubscription()
+                .assertNext(
+                        gotUser -> {
+                            assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
+                            assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
+                            assertEquals(
+                                    Set.of("ROLE_anonymous", "ROLE_authenticated"),
+                                    authorityListToSet(gotUser.getAuthorities()));
+                        })
+                .verifyComplete();
     }
 
     @Test
     void shouldNotFindUserDetailsByNonExistingUsername() {
-        when(userService.getUser("non-existing-user")).thenReturn(
-            Mono.error(() -> new UserNotFoundException("non-existing-user")));
+        when(userService.getUser("non-existing-user"))
+                .thenReturn(Mono.error(() -> new UserNotFoundException("non-existing-user")));
 
         var userDetailsMono = userDetailService.findByUsername("non-existing-user");
 
-        StepVerifier.create(userDetailsMono)
-            .expectError(AuthenticationException.class)
-            .verify();
+        StepVerifier.create(userDetailsMono).expectError(AuthenticationException.class).verify();
     }
 
     @Test
@@ -199,21 +205,25 @@ class DefaultUserDetailServiceTest {
         var foundUser = createFakeUser();
 
         when(userService.findUserByVerifiedEmail("faker@halo.run"))
-            .thenReturn(Mono.just(foundUser));
+                .thenReturn(Mono.just(foundUser));
         when(roleService.getRolesByUsername("faker")).thenReturn(Flux.just("fake-role"));
 
         var userDetailsMono = userDetailService.findByUsername("faker@halo.run");
 
         StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .assertNext(gotUser -> {
-                assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
-                assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(
-                    Set.of("ROLE_fake-role", "ROLE_authenticated", "ROLE_anonymous"),
-                    authorityListToSet(gotUser.getAuthorities()));
-            })
-            .verifyComplete();
+                .expectSubscription()
+                .assertNext(
+                        gotUser -> {
+                            assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
+                            assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
+                            assertEquals(
+                                    Set.of(
+                                            "ROLE_fake-role",
+                                            "ROLE_authenticated",
+                                            "ROLE_anonymous"),
+                                    authorityListToSet(gotUser.getAuthorities()));
+                        })
+                .verifyComplete();
 
         verify(userService, never()).getUser(any());
     }
@@ -221,21 +231,19 @@ class DefaultUserDetailServiceTest {
     @Test
     void shouldReturnNotFoundWhenEmailNotExists() {
         when(userService.findUserByVerifiedEmail("non-existing-email@halo.run"))
-            .thenReturn(Mono.error(new UserNotFoundException("non-existing-email@halo.run")));
+                .thenReturn(Mono.error(new UserNotFoundException("non-existing-email@halo.run")));
 
         var userDetailsMono = userDetailService.findByUsername("non-existing-email@halo.run");
 
-        StepVerifier.create(userDetailsMono)
-            .expectError(BadCredentialsException.class)
-            .verify();
+        StepVerifier.create(userDetailsMono).expectError(BadCredentialsException.class).verify();
     }
 
     UserDetails createFakeUserDetails() {
         return User.builder()
-            .username("faker")
-            .password("fake-password")
-            .roles("fake-role")
-            .build();
+                .username("faker")
+                .password("fake-password")
+                .roles("fake-role")
+                .build();
     }
 
     run.halo.app.core.extension.User createFakeUser() {
@@ -249,6 +257,5 @@ class DefaultUserDetailServiceTest {
         user.setMetadata(metadata);
         user.setSpec(userSpec);
         return user;
-
     }
 }

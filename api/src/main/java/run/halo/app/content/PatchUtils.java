@@ -26,16 +26,21 @@ public class PatchUtils {
     private static final Splitter lineSplitter = Splitter.on(DELIMITER);
 
     public static Patch<String> create(String deltasJson) {
-        List<Delta> deltas = JsonUtils.jsonToObject(deltasJson, new TypeReference<>() {
-        });
+        List<Delta> deltas = JsonUtils.jsonToObject(deltasJson, new TypeReference<>() {});
         Patch<String> patch = new Patch<>();
         for (Delta delta : deltas) {
             StringChunk sourceChunk = delta.getSource();
             StringChunk targetChunk = delta.getTarget();
-            Chunk<String> orgChunk = new Chunk<>(sourceChunk.getPosition(), sourceChunk.getLines(),
-                sourceChunk.getChangePosition());
-            Chunk<String> revChunk = new Chunk<>(targetChunk.getPosition(), targetChunk.getLines(),
-                targetChunk.getChangePosition());
+            Chunk<String> orgChunk =
+                    new Chunk<>(
+                            sourceChunk.getPosition(),
+                            sourceChunk.getLines(),
+                            sourceChunk.getChangePosition());
+            Chunk<String> revChunk =
+                    new Chunk<>(
+                            targetChunk.getPosition(),
+                            targetChunk.getLines(),
+                            targetChunk.getChangePosition());
             switch (delta.getType()) {
                 case DELETE -> patch.addDelta(new DeleteDelta<>(orgChunk, revChunk));
                 case INSERT -> patch.addDelta(new InsertDelta<>(orgChunk, revChunk));

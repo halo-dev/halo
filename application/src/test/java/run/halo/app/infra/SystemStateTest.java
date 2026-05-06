@@ -46,6 +46,6 @@ class SystemStateTest {
         newSystemState.setIsSetup(false);
         SystemState.update(newSystemState, configMap);
         assertThat(configMap.getData().get(SystemState.GROUP))
-            .isEqualTo("{\"isSetup\":false,\"foo\":\"bar\"}");
+                .isEqualTo("{\"isSetup\":false,\"foo\":\"bar\"}");
     }
 }

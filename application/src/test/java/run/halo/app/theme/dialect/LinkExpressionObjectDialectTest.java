@@ -13,13 +13,12 @@ import org.junit.jupiter.api.Test;
 class LinkExpressionObjectDialectTest {
 
     private final LinkExpressionObjectDialect linkExpressionObjectDialect =
-        new LinkExpressionObjectDialect();
+            new LinkExpressionObjectDialect();
 
     @Test
     void getExpressionObjectFactory() {
-        assertThat(linkExpressionObjectDialect.getName())
-            .isEqualTo("themeLink");
+        assertThat(linkExpressionObjectDialect.getName()).isEqualTo("themeLink");
         assertThat(linkExpressionObjectDialect.getExpressionObjectFactory())
-            .isInstanceOf(DefaultLinkExpressionFactory.class);
+                .isInstanceOf(DefaultLinkExpressionFactory.class);
     }
 }

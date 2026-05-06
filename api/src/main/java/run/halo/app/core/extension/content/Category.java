@@ -22,8 +22,12 @@ import run.halo.app.extension.GroupVersionKind;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION,
-    kind = KIND, plural = "categories", singular = "category")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = KIND,
+        plural = "categories",
+        singular = "category")
 @EqualsAndHashCode(callSuper = true)
 public class Category extends AbstractExtension {
 
@@ -36,9 +40,7 @@ public class Category extends AbstractExtension {
     @Nullable
     private CategorySpec spec;
 
-    @Schema
-    @Nullable
-    private CategoryStatus status;
+    @Schema @Nullable private CategoryStatus status;
 
     @JsonIgnore
     public boolean isDeleted() {

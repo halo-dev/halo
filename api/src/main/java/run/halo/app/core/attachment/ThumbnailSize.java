@@ -54,8 +54,7 @@ public enum ThumbnailSize {
 
     public static Integer[] allowedWidths() {
         return Arrays.stream(ThumbnailSize.values())
-            .map(ThumbnailSize::getWidth)
-            .toArray(Integer[]::new);
+                .map(ThumbnailSize::getWidth)
+                .toArray(Integer[]::new);
     }
-
 }

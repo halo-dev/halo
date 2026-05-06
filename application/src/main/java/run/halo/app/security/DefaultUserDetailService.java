@@ -22,7 +22,7 @@ import run.halo.app.security.authentication.twofactor.TwoFactorUtils;
 
 @Slf4j
 public class DefaultUserDetailService
-    implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
+        implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
 
     private final UserService userService;
 
@@ -31,8 +31,7 @@ public class DefaultUserDetailService
     /**
      * Indicates whether two-factor authentication is disabled.
      */
-    @Setter
-    private boolean twoFactorAuthDisabled;
+    @Setter private boolean twoFactorAuthDisabled;
 
     public DefaultUserDetailService(UserService userService, RoleService roleService) {
         this.userService = userService;
@@ -41,54 +40,73 @@ public class DefaultUserDetailService
 
     @Override
     public Mono<UserDetails> updatePassword(UserDetails user, String newPassword) {
-        return userService.updatePassword(user.getUsername(), newPassword)
-            .map(u -> withNewPassword(user, newPassword));
+        return userService
+                .updatePassword(user.getUsername(), newPassword)
+                .map(u -> withNewPassword(user, newPassword));
     }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        var getUser = Mono.defer(() -> {
-            var isEmail = username.contains("@");
-            if (isEmail) {
-                log.debug("Try to authenticate by email: {}", username);
-                return userService.findUserByVerifiedEmail(username);
-            } else {
-                log.debug("Try to authenticate by username: {}", username);
-                return userService.getUser(username);
-            }
-        });
+        var getUser =
+                Mono.defer(
+                        () -> {
+                            var isEmail = username.contains("@");
+                            if (isEmail) {
+                                log.debug("Try to authenticate by email: {}", username);
+                                return userService.findUserByVerifiedEmail(username);
+                            } else {
+                                log.debug("Try to authenticate by username: {}", username);
+                                return userService.getUser(username);
+                            }
+                        });
         return getUser.switchIfEmpty(Mono.error(() -> new UserNotFoundException(username)))
-            .onErrorMap(UserNotFoundException.class,
-                ignored -> new BadCredentialsException("Invalid Credentials"))
-            .flatMap(user -> {
-                var name = user.getMetadata().getName();
-                var userBuilder = User.withUsername(name)
-                    .password(user.getSpec().getPassword())
-                    .disabled(requireNonNullElse(user.getSpec().getDisabled(), false));
-                var setAuthorities = roleService.getRolesByUsername(name)
-                    // every authenticated user should have authenticated and anonymous roles.
-                    .concatWithValues(AUTHENTICATED_ROLE_NAME, ANONYMOUS_ROLE_NAME)
-                    .map(roleName -> new SimpleGrantedAuthority(ROLE_PREFIX + roleName))
-                    .distinct()
-                    .collectList()
-                    .doOnNext(userBuilder::authorities);
+                .onErrorMap(
+                        UserNotFoundException.class,
+                        ignored -> new BadCredentialsException("Invalid Credentials"))
+                .flatMap(
+                        user -> {
+                            var name = user.getMetadata().getName();
+                            var userBuilder =
+                                    User.withUsername(name)
+                                            .password(user.getSpec().getPassword())
+                                            .disabled(
+                                                    requireNonNullElse(
+                                                            user.getSpec().getDisabled(), false));
+                            var setAuthorities =
+                                    roleService
+                                            .getRolesByUsername(name)
+                                            // every authenticated user should have authenticated
+                                            // and anonymous roles.
+                                            .concatWithValues(
+                                                    AUTHENTICATED_ROLE_NAME, ANONYMOUS_ROLE_NAME)
+                                            .map(
+                                                    roleName ->
+                                                            new SimpleGrantedAuthority(
+                                                                    ROLE_PREFIX + roleName))
+                                            .distinct()
+                                            .collectList()
+                                            .doOnNext(userBuilder::authorities);
 
-                return setAuthorities.then(Mono.fromSupplier(() -> {
-                    var twoFactorAuthSettings = TwoFactorUtils.getTwoFactorAuthSettings(user);
-                    return new HaloUser.Builder(userBuilder.build())
-                        .twoFactorAuthEnabled(
-                            (!twoFactorAuthDisabled) && twoFactorAuthSettings.isAvailable()
-                        )
-                        .totpEncryptedSecret(user.getSpec().getTotpEncryptedSecret())
-                        .build();
-                }));
-            });
+                            return setAuthorities.then(
+                                    Mono.fromSupplier(
+                                            () -> {
+                                                var twoFactorAuthSettings =
+                                                        TwoFactorUtils.getTwoFactorAuthSettings(
+                                                                user);
+                                                return new HaloUser.Builder(userBuilder.build())
+                                                        .twoFactorAuthEnabled(
+                                                                (!twoFactorAuthDisabled)
+                                                                        && twoFactorAuthSettings
+                                                                                .isAvailable())
+                                                        .totpEncryptedSecret(
+                                                                user.getSpec()
+                                                                        .getTotpEncryptedSecret())
+                                                        .build();
+                                            }));
+                        });
     }
 
     private UserDetails withNewPassword(UserDetails userDetails, String newPassword) {
-        return User.withUserDetails(userDetails)
-            .password(newPassword)
-            .build();
+        return User.withUserDetails(userDetails).password(newPassword).build();
     }
-
 }

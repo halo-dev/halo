@@ -20,11 +20,9 @@ import run.halo.app.search.event.HaloDocumentRebuildRequestEvent;
 @ExtendWith(MockitoExtension.class)
 class IndicesEndpointTest {
 
-    @Mock
-    ApplicationEventPublisher publisher;
+    @Mock ApplicationEventPublisher publisher;
 
-    @InjectMocks
-    IndicesEndpoint endpoint;
+    @InjectMocks IndicesEndpoint endpoint;
 
     WebTestClient client;
 
@@ -36,13 +34,14 @@ class IndicesEndpointTest {
     @ParameterizedTest
     @ValueSource(strings = {"/indices/-/rebuild"})
     void shouldRebuildIndices(String uri) {
-        client.post().uri(uri)
-            .exchange()
-            .expectStatus().isAccepted();
-        verify(publisher).publishEvent(assertArg(event -> {
-            assertInstanceOf(HaloDocumentRebuildRequestEvent.class, event);
-            assertEquals(endpoint, event.getSource());
-        }));
+        client.post().uri(uri).exchange().expectStatus().isAccepted();
+        verify(publisher)
+                .publishEvent(
+                        assertArg(
+                                event -> {
+                                    assertInstanceOf(HaloDocumentRebuildRequestEvent.class, event);
+                                    assertEquals(endpoint, event.getSource());
+                                }));
     }
 
     @Test

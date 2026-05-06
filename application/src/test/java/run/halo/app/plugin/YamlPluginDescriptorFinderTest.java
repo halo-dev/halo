@@ -36,8 +36,8 @@ class YamlPluginDescriptorFinderTest {
     void setUp() throws IOException {
         yamlPluginDescriptorFinder = new YamlPluginDescriptorFinder();
         tempDirectory = Files.createTempDirectory("halo-plugin");
-        var plugin002Uri = requireNonNull(
-            ResourceUtils.getFile("classpath:plugin/plugin-0.0.2")).toURI();
+        var plugin002Uri =
+                requireNonNull(ResourceUtils.getFile("classpath:plugin/plugin-0.0.2")).toURI();
 
         Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
         FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
@@ -53,24 +53,21 @@ class YamlPluginDescriptorFinderTest {
     void isApplicable() throws IOException {
         // File not exists
         boolean applicable =
-            yamlPluginDescriptorFinder.isApplicable(Path.of("/some/path/test.jar"));
+                yamlPluginDescriptorFinder.isApplicable(Path.of("/some/path/test.jar"));
         assertThat(applicable).isFalse();
 
         // jar file is applicable
         Path tempJarFile = Files.createTempFile("test", ".jar");
         Path tempZipFile = Files.createTempFile("test", ".zip");
         try {
-            applicable =
-                yamlPluginDescriptorFinder.isApplicable(tempJarFile);
+            applicable = yamlPluginDescriptorFinder.isApplicable(tempJarFile);
             assertThat(applicable).isTrue();
             // zip file is not applicable
-            applicable =
-                yamlPluginDescriptorFinder.isApplicable(tempZipFile);
+            applicable = yamlPluginDescriptorFinder.isApplicable(tempZipFile);
             assertThat(applicable).isFalse();
 
             // directory is applicable
-            applicable =
-                yamlPluginDescriptorFinder.isApplicable(tempJarFile.getParent());
+            applicable = yamlPluginDescriptorFinder.isApplicable(tempJarFile.getParent());
             assertThat(applicable).isTrue();
         } finally {
             FileUtils.deleteRecursivelyAndSilently(tempJarFile);
@@ -82,7 +79,8 @@ class YamlPluginDescriptorFinderTest {
     void find() throws JSONException {
         PluginDescriptor pluginDescriptor = yamlPluginDescriptorFinder.find(testFile.toPath());
         String actual = JsonUtils.objectToJson(pluginDescriptor);
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                      "pluginId": "fake-plugin",
                      "pluginDescription": "Fake description",
@@ -94,7 +92,7 @@ class YamlPluginDescriptorFinderTest {
                      "license": "GPLv3"
                  }
                 """,
-            actual,
-            false);
+                actual,
+                false);
     }
 }

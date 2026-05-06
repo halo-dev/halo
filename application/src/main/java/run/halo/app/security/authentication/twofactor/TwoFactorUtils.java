@@ -19,5 +19,4 @@ public enum TwoFactorUtils {
         settings.setTotpConfigured(StringUtils.isNotBlank(totpEncryptedSecret));
         return settings;
     }
-
 }

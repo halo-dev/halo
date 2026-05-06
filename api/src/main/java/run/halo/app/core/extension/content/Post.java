@@ -28,8 +28,12 @@ import run.halo.app.infra.ConditionList;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Post.KIND,
-    plural = "posts", singular = "post")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = Post.KIND,
+        plural = "posts",
+        singular = "post")
 @EqualsAndHashCode(callSuper = true)
 public class Post extends AbstractExtension {
 
@@ -41,10 +45,10 @@ public class Post extends AbstractExtension {
 
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
     public static final String LAST_RELEASED_SNAPSHOT_ANNO =
-        "content.halo.run/last-released-snapshot";
+            "content.halo.run/last-released-snapshot";
     public static final String LAST_ASSOCIATED_TAGS_ANNO = "content.halo.run/last-associated-tags";
     public static final String LAST_ASSOCIATED_CATEGORIES_ANNO =
-        "content.halo.run/last-associated-categories";
+            "content.halo.run/last-associated-categories";
 
     public static final String STATS_ANNO = "content.halo.run/stats";
 
@@ -68,9 +72,7 @@ public class Post extends AbstractExtension {
     @Nullable
     private PostSpec spec;
 
-    @Schema
-    @Nullable
-    private PostStatus status;
+    @Schema @Nullable private PostStatus status;
 
     @JsonIgnore
     public PostStatus getStatusOrDefault() {
@@ -83,7 +85,7 @@ public class Post extends AbstractExtension {
     @JsonIgnore
     public boolean isDeleted() {
         return Objects.equals(true, spec.getDeleted())
-            || getMetadata().getDeletionTimestamp() != null;
+                || getMetadata().getDeletionTimestamp() != null;
     }
 
     @JsonIgnore
@@ -162,8 +164,7 @@ public class Post extends AbstractExtension {
     public static class PostStatus {
         private String phase;
 
-        @Schema
-        private ConditionList conditions;
+        @Schema private ConditionList conditions;
 
         private String permalink;
 

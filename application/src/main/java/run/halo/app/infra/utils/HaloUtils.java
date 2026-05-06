@@ -50,8 +50,10 @@ public class HaloUtils {
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalArgumentException(
-                String.format("Failed to read class path file as string from location [%s]",
-                    location), e);
+                    String.format(
+                            "Failed to read class path file as string from location [%s]",
+                            location),
+                    e);
         }
     }
 
@@ -117,10 +119,6 @@ public class HaloUtils {
         } catch (InvalidUrlException e) {
             uriBuilder = UriComponentsBuilder.fromUriString(decodedUri, ParserType.WHAT_WG);
         }
-        return uriBuilder
-            .build(false)
-            .encode()
-            .toUri();
+        return uriBuilder.build(false).encode().toUri();
     }
-
 }

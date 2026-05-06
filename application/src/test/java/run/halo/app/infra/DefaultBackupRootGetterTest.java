@@ -15,11 +15,9 @@ import run.halo.app.infra.properties.HaloProperties;
 @ExtendWith(MockitoExtension.class)
 class DefaultBackupRootGetterTest {
 
-    @Mock
-    HaloProperties haloProperties;
+    @Mock HaloProperties haloProperties;
 
-    @InjectMocks
-    DefaultBackupRootGetter backupRootGetter;
+    @InjectMocks DefaultBackupRootGetter backupRootGetter;
 
     @Test
     void shouldGetBackupRootFromWorkDir() {
@@ -28,6 +26,4 @@ class DefaultBackupRootGetterTest {
         assertEquals(Path.of("workdir", "backups"), backupRoot);
         verify(haloProperties).getWorkDir();
     }
-
-
 }

@@ -24,8 +24,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     }
 
     @Override
-    public Mono<AuthorizingVisitor> visitRules(Authentication authentication,
-        RequestInfo requestInfo) {
+    public Mono<AuthorizingVisitor> visitRules(
+            Authentication authentication, RequestInfo requestInfo) {
         var roleNames = AuthorityUtils.authoritiesToRoles(authentication.getAuthorities());
         var record = new AttributesRecord(requestInfo);
         var visitor = new AuthorizingVisitor(record);
@@ -34,41 +34,45 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         // then we should check whether the user is the owner of the userspace.
         if (StringUtils.isNotBlank(requestInfo.getUserspace())) {
             if (!authentication.getName().equals(requestInfo.getUserspace())) {
-                return Mono.fromSupplier(() -> {
-                    visitor.visit(null, null, null);
-                    return visitor;
-                });
+                return Mono.fromSupplier(
+                        () -> {
+                            visitor.visit(null, null, null);
+                            return visitor;
+                        });
             }
         }
 
         var stopVisiting = new AtomicBoolean(false);
-        return roleService.listDependenciesFlux(roleNames)
-            .filter(role -> !CollectionUtils.isEmpty(role.getRules()))
-            .doOnNext(role -> {
-                if (stopVisiting.get()) {
-                    return;
-                }
-                String roleName = role.getMetadata().getName();
-                var rules = role.getRules();
-                var source = roleBindingDescriber(roleName, authentication.getName());
-                for (var rule : rules) {
-                    if (!visitor.visit(source, rule, null)) {
-                        stopVisiting.set(true);
-                        return;
-                    }
-                }
-            })
-            .takeUntil(item -> stopVisiting.get())
-            .onErrorResume(t -> visitor.visit(null, null, t), t -> {
-                log.error("Error occurred when visiting rules", t);
-                //Do nothing here
-                return Mono.empty();
-            })
-            .then(Mono.just(visitor));
+        return roleService
+                .listDependenciesFlux(roleNames)
+                .filter(role -> !CollectionUtils.isEmpty(role.getRules()))
+                .doOnNext(
+                        role -> {
+                            if (stopVisiting.get()) {
+                                return;
+                            }
+                            String roleName = role.getMetadata().getName();
+                            var rules = role.getRules();
+                            var source = roleBindingDescriber(roleName, authentication.getName());
+                            for (var rule : rules) {
+                                if (!visitor.visit(source, rule, null)) {
+                                    stopVisiting.set(true);
+                                    return;
+                                }
+                            }
+                        })
+                .takeUntil(item -> stopVisiting.get())
+                .onErrorResume(
+                        t -> visitor.visit(null, null, t),
+                        t -> {
+                            log.error("Error occurred when visiting rules", t);
+                            // Do nothing here
+                            return Mono.empty();
+                        })
+                .then(Mono.just(visitor));
     }
 
     String roleBindingDescriber(String roleName, String subject) {
         return String.format("Binding role [%s] to [%s]", roleName, subject);
     }
-
 }

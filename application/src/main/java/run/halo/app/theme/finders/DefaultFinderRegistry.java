@@ -39,7 +39,7 @@ public class DefaultFinderRegistry implements FinderRegistry, InitializingBean {
     void putFinder(String name, Object finder) {
         if (finders.containsKey(name)) {
             throw new IllegalStateException(
-                "Finder with name '" + name + "' is already registered");
+                    "Finder with name '" + name + "' is already registered");
         }
         finders.put(name, finder);
     }
@@ -80,11 +80,13 @@ public class DefaultFinderRegistry implements FinderRegistry, InitializingBean {
     @Override
     public void afterPropertiesSet() {
         // initialize finders from application context
-        applicationContext.getBeansWithAnnotation(Finder.class)
-            .forEach((beanName, finder) -> {
-                var finderName = getFinderName(finder);
-                this.putFinder(finderName, finder);
-            });
+        applicationContext
+                .getBeansWithAnnotation(Finder.class)
+                .forEach(
+                        (beanName, finder) -> {
+                            var finderName = getFinderName(finder);
+                            this.putFinder(finderName, finder);
+                        });
     }
 
     @Override
@@ -93,14 +95,16 @@ public class DefaultFinderRegistry implements FinderRegistry, InitializingBean {
         // This handles the case where a previous registration was not properly cleaned up
         // (e.g., when a plugin context refresh partially succeeded and then failed).
         unregister(pluginId);
-        pluginContext.getBeansWithAnnotation(Finder.class)
-            .forEach((beanName, finder) -> {
-                var finderName = getFinderName(finder);
-                this.putFinder(finderName, finder);
-                pluginFindersLookup
-                    .computeIfAbsent(pluginId, ignored -> new ArrayList<>())
-                    .add(finderName);
-            });
+        pluginContext
+                .getBeansWithAnnotation(Finder.class)
+                .forEach(
+                        (beanName, finder) -> {
+                            var finderName = getFinderName(finder);
+                            this.putFinder(finderName, finder);
+                            pluginFindersLookup
+                                    .computeIfAbsent(pluginId, ignored -> new ArrayList<>())
+                                    .add(finderName);
+                        });
     }
 
     @Override
@@ -110,5 +114,4 @@ public class DefaultFinderRegistry implements FinderRegistry, InitializingBean {
             finderNames.forEach(finders::remove);
         }
     }
-
 }

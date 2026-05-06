@@ -34,17 +34,13 @@ import reactor.test.StepVerifier;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ViewNameResolverTest {
 
-    @Mock
-    ThemeResolver themeResolver;
+    @Mock ThemeResolver themeResolver;
 
-    @Mock
-    ThymeleafProperties thymeleafProperties;
+    @Mock ThymeleafProperties thymeleafProperties;
 
-    @InjectMocks
-    DefaultViewNameResolver viewNameResolver;
+    @InjectMocks DefaultViewNameResolver viewNameResolver;
 
-    @TempDir
-    Path themePath;
+    @TempDir Path themePath;
 
     @BeforeEach
     void setUp() {
@@ -60,52 +56,57 @@ class ViewNameResolverTest {
         Files.createFile(templatesPath.resolve("post_news.html"));
         Files.createFile(templatesPath.resolve("post_docs.html"));
 
-
         var exchange = Mockito.mock(ServerWebExchange.class);
         when(themeResolver.getTheme(exchange))
-            .thenReturn(Mono.fromSupplier(() -> ThemeContext.builder()
-                .name("fake-theme")
-                .path(themePath)
-                .active(true)
-                .build())
-            );
+                .thenReturn(
+                        Mono.fromSupplier(
+                                () ->
+                                        ThemeContext.builder()
+                                                .name("fake-theme")
+                                                .path(themePath)
+                                                .active(true)
+                                                .build()));
 
-        MockServerRequest request = MockServerRequest.builder()
-            .uri(new URI("/")).method(HttpMethod.GET)
-            .exchange(exchange)
-            .build();
+        MockServerRequest request =
+                MockServerRequest.builder()
+                        .uri(new URI("/"))
+                        .method(HttpMethod.GET)
+                        .exchange(exchange)
+                        .build();
 
-        viewNameResolver.resolveViewNameOrDefault(request, "post_news", "post")
-            .as(StepVerifier::create)
-            .expectNext("post_news")
-            .verifyComplete();
+        viewNameResolver
+                .resolveViewNameOrDefault(request, "post_news", "post")
+                .as(StepVerifier::create)
+                .expectNext("post_news")
+                .verifyComplete();
 
         // post_docs.html
         String viewName = "post_docs" + thymeleafProperties.getSuffix();
-        viewNameResolver.resolveViewNameOrDefault(request, viewName, "post")
-            .as(StepVerifier::create)
-            .expectNext(viewName)
-            .verifyComplete();
+        viewNameResolver
+                .resolveViewNameOrDefault(request, viewName, "post")
+                .as(StepVerifier::create)
+                .expectNext(viewName)
+                .verifyComplete();
 
-        viewNameResolver.resolveViewNameOrDefault(request, "post_nothing", "post")
-            .as(StepVerifier::create)
-            .expectNext("post")
-            .verifyComplete();
+        viewNameResolver
+                .resolveViewNameOrDefault(request, "post_nothing", "post")
+                .as(StepVerifier::create)
+                .expectNext("post")
+                .verifyComplete();
     }
 
     @Test
     void processName() {
         var suffix = thymeleafProperties.getSuffix();
         assertThat(viewNameResolver.computeResourceName("post_news"))
-            .isEqualTo("post_news" + suffix);
-        assertThat(
-            viewNameResolver.computeResourceName("post_news" + suffix))
-            .isEqualTo("post_news" + suffix);
+                .isEqualTo("post_news" + suffix);
+        assertThat(viewNameResolver.computeResourceName("post_news" + suffix))
+                .isEqualTo("post_news" + suffix);
         assertThat(viewNameResolver.computeResourceName("post_news.test"))
-            .isEqualTo("post_news.test" + suffix);
+                .isEqualTo("post_news.test" + suffix);
 
         assertThatThrownBy(() -> viewNameResolver.computeResourceName(null))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Name must not be null");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Name must not be null");
     }
 }

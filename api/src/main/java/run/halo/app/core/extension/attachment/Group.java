@@ -14,8 +14,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
-    plural = "groups", singular = "group")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = KIND,
+        plural = "groups",
+        singular = "group")
 public class Group extends AbstractExtension {
 
     public static final String KIND = "Group";
@@ -31,7 +35,6 @@ public class Group extends AbstractExtension {
 
         @Schema(requiredMode = REQUIRED, description = "Display name of group")
         private String displayName;
-
     }
 
     @Data
@@ -42,7 +45,5 @@ public class Group extends AbstractExtension {
 
         @Schema(description = "Total of attachments under the current group", minimum = "0")
         private Long totalAttachments;
-
     }
-
 }

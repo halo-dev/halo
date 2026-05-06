@@ -32,14 +32,11 @@ import run.halo.app.extension.index.ValueIndexQuery;
 @ExtendWith(MockitoExtension.class)
 class QueryVisitorTest {
 
-    @Mock
-    Indices<FakeExtension> indices;
+    @Mock Indices<FakeExtension> indices;
 
-    @Spy
-    ConversionService conversionService = ApplicationConversionService.getSharedInstance();
+    @Spy ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 
-    @InjectMocks
-    QueryVisitor<FakeExtension> visitor;
+    @InjectMocks QueryVisitor<FakeExtension> visitor;
 
     @Test
     void shouldVisitAllCondition() {
@@ -108,7 +105,7 @@ class QueryVisitorTest {
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.in(argThat(c -> c.containsAll(List.of("name1", "name1")))))
-            .thenReturn(Set.of("in", "data"));
+                .thenReturn(Set.of("in", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.in("metadata.name", Set.<String>of("name1", "name2"));
         condition.visit(visitor);
@@ -124,7 +121,7 @@ class QueryVisitorTest {
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.notIn(argThat(c -> c.containsAll(List.of("name1", "name2")))))
-            .thenReturn(Set.of("not-in", "data"));
+                .thenReturn(Set.of("not-in", "data"));
         when(index.getKeyType()).thenReturn(String.class);
         var condition = Queries.in("metadata.name", Set.<String>of("name1", "name2")).not();
         condition.visit(visitor);
@@ -337,7 +334,7 @@ class QueryVisitorTest {
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
         when(query.in(eq("env"), eq(Set.of("production", "staging"))))
-            .thenReturn(Set.of("label-in", "data"));
+                .thenReturn(Set.of("label-in", "data"));
         var condition = Queries.labelIn("env", Set.of("production", "staging"));
         condition.visit(visitor);
         assertEquals(Set.of("label-in", "data"), visitor.getResult());
@@ -353,7 +350,7 @@ class QueryVisitorTest {
         var query = (LabelIndexQuery) index;
         when(indices.getIndex("metadata.labels")).thenReturn(index);
         when(query.notIn(eq("env"), eq(Set.of("production", "staging"))))
-            .thenReturn(Set.of("label-not-in", "data"));
+                .thenReturn(Set.of("label-not-in", "data"));
         var condition = Queries.labelIn("env", Set.of("production", "staging")).not();
         condition.visit(visitor);
         assertEquals(Set.of("label-not-in", "data"), visitor.getResult());
@@ -397,8 +394,9 @@ class QueryVisitorTest {
         when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
         when(query.equal("name2")).thenReturn(Set.of("name2", "data"));
         when(index.getKeyType()).thenReturn(String.class);
-        var condition = Queries.equal("metadata.name", "name1")
-            .and(Queries.equal("metadata.name", "name2"));
+        var condition =
+                Queries.equal("metadata.name", "name1")
+                        .and(Queries.equal("metadata.name", "name2"));
         condition.visit(visitor);
         assertEquals(Set.of("data"), visitor.getResult());
     }
@@ -411,8 +409,8 @@ class QueryVisitorTest {
         when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
         when(query.equal("name2")).thenReturn(Set.of("name2", "data"));
         when(index.getKeyType()).thenReturn(String.class);
-        var condition = Queries.equal("metadata.name", "name1")
-            .or(Queries.equal("metadata.name", "name2"));
+        var condition =
+                Queries.equal("metadata.name", "name1").or(Queries.equal("metadata.name", "name2"));
         condition.visit(visitor);
         assertEquals(Set.of("name1", "name2", "data"), visitor.getResult());
     }
@@ -436,8 +434,7 @@ class QueryVisitorTest {
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
         when(index.getKeyType()).thenReturn(String.class);
-        var condition = Condition.empty()
-            .and(Queries.equal("metadata.name", "name1"));
+        var condition = Condition.empty().and(Queries.equal("metadata.name", "name1"));
         condition.visit(visitor);
         assertEquals(Set.of("name1", "data"), visitor.getResult());
     }
@@ -449,8 +446,7 @@ class QueryVisitorTest {
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.equal("name1")).thenReturn(Set.of("name1", "data"));
         when(index.getKeyType()).thenReturn(String.class);
-        var condition = Queries.equal("metadata.name", "name1")
-            .and(Condition.empty());
+        var condition = Queries.equal("metadata.name", "name1").and(Condition.empty());
         condition.visit(visitor);
         assertEquals(Set.of("name1", "data"), visitor.getResult());
     }
@@ -461,8 +457,7 @@ class QueryVisitorTest {
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.all()).thenReturn(Set.of("all"));
-        var condition = Condition.empty()
-            .or(Queries.equal("metadata.name", "name1"));
+        var condition = Condition.empty().or(Queries.equal("metadata.name", "name1"));
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
 
@@ -475,8 +470,7 @@ class QueryVisitorTest {
         var query = (ValueIndexQuery) index;
         when(indices.getIndex("metadata.name")).thenReturn(index);
         when(query.all()).thenReturn(Set.of("all"));
-        var condition = Queries.equal("metadata.name", "name1")
-            .or(Condition.empty());
+        var condition = Queries.equal("metadata.name", "name1").or(Condition.empty());
         condition.visit(visitor);
         assertEquals(Set.of("all"), visitor.getResult());
 
@@ -513,9 +507,11 @@ class QueryVisitorTest {
     void throwErrorIfIndexNotFound() {
         var condition = Queries.equal("metadata.unknownField", "value");
         when(indices.getIndex("metadata.unknownField")).thenThrow(IllegalArgumentException.class);
-        assertThrows(IllegalArgumentException.class, (() -> {
-            condition.visit(visitor);
-        }));
+        assertThrows(
+                IllegalArgumentException.class,
+                (() -> {
+                    condition.visit(visitor);
+                }));
     }
 
     @Test
@@ -523,9 +519,11 @@ class QueryVisitorTest {
         var labelIndex = mock(Index.class, withSettings().extraInterfaces(LabelIndexQuery.class));
         when(indices.getIndex("metadata.name")).thenReturn(labelIndex);
         var condition = Queries.equal("metadata.name", "name1");
-        assertThrows(IllegalArgumentException.class, (() -> {
-            condition.visit(visitor);
-        }));
+        assertThrows(
+                IllegalArgumentException.class,
+                (() -> {
+                    condition.visit(visitor);
+                }));
     }
 
     @Test
@@ -533,9 +531,11 @@ class QueryVisitorTest {
         var valueIndex = mock(Index.class, withSettings().extraInterfaces(ValueIndexQuery.class));
         when(indices.getIndex("metadata.labels")).thenReturn(valueIndex);
         var condition = Queries.labelEqual("env", "production");
-        assertThrows(IllegalArgumentException.class, (() -> {
-            condition.visit(visitor);
-        }));
+        assertThrows(
+                IllegalArgumentException.class,
+                (() -> {
+                    condition.visit(visitor);
+                }));
     }
 
     @Test
@@ -544,8 +544,10 @@ class QueryVisitorTest {
         when(indices.getIndex("metadata.age")).thenReturn(index);
         when(index.getKeyType()).thenReturn(Integer.class);
         var condition = Queries.equal("metadata.age", "not-an-integer");
-        assertThrows(ConversionFailedException.class, (() -> {
-            condition.visit(visitor);
-        }));
+        assertThrows(
+                ConversionFailedException.class,
+                (() -> {
+                    condition.visit(visitor);
+                }));
     }
 }

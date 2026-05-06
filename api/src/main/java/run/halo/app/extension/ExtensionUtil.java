@@ -35,12 +35,15 @@ public enum ExtensionUtil {
 
     public static boolean isDeleted(ExtensionOperator extension) {
         return extension.getMetadata() != null
-            && extension.getMetadata().getDeletionTimestamp() != null;
+                && extension.getMetadata().getDeletionTimestamp() != null;
     }
 
     public static boolean addFinalizers(MetadataOperator metadata, Set<String> finalizers) {
-        var modifiableFinalizers = new HashSet<>(
-            metadata.getFinalizers() == null ? Collections.emptySet() : metadata.getFinalizers());
+        var modifiableFinalizers =
+                new HashSet<>(
+                        metadata.getFinalizers() == null
+                                ? Collections.emptySet()
+                                : metadata.getFinalizers());
         var added = modifiableFinalizers.addAll(finalizers);
         if (added) {
             metadata.setFinalizers(modifiableFinalizers);
@@ -76,10 +79,6 @@ public enum ExtensionUtil {
      * @return Sort
      */
     public static Sort defaultSort() {
-        return Sort.by(
-            desc("metadata.creationTimestamp"),
-            asc("metadata.name")
-        );
+        return Sort.by(desc("metadata.creationTimestamp"), asc("metadata.name"));
     }
-
 }

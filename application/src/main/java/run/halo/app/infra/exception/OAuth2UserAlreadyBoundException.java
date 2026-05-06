@@ -12,12 +12,16 @@ import run.halo.app.core.extension.UserConnection;
 public class OAuth2UserAlreadyBoundException extends ServerWebInputException {
 
     public OAuth2UserAlreadyBoundException(UserConnection connection) {
-        super("The user has been bound to another account", null, null, null, new Object[] {
-            connection.getSpec().getUsername(),
-            connection.getSpec().getProviderUserId(),
-            connection.getSpec().getRegistrationId(),
-            connection.getSpec().getUpdatedAt()
-        });
+        super(
+                "The user has been bound to another account",
+                null,
+                null,
+                null,
+                new Object[] {
+                    connection.getSpec().getUsername(),
+                    connection.getSpec().getProviderUserId(),
+                    connection.getSpec().getRegistrationId(),
+                    connection.getSpec().getUpdatedAt()
+                });
     }
-
 }

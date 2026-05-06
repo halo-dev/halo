@@ -19,11 +19,9 @@ import run.halo.app.infra.properties.HaloProperties;
  */
 @ExtendWith(MockitoExtension.class)
 class AttachmentRootGetterImplTest {
-    @Mock
-    private HaloProperties haloProperties;
+    @Mock private HaloProperties haloProperties;
 
-    @InjectMocks
-    private AttachmentRootGetterImpl localAttachmentDirGetter;
+    @InjectMocks private AttachmentRootGetterImpl localAttachmentDirGetter;
 
     @Test
     void get() {

@@ -59,22 +59,23 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        var filter = new AuthenticationWebFilter(authenticationManager()) {
-            @Override
-            protected Mono<Void> onAuthenticationSuccess(Authentication authentication,
-                WebFilterExchange webFilterExchange) {
-                // check if 2FA is enabled after authenticating successfully.
-                if (authentication.getPrincipal() instanceof HaloUserDetails userDetails
-                    && userDetails.isTwoFactorAuthEnabled()) {
-                    authentication = new TwoFactorAuthentication(authentication);
-                }
-                return super.onAuthenticationSuccess(authentication, webFilterExchange);
-            }
-        };
+        var filter =
+                new AuthenticationWebFilter(authenticationManager()) {
+                    @Override
+                    protected Mono<Void> onAuthenticationSuccess(
+                            Authentication authentication, WebFilterExchange webFilterExchange) {
+                        // check if 2FA is enabled after authenticating successfully.
+                        if (authentication.getPrincipal() instanceof HaloUserDetails userDetails
+                                && userDetails.isTwoFactorAuthEnabled()) {
+                            authentication = new TwoFactorAuthentication(authentication);
+                        }
+                        return super.onAuthenticationSuccess(authentication, webFilterExchange);
+                    }
+                };
         var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
-        var handler = new UsernamePasswordHandler(
-            context, messageSource, loginHandlerEnhancer, parameterRequestCache
-        );
+        var handler =
+                new UsernamePasswordHandler(
+                        context, messageSource, loginHandlerEnhancer, parameterRequestCache);
         var authConverter = new LoginAuthenticationConverter(cryptoService, rateLimiterRegistry);
         authConverter.setUsernameParameter(SecurityConstant.USERNAME_PARAMETER_NAME);
         authConverter.setPasswordParameter(SecurityConstant.PASSWORD_PARAMETER_NAME);
@@ -88,8 +89,9 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
     }
 
     ReactiveAuthenticationManager authenticationManager() {
-        var manager = new UsernamePasswordDelegatingAuthenticationManager(extensionGetter,
-            defaultAuthenticationManager());
+        var manager =
+                new UsernamePasswordDelegatingAuthenticationManager(
+                        extensionGetter, defaultAuthenticationManager());
         return new ObservationReactiveAuthenticationManager(observationRegistry, manager);
     }
 

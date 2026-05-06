@@ -52,10 +52,11 @@ public class ArchiveRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
-        RequestPredicate requestPredicate = patterns(prefix).stream()
-            .map(RequestPredicates::GET)
-            .reduce(req -> false, RequestPredicate::or)
-            .and(accept(MediaType.TEXT_HTML));
+        RequestPredicate requestPredicate =
+                patterns(prefix).stream()
+                        .map(RequestPredicates::GET)
+                        .reduce(req -> false, RequestPredicate::or)
+                        .and(accept(MediaType.TEXT_HTML));
         return RouterFunctions.route(requestPredicate, handlerFunction());
     }
 
@@ -63,23 +64,24 @@ public class ArchiveRouteFactory implements RouteFactory {
         return request -> {
             String templateName = DefaultTemplateEnum.ARCHIVES.getValue();
             return ServerResponse.ok()
-                .render(templateName,
-                    Map.of("archives", archivePosts(request),
-                        ModelConst.TEMPLATE_ID, templateName)
-                );
+                    .render(
+                            templateName,
+                            Map.of(
+                                    "archives",
+                                    archivePosts(request),
+                                    ModelConst.TEMPLATE_ID,
+                                    templateName));
         };
     }
 
     private List<String> patterns(String prefix) {
         return List.of(
-            StringUtils.prependIfMissing(prefix, "/"),
-            PathUtils.combinePath(prefix, "/page/{page:\\d+}"),
-            PathUtils.combinePath(prefix, "/{year:\\d{4}}"),
-            PathUtils.combinePath(prefix, "/{year:\\d{4}}/page/{page:\\d+}"),
-            PathUtils.combinePath(prefix, "/{year:\\d{4}}/{month:\\d{2}}"),
-            PathUtils.combinePath(prefix,
-                "/{year:\\d{4}}/{month:\\d{2}}/page/{page:\\d+}")
-        );
+                StringUtils.prependIfMissing(prefix, "/"),
+                PathUtils.combinePath(prefix, "/page/{page:\\d+}"),
+                PathUtils.combinePath(prefix, "/{year:\\d{4}}"),
+                PathUtils.combinePath(prefix, "/{year:\\d{4}}/page/{page:\\d+}"),
+                PathUtils.combinePath(prefix, "/{year:\\d{4}}/{month:\\d{2}}"),
+                PathUtils.combinePath(prefix, "/{year:\\d{4}}/{month:\\d{2}}/page/{page:\\d+}"));
     }
 
     private Mono<UrlContextListResult<PostArchiveVo>> archivePosts(ServerRequest request) {
@@ -87,26 +89,43 @@ public class ArchiveRouteFactory implements RouteFactory {
         int pageNum = pageNumInPathVariable(request);
         String requestPath = request.path();
         return configuredPageSize(environmentFetcher, SystemSetting.Post::getArchivePageSize)
-            .flatMap(pageSize -> postFinder.archives(pageNum, pageSize, variables.getYear(),
-                variables.getMonth()))
-            .doOnNext(list -> list.get()
-                .map(PostArchiveVo::getMonths)
-                .flatMap(List::stream)
-                .flatMap(month -> month.getPosts().stream())
-                .forEach(postVo -> postVo.getSpec()
-                    .setTitle(titleVisibilityIdentifyCalculator.calculateTitle(
-                        postVo.getSpec().getTitle(),
-                        postVo.getSpec().getVisible(),
-                        localeContextResolver.resolveLocaleContext(request.exchange())
-                            .getLocale())
-                    )
-                )
-            )
-            .map(list -> new UrlContextListResult.Builder<PostArchiveVo>()
-                .listResult(list)
-                .nextUrl(PageUrlUtils.nextPageUrl(requestPath, totalPage(list)))
-                .prevUrl(PageUrlUtils.prevPageUrl(requestPath))
-                .build());
+                .flatMap(
+                        pageSize ->
+                                postFinder.archives(
+                                        pageNum,
+                                        pageSize,
+                                        variables.getYear(),
+                                        variables.getMonth()))
+                .doOnNext(
+                        list ->
+                                list.get()
+                                        .map(PostArchiveVo::getMonths)
+                                        .flatMap(List::stream)
+                                        .flatMap(month -> month.getPosts().stream())
+                                        .forEach(
+                                                postVo ->
+                                                        postVo.getSpec()
+                                                                .setTitle(
+                                                                        titleVisibilityIdentifyCalculator
+                                                                                .calculateTitle(
+                                                                                        postVo.getSpec()
+                                                                                                .getTitle(),
+                                                                                        postVo.getSpec()
+                                                                                                .getVisible(),
+                                                                                        localeContextResolver
+                                                                                                .resolveLocaleContext(
+                                                                                                        request
+                                                                                                                .exchange())
+                                                                                                .getLocale()))))
+                .map(
+                        list ->
+                                new UrlContextListResult.Builder<PostArchiveVo>()
+                                        .listResult(list)
+                                        .nextUrl(
+                                                PageUrlUtils.nextPageUrl(
+                                                        requestPath, totalPage(list)))
+                                        .prevUrl(PageUrlUtils.prevPageUrl(requestPath))
+                                        .build());
     }
 
     @Data

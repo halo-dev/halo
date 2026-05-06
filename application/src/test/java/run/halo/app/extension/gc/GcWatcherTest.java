@@ -21,11 +21,9 @@ import run.halo.app.extension.controller.RequestQueue;
 @ExtendWith(MockitoExtension.class)
 class GcWatcherTest {
 
-    @Mock
-    RequestQueue<GcRequest> queue;
+    @Mock RequestQueue<GcRequest> queue;
 
-    @InjectMocks
-    GcWatcher watcher;
+    @InjectMocks GcWatcher watcher;
 
     @Test
     void shouldAddIntoQueueWhenDeletionTimestampSet() {
@@ -80,7 +78,6 @@ class GcWatcherTest {
         assertTrue(watcher.isDisposed());
         verify(run).run();
     }
-
 
     FakeExtension createExtension() {
         var fake = new FakeExtension();

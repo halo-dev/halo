@@ -33,14 +33,11 @@ import run.halo.app.extension.controller.Reconciler;
 @ExtendWith(MockitoExtension.class)
 class PolicyConfigChangeDetectorTest {
 
-    @Mock
-    private PolicyConfigChangeDetector.AttachmentUpdateTrigger updateTrigger;
+    @Mock private PolicyConfigChangeDetector.AttachmentUpdateTrigger updateTrigger;
 
-    @Mock
-    private ExtensionClient client;
+    @Mock private ExtensionClient client;
 
-    @InjectMocks
-    private PolicyConfigChangeDetector policyConfigChangeDetector;
+    @InjectMocks private PolicyConfigChangeDetector policyConfigChangeDetector;
 
     @Test
     void reconcileTest() {
@@ -51,9 +48,9 @@ class PolicyConfigChangeDetectorTest {
         configMap.getMetadata().setLabels(Map.of(Policy.POLICY_OWNER_LABEL, "fake-policy"));
 
         when(client.fetch(eq(ConfigMap.class), eq("fake-config")))
-            .thenReturn(Optional.of(configMap));
+                .thenReturn(Optional.of(configMap));
         when(client.listAllNames(same(Attachment.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(List.of("fake-attachment"));
+                .thenReturn(List.of("fake-attachment"));
 
         spyDetector.reconcile(new Reconciler.Request("fake-config"));
 

@@ -32,8 +32,7 @@ class LuceneSearchEngineTest {
 
     LuceneSearchEngine searchEngine;
 
-    @TempDir
-    Path tempDir;
+    @TempDir Path tempDir;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -85,31 +84,34 @@ class LuceneSearchEngineTest {
 
     @Test
     void shouldAddOrUpdateDocumentConcurrently()
-        throws ExecutionException, InterruptedException, TimeoutException {
-        runConcurrently(() -> {
-            var haloDoc = createFakeHaloDoc();
-            searchEngine.addOrUpdate(List.of(haloDoc));
-        });
+            throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(
+                () -> {
+                    var haloDoc = createFakeHaloDoc();
+                    searchEngine.addOrUpdate(List.of(haloDoc));
+                });
     }
 
     @Test
     void shouldDeleteDocumentConcurrently()
-        throws ExecutionException, InterruptedException, TimeoutException {
-        runConcurrently(() -> {
-            var haloDoc = createFakeHaloDoc();
-            searchEngine.addOrUpdate(List.of(haloDoc));
-            searchEngine.deleteDocument(List.of(haloDoc.getId()));
-        });
+            throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(
+                () -> {
+                    var haloDoc = createFakeHaloDoc();
+                    searchEngine.addOrUpdate(List.of(haloDoc));
+                    searchEngine.deleteDocument(List.of(haloDoc.getId()));
+                });
     }
 
     @Test
     void shouldDeleteAllConcurrently()
-        throws ExecutionException, InterruptedException, TimeoutException {
-        runConcurrently(() -> {
-            var haloDoc = createFakeHaloDoc();
-            searchEngine.addOrUpdate(List.of(haloDoc));
-            searchEngine.deleteAll();
-        });
+            throws ExecutionException, InterruptedException, TimeoutException {
+        runConcurrently(
+                () -> {
+                    var haloDoc = createFakeHaloDoc();
+                    searchEngine.addOrUpdate(List.of(haloDoc));
+                    searchEngine.deleteAll();
+                });
     }
 
     @Test
@@ -155,11 +157,12 @@ class LuceneSearchEngineTest {
     }
 
     void runConcurrently(Runnable runnable)
-        throws ExecutionException, InterruptedException, TimeoutException {
+            throws ExecutionException, InterruptedException, TimeoutException {
         var executorService = Executors.newFixedThreadPool(10);
-        var futures = IntStream.of(0, 10)
-            .mapToObj(i -> CompletableFuture.runAsync(runnable, executorService))
-            .toArray(CompletableFuture[]::new);
+        var futures =
+                IntStream.of(0, 10)
+                        .mapToObj(i -> CompletableFuture.runAsync(runnable, executorService))
+                        .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(futures).get(10, TimeUnit.SECONDS);
         executorService.shutdownNow();
         assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
@@ -181,5 +184,4 @@ class LuceneSearchEngineTest {
         haloDoc.setAnnotations(Map.of("fake-anno-key", "fake-anno-value"));
         return haloDoc;
     }
-
 }

@@ -81,7 +81,6 @@ public class ConditionList extends AbstractCollection<Condition> {
         return null;
     }
 
-
     public void remove(Condition condition) {
         conditions.remove(condition);
     }
@@ -122,9 +121,9 @@ public class ConditionList extends AbstractCollection<Condition> {
             return false;
         }
         return Objects.equals(a.getType(), b.getType())
-            && Objects.equals(a.getStatus(), b.getStatus())
-            && Objects.equals(a.getReason(), b.getReason())
-            && Objects.equals(a.getMessage(), b.getMessage());
+                && Objects.equals(a.getStatus(), b.getStatus())
+                && Objects.equals(a.getReason(), b.getReason())
+                && Objects.equals(a.getMessage(), b.getMessage());
     }
 
     @Override

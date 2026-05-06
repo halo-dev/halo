@@ -23,30 +23,27 @@ public class TotpCodeAuthenticationConverter implements ServerAuthenticationConv
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         // Check the request is authenticated before.
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .filter(TwoFactorAuthentication.class::isInstance)
-            .switchIfEmpty(Mono.error(
-                () -> new TwoFactorAuthException(
-                    "MFA Authentication required."
-                ))
-            )
-            .flatMap(authentication -> exchange.getFormData())
-            .handle((formData, sink) -> {
-                var codeStr = formData.getFirst(codeParameter);
-                if (StringUtils.isBlank(codeStr)) {
-                    sink.error(new TwoFactorAuthException(
-                        "Empty code parameter."
-                    ));
-                    return;
-                }
-                try {
-                    var code = Integer.parseInt(codeStr);
-                    sink.next(new TotpAuthenticationToken(code));
-                } catch (NumberFormatException e) {
-                    sink.error(new TwoFactorAuthException(
-                        "Invalid code parameter " + codeStr + '.')
-                    );
-                }
-            });
+                .map(SecurityContext::getAuthentication)
+                .filter(TwoFactorAuthentication.class::isInstance)
+                .switchIfEmpty(
+                        Mono.error(
+                                () -> new TwoFactorAuthException("MFA Authentication required.")))
+                .flatMap(authentication -> exchange.getFormData())
+                .handle(
+                        (formData, sink) -> {
+                            var codeStr = formData.getFirst(codeParameter);
+                            if (StringUtils.isBlank(codeStr)) {
+                                sink.error(new TwoFactorAuthException("Empty code parameter."));
+                                return;
+                            }
+                            try {
+                                var code = Integer.parseInt(codeStr);
+                                sink.next(new TotpAuthenticationToken(code));
+                            } catch (NumberFormatException e) {
+                                sink.error(
+                                        new TwoFactorAuthException(
+                                                "Invalid code parameter " + codeStr + '.'));
+                            }
+                        });
     }
 }

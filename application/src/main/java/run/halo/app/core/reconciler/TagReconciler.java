@@ -38,51 +38,52 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Tag.class, request.name())
-            .ifPresent(tag -> {
-                if (ExtensionUtil.isDeleted(tag)) {
-                    if (removeFinalizers(tag.getMetadata(), Set.of(FINALIZER_NAME))) {
-                        client.update(tag);
-                        eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
-                    }
-                    return;
-                }
+                .ifPresent(
+                        tag -> {
+                            if (ExtensionUtil.isDeleted(tag)) {
+                                if (removeFinalizers(tag.getMetadata(), Set.of(FINALIZER_NAME))) {
+                                    client.update(tag);
+                                    eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
+                                }
+                                return;
+                            }
 
-                addFinalizers(tag.getMetadata(), Set.of(FINALIZER_NAME));
+                            addFinalizers(tag.getMetadata(), Set.of(FINALIZER_NAME));
 
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(tag);
+                            Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(tag);
 
-                if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
-                    var newPattern = tagPermalinkPolicy.pattern();
-                    annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
-                }
+                            if (!annotations.containsKey(Constant.PERMALINK_PATTERN_ANNO)) {
+                                var newPattern = tagPermalinkPolicy.pattern();
+                                annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+                            }
 
-                var status = tag.getStatusOrDefault();
-                String permalink = tagPermalinkPolicy.permalink(tag);
-                status.setPermalink(permalink);
+                            var status = tag.getStatusOrDefault();
+                            String permalink = tagPermalinkPolicy.permalink(tag);
+                            status.setPermalink(permalink);
 
-                if (status.getPostCount() == null) {
-                    status.setPostCount(0);
-                }
-                if (status.getVisiblePostCount() == null) {
-                    status.setVisiblePostCount(0);
-                }
+                            if (status.getPostCount() == null) {
+                                status.setPostCount(0);
+                            }
+                            if (status.getVisiblePostCount() == null) {
+                                status.setVisiblePostCount(0);
+                            }
 
-                // Update the observed version.
-                status.setObservedVersion(tag.getMetadata().getVersion() + 1);
+                            // Update the observed version.
+                            status.setObservedVersion(tag.getMetadata().getVersion() + 1);
 
-                client.update(tag);
-                eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
-            });
+                            client.update(tag);
+                            eventPublisher.publishEvent(new TagUpdatedEvent(this, tag));
+                        });
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Tag())
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(equal(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
-                .build())
-            .build();
+        return builder.extension(new Tag())
+                .syncAllListOptions(
+                        ListOptions.builder()
+                                .andQuery(equal(Tag.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                                .build())
+                .build();
     }
 }

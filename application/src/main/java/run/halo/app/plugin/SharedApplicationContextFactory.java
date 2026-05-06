@@ -47,61 +47,73 @@ public enum SharedApplicationContextFactory {
         beanFactory.registerSingleton("extensionClient", extensionClient);
         beanFactory.registerSingleton("reactiveExtensionClient", reactiveExtensionClient);
 
-        DefaultSchemeManager defaultSchemeManager =
-            rootContext.getBean(DefaultSchemeManager.class);
+        DefaultSchemeManager defaultSchemeManager = rootContext.getBean(DefaultSchemeManager.class);
         beanFactory.registerSingleton("schemeManager", defaultSchemeManager);
-        beanFactory.registerSingleton("externalUrlSupplier",
-            rootContext.getBean(ExternalUrlSupplier.class));
-        beanFactory.registerSingleton("serverSecurityContextRepository",
-            rootContext.getBean(ServerSecurityContextRepository.class));
-        beanFactory.registerSingleton("attachmentService",
-            rootContext.getBean(AttachmentService.class));
-        beanFactory.registerSingleton("backupRootGetter",
-            rootContext.getBean(BackupRootGetter.class));
-        beanFactory.registerSingleton("notificationReasonEmitter",
-            rootContext.getBean(NotificationReasonEmitter.class));
-        beanFactory.registerSingleton("notificationCenter",
-            rootContext.getBean(NotificationCenter.class));
-        beanFactory.registerSingleton("externalLinkProcessor",
-            rootContext.getBean(ExternalLinkProcessor.class));
-        beanFactory.registerSingleton("postContentService",
-            rootContext.getBean(PostContentService.class));
-        beanFactory.registerSingleton("cacheManager",
-            rootContext.getBean(CacheManager.class));
-        beanFactory.registerSingleton("loginHandlerEnhancer",
-            rootContext.getBean(LoginHandlerEnhancer.class));
-        rootContext.getBeanProvider(PluginsRootGetter.class)
-            .ifUnique(pluginsRootGetter ->
-                beanFactory.registerSingleton("pluginsRootGetter", pluginsRootGetter)
-            );
-        beanFactory.registerSingleton("extensionGetter",
-            rootContext.getBean(ExtensionGetter.class));
-        rootContext.getBeanProvider(CryptoService.class)
-            .ifUnique(
-                cryptoService -> beanFactory.registerSingleton("cryptoService", cryptoService)
-            );
-        rootContext.getBeanProvider(RateLimiterRegistry.class)
-            .ifUnique(rateLimiterRegistry ->
-                beanFactory.registerSingleton("rateLimiterRegistry", rateLimiterRegistry)
-            );
+        beanFactory.registerSingleton(
+                "externalUrlSupplier", rootContext.getBean(ExternalUrlSupplier.class));
+        beanFactory.registerSingleton(
+                "serverSecurityContextRepository",
+                rootContext.getBean(ServerSecurityContextRepository.class));
+        beanFactory.registerSingleton(
+                "attachmentService", rootContext.getBean(AttachmentService.class));
+        beanFactory.registerSingleton(
+                "backupRootGetter", rootContext.getBean(BackupRootGetter.class));
+        beanFactory.registerSingleton(
+                "notificationReasonEmitter", rootContext.getBean(NotificationReasonEmitter.class));
+        beanFactory.registerSingleton(
+                "notificationCenter", rootContext.getBean(NotificationCenter.class));
+        beanFactory.registerSingleton(
+                "externalLinkProcessor", rootContext.getBean(ExternalLinkProcessor.class));
+        beanFactory.registerSingleton(
+                "postContentService", rootContext.getBean(PostContentService.class));
+        beanFactory.registerSingleton("cacheManager", rootContext.getBean(CacheManager.class));
+        beanFactory.registerSingleton(
+                "loginHandlerEnhancer", rootContext.getBean(LoginHandlerEnhancer.class));
+        rootContext
+                .getBeanProvider(PluginsRootGetter.class)
+                .ifUnique(
+                        pluginsRootGetter ->
+                                beanFactory.registerSingleton(
+                                        "pluginsRootGetter", pluginsRootGetter));
+        beanFactory.registerSingleton(
+                "extensionGetter", rootContext.getBean(ExtensionGetter.class));
+        rootContext
+                .getBeanProvider(CryptoService.class)
+                .ifUnique(
+                        cryptoService ->
+                                beanFactory.registerSingleton("cryptoService", cryptoService));
+        rootContext
+                .getBeanProvider(RateLimiterRegistry.class)
+                .ifUnique(
+                        rateLimiterRegistry ->
+                                beanFactory.registerSingleton(
+                                        "rateLimiterRegistry", rateLimiterRegistry));
 
         // Authentication plugins may need this RequestCache to handle successful login redirect
-        rootContext.getBeanProvider(ServerRequestCache.class)
-            .ifUnique(serverRequestCache ->
-                beanFactory.registerSingleton("serverRequestCache", serverRequestCache)
-            );
-        rootContext.getBeanProvider(UserService.class)
-            .ifUnique(userService -> beanFactory.registerSingleton("userService", userService));
-        rootContext.getBeanProvider(RoleService.class)
-            .ifUnique(roleService -> beanFactory.registerSingleton("roleService", roleService));
-        rootContext.getBeanProvider(ReactiveUserDetailsService.class)
-            .ifUnique(userDetailsService ->
-                beanFactory.registerSingleton("userDetailsService", userDetailsService)
-            );
-        rootContext.getBeanProvider(SystemInfoGetter.class)
-            .ifUnique(systemInfoGetter ->
-                beanFactory.registerSingleton("systemInfoGetter", systemInfoGetter)
-            );
+        rootContext
+                .getBeanProvider(ServerRequestCache.class)
+                .ifUnique(
+                        serverRequestCache ->
+                                beanFactory.registerSingleton(
+                                        "serverRequestCache", serverRequestCache));
+        rootContext
+                .getBeanProvider(UserService.class)
+                .ifUnique(userService -> beanFactory.registerSingleton("userService", userService));
+        rootContext
+                .getBeanProvider(RoleService.class)
+                .ifUnique(roleService -> beanFactory.registerSingleton("roleService", roleService));
+        rootContext
+                .getBeanProvider(ReactiveUserDetailsService.class)
+                .ifUnique(
+                        userDetailsService ->
+                                beanFactory.registerSingleton(
+                                        "userDetailsService", userDetailsService));
+        rootContext
+                .getBeanProvider(SystemInfoGetter.class)
+                .ifUnique(
+                        systemInfoGetter ->
+                                beanFactory.registerSingleton(
+                                        "systemInfoGetter", systemInfoGetter));
         // TODO add more shared instance here
 
         sharedContext.refresh();

@@ -45,38 +45,41 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
     @Override
     public Result reconcile(Request request) {
         client.fetch(ConfigMap.class, request.name())
-            .ifPresent(configMap -> {
-                var labels = configMap.getMetadata().getLabels();
-                if (labels == null) {
-                    return;
-                }
-                var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
-                if (StringUtils.hasText(policyName)) {
-                    var options = ListOptions.builder()
-                        .andQuery(equal("spec.policyName", policyName))
-                        .build();
-                    var attachmentNames =
-                        client.listAllNames(Attachment.class, options, Sort.unsorted());
-                    attachmentUpdateTrigger.addAll(attachmentNames);
-                }
-            });
+                .ifPresent(
+                        configMap -> {
+                            var labels = configMap.getMetadata().getLabels();
+                            if (labels == null) {
+                                return;
+                            }
+                            var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
+                            if (StringUtils.hasText(policyName)) {
+                                var options =
+                                        ListOptions.builder()
+                                                .andQuery(equal("spec.policyName", policyName))
+                                                .build();
+                                var attachmentNames =
+                                        client.listAllNames(
+                                                Attachment.class, options, Sort.unsorted());
+                                attachmentUpdateTrigger.addAll(attachmentNames);
+                            }
+                        });
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        ExtensionMatcher matcher = extension -> {
-            var configMap = (ConfigMap) extension;
-            var labels = configMap.getMetadata().getLabels();
-            return labels != null && labels.containsKey(Policy.POLICY_OWNER_LABEL);
-        };
-        return builder
-            .extension(new ConfigMap())
-            .syncAllOnStart(false)
-            .onAddMatcher(matcher)
-            .onUpdateMatcher(matcher)
-            .onDeleteMatcher(matcher)
-            .build();
+        ExtensionMatcher matcher =
+                extension -> {
+                    var configMap = (ConfigMap) extension;
+                    var labels = configMap.getMetadata().getLabels();
+                    return labels != null && labels.containsKey(Policy.POLICY_OWNER_LABEL);
+                };
+        return builder.extension(new ConfigMap())
+                .syncAllOnStart(false)
+                .onAddMatcher(matcher)
+                .onUpdateMatcher(matcher)
+                .onDeleteMatcher(matcher)
+                .build();
     }
 
     @Component
@@ -97,11 +100,13 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
 
         @Override
         public Result reconcile(String name) {
-            client.fetch(Attachment.class, name).ifPresent(attachment -> {
-                var annotations = MetadataUtil.nullSafeAnnotations(attachment);
-                annotations.put(POLICY_UPDATED_AT, Instant.now().toString());
-                client.update(attachment);
-            });
+            client.fetch(Attachment.class, name)
+                    .ifPresent(
+                            attachment -> {
+                                var annotations = MetadataUtil.nullSafeAnnotations(attachment);
+                                annotations.put(POLICY_UPDATED_AT, Instant.now().toString());
+                                client.update(attachment);
+                            });
             return Result.doNotRetry();
         }
 
@@ -114,13 +119,12 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
         @Override
         public Controller setupWith(ControllerBuilder builder) {
             return new DefaultController<>(
-                "PolicyChangeAttachmentUpdater",
-                this,
-                queue,
-                null,
-                Duration.ofMillis(100),
-                Duration.ofMinutes(10)
-            );
+                    "PolicyChangeAttachmentUpdater",
+                    this,
+                    queue,
+                    null,
+                    Duration.ofMillis(100),
+                    Duration.ofMinutes(10));
         }
 
         @Override

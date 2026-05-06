@@ -6,8 +6,7 @@ import run.halo.app.core.extension.content.Tag;
 
 public class TagUpdatedEvent extends ApplicationEvent {
 
-    @Getter
-    private final Tag tag;
+    @Getter private final Tag tag;
 
     public TagUpdatedEvent(Object source, Tag tag) {
         super(source);

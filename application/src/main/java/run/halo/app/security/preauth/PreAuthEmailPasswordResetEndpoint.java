@@ -50,140 +50,271 @@ class PreAuthEmailPasswordResetEndpoint {
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    public PreAuthEmailPasswordResetEndpoint(
-        RateLimiterRegistry rateLimiterRegistry
-    ) {
+    public PreAuthEmailPasswordResetEndpoint(RateLimiterRegistry rateLimiterRegistry) {
         this.rateLimiterRegistry = rateLimiterRegistry;
     }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthPasswordResetEndpoints(
-        GlobalInfoService globalInfoService,
-        PasswordResetAvailabilityProviders availabilityProviders,
-        MessageSource messageSource,
-        EmailPasswordRecoveryService emailService,
-        Validator validator
-    ) {
-        return RouterFunctions.nest(path("/password-reset/email"), RouterFunctions.route()
-            .GET("", request -> request.bind(SendForm.class)
-                .flatMap(sendForm -> ServerResponse.ok().render(SEND_TEMPLATE, Map.of(
-                    "otherMethods", availabilityProviders.getOtherAvailableMethods("email"),
-                    "globalInfo", globalInfoService.getGlobalInfo(),
-                    "form", sendForm
-                )))
-            )
-            .GET("/{resetToken}",
-                request -> {
-                    var token = request.pathVariable("resetToken");
-                    return request.bind(ResetForm.class)
-                        .flatMap(resetForm -> {
-                            var model = new HashMap<String, Object>();
-                            model.put("form", resetForm);
-                            model.put("globalInfo", globalInfoService.getGlobalInfo());
-                            return emailService.getValidResetToken(token)
-                                .flatMap(resetToken -> {
-                                    // TODO Check the 2FA of the user
-                                    model.put("username", resetToken.username());
-                                    return ServerResponse.ok().render(RESET_TEMPLATE, model);
+            GlobalInfoService globalInfoService,
+            PasswordResetAvailabilityProviders availabilityProviders,
+            MessageSource messageSource,
+            EmailPasswordRecoveryService emailService,
+            Validator validator) {
+        return RouterFunctions.nest(
+                path("/password-reset/email"),
+                RouterFunctions.route()
+                        .GET(
+                                "",
+                                request ->
+                                        request.bind(SendForm.class)
+                                                .flatMap(
+                                                        sendForm ->
+                                                                ServerResponse.ok()
+                                                                        .render(
+                                                                                SEND_TEMPLATE,
+                                                                                Map.of(
+                                                                                        "otherMethods",
+                                                                                                availabilityProviders
+                                                                                                        .getOtherAvailableMethods(
+                                                                                                                "email"),
+                                                                                        "globalInfo",
+                                                                                                globalInfoService
+                                                                                                        .getGlobalInfo(),
+                                                                                        "form",
+                                                                                                sendForm))))
+                        .GET(
+                                "/{resetToken}",
+                                request -> {
+                                    var token = request.pathVariable("resetToken");
+                                    return request.bind(ResetForm.class)
+                                            .flatMap(
+                                                    resetForm -> {
+                                                        var model = new HashMap<String, Object>();
+                                                        model.put("form", resetForm);
+                                                        model.put(
+                                                                "globalInfo",
+                                                                globalInfoService.getGlobalInfo());
+                                                        return emailService
+                                                                .getValidResetToken(token)
+                                                                .flatMap(
+                                                                        resetToken -> {
+                                                                            // TODO Check the 2FA of
+                                                                            // the user
+                                                                            model.put(
+                                                                                    "username",
+                                                                                    resetToken
+                                                                                            .username());
+                                                                            return ServerResponse
+                                                                                    .ok()
+                                                                                    .render(
+                                                                                            RESET_TEMPLATE,
+                                                                                            model);
+                                                                        })
+                                                                .transformDeferred(
+                                                                        rateLimiterForPasswordResetVerification(
+                                                                                request.exchange()
+                                                                                        .getRequest()))
+                                                                .onErrorResume(
+                                                                        InvalidResetTokenException
+                                                                                .class,
+                                                                        e ->
+                                                                                ServerResponse
+                                                                                        .status(
+                                                                                                HttpStatus
+                                                                                                        .FOUND)
+                                                                                        .location(
+                                                                                                URI
+                                                                                                        .create(
+                                                                                                                "/password-reset/email?error=invalid_reset_token"))
+                                                                                        .build())
+                                                                .onErrorResume(
+                                                                        RequestNotPermitted.class,
+                                                                        e -> {
+                                                                            model.put(
+                                                                                    "error",
+                                                                                    "rate_limit_exceeded");
+                                                                            return ServerResponse
+                                                                                    .status(
+                                                                                            HttpStatus
+                                                                                                    .TOO_MANY_REQUESTS)
+                                                                                    .render(
+                                                                                            RESET_TEMPLATE,
+                                                                                            model);
+                                                                        });
+                                                    });
                                 })
-                                .transformDeferred(rateLimiterForPasswordResetVerification(
-                                    request.exchange().getRequest()
-                                ))
-                                .onErrorResume(InvalidResetTokenException.class, e ->
-                                    ServerResponse.status(HttpStatus.FOUND)
-                                        .location(URI.create(
-                                            "/password-reset/email?error=invalid_reset_token")
-                                        )
-                                        .build()
-                                )
-                                .onErrorResume(RequestNotPermitted.class, e -> {
-                                    model.put("error", "rate_limit_exceeded");
-                                    return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
-                                        .render(RESET_TEMPLATE, model);
-                                });
-                        });
-                }
-            )
-            .POST("/{resetToken}", request -> {
-                var token = request.pathVariable("resetToken");
-                return request.bind(ResetForm.class)
-                    .flatMap(resetForm -> emailService.getValidResetToken(token)
-                        .flatMap(resetToken -> {
-                            var bindingResult = validate(resetForm, validator, request.exchange());
-                            var model = bindingResult.getModel();
-                            model.put("globalInfo", globalInfoService.getGlobalInfo());
-                            model.put("username", resetToken.username());
-                            if (!Objects.equals(
-                                resetForm.getPassword(), resetForm.getConfirmPassword()
-                            )) {
-                                bindingResult.rejectValue(
-                                    "confirmPassword",
-                                    "validation.error.password.confirmPassword.mismatch",
-                                    "Password and confirm password mismatch"
-                                );
-                            }
-                            if (bindingResult.hasErrors()) {
-                                return ServerResponse.badRequest().render(RESET_TEMPLATE, model);
-                            }
-                            return emailService.changePassword(resetForm.getPassword(), token)
-                                .then(ServerResponse.status(HttpStatus.FOUND)
-                                    .location(URI.create("/login?password_reset"))
-                                    .build()
-                                )
-                                .transformDeferred(rateLimiterForPasswordResetVerification(
-                                    request.exchange().getRequest()
-                                ))
-                                .onErrorResume(RequestNotPermitted.class, e -> {
-                                    model.put("error", "rate_limit_exceeded");
-                                    return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
-                                        .render(RESET_TEMPLATE, model);
-                                });
-                        })
-                        .onErrorResume(InvalidResetTokenException.class,
-                            e -> ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create(
-                                    "/password-reset/email?error=invalid_reset_token"
-                                ))
-                                .build()
-                        )
-                    );
-            })
-            .POST("", contentType(MediaType.APPLICATION_FORM_URLENCODED),
-                request -> request.bind(SendForm.class)
-                    .flatMap(sendForm -> {
-                        // validate the send form
-                        var bindingResult = validate(sendForm, validator, request.exchange());
-                        var model = bindingResult.getModel();
-                        model.put("globalInfo", globalInfoService.getGlobalInfo());
-                        if (bindingResult.hasErrors()) {
-                            return ServerResponse.badRequest().render(SEND_TEMPLATE, model);
-                        }
-                        var email = sendForm.getEmail().toLowerCase();
-                        return emailService.sendPasswordResetEmail(email)
-                            .then(Mono.defer(() -> {
-                                model.put("sent", true);
-                                return ServerResponse.ok().render(SEND_TEMPLATE, model);
-                            }))
-                            .transformDeferred(rateLimiterForSendPasswordResetEmail(
-                                request.exchange().getRequest()
-                            ))
-                            .onErrorResume(RequestNotPermitted.class, e -> {
-                                model.put("error", "rate_limit_exceeded");
-                                return ServerResponse.status(HttpStatus.TOO_MANY_REQUESTS)
-                                    .render(SEND_TEMPLATE, model);
-                            });
-                    })
-            )
-            .before(HaloUtils.noCache())
-            .build());
+                        .POST(
+                                "/{resetToken}",
+                                request -> {
+                                    var token = request.pathVariable("resetToken");
+                                    return request.bind(ResetForm.class)
+                                            .flatMap(
+                                                    resetForm ->
+                                                            emailService
+                                                                    .getValidResetToken(token)
+                                                                    .flatMap(
+                                                                            resetToken -> {
+                                                                                var bindingResult =
+                                                                                        validate(
+                                                                                                resetForm,
+                                                                                                validator,
+                                                                                                request
+                                                                                                        .exchange());
+                                                                                var model =
+                                                                                        bindingResult
+                                                                                                .getModel();
+                                                                                model.put(
+                                                                                        "globalInfo",
+                                                                                        globalInfoService
+                                                                                                .getGlobalInfo());
+                                                                                model.put(
+                                                                                        "username",
+                                                                                        resetToken
+                                                                                                .username());
+                                                                                if (!Objects.equals(
+                                                                                        resetForm
+                                                                                                .getPassword(),
+                                                                                        resetForm
+                                                                                                .getConfirmPassword())) {
+                                                                                    bindingResult
+                                                                                            .rejectValue(
+                                                                                                    "confirmPassword",
+                                                                                                    "validation.error.password.confirmPassword.mismatch",
+                                                                                                    "Password"
+                                                                                                        + " and confirm"
+                                                                                                        + " password"
+                                                                                                        + " mismatch");
+                                                                                }
+                                                                                if (bindingResult
+                                                                                        .hasErrors()) {
+                                                                                    return ServerResponse
+                                                                                            .badRequest()
+                                                                                            .render(
+                                                                                                    RESET_TEMPLATE,
+                                                                                                    model);
+                                                                                }
+                                                                                return emailService
+                                                                                        .changePassword(
+                                                                                                resetForm
+                                                                                                        .getPassword(),
+                                                                                                token)
+                                                                                        .then(
+                                                                                                ServerResponse
+                                                                                                        .status(
+                                                                                                                HttpStatus
+                                                                                                                        .FOUND)
+                                                                                                        .location(
+                                                                                                                URI
+                                                                                                                        .create(
+                                                                                                                                "/login?password_reset"))
+                                                                                                        .build())
+                                                                                        .transformDeferred(
+                                                                                                rateLimiterForPasswordResetVerification(
+                                                                                                        request.exchange()
+                                                                                                                .getRequest()))
+                                                                                        .onErrorResume(
+                                                                                                RequestNotPermitted
+                                                                                                        .class,
+                                                                                                e -> {
+                                                                                                    model
+                                                                                                            .put(
+                                                                                                                    "error",
+                                                                                                                    "rate_limit_exceeded");
+                                                                                                    return ServerResponse
+                                                                                                            .status(
+                                                                                                                    HttpStatus
+                                                                                                                            .TOO_MANY_REQUESTS)
+                                                                                                            .render(
+                                                                                                                    RESET_TEMPLATE,
+                                                                                                                    model);
+                                                                                                });
+                                                                            })
+                                                                    .onErrorResume(
+                                                                            InvalidResetTokenException
+                                                                                    .class,
+                                                                            e ->
+                                                                                    ServerResponse
+                                                                                            .status(
+                                                                                                    HttpStatus
+                                                                                                            .FOUND)
+                                                                                            .location(
+                                                                                                    URI
+                                                                                                            .create(
+                                                                                                                    "/password-reset/email?error=invalid_reset_token"))
+                                                                                            .build()));
+                                })
+                        .POST(
+                                "",
+                                contentType(MediaType.APPLICATION_FORM_URLENCODED),
+                                request ->
+                                        request.bind(SendForm.class)
+                                                .flatMap(
+                                                        sendForm -> {
+                                                            // validate the send form
+                                                            var bindingResult =
+                                                                    validate(
+                                                                            sendForm,
+                                                                            validator,
+                                                                            request.exchange());
+                                                            var model = bindingResult.getModel();
+                                                            model.put(
+                                                                    "globalInfo",
+                                                                    globalInfoService
+                                                                            .getGlobalInfo());
+                                                            if (bindingResult.hasErrors()) {
+                                                                return ServerResponse.badRequest()
+                                                                        .render(
+                                                                                SEND_TEMPLATE,
+                                                                                model);
+                                                            }
+                                                            var email =
+                                                                    sendForm.getEmail()
+                                                                            .toLowerCase();
+                                                            return emailService
+                                                                    .sendPasswordResetEmail(email)
+                                                                    .then(
+                                                                            Mono.defer(
+                                                                                    () -> {
+                                                                                        model.put(
+                                                                                                "sent",
+                                                                                                true);
+                                                                                        return ServerResponse
+                                                                                                .ok()
+                                                                                                .render(
+                                                                                                        SEND_TEMPLATE,
+                                                                                                        model);
+                                                                                    }))
+                                                                    .transformDeferred(
+                                                                            rateLimiterForSendPasswordResetEmail(
+                                                                                    request.exchange()
+                                                                                            .getRequest()))
+                                                                    .onErrorResume(
+                                                                            RequestNotPermitted
+                                                                                    .class,
+                                                                            e -> {
+                                                                                model.put(
+                                                                                        "error",
+                                                                                        "rate_limit_exceeded");
+                                                                                return ServerResponse
+                                                                                        .status(
+                                                                                                HttpStatus
+                                                                                                        .TOO_MANY_REQUESTS)
+                                                                                        .render(
+                                                                                                SEND_TEMPLATE,
+                                                                                                model);
+                                                                            });
+                                                        }))
+                        .before(HaloUtils.noCache())
+                        .build());
     }
 
     <T> RateLimiterOperator<T> rateLimiterForSendPasswordResetEmail(ServerHttpRequest request) {
         var clientIp = IpAddressUtils.getClientIp(request);
         var rateLimiterKey = "send-password-reset-email-from-" + clientIp;
         var rateLimiter =
-            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-password-reset-email");
+                rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-password-reset-email");
         return RateLimiterOperator.of(rateLimiter);
     }
 
@@ -191,7 +322,7 @@ class PreAuthEmailPasswordResetEndpoint {
         var clientIp = IpAddressUtils.getClientIp(request);
         var rateLimiterKey = "password-reset-email-verify-from-" + clientIp;
         var rateLimiter =
-            rateLimiterRegistry.rateLimiter(rateLimiterKey, "password-reset-verification");
+                rateLimiterRegistry.rateLimiter(rateLimiterKey, "password-reset-verification");
         return RateLimiterOperator.of(rateLimiter);
     }
 
@@ -200,23 +331,17 @@ class PreAuthEmailPasswordResetEndpoint {
 
         @NotBlank
         @Pattern(
-            regexp = ValidationUtils.PASSWORD_REGEX,
-            message = "{validation.error.password.pattern}"
-        )
+                regexp = ValidationUtils.PASSWORD_REGEX,
+                message = "{validation.error.password.pattern}")
         @Size(min = 5, max = 257)
         private String password;
 
-        @NotBlank
-        private String confirmPassword;
-
+        @NotBlank private String confirmPassword;
     }
 
     @Data
     static class SendForm {
 
-        @NotBlank
-        @Email
-        private String email;
-
+        @NotBlank @Email private String email;
     }
 }

@@ -13,5 +13,4 @@ import reactor.core.publisher.Mono;
 public interface OAuth2LoginHandlerEnhancer {
 
     Mono<Void> loginSuccess(ServerWebExchange exchange, Authentication authentication);
-
 }

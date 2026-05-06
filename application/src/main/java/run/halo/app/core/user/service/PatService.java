@@ -71,5 +71,4 @@ public interface PatService {
      * @return the generated token
      */
     Mono<String> generateToken(PersonalAccessToken pat);
-
 }

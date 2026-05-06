@@ -38,7 +38,8 @@ class UserVoTest {
         user.setStatus(new User.UserStatus());
 
         UserVo userVo = UserVo.from(user);
-        JSONAssert.assertEquals("""
+        JSONAssert.assertEquals(
+                """
                 {
                     "metadata": {
                         "name": "fake-user"
@@ -60,8 +61,8 @@ class UserVoTest {
                     }
                 }
                 """,
-            JsonUtils.objectToJson(userVo),
-            true);
+                JsonUtils.objectToJson(userVo),
+                true);
     }
 
     @Test

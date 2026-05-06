@@ -20,8 +20,12 @@ import run.halo.app.extension.GVK;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = "auth.halo.run", version = "v1alpha1", kind = "AuthProvider",
-    singular = "authprovider", plural = "authproviders")
+@GVK(
+        group = "auth.halo.run",
+        version = "v1alpha1",
+        kind = "AuthProvider",
+        singular = "authprovider",
+        plural = "authproviders")
 public class AuthProvider extends AbstractExtension {
 
     public static final String AUTH_BINDING_LABEL = "auth.halo.run/auth-binding";

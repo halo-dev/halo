@@ -21,17 +21,13 @@ import run.halo.app.extension.Metadata;
 @ExtendWith(MockitoExtension.class)
 class DefaultIndicesTest {
 
-    @Mock
-    Index<Fake, String> index1;
+    @Mock Index<Fake, String> index1;
 
-    @Mock
-    Index<Fake, String> index2;
+    @Mock Index<Fake, String> index2;
 
-    @Mock
-    Index<Fake, String> index3;
+    @Mock Index<Fake, String> index3;
 
-    @Mock
-    Index<Fake, Long> longIndex;
+    @Mock Index<Fake, Long> longIndex;
 
     DefaultIndices<Fake> indices;
 
@@ -265,5 +261,4 @@ class DefaultIndicesTest {
         fake.getMetadata().setName(name);
         return fake;
     }
-
 }

@@ -41,7 +41,7 @@ import run.halo.app.infra.InitializationPhase;
 @Slf4j
 @Component
 public class ReplyEventReconciler
-    implements Reconciler<ReplyEventReconciler.CommentName>, SmartLifecycle {
+        implements Reconciler<ReplyEventReconciler.CommentName>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
@@ -59,55 +59,79 @@ public class ReplyEventReconciler
         String commentName = request.name();
 
         client.fetch(Comment.class, commentName)
-            // if the comment has been deleted, then do nothing.
-            .filter(comment -> comment.getMetadata().getDeletionTimestamp() == null)
-            .ifPresent(comment -> {
-                // order by reply creation time desc to get first as last reply time
-                var baseQuery = and(
-                    equal("spec.commentName", commentName),
-                    isNull("metadata.deletionTimestamp")
-                );
-                var pageRequest = PageRequestImpl.ofSize(1).withSort(
-                    Sort.by("spec.creationTime", "metadata.name").descending()
-                );
-                final Comment.CommentStatus status = comment.getStatusOrDefault();
+                // if the comment has been deleted, then do nothing.
+                .filter(comment -> comment.getMetadata().getDeletionTimestamp() == null)
+                .ifPresent(
+                        comment -> {
+                            // order by reply creation time desc to get first as last reply time
+                            var baseQuery =
+                                    and(
+                                            equal("spec.commentName", commentName),
+                                            isNull("metadata.deletionTimestamp"));
+                            var pageRequest =
+                                    PageRequestImpl.ofSize(1)
+                                            .withSort(
+                                                    Sort.by("spec.creationTime", "metadata.name")
+                                                            .descending());
+                            final Comment.CommentStatus status = comment.getStatusOrDefault();
 
-                var replyPageResult =
-                    client.listBy(Reply.class, listOptionsWithFieldQuery(baseQuery), pageRequest);
-                // total reply count
-                status.setReplyCount((int) replyPageResult.getTotal());
+                            var replyPageResult =
+                                    client.listBy(
+                                            Reply.class,
+                                            listOptionsWithFieldQuery(baseQuery),
+                                            pageRequest);
+                            // total reply count
+                            status.setReplyCount((int) replyPageResult.getTotal());
 
-                // calculate last reply time from total replies(top 1)
-                Instant lastReplyTime = replyPageResult.get()
-                    .map(reply -> reply.getSpec().getCreationTime())
-                    .findFirst()
-                    .orElse(null);
-                status.setLastReplyTime(lastReplyTime);
+                            // calculate last reply time from total replies(top 1)
+                            Instant lastReplyTime =
+                                    replyPageResult
+                                            .get()
+                                            .map(reply -> reply.getSpec().getCreationTime())
+                                            .findFirst()
+                                            .orElse(null);
+                            status.setLastReplyTime(lastReplyTime);
 
-                // calculate visible reply count(only approved and not hidden)
-                var visibleReplyPageResult =
-                    client.listBy(Reply.class, listOptionsWithFieldQuery(and(
-                        baseQuery,
-                        equal("spec.approved", BooleanUtils.TRUE),
-                        equal("spec.hidden", BooleanUtils.FALSE)
-                    )), pageRequest);
-                status.setVisibleReplyCount((int) visibleReplyPageResult.getTotal());
+                            // calculate visible reply count(only approved and not hidden)
+                            var visibleReplyPageResult =
+                                    client.listBy(
+                                            Reply.class,
+                                            listOptionsWithFieldQuery(
+                                                    and(
+                                                            baseQuery,
+                                                            equal(
+                                                                    "spec.approved",
+                                                                    BooleanUtils.TRUE),
+                                                            equal(
+                                                                    "spec.hidden",
+                                                                    BooleanUtils.FALSE))),
+                                            pageRequest);
+                            status.setVisibleReplyCount((int) visibleReplyPageResult.getTotal());
 
-                // calculate unread reply count(after last read time)
-                var unReadQuery = Optional.ofNullable(comment.getSpec().getLastReadTime())
-                    .map(lastReadTime -> and(
-                        baseQuery,
-                        greaterThan("spec.creationTime", lastReadTime.toString())
-                    ))
-                    .orElse(baseQuery);
-                var unReadPageResult =
-                    client.listBy(Reply.class, listOptionsWithFieldQuery(unReadQuery), pageRequest);
-                status.setUnreadReplyCount((int) unReadPageResult.getTotal());
+                            // calculate unread reply count(after last read time)
+                            var unReadQuery =
+                                    Optional.ofNullable(comment.getSpec().getLastReadTime())
+                                            .map(
+                                                    lastReadTime ->
+                                                            and(
+                                                                    baseQuery,
+                                                                    greaterThan(
+                                                                            "spec.creationTime",
+                                                                            lastReadTime
+                                                                                    .toString())))
+                                            .orElse(baseQuery);
+                            var unReadPageResult =
+                                    client.listBy(
+                                            Reply.class,
+                                            listOptionsWithFieldQuery(unReadQuery),
+                                            pageRequest);
+                            status.setUnreadReplyCount((int) unReadPageResult.getTotal());
 
-                status.setHasNewReply(defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
+                            status.setHasNewReply(
+                                    defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
 
-                client.update(comment);
-            });
+                            client.update(comment);
+                        });
         return new Result(false, null);
     }
 
@@ -126,12 +150,12 @@ public class ReplyEventReconciler
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            replyEventQueue,
-            null,
-            Duration.ofMillis(300),
-            Duration.ofMinutes(5));
+                this.getClass().getName(),
+                this,
+                replyEventQueue,
+                null,
+                Duration.ofMillis(300),
+                Duration.ofMinutes(5));
     }
 
     @Override

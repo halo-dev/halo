@@ -40,13 +40,15 @@ public class AttachmentHandler {
      * @param builder the operation builder
      */
     public void buildDoc(Builder builder) {
-        builder.requestBody(requestBodyBuilder()
-                .content(contentBuilder()
-                    .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                    .schema(schemaBuilder().implementation(UploadForm.class))
-                )
-            )
-            .response(responseBuilder().implementation(Attachment.class));
+        builder.requestBody(
+                        requestBodyBuilder()
+                                .content(
+                                        contentBuilder()
+                                                .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                                                .schema(
+                                                        schemaBuilder()
+                                                                .implementation(UploadForm.class))))
+                .response(responseBuilder().implementation(Attachment.class));
     }
 
     /**
@@ -56,59 +58,95 @@ public class AttachmentHandler {
      * @param getConfig the upload options fetcher
      * @return the server response
      */
-    public Mono<ServerResponse> handleUpload(ServerRequest serverRequest,
-        Mono<UploadOptions> getConfig) {
+    public Mono<ServerResponse> handleUpload(
+            ServerRequest serverRequest, Mono<UploadOptions> getConfig) {
         var getForm = serverRequest.bind(UploadForm.class);
-        var uploadAttachment = Mono.zip(getForm, getConfig)
-            .flatMap(tuple2 -> {
-                var form = tuple2.getT1();
-                var config = tuple2.getT2();
-                var file = form.getFile();
-                var upload = Mono.defer(() -> {
-                    if (file != null) {
-                        var mediaType = Optional.ofNullable(file.headers().getContentType())
-                            .orElse(MediaType.APPLICATION_OCTET_STREAM);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Preparing to upload attachment [filename={} mediaType={}]",
-                                file.name(), mediaType);
-                        }
-                        return attachmentService.upload(
-                            config.policyName(),
-                            config.groupName(),
-                            file.filename(),
-                            file.content(),
-                            mediaType
-                        );
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Preparing to upload attachment from url [{}], filename: {}",
-                            form.getUrl(), form.getFilename());
-                    }
-                    var url = Optional.ofNullable(form.getUrl())
-                        .filter(StringUtils::hasText)
-                        .map(URI::create)
-                        .map(uri -> {
-                            try {
-                                return uri.toURL();
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .orElse(null);
-                    if (url == null) {
-                        return Mono.error(new ServerWebInputException(
-                            "Invalid url provided: " + form.getUrl()
-                        ));
-                    }
-                    return attachmentService.uploadFromUrl(
-                        url, config.policyName(), config.groupName(), form.getFilename()
-                    );
-                });
-                return upload.flatMap(a -> attachmentService.getPermalink(a)
-                    .doOnNext(permalink -> a.getStatus().setPermalink(permalink.toString()))
-                    .thenReturn(a)
-                );
-            });
+        var uploadAttachment =
+                Mono.zip(getForm, getConfig)
+                        .flatMap(
+                                tuple2 -> {
+                                    var form = tuple2.getT1();
+                                    var config = tuple2.getT2();
+                                    var file = form.getFile();
+                                    var upload =
+                                            Mono.defer(
+                                                    () -> {
+                                                        if (file != null) {
+                                                            var mediaType =
+                                                                    Optional.ofNullable(
+                                                                                    file.headers()
+                                                                                            .getContentType())
+                                                                            .orElse(
+                                                                                    MediaType
+                                                                                            .APPLICATION_OCTET_STREAM);
+                                                            if (log.isDebugEnabled()) {
+                                                                log.debug(
+                                                                        "Preparing to upload"
+                                                                                + " attachment"
+                                                                                + " [filename={}"
+                                                                                + " mediaType={}]",
+                                                                        file.name(),
+                                                                        mediaType);
+                                                            }
+                                                            return attachmentService.upload(
+                                                                    config.policyName(),
+                                                                    config.groupName(),
+                                                                    file.filename(),
+                                                                    file.content(),
+                                                                    mediaType);
+                                                        }
+                                                        if (log.isDebugEnabled()) {
+                                                            log.debug(
+                                                                    "Preparing to upload attachment"
+                                                                            + " from url [{}],"
+                                                                            + " filename: {}",
+                                                                    form.getUrl(),
+                                                                    form.getFilename());
+                                                        }
+                                                        var url =
+                                                                Optional.ofNullable(form.getUrl())
+                                                                        .filter(
+                                                                                StringUtils
+                                                                                        ::hasText)
+                                                                        .map(URI::create)
+                                                                        .map(
+                                                                                uri -> {
+                                                                                    try {
+                                                                                        return uri
+                                                                                                .toURL();
+                                                                                    } catch (
+                                                                                            MalformedURLException
+                                                                                                    e) {
+                                                                                        throw new RuntimeException(
+                                                                                                e);
+                                                                                    }
+                                                                                })
+                                                                        .orElse(null);
+                                                        if (url == null) {
+                                                            return Mono.error(
+                                                                    new ServerWebInputException(
+                                                                            "Invalid url provided: "
+                                                                                    + form
+                                                                                            .getUrl()));
+                                                        }
+                                                        return attachmentService.uploadFromUrl(
+                                                                url,
+                                                                config.policyName(),
+                                                                config.groupName(),
+                                                                form.getFilename());
+                                                    });
+                                    return upload.flatMap(
+                                            a ->
+                                                    attachmentService
+                                                            .getPermalink(a)
+                                                            .doOnNext(
+                                                                    permalink ->
+                                                                            a.getStatus()
+                                                                                    .setPermalink(
+                                                                                            permalink
+                                                                                                    .toString()))
+                                                            .thenReturn(a));
+                                });
         return ServerResponse.ok().body(uploadAttachment, Attachment.class);
     }
 
@@ -125,21 +163,17 @@ public class AttachmentHandler {
         /**
          * The file to upload. If not provided, the url will be used.
          */
-        @Nullable
-        private FilePart file;
+        @Nullable private FilePart file;
 
         /**
          * The filename to use when uploading from url. If not provided, the filename will be
          * extracted from the url.
          */
-        @Nullable
-        private String filename;
+        @Nullable private String filename;
 
         /**
          * The url to upload from. If not provided, the file will be used.
          */
-        @Nullable
-        private String url;
-
+        @Nullable private String url;
     }
 }
