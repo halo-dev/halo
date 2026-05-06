@@ -72,9 +72,9 @@ class EmailVerificationCodeTest {
             .limitForPeriod(1)
             .build();
         var sendCodeRateLimiter = RateLimiterRegistry.of(config)
-            .rateLimiter("send-email-verification-code-fake-user:hi@halo.run");
+            .rateLimiter("send-email-verification-code-fake-user");
         when(rateLimiterRegistry.rateLimiter(
-            "send-email-verification-code-fake-user:hi@halo.run",
+            "send-email-verification-code-fake-user",
             "send-email-verification-code")
         ).thenReturn(sendCodeRateLimiter);
 
@@ -96,6 +96,44 @@ class EmailVerificationCodeTest {
         webClient.post()
             .uri("/users/-/send-email-verification-code")
             .bodyValue(Map.of("email", "hi@halo.run"))
+            .exchange()
+            .expectStatus()
+            .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @Test
+    void sendEmailVerificationCodeShouldRateLimitPerUserNotPerEmail() {
+        var config = RateLimiterConfig.custom()
+            .limitRefreshPeriod(Duration.ofSeconds(10))
+            .limitForPeriod(1)
+            .build();
+        var sendCodeRateLimiter = RateLimiterRegistry.of(config)
+            .rateLimiter("send-email-verification-code-fake-user");
+        when(rateLimiterRegistry.rateLimiter(
+            "send-email-verification-code-fake-user",
+            "send-email-verification-code")
+        ).thenReturn(sendCodeRateLimiter);
+
+        var user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("fake-user");
+        user.setSpec(new User.UserSpec());
+        user.getSpec().setEmail("hi@halo.run");
+        when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
+            .thenReturn(Mono.empty());
+        // first request with email A passes
+        webClient.post()
+            .uri("/users/-/send-email-verification-code")
+            .bodyValue(Map.of("email", "hi@halo.run"))
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        // second request with a different email B should also be rate-limited
+        // because the limiter is per-user, not per-email
+        webClient.post()
+            .uri("/users/-/send-email-verification-code")
+            .bodyValue(Map.of("email", "another@halo.run"))
             .exchange()
             .expectStatus()
             .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
