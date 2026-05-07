@@ -13,6 +13,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 import run.halo.app.theme.engine.HaloTemplateEngine;
 import run.halo.app.theme.engine.PluginClassloaderTemplateResolver;
@@ -50,16 +51,20 @@ public class TemplateEngineManager {
 
     private final ThemeResolver themeResolver;
 
+    private final SystemVersionSupplier systemVersionSupplier;
+
     public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
         ExternalUrlSupplier externalUrlSupplier,
         PluginManager pluginManager, ObjectProvider<ITemplateResolver> templateResolvers,
-        ObjectProvider<IDialect> dialects, ThemeResolver themeResolver) {
+        ObjectProvider<IDialect> dialects, ThemeResolver themeResolver,
+        SystemVersionSupplier systemVersionSupplier) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.pluginManager = pluginManager;
         this.templateResolvers = templateResolvers;
         this.dialects = dialects;
         this.themeResolver = themeResolver;
+        this.systemVersionSupplier = systemVersionSupplier;
         engineCache = new ConcurrentLruCache<>(CACHE_SIZE_LIMIT, this::templateEngineGenerator);
     }
 
@@ -108,7 +113,7 @@ public class TemplateEngineManager {
                 return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
             }
         });
-        engine.addDialect(new HaloProcessorDialect());
+        engine.addDialect(new HaloProcessorDialect(systemVersionSupplier));
 
         templateResolvers.orderedStream().forEach(engine::addTemplateResolver);
 
