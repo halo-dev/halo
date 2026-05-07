@@ -33,6 +33,7 @@ import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.CodeInjection;
 import run.halo.app.infra.SystemSetting.Seo;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.Constant;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -71,11 +72,14 @@ class HaloProcessorDialectTest {
     @Mock
     ExtensionGetter extensionGetter;
 
+    @Mock
+    SystemVersionSupplier systemVersionSupplier;
+
     private TemplateEngine templateEngine;
 
     @BeforeEach
     void setUp() {
-        HaloProcessorDialect haloProcessorDialect = new HaloProcessorDialect();
+        HaloProcessorDialect haloProcessorDialect = new HaloProcessorDialect(systemVersionSupplier);
         templateEngine = new TemplateEngine();
         templateEngine.setDialects(Set.of(haloProcessorDialect, new SpringStandardDialect()));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
@@ -270,6 +274,46 @@ class HaloProcessorDialectTest {
     }
 
     @Nested
+    class HaloExpressionObjectTest {
+
+        @Test
+        void matchVersionWhenSatisfied() {
+            when(systemVersionSupplier.get()).thenReturn(com.github.zafarkhaja.semver.Version.parse("2.24.2"));
+
+            Context context = getContext();
+            String result = templateEngine.process("matchVersionSatisfied", context);
+            assertThat(result).contains("<p>true</p>");
+        }
+
+        @Test
+        void matchVersionWhenNotSatisfied() {
+            when(systemVersionSupplier.get()).thenReturn(com.github.zafarkhaja.semver.Version.parse("2.23.0"));
+
+            Context context = getContext();
+            String result = templateEngine.process("matchVersionNotSatisfied", context);
+            assertThat(result).contains("<p>false</p>");
+        }
+
+        @Test
+        void matchVersionWithRange() {
+            when(systemVersionSupplier.get()).thenReturn(com.github.zafarkhaja.semver.Version.parse("2.24.2"));
+
+            Context context = getContext();
+            String result = templateEngine.process("matchVersionRange", context);
+            assertThat(result).contains("<p>true</p>");
+        }
+
+        @Test
+        void matchVersionWithDevVersion() {
+            when(systemVersionSupplier.get()).thenReturn(com.github.zafarkhaja.semver.Version.parse("0.0.0"));
+
+            Context context = getContext();
+            String result = templateEngine.process("matchVersionNotSatisfied", context);
+            assertThat(result).contains("<p>true</p>");
+        }
+    }
+
+    @Nested
     class AnnotationExpressionObjectFactoryTest {
 
         @Test
@@ -377,6 +421,15 @@ class HaloProcessorDialectTest {
             if (template.equals("annotationsContainsExpression")) {
                 return new StringTemplateResource(annotationsContainsExpression());
             }
+            if (template.equals("matchVersionSatisfied")) {
+                return new StringTemplateResource(matchVersionSatisfied());
+            }
+            if (template.equals("matchVersionNotSatisfied")) {
+                return new StringTemplateResource(matchVersionNotSatisfied());
+            }
+            if (template.equals("matchVersionRange")) {
+                return new StringTemplateResource(matchVersionRange());
+            }
             return null;
         }
 
@@ -443,6 +496,24 @@ class HaloProcessorDialectTest {
         private String annotationsContainsExpression() {
             return """
                 <p th:text="${#annotations.contains(user, 'background')}"></p>
+                """;
+        }
+
+        private String matchVersionSatisfied() {
+            return """
+                <p th:text="${#halo.matchVersion('>=2.24.0')}"></p>
+                """;
+        }
+
+        private String matchVersionNotSatisfied() {
+            return """
+                <p th:text="${#halo.matchVersion('>=2.24.0')}"></p>
+                """;
+        }
+
+        private String matchVersionRange() {
+            return """
+                <p th:text="${#halo.matchVersion('>=2.24.0 & <2.26.0')}"></p>
                 """;
         }
     }

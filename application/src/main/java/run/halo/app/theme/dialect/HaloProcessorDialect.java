@@ -12,6 +12,7 @@ import org.thymeleaf.postprocessor.IPostProcessor;
 import org.thymeleaf.postprocessor.PostProcessor;
 import org.thymeleaf.processor.IProcessor;
 import org.thymeleaf.standard.StandardDialect;
+import run.halo.app.infra.SystemVersionSupplier;
 
 /**
  * Thymeleaf processor dialect for Halo.
@@ -23,12 +24,17 @@ public class HaloProcessorDialect extends AbstractProcessorDialect
         implements IExpressionObjectDialect, IPostProcessorDialect {
     private static final String DIALECT_NAME = "haloThemeProcessorDialect";
 
-    private static final IExpressionObjectFactory HALO_EXPRESSION_OBJECTS_FACTORY = new HaloExpressionObjectFactory();
+    private final IExpressionObjectFactory expressionObjectFactory;
 
     public HaloProcessorDialect() {
+        this(null);
+    }
+
+    public HaloProcessorDialect(SystemVersionSupplier systemVersionSupplier) {
         // We will set this dialect the same "dialect processor" precedence as
         // the Standard Dialect, so that processor executions can interleave.
         super(DIALECT_NAME, "halo", StandardDialect.PROCESSOR_PRECEDENCE);
+        this.expressionObjectFactory = new HaloExpressionObjectFactory(systemVersionSupplier);
     }
 
     @Override
@@ -46,7 +52,7 @@ public class HaloProcessorDialect extends AbstractProcessorDialect
 
     @Override
     public IExpressionObjectFactory getExpressionObjectFactory() {
-        return HALO_EXPRESSION_OBJECTS_FACTORY;
+        return expressionObjectFactory;
     }
 
     @Override

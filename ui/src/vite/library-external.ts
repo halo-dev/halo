@@ -11,16 +11,16 @@ import type { HtmlTagDescriptor, Plugin } from "vite-plus";
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
  *
- * @param {string} mode
+ * @param {string} command
  * @returns An array of plugins
  */
-export const setupLibraryExternal = (mode: string) => {
-  // Vitest mode doesn't need to setup library external.
-  if (mode === "test") {
+export const setupLibraryExternal = (command?: string) => {
+  // test command doesn't need to setup library external.
+  if (command === "test") {
     return [];
   }
 
-  const isProduction = mode === "production";
+  const isProduction = command === "build";
 
   const staticTargets: Target[] = [
     {
