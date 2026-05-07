@@ -13,14 +13,12 @@ import run.halo.app.extension.index.query.Query;
 public enum ExtensionUtil {
     ;
 
-    /**
-     * Label to mark an extension resource should not be overwritten during initialization.
-     */
+    /** Label to mark an extension resource should not be overwritten during initialization. */
     public static final String DO_NOT_OVERWRITE_LABEL = "halo.run/do-not-overwrite";
 
     /**
-     * Check if the extension has the do-not-overwrite label. If the label is present and set to
-     * true, it indicates that the extension should not be overwritten during initialization.
+     * Check if the extension has the do-not-overwrite label. If the label is present and set to true, it indicates that
+     * the extension should not be overwritten during initialization.
      *
      * @param extension the extension
      * @return true if it has the label, false otherwise
@@ -34,13 +32,12 @@ public enum ExtensionUtil {
     }
 
     public static boolean isDeleted(ExtensionOperator extension) {
-        return extension.getMetadata() != null
-            && extension.getMetadata().getDeletionTimestamp() != null;
+        return extension.getMetadata() != null && extension.getMetadata().getDeletionTimestamp() != null;
     }
 
     public static boolean addFinalizers(MetadataOperator metadata, Set<String> finalizers) {
-        var modifiableFinalizers = new HashSet<>(
-            metadata.getFinalizers() == null ? Collections.emptySet() : metadata.getFinalizers());
+        var modifiableFinalizers =
+                new HashSet<>(metadata.getFinalizers() == null ? Collections.emptySet() : metadata.getFinalizers());
         var added = modifiableFinalizers.addAll(finalizers);
         if (added) {
             metadata.setFinalizers(modifiableFinalizers);
@@ -76,10 +73,6 @@ public enum ExtensionUtil {
      * @return Sort
      */
     public static Sort defaultSort() {
-        return Sort.by(
-            desc("metadata.creationTimestamp"),
-            asc("metadata.name")
-        );
+        return Sort.by(desc("metadata.creationTimestamp"), asc("metadata.name"));
     }
-
 }

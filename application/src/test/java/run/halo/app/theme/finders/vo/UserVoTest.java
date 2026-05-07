@@ -59,9 +59,7 @@ class UserVoTest {
                     "status": {
                     }
                 }
-                """,
-            JsonUtils.objectToJson(userVo),
-            true);
+                """, JsonUtils.objectToJson(userVo), true);
     }
 
     @Test

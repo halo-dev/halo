@@ -39,12 +39,17 @@ class PluginQueryEndpointTest {
     @Test
     void available() {
         when(pluginFinder.available("fake-plugin")).thenReturn(true);
-        webClient.get().uri("/plugins/fake-plugin/available")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$").isEqualTo(true);
+        webClient
+                .get()
+                .uri("/plugins/fake-plugin/available")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$")
+                .isEqualTo(true);
     }
 
     @Test

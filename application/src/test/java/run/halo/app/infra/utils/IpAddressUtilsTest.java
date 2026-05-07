@@ -12,8 +12,8 @@ class IpAddressUtilsTest {
     @Test
     void testGetIPAddressFromCloudflareProxy() {
         var request = MockServerHttpRequest.get("/")
-            .header("CF-Connecting-IP", "127.0.0.1")
-            .build();
+                .header("CF-Connecting-IP", "127.0.0.1")
+                .build();
         var expected = "127.0.0.1";
         var actual = IpAddressUtils.getClientIp(request);
         assertEquals(expected, actual);
@@ -21,9 +21,8 @@ class IpAddressUtilsTest {
 
     @Test
     void testGetIPAddressFromXRealIpHeader() {
-        var request = MockServerHttpRequest.get("/")
-            .header("X-Real-IP", "127.0.0.1")
-            .build();
+        var request =
+                MockServerHttpRequest.get("/").header("X-Real-IP", "127.0.0.1").build();
         var expected = "127.0.0.1";
         var actual = IpAddressUtils.getClientIp(request);
         assertEquals(expected, actual);
@@ -39,8 +38,8 @@ class IpAddressUtilsTest {
     @Test
     void testGetUnknownIPAddressWhenRemoteAddressIsUnresolved() {
         var request = MockServerHttpRequest.get("/")
-            .remoteAddress(InetSocketAddress.createUnresolved("localhost", 8090))
-            .build();
+                .remoteAddress(InetSocketAddress.createUnresolved("localhost", 8090))
+                .build();
         var actual = IpAddressUtils.getClientIp(request);
         assertEquals(IpAddressUtils.UNKNOWN, actual);
     }
@@ -54,9 +53,7 @@ class IpAddressUtilsTest {
         headers.add("WL-Proxy-Client-IP", "127.0.0.3");
         headers.add("HTTP_CLIENT_IP", "127.0.0.4");
         headers.add("HTTP_X_FORWARDED_FOR", "127.0.0.5");
-        var request = MockServerHttpRequest.get("/")
-            .headers(headers)
-            .build();
+        var request = MockServerHttpRequest.get("/").headers(headers).build();
         var expected = "127.0.0.1";
         var actual = IpAddressUtils.getClientIp(request);
         assertEquals(expected, actual);

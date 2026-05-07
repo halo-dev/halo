@@ -19,11 +19,7 @@ import reactor.test.StepVerifier;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.*;
 
 /**
  * Tests for {@link CategoryPostCountUpdater}.
@@ -33,7 +29,6 @@ import run.halo.app.extension.SchemeManager;
  */
 @SpringBootTest
 class CategoryPostCountUpdaterTest {
-
 
     private final List<Post> storedPosts = posts();
 
@@ -53,47 +48,46 @@ class CategoryPostCountUpdaterTest {
     Mono<Extension> deleteImmediately(Extension extension) {
         var name = extension.getMetadata().getName();
         var scheme = schemeManager.get(extension.getClass());
-        return reactiveClient.fetch(scheme.type(), name)
-            .flatMap(reactiveClient::delete)
-            .flatMap(deleting -> reactiveClient.fetch(scheme.type(), name)
-                .flatMap(e -> Mono.error(new IllegalStateException("Extension still exists")))
-                .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
-                    .filter(IllegalStateException.class::isInstance)
-                )
-                .thenReturn(deleting)
-            );
+        return reactiveClient
+                .fetch(scheme.type(), name)
+                .flatMap(reactiveClient::delete)
+                .flatMap(deleting -> reactiveClient
+                        .fetch(scheme.type(), name)
+                        .flatMap(e -> Mono.error(new IllegalStateException("Extension still exists")))
+                        .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
+                                .filter(IllegalStateException.class::isInstance))
+                        .thenReturn(deleting));
     }
 
     @BeforeEach
     void setUp() {
-        categoryPostCountService =
-            new CategoryPostCountUpdater.CategoryPostCountService(client);
+        categoryPostCountService = new CategoryPostCountUpdater.CategoryPostCountService(client);
         Flux.fromIterable(storedPosts)
-            .flatMap(post -> reactiveClient.create(post))
-            .as(StepVerifier::create)
-            .expectNextCount(storedPosts.size())
-            .verifyComplete();
+                .flatMap(post -> reactiveClient.create(post))
+                .as(StepVerifier::create)
+                .expectNextCount(storedPosts.size())
+                .verifyComplete();
 
         Flux.fromIterable(storedCategories)
-            .flatMap(category -> reactiveClient.create(category))
-            .as(StepVerifier::create)
-            .expectNextCount(storedCategories.size())
-            .verifyComplete();
+                .flatMap(category -> reactiveClient.create(category))
+                .as(StepVerifier::create)
+                .expectNextCount(storedCategories.size())
+                .verifyComplete();
     }
 
     @AfterEach
     void tearDown() {
         Flux.fromIterable(storedPosts)
-            .flatMap(this::deleteImmediately)
-            .as(StepVerifier::create)
-            .expectNextCount(storedPosts.size())
-            .verifyComplete();
+                .flatMap(this::deleteImmediately)
+                .as(StepVerifier::create)
+                .expectNextCount(storedPosts.size())
+                .verifyComplete();
 
         Flux.fromIterable(storedCategories)
-            .flatMap(this::deleteImmediately)
-            .as(StepVerifier::create)
-            .expectNextCount(storedCategories.size())
-            .verifyComplete();
+                .flatMap(this::deleteImmediately)
+                .as(StepVerifier::create)
+                .expectNextCount(storedCategories.size())
+                .verifyComplete();
     }
 
     @Test
@@ -213,5 +207,4 @@ class CategoryPostCountUpdaterTest {
         post.getSpec().setSlug("fake-post");
         return post;
     }
-
 }

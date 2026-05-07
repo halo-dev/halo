@@ -12,18 +12,27 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:plugins:manage"]
 rules:
-  - apiGroups: [ "plugin.halo.run" ]
-    resources: [ "plugins" ]
-    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins/upgrade", "plugins/resetconfig", "plugins/config", "plugins/json-config",
-                 "plugins/reload", "plugins/install-from-uri", "plugins/upgrade-from-uri", "plugins/plugin-state" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugin-presets" ]
-    verbs: [ "list" ]
-  - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/plugins/*" ]
-    verbs: [ "create" ]
+  - apiGroups: ["plugin.halo.run"]
+    resources: ["plugins"]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]
+  - apiGroups: ["api.console.halo.run"]
+    resources:
+      [
+        "plugins/upgrade",
+        "plugins/resetconfig",
+        "plugins/config",
+        "plugins/json-config",
+        "plugins/reload",
+        "plugins/install-from-uri",
+        "plugins/upgrade-from-uri",
+        "plugins/plugin-state",
+      ]
+    verbs: ["*"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["plugin-presets"]
+    verbs: ["list"]
+  - nonResourceURLs: ["/apis/api.console.halo.run/v1alpha1/plugins/*"]
+    verbs: ["create"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -37,9 +46,10 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:plugins:view"]
 rules:
-  - apiGroups: [ "plugin.halo.run" ]
-    resources: [ "plugins" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins", "plugins/setting", "plugins/config", "plugins/json-config" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["plugin.halo.run"]
+    resources: ["plugins"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources:
+      ["plugins", "plugins/setting", "plugins/config", "plugins/json-config"]
+    verbs: ["get", "list"]

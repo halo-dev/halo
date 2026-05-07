@@ -11,5 +11,4 @@ record AllCondition(String indexName) implements Condition {
     public String toString() {
         return "ALL " + indexName;
     }
-
 }

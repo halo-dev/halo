@@ -4,7 +4,6 @@ import java.util.Set;
 import run.halo.app.extension.Extension;
 
 /**
- *
  * An attribute used for indexing extensions.
  *
  * @param <E> the type of the extension
@@ -43,5 +42,4 @@ public interface IndexAttribute<E extends Extension, K extends Comparable<K>> {
      * @return true if single-valued, false otherwise
      */
     boolean singleValue();
-
 }

@@ -65,13 +65,12 @@ public class ReactiveFinderExpressionParserTests {
             }
         }));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
-        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(environmentFetcher);
-        when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenReturn(extensionGetterProvider);
+        lenient()
+                .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
+                .thenReturn(environmentFetcher);
+        when(applicationContext.getBeanProvider(ExtensionGetter.class)).thenReturn(extensionGetterProvider);
         when(extensionGetterProvider.getIfUnique()).thenReturn(null);
-        lenient().when(environmentFetcher.fetchComment())
-            .thenReturn(Mono.just(new SystemSetting.Comment()));
+        lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
@@ -109,9 +108,7 @@ public class ReactiveFinderExpressionParserTests {
         }
 
         public Flux<TestUser> users() {
-            return Flux.just(
-                new TestUser("guqing"), new TestUser("ruibaby"), new TestUser("johnniang")
-            );
+            return Flux.just(new TestUser("guqing"), new TestUser("ruibaby"), new TestUser("johnniang"));
         }
 
         public Flux<JsonNode> objectJsonNodeFlux() {
@@ -131,22 +128,23 @@ public class ReactiveFinderExpressionParserTests {
         }
     }
 
-    record TestUser(String name) {
-    }
+    record TestUser(String name) {}
 
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             return new StringTemplateResource("""
                 <p th:text="${genericMap.key}"></p>
                 <p th:text="${target.users[1].name}"></p>
@@ -165,6 +163,5 @@ public class ReactiveFinderExpressionParserTests {
                 </script>
                 """);
         }
-
     }
 }

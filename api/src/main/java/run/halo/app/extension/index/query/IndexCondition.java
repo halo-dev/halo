@@ -14,5 +14,4 @@ public interface IndexCondition extends Condition {
      * @return the index name
      */
     String indexName();
-
 }

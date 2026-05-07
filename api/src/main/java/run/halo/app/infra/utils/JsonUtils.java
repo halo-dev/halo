@@ -20,8 +20,7 @@ import org.springframework.util.Assert;
 public class JsonUtils {
     public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
 
-    private JsonUtils() {
-    }
+    private JsonUtils() {}
 
     public static ObjectMapper mapper() {
         return DEFAULT_JSON_MAPPER;

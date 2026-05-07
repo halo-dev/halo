@@ -9,19 +9,24 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * <p>{@link NotificationTemplate} is a custom extension that defines a notification template.</p>
- * <p>It describes the notification template's name, description, and the template content.</p>
- * <p>{@link Spec#getReasonSelector()} is used to select the template by reasonType and language,
- * if multiple templates are matched, the best match will be selected. This is useful when you
- * want to override the default template.</p>
+ * {@link NotificationTemplate} is a custom extension that defines a notification template.
+ *
+ * <p>It describes the notification template's name, description, and the template content.
+ *
+ * <p>{@link Spec#getReasonSelector()} is used to select the template by reasonType and language, if multiple templates
+ * are matched, the best match will be selected. This is useful when you want to override the default template.
  *
  * @author guqing
  * @since 2.10.0
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "NotificationTemplate",
-    plural = "notificationtemplates", singular = "notificationtemplate")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "NotificationTemplate",
+        plural = "notificationtemplates",
+        singular = "notificationtemplate")
 public class NotificationTemplate extends AbstractExtension {
 
     @Schema

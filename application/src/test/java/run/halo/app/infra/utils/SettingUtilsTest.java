@@ -22,56 +22,57 @@ class SettingUtilsTest {
                 {
                     "sns": "{\\"email\\":\\"example@exmple.com\\"}"
                 }
-                """,
-            JsonUtils.objectToJson(map),
-            true);
+                """, JsonUtils.objectToJson(map), true);
     }
 
     @Test
     void mergePatch() throws JSONException {
-        Map<String, String> defaultValue =
-            Map.of("comment", "{\"enable\":true,\"requireReviewForNew\":true}",
-                "basic", "{\"title\":\"guqing's blog\"}",
-                "authProvider", "{\"github\":{\"clientId\":\"fake-client-id\"}}");
-        Map<String, String> modified = Map.of("comment",
-            "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
-            "basic", "{\"title\":\"guqing's blog\", \"subtitle\": \"fake-sub-title\"}");
+        Map<String, String> defaultValue = Map.of(
+                "comment",
+                "{\"enable\":true,\"requireReviewForNew\":true}",
+                "basic",
+                "{\"title\":\"guqing's blog\"}",
+                "authProvider",
+                "{\"github\":{\"clientId\":\"fake-client-id\"}}");
+        Map<String, String> modified = Map.of(
+                "comment",
+                "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
+                "basic",
+                "{\"title\":\"guqing's blog\", \"subtitle\": \"fake-sub-title\"}");
 
         Map<String, String> result = SettingUtils.mergePatch(modified, defaultValue);
-        Map<String, String> excepted = Map.of("comment",
-            "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
-            "basic", "{\"title\":\"guqing's blog\",\"subtitle\":\"fake-sub-title\"}",
-            "authProvider", "{\"github\":{\"clientId\":\"fake-client-id\"}}");
-        JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result),
-            true);
+        Map<String, String> excepted = Map.of(
+                "comment",
+                "{\"enable\":true,\"requireReviewForNew\":true,\"systemUserOnly\":false}",
+                "basic",
+                "{\"title\":\"guqing's blog\",\"subtitle\":\"fake-sub-title\"}",
+                "authProvider",
+                "{\"github\":{\"clientId\":\"fake-client-id\"}}");
+        JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result), true);
     }
 
     @Test
     void mergePatchWithMoreType() throws JSONException {
         Map<String, String> defaultValue = Map.of(
-            "array", "[1,2,3]",
-            "number", "1",
-            "boolean", "false",
-            "string", "new-default-string-value",
-            "object", "{\"name\":\"guqing\"}"
-        );
+                "array", "[1,2,3]",
+                "number", "1",
+                "boolean", "false",
+                "string", "new-default-string-value",
+                "object", "{\"name\":\"guqing\"}");
         Map<String, String> modified = Map.of(
-            "stringArray", "[\"hello\", \"world\"]",
-            "boolean", "true",
-            "string", "hello",
-            "object", "{\"name\":\"guqing\", \"age\": 18}"
-        );
+                "stringArray", "[\"hello\", \"world\"]",
+                "boolean", "true",
+                "string", "hello",
+                "object", "{\"name\":\"guqing\", \"age\": 18}");
         Map<String, String> result = SettingUtils.mergePatch(modified, defaultValue);
         Map<String, String> excepted = Map.of(
-            "array", "[1,2,3]",
-            "number", "1",
-            "boolean", "true",
-            "string", "hello",
-            "object", "{\"name\":\"guqing\",\"age\":18}",
-            "stringArray", "[\"hello\",\"world\"]"
-        );
-        JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result),
-            true);
+                "array", "[1,2,3]",
+                "number", "1",
+                "boolean", "true",
+                "string", "hello",
+                "object", "{\"name\":\"guqing\",\"age\":18}",
+                "stringArray", "[\"hello\",\"world\"]");
+        JSONAssert.assertEquals(JsonUtils.objectToJson(excepted), JsonUtils.objectToJson(result), true);
     }
 
     private static Setting getFakeSetting() {

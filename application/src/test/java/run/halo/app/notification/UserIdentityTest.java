@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
  */
 class UserIdentityTest {
 
-
     @Test
     void getEmailTest() {
         var identity = UserIdentity.anonymousWithEmail("test@example.com");

@@ -36,8 +36,8 @@ class UserNotificationPreferenceTest {
         var preference = JsonUtils.jsonToObject(s, UserNotificationPreference.class);
         assertThat(preference.getReasonTypeNotifier()).isNotNull();
         assertThat(preference.getReasonTypeNotifier().get("comment").getNotifiers())
-            .containsExactlyInAnyOrder("email-notifier", "sms-notifier");
+                .containsExactlyInAnyOrder("email-notifier", "sms-notifier");
         assertThat(preference.getReasonTypeNotifier().get("new-post").getNotifiers())
-            .containsExactlyInAnyOrder("email-notifier", "webhook-router-notifier");
+                .containsExactlyInAnyOrder("email-notifier", "webhook-router-notifier");
     }
 }

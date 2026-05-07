@@ -19,13 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.RequestPredicate;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,8 +39,7 @@ import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 
 /**
- * The {@link PostRouteFactory} for generate {@link RouterFunction} specific to the template
- * <code>post.html</code>.
+ * The {@link PostRouteFactory} for generate {@link RouterFunction} specific to the template <code>post.html</code>.
  *
  * @author guqing
  * @since 2.0.0
@@ -73,26 +66,22 @@ public class PostRouteFactory implements RouteFactory {
         var postParamPredicate = new PatternParser(pattern);
         if (postParamPredicate.isQueryParamPattern()) {
             RequestPredicate requestPredicate = postParamPredicate.toRequestPredicate();
-            return RouterFunctions.route(GET("/")
-                .and(requestPredicate), queryParamHandlerFunction(postParamPredicate));
+            return RouterFunctions.route(GET("/").and(requestPredicate), queryParamHandlerFunction(postParamPredicate));
         }
-        return RouterFunctions
-            .route(GET(pattern).and(accept(MediaType.TEXT_HTML)), handlerFunction());
+        return RouterFunctions.route(GET(pattern).and(accept(MediaType.TEXT_HTML)), handlerFunction());
     }
 
     HandlerFunction<ServerResponse> queryParamHandlerFunction(PatternParser paramPredicate) {
         return request -> {
             Map<String, String> variables = mergedVariables(request);
             PostPatternVariable patternVariable = new PostPatternVariable();
-            Optional.ofNullable(variables.get(paramPredicate.getParamName()))
-                .ifPresent(value -> {
-                    switch (paramPredicate.getPlaceholderName()) {
-                        case "name" -> patternVariable.setName(value);
-                        case "slug" -> patternVariable.setSlug(value);
-                        default ->
-                            throw new IllegalArgumentException("Unsupported query param predicate");
-                    }
-                });
+            Optional.ofNullable(variables.get(paramPredicate.getParamName())).ifPresent(value -> {
+                switch (paramPredicate.getPlaceholderName()) {
+                    case "name" -> patternVariable.setName(value);
+                    case "slug" -> patternVariable.setSlug(value);
+                    default -> throw new IllegalArgumentException("Unsupported query param predicate");
+                }
+            });
             return postResponse(request, patternVariable);
         };
     }
@@ -101,74 +90,69 @@ public class PostRouteFactory implements RouteFactory {
         return request -> {
             PostPatternVariable patternVariable = PostPatternVariable.from(request);
             return postResponse(request, patternVariable)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")));
+                    .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")));
         };
     }
 
-    private Mono<ServerResponse> postResponse(ServerRequest request,
-        PostPatternVariable patternVariable) {
+    private Mono<ServerResponse> postResponse(ServerRequest request, PostPatternVariable patternVariable) {
         Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
         return postVoMono
-            .doOnNext(postVo -> {
-                postVo.getSpec().setTitle(
-                    titleVisibilityIdentifyCalculator.calculateTitle(
-                        postVo.getSpec().getTitle(),
-                        postVo.getSpec().getVisible(),
-                        localeContextResolver.resolveLocaleContext(request.exchange())
-                            .getLocale())
-                );
-            })
-            .flatMap(postVo -> {
-                Map<String, Object> model = ModelMapUtils.postModel(postVo);
-                return determineTemplate(request, postVo)
-                    .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
-            });
+                .doOnNext(postVo -> {
+                    postVo.getSpec()
+                            .setTitle(titleVisibilityIdentifyCalculator.calculateTitle(
+                                    postVo.getSpec().getTitle(),
+                                    postVo.getSpec().getVisible(),
+                                    localeContextResolver
+                                            .resolveLocaleContext(request.exchange())
+                                            .getLocale()));
+                })
+                .flatMap(postVo -> {
+                    Map<String, Object> model = ModelMapUtils.postModel(postVo);
+                    return determineTemplate(request, postVo)
+                            .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
+                });
     }
 
     Mono<String> determineTemplate(ServerRequest request, PostVo postVo) {
         return Flux.fromIterable(defaultIfNull(postVo.getCategories(), List.of()))
-            .filter(category -> isNotBlank(category.getSpec().getPostTemplate()))
-            .concatMap(category -> viewNameResolver.resolveViewNameOrDefault(request,
-                category.getSpec().getPostTemplate(), null)
-            )
-            .next()
-            .switchIfEmpty(Mono.defer(() -> viewNameResolver.resolveViewNameOrDefault(request,
-                postVo.getSpec().getTemplate(),
-                DefaultTemplateEnum.POST.getValue())
-            ));
+                .filter(category -> isNotBlank(category.getSpec().getPostTemplate()))
+                .concatMap(category -> viewNameResolver.resolveViewNameOrDefault(
+                        request, category.getSpec().getPostTemplate(), null))
+                .next()
+                .switchIfEmpty(Mono.defer(() -> viewNameResolver.resolveViewNameOrDefault(
+                        request, postVo.getSpec().getTemplate(), DefaultTemplateEnum.POST.getValue())));
     }
 
     Mono<PostVo> bestMatchPost(PostPatternVariable variable) {
         return postsByPredicates(variable)
-            .filter(post -> {
-                Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
-                return matchIfPresent(variable.getName(), post.getMetadata().getName())
-                    && matchIfPresent(variable.getSlug(), post.getSpec().getSlug())
-                    && matchIfPresent(variable.getYear(), labels.get(Post.ARCHIVE_YEAR_LABEL))
-                    && matchIfPresent(variable.getMonth(), labels.get(Post.ARCHIVE_MONTH_LABEL))
-                    && matchIfPresent(variable.getDay(), labels.get(Post.ARCHIVE_DAY_LABEL));
-            })
-            .filterWhen(post -> {
-                if (isNotBlank(variable.getCategorySlug())) {
-                    var categoryNames = post.getSpec().getCategories();
-                    return postService.listCategories(categoryNames)
-                        .next()
-                        .filter(category -> category.getSpec().getSlug()
-                            .equals(variable.getCategorySlug())
-                        )
-                        .map(category -> category.getSpec().getSlug())
-                        .switchIfEmpty(Mono.defer(() -> {
-                            if (DEFAULT_CATEGORY.equals(variable.getCategorySlug())) {
-                                return Mono.just(DEFAULT_CATEGORY);
-                            }
-                            return Mono.empty();
-                        }))
-                        .hasElement();
-                }
-                return Mono.just(true);
-            })
-            .next()
-            .flatMap(post -> postFinder.getByName(post.getMetadata().getName()));
+                .filter(post -> {
+                    Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
+                    return matchIfPresent(variable.getName(), post.getMetadata().getName())
+                            && matchIfPresent(variable.getSlug(), post.getSpec().getSlug())
+                            && matchIfPresent(variable.getYear(), labels.get(Post.ARCHIVE_YEAR_LABEL))
+                            && matchIfPresent(variable.getMonth(), labels.get(Post.ARCHIVE_MONTH_LABEL))
+                            && matchIfPresent(variable.getDay(), labels.get(Post.ARCHIVE_DAY_LABEL));
+                })
+                .filterWhen(post -> {
+                    if (isNotBlank(variable.getCategorySlug())) {
+                        var categoryNames = post.getSpec().getCategories();
+                        return postService
+                                .listCategories(categoryNames)
+                                .next()
+                                .filter(category -> category.getSpec().getSlug().equals(variable.getCategorySlug()))
+                                .map(category -> category.getSpec().getSlug())
+                                .switchIfEmpty(Mono.defer(() -> {
+                                    if (DEFAULT_CATEGORY.equals(variable.getCategorySlug())) {
+                                        return Mono.just(DEFAULT_CATEGORY);
+                                    }
+                                    return Mono.empty();
+                                }))
+                                .hasElement();
+                    }
+                    return Mono.just(true);
+                })
+                .next()
+                .flatMap(post -> postFinder.getByName(post.getMetadata().getName()));
     }
 
     Flux<Post> postsByPredicates(PostPatternVariable patternVariable) {
@@ -182,22 +166,20 @@ public class PostRouteFactory implements RouteFactory {
     }
 
     private Flux<Post> fetchPostsByName(String name) {
-        return queryPostPredicateResolver.getPredicate()
-            .flatMap(predicate -> client.fetch(Post.class, name)
-                .filter(predicate)
-            )
-            .flux();
+        return queryPostPredicateResolver
+                .getPredicate()
+                .flatMap(predicate -> client.fetch(Post.class, name).filter(predicate))
+                .flux();
     }
 
     private Flux<Post> fetchPostsBySlug(String slug) {
-        return queryPostPredicateResolver.getListOptions()
-            .flatMapMany(listOptions -> {
-                if (isNotBlank(slug)) {
-                    var other = Queries.equal("spec.slug", slug);
-                    listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(other));
-                }
-                return client.listAll(Post.class, listOptions, Sort.unsorted());
-            });
+        return queryPostPredicateResolver.getListOptions().flatMapMany(listOptions -> {
+            if (isNotBlank(slug)) {
+                var other = Queries.equal("spec.slug", slug);
+                listOptions.setFieldSelector(listOptions.getFieldSelector().andQuery(other));
+            }
+            return client.listAll(Post.class, listOptions, Sort.unsorted());
+        });
     }
 
     private boolean matchIfPresent(String variable, String target) {

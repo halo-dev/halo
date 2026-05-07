@@ -1,7 +1,8 @@
-create table if not exists extensions
-(
-    name    varchar(255) not null COLLATE utf8mb4_bin,
-    data    longblob,
-    version bigint,
-    primary key (name)
-);
+CREATE
+    TABLE
+        IF NOT EXISTS extensions(
+            name VARCHAR(255) NOT NULL COLLATE utf8mb4_bin,
+            DATA longblob,
+            version BIGINT,
+            PRIMARY KEY(name)
+        );

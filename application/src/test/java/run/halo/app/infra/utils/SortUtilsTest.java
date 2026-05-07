@@ -31,7 +31,7 @@ class SortUtilsTest {
 
         // whitespace in direction
         assertThatThrownBy(() -> SortUtils.resolve(List.of("name, desc")))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Direction must not contain whitespace");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Direction must not contain whitespace");
     }
 }

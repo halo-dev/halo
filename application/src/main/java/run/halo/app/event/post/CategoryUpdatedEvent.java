@@ -13,5 +13,4 @@ public class CategoryUpdatedEvent extends ApplicationEvent {
         super(source);
         this.category = category;
     }
-
 }

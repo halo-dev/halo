@@ -22,26 +22,20 @@ class CsrfConfigurer implements SecurityConfigurer {
     @Override
     public void configure(ServerHttpSecurity http) {
         var csrfMatcher = new AndServerWebExchangeMatcher(
-            CsrfWebFilter.DEFAULT_CSRF_MATCHER,
-            new NegatedServerWebExchangeMatcher(pathMatchers(
-                "/api/**",
-                "/apis/**",
-                "/actuator/**",
-                "/system/setup"
-            )),
-            new NegatedServerWebExchangeMatcher(tokenAuthMatcher())
-        );
-        http.csrf(csrfSpec -> csrfSpec
-            .csrfTokenRepository(new CookieServerCsrfTokenRepository())
-            .csrfTokenRequestHandler(new XorServerCsrfTokenRequestAttributeHandler())
-            .requireCsrfProtectionMatcher(csrfMatcher));
+                CsrfWebFilter.DEFAULT_CSRF_MATCHER,
+                new NegatedServerWebExchangeMatcher(
+                        pathMatchers("/api/**", "/apis/**", "/actuator/**", "/system/setup")),
+                new NegatedServerWebExchangeMatcher(tokenAuthMatcher()));
+        http.csrf(csrfSpec -> csrfSpec.csrfTokenRepository(new CookieServerCsrfTokenRepository())
+                .csrfTokenRequestHandler(new XorServerCsrfTokenRequestAttributeHandler())
+                .requireCsrfProtectionMatcher(csrfMatcher));
     }
 
     private static ServerWebExchangeMatcher tokenAuthMatcher() {
         var bearerTokenConverter = new ServerBearerTokenAuthenticationConverter();
-        return exchange -> bearerTokenConverter.convert(exchange)
-            .flatMap(a -> ServerWebExchangeMatcher.MatchResult.match())
-            .switchIfEmpty(Mono.defer(ServerWebExchangeMatcher.MatchResult::notMatch));
+        return exchange -> bearerTokenConverter
+                .convert(exchange)
+                .flatMap(a -> ServerWebExchangeMatcher.MatchResult.match())
+                .switchIfEmpty(Mono.defer(ServerWebExchangeMatcher.MatchResult::notMatch));
     }
-
 }

@@ -14,29 +14,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface GVK {
 
-    /**
-     * @return group name of Extension.
-     */
+    /** @return group name of Extension. */
     String group();
 
-    /**
-     * @return version name of Extension.
-     */
+    /** @return version name of Extension. */
     String version();
 
-    /**
-     * @return kind name of Extension.
-     */
+    /** @return kind name of Extension. */
     String kind();
 
-    /**
-     * @return plural name of Extension.
-     */
+    /** @return plural name of Extension. */
     String plural();
 
-    /**
-     * @return singular name of Extension.
-     */
+    /** @return singular name of Extension. */
     String singular();
-
 }

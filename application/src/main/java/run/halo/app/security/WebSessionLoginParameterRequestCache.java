@@ -25,60 +25,59 @@ import reactor.core.publisher.Mono;
 @Component
 class WebSessionLoginParameterRequestCache implements LoginParameterRequestCache {
 
-    private static final String SESSION_ATTRIBUTE_NAME_PREFIX =
-        WebSessionLoginParameterRequestCache.class + ".";
+    private static final String SESSION_ATTRIBUTE_NAME_PREFIX = WebSessionLoginParameterRequestCache.class + ".";
 
     private final ServerWebExchangeMatcher cacheMatcher = createDefaultRequestMatcher();
 
     @Override
     public Mono<Void> saveParameter(ServerWebExchange exchange, String parameterName) {
-        return cacheMatcher.matches(exchange)
-            .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-            .flatMap(m -> loadParameter(exchange, parameterName))
-            .delayUntil(parameter -> exchange.getSession()
-                .map(WebSession::getAttributes)
-                .doOnNext(attributes -> {
-                    log.debug("Save {}: {} into session", parameterName, parameter);
-                    attributes.put(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName, parameter);
-                })
-            )
-            .then();
+        return cacheMatcher
+                .matches(exchange)
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                .flatMap(m -> loadParameter(exchange, parameterName))
+                .delayUntil(parameter -> exchange.getSession()
+                        .map(WebSession::getAttributes)
+                        .doOnNext(attributes -> {
+                            log.debug("Save {}: {} into session", parameterName, parameter);
+                            attributes.put(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName, parameter);
+                        }))
+                .then();
     }
 
     @Override
     public Mono<Void> removeParameter(ServerWebExchange exchange, String parameterName) {
-        return cacheMatcher.matches(exchange)
-            .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-            .flatMap(m -> exchange.getSession())
-            .map(WebSession::getAttributes)
-            .doOnNext(attributes -> {
-                var removed = attributes.remove(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName);
-                log.debug("Remove {}: {} from session", parameterName, removed);
-            })
-            .then();
+        return cacheMatcher
+                .matches(exchange)
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                .flatMap(m -> exchange.getSession())
+                .map(WebSession::getAttributes)
+                .doOnNext(attributes -> {
+                    var removed = attributes.remove(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName);
+                    log.debug("Remove {}: {} from session", parameterName, removed);
+                })
+                .then();
     }
 
     @Override
     public Mono<String> getParameter(ServerWebExchange exchange, String parameterName) {
         return exchange.getSession()
-            .map(WebSession::getAttributes)
-            .mapNotNull(attributes -> {
-                var parameter = attributes.get(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName);
-                log.debug("Get {}: {} from session", parameterName, parameter);
-                return parameter;
-            })
-            .filter(String.class::isInstance)
-            .cast(String.class);
+                .map(WebSession::getAttributes)
+                .mapNotNull(attributes -> {
+                    var parameter = attributes.get(SESSION_ATTRIBUTE_NAME_PREFIX + parameterName);
+                    log.debug("Get {}: {} from session", parameterName, parameter);
+                    return parameter;
+                })
+                .filter(String.class::isInstance)
+                .cast(String.class);
     }
 
     private static Mono<String> loadParameter(ServerWebExchange exchange, String parameterName) {
         // load from query
         return Mono.justOrEmpty(exchange.getRequest().getQueryParams().getFirst(parameterName))
-            .filter(Predicate.not(String::isBlank))
-            .switchIfEmpty(Mono.defer(() -> exchange.getFormData()
-                .mapNotNull(form -> form.getFirst(parameterName))
-                .filter(Predicate.not(String::isBlank)))
-            );
+                .filter(Predicate.not(String::isBlank))
+                .switchIfEmpty(Mono.defer(() -> exchange.getFormData()
+                        .mapNotNull(form -> form.getFirst(parameterName))
+                        .filter(Predicate.not(String::isBlank))));
     }
 
     private static ServerWebExchangeMatcher createDefaultRequestMatcher() {
@@ -87,5 +86,4 @@ class WebSessionLoginParameterRequestCache implements LoginParameterRequestCache
         form.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
         return new AndServerWebExchangeMatcher(post, form);
     }
-
 }

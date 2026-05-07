@@ -8,5 +8,4 @@ public interface PluginRouterFunctionRegistry {
     void register(Collection<RouterFunction<ServerResponse>> routerFunctions);
 
     void unregister(Collection<RouterFunction<ServerResponse>> routerFunctions);
-
 }

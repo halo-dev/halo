@@ -20,13 +20,8 @@ public class ContentVo {
 
     String content;
 
-    /**
-     * Empty content object.
-     */
+    /** Empty content object. */
     public static ContentVo empty() {
-        return ContentVo.builder()
-            .raw("")
-            .content("")
-            .build();
+        return ContentVo.builder().raw("").content("").build();
     }
 }

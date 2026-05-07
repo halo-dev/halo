@@ -11,5 +11,4 @@ record LabelNotEqualsCondition(String labelKey, String labelValue) implements La
     public String toString() {
         return INDEX_NAME + "['" + labelKey + "'] <> '" + labelValue + "'";
     }
-
 }

@@ -59,5 +59,4 @@ public interface Index<E extends Extension, K extends Comparable<K>> extends Clo
      * @return the transactional operation.
      */
     TransactionalOperation prepareDelete(String primaryKey);
-
 }

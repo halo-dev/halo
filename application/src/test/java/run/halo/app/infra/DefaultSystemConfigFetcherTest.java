@@ -2,9 +2,7 @@ package run.halo.app.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,25 +48,22 @@ class DefaultSystemConfigFetcherTest {
     void setUp() {
         mockConfigMap = new ConfigMap();
         mockConfigMap.setData(Map.of(
-            "basic", """
+                "basic", """
                 {
                   "title": "Test Blog",
                   "subtitle": "Test"
                 }""",
-            "post", """
+                "post", """
                 {
                   "postPageSize": 10
-                }"""
-        ));
+                }"""));
     }
 
     @Test
     void testFetchWithConvertibleType() {
         // Arrange
-        when(conversionService.canConvert(String.class, String.class))
-            .thenReturn(true);
-        when(conversionService.convert("testValue", String.class))
-            .thenReturn("testValue");
+        when(conversionService.canConvert(String.class, String.class)).thenReturn(true);
+        when(conversionService.convert("testValue", String.class)).thenReturn("testValue");
 
         var configMapWithString = new ConfigMap();
         var data = new HashMap<String, String>();
@@ -78,36 +73,36 @@ class DefaultSystemConfigFetcherTest {
         systemConfigFetcher.getConfigMapCache().set(configMapWithString.getData());
 
         // Act & Assert
-        systemConfigFetcher.fetch("testKey", String.class)
-            .as(StepVerifier::create)
-            .expectNext("testValue")
-            .verifyComplete();
+        systemConfigFetcher
+                .fetch("testKey", String.class)
+                .as(StepVerifier::create)
+                .expectNext("testValue")
+                .verifyComplete();
     }
 
     @Test
     void testFetchWithJsonConversion() {
         // Arrange
         var configMap = new ConfigMap();
-        configMap.setData(Map.of(
-            "basic", """
+        configMap.setData(Map.of("basic", """
                 {
                   "title": "Test Blog",
                   "subtitle": "Test Subtitle"
-                }"""
-        ));
+                }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
         when(conversionService.canConvert(String.class, SystemSetting.Basic.class))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act & Assert
-        systemConfigFetcher.fetch("basic", SystemSetting.Basic.class)
-            .as(StepVerifier::create)
-            .assertNext(basic -> {
-                assertThat(basic.getTitle()).isEqualTo("Test Blog");
-                assertThat(basic.getSubtitle()).isEqualTo("Test Subtitle");
-            })
-            .verifyComplete();
+        systemConfigFetcher
+                .fetch("basic", SystemSetting.Basic.class)
+                .as(StepVerifier::create)
+                .assertNext(basic -> {
+                    assertThat(basic.getTitle()).isEqualTo("Test Blog");
+                    assertThat(basic.getSubtitle()).isEqualTo("Test Subtitle");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -116,37 +111,37 @@ class DefaultSystemConfigFetcherTest {
         systemConfigFetcher.getConfigMapCache().set(mockConfigMap.getData());
 
         // Act & Assert
-        systemConfigFetcher.fetch("nonExistentKey", String.class)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        systemConfigFetcher
+                .fetch("nonExistentKey", String.class)
+                .as(StepVerifier::create)
+                .verifyComplete();
     }
 
     @Test
     void testGetBasicWithValidData() {
         // Arrange
         var configMap = new ConfigMap();
-        configMap.setData(Map.of(
-            "basic", """
+        configMap.setData(Map.of("basic", """
                 {
                   "title": "My Blog",
                   "subtitle": "My Subtitle",
                   "logo": "logo.png"
-                }"""
-        ));
+                }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
         when(conversionService.canConvert(String.class, SystemSetting.Basic.class))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act & Assert
-        systemConfigFetcher.getBasic()
-            .as(StepVerifier::create)
-            .assertNext(basic -> {
-                assertThat(basic.getTitle()).isEqualTo("My Blog");
-                assertThat(basic.getSubtitle()).isEqualTo("My Subtitle");
-                assertThat(basic.getLogo()).isEqualTo("logo.png");
-            })
-            .verifyComplete();
+        systemConfigFetcher
+                .getBasic()
+                .as(StepVerifier::create)
+                .assertNext(basic -> {
+                    assertThat(basic.getTitle()).isEqualTo("My Blog");
+                    assertThat(basic.getSubtitle()).isEqualTo("My Subtitle");
+                    assertThat(basic.getLogo()).isEqualTo("logo.png");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -155,84 +150,82 @@ class DefaultSystemConfigFetcherTest {
         systemConfigFetcher.getConfigMapCache().set(Map.of());
 
         // Act & Assert - should return a new instance
-        systemConfigFetcher.getBasic()
-            .as(StepVerifier::create)
-            .assertNext(basic -> assertThat(basic).isNotNull())
-            .verifyComplete();
+        systemConfigFetcher
+                .getBasic()
+                .as(StepVerifier::create)
+                .assertNext(basic -> assertThat(basic).isNotNull())
+                .verifyComplete();
     }
 
     @Test
     void testFetchComment() {
         // Arrange
         var configMap = new ConfigMap();
-        configMap.setData(Map.of(
-            "comment", """
+        configMap.setData(Map.of("comment", """
                 {
                   "enable": true
-                }"""
-        ));
+                }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
         when(conversionService.canConvert(String.class, SystemSetting.Comment.class))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act & Assert
-        systemConfigFetcher.fetchComment()
-            .as(StepVerifier::create)
-            .expectNextMatches(java.util.Objects::nonNull)
-            .verifyComplete();
+        systemConfigFetcher
+                .fetchComment()
+                .as(StepVerifier::create)
+                .expectNextMatches(java.util.Objects::nonNull)
+                .verifyComplete();
     }
 
     @Test
     void testFetchPost() {
         // Arrange
         var configMap = new ConfigMap();
-        configMap.setData(Map.of(
-            "post", """
+        configMap.setData(Map.of("post", """
                 {
                   "postPageSize": 10,
                   "archivePageSize": 20
-                }"""
-        ));
+                }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
         when(conversionService.canConvert(String.class, SystemSetting.Post.class))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act & Assert
-        systemConfigFetcher.fetchPost()
-            .as(StepVerifier::create)
-            .assertNext(post -> {
-                assertThat(post.getPostPageSize()).isEqualTo(10);
-                assertThat(post.getArchivePageSize()).isEqualTo(20);
-            })
-            .verifyComplete();
+        systemConfigFetcher
+                .fetchPost()
+                .as(StepVerifier::create)
+                .assertNext(post -> {
+                    assertThat(post.getPostPageSize()).isEqualTo(10);
+                    assertThat(post.getArchivePageSize()).isEqualTo(20);
+                })
+                .verifyComplete();
     }
 
     @Test
     void testFetchRouteRules() {
         // Arrange
         var configMap = new ConfigMap();
-        configMap.setData(Map.of(
-            "routeRules", """
+        configMap.setData(Map.of("routeRules", """
                 {
                   "post": "/articles/{slug}",
                   "tags": "/labels"
-                }"""
-        ));
+                }"""));
         systemConfigFetcher.getConfigMapCache().set(configMap.getData());
 
         when(conversionService.canConvert(String.class, SystemSetting.ThemeRouteRules.class))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act & Assert
-        systemConfigFetcher.fetchRouteRules()
-            .as(StepVerifier::create)
-            .assertNext(rules -> {
-                assertThat(rules.getPost()).isEqualTo("/articles/{slug}");
-                assertThat(rules.getTags()).isEqualTo("/labels");
-            })
-            .verifyComplete();
+        systemConfigFetcher
+                .fetchRouteRules()
+                .as(StepVerifier::create)
+                .assertNext(rules -> {
+                    assertThat(rules.getPost()).isEqualTo("/articles/{slug}");
+                    assertThat(rules.getTags()).isEqualTo("/labels");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -242,30 +235,30 @@ class DefaultSystemConfigFetcherTest {
         systemConfigFetcher.getConfigMapCache().set(configData);
 
         // Act & Assert
-        systemConfigFetcher.getConfig()
-            .as(StepVerifier::create)
-            .expectNext(java.util.Objects.requireNonNull(configData))
-            .verifyComplete();
+        systemConfigFetcher
+                .getConfig()
+                .as(StepVerifier::create)
+                .expectNext(java.util.Objects.requireNonNull(configData))
+                .verifyComplete();
     }
 
     @Test
     void testGetConfigMap() {
         // Arrange
-        when(client.fetch(ConfigMap.class, "system"))
-            .thenReturn(Mono.just(mockConfigMap));
+        when(client.fetch(ConfigMap.class, "system")).thenReturn(Mono.just(mockConfigMap));
 
         // Act & Assert
-        systemConfigFetcher.getConfigMap()
-            .as(StepVerifier::create)
-            .expectNext(mockConfigMap)
-            .verifyComplete();
+        systemConfigFetcher
+                .getConfigMap()
+                .as(StepVerifier::create)
+                .expectNext(mockConfigMap)
+                .verifyComplete();
     }
 
     @Test
     void testGetConfigMapBlocking() {
         // Arrange
-        when(client.fetch(ConfigMap.class, "system"))
-            .thenReturn(Mono.just(mockConfigMap));
+        when(client.fetch(ConfigMap.class, "system")).thenReturn(Mono.just(mockConfigMap));
 
         // Act
         Optional<ConfigMap> result = systemConfigFetcher.getConfigMapBlocking();
@@ -278,8 +271,7 @@ class DefaultSystemConfigFetcherTest {
     @Test
     void testGetConfigMapBlockingWhenNotFound() {
         // Arrange
-        when(client.fetch(ConfigMap.class, "system"))
-            .thenReturn(Mono.empty());
+        when(client.fetch(ConfigMap.class, "system")).thenReturn(Mono.empty());
 
         // Act
         Optional<ConfigMap> result = systemConfigFetcher.getConfigMapBlocking();
@@ -323,34 +315,32 @@ class DefaultSystemConfigFetcherTest {
     @Test
     void shouldGetConfigMapFromDatabaseIfNoCache() {
         // Arrange
-        when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG))
-            .thenReturn(Mono.just(mockConfigMap));
-        when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT))
-            .thenReturn(Mono.empty());
+        when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)).thenReturn(Mono.just(mockConfigMap));
+        when(client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)).thenReturn(Mono.empty());
 
         assertNotNull(mockConfigMap.getData());
-        systemConfigFetcher.getConfigMapMono()
-            .as(StepVerifier::create)
-            .expectNext(mockConfigMap.getData())
-            .verifyComplete();
+        systemConfigFetcher
+                .getConfigMapMono()
+                .as(StepVerifier::create)
+                .expectNext(mockConfigMap.getData())
+                .verifyComplete();
     }
 
     @Test
     void shouldGetConfigMapFromCacheIfPresent() {
         // Arrange
-        var cachedData = Map.of(
-            "cachedKey", """
+        var cachedData = Map.of("cachedKey", """
                 {
                   "key1": "value1"
-                }"""
-        );
+                }""");
         systemConfigFetcher.getConfigMapCache().set(cachedData);
 
         // Act & Assert
-        systemConfigFetcher.getConfigMapMono()
-            .as(StepVerifier::create)
-            .expectNext(cachedData)
-            .verifyComplete();
+        systemConfigFetcher
+                .getConfigMapMono()
+                .as(StepVerifier::create)
+                .expectNext(cachedData)
+                .verifyComplete();
 
         verify(client, never()).fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG);
     }

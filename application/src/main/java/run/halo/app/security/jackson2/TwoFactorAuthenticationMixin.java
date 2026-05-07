@@ -13,15 +13,13 @@ import org.springframework.security.core.Authentication;
  * @author johnniang
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class TwoFactorAuthenticationMixin {
 
     @JsonCreator
-    TwoFactorAuthenticationMixin(
-        @JsonProperty("previous") Authentication previous
-    ) {
-    }
+    TwoFactorAuthenticationMixin(@JsonProperty("previous") Authentication previous) {}
 }

@@ -32,5 +32,4 @@ public enum DefaultTemplateEnum {
     public String getValue() {
         return value;
     }
-
 }

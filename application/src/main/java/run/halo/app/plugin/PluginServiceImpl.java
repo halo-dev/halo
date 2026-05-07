@@ -90,10 +90,11 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     private Clock clock = Clock.systemUTC();
 
-    public PluginServiceImpl(ReactiveExtensionClient client,
-        SystemVersionSupplier systemVersion,
-        PluginsRootGetter pluginsRootGetter,
-        SpringPluginManager pluginManager) {
+    public PluginServiceImpl(
+            ReactiveExtensionClient client,
+            SystemVersionSupplier systemVersion,
+            PluginsRootGetter pluginsRootGetter,
+            SpringPluginManager pluginManager) {
         this.client = client;
         this.systemVersion = systemVersion;
         this.pluginsRootGetter = pluginsRootGetter;
@@ -116,66 +117,57 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     @Override
     public Mono<Void> installPresetPlugins() {
         return getPresetJars()
-            .flatMap(path -> this.install(path)
-                .onErrorResume(PluginAlreadyExistsException.class, e -> Mono.empty())
-                .flatMap(plugin -> FileUtils.deleteFileSilently(path)
-                    .thenReturn(plugin)
-                )
-            )
-            .flatMap(this::enablePlugin)
-            .subscribeOn(Schedulers.boundedElastic())
-            .then();
+                .flatMap(path -> this.install(path)
+                        .onErrorResume(PluginAlreadyExistsException.class, e -> Mono.empty())
+                        .flatMap(plugin -> FileUtils.deleteFileSilently(path).thenReturn(plugin)))
+                .flatMap(this::enablePlugin)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     private Mono<Plugin> enablePlugin(Plugin plugin) {
         plugin.getSpec().setEnabled(true);
         return client.update(plugin)
-            .onErrorResume(OptimisticLockingFailureException.class,
-                e -> enablePlugin(plugin.getMetadata().getName())
-            );
+                .onErrorResume(
+                        OptimisticLockingFailureException.class,
+                        e -> enablePlugin(plugin.getMetadata().getName()));
     }
 
     private Mono<Plugin> enablePlugin(String name) {
-        return Mono.defer(() -> client.get(Plugin.class, name)
-                .flatMap(plugin -> {
+        return Mono.defer(() -> client.get(Plugin.class, name).flatMap(plugin -> {
                     plugin.getSpec().setEnabled(true);
                     return client.update(plugin);
-                })
-            )
-            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
+                }))
+                .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     @Override
     public Mono<Plugin> install(Path path) {
         return findPluginManifest(path)
-            .doOnNext(plugin -> {
-                // validate the plugin version
-                satisfiesRequiresVersion(plugin);
-                checkDependencies(plugin);
-            })
-            .flatMap(pluginInPath ->
-                client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
-                    .flatMap(oldPlugin -> Mono.<Plugin>error(
-                        new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
-                    .switchIfEmpty(Mono.defer(
-                        () -> copyToPluginHome(pluginInPath)
-                            .flatMap(this::findPluginManifest)
-                            .doOnNext(p -> {
-                                // Disable auto enable after installation
-                                p.getSpec().setEnabled(false);
-                            })
-                            .flatMap(client::create))
-                    ));
+                .doOnNext(plugin -> {
+                    // validate the plugin version
+                    satisfiesRequiresVersion(plugin);
+                    checkDependencies(plugin);
+                })
+                .flatMap(pluginInPath -> client.fetch(
+                                Plugin.class, pluginInPath.getMetadata().getName())
+                        .flatMap(oldPlugin -> Mono.<Plugin>error(new PluginAlreadyExistsException(
+                                oldPlugin.getMetadata().getName())))
+                        .switchIfEmpty(Mono.defer(() -> copyToPluginHome(pluginInPath)
+                                .flatMap(this::findPluginManifest)
+                                .doOnNext(p -> {
+                                    // Disable auto enable after installation
+                                    p.getSpec().setEnabled(false);
+                                })
+                                .flatMap(client::create))));
     }
 
     private void checkDependencies(Plugin plugin) {
         var resolvedPlugins = new ArrayList<>(pluginManager.getResolvedPlugins());
         var pluginDescriptors = new ArrayList<PluginDescriptor>(resolvedPlugins.size() + 1);
 
-        resolvedPlugins.stream()
-            .map(PluginWrapper::getDescriptor)
-            .forEach(pluginDescriptors::add);
+        resolvedPlugins.stream().map(PluginWrapper::getDescriptor).forEach(pluginDescriptors::add);
 
         var pluginDescriptor = YamlPluginDescriptorFinder.convert(plugin);
         pluginDescriptors.add(pluginDescriptor);
@@ -199,119 +191,106 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     @Override
     public Mono<Plugin> upgrade(String name, Path path) {
         return findPluginManifest(path)
-            .doOnNext(plugin -> {
-                satisfiesRequiresVersion(plugin);
-                checkDependencies(plugin);
-            })
-            .flatMap(pluginInPath -> {
-                // pre-check the plugin in the path
-                Assert.notNull(pluginInPath.statusNonNull().getLoadLocation(),
-                    "plugin.status.load-location must not be null");
-                if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
-                    return Mono.error(new ServerWebInputException(
-                        "The provided plugin " + pluginInPath.getMetadata().getName()
-                            + " didn't match the given plugin " + name));
-                }
+                .doOnNext(plugin -> {
+                    satisfiesRequiresVersion(plugin);
+                    checkDependencies(plugin);
+                })
+                .flatMap(pluginInPath -> {
+                    // pre-check the plugin in the path
+                    Assert.notNull(
+                            pluginInPath.statusNonNull().getLoadLocation(),
+                            "plugin.status.load-location must not be null");
+                    if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
+                        return Mono.error(new ServerWebInputException("The provided plugin "
+                                + pluginInPath.getMetadata().getName() + " didn't match the given plugin " + name));
+                    }
 
-                // check if the plugin exists
-                return client.fetch(Plugin.class, name)
-                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                        "The given plugin with name " + name + " was not found.")))
-                    // copy plugin into plugin home
-                    .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).thenReturn(oldPlugin))
-                    .doOnNext(oldPlugin -> updatePlugin(oldPlugin, pluginInPath))
-                    .flatMap(client::update);
-            });
+                    // check if the plugin exists
+                    return client.fetch(Plugin.class, name)
+                            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                                    "The given plugin with name " + name + " was not found.")))
+                            // copy plugin into plugin home
+                            .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).thenReturn(oldPlugin))
+                            .doOnNext(oldPlugin -> updatePlugin(oldPlugin, pluginInPath))
+                            .flatMap(client::update);
+                });
     }
 
     @Override
     public Mono<Plugin> reload(String name) {
         return client.get(Plugin.class, name)
-            .flatMap(oldPlugin -> {
-                if (oldPlugin.getStatus() == null
-                    || oldPlugin.getStatus().getLoadLocation() == null) {
-                    return Mono.error(new IllegalStateException(
-                        "Load location of plugin has not been populated."));
-                }
-                var loadLocation = oldPlugin.getStatus().getLoadLocation();
-                var loadPath = Path.of(loadLocation);
-                return findPluginManifest(loadPath)
-                    .doOnNext(newPlugin -> updatePlugin(oldPlugin, newPlugin))
-                    .thenReturn(oldPlugin);
-            })
-            .flatMap(client::update);
+                .flatMap(oldPlugin -> {
+                    if (oldPlugin.getStatus() == null || oldPlugin.getStatus().getLoadLocation() == null) {
+                        return Mono.error(new IllegalStateException("Load location of plugin has not been populated."));
+                    }
+                    var loadLocation = oldPlugin.getStatus().getLoadLocation();
+                    var loadPath = Path.of(loadLocation);
+                    return findPluginManifest(loadPath)
+                            .doOnNext(newPlugin -> updatePlugin(oldPlugin, newPlugin))
+                            .thenReturn(oldPlugin);
+                })
+                .flatMap(client::update);
     }
 
     @Override
     public Flux<DataBuffer> uglifyJsBundle() {
         var startedPlugins = pluginManager.startedPlugins();
         var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-        var end = Mono.fromSupplier(
-            () -> {
-                var sb = new StringBuilder("this.enabledPlugins = [");
-                var iterator = startedPlugins.iterator();
-                while (iterator.hasNext()) {
-                    var plugin = iterator.next();
-                    sb.append("""
+        var end = Mono.fromSupplier(() -> {
+            var sb = new StringBuilder("this.enabledPlugins = [");
+            var iterator = startedPlugins.iterator();
+            while (iterator.hasNext()) {
+                var plugin = iterator.next();
+                sb.append("""
                         {"name":"%s","version":"%s"}\
-                        """
-                        .formatted(
-                            plugin.getPluginId(),
-                            plugin.getDescriptor().getVersion()
-                        )
-                    );
-                    if (iterator.hasNext()) {
-                        sb.append(',');
-                    }
+                        """.formatted(
+                                plugin.getPluginId(), plugin.getDescriptor().getVersion()));
+                if (iterator.hasNext()) {
+                    sb.append(',');
                 }
-                sb.append(']');
-                return dataBufferFactory.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
-            });
+            }
+            sb.append(']');
+            return dataBufferFactory.wrap(sb.toString().getBytes(StandardCharsets.UTF_8));
+        });
         var body = Flux.fromIterable(startedPlugins)
-            .sort(Comparator.comparing(PluginWrapper::getPluginId))
-            .flatMapSequential(pluginWrapper -> {
-                var pluginId = pluginWrapper.getPluginId();
-                return getBundleResource(pluginId, BundleResourceUtils.JS_BUNDLE)
-                    .flatMapMany(resource -> {
-                        var head = Mono.<DataBuffer>fromSupplier(
-                            () -> dataBufferFactory.wrap(
-                                ("// Generated from plugin " + pluginId + "\n").getBytes()
-                            ));
-                        var content = DataBufferUtils.read(
-                            resource, dataBufferFactory, StreamUtils.BUFFER_SIZE
-                        );
-                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
-                        return Flux.concat(head, content, tail);
-                    });
-            });
+                .sort(Comparator.comparing(PluginWrapper::getPluginId))
+                .flatMapSequential(pluginWrapper -> {
+                    var pluginId = pluginWrapper.getPluginId();
+                    return getBundleResource(pluginId, BundleResourceUtils.JS_BUNDLE)
+                            .flatMapMany(resource -> {
+                                var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                                        ("// Generated from plugin " + pluginId + "\n").getBytes()));
+                                var content =
+                                        DataBufferUtils.read(resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
+                                var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                                return Flux.concat(head, content, tail);
+                            });
+                });
         return Flux.concat(body, end);
     }
 
     @Override
     public Flux<DataBuffer> uglifyCssBundle() {
         return Flux.fromIterable(pluginManager.startedPlugins())
-            .sort(Comparator.comparing(PluginWrapper::getPluginId))
-            .flatMapSequential(pluginWrapper -> {
-                var pluginId = pluginWrapper.getPluginId();
-                var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
-                return getBundleResource(pluginId, BundleResourceUtils.CSS_BUNDLE)
-                    .flatMapMany(resource -> {
-                        var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
-                            ("/* Generated from plugin " + pluginId + " */\n").getBytes()
-                        ));
-                        var content = DataBufferUtils.read(
-                            resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
-                        var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
-                        return Flux.concat(head, content, tail);
-                    });
-            });
+                .sort(Comparator.comparing(PluginWrapper::getPluginId))
+                .flatMapSequential(pluginWrapper -> {
+                    var pluginId = pluginWrapper.getPluginId();
+                    var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
+                    return getBundleResource(pluginId, BundleResourceUtils.CSS_BUNDLE)
+                            .flatMapMany(resource -> {
+                                var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                                        ("/* Generated from plugin " + pluginId + " */\n").getBytes()));
+                                var content =
+                                        DataBufferUtils.read(resource, dataBufferFactory, StreamUtils.BUFFER_SIZE);
+                                var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes()));
+                                return Flux.concat(head, content, tail);
+                            });
+                });
     }
 
     private Mono<Resource> getBundleResource(String pluginName, String bundleName) {
-        return Mono.fromSupplier(
-                () -> BundleResourceUtils.getJsBundleResource(pluginManager, pluginName, bundleName)
-            )
-            .filter(Resource::isReadable);
+        return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(pluginManager, pluginName, bundleName))
+                .filter(Resource::isReadable);
     }
 
     @Override
@@ -320,11 +299,11 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             return Mono.just(String.valueOf(clock.instant().toEpochMilli()));
         }
         return Flux.fromIterable(pluginManager.startedPlugins())
-            .sort(Comparator.comparing(PluginWrapper::getPluginId))
-            .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
-            .collect(Collectors.joining())
-            .map(Hashing.sha256()::hashUnencodedChars)
-            .map(HashCode::toString);
+                .sort(Comparator.comparing(PluginWrapper::getPluginId))
+                .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
+                .collect(Collectors.joining())
+                .map(Hashing.sha256()::hashUnencodedChars)
+                .map(HashCode::toString);
     }
 
     @Override
@@ -340,117 +319,101 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     @Override
     public Mono<Plugin> changeState(String pluginName, boolean requestToEnable, boolean wait) {
         var updatedPlugin = Mono.defer(() -> client.get(Plugin.class, pluginName))
-            .flatMap(plugin -> {
-                if (!Objects.equals(requestToEnable, plugin.getSpec().getEnabled())) {
-                    // preflight check
-                    if (requestToEnable) {
-                        // make sure the dependencies are enabled
-                        var notStartedDependencies = getRequiredDependencies(plugin,
-                            pw -> pw == null || !Objects.equals(STARTED, pw.getPluginState())
-                        );
-                        if (!CollectionUtils.isEmpty(notStartedDependencies)) {
-                            return Mono.error(
-                                new PluginDependenciesNotEnabledException(notStartedDependencies)
-                            );
+                .flatMap(plugin -> {
+                    if (!Objects.equals(requestToEnable, plugin.getSpec().getEnabled())) {
+                        // preflight check
+                        if (requestToEnable) {
+                            // make sure the dependencies are enabled
+                            var notStartedDependencies = getRequiredDependencies(
+                                    plugin, pw -> pw == null || !Objects.equals(STARTED, pw.getPluginState()));
+                            if (!CollectionUtils.isEmpty(notStartedDependencies)) {
+                                return Mono.error(new PluginDependenciesNotEnabledException(notStartedDependencies));
+                            }
+                        } else {
+                            // make sure the dependents are disabled
+                            var dependents = pluginManager.getDependents(pluginName);
+                            var notDisabledDependents = dependents.stream()
+                                    .filter(dependent -> Objects.equals(STARTED, dependent.getPluginState()))
+                                    .map(PluginWrapper::getPluginId)
+                                    .toList();
+                            if (!CollectionUtils.isEmpty(notDisabledDependents)) {
+                                return Mono.error(new PluginDependentsNotDisabledException(notDisabledDependents));
+                            }
                         }
-                    } else {
-                        // make sure the dependents are disabled
-                        var dependents = pluginManager.getDependents(pluginName);
-                        var notDisabledDependents = dependents.stream()
-                            .filter(
-                                dependent -> Objects.equals(STARTED, dependent.getPluginState())
-                            )
-                            .map(PluginWrapper::getPluginId)
-                            .toList();
-                        if (!CollectionUtils.isEmpty(notDisabledDependents)) {
-                            return Mono.error(
-                                new PluginDependentsNotDisabledException(notDisabledDependents)
-                            );
-                        }
-                    }
 
-                    plugin.getSpec().setEnabled(requestToEnable);
-                    log.debug("Updating plugin {} state to {}", pluginName, requestToEnable);
-                    return client.update(plugin);
-                }
-                log.debug("Checking plugin {} state, no need to update", pluginName);
-                return Mono.just(plugin);
-            });
+                        plugin.getSpec().setEnabled(requestToEnable);
+                        log.debug("Updating plugin {} state to {}", pluginName, requestToEnable);
+                        return client.update(plugin);
+                    }
+                    log.debug("Checking plugin {} state, no need to update", pluginName);
+                    return Mono.just(plugin);
+                });
 
         if (wait) {
             // if we want to wait the state of plugin to be updated
             updatedPlugin = updatedPlugin
-                .flatMap(plugin -> {
-                    var phase = plugin.statusNonNull().getPhase();
-                    if (requestToEnable) {
-                        // if we request to enable the plugin
-                        if (!(Plugin.Phase.STARTED.equals(phase)
-                            || Plugin.Phase.FAILED.equals(phase))) {
-                            return Mono.error(UnexpectedPluginStateException::new);
+                    .flatMap(plugin -> {
+                        var phase = plugin.statusNonNull().getPhase();
+                        if (requestToEnable) {
+                            // if we request to enable the plugin
+                            if (!(Plugin.Phase.STARTED.equals(phase) || Plugin.Phase.FAILED.equals(phase))) {
+                                return Mono.error(UnexpectedPluginStateException::new);
+                            }
+                        } else {
+                            // if we request to disable the plugin
+                            if (Plugin.Phase.STARTED.equals(phase)) {
+                                return Mono.error(UnexpectedPluginStateException::new);
+                            }
                         }
-                    } else {
-                        // if we request to disable the plugin
-                        if (Plugin.Phase.STARTED.equals(phase)) {
-                            return Mono.error(UnexpectedPluginStateException::new);
-                        }
-                    }
-                    return Mono.just(plugin);
-                })
-                .retryWhen(
-                    Retry.backoff(10, Duration.ofMillis(100))
-                        .filter(UnexpectedPluginStateException.class::isInstance)
-                        .doBeforeRetry(signal ->
-                            log.debug("Waiting for plugin {} to meet expected state", pluginName)
-                        )
-                )
-                .doOnSuccess(plugin -> {
-                    log.info("Plugin {} met expected state {}",
-                        pluginName, plugin.statusNonNull().getPhase());
-                });
+                        return Mono.just(plugin);
+                    })
+                    .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
+                            .filter(UnexpectedPluginStateException.class::isInstance)
+                            .doBeforeRetry(
+                                    signal -> log.debug("Waiting for plugin {} to meet expected state", pluginName)))
+                    .doOnSuccess(plugin -> {
+                        log.info(
+                                "Plugin {} met expected state {}",
+                                pluginName,
+                                plugin.statusNonNull().getPhase());
+                    });
         }
 
         return updatedPlugin;
     }
 
     @Override
-    public List<String> getRequiredDependencies(Plugin plugin,
-        Predicate<PluginWrapper> predicate) {
-        return getPluginDependency(plugin)
-            .stream()
-            .filter(dependency -> !dependency.isOptional())
-            .map(PluginDependency::getPluginId)
-            .filter(dependencyPlugin -> {
-                var pluginWrapper = pluginManager.getPlugin(dependencyPlugin);
-                return predicate.test(pluginWrapper);
-            })
-            .sorted()
-            .toList();
+    public List<String> getRequiredDependencies(Plugin plugin, Predicate<PluginWrapper> predicate) {
+        return getPluginDependency(plugin).stream()
+                .filter(dependency -> !dependency.isOptional())
+                .map(PluginDependency::getPluginId)
+                .filter(dependencyPlugin -> {
+                    var pluginWrapper = pluginManager.getPlugin(dependencyPlugin);
+                    return predicate.test(pluginWrapper);
+                })
+                .sorted()
+                .toList();
     }
 
     @Override
     public Flux<String> getStartedPluginNames() {
-        return Flux.fromIterable(pluginManager.startedPlugins())
-            .map(PluginWrapper::getPluginId);
+        return Flux.fromIterable(pluginManager.startedPlugins()).map(PluginWrapper::getPluginId);
     }
 
     private static List<PluginDependency> getPluginDependency(Plugin plugin) {
-        return plugin.getSpec().getPluginDependencies().keySet()
-            .stream()
-            .map(PluginDependency::new)
-            .toList();
+        return plugin.getSpec().getPluginDependencies().keySet().stream()
+                .map(PluginDependency::new)
+                .toList();
     }
 
     Mono<Plugin> findPluginManifest(Path path) {
-        return Mono.fromSupplier(
-                () -> {
+        return Mono.fromSupplier(() -> {
                     final var pluginFinder = new YamlPluginFinder();
                     return pluginFinder.find(path);
                 })
-            .onErrorMap(e -> new PluginInstallationException("Failed to parse the plugin manifest",
-                "problemDetail.plugin.missingManifest", null)
-            );
+                .onErrorMap(e -> new PluginInstallationException(
+                        "Failed to parse the plugin manifest", "problemDetail.plugin.missingManifest", null));
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -478,8 +441,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
      * @return new path in plugin home.
      */
     private Mono<Path> copyToPluginHome(Plugin plugin) {
-        return Mono.fromCallable(
-                () -> {
+        return Mono.fromCallable(() -> {
                     var fileName = PluginUtils.generateFileName(plugin);
                     var pluginRoot = pluginsRootGetter.get();
                     try {
@@ -495,17 +457,17 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                     FileUtils.copy(path, pluginFilePath, REPLACE_EXISTING);
                     return pluginFilePath;
                 })
-            .subscribeOn(Schedulers.boundedElastic())
-            .doOnNext(loadLocation -> {
-                // reset load location and annotation PLUGIN_PATH
-                plugin.getStatus().setLoadLocation(loadLocation.toUri());
-                var annotations = plugin.getMetadata().getAnnotations();
-                if (annotations == null) {
-                    annotations = new HashMap<>();
-                    plugin.getMetadata().setAnnotations(annotations);
-                }
-                annotations.put(PluginConst.PLUGIN_PATH, loadLocation.toString());
-            });
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnNext(loadLocation -> {
+                    // reset load location and annotation PLUGIN_PATH
+                    plugin.getStatus().setLoadLocation(loadLocation.toUri());
+                    var annotations = plugin.getMetadata().getAnnotations();
+                    if (annotations == null) {
+                        annotations = new HashMap<>();
+                        plugin.getMetadata().setAnnotations(annotations);
+                    }
+                    annotations.put(PluginConst.PLUGIN_PATH, loadLocation.toString());
+                });
     }
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
@@ -516,12 +478,12 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         String systemVersion = version.toStableVersion().toString();
         String requires = newPlugin.getSpec().getRequires();
         if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-            throw new UnsatisfiedAttributeValueException(String.format(
-                "Plugin requires a minimum system version of [%s], but the current version is "
-                    + "[%s].",
-                requires, systemVersion),
-                "problemDetail.plugin.version.unsatisfied.requires",
-                new String[] {requires, systemVersion});
+            throw new UnsatisfiedAttributeValueException(
+                    String.format(
+                            "Plugin requires a minimum system version of [%s], but the current version is " + "[%s].",
+                            requires, systemVersion),
+                    "problemDetail.plugin.version.unsatisfied.requires",
+                    new String[] {requires, systemVersion});
         }
     }
 
@@ -529,16 +491,15 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         var resolver = new PathMatchingResourcePatternResolver();
         try {
             var resources = resolver.getResources(PRESETS_LOCATION_PATTERN);
-            return Flux.fromArray(resources)
-                .mapNotNull(resource -> {
-                    var filename = resource.getFilename();
-                    if (StringUtils.isBlank(filename)) {
-                        return null;
-                    }
-                    var path = tempDir.resolve(filename);
-                    FileUtils.copyResource(resource, path);
-                    return path;
-                });
+            return Flux.fromArray(resources).mapNotNull(resource -> {
+                var filename = resource.getFilename();
+                if (StringUtils.isBlank(filename)) {
+                    return null;
+                }
+                var path = tempDir.resolve(filename);
+                FileUtils.copyResource(resource, path);
+                return path;
+            });
         } catch (IOException e) {
             log.debug("Failed to load preset plugins: {}", e.getMessage());
             return Flux.empty();
@@ -570,8 +531,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         }
 
         // request to reload
-        annotations.put(RELOAD_ANNO,
-            newPlugin.getStatus().getLoadLocation().toString());
+        annotations.put(RELOAD_ANNO, newPlugin.getStatus().getLoadLocation().toString());
 
         // apply spec and keep enabled request
         var enabled = oldPlugin.getSpec().getEnabled();
@@ -596,53 +556,50 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
             if (isResourceMatch(resource, filename)) {
                 return Mono.just(resource);
             }
-            return generateBundleVersion()
-                .flatMap(newVersion -> {
-                    var newFilename = buildBundleFilename(newVersion, suffix);
-                    if (isResourceMatch(this.resource, newFilename)) {
-                        // if the resource was not changed, just return it
-                        return Mono.just(resource);
-                    }
-                    if (writing.compareAndSet(false, true)) {
-                        return Mono.justOrEmpty(this.resource)
+            return generateBundleVersion().flatMap(newVersion -> {
+                var newFilename = buildBundleFilename(newVersion, suffix);
+                if (isResourceMatch(this.resource, newFilename)) {
+                    // if the resource was not changed, just return it
+                    return Mono.just(resource);
+                }
+                if (writing.compareAndSet(false, true)) {
+                    return Mono.justOrEmpty(this.resource)
                             // double check of the resource
                             .filter(res -> isResourceMatch(res, newFilename))
                             .switchIfEmpty(Mono.using(
-                                    () -> {
-                                        if (!Files.exists(tempDir)) {
-                                            Files.createDirectories(tempDir);
-                                        }
-                                        return tempDir.resolve(newFilename);
-                                    },
-                                    path -> DataBufferUtils.write(content, path,
-                                            CREATE, TRUNCATE_EXISTING)
-                                        .then(Mono.<Resource>fromSupplier(
-                                            () -> new FileSystemResource(path)
-                                        )),
-                                    path -> {
-                                        if (shouldCleanUp(path)) {
-                                            // clean up old resource
-                                            cleanUp(this.resource);
-                                        }
-                                    })
-                                .subscribeOn(scheduler)
-                                .doOnNext(newResource -> this.resource = newResource)
-                            )
+                                            () -> {
+                                                if (!Files.exists(tempDir)) {
+                                                    Files.createDirectories(tempDir);
+                                                }
+                                                return tempDir.resolve(newFilename);
+                                            },
+                                            path -> DataBufferUtils.write(content, path, CREATE, TRUNCATE_EXISTING)
+                                                    .then(Mono.<Resource>fromSupplier(
+                                                            () -> new FileSystemResource(path))),
+                                            path -> {
+                                                if (shouldCleanUp(path)) {
+                                                    // clean up old resource
+                                                    cleanUp(this.resource);
+                                                }
+                                            })
+                                    .subscribeOn(scheduler)
+                                    .doOnNext(newResource -> this.resource = newResource))
                             .doFinally(signalType -> writing.set(false));
-                    } else {
-                        return Mono.defer(() -> {
-                            if (this.writing.get()) {
-                                log.debug("Waiting for the bundle file {} to be written", filename);
-                                return Mono.empty();
-                            }
-                            log.debug("Waited the bundle file {} to be written", filename);
-                            return Mono.just(this.resource);
-                        }).repeatWhenEmpty(100, count -> {
-                            // retry after 100ms
-                            return count.delayElements(Duration.ofMillis(100));
-                        });
-                    }
-                });
+                } else {
+                    return Mono.defer(() -> {
+                                if (this.writing.get()) {
+                                    log.debug("Waiting for the bundle file {} to be written", filename);
+                                    return Mono.empty();
+                                }
+                                log.debug("Waited the bundle file {} to be written", filename);
+                                return Mono.just(this.resource);
+                            })
+                            .repeatWhenEmpty(100, count -> {
+                                // retry after 100ms
+                                return count.delayElements(Duration.ofMillis(100));
+                            });
+                }
+            });
         }
 
         private boolean shouldCleanUp(Path newPath) {
@@ -658,23 +615,20 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         }
 
         private static void cleanUp(Resource resource) {
-            if (resource instanceof WritableResource wr
-                && wr.isWritable()
-                && wr.isFile()) {
+            if (resource instanceof WritableResource wr && wr.isWritable() && wr.isFile()) {
                 try {
                     Files.deleteIfExists(wr.getFile().toPath());
                 } catch (IOException e) {
-                    log.warn("Failed to delete old bundle file {}",
-                        wr.getFilename(), e);
+                    log.warn("Failed to delete old bundle file {}", wr.getFilename(), e);
                 }
             }
         }
 
         private static boolean isResourceMatch(Resource resource, String filename) {
             return resource != null
-                && resource.exists()
-                && resource.isFile()
-                && Objects.equals(filename, resource.getFilename());
+                    && resource.exists()
+                    && resource.isFile()
+                    && Objects.equals(filename, resource.getFilename());
         }
     }
 
@@ -684,7 +638,5 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         return v + suffix;
     }
 
-    private static class UnexpectedPluginStateException extends RuntimeException {
-    }
-
+    private static class UnexpectedPluginStateException extends RuntimeException {}
 }

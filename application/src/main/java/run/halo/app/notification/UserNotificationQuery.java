@@ -23,13 +23,10 @@ public class UserNotificationQuery extends SortableRequest {
         this.username = username;
     }
 
-    /**
-     * Build a list options from the query object.
-     */
+    /** Build a list options from the query object. */
     @Override
     public ListOptions toListOptions() {
-        var listOptions =
-            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+        var listOptions = labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
         var builder = ListOptions.builder(listOptions);
         if (StringUtils.isNotBlank(username)) {
             builder.andQuery(equal("spec.recipient", username));

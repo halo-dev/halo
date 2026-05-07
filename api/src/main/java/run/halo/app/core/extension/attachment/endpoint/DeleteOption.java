@@ -5,5 +5,4 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 
 public record DeleteOption(Attachment attachment, Policy policy, ConfigMap configMap)
-    implements AttachmentHandler.DeleteContext {
-}
+        implements AttachmentHandler.DeleteContext {}

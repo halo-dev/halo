@@ -16,7 +16,7 @@ import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.model.License;
 
 /**
- * <p>Theme extension.</p>
+ * Theme extension.
  *
  * @author guqing
  * @since 2.0.0
@@ -24,8 +24,7 @@ import run.halo.app.infra.model.License;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "theme.halo.run", version = "v1alpha1", kind = Theme.KIND,
-    plural = "themes", singular = "theme")
+@GVK(group = "theme.halo.run", version = "v1alpha1", kind = Theme.KIND, plural = "themes", singular = "theme")
 public class Theme extends AbstractExtension {
 
     public static final String KIND = "Theme";
@@ -73,7 +72,6 @@ public class Theme extends AbstractExtension {
 
         @Schema
         private CustomTemplates customTemplates;
-
     }
 
     @Data
@@ -141,5 +139,4 @@ public class Theme extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String file;
     }
-
 }

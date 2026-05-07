@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
 
 /**
- * This class will be extended by all plugins and serve as the common class between a plugin and
- * the application.
+ * This class will be extended by all plugins and serve as the common class between a plugin and the application.
  *
  * @author guqing
  * @since 2.0.0
@@ -26,6 +25,5 @@ public class BasePlugin extends Plugin {
         this.context = pluginContext;
     }
 
-    public BasePlugin() {
-    }
+    public BasePlugin() {}
 }

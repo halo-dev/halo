@@ -38,30 +38,29 @@ class BundleResourceUtilsTest {
         lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
         lenient().when(pluginManager.getPlugin(eq("fake-plugin"))).thenReturn(pluginWrapper);
 
-        lenient().when(pluginClassLoader.getResource(eq("console/main.js"))).thenReturn(
-            new URL("file://console/main.js"));
-        lenient().when(pluginClassLoader.getResource(eq("console/style.css"))).thenReturn(
-            new URL("file://console/style.css"));
+        lenient()
+                .when(pluginClassLoader.getResource(eq("console/main.js")))
+                .thenReturn(new URL("file://console/main.js"));
+        lenient()
+                .when(pluginClassLoader.getResource(eq("console/style.css")))
+                .thenReturn(new URL("file://console/style.css"));
     }
 
     @Test
     void getJsBundleResource() {
-        Resource jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
         assertThat(jsBundleResource).isNotNull();
         assertThat(jsBundleResource.exists()).isTrue();
 
-        jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "test.js");
+        jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "test.js");
         assertThat(jsBundleResource).isNull();
 
-        jsBundleResource =
-            BundleResourceUtils.getJsBundleResource(pluginManager, "nothing-plugin", "main.js");
+        jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "nothing-plugin", "main.js");
         assertThat(jsBundleResource).isNull();
 
         assertThatThrownBy(() -> {
-            BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin",
-                "../test/main.js");
-        }).isInstanceOf(AccessDeniedException.class);
+                    BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "../test/main.js");
+                })
+                .isInstanceOf(AccessDeniedException.class);
     }
 }

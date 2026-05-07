@@ -8,29 +8,27 @@ import org.springframework.util.Assert;
 public class WatcherExtensionMatchers {
     @Getter
     private final ExtensionClient client;
+
     private final GroupVersionKind gvk;
     private final ExtensionMatcher onAddMatcher;
     private final ExtensionMatcher onUpdateMatcher;
     private final ExtensionMatcher onDeleteMatcher;
 
-    /**
-     * Constructs a new {@link WatcherExtensionMatchers} with the given
-     * {@link DefaultExtensionMatcher}.
-     */
+    /** Constructs a new {@link WatcherExtensionMatchers} with the given {@link DefaultExtensionMatcher}. */
     @Builder(builderMethodName = "internalBuilder")
-    public WatcherExtensionMatchers(ExtensionClient client,
-        GroupVersionKind gvk, ExtensionMatcher onAddMatcher,
-        ExtensionMatcher onUpdateMatcher, ExtensionMatcher onDeleteMatcher) {
+    public WatcherExtensionMatchers(
+            ExtensionClient client,
+            GroupVersionKind gvk,
+            ExtensionMatcher onAddMatcher,
+            ExtensionMatcher onUpdateMatcher,
+            ExtensionMatcher onDeleteMatcher) {
         Assert.notNull(client, "The client must not be null.");
         Assert.notNull(gvk, "The gvk must not be null.");
         this.client = client;
         this.gvk = gvk;
-        this.onAddMatcher =
-            Objects.requireNonNullElseGet(onAddMatcher, () -> emptyMatcher(client, gvk));
-        this.onUpdateMatcher =
-            Objects.requireNonNullElseGet(onUpdateMatcher, () -> emptyMatcher(client, gvk));
-        this.onDeleteMatcher =
-            Objects.requireNonNullElseGet(onDeleteMatcher, () -> emptyMatcher(client, gvk));
+        this.onAddMatcher = Objects.requireNonNullElseGet(onAddMatcher, () -> emptyMatcher(client, gvk));
+        this.onUpdateMatcher = Objects.requireNonNullElseGet(onUpdateMatcher, () -> emptyMatcher(client, gvk));
+        this.onDeleteMatcher = Objects.requireNonNullElseGet(onDeleteMatcher, () -> emptyMatcher(client, gvk));
     }
 
     public GroupVersionKind getGroupVersionKind() {
@@ -49,13 +47,11 @@ public class WatcherExtensionMatchers {
         return delegateExtensionMatcher(this.onDeleteMatcher);
     }
 
-    public static WatcherExtensionMatchersBuilder builder(ExtensionClient client,
-        GroupVersionKind gvk) {
+    public static WatcherExtensionMatchersBuilder builder(ExtensionClient client, GroupVersionKind gvk) {
         return internalBuilder().gvk(gvk).client(client);
     }
 
-    static ExtensionMatcher emptyMatcher(ExtensionClient client,
-        GroupVersionKind gvk) {
+    static ExtensionMatcher emptyMatcher(ExtensionClient client, GroupVersionKind gvk) {
         return DefaultExtensionMatcher.builder(client, gvk).build();
     }
 

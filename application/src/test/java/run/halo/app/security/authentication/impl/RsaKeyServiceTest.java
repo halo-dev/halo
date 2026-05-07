@@ -2,9 +2,7 @@ package run.halo.app.security.authentication.impl;
 
 import static com.nimbusds.jose.jwk.KeyOperation.SIGN;
 import static com.nimbusds.jose.jwk.KeyOperation.VERIFY;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -50,8 +48,7 @@ class RsaKeyServiceTest {
     }
 
     @Test
-    void shouldGenerateKeyPair()
-        throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    void shouldGenerateKeyPair() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] privKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa"));
         byte[] pubKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub"));
 
@@ -69,8 +66,8 @@ class RsaKeyServiceTest {
         var realPubKeyBytes = Files.readAllBytes(tempDir.resolve("pat_id_rsa.pub"));
 
         StepVerifier.create(service.readPublicKey())
-            .assertNext(bytes -> assertArrayEquals(realPubKeyBytes, bytes))
-            .verifyComplete();
+                .assertNext(bytes -> assertArrayEquals(realPubKeyBytes, bytes))
+                .verifyComplete();
     }
 
     @Test
@@ -78,32 +75,33 @@ class RsaKeyServiceTest {
         final String message = "halo";
 
         var mono = service.readPublicKey()
-            .map(pubKeyBytes -> {
-                var pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
-                try {
-                    var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
-                    var pubKey = keyFactory.generatePublic(pubKeySpec);
-                    var cipher = Cipher.getInstance(RsaKeyService.TRANSFORMATION);
-                    cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-                    return cipher.doFinal(message.getBytes());
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException
-                         | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException
-                         | BadPaddingException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .flatMap(service::decrypt)
-            .map(String::new);
+                .map(pubKeyBytes -> {
+                    var pubKeySpec = new X509EncodedKeySpec(pubKeyBytes);
+                    try {
+                        var keyFactory = KeyFactory.getInstance(RsaKeyService.ALGORITHM);
+                        var pubKey = keyFactory.generatePublic(pubKeySpec);
+                        var cipher = Cipher.getInstance(RsaKeyService.TRANSFORMATION);
+                        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+                        return cipher.doFinal(message.getBytes());
+                    } catch (NoSuchAlgorithmException
+                            | InvalidKeySpecException
+                            | NoSuchPaddingException
+                            | InvalidKeyException
+                            | IllegalBlockSizeException
+                            | BadPaddingException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                })
+                .flatMap(service::decrypt)
+                .map(String::new);
 
-        StepVerifier.create(mono)
-            .expectNext(message)
-            .verifyComplete();
+        StepVerifier.create(mono).expectNext(message).verifyComplete();
     }
 
     @Test
     void shouldFailToDecryptMessage() {
         StepVerifier.create(service.decrypt("invalid-bytes".getBytes()))
-            .verifyError(InvalidEncryptedMessageException.class);
+                .verifyError(InvalidEncryptedMessageException.class);
     }
 
     @Test

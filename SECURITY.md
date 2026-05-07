@@ -8,8 +8,8 @@ Halo currently supports the versions listed below, where as:
   Vulnerability Report.
 - :x: indicates such version has already deprecated and **will not** be receiving Security Vulnerability Report.
 
-| Version | Supported          |
-| ------- | ------------------ |
+| Version |     Supported      |
+|---------|--------------------|
 | 0.x     | :x:                |
 | 1.x     | :x:                |
 | 2.x     | :white_check_mark: |
@@ -40,3 +40,4 @@ Vulnerability has been observed in...
 - Vulnerability self-scoring [1-10]: 
 - Would you like to be attributed? (Whether you agree us to appreciate you by putting your name in the CHANGELOG of the next fix release) [n/y]: 
 ```
+

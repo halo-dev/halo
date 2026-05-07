@@ -27,11 +27,11 @@ public class VersionUtils {
     }
 
     /**
-     * Checks if a version satisfies the specified SemVer {@link Expression} string.
-     * If the constraint is empty or null then the method returns true.
-     * Constraint examples: {@code >2.0.0} (simple), {@code ">=1.4.0 & <1.6.0"} (range).
-     * See
-     * <a href="https://github.com/zafarkhaja/jsemver#semver-expressions-api-ranges">semver-expressions-api-ranges</a> for more info.
+     * Checks if a version satisfies the specified SemVer {@link Expression} string. If the constraint is empty or null
+     * then the method returns true. Constraint examples: {@code >2.0.0} (simple), {@code ">=1.4.0 & <1.6.0"} (range).
+     * See <a
+     * href="https://github.com/zafarkhaja/jsemver#semver-expressions-api-ranges">semver-expressions-api-ranges</a> for
+     * more info.
      *
      * @param version the version to check
      * @param constraint the SemVer Expression string
@@ -40,8 +40,8 @@ public class VersionUtils {
     public static boolean checkVersionConstraint(String version, String constraint) {
         try {
             return StringUtils.isBlank(constraint)
-                || "*".equals(constraint)
-                || Version.parse(version).satisfies(constraint);
+                    || "*".equals(constraint)
+                    || Version.parse(version).satisfies(constraint);
         } catch (Exception e) {
             throw new ServerWebInputException("Illegal requires version expression.", null, e);
         }

@@ -23,33 +23,27 @@ class ContentTemplateHeadProcessorTest {
         void toMetaWhenExcerptIsNull() {
             List<Map<String, String>> htmlMetas = new ArrayList<>();
             htmlMetas.add(createMetaMap("keywords", "test"));
-            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas,
-                null);
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas, null);
             assertThat(result).hasSize(2);
             assertThat(result.get(0)).containsEntry("name", "keywords");
-            assertThat(result.get(1)).containsEntry("name", "description")
-                .containsEntry("content", "");
+            assertThat(result.get(1)).containsEntry("name", "description").containsEntry("content", "");
         }
 
         @Test
         void toMetaWhenWhenHtmlMetaIsNull() {
-            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(null,
-                null);
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(null, null);
             assertThat(result).hasSize(1);
-            assertThat(result.get(0)).containsEntry("name", "description")
-                .containsEntry("content", "");
+            assertThat(result.get(0)).containsEntry("name", "description").containsEntry("content", "");
         }
 
         @Test
         void toMetaWhenWhenExcerptNotEmpty() {
             List<Map<String, String>> htmlMetas = new ArrayList<>();
             htmlMetas.add(createMetaMap("keywords", "test"));
-            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas,
-                "test excerpt");
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas, "test excerpt");
             assertThat(result).hasSize(2);
             assertThat(result.get(0)).containsEntry("name", "keywords");
-            assertThat(result.get(1)).containsEntry("name", "description")
-                .containsEntry("content", "test excerpt");
+            assertThat(result.get(1)).containsEntry("name", "description").containsEntry("content", "test excerpt");
         }
 
         @Test
@@ -57,12 +51,10 @@ class ContentTemplateHeadProcessorTest {
             List<Map<String, String>> htmlMetas = new ArrayList<>();
             htmlMetas.add(createMetaMap("keywords", "test"));
             htmlMetas.add(createMetaMap("description", ""));
-            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas,
-                "test excerpt");
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas, "test excerpt");
             assertThat(result).hasSize(2);
             assertThat(result.get(0)).containsEntry("name", "keywords");
-            assertThat(result.get(1)).containsEntry("name", "description")
-                .containsEntry("content", "test excerpt");
+            assertThat(result.get(1)).containsEntry("name", "description").containsEntry("content", "test excerpt");
         }
 
         @Test
@@ -70,12 +62,10 @@ class ContentTemplateHeadProcessorTest {
             List<Map<String, String>> htmlMetas = new ArrayList<>();
             htmlMetas.add(createMetaMap("keywords", "test"));
             htmlMetas.add(createMetaMap("description", "test description"));
-            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas,
-                "test excerpt");
+            var result = ContentTemplateHeadProcessor.excerptToMetaDescriptionIfAbsent(htmlMetas, "test excerpt");
             assertThat(result).hasSize(2);
             assertThat(result.get(0)).containsEntry("name", "keywords");
-            assertThat(result.get(1)).containsEntry("name", "description")
-                .containsEntry("content", "test description");
+            assertThat(result.get(1)).containsEntry("name", "description").containsEntry("content", "test description");
         }
 
         Map<String, String> createMetaMap(String nameValue, String contentValue) {

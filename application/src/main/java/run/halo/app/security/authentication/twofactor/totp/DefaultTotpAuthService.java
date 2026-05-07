@@ -2,18 +2,12 @@ package run.halo.app.security.authentication.twofactor.totp;
 
 import static com.j256.twofactorauth.TimeBasedOneTimePasswordUtil.generateBase32Secret;
 import static com.j256.twofactorauth.TimeBasedOneTimePasswordUtil.validateCurrentNumber;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -71,11 +65,13 @@ public class DefaultTotpAuthService implements TotpAuthService {
                     keyStore.store(os, password);
                 }
             }
-            return new AesBytesEncryptor(secretKey,
-                KeyGenerators.secureRandom(32),
-                AesBytesEncryptor.CipherAlgorithm.GCM);
-        } catch (IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException
-                 | UnrecoverableEntryException e) {
+            return new AesBytesEncryptor(
+                    secretKey, KeyGenerators.secureRandom(32), AesBytesEncryptor.CipherAlgorithm.GCM);
+        } catch (IOException
+                | KeyStoreException
+                | CertificateException
+                | NoSuchAlgorithmException
+                | UnrecoverableEntryException e) {
             throw new RuntimeException("Failed to initialize AesBytesEncryptor", e);
         }
     }

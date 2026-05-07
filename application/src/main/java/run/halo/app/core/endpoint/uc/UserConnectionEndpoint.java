@@ -29,8 +29,7 @@ public class UserConnectionEndpoint implements CustomEndpoint {
 
     private final UserConnectionService connectionService;
 
-    private final AuthenticationTrustResolver authenticationTrustResolver =
-        new AuthenticationTrustResolverImpl();
+    private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     public UserConnectionEndpoint(UserConnectionService connectionService) {
         this.connectionService = connectionService;
@@ -40,31 +39,28 @@ public class UserConnectionEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "UserConnectionV1alpha1Uc";
         return SpringdocRouteBuilder.route()
-            .PUT(
-                "/user-connections/{registerId}/disconnect",
-                request -> {
-                    var removedUserConnections = ReactiveSecurityContextHolder.getContext()
-                        .map(SecurityContext::getAuthentication)
-                        .filter(authenticationTrustResolver::isAuthenticated)
-                        .map(Authentication::getName)
-                        .flatMapMany(username -> connectionService.removeUserConnection(
-                            request.pathVariable("registerId"), username)
-                        );
-                    return ServerResponse.ok().body(removedUserConnections, UserConnection.class);
-                },
-                builder -> builder.operationId("DisconnectMyConnection")
-                    .description("Disconnect my connection from a third-party platform.")
-                    .tag(tag)
-                    .parameter(Builder.parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("registerId")
-                        .description("The registration ID of the third-party platform.")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder().implementationArray(UserConnection.class))
-            )
-            .build();
+                .PUT(
+                        "/user-connections/{registerId}/disconnect",
+                        request -> {
+                            var removedUserConnections = ReactiveSecurityContextHolder.getContext()
+                                    .map(SecurityContext::getAuthentication)
+                                    .filter(authenticationTrustResolver::isAuthenticated)
+                                    .map(Authentication::getName)
+                                    .flatMapMany(username -> connectionService.removeUserConnection(
+                                            request.pathVariable("registerId"), username));
+                            return ServerResponse.ok().body(removedUserConnections, UserConnection.class);
+                        },
+                        builder -> builder.operationId("DisconnectMyConnection")
+                                .description("Disconnect my connection from a third-party platform.")
+                                .tag(tag)
+                                .parameter(Builder.parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("registerId")
+                                        .description("The registration ID of the third-party platform.")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .response(responseBuilder().implementationArray(UserConnection.class)))
+                .build();
     }
 
     @Override

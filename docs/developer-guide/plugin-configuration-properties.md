@@ -15,64 +15,62 @@
 
 - `src/main/java/my/plugin/MyPluginProperties.java`
 
-    ```java
-    @Data
-    @ConfigurationProperties
-    public class MyPluginProperties {
-    
-        private String encryptKey;
-    
-        private String certPath;
-    }
-    ```
+  ```java
+  @Data
+  @ConfigurationProperties
+  public class MyPluginProperties {
 
+      private String encryptKey;
+
+      private String certPath;
+  }
+  ```
 - `src/main/java/my/plugin/MyPluginConfiguration.java`
 
-    ```java
-    @EnableConfigurationProperties(MyPluginProperties.class)
-    @Configuration
-    public class MyPluginConfiguration {
-        
-    }
-    ```
+  ```java
+  @EnableConfigurationProperties(MyPluginProperties.class)
+  @Configuration
+  public class MyPluginConfiguration {
 
+  }
+  ```
 - `src/main/java/my/plugin/MyPlugin.java`
 
-    ```java
-    @Component
-    @Slf4j
-    public class MyPlugin extends BasePlugin {
-    
-        private final MyPluginProperties storeProperties;
-    
-        public MyPlugin(PluginWrapper wrapper, MyPluginProperties storeProperties) {
-            super(wrapper);
-            this.storeProperties = storeProperties;
-        }
-    
-        @Override
-        public void start() {
-            log.info("My plugin properties: {}", storeProperties);
-        }
-    }
-    ```
+  ```java
+  @Component
+  @Slf4j
+  public class MyPlugin extends BasePlugin {
 
+      private final MyPluginProperties storeProperties;
+
+      public MyPlugin(PluginWrapper wrapper, MyPluginProperties storeProperties) {
+          super(wrapper);
+          this.storeProperties = storeProperties;
+      }
+
+      @Override
+      public void start() {
+          log.info("My plugin properties: {}", storeProperties);
+      }
+  }
+  ```
 - `src/main/resources/config.yaml`
 
-    ```yaml
-    encryptKey: encrytkey==
-    certPath: /path/to/cert
-    ```
+  ```yaml
+  encryptKey: encrytkey==
+  certPath: /path/to/cert
+  ```
 
 ## 插件使用者配置
 
 - `${halo.work-dir}/plugins/configs/${plugin-id}.{yaml|yml}`
 
-    ```yaml
-    encryptKey: override encrytkey==
-    certPath: /another/path/to/cert
-    ```
+  ```yaml
+  encryptKey: override encrytkey==
+  certPath: /another/path/to/cert
+  ```
 
 ## 可能存在的问题
 
 - 增加未来实现"集群"架构的难度。
+

@@ -13,5 +13,4 @@ public class ThemeInstallationException extends ResponseStatusException {
     public ThemeInstallationException(String reason, String detailCode, Object[] detailArgs) {
         super(HttpStatus.BAD_REQUEST, reason, null, detailCode, detailArgs);
     }
-
 }

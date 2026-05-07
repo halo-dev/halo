@@ -10,8 +10,9 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * <p>{@link ReasonType} is a custom extension that defines a type of reason.</p>
- * <p>One {@link ReasonType} can have multiple {@link Reason}s to notify.</p>
+ * {@link ReasonType} is a custom extension that defines a type of reason.
+ *
+ * <p>One {@link ReasonType} can have multiple {@link Reason}s to notify.
  *
  * @author guqing
  * @see NotificationTemplate
@@ -20,11 +21,14 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "ReasonType",
-    plural = "reasontypes", singular = "reasontype")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "ReasonType",
+        plural = "reasontypes",
+        singular = "reasontype")
 public class ReasonType extends AbstractExtension {
-    public static final String LOCALIZED_RESOURCE_NAME_ANNO =
-        "notification.halo.run/localized-resource-name";
+    public static final String LOCALIZED_RESOURCE_NAME_ANNO = "notification.halo.run/localized-resource-name";
 
     @Schema
     private Spec spec;

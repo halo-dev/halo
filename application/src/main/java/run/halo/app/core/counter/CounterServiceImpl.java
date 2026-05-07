@@ -37,14 +37,13 @@ public class CounterServiceImpl implements CounterService {
             return Flux.empty();
         }
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", names))
-            .build();
+                .andQuery(Queries.in("metadata.name", names))
+                .build();
         return client.listAll(Counter.class, options, ExtensionUtil.defaultSort());
     }
 
     @Override
     public Mono<Counter> deleteByName(String counterName) {
-        return client.fetch(Counter.class, counterName)
-            .flatMap(client::delete);
+        return client.fetch(Counter.class, counterName).flatMap(client::delete);
     }
 }

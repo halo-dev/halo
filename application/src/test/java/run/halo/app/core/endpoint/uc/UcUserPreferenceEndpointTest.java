@@ -50,8 +50,8 @@ class UcUserPreferenceEndpointTest {
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .apply(springSecurity())
-            .build();
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
@@ -63,33 +63,34 @@ class UcUserPreferenceEndpointTest {
 
     @Test
     void shouldNotGetPreferenceWhenUnauthenticated() {
-        webClient.mutate()
-            .apply(mockAuthentication(new AnonymousAuthenticationToken(
-                "key", "anonymousUser", createAuthorityList("ROLE_ANONYMOUS")
-            )))
-            .build()
-            .get()
-            .uri("/user-preferences/fake")
-            .exchange()
-            .expectStatus()
-            .isForbidden();
+        webClient
+                .mutate()
+                .apply(mockAuthentication(new AnonymousAuthenticationToken(
+                        "key", "anonymousUser", createAuthorityList("ROLE_ANONYMOUS"))))
+                .build()
+                .get()
+                .uri("/user-preferences/fake")
+                .exchange()
+                .expectStatus()
+                .isForbidden();
     }
 
     @Test
     void shouldGetNullPreferenceWhenAuthenticatedAndConfigMapAbsent() {
         when(client.fetch(ConfigMap.class, "user-preferences-faker")).thenReturn(Mono.empty());
-        webClient.mutate()
-            .apply(mockUser("faker"))
-            .build()
-            .get()
-            .uri("/user-preferences/fake")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(JsonNode.class)
-            .value(n -> {
-                assertInstanceOf(NullNode.class, n);
-            });
+        webClient
+                .mutate()
+                .apply(mockUser("faker"))
+                .build()
+                .get()
+                .uri("/user-preferences/fake")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(JsonNode.class)
+                .value(n -> {
+                    assertInstanceOf(NullNode.class, n);
+                });
     }
 
     @Test
@@ -101,60 +102,59 @@ class UcUserPreferenceEndpointTest {
               "key": "value"
             }\
             """);
-        when(client.fetch(ConfigMap.class, "user-preferences-faker"))
-            .thenReturn(Mono.just(cm));
-        webClient.mutate()
-            .apply(mockUser("faker"))
-            .build()
-            .get()
-            .uri("/user-preferences/fake")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(ObjectNode.class)
-            .value(node -> assertEquals("value", node.get("key").asString()));
+        when(client.fetch(ConfigMap.class, "user-preferences-faker")).thenReturn(Mono.just(cm));
+        webClient
+                .mutate()
+                .apply(mockUser("faker"))
+                .build()
+                .get()
+                .uri("/user-preferences/fake")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ObjectNode.class)
+                .value(node -> assertEquals("value", node.get("key").asString()));
     }
 
     @Test
     void shouldNotCreatePreferenceWhenUnauthenticated() {
-        webClient.mutate()
-            .apply(mockAuthentication(new AnonymousAuthenticationToken(
-                "key", "anonymousUser", createAuthorityList("ROLE_ANONYMOUS")
-            )))
-            .build()
-            .put()
-            .uri("/user-preferences/faker")
-            .exchange()
-            .expectStatus()
-            .isForbidden();
+        webClient
+                .mutate()
+                .apply(mockAuthentication(new AnonymousAuthenticationToken(
+                        "key", "anonymousUser", createAuthorityList("ROLE_ANONYMOUS"))))
+                .build()
+                .put()
+                .uri("/user-preferences/faker")
+                .exchange()
+                .expectStatus()
+                .isForbidden();
     }
 
     @Test
     void shouldCreatePreferenceWithoutConfigMap() {
         when(client.fetch(ConfigMap.class, "user-preferences-faker")).thenReturn(Mono.empty());
         when(client.create(any(ConfigMap.class))).thenReturn(Mono.just(new ConfigMap()));
-        webClient.mutate()
-            .apply(mockUser("faker"))
-            .build()
-            .put()
-            .uri("/user-preferences/fake")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("""
+        webClient
+                .mutate()
+                .apply(mockUser("faker"))
+                .build()
+                .put()
+                .uri("/user-preferences/fake")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
                 {
                   "key": "value"
                 }\
                 """)
-            .exchange()
-            .expectStatus()
-            .isNoContent();
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
-        verify(client).<ConfigMap>create(assertArg(cm -> JSONAssert.assertEquals(
-            """
+        verify(client)
+                .<ConfigMap>create(assertArg(
+                        cm -> JSONAssert.assertEquals("""
                 {"key":"value"}\
-                """,
-            cm.getData().get("fake"),
-            true
-        )));
+                """, cm.getData().get("fake"), true)));
         verify(client, never()).update(any());
     }
 
@@ -177,36 +177,29 @@ class UcUserPreferenceEndpointTest {
             """);
         when(client.fetch(ConfigMap.class, "user-preferences-faker")).thenReturn(Mono.just(cm));
         when(client.update(any(ConfigMap.class))).thenReturn(Mono.just(cm));
-        webClient.mutate()
-            .apply(mockUser("faker"))
-            .build()
-            .put()
-            .uri("/user-preferences/fake1")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("""
+        webClient
+                .mutate()
+                .apply(mockUser("faker"))
+                .build()
+                .put()
+                .uri("/user-preferences/fake1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
                 {
                   "newKey": "newValue"
                 }\
                 """)
-            .exchange()
-            .expectStatus()
-            .isNoContent();
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         verify(client).<ConfigMap>update(assertArg(cmToUpdate -> {
-            JSONAssert.assertEquals(
-                """
+            JSONAssert.assertEquals("""
                     {"newKey":"newValue"}\
-                    """,
-                cmToUpdate.getData().get("fake1"),
-                true
-            );
-            JSONAssert.assertEquals(
-                """
+                    """, cmToUpdate.getData().get("fake1"), true);
+            JSONAssert.assertEquals("""
                     {"key2":"value2"}\
-                    """,
-                cmToUpdate.getData().get("fake2"),
-                true
-            );
+                    """, cmToUpdate.getData().get("fake2"), true);
         }));
 
         verify(client, never()).create(any());
@@ -223,18 +216,19 @@ class UcUserPreferenceEndpointTest {
             {"key":"value"}\
             """);
         when(client.fetch(ConfigMap.class, "user-preferences-faker")).thenReturn(Mono.just(cm));
-        webClient.mutate()
-            .apply(mockUser("faker"))
-            .build()
-            .put()
-            .uri("/user-preferences/fake")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("""
+        webClient
+                .mutate()
+                .apply(mockUser("faker"))
+                .build()
+                .put()
+                .uri("/user-preferences/fake")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
                 {"key":"value"}\
                 """)
-            .exchange()
-            .expectStatus()
-            .isNoContent();
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         verify(client, never()).update(any(ConfigMap.class));
         verify(client, never()).create(any(ConfigMap.class));

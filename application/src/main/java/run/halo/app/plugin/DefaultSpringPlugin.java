@@ -24,8 +24,7 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
 
     private final PluginContext pluginContext;
 
-    public DefaultSpringPlugin(PluginApplicationContextFactory contextFactory,
-        PluginContext pluginContext) {
+    public DefaultSpringPlugin(PluginApplicationContextFactory contextFactory, PluginContext pluginContext) {
         this.contextFactory = contextFactory;
         this.pluginContext = pluginContext;
     }
@@ -41,9 +40,7 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
             Thread.currentThread().setContextClassLoader(this.context.getClassLoader());
             log.info("Application context {} for plugin {} is created", this.context, pluginId);
 
-            var pluginOpt = context.getBeanProvider(Plugin.class)
-                .stream()
-                .findFirst();
+            var pluginOpt = context.getBeanProvider(Plugin.class).stream().findFirst();
             log.info("Before publishing plugin starting event for plugin {}", pluginId);
             context.publishEvent(new SpringPluginStartingEvent(this, this));
             log.info("After publishing plugin starting event for plugin {}", pluginId);
@@ -58,9 +55,7 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
             log.info("After publishing plugin started event for plugin {}", pluginId);
         } catch (Throwable t) {
             // try to stop plugin for cleaning resources if something went wrong
-            log.error(
-                "Cleaning up plugin resources for plugin {} due to not being able to start plugin.",
-                pluginId);
+            log.error("Cleaning up plugin resources for plugin {} due to not being able to start plugin.", pluginId);
             this.stop();
             // propagate exception to invoker.
             throw t;
@@ -75,11 +70,9 @@ class DefaultSpringPlugin extends Plugin implements SpringPlugin {
         try {
             if (context != null) {
                 Thread.currentThread().setContextClassLoader(context.getClassLoader());
-                log.info("Before publishing plugin stopping event for plugin {}",
-                    pluginContext.getName());
+                log.info("Before publishing plugin stopping event for plugin {}", pluginContext.getName());
                 context.publishEvent(new SpringPluginStoppingEvent(this, this));
-                log.info("After publishing plugin stopping event for plugin {}",
-                    pluginContext.getName());
+                log.info("After publishing plugin stopping event for plugin {}", pluginContext.getName());
             }
             if (this.delegate != null) {
                 log.info("Stopping {} for plugin {}", this.delegate, pluginContext.getName());

@@ -13,12 +13,10 @@ import reactor.core.publisher.Mono;
  * @since 2.0.0
  */
 public class EmptyView extends ThymeleafReactiveView {
-    public EmptyView() {
-    }
+    public EmptyView() {}
 
     @Override
-    public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-        ServerWebExchange exchange) {
+    public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
         return Mono.empty();
     }
 }

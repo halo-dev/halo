@@ -17,8 +17,6 @@ record InCondition(String indexName, Collection<Object> keys) implements IndexCo
 
     @Override
     public String toString() {
-        return indexName + " IN ("
-            + keys.stream().map(Object::toString).collect(Collectors.joining(", "))
-            + ")";
+        return indexName + " IN (" + keys.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")";
     }
 }

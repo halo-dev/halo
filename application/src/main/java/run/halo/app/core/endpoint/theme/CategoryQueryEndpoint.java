@@ -43,83 +43,71 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "CategoryV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("categories", this::listCategories,
-                builder -> {
+                .GET("categories", this::listCategories, builder -> {
                     builder.operationId("queryCategories")
-                        .description("Lists categories.")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(CategoryVo.class))
-                        );
+                            .description("Lists categories.")
+                            .tag(tag)
+                            .response(responseBuilder()
+                                    .implementation(ListResult.generateGenericClass(CategoryVo.class)));
                     CategoryPublicQuery.buildParameters(builder);
-                }
-            )
-            .GET("categories/{name}", this::getByName,
-                builder -> builder.operationId("queryCategoryByName")
-                    .description("Gets category by name.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Category name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(CategoryVo.class)
-                    )
-            )
-            .GET("categories/{name}/posts", this::listPostsByCategoryName,
-                builder -> {
+                })
+                .GET(
+                        "categories/{name}",
+                        this::getByName,
+                        builder -> builder.operationId("queryCategoryByName")
+                                .description("Gets category by name.")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("Category name")
+                                        .required(true))
+                                .response(responseBuilder().implementation(CategoryVo.class)))
+                .GET("categories/{name}/posts", this::listPostsByCategoryName, builder -> {
                     builder.operationId("queryPostsByCategoryName")
-                        .description("Lists posts by category name.")
-                        .tag(tag)
-                        .parameter(parameterBuilder()
-                            .in(ParameterIn.PATH)
-                            .name("name")
-                            .description("Category name")
-                            .required(true)
-                        )
-                        .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(ListedPostVo.class))
-                        );
+                            .description("Lists posts by category name.")
+                            .tag(tag)
+                            .parameter(parameterBuilder()
+                                    .in(ParameterIn.PATH)
+                                    .name("name")
+                                    .description("Category name")
+                                    .required(true))
+                            .response(responseBuilder()
+                                    .implementation(ListResult.generateGenericClass(ListedPostVo.class)));
                     PostPublicQuery.buildParameters(builder);
-                }
-            )
-            .build();
+                })
+                .build();
     }
 
     private Mono<ServerResponse> listPostsByCategoryName(ServerRequest request) {
         final var name = request.pathVariable("name");
         final var query = new PostPublicQuery(request.exchange());
         var listOptions = query.toListOptions();
-        var newFieldSelector = listOptions.getFieldSelector()
-            .andQuery(Queries.equal("spec.categories", name));
+        var newFieldSelector = listOptions.getFieldSelector().andQuery(Queries.equal("spec.categories", name));
         listOptions.setFieldSelector(newFieldSelector);
-        return postPublicQueryService.list(listOptions, query.toPageRequest())
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return postPublicQueryService
+                .list(listOptions, query.toPageRequest())
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     private Mono<ServerResponse> getByName(ServerRequest request) {
         String name = request.pathVariable("name");
         return client.get(Category.class, name)
-            .map(CategoryVo::from)
-            .flatMap(categoryVo -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(categoryVo)
-            );
+                .map(CategoryVo::from)
+                .flatMap(categoryVo -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(categoryVo));
     }
 
     private Mono<ServerResponse> listCategories(ServerRequest request) {
         CategoryPublicQuery query = new CategoryPublicQuery(request.exchange());
         return client.listBy(Category.class, query.toListOptions(), query.toPageRequest())
-            .map(listResult -> toAnotherListResult(listResult, CategoryVo::from))
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+                .map(listResult -> toAnotherListResult(listResult, CategoryVo::from))
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     public static class CategoryPublicQuery extends SortableRequest {

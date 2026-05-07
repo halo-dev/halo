@@ -8,24 +8,23 @@ import org.springframework.security.oauth2.server.resource.InvalidBearerTokenExc
 import reactor.core.publisher.Mono;
 
 /**
- * JWT authentication converter that skips PAT tokens. We should skip PAT tokens here because
- * they are handled by a different authentication mechanism.
+ * JWT authentication converter that skips PAT tokens. We should skip PAT tokens here because they are handled by a
+ * different authentication mechanism.
  *
  * @param delegate the delegate converter
  */
 @Slf4j
-record NonPatJwtAuthenticationConverter(
-    Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate
-) implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+record NonPatJwtAuthenticationConverter(Converter<Jwt, Mono<AbstractAuthenticationToken>> delegate)
+        implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
 
     @Override
     public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
         // we should skip PAT here
         if (jwt.getClaims().containsKey("pat_name")) {
-            log.warn("Skip JWT authentication for PAT token: {}", jwt.getClaims().get("pat_name"));
+            log.warn(
+                    "Skip JWT authentication for PAT token: {}", jwt.getClaims().get("pat_name"));
             return Mono.error(new InvalidBearerTokenException("PAT token is not allowed here"));
         }
         return delegate.convert(jwt);
     }
-
 }

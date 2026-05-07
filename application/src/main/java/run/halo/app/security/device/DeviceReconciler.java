@@ -1,8 +1,6 @@
 package run.halo.app.security.device;
 
-import static run.halo.app.extension.ExtensionUtil.addFinalizers;
-import static run.halo.app.extension.ExtensionUtil.isDeleted;
-import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
+import static run.halo.app.extension.ExtensionUtil.*;
 import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Duration;
@@ -31,45 +29,43 @@ public class DeviceReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Device.class, request.name())
-            .ifPresent(device -> {
-                if (isDeleted(device)) {
-                    if (removeFinalizers(device.getMetadata(), Set.of(FINALIZER_NAME))) {
-                        sessionRepository.deleteById(device.getSpec().getSessionId())
+        client.fetch(Device.class, request.name()).ifPresent(device -> {
+            if (isDeleted(device)) {
+                if (removeFinalizers(device.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    sessionRepository
+                            .deleteById(device.getSpec().getSessionId())
                             .block(BLOCKING_TIMEOUT);
-                        client.update(device);
-                    }
-                    return;
-                }
-                if (addFinalizers(device.getMetadata(), Set.of(FINALIZER_NAME))) {
                     client.update(device);
                 }
-                revokeInactiveDevices(device.getSpec().getPrincipalName());
-            });
+                return;
+            }
+            if (addFinalizers(device.getMetadata(), Set.of(FINALIZER_NAME))) {
+                client.update(device);
+            }
+            revokeInactiveDevices(device.getSpec().getPrincipalName());
+        });
         return Result.doNotRetry();
     }
 
     private void revokeInactiveDevices(String principalName) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            equal("spec.principalName", principalName))
-        );
-        client.listAll(Device.class, listOptions,
-                Sort.by("metadata.creationTimestamp").descending())
-            .stream()
-            .skip(MAX_DEVICES)
-            .filter(device -> sessionRepository.findById(device.getSpec().getSessionId())
-                .blockOptional(BLOCKING_TIMEOUT)
-                .isEmpty()
-            )
-            .forEach(client::delete);
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.principalName", principalName)));
+        client
+                .listAll(
+                        Device.class,
+                        listOptions,
+                        Sort.by("metadata.creationTimestamp").descending())
+                .stream()
+                .skip(MAX_DEVICES)
+                .filter(device -> sessionRepository
+                        .findById(device.getSpec().getSessionId())
+                        .blockOptional(BLOCKING_TIMEOUT)
+                        .isEmpty())
+                .forEach(client::delete);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Device())
-            .syncAllOnStart(false)
-            .build();
+        return builder.extension(new Device()).syncAllOnStart(false).build();
     }
 }

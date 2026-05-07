@@ -40,53 +40,57 @@ class ThumbnailResourceTransformerTest {
 
     @Test
     void shouldNotTransformWithoutWidthQuery() {
-        var exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/halo.png").build())
-            .build();
-        when(this.transformerChain.transform(exchange, this.resource))
-            .thenReturn(Mono.just(this.resource));
+        var exchange = MockServerWebExchange.builder(
+                        MockServerHttpRequest.get("/halo.png").build())
+                .build();
+        when(this.transformerChain.transform(exchange, this.resource)).thenReturn(Mono.just(this.resource));
 
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .expectNext(this.resource)
-            .verifyComplete();
+        thumbnailResourceTransformer
+                .transform(exchange, this.resource, this.transformerChain)
+                .as(StepVerifier::create)
+                .expectNext(this.resource)
+                .verifyComplete();
     }
 
     @Test
     void shouldNotTransformWithNonFileResource() {
-        var exchange = MockServerWebExchange.builder(
-                MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
-            .build();
+        var exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/halo.png")
+                        .queryParam("width", "400")
+                        .build())
+                .build();
         when(this.resource.isFile()).thenReturn(false);
-        when(this.transformerChain.transform(exchange, this.resource))
-            .thenReturn(Mono.just(this.resource));
+        when(this.transformerChain.transform(exchange, this.resource)).thenReturn(Mono.just(this.resource));
 
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .expectNext(this.resource)
-            .verifyComplete();
+        thumbnailResourceTransformer
+                .transform(exchange, this.resource, this.transformerChain)
+                .as(StepVerifier::create)
+                .expectNext(this.resource)
+                .verifyComplete();
     }
 
     @Test
     void shouldNotTransformWithUnsupportedImageType() {
-        var exchange = MockServerWebExchange.builder(
-                MockServerHttpRequest.get("/halo.svg").queryParam("width", "400").build())
-            .build();
+        var exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/halo.svg")
+                        .queryParam("width", "400")
+                        .build())
+                .build();
         when(this.resource.isFile()).thenReturn(true);
         when(this.resource.getFilename()).thenReturn("halo.svg");
-        when(this.transformerChain.transform(exchange, this.resource))
-            .thenReturn(Mono.just(this.resource));
+        when(this.transformerChain.transform(exchange, this.resource)).thenReturn(Mono.just(this.resource));
 
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .expectNext(this.resource)
-            .verifyComplete();
+        thumbnailResourceTransformer
+                .transform(exchange, this.resource, this.transformerChain)
+                .as(StepVerifier::create)
+                .expectNext(this.resource)
+                .verifyComplete();
     }
 
     @Test
     void shouldReturnSourceIfEmptyGeneration() throws IOException {
-        var exchange = MockServerWebExchange.builder(
-                MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
-            .build();
+        var exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/halo.png")
+                        .queryParam("width", "400")
+                        .build())
+                .build();
         var attachmentRoot = Path.of("attachments").toAbsolutePath();
         var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
         when(this.resource.isFile()).thenReturn(true);
@@ -97,21 +101,21 @@ class ThumbnailResourceTransformerTest {
         when(localThumbnailService.generate(sourcePath, ThumbnailSize.S)).thenReturn(Mono.empty());
 
         when(this.transformerChain.transform(eq(exchange), isA(Resource.class)))
-            .thenAnswer(invocation -> Mono.just(invocation.getArgument(1)));
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(1)));
 
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .assertNext(resource -> assertDoesNotThrow(
-                () -> assertEquals(sourcePath.toUri(), resource.getURI())
-            ))
-            .verifyComplete();
+        thumbnailResourceTransformer
+                .transform(exchange, this.resource, this.transformerChain)
+                .as(StepVerifier::create)
+                .assertNext(resource -> assertDoesNotThrow(() -> assertEquals(sourcePath.toUri(), resource.getURI())))
+                .verifyComplete();
     }
 
     @Test
     void shouldReturnIfThumbnailExists() throws IOException {
-        var exchange = MockServerWebExchange.builder(
-                MockServerHttpRequest.get("/halo.png").queryParam("width", "400").build())
-            .build();
+        var exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/halo.png")
+                        .queryParam("width", "400")
+                        .build())
+                .build();
 
         var attachmentRoot = Path.of("attachments").toAbsolutePath();
         var sourcePath = attachmentRoot.resolve("upload").resolve("halo.png");
@@ -121,14 +125,13 @@ class ThumbnailResourceTransformerTest {
         thumbnailResourceTransformer = spy(thumbnailResourceTransformer);
 
         var generatedResource = mock(Resource.class);
-        when(this.localThumbnailService.generate(sourcePath, ThumbnailSize.S))
-            .thenReturn(Mono.just(generatedResource));
-        when(this.transformerChain.transform(exchange, generatedResource))
-            .thenReturn(Mono.just(generatedResource));
+        when(this.localThumbnailService.generate(sourcePath, ThumbnailSize.S)).thenReturn(Mono.just(generatedResource));
+        when(this.transformerChain.transform(exchange, generatedResource)).thenReturn(Mono.just(generatedResource));
 
-        thumbnailResourceTransformer.transform(exchange, this.resource, this.transformerChain)
-            .as(StepVerifier::create)
-            .expectNext(generatedResource)
-            .verifyComplete();
+        thumbnailResourceTransformer
+                .transform(exchange, this.resource, this.transformerChain)
+                .as(StepVerifier::create)
+                .expectNext(generatedResource)
+                .verifyComplete();
     }
 }

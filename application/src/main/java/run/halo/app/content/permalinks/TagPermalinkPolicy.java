@@ -27,28 +27,26 @@ public class TagPermalinkPolicy implements PermalinkPolicy<Tag> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private static final String DEFAULT_PERMALINK_PREFIX =
-        SystemSetting.ThemeRouteRules.empty().getTags();
+            SystemSetting.ThemeRouteRules.empty().getTags();
     private final ExternalUrlSupplier externalUrlSupplier;
     private final SystemConfigFetcher environmentFetcher;
 
     @Override
     public String permalink(Tag tag) {
         Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(tag);
-        String permalinkPrefix =
-            annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
+        String permalinkPrefix = annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
 
         String slug = UriUtils.encode(tag.getSpec().getSlug(), StandardCharsets.UTF_8);
         String path = PathUtils.combinePath(permalinkPrefix, slug);
-        return externalUrlSupplier.get()
-            .resolve(path)
-            .normalize().toString();
+        return externalUrlSupplier.get().resolve(path).normalize().toString();
     }
 
     public String pattern() {
-        return environmentFetcher.fetchRouteRules()
-            .map(SystemSetting.ThemeRouteRules::getTags)
-            .defaultIfEmpty(DEFAULT_PERMALINK_PREFIX)
-            .map(PatternUtils::normalizePattern)
-            .block(BLOCKING_TIMEOUT);
+        return environmentFetcher
+                .fetchRouteRules()
+                .map(SystemSetting.ThemeRouteRules::getTags)
+                .defaultIfEmpty(DEFAULT_PERMALINK_PREFIX)
+                .map(PatternUtils::normalizePattern)
+                .block(BLOCKING_TIMEOUT);
     }
 }

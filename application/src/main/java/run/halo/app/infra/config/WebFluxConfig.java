@@ -83,8 +83,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean
-    ServerResponse.Context context(CodecConfigurer codec,
-        ViewResolutionResultHandler resultHandler) {
+    ServerResponse.Context context(CodecConfigurer codec, ViewResolutionResultHandler resultHandler) {
         return new ServerResponse.Context() {
             @Override
             public List<HttpMessageWriter<?>> messageWriters() {
@@ -123,39 +122,35 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Bean
     RouterFunction<ServerResponse> uiPageEndpoints() {
-        var consolePagePredicate = path("/console/**")
-            .and(accept(MediaType.TEXT_HTML))
-            .and(new WebSocketRequestPredicate().negate());
+        var consolePagePredicate =
+                path("/console/**").and(accept(MediaType.TEXT_HTML)).and(new WebSocketRequestPredicate().negate());
 
-        var ucPagePredicate = path("/uc/**")
-            .and(accept(MediaType.TEXT_HTML))
-            .and(new WebSocketRequestPredicate().negate());
+        var ucPagePredicate =
+                path("/uc/**").and(accept(MediaType.TEXT_HTML)).and(new WebSocketRequestPredicate().negate());
 
         var consolePageHtml = applicationContext.getResource("classpath:/ui/console.html");
 
         var ucPageHtml = applicationContext.getResource("classpath:/ui/uc.html");
 
         return RouterFunctions.route()
-            .GET(consolePagePredicate,
-                request -> ServerResponse.ok()
-                    .cacheControl(CacheControl.noStore())
-                    .bodyValue(consolePageHtml)
-            )
-            .GET(ucPagePredicate,
-                request -> ServerResponse.ok()
-                    .cacheControl(CacheControl.noStore())
-                    .bodyValue(ucPageHtml)
-            )
-            .build();
+                .GET(
+                        consolePagePredicate,
+                        request -> ServerResponse.ok()
+                                .cacheControl(CacheControl.noStore())
+                                .bodyValue(consolePageHtml))
+                .GET(
+                        ucPagePredicate,
+                        request -> ServerResponse.ok()
+                                .cacheControl(CacheControl.noStore())
+                                .bodyValue(ucPageHtml))
+                .build();
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = attachmentRootGetter.get();
         var resourceProperties = webProperties.getResources();
-        var cacheControl = resourceProperties.getCache()
-            .getCachecontrol()
-            .toHttpCacheControl();
+        var cacheControl = resourceProperties.getCache().getCachecontrol().toHttpCacheControl();
         if (cacheControl == null) {
             cacheControl = CacheControl.empty();
         }
@@ -163,17 +158,17 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
         // Mandatory resource mapping
         var uploadRegistration = registry.addResourceHandler("/upload/**")
-            .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
-            .setUseLastModified(useLastModified)
-            .setCacheControl(cacheControl);
+                .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
+                .setUseLastModified(useLastModified)
+                .setCacheControl(cacheControl);
 
         registry.addResourceHandler("/ui-assets/**")
-            .addResourceLocations("classpath:/ui/ui-assets/")
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
+                .addResourceLocations("classpath:/ui/ui-assets/")
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
 
         // Additional resource mappings
         var staticResources = haloProp.getAttachment().getResourceMappings();
@@ -183,8 +178,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 registration = uploadRegistration;
             } else {
                 registration = registry.addResourceHandler(staticResource.getPathPattern())
-                    .setCacheControl(cacheControl)
-                    .setUseLastModified(useLastModified);
+                        .setCacheControl(cacheControl)
+                        .setUseLastModified(useLastModified);
             }
             for (String location : staticResource.getLocations()) {
                 var path = attachmentsRoot.resolve(location);
@@ -199,28 +194,22 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
         var haloStaticPath = haloProp.getWorkDir().resolve("static");
         registry.addResourceHandler("/**")
-            .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")
-            .addResourceLocations(resourceProperties.getStaticLocations())
-            .setCacheControl(cacheControl)
-            .setUseLastModified(useLastModified)
-            .resourceChain(true)
-            .addResolver(new EncodedResourceResolver())
-            .addResolver(new PathResourceResolver());
+                .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")
+                .addResourceLocations(resourceProperties.getStaticLocations())
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new PathResourceResolver());
     }
 
     private void applyThumbnailChain(ResourceHandlerRegistration registration) {
-        registration.resourceChain(false)
-            .addTransformer(
-                new ThumbnailResourceTransformer(localThumbnailService)
-            );
+        registration.resourceChain(false).addTransformer(new ThumbnailResourceTransformer(localThumbnailService));
     }
 
     /**
-     * Order of this filter is higher than
-     * {@link LocaleChangeWebFilter} to allow change locale in dev
-     * mode.
-     * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to
-     * obtain the locale
+     * Order of this filter is higher than {@link LocaleChangeWebFilter} to allow change locale in dev mode.
+     * {@link UserLocaleRequestAttributeWriteFilter} is before {@link LocaleChangeWebFilter} to obtain the locale
      */
     @ConditionalOnProperty(name = "halo.ui.proxy.enabled", havingValue = "true")
     @Bean
@@ -232,9 +221,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
     /**
      * Create a WebFilterChainProxy for all AdditionalWebFilters.
      *
-     * <p>The reason why the order is -101 is that the current
-     * AdditionalWebFilterChainProxy should be executed before WebFilterChainProxy
-     * and the order of WebFilterChainProxy is -100.
+     * <p>The reason why the order is -101 is that the current AdditionalWebFilterChainProxy should be executed before
+     * WebFilterChainProxy and the order of WebFilterChainProxy is -100.
      *
      * <p>See {@code org.springframework.security.config.annotation.web.reactive
      * .WebFluxSecurityConfiguration#WEB_FILTER_CHAIN_FILTER_ORDER} for more
@@ -258,8 +246,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     UrlHandlerFilter urlHandlerFilter() {
-        return UrlHandlerFilter
-            .trailingSlashHandler("/**").mutateRequest()
-            .build();
+        return UrlHandlerFilter.trailingSlashHandler("/**").mutateRequest().build();
     }
 }

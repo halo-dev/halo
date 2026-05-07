@@ -2,14 +2,7 @@ package run.halo.app.content;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.ChangeDelta;
-import com.github.difflib.patch.Chunk;
-import com.github.difflib.patch.DeleteDelta;
-import com.github.difflib.patch.DeltaType;
-import com.github.difflib.patch.InsertDelta;
-import com.github.difflib.patch.Patch;
-import com.github.difflib.patch.PatchFailedException;
+import com.github.difflib.patch.*;
 import com.google.common.base.Splitter;
 import java.util.Collections;
 import java.util.List;
@@ -26,16 +19,15 @@ public class PatchUtils {
     private static final Splitter lineSplitter = Splitter.on(DELIMITER);
 
     public static Patch<String> create(String deltasJson) {
-        List<Delta> deltas = JsonUtils.jsonToObject(deltasJson, new TypeReference<>() {
-        });
+        List<Delta> deltas = JsonUtils.jsonToObject(deltasJson, new TypeReference<>() {});
         Patch<String> patch = new Patch<>();
         for (Delta delta : deltas) {
             StringChunk sourceChunk = delta.getSource();
             StringChunk targetChunk = delta.getTarget();
-            Chunk<String> orgChunk = new Chunk<>(sourceChunk.getPosition(), sourceChunk.getLines(),
-                sourceChunk.getChangePosition());
-            Chunk<String> revChunk = new Chunk<>(targetChunk.getPosition(), targetChunk.getLines(),
-                targetChunk.getChangePosition());
+            Chunk<String> orgChunk =
+                    new Chunk<>(sourceChunk.getPosition(), sourceChunk.getLines(), sourceChunk.getChangePosition());
+            Chunk<String> revChunk =
+                    new Chunk<>(targetChunk.getPosition(), targetChunk.getLines(), targetChunk.getChangePosition());
             switch (delta.getType()) {
                 case DELETE -> patch.addDelta(new DeleteDelta<>(orgChunk, revChunk));
                 case INSERT -> patch.addDelta(new InsertDelta<>(orgChunk, revChunk));

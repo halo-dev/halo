@@ -45,5 +45,4 @@ public class TwoFactorAuthentication extends AbstractAuthenticationToken {
     public Authentication getPrevious() {
         return previous;
     }
-
 }

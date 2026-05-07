@@ -22,15 +22,14 @@ public class LabelSelector {
             return Condition.empty().toString();
         }
         return conditions.stream()
-            .map(c -> (Condition) c)
-            .reduce(Condition::and)
-            .orElseGet(Condition::empty)
-            .toString();
+                .map(c -> (Condition) c)
+                .reduce(Condition::and)
+                .orElseGet(Condition::empty)
+                .toString();
     }
 
     /**
-     * Returns a new label selector that is the result of ANDing the current selector with the
-     * given selector.
+     * Returns a new label selector that is the result of ANDing the current selector with the given selector.
      *
      * @param other the selector to AND with
      * @return a new label selector
@@ -51,12 +50,9 @@ public class LabelSelector {
     public static class LabelSelectorBuilder<T extends LabelSelectorBuilder<T>> {
         private final List<LabelCondition> conditions = new ArrayList<>();
 
-        public LabelSelectorBuilder() {
-        }
+        public LabelSelectorBuilder() {}
 
-        /**
-         * Create a new label selector builder with the given matchers.
-         */
+        /** Create a new label selector builder with the given matchers. */
         public LabelSelectorBuilder(List<LabelCondition> conditions) {
             if (conditions != null) {
                 this.conditions.addAll(conditions);
@@ -98,9 +94,7 @@ public class LabelSelector {
             return self();
         }
 
-        /**
-         * Build the label selector.
-         */
+        /** Build the label selector. */
         public LabelSelector build() {
             var labelSelector = new LabelSelector();
             labelSelector.setConditions(conditions);

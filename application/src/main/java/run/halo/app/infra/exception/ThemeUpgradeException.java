@@ -13,5 +13,4 @@ public class ThemeUpgradeException extends ResponseStatusException {
     public ThemeUpgradeException(String reason, String detailCode, Object[] detailArgs) {
         super(HttpStatus.BAD_REQUEST, reason, null, detailCode, detailArgs);
     }
-
 }

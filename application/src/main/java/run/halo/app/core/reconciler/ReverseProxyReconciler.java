@@ -25,8 +25,7 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ReverseProxyRouterFunctionRegistry routerFunctionRegistry;
 
-    public ReverseProxyReconciler(ExtensionClient client,
-        ReverseProxyRouterFunctionRegistry routerFunctionRegistry) {
+    public ReverseProxyReconciler(ExtensionClient client, ReverseProxyRouterFunctionRegistry routerFunctionRegistry) {
         this.client = client;
         this.routerFunctionRegistry = routerFunctionRegistry;
     }
@@ -34,23 +33,21 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         return client.fetch(ReverseProxy.class, request.name())
-            .map(reverseProxy -> {
-                if (isDeleted(reverseProxy)) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                .map(reverseProxy -> {
+                    if (isDeleted(reverseProxy)) {
+                        cleanUpResourcesAndRemoveFinalizer(request.name());
+                        return new Result(false, null);
+                    }
+                    addFinalizerIfNecessary(reverseProxy);
+                    registerReverseProxy(reverseProxy);
                     return new Result(false, null);
-                }
-                addFinalizerIfNecessary(reverseProxy);
-                registerReverseProxy(reverseProxy);
-                return new Result(false, null);
-            })
-            .orElse(new Result(false, null));
+                })
+                .orElse(new Result(false, null));
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new ReverseProxy())
-            .build();
+        return builder.extension(new ReverseProxy()).build();
     }
 
     private void registerReverseProxy(ReverseProxy reverseProxy) {
@@ -69,15 +66,15 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
             return;
         }
         client.fetch(ReverseProxy.class, oldReverseProxy.getMetadata().getName())
-            .ifPresent(reverseProxy -> {
-                Set<String> newFinalizers = reverseProxy.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    reverseProxy.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(reverseProxy);
-            });
+                .ifPresent(reverseProxy -> {
+                    Set<String> newFinalizers = reverseProxy.getMetadata().getFinalizers();
+                    if (newFinalizers == null) {
+                        newFinalizers = new HashSet<>();
+                        reverseProxy.getMetadata().setFinalizers(newFinalizers);
+                    }
+                    newFinalizers.add(FINALIZER_NAME);
+                    client.update(reverseProxy);
+                });
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String name) {
@@ -99,7 +96,6 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
         if (labels == null) {
             return PluginConst.SYSTEM_PLUGIN_NAME;
         }
-        return Objects.toString(labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME),
-            PluginConst.SYSTEM_PLUGIN_NAME);
+        return Objects.toString(labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME), PluginConst.SYSTEM_PLUGIN_NAME);
     }
 }

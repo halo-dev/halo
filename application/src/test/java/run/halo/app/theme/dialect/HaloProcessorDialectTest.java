@@ -3,16 +3,10 @@ package run.halo.app.theme.dialect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableSortedMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -87,8 +81,7 @@ class HaloProcessorDialectTest {
         templateEngine.addTemplateResolver(new TestTemplateResolver());
 
         Map<String, TemplateHeadProcessor> map = new HashMap<>();
-        map.put("postTemplateHeadProcessor",
-            new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
+        map.put("postTemplateHeadProcessor", new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
         map.put("globalSeoProcessor", new GlobalSeoProcessor(fetcher));
@@ -98,38 +91,38 @@ class HaloProcessorDialectTest {
         codeInjection.setContentHead("<meta name=\"content-head-test\" content=\"test\" />");
         codeInjection.setGlobalHead("<meta name=\"global-head-test\" content=\"test\" />");
         codeInjection.setFooter("<footer>hello this is global footer.</footer>");
-        lenient().when(fetcher.fetch(eq(CodeInjection.GROUP), eq(CodeInjection.class)))
-            .thenReturn(Mono.just(codeInjection));
+        lenient()
+                .when(fetcher.fetch(eq(CodeInjection.GROUP), eq(CodeInjection.class)))
+                .thenReturn(Mono.just(codeInjection));
 
-        lenient().when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(fetcher);
-        lenient().when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class)))
-            .thenReturn(Mono.empty());
+        lenient()
+                .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
+                .thenReturn(fetcher);
+        lenient().when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class))).thenReturn(Mono.empty());
 
-        lenient().when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .then(invocation -> {
-                @SuppressWarnings("unchecked")
-                ObjectProvider<ExtensionGetter> objectProvider = mock(ObjectProvider.class);
-                when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
-                return objectProvider;
-            });
-        lenient().when(extensionGetter.getExtensions(TemplateHeadProcessor.class)).thenReturn(
-            Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE)
-        );
+        lenient()
+                .when(applicationContext.getBeanProvider(ExtensionGetter.class))
+                .then(invocation -> {
+                    @SuppressWarnings("unchecked")
+                    ObjectProvider<ExtensionGetter> objectProvider = mock(ObjectProvider.class);
+                    when(objectProvider.getIfUnique()).thenReturn(extensionGetter);
+                    return objectProvider;
+                });
+        lenient()
+                .when(extensionGetter.getExtensions(TemplateHeadProcessor.class))
+                .thenReturn(Flux.fromIterable(map.values()).sort(AnnotationAwareOrderComparator.INSTANCE));
 
-        lenient().when(fetcher.fetchComment())
-            .thenReturn(Mono.just(new SystemSetting.Comment()));
+        lenient().when(fetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
     void globalHeadAndFooterProcessors() {
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon("favicon.ico");
-        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
-            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+                .thenReturn(Mono.just(basic));
 
-        when(extensionGetter.getExtensions(TemplateFooterProcessor.class))
-            .thenReturn(Flux.empty());
+        when(extensionGetter.getExtensions(TemplateFooterProcessor.class)).thenReturn(Flux.empty());
 
         Context context = getContext();
 
@@ -148,7 +141,7 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-            
+
               </body>
             </html>
             """);
@@ -168,18 +161,15 @@ class HaloProcessorDialectTest {
         postSpec.setHtmlMetas(htmlMetas);
         Metadata metadata = new Metadata();
         metadata.setName("fake-post");
-        PostVo postVo = PostVo.builder()
-            .spec(postSpec)
-            .metadata(metadata).build();
+        PostVo postVo = PostVo.builder().spec(postSpec).metadata(metadata).build();
         when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
 
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon(null);
-        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
-            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+                .thenReturn(Mono.just(basic));
 
-        when(extensionGetter.getExtensions(TemplateFooterProcessor.class))
-            .thenReturn(Flux.empty());
+        when(extensionGetter.getExtensions(TemplateFooterProcessor.class)).thenReturn(Flux.empty());
 
         String result = templateEngine.process("post", context);
         assertThat(result).isEqualTo("""
@@ -199,7 +189,7 @@ class HaloProcessorDialectTest {
             <div class="footer">
               <footer>hello this is global footer.</footer>
             </div>
-            
+
               </body>
             </html>
             """);
@@ -211,7 +201,7 @@ class HaloProcessorDialectTest {
         context.setVariable(Constant.META_DESCRIPTION_VARIABLE_NAME, "Fake description");
         when(fetcher.fetch(Seo.GROUP, Seo.class)).thenReturn(Mono.empty());
         when(fetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
         var result = templateEngine.process("seo", context);
         assertTrue(result.contains("""
             <meta name="description" content="Fake description"/>\
@@ -223,12 +213,11 @@ class HaloProcessorDialectTest {
         final Context context = getContext();
         Seo seo = new Seo();
         seo.setBlockSpiders(true);
-        when(fetcher.fetch(eq(Seo.GROUP),
-            eq(Seo.class))).thenReturn(Mono.just(seo));
+        when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class))).thenReturn(Mono.just(seo));
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon("favicon.ico");
-        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
-            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+                .thenReturn(Mono.just(basic));
 
         String result = templateEngine.process("seo", context);
         assertThat(result).isEqualTo("""
@@ -255,12 +244,11 @@ class HaloProcessorDialectTest {
         Seo seo = new Seo();
         seo.setKeywords("K1, K2, K3");
         seo.setDescription("This is a description.");
-        when(fetcher.fetch(eq(Seo.GROUP),
-            eq(Seo.class))).thenReturn(Mono.just(seo));
+        when(fetcher.fetch(eq(Seo.GROUP), eq(Seo.class))).thenReturn(Mono.just(seo));
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon("favicon.ico");
-        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
-            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP), eq(SystemSetting.Basic.class)))
+                .thenReturn(Mono.just(basic));
 
         String result = templateEngine.process("seo", context);
         assertThat(result).isEqualTo("""
@@ -356,16 +344,18 @@ class HaloProcessorDialectTest {
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             if (template.equals(DefaultTemplateEnum.INDEX.getValue())) {
                 return new StringTemplateResource(indexTemplate());
             }

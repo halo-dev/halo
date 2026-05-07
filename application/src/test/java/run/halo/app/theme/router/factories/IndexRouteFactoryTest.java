@@ -29,24 +29,12 @@ class IndexRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = indexRouteFactory.create("/");
         WebTestClient webTestClient = getWebTestClient(routerFunction);
 
-        webTestClient.get()
-            .uri("/")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/").exchange().expectStatus().isOk();
 
-        webTestClient.get()
-            .uri("/page/1")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient.get().uri("/page/1").exchange().expectStatus().isOk();
 
-        webTestClient.get()
-            .uri("/page/abc")
-            .exchange()
-            .expectStatus().isNotFound();
+        webTestClient.get().uri("/page/abc").exchange().expectStatus().isNotFound();
 
-        webTestClient.get()
-            .uri("/page/2f")
-            .exchange()
-            .expectStatus().isNotFound();
+        webTestClient.get().uri("/page/2f").exchange().expectStatus().isNotFound();
     }
 }

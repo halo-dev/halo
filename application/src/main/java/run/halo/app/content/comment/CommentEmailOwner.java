@@ -7,9 +7,8 @@ import org.springframework.util.Assert;
 import run.halo.app.core.extension.content.Comment;
 
 /**
- * <p>The creator info of the comment.</p>
- * This {@link CommentEmailOwner} is only applicable to the user who is allowed to comment
- * without logging in.
+ * The creator info of the comment. This {@link CommentEmailOwner} is only applicable to the user who is allowed to
+ * comment without logging in.
  *
  * @param email email for comment owner
  * @param avatar avatar for comment owner

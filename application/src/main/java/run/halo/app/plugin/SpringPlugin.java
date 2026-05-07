@@ -24,5 +24,4 @@ public interface SpringPlugin {
      * @throws IllegalStateException if the application context is not ready yet
      */
     ApplicationContext getApplicationContext();
-
 }

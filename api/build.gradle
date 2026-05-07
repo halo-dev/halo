@@ -33,7 +33,7 @@ jar {
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
                 'Implementation-Vendor': 'Halo Project',
-        )
+                )
     }
 }
 

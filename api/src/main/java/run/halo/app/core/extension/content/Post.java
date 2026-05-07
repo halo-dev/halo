@@ -20,7 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.ConditionList;
 
 /**
- * <p>Post extension.</p>
+ * Post extension.
  *
  * @author guqing
  * @see <a href="https://github.com/halo-dev/halo/issues/2322">issue#2322</a>
@@ -28,8 +28,7 @@ import run.halo.app.infra.ConditionList;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Post.KIND,
-    plural = "posts", singular = "post")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Post.KIND, plural = "posts", singular = "post")
 @EqualsAndHashCode(callSuper = true)
 public class Post extends AbstractExtension {
 
@@ -40,17 +39,16 @@ public class Post extends AbstractExtension {
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Post.class);
 
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
-    public static final String LAST_RELEASED_SNAPSHOT_ANNO =
-        "content.halo.run/last-released-snapshot";
+    public static final String LAST_RELEASED_SNAPSHOT_ANNO = "content.halo.run/last-released-snapshot";
     public static final String LAST_ASSOCIATED_TAGS_ANNO = "content.halo.run/last-associated-tags";
-    public static final String LAST_ASSOCIATED_CATEGORIES_ANNO =
-        "content.halo.run/last-associated-categories";
+    public static final String LAST_ASSOCIATED_CATEGORIES_ANNO = "content.halo.run/last-associated-categories";
 
     public static final String STATS_ANNO = "content.halo.run/stats";
 
     /**
-     * <p>The key of the label that indicates that the post is scheduled to be published.</p>
-     * <p>Can be used to query posts that are scheduled to be published.</p>
+     * The key of the label that indicates that the post is scheduled to be published.
+     *
+     * <p>Can be used to query posts that are scheduled to be published.
      */
     public static final String SCHEDULING_PUBLISH_LABEL = "content.halo.run/scheduling-publish";
 
@@ -82,8 +80,7 @@ public class Post extends AbstractExtension {
 
     @JsonIgnore
     public boolean isDeleted() {
-        return Objects.equals(true, spec.getDeleted())
-            || getMetadata().getDeletionTimestamp() != null;
+        return Objects.equals(true, spec.getDeleted()) || getMetadata().getDeletionTimestamp() != null;
     }
 
     @JsonIgnore
@@ -113,9 +110,7 @@ public class Post extends AbstractExtension {
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
         private String slug;
 
-        /**
-         * 文章引用到的已发布的内容，用于主题端显示.
-         */
+        /** 文章引用到的已发布的内容，用于主题端显示. */
         private String releaseSnapshot;
 
         private String headSnapshot;
@@ -175,9 +170,7 @@ public class Post extends AbstractExtension {
 
         private List<String> contributors;
 
-        /**
-         * see {@link Category.CategorySpec#isHideFromList()}.
-         */
+        /** see {@link Category.CategorySpec#isHideFromList()}. */
         private Boolean hideFromList;
 
         private Instant lastModifyTime;

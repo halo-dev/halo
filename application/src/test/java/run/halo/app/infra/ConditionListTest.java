@@ -58,13 +58,10 @@ class ConditionListTest {
                         "reason": "reason"
                     }
                 ]
-                """,
-            JsonUtils.objectToJson(conditionList),
-            true);
+                """, JsonUtils.objectToJson(conditionList), true);
         assertThat(conditionList.size()).isEqualTo(3);
 
-        conditionList.addAndEvictFIFO(
-            condition("type4", "message4", "reason4", ConditionStatus.FALSE), 1);
+        conditionList.addAndEvictFIFO(condition("type4", "message4", "reason4", ConditionStatus.FALSE), 1);
 
         assertThat(conditionList.size()).isEqualTo(1);
 
@@ -78,8 +75,7 @@ class ConditionListTest {
                         "reason": "reason4"
                     }
                 ]
-                """,
-            JsonUtils.objectToJson(conditionList), true);
+                """, JsonUtils.objectToJson(conditionList), true);
     }
 
     @Test
@@ -109,10 +105,8 @@ class ConditionListTest {
     @Test
     void test() {
         ConditionList conditionList = new ConditionList();
-        conditionList.addAndEvictFIFO(
-            condition("type", "message", "reason", ConditionStatus.FALSE));
-        conditionList.addAndEvictFIFO(
-            condition("type2", "message2", "reason2", ConditionStatus.FALSE));
+        conditionList.addAndEvictFIFO(condition("type", "message", "reason", ConditionStatus.FALSE));
+        conditionList.addAndEvictFIFO(condition("type2", "message2", "reason2", ConditionStatus.FALSE));
 
         Iterator<Condition> iterator = conditionList.iterator();
         assertThat(iterator.next().getType()).isEqualTo("type2");
@@ -149,18 +143,18 @@ class ConditionListTest {
     void shouldNotAddIfTypeIsSame() {
         var conditions = new ConditionList();
         var condition = Condition.builder()
-            .type("type")
-            .status(ConditionStatus.TRUE)
-            .reason("reason")
-            .message("message")
-            .build();
+                .type("type")
+                .status(ConditionStatus.TRUE)
+                .reason("reason")
+                .message("message")
+                .build();
 
         var anotherCondition = Condition.builder()
-            .type("type")
-            .status(ConditionStatus.FALSE)
-            .reason("another reason")
-            .message("another message")
-            .build();
+                .type("type")
+                .status(ConditionStatus.FALSE)
+                .reason("another reason")
+                .message("another message")
+                .build();
 
         conditions.addAndEvictFIFO(condition);
         conditions.addAndEvictFIFO(anotherCondition);
@@ -172,25 +166,21 @@ class ConditionListTest {
     void shouldNotUpdateLastTransitionTimeIfStatusNotChanged() {
         var now = Instant.now();
         var conditions = new ConditionList();
-        conditions.addAndEvictFIFO(
-            Condition.builder()
+        conditions.addAndEvictFIFO(Condition.builder()
                 .type("type")
                 .status(ConditionStatus.TRUE)
                 .reason("reason")
                 .message("message")
                 .lastTransitionTime(now)
-                .build()
-        );
+                .build());
 
-        conditions.addAndEvictFIFO(
-            Condition.builder()
+        conditions.addAndEvictFIFO(Condition.builder()
                 .type("type")
                 .status(ConditionStatus.TRUE)
                 .reason("reason")
                 .message("message")
                 .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
-                .build()
-        );
+                .build());
 
         assertEquals(1, conditions.size());
         // make sure the last transition time was not modified.
@@ -201,32 +191,27 @@ class ConditionListTest {
     void shouldUpdateLastTransitionTimeIfStatusChanged() {
         var now = Instant.now();
         var conditions = new ConditionList();
-        conditions.addAndEvictFIFO(
-            Condition.builder()
+        conditions.addAndEvictFIFO(Condition.builder()
                 .type("type")
                 .status(ConditionStatus.TRUE)
                 .reason("reason")
                 .message("message")
                 .lastTransitionTime(now)
-                .build()
-        );
+                .build());
 
-        conditions.addAndEvictFIFO(
-            Condition.builder()
+        conditions.addAndEvictFIFO(Condition.builder()
                 .type("type")
                 .status(ConditionStatus.FALSE)
                 .reason("reason")
                 .message("message")
                 .lastTransitionTime(now.plus(Duration.ofSeconds(1)))
-                .build()
-        );
+                .build());
 
         assertEquals(1, conditions.size());
         assertEquals(now.plus(Duration.ofSeconds(1)), conditions.peek().getLastTransitionTime());
     }
 
-    private Condition condition(String type, String message, String reason,
-        ConditionStatus status) {
+    private Condition condition(String type, String message, String reason, ConditionStatus status) {
         Condition condition = new Condition();
         condition.setType(type);
         condition.setMessage(message);

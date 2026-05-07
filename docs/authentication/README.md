@@ -29,57 +29,56 @@ YWRtaW46UEA4OHcwcmQ=
 
 - 表单参数
 
-  | 参数名     | 类型   | 说明                                  |
-                                                                                                            | ---------- | ------ | ------------------------------------- |
-  | username   | form   | 用户名                                |
-  | password   | form   | 密码                                  |
-  | _csrf      | form   | `CSRF` 令牌。由客户端随机生成。       |
+  |    参数名     |   类型   |           说明            |
+  |------------|--------|-------------------------|
+  | username   | form   | 用户名                     |
+  | password   | form   | 密码                      |
+  | _csrf      | form   | `CSRF` 令牌。由客户端随机生成。     |
   | XSRF-TOKEN | cookie | 跨站请求伪造令牌，和 `_csrf` 的值一致 |
 
 - HTTP 200 响应
 
   仅在请求头 `Accept` 中包含 `application/json` 时发生，响应示例如下所示：
 
-    ```bash
-    ╰─❯ curl 'http://localhost:8090/login' \
-      -H 'Accept: application/json' \
-      -H 'Cookie: XSRF-TOKEN=1ff67e0c-6f2c-4cf9-afb5-81bc1015b8e5' \
-      -H 'Content-Type: application/x-www-form-urlencoded' \
-      --data-raw '_csrf=1ff67e0c-6f2c-4cf9-afb5-81bc1015b8e5&username=admin&password=P@88w0rd'
-    ```
+  ```bash
+  ╰─❯ curl 'http://localhost:8090/login' \
+    -H 'Accept: application/json' \
+    -H 'Cookie: XSRF-TOKEN=1ff67e0c-6f2c-4cf9-afb5-81bc1015b8e5' \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    --data-raw '_csrf=1ff67e0c-6f2c-4cf9-afb5-81bc1015b8e5&username=admin&password=P@88w0rd'
+  ```
 
-    ```bash
-    < HTTP/1.1 200 OK
-    < Vary: Origin
-    < Vary: Access-Control-Request-Method
-    < Vary: Access-Control-Request-Headers
-    < Content-Type: application/json
-    < Content-Length: 161
-    < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-    < Pragma: no-cache
-    < Expires: 0
-    < X-Content-Type-Options: nosniff
-    < X-Frame-Options: DENY
-    < X-XSS-Protection: 1 ; mode=block
-    < Referrer-Policy: no-referrer
-    < Set-Cookie: SESSION=d04db9f7-d2a6-4b7c-9845-ef790eb4a980; Path=/; HttpOnly; SameSite=Lax
-    ```
+  ```bash
+  < HTTP/1.1 200 OK
+  < Vary: Origin
+  < Vary: Access-Control-Request-Method
+  < Vary: Access-Control-Request-Headers
+  < Content-Type: application/json
+  < Content-Length: 161
+  < Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+  < Pragma: no-cache
+  < Expires: 0
+  < X-Content-Type-Options: nosniff
+  < X-Frame-Options: DENY
+  < X-XSS-Protection: 1 ; mode=block
+  < Referrer-Policy: no-referrer
+  < Set-Cookie: SESSION=d04db9f7-d2a6-4b7c-9845-ef790eb4a980; Path=/; HttpOnly; SameSite=Lax
+  ```
 
-    ```json
-    {
-      "username": "admin",
-      "authorities": [
-        {
-          "authority": "ROLE_super-role"
-        }
-      ],
-      "accountNonExpired": true,
-      "accountNonLocked": true,
-      "credentialsNonExpired": true,
-      "enabled": true
-    }
-    ```
-
+  ```json
+  {
+    "username": "admin",
+    "authorities": [
+      {
+        "authority": "ROLE_super-role"
+      }
+    ],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true,
+    "enabled": true
+  }
+  ```
 - HTTP 302 响应
 
   仅在请求头 `Accept` 中不包含 `application/json`才会发生，响应示例如下所示：
@@ -205,7 +204,7 @@ curl -u admin:admin -X 'POST' \
 
 请求体说明如下表所示：
 
-| 属性名         | 描述                                                                                                 |
+|     属性名     |                                                 描述                                                 |
 |-------------|----------------------------------------------------------------------------------------------------|
 | name        | PAT 名称。必填。                                                                                         |
 | description | PAT 描述。非必填。                                                                                        |
@@ -214,8 +213,8 @@ curl -u admin:admin -X 'POST' \
 
 响应体说明如下所示：
 
-| 属性路径                                                | 描述                                           |
-|-----------------------------------------------------|----------------------------------------------|
+|              属性路径              |                      描述                      |
+|--------------------------------|----------------------------------------------|
 | security.halo.run/access-token | 生成好的 PAT。需要注意的是，这个 PAT 不会保存在数据库中，所以仅有一次保存机会。 |
 
 #### 使用 PAT
@@ -226,3 +225,4 @@ curl -u admin:admin -X 'POST' \
 curl http://localhost:8090/apis/api.console.halo.run/v1alpha1/users/- \
   -H "Authorization: Bearer pat_eyJraWQiOiJabUNtcWhJX2FuaFlWQW5aRlVTS0lOckxXRFhqaEp1Nk9ZRGRtcW13Rno4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbXSwicGF0X25hbWUiOiJwYXQtYWRtaW4tbG9ia20iLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvIiwiZXhwIjoxNjk0ODMyMTU1LCJpYXQiOjE2OTQ3NDcyOTgsImp0aSI6IjBiODk3ZDljLTU2ZDctNTU0MS0yNjYyLTExMGI3MGUzZjlmZCJ9.UVFYzKmz3bUk7fV6xh_CpuNJA-BR8bci-DIJ7o0fk-hayHXFHr_-7HMrVn7iZcphryqmk0RLv7Zsu_AjY9Qn9iCYybBJBycU0tUJzhDexRtj1ViJtlsraoYxLNSYpJK1hcPngeJuiMa9FZrYGp0k_7GX1NddoXLUBI9orN9DbdKmmJXtvigaxPCp52Mu7fBtVsTmO5fk_y2CglqRl_tkLRpFSgUbERKOqKItctDFRg-WUALBYEpXbhZIXBMuTCsJwhniBMpc1Uu_a1Dqa3K5hDgfHTeUADY2BuhEdYJCODPCzmdfWMNqxYSKQT5JFYoDv-ed6cRqNjKeNvd1IPT3RDkVt_fbo8KPrzvkgIjIzni-Wlwe-pXXQbj_n8iax-jkeK526iu8q2CLptxYxLGD0j8htKZramrov4UkK_eIsotEZZfqig9sYVU5_b442WhOWatdB_pbKj7h-YK1Cb2ueg5kl73bcbBu63b8edJZClp6xr72az343SfBZdwrT_JJ5HR0hJmckAMR_U4qvGWrJ-dobXDgY9Oz-qObfiyglzn0Wrz4HRPlmqDFr2o6TMV7UVjQiV77tDzaNbaXVevXGPS5MaZr313dia7XLpIV3QopXma7rDR6Xnqg7ftDQb5vAvsjwN-JsVabAsdFeCo6ejE1slAD9ZQrD88kgfAIuX4"
 ```
+

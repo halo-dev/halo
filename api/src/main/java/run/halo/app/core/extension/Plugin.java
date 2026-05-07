@@ -27,8 +27,7 @@ import run.halo.app.infra.ConditionList;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "Plugin", plural = "plugins",
-    singular = "plugin")
+@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "Plugin", plural = "plugins", singular = "plugin")
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
 
@@ -64,11 +63,12 @@ public class Plugin extends AbstractExtension {
          *
          * @see <a href="semver.org">semantic version</a>
          */
-        @Schema(requiredMode = REQUIRED,
-            pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
-                + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
-                + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
-                + ".[0-9a-zA-Z-]+)*))?$")
+        @Schema(
+                requiredMode = REQUIRED,
+                pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
+                        + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
+                        + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
+                        + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
         private PluginAuthor author;
@@ -87,9 +87,7 @@ public class Plugin extends AbstractExtension {
 
         private List<License> license;
 
-        /**
-         * SemVer format.
-         */
+        /** SemVer format. */
         private String requires = "*";
 
         private Boolean enabled = false;
@@ -100,8 +98,8 @@ public class Plugin extends AbstractExtension {
     }
 
     /**
-     * In the future, we may consider using {@link run.halo.app.infra.model.License} instead of it.
-     * But now, replace it will lead to incompatibility with downstream.
+     * In the future, we may consider using {@link run.halo.app.infra.model.License} instead of it. But now, replace it
+     * will lead to incompatibility with downstream.
      */
     @Data
     public static class License {

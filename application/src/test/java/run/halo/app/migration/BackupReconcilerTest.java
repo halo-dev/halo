@@ -1,16 +1,8 @@
 package run.halo.app.migration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 
 import java.io.IOException;
@@ -174,8 +166,7 @@ class BackupReconcilerTest {
         backup.getSpec().setFormat("zip");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
-        when(migrationService.backup(backup)).thenReturn(
-            Mono.error(Exceptions.propagate(new InterruptedException())));
+        when(migrationService.backup(backup)).thenReturn(Mono.error(Exceptions.propagate(new InterruptedException())));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -204,7 +195,7 @@ class BackupReconcilerTest {
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
         when(migrationService.backup(backup))
-            .thenReturn(Mono.error(Exceptions.propagate(new IOException("File not found"))));
+                .thenReturn(Mono.error(Exceptions.propagate(new IOException("File not found"))));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -246,5 +237,4 @@ class BackupReconcilerTest {
         backup.setMetadata(metadata);
         return backup;
     }
-
 }

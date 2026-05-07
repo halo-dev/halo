@@ -19,5 +19,4 @@ public class ExternalUrlChangedEvent extends ApplicationEvent {
         super(source);
         this.externalUrl = externalUrl;
     }
-
 }

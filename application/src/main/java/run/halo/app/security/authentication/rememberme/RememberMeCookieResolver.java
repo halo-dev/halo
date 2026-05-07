@@ -7,7 +7,8 @@ import org.springframework.web.server.ServerWebExchange;
 
 public interface RememberMeCookieResolver {
 
-    @Nullable HttpCookie resolveRememberMeCookie(ServerWebExchange exchange);
+    @Nullable
+    HttpCookie resolveRememberMeCookie(ServerWebExchange exchange);
 
     void setRememberMeCookie(ServerWebExchange exchange, String value);
 

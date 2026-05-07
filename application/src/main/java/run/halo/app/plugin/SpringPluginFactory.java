@@ -7,7 +7,8 @@ import org.pf4j.PluginWrapper;
 
 /**
  * The default implementation for PluginFactory.
- * <p>Get a {@link BasePlugin} instance from the {@link PluginApplicationContext}.</p>
+ *
+ * <p>Get a {@link BasePlugin} instance from the {@link PluginApplicationContext}.
  *
  * @author guqing
  * @author johnniang
@@ -19,8 +20,7 @@ public class SpringPluginFactory implements PluginFactory {
     private final PluginApplicationContextFactory contextFactory;
     private final PluginGetter pluginGetter;
 
-    public SpringPluginFactory(PluginApplicationContextFactory contextFactory,
-        PluginGetter pluginGetter) {
+    public SpringPluginFactory(PluginApplicationContextFactory contextFactory, PluginGetter pluginGetter) {
         this.contextFactory = contextFactory;
         this.pluginGetter = pluginGetter;
     }
@@ -29,11 +29,11 @@ public class SpringPluginFactory implements PluginFactory {
     public Plugin create(PluginWrapper pluginWrapper) {
         var plugin = pluginGetter.getPlugin(pluginWrapper.getPluginId());
         var pluginContext = PluginContext.builder()
-            .name(pluginWrapper.getPluginId())
-            .configMapName(plugin.getSpec().getConfigMapName())
-            .version(pluginWrapper.getDescriptor().getVersion())
-            .runtimeMode(pluginWrapper.getRuntimeMode())
-            .build();
+                .name(pluginWrapper.getPluginId())
+                .configMapName(plugin.getSpec().getConfigMapName())
+                .version(pluginWrapper.getDescriptor().getVersion())
+                .runtimeMode(pluginWrapper.getRuntimeMode())
+                .build();
         return new DefaultSpringPlugin(contextFactory, pluginContext);
     }
 }

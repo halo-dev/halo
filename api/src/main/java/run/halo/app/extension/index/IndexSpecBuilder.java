@@ -10,11 +10,7 @@ import run.halo.app.extension.Extension;
  * @author johnniang
  * @since 2.22.0
  */
-public interface IndexSpecBuilder<
-    E extends Extension,
-    K extends Comparable<K>,
-    B extends IndexSpecBuilder<E, K, B>
-    > {
+public interface IndexSpecBuilder<E extends Extension, K extends Comparable<K>, B extends IndexSpecBuilder<E, K, B>> {
 
     /**
      * Sets whether the index is unique.
@@ -38,5 +34,4 @@ public interface IndexSpecBuilder<
      * @return the value index specification
      */
     ValueIndexSpec<E, K> build();
-
 }

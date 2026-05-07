@@ -39,10 +39,10 @@ public class MenuVo implements ExtensionVoOperator {
      */
     public static MenuVo from(Menu menu) {
         return builder()
-            .metadata(menu.getMetadata())
-            .spec(menu.getSpec())
-            .menuItems(List.of())
-            .build();
+                .metadata(menu.getMetadata())
+                .spec(menu.getSpec())
+                .menuItems(List.of())
+                .build();
     }
 
     public void print(StringBuilder buffer) {

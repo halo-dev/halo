@@ -3,7 +3,7 @@ package run.halo.app.infra;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>A interface that get system initialization state.</p>
+ * A interface that get system initialization state.
  *
  * @author guqing
  * @since 2.9.0

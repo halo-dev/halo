@@ -26,8 +26,7 @@ class EmailVerificationServiceImplTest {
 
         @Test
         public void generateCodeTest() {
-            var emailVerificationManager =
-                new EmailVerificationServiceImpl.EmailVerificationManager();
+            var emailVerificationManager = new EmailVerificationServiceImpl.EmailVerificationManager();
             emailVerificationManager.generateCode("fake-user", "fake-email");
             var result = emailVerificationManager.contains("fake-user", "fake-email");
             assertThat(result).isTrue();
@@ -42,8 +41,7 @@ class EmailVerificationServiceImplTest {
 
         @Test
         public void removeTest() {
-            var emailVerificationManager =
-                new EmailVerificationServiceImpl.EmailVerificationManager();
+            var emailVerificationManager = new EmailVerificationServiceImpl.EmailVerificationManager();
             emailVerificationManager.generateCode("fake-user", "fake-email");
             var result = emailVerificationManager.contains("fake-user", "fake-email");
             emailVerificationManager.removeCode("fake-user", "fake-email");
@@ -55,8 +53,7 @@ class EmailVerificationServiceImplTest {
         void verifyCodeTestNormal() {
             String username = "guqing";
             String email = "hi@halo.run";
-            var emailVerificationManager =
-                new EmailVerificationServiceImpl.EmailVerificationManager();
+            var emailVerificationManager = new EmailVerificationServiceImpl.EmailVerificationManager();
             var result = emailVerificationManager.verifyCode(username, email, "fake-code");
             assertThat(result).isFalse();
 
@@ -72,8 +69,7 @@ class EmailVerificationServiceImplTest {
         void verifyCodeFailedAfterMaxAttempts() {
             String username = "guqing";
             String email = "example@example.com";
-            var emailVerificationManager =
-                new EmailVerificationServiceImpl.EmailVerificationManager();
+            var emailVerificationManager = new EmailVerificationServiceImpl.EmailVerificationManager();
             var code = emailVerificationManager.generateCode(username, email);
             for (int i = 0; i <= MAX_ATTEMPTS; i++) {
                 var result = emailVerificationManager.verifyCode(username, email, "fake-code");
@@ -81,8 +77,8 @@ class EmailVerificationServiceImplTest {
             }
 
             assertThatThrownBy(() -> emailVerificationManager.verifyCode(username, email, code))
-                .isInstanceOf(EmailVerificationFailed.class)
-                .hasMessage("400 BAD_REQUEST \"Too many attempts. Please try again later.\"");
+                    .isInstanceOf(EmailVerificationFailed.class)
+                    .hasMessage("400 BAD_REQUEST \"Too many attempts. Please try again later.\"");
         }
     }
 

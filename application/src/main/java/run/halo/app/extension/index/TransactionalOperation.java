@@ -9,19 +9,14 @@ package run.halo.app.extension.index;
 public interface TransactionalOperation {
 
     /**
-     * Prepares the operation for execution. Implementation should perform necessary checks here and
-     * save any state needed for rollback.
+     * Prepares the operation for execution. Implementation should perform necessary checks here and save any state
+     * needed for rollback.
      */
     void prepare();
 
-    /**
-     * Commits the operation.
-     */
+    /** Commits the operation. */
     void commit();
 
-    /**
-     * Rolls back the operation.
-     */
+    /** Rolls back the operation. */
     void rollback();
-
 }

@@ -9,6 +9,4 @@ import java.util.function.Supplier;
  * @author johnniang
  * @since 2.9.0
  */
-public interface BackupRootGetter extends Supplier<Path> {
-
-}
+public interface BackupRootGetter extends Supplier<Path> {}

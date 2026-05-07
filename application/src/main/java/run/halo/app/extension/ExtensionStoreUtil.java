@@ -9,8 +9,7 @@ import org.springframework.util.StringUtils;
  */
 public final class ExtensionStoreUtil {
 
-    private ExtensionStoreUtil() {
-    }
+    private ExtensionStoreUtil() {}
 
     /**
      * Builds the name prefix of ExtensionStore.
@@ -38,5 +37,4 @@ public final class ExtensionStoreUtil {
     public static String buildStoreName(Scheme scheme, String name) {
         return buildStoreNamePrefix(scheme) + "/" + name;
     }
-
 }

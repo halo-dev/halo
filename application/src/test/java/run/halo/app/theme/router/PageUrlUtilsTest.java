@@ -21,43 +21,29 @@ class PageUrlUtilsTest {
     @Test
     void nextPageUrl() {
         long totalPage = 10;
-        assertThat(PageUrlUtils.nextPageUrl(s, totalPage))
-            .isEqualTo("/tags/page/2");
-        assertThat(PageUrlUtils.nextPageUrl(s2, totalPage))
-            .isEqualTo("/tags/page/3");
-        assertThat(PageUrlUtils.nextPageUrl(s3, totalPage))
-            .isEqualTo("/tags/y/m/page/3");
-        assertThat(PageUrlUtils.nextPageUrl(s4, totalPage))
-            .isEqualTo("/tags/y/m/page/2");
-        assertThat(PageUrlUtils.nextPageUrl(s5, totalPage))
-            .isEqualTo("/tags/y/m/page/4");
+        assertThat(PageUrlUtils.nextPageUrl(s, totalPage)).isEqualTo("/tags/page/2");
+        assertThat(PageUrlUtils.nextPageUrl(s2, totalPage)).isEqualTo("/tags/page/3");
+        assertThat(PageUrlUtils.nextPageUrl(s3, totalPage)).isEqualTo("/tags/y/m/page/3");
+        assertThat(PageUrlUtils.nextPageUrl(s4, totalPage)).isEqualTo("/tags/y/m/page/2");
+        assertThat(PageUrlUtils.nextPageUrl(s5, totalPage)).isEqualTo("/tags/y/m/page/4");
 
         // The number of pages does not exceed the total number of pages
         totalPage = 1;
-        assertThat(PageUrlUtils.nextPageUrl("/tags/page/1", totalPage))
-            .isEqualTo("/tags/page/1");
+        assertThat(PageUrlUtils.nextPageUrl("/tags/page/1", totalPage)).isEqualTo("/tags/page/1");
 
         totalPage = 0;
-        assertThat(PageUrlUtils.nextPageUrl("/tags", totalPage))
-            .isEqualTo("/tags/page/1");
+        assertThat(PageUrlUtils.nextPageUrl("/tags", totalPage)).isEqualTo("/tags/page/1");
     }
 
     @Test
     void prevPageUrl() {
-        assertThat(PageUrlUtils.prevPageUrl(s))
-            .isEqualTo("/tags");
-        assertThat(PageUrlUtils.prevPageUrl(s1))
-            .isEqualTo("/tags");
-        assertThat(PageUrlUtils.prevPageUrl(s2))
-            .isEqualTo("/tags");
-        assertThat(PageUrlUtils.prevPageUrl(s3))
-            .isEqualTo("/tags/y/m");
-        assertThat(PageUrlUtils.prevPageUrl(s4))
-            .isEqualTo("/tags/y/m");
-        assertThat(PageUrlUtils.prevPageUrl(s5))
-            .isEqualTo("/tags/y/m/page/2");
+        assertThat(PageUrlUtils.prevPageUrl(s)).isEqualTo("/tags");
+        assertThat(PageUrlUtils.prevPageUrl(s1)).isEqualTo("/tags");
+        assertThat(PageUrlUtils.prevPageUrl(s2)).isEqualTo("/tags");
+        assertThat(PageUrlUtils.prevPageUrl(s3)).isEqualTo("/tags/y/m");
+        assertThat(PageUrlUtils.prevPageUrl(s4)).isEqualTo("/tags/y/m");
+        assertThat(PageUrlUtils.prevPageUrl(s5)).isEqualTo("/tags/y/m/page/2");
 
-        assertThat(PageUrlUtils.prevPageUrl("/page/2"))
-            .isEqualTo("/");
+        assertThat(PageUrlUtils.prevPageUrl("/page/2")).isEqualTo("/");
     }
 }

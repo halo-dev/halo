@@ -105,3 +105,4 @@ spec:
   displayName: "KatexSinglePageContentHandler"
   description: "Katex support for single page content."
 ```
+

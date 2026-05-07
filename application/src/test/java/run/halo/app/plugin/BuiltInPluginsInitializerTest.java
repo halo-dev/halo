@@ -1,12 +1,8 @@
 package run.halo.app.plugin;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static run.halo.app.core.extension.Plugin.BUILT_IN_KEEPER_FINALIZER;
 import static run.halo.app.core.extension.Plugin.SYSTEM_RESERVED_LABEL_KEY;
 
@@ -60,8 +56,7 @@ class BuiltInPluginsInitializerTest {
         var pluginUri = URI.create("file:///fake-plugin.jar");
         var pluginPath = Path.of(pluginUri);
         when(resource.getURI()).thenReturn(pluginUri);
-        when(resourcePatternResolver.getResources(isA(String.class)))
-            .thenReturn(new Resource[] {resource});
+        when(resourcePatternResolver.getResources(isA(String.class))).thenReturn(new Resource[] {resource});
 
         var fakePlugin = createPlugin();
         when(pluginFinder.find(pluginPath)).thenReturn(fakePlugin);
@@ -82,15 +77,12 @@ class BuiltInPluginsInitializerTest {
         var pluginUri = URI.create("file:///fake-plugin.jar");
         var pluginPath = Path.of(pluginUri);
         when(resource.getURI()).thenReturn(pluginUri);
-        when(resourcePatternResolver.getResources(isA(String.class)))
-            .thenReturn(new Resource[] {resource});
+        when(resourcePatternResolver.getResources(isA(String.class))).thenReturn(new Resource[] {resource});
 
         var fakePlugin = createPlugin();
         when(pluginFinder.find(pluginPath)).thenReturn(fakePlugin);
-        when(pluginService.install(pluginPath))
-            .thenReturn(Mono.error(new PluginAlreadyExistsException("fake-plugin")));
-        when(pluginService.upgrade("fake-plugin", pluginPath))
-            .thenReturn(Mono.just(fakePlugin));
+        when(pluginService.install(pluginPath)).thenReturn(Mono.error(new PluginAlreadyExistsException("fake-plugin")));
+        when(pluginService.upgrade("fake-plugin", pluginPath)).thenReturn(Mono.just(fakePlugin));
         doNothing().when(client).update(fakePlugin);
         var event = mock(ExtensionInitializedEvent.class);
 
@@ -107,8 +99,7 @@ class BuiltInPluginsInitializerTest {
         var pluginUri = URI.create("file:///fake-plugin.jar");
         var pluginPath = Path.of(pluginUri);
         when(resource.getURI()).thenReturn(pluginUri);
-        when(resourcePatternResolver.getResources(isA(String.class)))
-            .thenReturn(new Resource[] {resource});
+        when(resourcePatternResolver.getResources(isA(String.class))).thenReturn(new Resource[] {resource});
 
         var fakePlugin = createPlugin();
         fakePlugin.getMetadata().setDeletionTimestamp(Instant.now());
@@ -128,5 +119,4 @@ class BuiltInPluginsInitializerTest {
         plugin.getMetadata().setName("fake-plugin");
         return plugin;
     }
-
 }

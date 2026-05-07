@@ -24,5 +24,4 @@ class DefaultIndexEngineTest {
         }
         result.forEach(System.out::println);
     }
-
 }

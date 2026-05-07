@@ -9,11 +9,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
@@ -33,8 +29,8 @@ import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
 
 /**
- * The {@link AuthorPostsRouteFactory} for generate {@link RouterFunction} specific to the template
- * <code>index.html</code>.
+ * The {@link AuthorPostsRouteFactory} for generate {@link RouterFunction} specific to the template <code>index.html
+ * </code>.
  *
  * @author guqing
  * @since 2.0.0
@@ -54,66 +50,71 @@ public class AuthorPostsRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
-        return RouterFunctions
-            .route(GET("/authors/{name}").or(GET("/authors/{name}/page/{page:\\d+}"))
-                .and(accept(MediaType.TEXT_HTML)), handlerFunction());
+        return RouterFunctions.route(
+                GET("/authors/{name}")
+                        .or(GET("/authors/{name}/page/{page:\\d+}"))
+                        .and(accept(MediaType.TEXT_HTML)),
+                handlerFunction());
     }
 
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             String name = request.pathVariable("name");
-            return hasPostManageRole(name)
-                .flatMap(hasPostManageRole -> {
-                    if (hasPostManageRole) {
-                        return ServerResponse.ok()
-                            .render(DefaultTemplateEnum.AUTHOR.getValue(),
-                                Map.of("name", name,
-                                    "author", getByName(name),
-                                    "posts", postList(request, name),
-                                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.AUTHOR.getValue()
-                                )
-                            );
-                    }
-                    return Mono.error(new NotFoundException("Author page not found."));
-                });
+            return hasPostManageRole(name).flatMap(hasPostManageRole -> {
+                if (hasPostManageRole) {
+                    return ServerResponse.ok()
+                            .render(
+                                    DefaultTemplateEnum.AUTHOR.getValue(),
+                                    Map.of(
+                                            "name",
+                                            name,
+                                            "author",
+                                            getByName(name),
+                                            "posts",
+                                            postList(request, name),
+                                            ModelConst.TEMPLATE_ID,
+                                            DefaultTemplateEnum.AUTHOR.getValue()));
+                }
+                return Mono.error(new NotFoundException("Author page not found."));
+            });
         };
     }
 
     protected Mono<Boolean> hasPostManageRole(String username) {
-        return roleService.getRolesByUsername(username)
-            .collectList()
-            .flatMap(roles -> roleService.contains(roles,
-                Set.of(AuthorityUtils.POST_CONTRIBUTOR_ROLE_NAME))
-            )
-            .defaultIfEmpty(false);
+        return roleService
+                .getRolesByUsername(username)
+                .collectList()
+                .flatMap(roles -> roleService.contains(roles, Set.of(AuthorityUtils.POST_CONTRIBUTOR_ROLE_NAME)))
+                .defaultIfEmpty(false);
     }
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request, String name) {
         String path = request.path();
         int pageNum = pageNumInPathVariable(request);
         return configuredPageSize(environmentFetcher, SystemSetting.Post::getAuthorPageSize)
-            .flatMap(pageSize -> postFinder.listByOwner(pageNum, pageSize, name))
-            .doOnNext(list -> {
-                list.getItems().forEach(listedPostVo -> {
-                    listedPostVo.getSpec().setTitle(
-                        titleVisibilityIdentifyCalculator.calculateTitle(
-                            listedPostVo.getSpec().getTitle(),
-                            listedPostVo.getSpec().getVisible(),
-                            localeContextResolver.resolveLocaleContext(request.exchange())
-                                .getLocale())
-                    );
-                });
-            })
-            .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
-                .listResult(list)
-                .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
-                .prevUrl(PageUrlUtils.prevPageUrl(path))
-                .build());
+                .flatMap(pageSize -> postFinder.listByOwner(pageNum, pageSize, name))
+                .doOnNext(list -> {
+                    list.getItems().forEach(listedPostVo -> {
+                        listedPostVo
+                                .getSpec()
+                                .setTitle(titleVisibilityIdentifyCalculator.calculateTitle(
+                                        listedPostVo.getSpec().getTitle(),
+                                        listedPostVo.getSpec().getVisible(),
+                                        localeContextResolver
+                                                .resolveLocaleContext(request.exchange())
+                                                .getLocale()));
+                    });
+                })
+                .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
+                        .listResult(list)
+                        .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
+                        .prevUrl(PageUrlUtils.prevPageUrl(path))
+                        .build());
     }
 
     private Mono<UserVo> getByName(String name) {
         return client.fetch(User.class, name)
-            .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
-            .map(UserVo::from);
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
+                .map(UserVo::from);
     }
 }

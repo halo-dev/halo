@@ -1,11 +1,7 @@
 package run.halo.app.core.attachment.thumbnail;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
@@ -51,15 +47,14 @@ class DefaultLocalThumbnailServiceTest {
         when(haloProperties.getAttachment()).thenReturn(attachmentProperties);
         when(thumbnailProperties.isDisabled()).thenReturn(false);
         when(thumbnailProperties.getConcurrentThreads()).thenReturn(1);
-        var imagePath =
-            ResourceUtils.getFile("classpath:static/images/halo-logo-401x401.png").toPath();
+        var imagePath = ResourceUtils.getFile("classpath:static/images/halo-logo-401x401.png")
+                .toPath();
         lenient().when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
         this.source = attachmentRoot.resolve("static").resolve("hal-logo-401x401.png");
         Files.createDirectories(this.source.getParent());
         Files.copy(imagePath, this.source);
 
-        this.generator =
-            new DefaultLocalThumbnailService(this.attachmentRootGetter, this.haloProperties);
+        this.generator = new DefaultLocalThumbnailService(this.attachmentRootGetter, this.haloProperties);
         var executorService = MoreExecutors.newDirectExecutorService();
         this.generator.setExecutorService(executorService);
     }
@@ -71,39 +66,42 @@ class DefaultLocalThumbnailServiceTest {
 
     @Test
     void shouldGenerateThumbnail() {
-        this.generator.generate(source, ThumbnailSize.S)
-            .as(StepVerifier::create)
-            .assertNext(resource -> {
-                assertTrue(resource.isReadable());
-                assertDoesNotThrow(() -> {
-                    var thumbnailSize = resource.contentLength();
-                    var sourceSize = Files.size(source);
-                    assertTrue(thumbnailSize < sourceSize);
-                });
-            })
-            .verifyComplete();
+        this.generator
+                .generate(source, ThumbnailSize.S)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    assertTrue(resource.isReadable());
+                    assertDoesNotThrow(() -> {
+                        var thumbnailSize = resource.contentLength();
+                        var sourceSize = Files.size(source);
+                        assertTrue(thumbnailSize < sourceSize);
+                    });
+                })
+                .verifyComplete();
     }
 
     @Test
     void shouldReplaceWithSourceIfSizeIsLarger() {
-        this.generator.generate(source, ThumbnailSize.M)
-            .as(StepVerifier::create)
-            .assertNext(resource -> {
-                assertTrue(resource.isReadable());
-                assertDoesNotThrow(() -> {
-                    var thumbnailSize = resource.contentLength();
-                    var sourceSize = Files.size(source);
-                    assertEquals(thumbnailSize, sourceSize);
-                });
-            })
-            .verifyComplete();
+        this.generator
+                .generate(source, ThumbnailSize.M)
+                .as(StepVerifier::create)
+                .assertNext(resource -> {
+                    assertTrue(resource.isReadable());
+                    assertDoesNotThrow(() -> {
+                        var thumbnailSize = resource.contentLength();
+                        var sourceSize = Files.size(source);
+                        assertEquals(thumbnailSize, sourceSize);
+                    });
+                })
+                .verifyComplete();
     }
 
     @Test
     void shouldDisableThumbnailGeneration() {
         when(thumbnailProperties.isDisabled()).thenReturn(true);
-        this.generator.generate(source, ThumbnailSize.S)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        this.generator
+                .generate(source, ThumbnailSize.S)
+                .as(StepVerifier::create)
+                .verifyComplete();
     }
 }

@@ -354,3 +354,4 @@ curl 'https://wiki.fit2cloud.com/rest/api/search?cql=siteSearch%20~%20%22halo%22
 
 - Lucene 目前是作为 Halo 的依赖使用的，也就意味着只支持 Halo 单实例部署，阻碍未来 Halo 无状态化的趋势。
 - 相反，其他搜索引擎（例如 Solr、MeiliSearch、ElasticSearch 等）都可以独立部署，Halo 只需要利用对应的 SDK 和搜索引擎沟通即可，无论 Halo 是否是多实例部署。
+

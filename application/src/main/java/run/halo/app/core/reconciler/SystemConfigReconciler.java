@@ -37,68 +37,55 @@ class SystemConfigReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Result reconcile(Request request) {
         Assert.state(
-            Objects.equals(SystemSetting.SYSTEM_CONFIG, request.name()),
-            "Only system config reconciler is supported to reconcile system config."
-        );
-        client.fetch(ConfigMap.class, request.name())
-            .ifPresent(configMap -> {
-                if (ExtensionUtil.isDeleted(configMap)) {
-                    log.warn("System config was attempted to be deleted");
-                    return;
-                }
-                // calculate if the configMap has changed
-                // and publish event if changed
-                var dataSnapshot = SystemConfigUtils.getDataSnapshot(configMap);
-                if (SystemConfigUtils.populateChecksum(configMap)) {
-                    SystemConfigUtils.updateDataSnapshot(configMap);
-                    client.update(configMap);
-                    log.info("System config has been detected as changed");
-                    eventPublisher.publishEvent(
-                        computeChangedEvent(configMap, dataSnapshot)
-                    );
-                }
-                // do nothing if not changed
-            });
+                Objects.equals(SystemSetting.SYSTEM_CONFIG, request.name()),
+                "Only system config reconciler is supported to reconcile system config.");
+        client.fetch(ConfigMap.class, request.name()).ifPresent(configMap -> {
+            if (ExtensionUtil.isDeleted(configMap)) {
+                log.warn("System config was attempted to be deleted");
+                return;
+            }
+            // calculate if the configMap has changed
+            // and publish event if changed
+            var dataSnapshot = SystemConfigUtils.getDataSnapshot(configMap);
+            if (SystemConfigUtils.populateChecksum(configMap)) {
+                SystemConfigUtils.updateDataSnapshot(configMap);
+                client.update(configMap);
+                log.info("System config has been detected as changed");
+                eventPublisher.publishEvent(computeChangedEvent(configMap, dataSnapshot));
+            }
+            // do nothing if not changed
+        });
         return null;
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        ExtensionMatcher matcher = extension ->
-            Objects.equals(extension.getMetadata().getName(), SystemSetting.SYSTEM_CONFIG);
+        ExtensionMatcher matcher =
+                extension -> Objects.equals(extension.getMetadata().getName(), SystemSetting.SYSTEM_CONFIG);
         return builder.extension(new ConfigMap())
-            .syncAllOnStart(true)
-            .syncAllListOptions(ListOptions.builder()
-                .fieldQuery(equal("metadata.name", SystemSetting.SYSTEM_CONFIG))
-                .build()
-            )
-            .onAddMatcher(matcher)
-            .onUpdateMatcher(matcher)
-            .onDeleteMatcher(matcher)
-            .build();
+                .syncAllOnStart(true)
+                .syncAllListOptions(ListOptions.builder()
+                        .fieldQuery(equal("metadata.name", SystemSetting.SYSTEM_CONFIG))
+                        .build())
+                .onAddMatcher(matcher)
+                .onUpdateMatcher(matcher)
+                .onDeleteMatcher(matcher)
+                .build();
     }
 
-    private SystemConfigChangedEvent computeChangedEvent(ConfigMap configMap,
-        @Nullable Map<String, String> oldData) {
+    private SystemConfigChangedEvent computeChangedEvent(ConfigMap configMap, @Nullable Map<String, String> oldData) {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)
-            .map(defaultConfigMap -> {
-                var defaultData =
-                    requireNonNullElse(defaultConfigMap.getData(), Map.<String, String>of());
-                try {
-                    var mergedOldData = mergeMap(
-                        defaultData, requireNonNullElse(oldData, Map.of())
-                    );
-                    var mergedNewData = mergeMap(
-                        defaultData, requireNonNullElse(configMap.getData(), Map.of())
-                    );
-                    return new SystemConfigChangedEvent(this, mergedOldData, mergedNewData);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .orElseGet(() -> new SystemConfigChangedEvent(
-                this, oldData, requireNonNullElse(configMap.getData(), Map.of())
-            ));
+                .map(defaultConfigMap -> {
+                    var defaultData = requireNonNullElse(defaultConfigMap.getData(), Map.<String, String>of());
+                    try {
+                        var mergedOldData = mergeMap(defaultData, requireNonNullElse(oldData, Map.of()));
+                        var mergedNewData = mergeMap(defaultData, requireNonNullElse(configMap.getData(), Map.of()));
+                        return new SystemConfigChangedEvent(this, mergedOldData, mergedNewData);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElseGet(() ->
+                        new SystemConfigChangedEvent(this, oldData, requireNonNullElse(configMap.getData(), Map.of())));
     }
-
 }

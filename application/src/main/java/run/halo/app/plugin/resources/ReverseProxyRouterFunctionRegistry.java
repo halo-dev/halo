@@ -25,14 +25,12 @@ public class ReverseProxyRouterFunctionRegistry {
 
     private final ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
     private final StampedLock lock = new StampedLock();
-    private final Map<String, RouterFunction<ServerResponse>> proxyNameRouterFunctionRegistry =
-        new HashMap<>();
-    private final LinkedHashMultimap<String, String> pluginIdReverseProxyMap =
-        LinkedHashMultimap.create();
+    private final Map<String, RouterFunction<ServerResponse>> proxyNameRouterFunctionRegistry = new HashMap<>();
+    private final LinkedHashMultimap<String, String> pluginIdReverseProxyMap = LinkedHashMultimap.create();
 
     public ReverseProxyRouterFunctionRegistry(
-        PluginRouterFunctionRegistry pluginRouterFunctionRegistry,
-        ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory) {
+            PluginRouterFunctionRegistry pluginRouterFunctionRegistry,
+            ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory) {
         this.pluginRouterFunctionRegistry = pluginRouterFunctionRegistry;
         this.reverseProxyRouterFunctionFactory = reverseProxyRouterFunctionFactory;
     }
@@ -59,17 +57,13 @@ public class ReverseProxyRouterFunctionRegistry {
         }
     }
 
-    /**
-     * Only for test.
-     */
+    /** Only for test. */
     int reverseProxySize(String pluginId) {
         Set<String> names = pluginIdReverseProxyMap.get(pluginId);
         return names.size();
     }
 
-    /**
-     * Remove reverse proxy router function by pluginId and reverse proxy name.
-     */
+    /** Remove reverse proxy router function by pluginId and reverse proxy name. */
     public void remove(String pluginId, String reverseProxyName) {
         long stamp = lock.writeLock();
         try {
@@ -82,5 +76,4 @@ public class ReverseProxyRouterFunctionRegistry {
             lock.unlockWrite(stamp);
         }
     }
-
 }

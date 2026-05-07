@@ -2,9 +2,7 @@ package run.halo.app.core.endpoint.console;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +36,8 @@ class SinglePageEndpointTest {
 
     @BeforeEach
     void setUp() {
-        webTestClient = WebTestClient
-            .bindToRouterFunction(singlePageEndpoint.endpoint())
-            .build();
+        webTestClient = WebTestClient.bindToRouterFunction(singlePageEndpoint.endpoint())
+                .build();
     }
 
     @Test
@@ -52,14 +49,15 @@ class SinglePageEndpointTest {
         when(client.get(eq(SinglePage.class), eq("page-1"))).thenReturn(Mono.just(page));
 
         when(client.update(any(SinglePage.class)))
-            .thenReturn(Mono.error(new OptimisticLockingFailureException("fake-error")));
+                .thenReturn(Mono.error(new OptimisticLockingFailureException("fake-error")));
 
         // Send request
-        webTestClient.put()
-            .uri("/singlepages/{name}/publish?async=false", "page-1")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError();
+        webTestClient
+                .put()
+                .uri("/singlepages/{name}/publish?async=false", "page-1")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
 
         // Verify WebClient retry behavior
         verify(client, times(6)).get(eq(SinglePage.class), eq("page-1"));
@@ -79,11 +77,12 @@ class SinglePageEndpointTest {
         when(client.update(any(SinglePage.class))).thenReturn(Mono.just(page));
 
         // Send request
-        webTestClient.put()
-            .uri("/singlepages/{name}/publish?async=false", "page-1")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful();
+        webTestClient
+                .put()
+                .uri("/singlepages/{name}/publish?async=false", "page-1")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
 
         // Verify WebClient retry behavior
         verify(client, times(1)).get(eq(SinglePage.class), eq("page-1"));

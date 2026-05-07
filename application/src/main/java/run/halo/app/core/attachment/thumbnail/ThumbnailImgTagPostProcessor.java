@@ -35,14 +35,11 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
 
     public ThumbnailImgTagPostProcessor(ThumbnailService thumbnailService) {
         this.thumbnailService = thumbnailService;
-        this.matchingElementName =
-            MatchingElementName.forElementName(HTML, ElementNames.forHTMLName("img"));
+        this.matchingElementName = MatchingElementName.forElementName(HTML, ElementNames.forHTMLName("img"));
     }
 
-
     @Override
-    public Mono<IProcessableElementTag> process(ITemplateContext context,
-        IProcessableElementTag tag) {
+    public Mono<IProcessableElementTag> process(ITemplateContext context, IProcessableElementTag tag) {
         if (!matchingElementName.matches(tag.getElementDefinition().getElementName())) {
             return Mono.empty();
         }
@@ -50,10 +47,10 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
             return Mono.empty();
         }
         var srcValue = Optional.ofNullable(tag.getAttribute("src"))
-            .map(IAttribute::getValue)
-            .filter(StringUtils::hasText)
-            .map(String::trim)
-            .map(HaloUtils::safeToUri);
+                .map(IAttribute::getValue)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .map(HaloUtils::safeToUri);
         if (srcValue.isEmpty()) {
             log.debug("Skip processing img tag without src attribute");
             return Mono.empty();
@@ -61,23 +58,23 @@ class ThumbnailImgTagPostProcessor implements ElementTagPostProcessor {
         // get img tag
         var imageUri = srcValue.get();
 
-        return thumbnailService.get(imageUri)
-            .filter(Predicate.not(Map::isEmpty))
-            .map(thumbnails -> {
-                var modelFactory = context.getModelFactory();
-                var newTag = tag;
-                if (!newTag.hasAttribute("sizes")) {
-                    newTag = modelFactory.setAttribute(newTag, "sizes", DEFAULT_SIZES);
-                }
-                var srcset = thumbnails.keySet().stream()
-                    .map(size -> {
-                        var uri = thumbnails.get(size);
-                        return uri + " " + size.getWidth() + "w";
-                    })
-                    .collect(Collectors.joining(", "));
-                newTag = modelFactory.setAttribute(newTag, "srcset", srcset);
-                return newTag;
-            });
+        return thumbnailService
+                .get(imageUri)
+                .filter(Predicate.not(Map::isEmpty))
+                .map(thumbnails -> {
+                    var modelFactory = context.getModelFactory();
+                    var newTag = tag;
+                    if (!newTag.hasAttribute("sizes")) {
+                        newTag = modelFactory.setAttribute(newTag, "sizes", DEFAULT_SIZES);
+                    }
+                    var srcset = thumbnails.keySet().stream()
+                            .map(size -> {
+                                var uri = thumbnails.get(size);
+                                return uri + " " + size.getWidth() + "w";
+                            })
+                            .collect(Collectors.joining(", "));
+                    newTag = modelFactory.setAttribute(newTag, "srcset", srcset);
+                    return newTag;
+                });
     }
-
 }

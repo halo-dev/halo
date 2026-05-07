@@ -21,5 +21,4 @@ public class DefaultThemeTemplateAvailabilityProvider implements ThemeTemplateAv
         var path = themeContext.getPath().resolve("templates").resolve(viewName + suffix);
         return Files.exists(path);
     }
-
 }

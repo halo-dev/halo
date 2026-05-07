@@ -1,14 +1,9 @@
 package run.halo.app.migration.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
@@ -81,9 +76,7 @@ class MigrationServiceImplTest {
     @Test
     void backupTest() throws IOException {
         Files.writeString(tempDir.resolve("fake-file"), "halo", StandardOpenOption.CREATE_NEW);
-        var extensionStores = List.of(
-            createExtensionStore("fake-extension-store", "fake-data")
-        );
+        var extensionStores = List.of(createExtensionStore("fake-extension-store", "fake-data"));
         var tx = mock(ReactiveTransaction.class);
         when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
         when(txManager.commit(tx)).thenReturn(Mono.empty());
@@ -91,15 +84,14 @@ class MigrationServiceImplTest {
         when(entityTemplate.select(ExtensionStore.class)).thenReturn(reactiveSelect);
         when(reactiveSelect.withFetchSize(100)).thenReturn(selectWithQuery);
         when(selectWithQuery.all())
-            .thenReturn(Flux.fromIterable(extensionStores))
-            .thenReturn(Flux.empty());
+                .thenReturn(Flux.fromIterable(extensionStores))
+                .thenReturn(Flux.empty());
 
         when(haloProperties.getWorkDir()).thenReturn(tempDir);
         when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
         var startTimestamp = Instant.now();
         var backup = createRunningBackup("fake-backup", startTimestamp);
-        StepVerifier.create(migrationService.backup(backup))
-            .verifyComplete();
+        StepVerifier.create(migrationService.backup(backup)).verifyComplete();
 
         // 1. backup workdir
         // 2. package backup
@@ -109,14 +101,12 @@ class MigrationServiceImplTest {
         var status = backup.getStatus();
         var datetimePart = migrationService.getDateTimeFormatter().format(startTimestamp);
         assertEquals(datetimePart + "-fake-backup.zip", status.getFilename());
-        var backupFile = migrationService.getBackupsRoot()
-            .resolve(status.getFilename());
+        var backupFile = migrationService.getBackupsRoot().resolve(status.getFilename());
         assertTrue(Files.exists(backupFile));
         assertEquals(Files.size(backupFile), status.getSize());
 
         var target = tempDir.resolve("target");
-        try (var zis = new ZipInputStream(
-            Files.newInputStream(backupFile, StandardOpenOption.READ))) {
+        try (var zis = new ZipInputStream(Files.newInputStream(backupFile, StandardOpenOption.READ))) {
             FileUtils.unzip(zis, tempDir.resolve("target"));
         }
 
@@ -126,24 +116,21 @@ class MigrationServiceImplTest {
         assertTrue(Files.exists(workdir));
 
         var objectMapper = migrationService.getObjectMapper();
-        var gotExtensionStores = objectMapper.readValue(extensionsFile.toFile(),
-            new TypeReference<List<ExtensionStore>>() {
-            });
+        var gotExtensionStores =
+                objectMapper.readValue(extensionsFile.toFile(), new TypeReference<List<ExtensionStore>>() {});
         assertEquals(gotExtensionStores, extensionStores);
         assertEquals("halo", Files.readString(workdir.resolve("fake-file")));
     }
 
     @Test
     void restoreTest() throws IOException, URISyntaxException {
-        var unpackedBackup =
-            getClass().getClassLoader().getResource("backups/backup-for-restoration");
+        var unpackedBackup = getClass().getClassLoader().getResource("backups/backup-for-restoration");
         assertNotNull(unpackedBackup);
         var backupFile = tempDir.resolve("backups").resolve("fake-backup.zip");
         Files.createDirectories(backupFile.getParent());
         FileUtils.zip(Path.of(unpackedBackup.toURI()), backupFile);
         var workdir = tempDir.resolve("workdir-for-restoration");
         Files.createDirectory(workdir);
-
 
         var expectStore = createExtensionStore("fake-extension-store", "fake-data");
         expectStore.setVersion(null);
@@ -156,13 +143,9 @@ class MigrationServiceImplTest {
         when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
         when(txManager.commit(tx)).thenReturn(Mono.empty());
 
-        var content = DataBufferUtils.read(backupFile,
-            DefaultDataBufferFactory.sharedInstance,
-            2048,
-            StandardOpenOption.READ);
-        StepVerifier.create(migrationService.restore(content))
-            .verifyComplete();
-
+        var content = DataBufferUtils.read(
+                backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content)).verifyComplete();
 
         verify(haloProperties).getWorkDir();
         verify(repository).deleteAll();
@@ -181,8 +164,7 @@ class MigrationServiceImplTest {
 
         when(backupRoot.get()).thenReturn(tempDir.resolve("workdir").resolve("backups"));
         var backup = createSucceededBackup("fake-backup", "backup.zip");
-        StepVerifier.create(migrationService.cleanup(backup))
-            .verifyComplete();
+        StepVerifier.create(migrationService.cleanup(backup)).verifyComplete();
         verify(haloProperties, never()).getWorkDir();
         verify(backupRoot).get();
         assertTrue(Files.notExists(backupFile));
@@ -191,8 +173,7 @@ class MigrationServiceImplTest {
     @Test
     void cleanupBackupWithNoFilename() {
         var backup = createSucceededBackup("fake-backup", null);
-        StepVerifier.create(migrationService.cleanup(backup))
-            .verifyComplete();
+        StepVerifier.create(migrationService.cleanup(backup)).verifyComplete();
         verify(haloProperties, never()).getWorkDir();
         verify(backupRoot, never()).get();
     }
@@ -206,16 +187,16 @@ class MigrationServiceImplTest {
         var backup = createSucceededBackup("fake-backup", "backup.zip");
 
         StepVerifier.create(migrationService.download(backup))
-            .assertNext(resource -> {
-                assertEquals("backup.zip", resource.getFilename());
-                try {
-                    var content = resource.getContentAsString(UTF_8);
-                    assertEquals("this is a backup file.", content);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .verifyComplete();
+                .assertNext(resource -> {
+                    assertEquals("backup.zip", resource.getFilename());
+                    try {
+                        var content = resource.getContentAsString(UTF_8);
+                        assertEquals("this is a backup file.", content);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
 
         verify(haloProperties, never()).getWorkDir();
         verify(backupRoot).get();
@@ -227,8 +208,8 @@ class MigrationServiceImplTest {
         when(backupRoot.get()).thenReturn(tempDir.resolve("workdir").resolve("backups"));
 
         StepVerifier.create(migrationService.download(backup))
-            .expectError(NotFoundException.class)
-            .verify();
+                .expectError(NotFoundException.class)
+                .verify();
         verify(haloProperties, never()).getWorkDir();
         verify(backupRoot).get();
     }
@@ -242,33 +223,28 @@ class MigrationServiceImplTest {
 
         var backup2 = tempDir.resolve("backup2.zip");
         Files.writeString(backup2, "fake--content");
-        Files.setLastModifiedTime(
-            backup2,
-            FileTime.from(now.plus(Duration.ofSeconds(1)))
-        );
+        Files.setLastModifiedTime(backup2, FileTime.from(now.plus(Duration.ofSeconds(1))));
 
         var backup3 = tempDir.resolve("backup3.not-a-zip");
         Files.writeString(backup3, "fake-content");
-        Files.setLastModifiedTime(
-            backup3,
-            FileTime.from(now.plus(Duration.ofSeconds(2)))
-        );
+        Files.setLastModifiedTime(backup3, FileTime.from(now.plus(Duration.ofSeconds(2))));
         when(backupRoot.get()).thenReturn(tempDir);
 
         migrationService.afterPropertiesSet();
-        migrationService.getBackupFiles()
-            .as(StepVerifier::create)
-            .assertNext(backupFile -> {
-                assertEquals("backup2.zip", backupFile.getFilename());
-                assertEquals(13, backupFile.getSize());
-                assertEquals(now.plus(Duration.ofSeconds(1)), backupFile.getLastModifiedTime());
-            })
-            .assertNext(backupFile -> {
-                assertEquals("backup1.zip", backupFile.getFilename());
-                assertEquals(12, backupFile.getSize());
-                assertEquals(now, backupFile.getLastModifiedTime());
-            })
-            .verifyComplete();
+        migrationService
+                .getBackupFiles()
+                .as(StepVerifier::create)
+                .assertNext(backupFile -> {
+                    assertEquals("backup2.zip", backupFile.getFilename());
+                    assertEquals(13, backupFile.getSize());
+                    assertEquals(now.plus(Duration.ofSeconds(1)), backupFile.getLastModifiedTime());
+                })
+                .assertNext(backupFile -> {
+                    assertEquals("backup1.zip", backupFile.getFilename());
+                    assertEquals(12, backupFile.getSize());
+                    assertEquals(now, backupFile.getLastModifiedTime());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -279,18 +255,20 @@ class MigrationServiceImplTest {
         when(backupRoot.get()).thenReturn(tempDir);
 
         migrationService.afterPropertiesSet();
-        migrationService.getBackupFile("backup.zip")
-            .as(StepVerifier::create)
-            .assertNext(backupFile -> {
-                assertEquals("backup.zip", backupFile.getFilename());
-                assertEquals(12, backupFile.getSize());
-                assertEquals(now, backupFile.getLastModifiedTime());
-            })
-            .verifyComplete();
+        migrationService
+                .getBackupFile("backup.zip")
+                .as(StepVerifier::create)
+                .assertNext(backupFile -> {
+                    assertEquals("backup.zip", backupFile.getFilename());
+                    assertEquals(12, backupFile.getSize());
+                    assertEquals(now, backupFile.getLastModifiedTime());
+                })
+                .verifyComplete();
 
-        migrationService.getBackupFile("backup-not-exist.zip")
-            .as(StepVerifier::create)
-            .verifyComplete();
+        migrationService
+                .getBackupFile("backup-not-exist.zip")
+                .as(StepVerifier::create)
+                .verifyComplete();
     }
 
     Backup createSucceededBackup(String name, String filename) {

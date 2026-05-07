@@ -16,18 +16,14 @@
 
 package run.halo.app.security.jackson2;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.security.web.jackson2.WebServletJackson2Module;
 
 /**
- * Jackson mixin class to serialize/deserialize {@link SwitchUserGrantedAuthority}.
- * <b>This class is copied from repository spring-projects/spring-security.</b>
+ * Jackson mixin class to serialize/deserialize {@link SwitchUserGrantedAuthority}. <b>This class is copied from
+ * repository spring-projects/spring-security.</b>
  *
  * @author Markus Heiden
  * @see WebServletJackson2Module
@@ -36,18 +32,12 @@ import org.springframework.security.web.jackson2.WebServletJackson2Module;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.ANY,
-    getterVisibility = JsonAutoDetect.Visibility.NONE,
-    isGetterVisibility = JsonAutoDetect.Visibility.NONE
-)
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class SwitchUserGrantedAuthorityMixIn {
 
     @JsonCreator
-    SwitchUserGrantedAuthorityMixIn(
-        @JsonProperty("role") String role,
-        @JsonProperty("source") Authentication source
-    ) {
-    }
-
+    SwitchUserGrantedAuthorityMixIn(@JsonProperty("role") String role, @JsonProperty("source") Authentication source) {}
 }

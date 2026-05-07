@@ -1,8 +1,6 @@
 package run.halo.app.extension.index;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 
@@ -27,7 +25,6 @@ class SingleValueIndexTest {
 
     @InjectMocks
     SingleValueIndex<Fake, String> index;
-
 
     @Nested
     class NonNullAndUniqueTest {
@@ -103,7 +100,6 @@ class SingleValueIndexTest {
 
                 assertEquals(Set.of("fake"), index.equal("new-string"));
             }
-
 
             @Test
             void shouldRollbackUpdateCorrectly() {
@@ -374,9 +370,7 @@ class SingleValueIndexTest {
                 assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
                 assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
             }
-
         }
-
     }
 
     @Nested
@@ -696,7 +690,6 @@ class SingleValueIndexTest {
                 assertEquals(Set.of("fake2", "fake3"), index.stringNotEndsWith("ing1"));
                 assertEquals(Set.of("fake1", "fake2"), index.stringNotEndsWith("ing3"));
             }
-
         }
     }
 
@@ -712,6 +705,4 @@ class SingleValueIndexTest {
         fake.getMetadata().setName(name);
         return fake;
     }
-
 }
-

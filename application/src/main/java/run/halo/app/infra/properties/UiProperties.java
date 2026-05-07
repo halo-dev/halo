@@ -12,5 +12,4 @@ public class UiProperties {
     @Valid
     @NestedConfigurationProperty
     private ProxyProperties proxy = new ProxyProperties();
-
 }

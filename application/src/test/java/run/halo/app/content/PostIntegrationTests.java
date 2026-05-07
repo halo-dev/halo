@@ -43,10 +43,10 @@ public class PostIntegrationTests {
     @BeforeEach
     void setUp() {
         var rule = new Role.PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .verbs("*")
-            .build();
+                .apiGroups("*")
+                .resources("*")
+                .verbs("*")
+                .build();
         var role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName("super-role");
@@ -57,45 +57,48 @@ public class PostIntegrationTests {
 
     @Test
     void draftPost() {
-        webTestClient.post()
-            .uri("/apis/api.console.halo.run/v1alpha1/posts")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(postDraftRequest())
-            .exchange()
-            .expectBody(Post.class)
-            .value(post -> {
-                MetadataOperator metadata = post.getMetadata();
-                Post.PostSpec spec = post.getSpec();
-                assertThat(spec.getTitle()).isEqualTo("无标题文章");
-                assertThat(metadata.getCreationTimestamp()).isNotNull();
-                assertThat(metadata.getName()).startsWith("post-");
-                assertThat(spec.getHeadSnapshot()).isNotNull();
-                assertThat(spec.getHeadSnapshot()).isEqualTo(spec.getBaseSnapshot());
-                assertThat(spec.getOwner()).isEqualTo("fake-user");
+        webTestClient
+                .post()
+                .uri("/apis/api.console.halo.run/v1alpha1/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(postDraftRequest())
+                .exchange()
+                .expectBody(Post.class)
+                .value(post -> {
+                    MetadataOperator metadata = post.getMetadata();
+                    Post.PostSpec spec = post.getSpec();
+                    assertThat(spec.getTitle()).isEqualTo("无标题文章");
+                    assertThat(metadata.getCreationTimestamp()).isNotNull();
+                    assertThat(metadata.getName()).startsWith("post-");
+                    assertThat(spec.getHeadSnapshot()).isNotNull();
+                    assertThat(spec.getHeadSnapshot()).isEqualTo(spec.getBaseSnapshot());
+                    assertThat(spec.getOwner()).isEqualTo("fake-user");
 
-                assertThat(post.getStatus()).isNotNull();
-                assertThat(post.getStatus().getPhase()).isEqualTo("DRAFT");
-                assertThat(post.getStatus().getConditions().peek().getType()).isEqualTo("DRAFT");
-            });
+                    assertThat(post.getStatus()).isNotNull();
+                    assertThat(post.getStatus().getPhase()).isEqualTo("DRAFT");
+                    assertThat(post.getStatus().getConditions().peek().getType())
+                            .isEqualTo("DRAFT");
+                });
     }
 
     @Test
     void draftPostAsPublish() {
         PostRequest postRequest = postDraftRequest();
         postRequest.post().getSpec().setPublish(true);
-        webTestClient.post()
-            .uri("/apis/api.console.halo.run/v1alpha1/posts")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(postRequest)
-            .exchange()
-            .expectBody(Post.class)
-            .value(post -> {
-                assertThat(post.getSpec().getReleaseSnapshot()).isNotNull();
-                assertThat(post.getSpec().getReleaseSnapshot())
-                    .isEqualTo(post.getSpec().getHeadSnapshot());
-                assertThat(post.getSpec().getHeadSnapshot())
-                    .isEqualTo(post.getSpec().getBaseSnapshot());
-            });
+        webTestClient
+                .post()
+                .uri("/apis/api.console.halo.run/v1alpha1/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(postRequest)
+                .exchange()
+                .expectBody(Post.class)
+                .value(post -> {
+                    assertThat(post.getSpec().getReleaseSnapshot()).isNotNull();
+                    assertThat(post.getSpec().getReleaseSnapshot())
+                            .isEqualTo(post.getSpec().getHeadSnapshot());
+                    assertThat(post.getSpec().getHeadSnapshot())
+                            .isEqualTo(post.getSpec().getBaseSnapshot());
+                });
     }
 
     PostRequest postDraftRequest() {

@@ -26,11 +26,11 @@ public class SearchServiceImpl implements SearchService {
         if (errors.hasErrors()) {
             return Mono.error(new RequestBodyValidationException(errors));
         }
-        return extensionGetter.getEnabledExtension(SearchEngine.class)
-            .filter(SearchEngine::available)
-            .switchIfEmpty(Mono.error(SearchEngineUnavailableException::new))
-            .flatMap(searchEngine -> Mono.fromSupplier(() ->
-                searchEngine.search(option)
-            ).subscribeOn(Schedulers.boundedElastic()));
+        return extensionGetter
+                .getEnabledExtension(SearchEngine.class)
+                .filter(SearchEngine::available)
+                .switchIfEmpty(Mono.error(SearchEngineUnavailableException::new))
+                .flatMap(searchEngine ->
+                        Mono.fromSupplier(() -> searchEngine.search(option)).subscribeOn(Schedulers.boundedElastic()));
     }
 }

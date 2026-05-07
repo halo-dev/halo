@@ -1,10 +1,6 @@
 package run.halo.app.plugin;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -41,8 +37,7 @@ class SharedEventDispatcherTest {
     void shouldDispatchEventToAllStartedPlugins() {
         var pw = mock(PluginWrapper.class);
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
-        var context =
-            mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
+        var context = mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
         when(((Lifecycle) context).isRunning()).thenReturn(true);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
@@ -58,8 +53,7 @@ class SharedEventDispatcherTest {
     void shouldNotDispatchEventToAllStartedPluginsWhilePluginContextIsNotRunning() {
         var pw = mock(PluginWrapper.class);
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
-        var context =
-            mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
+        var context = mock(ApplicationContext.class, withSettings().extraInterfaces(Lifecycle.class));
         when(((Lifecycle) context).isRunning()).thenReturn(false);
         when(((SpringPlugin) plugin).getApplicationContext()).thenReturn(context);
         when(pw.getPlugin()).thenReturn(plugin);
@@ -94,7 +88,6 @@ class SharedEventDispatcherTest {
         public FakeEvent(Object source) {
             super(source);
         }
-
     }
 
     @SharedEvent
@@ -103,6 +96,5 @@ class SharedEventDispatcherTest {
         public FakeSharedEvent(Object source) {
             super(source);
         }
-
     }
 }

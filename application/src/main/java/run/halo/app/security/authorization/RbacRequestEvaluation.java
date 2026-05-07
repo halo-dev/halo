@@ -31,17 +31,16 @@ public class RbacRequestEvaluation {
         if (requestAttributes.isResourceRequest()) {
             String combinedResource = requestAttributes.getResource();
             if (StringUtils.isNotBlank(requestAttributes.getSubresource())) {
-                combinedResource =
-                    requestAttributes.getResource() + "/" + requestAttributes.getSubresource();
+                combinedResource = requestAttributes.getResource() + "/" + requestAttributes.getSubresource();
             }
             return verbMatches(rule, requestAttributes.getVerb())
-                && apiGroupMatches(rule, requestAttributes.getApiGroup())
-                && resourceMatches(rule, combinedResource, requestAttributes.getSubresource())
-                && resourceNameMatches(rule,
-                combineResourceName(requestAttributes.getName(), requestAttributes.getSubName()));
+                    && apiGroupMatches(rule, requestAttributes.getApiGroup())
+                    && resourceMatches(rule, combinedResource, requestAttributes.getSubresource())
+                    && resourceNameMatches(
+                            rule, combineResourceName(requestAttributes.getName(), requestAttributes.getSubName()));
         }
         return verbMatches(rule, requestAttributes.getVerb())
-            && nonResourceURLMatches(rule, requestAttributes.getPath());
+                && nonResourceURLMatches(rule, requestAttributes.getPath());
     }
 
     private String combineResourceName(String name, String subName) {
@@ -78,8 +77,8 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean resourceMatches(Role.PolicyRule rule, String combinedRequestedResource,
-        String requestedSubresource) {
+    protected boolean resourceMatches(
+            Role.PolicyRule rule, String combinedRequestedResource, String requestedSubresource) {
         for (String ruleResource : rule.getResources()) {
             // if everything is allowed, we match
             if (Objects.equals(ruleResource, WildCard.ResourceAll)) {
@@ -97,8 +96,8 @@ public class RbacRequestEvaluation {
             }
             // if the rule isn't in the format */subresource, then we don't match, continue
             if (StringUtils.length(ruleResource) == StringUtils.length(requestedSubresource) + 2
-                && StringUtils.startsWith(ruleResource, "*/")
-                && StringUtils.startsWith(ruleResource, requestedSubresource)) {
+                    && StringUtils.startsWith(ruleResource, "*/")
+                    && StringUtils.startsWith(ruleResource, requestedSubresource)) {
                 return true;
             }
         }
@@ -151,8 +150,7 @@ public class RbacRequestEvaluation {
                 return true;
             }
             if (StringUtils.endsWith(ruleURL, WildCard.NonResourceAll)
-                && StringUtils.startsWith(requestedURL,
-                StringUtils.stripEnd(ruleURL, WildCard.NonResourceAll))) {
+                    && StringUtils.startsWith(requestedURL, StringUtils.stripEnd(ruleURL, WildCard.NonResourceAll))) {
                 return true;
             }
         }

@@ -22,8 +22,7 @@ public class PostHaloDocumentsProvider implements HaloDocumentsProvider {
 
     private final PostService postService;
 
-    public PostHaloDocumentsProvider(ReactiveExtensionPaginatedOperator paginatedOperator,
-        PostService postService) {
+    public PostHaloDocumentsProvider(ReactiveExtensionPaginatedOperator paginatedOperator, PostService postService) {
         this.paginatedOperator = paginatedOperator;
         this.postService = postService;
     }
@@ -35,15 +34,16 @@ public class PostHaloDocumentsProvider implements HaloDocumentsProvider {
         var noteDeleted = Queries.isNull("metadata.deletionTimestamp");
         options.setFieldSelector(FieldSelector.of(noteDeleted));
         // get content
-        return paginatedOperator.list(Post.class, options)
-            .flatMap(post -> postService.getReleaseContent(post)
-                .switchIfEmpty(Mono.fromSupplier(() -> ContentWrapper.builder()
-                    .content("")
-                    .raw("")
-                    .rawType("")
-                    .build()))
-                .map(contentWrapper -> convert(post, contentWrapper))
-            );
+        return paginatedOperator
+                .list(Post.class, options)
+                .flatMap(post -> postService
+                        .getReleaseContent(post)
+                        .switchIfEmpty(Mono.fromSupplier(() -> ContentWrapper.builder()
+                                .content("")
+                                .raw("")
+                                .rawType("")
+                                .build()))
+                        .map(contentWrapper -> convert(post, contentWrapper)));
     }
 
     @Override

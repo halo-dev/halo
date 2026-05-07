@@ -1,8 +1,6 @@
 package run.halo.app.extension.index;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 
@@ -319,74 +317,55 @@ class MultiValueIndexTest {
 
             @Test
             void betweenQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.between("string1", true, "string3", false)
-                );
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.between("string1", true, "string3", false));
             }
 
             @Test
             void notBetweenQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.notBetween("string1", true, "string2", false)
-                );
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.notBetween("string1", true, "string2", false));
             }
 
             @Test
             void lessThanQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.lessThan("string3", false)
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.lessThan("string3", false));
             }
 
             @Test
             void greaterThanQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.greaterThan("string1", false)
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.greaterThan("string1", false));
             }
 
             @Test
             void stringContainsQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringContains("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringContains("ing"));
             }
 
             @Test
             void stringNotContainsQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotContains("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotContains("ing"));
             }
 
             @Test
             void stringStartsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringStartsWith("string")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringStartsWith("string"));
             }
 
             @Test
             void stringNotStartsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotStartsWith("string")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotStartsWith("string"));
             }
 
             @Test
             void stringEndsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringEndsWith("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringEndsWith("ing"));
             }
 
             @Test
             void stringNotEndsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotEndsWith("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotEndsWith("ing"));
             }
-
         }
     }
 
@@ -671,76 +650,56 @@ class MultiValueIndexTest {
 
             @Test
             void betweenQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.between("string1", true, "string3", false)
-                );
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.between("string1", true, "string3", false));
             }
 
             @Test
             void notBetweenQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.notBetween("string1", true, "string2", false)
-                );
+                assertThrows(
+                        UnsupportedOperationException.class, () -> index.notBetween("string1", true, "string2", false));
             }
 
             @Test
             void lessThanQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.lessThan("string3", false)
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.lessThan("string3", false));
             }
 
             @Test
             void greaterThanQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.greaterThan("string1", false)
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.greaterThan("string1", false));
             }
 
             @Test
             void stringContainsQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringContains("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringContains("ing"));
             }
 
             @Test
             void stringNotContainsQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotContains("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotContains("ing"));
             }
 
             @Test
             void stringStartsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringStartsWith("string")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringStartsWith("string"));
             }
 
             @Test
             void stringNotStartsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotStartsWith("string")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotStartsWith("string"));
             }
 
             @Test
             void stringEndsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringEndsWith("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringEndsWith("ing"));
             }
 
             @Test
             void stringNotEndsWithQuery() {
-                assertThrows(UnsupportedOperationException.class,
-                    () -> index.stringNotEndsWith("ing")
-                );
+                assertThrows(UnsupportedOperationException.class, () -> index.stringNotEndsWith("ing"));
             }
-
         }
-
     }
 
     void insert(Fake fake) {
@@ -755,5 +714,4 @@ class MultiValueIndexTest {
         fake.getMetadata().setName(name);
         return fake;
     }
-
 }

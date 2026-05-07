@@ -12,5 +12,4 @@ public class ExtensionInitializedEvent extends ApplicationEvent {
     public ExtensionInitializedEvent(Object source) {
         super(source);
     }
-
 }

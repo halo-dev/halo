@@ -23,9 +23,11 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * Comment enabled variable processor.
- * <p>Compute comment enabled state and set it to the model when the template is start rendering</p>
- * <p>It is not suitable for scenarios where there are multiple comment components on the same page
- * and some of them need to be controlled to be closed.</p>
+ *
+ * <p>Compute comment enabled state and set it to the model when the template is start rendering
+ *
+ * <p>It is not suitable for scenarios where there are multiple comment components on the same page and some of them
+ * need to be controlled to be closed.
  *
  * @author guqing
  * @since 2.9.0
@@ -42,35 +44,39 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
     }
 
     @Override
-    public void doProcessTemplateStart(ITemplateContext context, ITemplateStart templateStart,
-        ITemplateBoundariesStructureHandler structureHandler) {
-        getCommentWidget(context).ifPresentOrElse(commentWidget -> {
-            populateAllowCommentAttribute(context, true);
-            structureHandler.setLocalVariable(COMMENT_WIDGET_OBJECT_VARIABLE, commentWidget);
-        }, () -> populateAllowCommentAttribute(context, false));
+    public void doProcessTemplateStart(
+            ITemplateContext context,
+            ITemplateStart templateStart,
+            ITemplateBoundariesStructureHandler structureHandler) {
+        getCommentWidget(context)
+                .ifPresentOrElse(
+                        commentWidget -> {
+                            populateAllowCommentAttribute(context, true);
+                            structureHandler.setLocalVariable(COMMENT_WIDGET_OBJECT_VARIABLE, commentWidget);
+                        },
+                        () -> populateAllowCommentAttribute(context, false));
     }
 
     @Override
-    public void doProcessTemplateEnd(ITemplateContext context, ITemplateEnd templateEnd,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateEnd(
+            ITemplateContext context, ITemplateEnd templateEnd, ITemplateBoundariesStructureHandler structureHandler) {
         structureHandler.removeLocalVariable(COMMENT_WIDGET_OBJECT_VARIABLE);
     }
 
     static void populateAllowCommentAttribute(ITemplateContext context, boolean allowComment) {
         if (Contexts.isWebContext(context)) {
             IWebContext webContext = Contexts.asWebContext(context);
-            webContext.getExchange()
-                .setAttributeValue(COMMENT_ENABLED_MODEL_ATTRIBUTE, allowComment);
+            webContext.getExchange().setAttributeValue(COMMENT_ENABLED_MODEL_ATTRIBUTE, allowComment);
         }
     }
 
     static Optional<CommentWidget> getCommentWidget(ITemplateContext context) {
         final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-        SystemConfigFetcher environmentFetcher =
-            appCtx.getBean(SystemConfigFetcher.class);
-        var commentSetting = environmentFetcher.fetchComment()
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElseThrow();
+        SystemConfigFetcher environmentFetcher = appCtx.getBean(SystemConfigFetcher.class);
+        var commentSetting = environmentFetcher
+                .fetchComment()
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElseThrow();
         var globalEnabled = isTrue(commentSetting.getEnable());
         if (!globalEnabled) {
             return Optional.empty();
@@ -78,18 +84,14 @@ public class CommentEnabledVariableProcessor extends AbstractTemplateBoundariesP
 
         if (Contexts.isWebContext(context)) {
             IWebContext webContext = Contexts.asWebContext(context);
-            Object attributeValue = webContext.getExchange()
-                .getAttributeValue(CommentWidget.ENABLE_COMMENT_ATTRIBUTE);
-            Boolean enabled = DefaultConversionService.getSharedInstance()
-                .convert(attributeValue, Boolean.class);
+            Object attributeValue = webContext.getExchange().getAttributeValue(CommentWidget.ENABLE_COMMENT_ATTRIBUTE);
+            Boolean enabled = DefaultConversionService.getSharedInstance().convert(attributeValue, Boolean.class);
             if (isFalse(enabled)) {
                 return Optional.empty();
             }
         }
 
         ExtensionGetter extensionGetter = appCtx.getBean(ExtensionGetter.class);
-        return extensionGetter.getEnabledExtensions(CommentWidget.class)
-            .next()
-            .blockOptional(BLOCKING_TIMEOUT);
+        return extensionGetter.getEnabledExtensions(CommentWidget.class).next().blockOptional(BLOCKING_TIMEOUT);
     }
 }

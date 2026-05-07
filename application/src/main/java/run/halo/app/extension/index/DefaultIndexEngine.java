@@ -74,8 +74,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
     }
 
     @Override
-    public <E extends Extension> ListResult<String> retrieve(
-        Class<E> type, ListOptions options, PageRequest page) {
+    public <E extends Extension> ListResult<String> retrieve(Class<E> type, ListOptions options, PageRequest page) {
         if (options == null) {
             options = ListOptions.builder().build();
         }
@@ -94,27 +93,19 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         if (limit <= 0) {
             // return all results for backward compatibility
             var finalResult = result.stream().sorted(comparator).toList();
-            return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, finalResult
-            );
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
         }
         if (offset >= total) {
-            return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, new LinkedList<>()
-            );
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, new LinkedList<>());
         }
         if (offset + limit > total) {
             limit = total - offset;
         }
         var n = offset + limit;
         if (n > 1000) {
-            var finalResult = result.stream().sorted(comparator)
-                .skip(offset)
-                .limit(limit)
-                .toList();
-            return new ListResult<>(
-                page.getPageNumber(), page.getPageSize(), total, finalResult
-            );
+            var finalResult =
+                    result.stream().sorted(comparator).skip(offset).limit(limit).toList();
+            return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
         }
         var pq = new PriorityQueue<>(n, comparator.reversed());
         result.forEach(primaryKey -> {
@@ -132,15 +123,11 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
             }
         }
         pq.clear();
-        return new ListResult<>(
-            page.getPageNumber(), page.getPageSize(), total, finalResult
-        );
+        return new ListResult<>(page.getPageNumber(), page.getPageSize(), total, finalResult);
     }
 
-
     @Override
-    public <E extends Extension> Iterable<String> retrieveAll(
-        Class<E> type, ListOptions options, Sort sort) {
+    public <E extends Extension> Iterable<String> retrieveAll(Class<E> type, ListOptions options, Sort sort) {
         if (options == null) {
             options = ListOptions.builder().build();
         }
@@ -163,7 +150,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
 
     @Override
     public <E extends Extension> Iterable<String> retrieveTopN(
-        Class<E> type, ListOptions options, Sort sort, int topN) {
+            Class<E> type, ListOptions options, Sort sort, int topN) {
         Assert.isTrue(topN > 0, "topN must be greater than 0");
         if (options == null) {
             options = ListOptions.builder().build();
@@ -210,18 +197,15 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
         return this.indicesManager;
     }
 
-    private <E extends Extension> Comparator<String> buildComparator(
-        Sort sort, Indices<E> indices
-    ) {
+    private <E extends Extension> Comparator<String> buildComparator(Sort sort, Indices<E> indices) {
         return sort.stream()
-            .map(order -> buildComparator(order, indices))
-            .reduce(Comparator::thenComparing)
-            .orElseGet(Comparator::naturalOrder);
+                .map(order -> buildComparator(order, indices))
+                .reduce(Comparator::thenComparing)
+                .orElseGet(Comparator::naturalOrder);
     }
 
     private <K extends Comparable<K>, E extends Extension> Comparator<String> buildComparator(
-        Sort.Order order, Indices<E> indices
-    ) {
+            Sort.Order order, Indices<E> indices) {
         var index = indices.<K>getIndex(order.getProperty());
         Comparator<String> comparator;
         if (index instanceof MultiValueIndex<E, K> multiValueIndex) {
@@ -254,9 +238,7 @@ class DefaultIndexEngine implements IndexEngine, DisposableBean {
                 return leftKey.compareTo(rightKey);
             };
         } else {
-            throw new UnsupportedOperationException(
-                "Unsupported index type for sorting: " + index.getClass()
-            );
+            throw new UnsupportedOperationException("Unsupported index type for sorting: " + index.getClass());
         }
         if (order.isDescending()) {
             comparator = comparator.reversed();

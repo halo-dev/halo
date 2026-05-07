@@ -5,19 +5,10 @@ import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEN
 import static org.apache.lucene.search.BooleanClause.Occur.FILTER;
 import static org.apache.lucene.search.BooleanClause.Occur.MUST;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
@@ -27,26 +18,11 @@ import org.apache.lucene.analysis.cjk.CJKWidthFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.LongField;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DocValuesType;
-import org.apache.lucene.index.IndexNotFoundException;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermInSetQuery;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryTermScorer;
@@ -71,11 +47,9 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
     private final Path indexRootDir;
 
-    private final Converter<HaloDocument, Document> haloDocumentConverter =
-        new HaloDocumentConverter();
+    private final Converter<HaloDocument, Document> haloDocumentConverter = new HaloDocumentConverter();
 
-    private final Converter<Document, HaloDocument> documentConverter =
-        new DocumentConverter();
+    private final Converter<Document, HaloDocument> documentConverter = new DocumentConverter();
 
     private Analyzer analyzer;
 
@@ -103,8 +77,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         });
         var deleteQuery = new TermInSetQuery("id", terms);
 
-        var writerConfig = new IndexWriterConfig(this.analyzer)
-            .setOpenMode(CREATE_OR_APPEND);
+        var writerConfig = new IndexWriterConfig(this.analyzer).setOpenMode(CREATE_OR_APPEND);
         synchronized (this) {
             try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
                 indexWriter.updateDocuments(deleteQuery, docs);
@@ -121,8 +94,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
         var terms = new LinkedList<BytesRef>();
         haloDocIds.forEach(haloDocId -> terms.add(new BytesRef(haloDocId)));
         var deleteQuery = new TermInSetQuery("id", terms);
-        var writerConfig = new IndexWriterConfig(this.analyzer)
-            .setOpenMode(CREATE_OR_APPEND);
+        var writerConfig = new IndexWriterConfig(this.analyzer).setOpenMode(CREATE_OR_APPEND);
         synchronized (this) {
             try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
                 indexWriter.deleteDocuments(deleteQuery);
@@ -136,8 +108,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
     @Override
     public void deleteAll() {
-        var writerConfig = new IndexWriterConfig(this.analyzer)
-            .setOpenMode(CREATE_OR_APPEND);
+        var writerConfig = new IndexWriterConfig(this.analyzer).setOpenMode(CREATE_OR_APPEND);
         synchronized (this) {
             try (var indexWriter = new IndexWriter(this.directory, writerConfig)) {
                 indexWriter.deleteAll();
@@ -172,65 +143,51 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
 
             var keyword = option.getKeyword();
             var query = queryParser.parse(keyword, null);
-            var queryBuilder = new BooleanQuery.Builder()
-                .add(query, MUST);
+            var queryBuilder = new BooleanQuery.Builder().add(query, MUST);
 
             var filterExposed = option.getFilterExposed();
             if (filterExposed != null) {
-                queryBuilder.add(
-                    new TermQuery(new Term("exposed", filterExposed.toString())), FILTER
-                );
+                queryBuilder.add(new TermQuery(new Term("exposed", filterExposed.toString())), FILTER);
             }
             var filterRecycled = option.getFilterRecycled();
             if (filterRecycled != null) {
-                queryBuilder.add(
-                    new TermQuery(new Term("recycled", filterRecycled.toString())), FILTER
-                );
+                queryBuilder.add(new TermQuery(new Term("recycled", filterRecycled.toString())), FILTER);
             }
             var filterPublished = option.getFilterPublished();
             if (filterPublished != null) {
-                queryBuilder.add(
-                    new TermQuery(new Term("published", filterPublished.toString())), FILTER
-                );
+                queryBuilder.add(new TermQuery(new Term("published", filterPublished.toString())), FILTER);
             }
 
             Optional.ofNullable(option.getIncludeTypes())
-                .filter(types -> !types.isEmpty())
-                .ifPresent(types -> {
-                    var typeTerms = types.stream()
-                        .distinct()
-                        .map(BytesRef::new)
-                        .toList();
-                    queryBuilder.add(new TermInSetQuery("type", typeTerms), FILTER);
-                });
+                    .filter(types -> !types.isEmpty())
+                    .ifPresent(types -> {
+                        var typeTerms =
+                                types.stream().distinct().map(BytesRef::new).toList();
+                        queryBuilder.add(new TermInSetQuery("type", typeTerms), FILTER);
+                    });
 
             Optional.ofNullable(option.getIncludeOwnerNames())
-                .filter(ownerNames -> !ownerNames.isEmpty())
-                .ifPresent(ownerNames -> {
-                    var ownerTerms = ownerNames.stream()
-                        .distinct()
-                        .map(BytesRef::new)
-                        .toList();
-                    queryBuilder.add(new TermInSetQuery("ownerName", ownerTerms), FILTER);
-                });
+                    .filter(ownerNames -> !ownerNames.isEmpty())
+                    .ifPresent(ownerNames -> {
+                        var ownerTerms = ownerNames.stream()
+                                .distinct()
+                                .map(BytesRef::new)
+                                .toList();
+                        queryBuilder.add(new TermInSetQuery("ownerName", ownerTerms), FILTER);
+                    });
 
             Optional.ofNullable(option.getIncludeTagNames())
-                .filter(tagNames -> !tagNames.isEmpty())
-                .ifPresent(tagNames -> tagNames
-                    .stream()
-                    .distinct()
-                    .forEach(tagName ->
-                        queryBuilder.add(new TermQuery(new Term("tag", tagName)), FILTER)
-                    ));
+                    .filter(tagNames -> !tagNames.isEmpty())
+                    .ifPresent(tagNames -> tagNames.stream()
+                            .distinct()
+                            .forEach(tagName -> queryBuilder.add(new TermQuery(new Term("tag", tagName)), FILTER)));
 
             Optional.ofNullable(option.getIncludeCategoryNames())
-                .filter(categoryNames -> !categoryNames.isEmpty())
-                .ifPresent(categoryNames -> categoryNames
-                    .stream()
-                    .distinct()
-                    .forEach(categoryName ->
-                        queryBuilder.add(new TermQuery(new Term("category", categoryName)), FILTER)
-                    ));
+                    .filter(categoryNames -> !categoryNames.isEmpty())
+                    .ifPresent(categoryNames -> categoryNames.stream()
+                            .distinct()
+                            .forEach(categoryName ->
+                                    queryBuilder.add(new TermQuery(new Term("category", categoryName)), FILTER)));
 
             var finalQuery = queryBuilder.build();
             var limit = option.getLimit();
@@ -239,8 +196,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             stopWatch.start("search " + keyword);
             var hits = searcher.search(finalQuery, limit, Sort.RELEVANCE);
             stopWatch.stop();
-            var formatter =
-                new SimpleHTMLFormatter(option.getHighlightPreTag(), option.getHighlightPostTag());
+            var formatter = new SimpleHTMLFormatter(option.getHighlightPreTag(), option.getHighlightPostTag());
             var queryScorer = new QueryTermScorer(query);
             var highlighter = new Highlighter(formatter, queryScorer);
 
@@ -258,8 +214,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
                 var description = doc.get("description");
                 String hlDescription = null;
                 if (description != null) {
-                    hlDescription =
-                        highlighter.getBestFragment(this.analyzer, "description", description);
+                    hlDescription = highlighter.getBestFragment(this.analyzer, "description", description);
                 }
 
                 var content = doc.get("content");
@@ -293,13 +248,13 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
     @Override
     public void afterPropertiesSet() throws Exception {
         this.analyzer = CustomAnalyzer.builder()
-            .withTokenizer(StandardTokenizerFactory.class)
-            .addCharFilter(HTMLStripCharFilterFactory.NAME)
-            .addCharFilter(CJKWidthCharFilterFactory.NAME)
-            .addTokenFilter(LowerCaseFilterFactory.NAME)
-            .addTokenFilter(CJKWidthFilterFactory.NAME)
-            .addTokenFilter(CJKBigramFilterFactory.NAME)
-            .build();
+                .withTokenizer(StandardTokenizerFactory.class)
+                .addCharFilter(HTMLStripCharFilterFactory.NAME)
+                .addCharFilter(CJKWidthCharFilterFactory.NAME)
+                .addTokenFilter(LowerCaseFilterFactory.NAME)
+                .addTokenFilter(CJKWidthFilterFactory.NAME)
+                .addTokenFilter(CJKBigramFilterFactory.NAME)
+                .build();
         this.directory = FSDirectory.open(this.indexRootDir);
         log.info("Initialized lucene search engine");
     }
@@ -412,7 +367,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             var annotations = haloDoc.getAnnotations();
             if (annotations != null) {
                 try (var baos = new ByteArrayOutputStream();
-                     var oos = new ObjectOutputStream(baos)) {
+                        var oos = new ObjectOutputStream(baos)) {
                     oos.writeObject(annotations);
                     var type = new FieldType();
                     type.setStored(true);
@@ -458,7 +413,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             var annotationsBytesRef = doc.getBinaryValue("annotations");
             if (annotationsBytesRef != null) {
                 try (var bais = new ByteArrayInputStream(annotationsBytesRef.bytes);
-                     var ois = new ObjectInputStream(bais)) {
+                        var ois = new ObjectInputStream(bais)) {
                     @SuppressWarnings("unchecked")
                     var annotations = (Map<String, String>) ois.readObject();
                     haloDoc.setAnnotations(annotations);
@@ -467,7 +422,8 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
                 }
             }
 
-            var creationTimestamp = doc.getField("creationTimestamp").numericValue().longValue();
+            var creationTimestamp =
+                    doc.getField("creationTimestamp").numericValue().longValue();
             haloDoc.setCreationTimestamp(Instant.ofEpochMilli(creationTimestamp));
             var updateTimestampField = doc.getField("updateTimestamp");
             if (updateTimestampField != null) {
@@ -478,8 +434,7 @@ public class LuceneSearchEngine implements SearchEngine, InitializingBean, Dispo
             return haloDoc;
         }
 
-        private static boolean getBooleanValue(Document doc, String fieldName,
-            boolean defaultValue) {
+        private static boolean getBooleanValue(Document doc, String fieldName, boolean defaultValue) {
             var boolStr = doc.get(fieldName);
             return boolStr == null ? defaultValue : Boolean.parseBoolean(boolStr);
         }

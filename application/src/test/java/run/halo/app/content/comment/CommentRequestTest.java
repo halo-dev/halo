@@ -35,9 +35,7 @@ class CommentRequestTest {
                     "content": "content",
                     "allowNotification": true
                 }
-                """,
-            JsonUtils.objectToJson(commentRequest),
-            true);
+                """, JsonUtils.objectToJson(commentRequest), true);
     }
 
     @Test
@@ -66,9 +64,7 @@ class CommentRequestTest {
                         "name": "fake"
                     }
                 }
-                """,
-            JsonUtils.objectToJson(comment),
-            true);
+                """, JsonUtils.objectToJson(comment), true);
     }
 
     private static CommentRequest createCommentRequest() {

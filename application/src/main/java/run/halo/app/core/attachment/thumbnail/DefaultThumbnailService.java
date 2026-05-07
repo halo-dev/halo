@@ -26,8 +26,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 /**
  * Implementation of {@link ThumbnailService}.
  *
- * <p>
- * Caches thumbnail links in memory for better performance.
+ * <p>Caches thumbnail links in memory for better performance.
  *
  * @author johnniang
  * @since 2.22.0
@@ -44,14 +43,13 @@ class DefaultThumbnailService implements ThumbnailService {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
-    public DefaultThumbnailService(ReactiveExtensionClient client,
-        ExternalUrlSupplier externalUrlSupplier) {
+    public DefaultThumbnailService(ReactiveExtensionClient client, ExternalUrlSupplier externalUrlSupplier) {
         this.client = client;
         this.externalUrlSupplier = externalUrlSupplier;
         this.thumbnailCache = Caffeine.newBuilder()
-            // TODO make it configurable
-            .maximumSize(10_000)
-            .build();
+                // TODO make it configurable
+                .maximumSize(10_000)
+                .build();
     }
 
     @EventListener
@@ -105,11 +103,10 @@ class DefaultThumbnailService implements ThumbnailService {
         // TODO Optimize concurrent requests for the same permalink
         return Mono.deferContextual(contextView -> {
             var externalUrl = ServerWebExchangeContextFilter.getExchange(contextView)
-                .map(exchange -> externalUrlSupplier.getURL(exchange.getRequest()))
-                .orElseGet(externalUrlSupplier::getRaw);
+                    .map(exchange -> externalUrlSupplier.getURL(exchange.getRequest()))
+                    .orElseGet(externalUrlSupplier::getRaw);
             // check if the permalink is from local site
-            if (externalUrl != null
-                && Objects.equals(externalUrl.getAuthority(), encodedPermalink.getAuthority())) {
+            if (externalUrl != null && Objects.equals(externalUrl.getAuthority(), encodedPermalink.getAuthority())) {
                 return Mono.just(ThumbnailUtils.buildSrcsetMap(encodedPermalink));
             }
             var permalinkString = encodedPermalink.toASCIIString();
@@ -119,20 +116,19 @@ class DefaultThumbnailService implements ThumbnailService {
             }
             // query from attachments
             var listOptions = ListOptions.builder()
-                .andQuery(Queries.equal("status.permalink", permalinkString))
-                .build();
+                    .andQuery(Queries.equal("status.permalink", permalinkString))
+                    .build();
             return client.listAll(Attachment.class, listOptions, ExtensionUtil.defaultSort())
-                .next()
-                // Here we allow concurrent updates
-                .doOnNext(this::updateCache)
-                .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
-                .switchIfEmpty(Mono.fromSupplier(() -> {
-                    // No attachment or no thumbnails, cache empty map to avoid cache miss again and
-                    // again.
-                    this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
-                    return EMPTY_THUMBNAILS;
-                }));
+                    .next()
+                    // Here we allow concurrent updates
+                    .doOnNext(this::updateCache)
+                    .mapNotNull(attachment -> this.thumbnailCache.getIfPresent(permalinkString))
+                    .switchIfEmpty(Mono.fromSupplier(() -> {
+                        // No attachment or no thumbnails, cache empty map to avoid cache miss again and
+                        // again.
+                        this.thumbnailCache.put(permalinkString, EMPTY_THUMBNAILS);
+                        return EMPTY_THUMBNAILS;
+                    }));
         });
     }
-
 }

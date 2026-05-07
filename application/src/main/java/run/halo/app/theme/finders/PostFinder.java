@@ -7,11 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
-import run.halo.app.theme.finders.vo.ContentVo;
-import run.halo.app.theme.finders.vo.ListedPostVo;
-import run.halo.app.theme.finders.vo.NavigationPostVo;
-import run.halo.app.theme.finders.vo.PostArchiveVo;
-import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.*;
 
 /**
  * A finder for {@link Post}.
@@ -22,8 +18,7 @@ import run.halo.app.theme.finders.vo.PostVo;
 public interface PostFinder {
 
     /**
-     * <p>Gets post detail by name.</p>
-     * We ensure the post is public, non-deleted and published.
+     * Gets post detail by name. We ensure the post is public, non-deleted and published.
      *
      * @param postName is post name
      * @return post detail
@@ -47,26 +42,21 @@ public interface PostFinder {
     /**
      * Lists posts by query params.
      *
-     * @param params query params see
-     * {@link run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery}
+     * @param params query params see {@link run.halo.app.theme.finders.impl.PostFinderImpl.PostQuery}
      */
     Mono<ListResult<ListedPostVo>> list(Map<String, Object> params);
 
     Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 
-    Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size,
-        String categoryName);
+    Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size, String categoryName);
 
-    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size,
-        String tag);
+    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
 
-    Mono<ListResult<ListedPostVo>> listByOwner(@Nullable Integer page, @Nullable Integer size,
-        String owner);
+    Mono<ListResult<ListedPostVo>> listByOwner(@Nullable Integer page, @Nullable Integer size, String owner);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year, String month);
-
 }

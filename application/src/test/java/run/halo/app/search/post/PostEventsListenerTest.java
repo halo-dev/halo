@@ -3,9 +3,7 @@ package run.halo.app.search.post;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Nested;
@@ -47,12 +45,9 @@ class PostEventsListenerTest {
 
         @Test
         void shouldDoNothingIfPostIsDeleted() {
-            when(client.fetch(Post.class, "fake-post"))
-                .thenReturn(Mono.empty());
+            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.empty());
             var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
 
             verify(publisher, never()).publishEvent(any());
         }
@@ -64,16 +59,11 @@ class PostEventsListenerTest {
             metadata.setName("fake-post");
             metadata.setDeletionTimestamp(Instant.now());
             post.setMetadata(metadata);
-            when(client.fetch(Post.class, "fake-post"))
-                .thenReturn(Mono.just(post));
+            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.just(post));
             var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
 
-            verify(publisher).publishEvent(
-                assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e))
-            );
+            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e)));
         }
 
         @Test
@@ -86,21 +76,16 @@ class PostEventsListenerTest {
             post.setSpec(spec);
             var status = new Post.PostStatus();
             post.setStatus(status);
-            when(client.fetch(Post.class, "fake-post"))
-                .thenReturn(Mono.just(post));
+            when(client.fetch(Post.class, "fake-post")).thenReturn(Mono.just(post));
             var content = ContentWrapper.builder()
-                .content("fake-content")
-                .raw("fake-content")
-                .build();
+                    .content("fake-content")
+                    .raw("fake-content")
+                    .build();
             when(postService.getReleaseContent(post)).thenReturn(Mono.just(content));
             var event = new PostUpdatedEvent(this, "fake-post");
-            listener.onApplicationEvent(event)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            listener.onApplicationEvent(event).as(StepVerifier::create).verifyComplete();
 
-            verify(publisher).publishEvent(
-                assertArg(e -> assertInstanceOf(HaloDocumentAddRequestEvent.class, e))
-            );
+            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentAddRequestEvent.class, e)));
         }
     }
 
@@ -116,9 +101,7 @@ class PostEventsListenerTest {
             var event = new PostDeletedEvent(this, post);
             listener.onApplicationEvent(event);
 
-            verify(publisher).publishEvent(
-                assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e))
-            );
+            verify(publisher).publishEvent(assertArg(e -> assertInstanceOf(HaloDocumentDeleteRequestEvent.class, e)));
         }
     }
 }

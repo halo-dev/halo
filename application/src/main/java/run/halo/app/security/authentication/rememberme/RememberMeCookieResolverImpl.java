@@ -33,27 +33,28 @@ class RememberMeCookieResolverImpl implements RememberMeCookieResolver {
     @Override
     public void setRememberMeCookie(ServerWebExchange exchange, String value) {
         Assert.notNull(value, "'value' is required");
-        exchange.getResponse().beforeCommit(() -> Mono.fromRunnable(() -> {
-            var cookie = initCookie(exchange, value).build();
-            exchange.getResponse().addCookie(cookie);
-        }));
+        exchange.getResponse()
+                .beforeCommit(() -> Mono.fromRunnable(() -> {
+                    var cookie = initCookie(exchange, value).build();
+                    exchange.getResponse().addCookie(cookie);
+                }));
     }
 
     @Override
     public void expireCookie(ServerWebExchange exchange) {
-        exchange.getResponse().beforeCommit(() -> Mono.fromRunnable(() -> {
-            var cookie = initCookie(exchange, "").maxAge(0).build();
-            exchange.getResponse().getCookies().set(this.cookieName, cookie);
-        }));
+        exchange.getResponse()
+                .beforeCommit(() -> Mono.fromRunnable(() -> {
+                    var cookie = initCookie(exchange, "").maxAge(0).build();
+                    exchange.getResponse().getCookies().set(this.cookieName, cookie);
+                }));
     }
 
-    private ResponseCookie.ResponseCookieBuilder initCookie(ServerWebExchange exchange,
-        String value) {
+    private ResponseCookie.ResponseCookieBuilder initCookie(ServerWebExchange exchange, String value) {
         return ResponseCookie.from(this.cookieName, value)
-            .path(exchange.getRequest().getPath().contextPath().value() + "/")
-            .maxAge(getCookieMaxAge())
-            .httpOnly(true)
-            .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))
-            .sameSite("Lax");
+                .path(exchange.getRequest().getPath().contextPath().value() + "/")
+                .maxAge(getCookieMaxAge())
+                .httpOnly(true)
+                .secure("https".equalsIgnoreCase(exchange.getRequest().getURI().getScheme()))
+                .sameSite("Lax");
     }
 }

@@ -31,32 +31,30 @@ import run.halo.app.extension.router.JsonPatch;
 public class SwaggerConfig {
 
     @Bean
-    OpenAPI haloOpenApi(ObjectProvider<BuildProperties> buildPropertiesProvider,
-        SpringDocConfigProperties docConfigProperties) {
+    OpenAPI haloOpenApi(
+            ObjectProvider<BuildProperties> buildPropertiesProvider, SpringDocConfigProperties docConfigProperties) {
         var buildProperties = buildPropertiesProvider.getIfAvailable();
         var version = "unknown";
         if (buildProperties != null) {
             version = buildProperties.getVersion();
         }
         return new OpenAPI()
-            .specVersion(docConfigProperties.getSpecVersion())
-            // See https://swagger.io/docs/specification/authentication/ for more.
-            .components(new Components()
-                .addSecuritySchemes("basicAuth", new SecurityScheme()
-                    .type(SecurityScheme.Type.HTTP)
-                    .scheme("basic"))
-                .addSecuritySchemes("bearerAuth", new SecurityScheme()
-                    .type(SecurityScheme.Type.HTTP)
-                    .scheme("bearer")
-                    .bearerFormat("JWT"))
-            )
-            .addSecurityItem(new SecurityRequirement()
-                .addList("basicAuth")
-                .addList("bearerAuth"))
-            .info(new Info()
-                .title("Halo")
-                .version(version)
-            );
+                .specVersion(docConfigProperties.getSpecVersion())
+                // See https://swagger.io/docs/specification/authentication/ for more.
+                .components(new Components()
+                        .addSecuritySchemes(
+                                "basicAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("basic"))
+                        .addSecuritySchemes(
+                                "bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList("basicAuth").addList("bearerAuth"))
+                .info(new Info().title("Halo").version(version));
     }
 
     @Bean
@@ -67,81 +65,66 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi aggregatedV1alpha1Api() {
         return GroupedOpenApi.builder()
-            .group("apis_aggregated.api_v1alpha1")
-            .displayName("Aggregated API V1alpha1")
-            .pathsToMatch(
-                "/apis/*/v1alpha1/**",
-                "/api/v1alpha1/**",
-                "/login/**",
-                "/system/setup"
-            )
-            .build();
+                .group("apis_aggregated.api_v1alpha1")
+                .displayName("Aggregated API V1alpha1")
+                .pathsToMatch("/apis/*/v1alpha1/**", "/api/v1alpha1/**", "/login/**", "/system/setup")
+                .build();
     }
 
     @Bean
     GroupedOpenApi publicV1alpha1Api() {
         return GroupedOpenApi.builder()
-            .group("apis_public.api_v1alpha1")
-            .displayName("Public API V1alpha1")
-            .pathsToMatch(
-                "/apis/api.*/**"
-            )
-            .pathsToExclude(
-                "/apis/api.console.*/v1alpha1/**",
-                // compatible with legacy issues
-                "/apis/api.notification.halo.run/v1alpha1/userspaces/**",
-                "/apis/api.notification.halo.run/v1alpha1/notifiers/**"
-            )
-            .build();
+                .group("apis_public.api_v1alpha1")
+                .displayName("Public API V1alpha1")
+                .pathsToMatch("/apis/api.*/**")
+                .pathsToExclude(
+                        "/apis/api.console.*/v1alpha1/**",
+                        // compatible with legacy issues
+                        "/apis/api.notification.halo.run/v1alpha1/userspaces/**",
+                        "/apis/api.notification.halo.run/v1alpha1/notifiers/**")
+                .build();
     }
 
     @Bean
     GroupedOpenApi consoleV1alpha1Api() {
         return GroupedOpenApi.builder()
-            .group("apis_console.api_v1alpha1")
-            .displayName("Console API V1alpha1")
-            .pathsToMatch(
-                "/apis/console.api.*/v1alpha1/**",
-                "/apis/api.console.halo.run/v1alpha1/**"
-            )
-            .build();
+                .group("apis_console.api_v1alpha1")
+                .displayName("Console API V1alpha1")
+                .pathsToMatch("/apis/console.api.*/v1alpha1/**", "/apis/api.console.halo.run/v1alpha1/**")
+                .build();
     }
-
 
     @Bean
     GroupedOpenApi ucV1alpha1Api() {
         return GroupedOpenApi.builder()
-            .group("apis_uc.api_v1alpha1")
-            .displayName("User-center API V1alpha1")
-            .pathsToMatch(
-                "/apis/uc.api.*/v1alpha1/**",
-                // compatible with legacy issues
-                "/apis/api.notification.halo.run/v1alpha1/userspaces/**",
-                "/apis/api.notification.halo.run/v1alpha1/notifiers/**"
-            )
-            .build();
+                .group("apis_uc.api_v1alpha1")
+                .displayName("User-center API V1alpha1")
+                .pathsToMatch(
+                        "/apis/uc.api.*/v1alpha1/**",
+                        // compatible with legacy issues
+                        "/apis/api.notification.halo.run/v1alpha1/userspaces/**",
+                        "/apis/api.notification.halo.run/v1alpha1/notifiers/**")
+                .build();
     }
-
 
     @Bean
     GroupedOpenApi extensionV1alpha1Api() {
         return GroupedOpenApi.builder()
-            .group("apis_extension.api_v1alpha1")
-            .displayName("Extension API V1alpha1")
-            .pathsToMatch(
-                "/api/v1alpha1/**",
-                "/apis/content.halo.run/v1alpha1/**",
-                "/apis/theme.halo.run/v1alpha1/**",
-                "/apis/security.halo.run/v1alpha1/**",
-                "/apis/migration.halo.run/v1alpha1/**",
-                "/apis/auth.halo.run/v1alpha1/**",
-                "/apis/metrics.halo.run/v1alpha1/**",
-                "/apis/storage.halo.run/v1alpha1/**",
-                "/apis/plugin.halo.run/v1alpha1/**",
-                "/apis/notification.halo.run/**",
-                "/apis/migration.halo.run/**"
-            )
-            .build();
+                .group("apis_extension.api_v1alpha1")
+                .displayName("Extension API V1alpha1")
+                .pathsToMatch(
+                        "/api/v1alpha1/**",
+                        "/apis/content.halo.run/v1alpha1/**",
+                        "/apis/theme.halo.run/v1alpha1/**",
+                        "/apis/security.halo.run/v1alpha1/**",
+                        "/apis/migration.halo.run/v1alpha1/**",
+                        "/apis/auth.halo.run/v1alpha1/**",
+                        "/apis/metrics.halo.run/v1alpha1/**",
+                        "/apis/storage.halo.run/v1alpha1/**",
+                        "/apis/plugin.halo.run/v1alpha1/**",
+                        "/apis/notification.halo.run/**",
+                        "/apis/migration.halo.run/**")
+                .build();
     }
 
     @Bean
@@ -158,5 +141,4 @@ public class SwaggerConfig {
             return super.nameForClass(cls, options).replaceAll("\\$", ".");
         }
     }
-
 }

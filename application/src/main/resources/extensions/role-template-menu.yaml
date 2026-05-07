@@ -5,19 +5,19 @@ metadata:
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-menus\" ]"
+    rbac.authorization.halo.run/dependencies: '[ "role-template-view-menus" ]'
     rbac.authorization.halo.run/module: "Menus Management"
     rbac.authorization.halo.run/display-name: "Menu Manage"
     rbac.authorization.halo.run/ui-permissions: |
       ["system:menus:manage"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "menus", "menuitems" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "console.api.halo.run" ]
-    resources: [ "systemconfigs" ]
-    resourceNames: [ "menu" ]
-    verbs: [ "update" ]
+  - apiGroups: [""]
+    resources: ["menus", "menuitems"]
+    verbs: ["*"]
+  - apiGroups: ["console.api.halo.run"]
+    resources: ["systemconfigs"]
+    resourceNames: ["menu"]
+    verbs: ["update"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -31,10 +31,10 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:menus:view"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "menus", "menuitems" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "console.api.halo.run" ]
-    resources: [ "systemconfigs" ]
-    resourceNames: [ "menu" ]
-    verbs: [ "get" ]
+  - apiGroups: [""]
+    resources: ["menus", "menuitems"]
+    verbs: ["get", "list"]
+  - apiGroups: ["console.api.halo.run"]
+    resources: ["systemconfigs"]
+    resourceNames: ["menu"]
+    verbs: ["get"]

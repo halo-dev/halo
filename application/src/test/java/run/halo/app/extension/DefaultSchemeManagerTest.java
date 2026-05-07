@@ -1,13 +1,7 @@
 package run.halo.app.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.ArgumentMatchers.same;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 
@@ -46,11 +40,9 @@ class DefaultSchemeManagerTest {
 
     @Test
     void shouldThrowExceptionWhenNoGvkAnnotation() {
-        class WithoutGvkExtension extends AbstractExtension {
-        }
+        class WithoutGvkExtension extends AbstractExtension {}
 
-        assertThrows(IllegalArgumentException.class,
-            () -> schemeManager.register(WithoutGvkExtension.class));
+        assertThrows(IllegalArgumentException.class, () -> schemeManager.register(WithoutGvkExtension.class));
     }
 
     @Test
@@ -126,9 +118,6 @@ class DefaultSchemeManagerTest {
         });
     }
 
-    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Foo",
-        plural = "foos", singular = "foo")
-    static class FooExtension extends AbstractExtension {
-    }
+    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Foo", plural = "foos", singular = "foo")
+    static class FooExtension extends AbstractExtension {}
 }
-

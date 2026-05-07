@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import run.halo.app.extension.MetadataUtil;
 
-/**
- * Tests for {@link DefaultSuperAdminInitializer}.
- */
+/** Tests for {@link DefaultSuperAdminInitializer}. */
 class DefaultSuperAdminInitializerTest {
 
     @Test
@@ -21,7 +19,6 @@ class DefaultSuperAdminInitializerTest {
 
         assertThat(admin.getMetadata()).isNotNull();
         assertThat(admin.getMetadata().getFinalizers()).isNotNull();
-        assertThat(admin.getMetadata().getFinalizers())
-            .contains(MetadataUtil.SYSTEM_FINALIZER);
+        assertThat(admin.getMetadata().getFinalizers()).contains(MetadataUtil.SYSTEM_FINALIZER);
     }
 }

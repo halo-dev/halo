@@ -9,20 +9,26 @@ metadata:
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-own-permissions", "role-template-public-apis" ]
 rules:
-  - apiGroups: [ "api.halo.run" ]
-    resources: [ "comments", "comments/reply" ]
-    verbs: [ "create", "get", "list" ]
-  - apiGroups: [ "api.halo.run" ]
-    resources: [ "*" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users" ]
-    resourceNames: [ "-" ]
-    verbs: [ "get" ]
-  - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/*" ]
-    verbs: [ "create" ]
-  - nonResourceURLs: [ "/actuator/globalinfo", "/actuator/health", "/actuator/health/*", "/login/public-key" ]
-    verbs: [ "get" ]
+  - apiGroups: ["api.halo.run"]
+    resources: ["comments", "comments/reply"]
+    verbs: ["create", "get", "list"]
+  - apiGroups: ["api.halo.run"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users"]
+    resourceNames: ["-"]
+    verbs: ["get"]
+  - nonResourceURLs: ["/apis/api.halo.run/v1alpha1/trackers/*"]
+    verbs: ["create"]
+  - nonResourceURLs:
+      [
+        "/actuator/globalinfo",
+        "/actuator/health",
+        "/actuator/health/*",
+        "/login/public-key",
+      ]
+    verbs: ["get"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -32,18 +38,18 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.halo.run" ]
-    resources: [ "*" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.content.halo.run" ]
-    resources: [ "*" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.plugin.halo.run" ]
-    resources: [ "*" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.notification.halo.run" ]
-    resources: [ "subscriptions/unsubscribe" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.storage.halo.run" ]
-    resources: [ "thumbnails/via-uri" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["api.halo.run"]
+    resources: ["*"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.content.halo.run"]
+    resources: ["*"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.plugin.halo.run"]
+    resources: ["*"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.notification.halo.run"]
+    resources: ["subscriptions/unsubscribe"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.storage.halo.run"]
+    resources: ["thumbnails/via-uri"]
+    verbs: ["get", "list"]

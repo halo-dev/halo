@@ -1,19 +1,15 @@
 package run.halo.app.infra;
 
-import java.util.AbstractCollection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
 /**
- * <p>This {@link ConditionList} to stores multiple {@link Condition}.</p>
- * <p>The element added after is always the first, the first to be removed is always the first to
- * be added.</p>
- * <p>The queue head is the one whose element index is 0</p>
- * Note that: this class is not thread-safe.
+ * This {@link ConditionList} to stores multiple {@link Condition}.
+ *
+ * <p>The element added after is always the first, the first to be removed is always the first to be added.
+ *
+ * <p>The queue head is the one whose element index is 0 Note that: this class is not thread-safe.
  *
  * @author guqing
  * @since 2.0.0
@@ -81,20 +77,17 @@ public class ConditionList extends AbstractCollection<Condition> {
         return null;
     }
 
-
     public void remove(Condition condition) {
         conditions.remove(condition);
     }
 
     /**
-     * Retrieves, but does not remove, the head of the queue represented by
-     * this deque (in other words, the first element of this deque), or
-     * returns {@code null} if this deque is empty.
+     * Retrieves, but does not remove, the head of the queue represented by this deque (in other words, the first
+     * element of this deque), or returns {@code null} if this deque is empty.
      *
      * <p>This method is equivalent to {@link #peekFirst()}.
      *
-     * @return the head of the queue represented by this deque, or
-     * {@code null} if this deque is empty
+     * @return the head of the queue represented by this deque, or {@code null} if this deque is empty
      */
     public @Nullable Condition peek() {
         return peekFirst();
@@ -122,9 +115,9 @@ public class ConditionList extends AbstractCollection<Condition> {
             return false;
         }
         return Objects.equals(a.getType(), b.getType())
-            && Objects.equals(a.getStatus(), b.getStatus())
-            && Objects.equals(a.getReason(), b.getReason())
-            && Objects.equals(a.getMessage(), b.getMessage());
+                && Objects.equals(a.getStatus(), b.getStatus())
+                && Objects.equals(a.getReason(), b.getReason())
+                && Objects.equals(a.getMessage(), b.getMessage());
     }
 
     @Override

@@ -52,12 +52,12 @@ public class ListedPostVo implements ExtensionVoOperator {
         Post.PostSpec spec = post.getSpec();
         Post.PostStatus postStatus = post.getStatusOrDefault();
         return ListedPostVo.builder()
-            .metadata(post.getMetadata())
-            .spec(spec)
-            .status(postStatus)
-            .categories(List.of())
-            .tags(List.of())
-            .contributors(List.of())
-            .build();
+                .metadata(post.getMetadata())
+                .spec(spec)
+                .status(postStatus)
+                .categories(List.of())
+                .tags(List.of())
+                .contributors(List.of())
+                .build();
     }
 }

@@ -1,9 +1,6 @@
 package run.halo.app.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -68,19 +65,13 @@ class ExtensionUtilTest {
         when(metadata.getLabels()).thenReturn(null);
         assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "false")
-        );
+        when(metadata.getLabels()).thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "false"));
         assertFalse(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true")
-        );
+        when(metadata.getLabels()).thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "true"));
         assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
 
-        when(metadata.getLabels()).thenReturn(
-            Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "TrUe")
-        );
+        when(metadata.getLabels()).thenReturn(Map.of(ExtensionUtil.DO_NOT_OVERWRITE_LABEL, "TrUe"));
         assertTrue(ExtensionUtil.hasDoNotOverwriteLabel(extension));
     }
 }

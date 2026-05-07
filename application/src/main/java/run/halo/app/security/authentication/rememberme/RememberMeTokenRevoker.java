@@ -10,10 +10,9 @@ import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * Remember me token revoker.
- * <p>
- * Listen to password changed event and revoke remember me token.
- * </p>
- * Maybe you should consider revoke remember me token when user logout or username changed.
+ *
+ * <p>Listen to password changed event and revoke remember me token. Maybe you should consider revoke remember me token
+ * when user logout or username changed.
  *
  * @author guqing
  * @since 2.17.0
@@ -27,7 +26,6 @@ public class RememberMeTokenRevoker {
     @Async
     @EventListener(PasswordChangedEvent.class)
     public void onPasswordChanged(PasswordChangedEvent event) {
-        tokenRepository.removeUserTokens(event.getUsername())
-            .block(BLOCKING_TIMEOUT);
+        tokenRepository.removeUserTokens(event.getUsername()).block(BLOCKING_TIMEOUT);
     }
 }

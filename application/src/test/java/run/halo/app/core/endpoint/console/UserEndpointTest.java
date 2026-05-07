@@ -75,9 +75,9 @@ class UserEndpointTest {
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .apply(springSecurity())
-            .build()
-            .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
+                .apply(springSecurity())
+                .build()
+                .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
     }
 
     @Nested
@@ -88,41 +88,45 @@ class UserEndpointTest {
             when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(any())).thenReturn(Flux.empty());
             when(client.listBy(same(User.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(ListResult.emptyResult()));
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
 
-            webClient.get().uri("/users")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(0)
-                .jsonPath("$.total").isEqualTo(0);
+            webClient
+                    .get()
+                    .uri("/users")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(0)
+                    .jsonPath("$.total")
+                    .isEqualTo(0);
         }
 
         @Test
         void shouldListUsersWhenUserPresent() {
-            var users = List.of(
-                createUser("fake-user-1"),
-                createUser("fake-user-2"),
-                createUser("fake-user-3")
-            );
+            var users = List.of(createUser("fake-user-1"), createUser("fake-user-2"), createUser("fake-user-3"));
             var expectResult = new ListResult<>(users);
             when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
-            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class))).thenReturn(Mono.just(expectResult));
 
-            webClient.get().uri("/users")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(3)
-                .jsonPath("$.total").isEqualTo(3);
+            webClient
+                    .get()
+                    .uri("/users")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(3)
+                    .jsonPath("$.total")
+                    .isEqualTo(3);
         }
 
         @Test
         void shouldFilterUsersWhenRoleProvided() {
-            var expectUser =
-                JsonUtils.jsonToObject("""
+            var expectUser = JsonUtils.jsonToObject("""
                     {
                         "apiVersion": "v1alpha1",
                         "kind": "User",
@@ -134,33 +138,29 @@ class UserEndpointTest {
                         }
                     }
                     """, User.class);
-            var users = List.of(
-                expectUser
-            );
+            var users = List.of(expectUser);
             var expectResult = new ListResult<>(users);
-            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class))).thenReturn(Mono.just(expectResult));
             when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
-            webClient.get().uri("/users?role=guest")
-                .exchange()
-                .expectStatus().isOk();
+            webClient.get().uri("/users?role=guest").exchange().expectStatus().isOk();
         }
 
         @Test
         void shouldSortUsersWhenCreationTimestampSet() {
-            var expectUser =
-                createUser("fake-user-2", "expected display name");
+            var expectUser = createUser("fake-user-2", "expected display name");
             var expectResult = new ListResult<>(List.of(expectUser));
-            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
-                .thenReturn(Mono.just(expectResult));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class))).thenReturn(Mono.just(expectResult));
             when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
-            webClient.get().uri("/users?sort=creationTimestamp,desc")
-                .exchange()
-                .expectStatus().isOk();
+            webClient
+                    .get()
+                    .uri("/users?sort=creationTimestamp,desc")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
         }
 
         User createUser(String name) {
@@ -178,7 +178,6 @@ class UserEndpointTest {
             user.setSpec(spec);
             return user;
         }
-
     }
 
     @Nested
@@ -187,11 +186,8 @@ class UserEndpointTest {
 
         @Test
         void shouldResponseErrorIfUserNotFound() {
-            when(userService.getUser("fake-user"))
-                .thenReturn(Mono.error(new UserNotFoundException("fake-user")));
-            webClient.get().uri("/users/-")
-                .exchange()
-                .expectStatus().isNotFound();
+            when(userService.getUser("fake-user")).thenReturn(Mono.error(new UserNotFoundException("fake-user")));
+            webClient.get().uri("/users/-").exchange().expectStatus().isNotFound();
 
             verify(userService).getUser(eq("fake-user"));
         }
@@ -208,12 +204,16 @@ class UserEndpointTest {
             role.getMetadata().setName("fake-super-role");
             role.setRules(List.of());
             when(roleService.list(Set.of("fake-super-role"), true)).thenReturn(Flux.just(role));
-            webClient.get().uri("/users/-")
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(UserEndpoint.DetailedUser.class)
-                .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
+            webClient
+                    .get()
+                    .uri("/users/-")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectHeader()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .expectBody(UserEndpoint.DetailedUser.class)
+                    .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
         }
     }
 
@@ -230,12 +230,15 @@ class UserEndpointTest {
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
 
-            webClient.put().uri("/users/-")
-                .bodyValue(requestUser)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(User.class)
-                .isEqualTo(updatedUser);
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(requestUser)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(updatedUser);
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -248,10 +251,13 @@ class UserEndpointTest {
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
 
-            webClient.put().uri("/users/-")
-                .bodyValue(requestUser)
-                .exchange()
-                .expectStatus().isBadRequest();
+            webClient
+                    .put()
+                    .uri("/users/-")
+                    .bodyValue(requestUser)
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
 
             verify(client).get(User.class, "fake-user");
             verify(client, never()).update(currentUser);
@@ -281,17 +287,17 @@ class UserEndpointTest {
         @Test
         void shouldUpdateMyPasswordCorrectly() {
             var user = new User();
-            when(userService.updateWithRawPassword("fake-user", "new-password"))
-                .thenReturn(Mono.just(user));
-            when(userService.confirmPassword("fake-user", "old-password"))
-                .thenReturn(Mono.just(true));
-            webClient.put().uri("/users/-/password")
-                .bodyValue(
-                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(User.class)
-                .isEqualTo(user);
+            when(userService.updateWithRawPassword("fake-user", "new-password")).thenReturn(Mono.just(user));
+            when(userService.confirmPassword("fake-user", "old-password")).thenReturn(Mono.just(true));
+            webClient
+                    .put()
+                    .uri("/users/-/password")
+                    .bodyValue(new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(user);
 
             verify(userService, times(1)).updateWithRawPassword("fake-user", "new-password");
         }
@@ -300,20 +306,19 @@ class UserEndpointTest {
         void shouldUpdateOtherPasswordCorrectly() {
             var user = new User();
             when(userService.updateWithRawPassword("another-fake-user", "new-password"))
-                .thenReturn(Mono.just(user));
-            webClient.put()
-                .uri("/users/another-fake-user/password")
-                .bodyValue(
-                    new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(User.class)
-                .isEqualTo(user);
+                    .thenReturn(Mono.just(user));
+            webClient
+                    .put()
+                    .uri("/users/another-fake-user/password")
+                    .bodyValue(new UserEndpoint.ChangeOwnPasswordRequest("old-password", "new-password"))
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(user);
 
-            verify(userService, times(1)).updateWithRawPassword("another-fake-user",
-                "new-password");
+            verify(userService, times(1)).updateWithRawPassword("another-fake-user", "new-password");
         }
-
     }
 
     @Nested
@@ -322,10 +327,13 @@ class UserEndpointTest {
 
         @Test
         void shouldGetBadRequestIfRequestBodyIsEmpty() {
-            webClient.post().uri("/users/fake-user/permissions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest();
+            webClient
+                    .post()
+                    .uri("/users/fake-user/permissions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus()
+                    .isBadRequest();
 
             // Why one more time to verify? Because the SuperAdminInitializer will fetch admin user.
             verify(client, never()).fetch(same(User.class), eq("fake-user"));
@@ -336,11 +344,14 @@ class UserEndpointTest {
         void shouldGrantPermission() {
             when(userService.grantRoles("fake-user", Set.of("fake-role"))).thenReturn(Mono.empty());
 
-            webClient.post().uri("/users/fake-user/permissions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
-                .exchange()
-                .expectStatus().isOk();
+            webClient
+                    .post()
+                    .uri("/users/fake-user/permissions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
         }
 
         @Test
@@ -363,36 +374,33 @@ class UserEndpointTest {
             when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.just("test-A"));
             when(roleService.list(Set.of("test-A"), true)).thenReturn(Flux.just(roleA));
 
-            webClient.get().uri("/users/fake-user/permissions")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(UserEndpoint.UserPermission.class)
-                .value(userPermission -> {
-                    assertEquals(List.of(roleA), userPermission.getRoles());
-                    assertEquals(List.of(roleA), userPermission.getPermissions());
-                    assertEquals(List.of("permission-A"), userPermission.getUiPermissions());
-                });
+            webClient
+                    .get()
+                    .uri("/users/fake-user/permissions")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(UserEndpoint.UserPermission.class)
+                    .value(userPermission -> {
+                        assertEquals(List.of(roleA), userPermission.getRoles());
+                        assertEquals(List.of(roleA), userPermission.getPermissions());
+                        assertEquals(List.of("permission-A"), userPermission.getUiPermissions());
+                    });
         }
     }
 
     @Test
     void createWhenNameDuplicate() {
-        when(userService.createUser(any(User.class), anySet()))
-            .thenReturn(Mono.just(new User()));
-        var userRequest = new UserEndpoint.CreateUserRequest("fake-user",
-            "fake-email",
-            "",
-            "",
-            "",
-            "",
-            "",
-            Map.of(),
-            Set.of());
-        webClient.post().uri("/users")
-            .bodyValue(userRequest)
-            .exchange()
-            .expectStatus().isOk();
+        when(userService.createUser(any(User.class), anySet())).thenReturn(Mono.just(new User()));
+        var userRequest =
+                new UserEndpoint.CreateUserRequest("fake-user", "fake-email", "", "", "", "", "", Map.of(), Set.of());
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 
     @Nested
@@ -401,28 +409,25 @@ class UserEndpointTest {
         void respondWithErrorIfExtensionNotAllowed() {
 
             var multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", "fake-file")
-                .contentType(MediaType.parseMediaType("image/bmp"))
-                .filename("fake-filename.bmp");
+            multipartBodyBuilder
+                    .part("file", "fake-file")
+                    .contentType(MediaType.parseMediaType("image/bmp"))
+                    .filename("fake-filename.bmp");
 
-            when(environmentFetcher.fetch(
-                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
-            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
-                .avatar(null)
-                .build())
-            );
-            when(environmentFetcher.fetch(
-                SystemSetting.User.GROUP, SystemSetting.User.class)
-            ).thenReturn(Mono.empty());
+            when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
+                    .thenReturn(Mono.fromSupplier(() ->
+                            SystemSetting.Attachment.builder().avatar(null).build()));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.empty());
 
             webClient
-                .post()
-                .uri("/users/-/avatar")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange()
-                .expectStatus()
-                .is4xxClientError();
+                    .post()
+                    .uri("/users/-/avatar")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError();
         }
 
         @ParameterizedTest
@@ -436,33 +441,32 @@ class UserEndpointTest {
             attachment.setMetadata(metadata);
 
             var multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", "fake-file")
-                .contentType(MediaType.parseMediaType("image/" + ext))
-                .filename("fake-filename." + ext);
+            multipartBodyBuilder
+                    .part("file", "fake-file")
+                    .contentType(MediaType.parseMediaType("image/" + ext))
+                    .filename("fake-filename." + ext);
 
-            when(environmentFetcher.fetch(
-                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
-            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
-                .avatar(null)
-                .build())
-            );
-            when(environmentFetcher.fetch(
-                SystemSetting.User.GROUP, SystemSetting.User.class)
-            ).thenReturn(Mono.empty());
+            when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
+                    .thenReturn(Mono.fromSupplier(() ->
+                            SystemSetting.Attachment.builder().avatar(null).build()));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.empty());
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
-            when(attachmentService.upload(eq("default-policy"), anyString(), anyString(),
-                any(), any(MediaType.class))).thenReturn(Mono.just(attachment));
+            when(attachmentService.upload(eq("default-policy"), anyString(), anyString(), any(), any(MediaType.class)))
+                    .thenReturn(Mono.just(attachment));
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
 
-            webClient.post()
-                .uri("/users/-/avatar")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(User.class).isEqualTo(currentUser);
+            webClient
+                    .post()
+                    .uri("/users/-/avatar")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(currentUser);
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -478,35 +482,34 @@ class UserEndpointTest {
             attachment.setMetadata(metadata);
 
             var multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", "fake-file")
-                .contentType(MediaType.IMAGE_PNG)
-                .filename("fake-filename.png");
+            multipartBodyBuilder
+                    .part("file", "fake-file")
+                    .contentType(MediaType.IMAGE_PNG)
+                    .filename("fake-filename.png");
 
-
-            when(environmentFetcher.fetch(
-                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
-            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
-                .avatar(null)
-                .build())
-            );
-            when(environmentFetcher.fetch(
-                SystemSetting.User.GROUP, SystemSetting.User.class)
-            ).thenReturn(Mono.empty());
+            when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
+                    .thenReturn(Mono.fromSupplier(() ->
+                            SystemSetting.Attachment.builder().avatar(null).build()));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.empty());
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
-            when(attachmentService.upload(eq("default-policy"), anyString(), anyString(),
-                any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
+            when(attachmentService.upload(
+                            eq("default-policy"), anyString(), anyString(), any(), any(MediaType.IMAGE_PNG.getClass())))
+                    .thenReturn(Mono.just(attachment));
 
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
 
-            webClient.post()
-                .uri("/users/-/avatar")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(User.class).isEqualTo(currentUser);
+            webClient
+                    .post()
+                    .uri("/users/-/avatar")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(currentUser);
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);
@@ -522,38 +525,42 @@ class UserEndpointTest {
             attachment.setMetadata(metadata);
 
             var multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", "fake-file")
-                .contentType(MediaType.IMAGE_PNG)
-                .filename("fake-filename.png");
+            multipartBodyBuilder
+                    .part("file", "fake-file")
+                    .contentType(MediaType.IMAGE_PNG)
+                    .filename("fake-filename.png");
 
-            when(environmentFetcher.fetch(
-                SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class
-            )).thenReturn(Mono.fromSupplier(() -> SystemSetting.Attachment.builder()
-                .avatar(null)
-                .build())
-            );
-            when(environmentFetcher.fetch(
-                SystemSetting.User.GROUP, SystemSetting.User.class)
-            ).thenReturn(Mono.fromSupplier(() -> {
-                var us = new SystemSetting.User();
-                us.setAvatarPolicy("fake-avatar-policy");
-                return us;
-            }));
+            when(environmentFetcher.fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class))
+                    .thenReturn(Mono.fromSupplier(() ->
+                            SystemSetting.Attachment.builder().avatar(null).build()));
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                    .thenReturn(Mono.fromSupplier(() -> {
+                        var us = new SystemSetting.User();
+                        us.setAvatarPolicy("fake-avatar-policy");
+                        return us;
+                    }));
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
-            when(attachmentService.upload(eq("fake-avatar-policy"), anyString(), anyString(),
-                any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
+            when(attachmentService.upload(
+                            eq("fake-avatar-policy"),
+                            anyString(),
+                            anyString(),
+                            any(),
+                            any(MediaType.IMAGE_PNG.getClass())))
+                    .thenReturn(Mono.just(attachment));
 
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
 
-            webClient.post()
-                .uri("/users/-/avatar")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(User.class).isEqualTo(currentUser);
+            webClient
+                    .post()
+                    .uri("/users/-/avatar")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(User.class)
+                    .isEqualTo(currentUser);
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);

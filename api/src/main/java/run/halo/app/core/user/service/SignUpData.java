@@ -28,8 +28,7 @@ public class SignUpData {
 
     @NotBlank
     @Size(min = 4, max = 63)
-    @Pattern(regexp = ValidationUtils.NAME_REGEX,
-        message = "{validation.error.username.pattern}")
+    @Pattern(regexp = ValidationUtils.NAME_REGEX, message = "{validation.error.username.pattern}")
     private String username;
 
     @NotBlank
@@ -42,8 +41,7 @@ public class SignUpData {
 
     @NotBlank
     @Size(min = 5, max = 257)
-    @Pattern(regexp = ValidationUtils.PASSWORD_REGEX,
-        message = "{validation.error.password.pattern}")
+    @Pattern(regexp = ValidationUtils.PASSWORD_REGEX, message = "{validation.error.password.pattern}")
     private String password;
 
     @NotBlank
@@ -59,22 +57,19 @@ public class SignUpData {
         Class<?>[] groups() default {};
 
         Class<? extends Payload>[] payload() default {};
-
     }
 
     private static class SignUpDataConstraintValidator
-        implements ConstraintValidator<SignUpDataConstraint, SignUpData> {
+            implements ConstraintValidator<SignUpDataConstraint, SignUpData> {
 
         @Override
         public boolean isValid(SignUpData signUpData, ConstraintValidatorContext context) {
             var isValid = Objects.equals(signUpData.getPassword(), signUpData.getConfirmPassword());
             if (!isValid) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(
-                        "{signup.error.confirm-password-not-match}"
-                    )
-                    .addPropertyNode("confirmPassword")
-                    .addConstraintViolation();
+                context.buildConstraintViolationWithTemplate("{signup.error.confirm-password-not-match}")
+                        .addPropertyNode("confirmPassword")
+                        .addConstraintViolation();
             }
             return isValid;
         }

@@ -20,5 +20,4 @@ public interface Indices<E extends Extension> extends Closeable {
      * @throws IllegalArgumentException if the index with the given name does not exist
      */
     <K extends Comparable<K>> Index<E, K> getIndex(String indexName);
-
 }

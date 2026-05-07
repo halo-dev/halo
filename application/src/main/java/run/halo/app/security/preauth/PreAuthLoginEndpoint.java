@@ -54,88 +54,106 @@ class PreAuthLoginEndpoint {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
     RouterFunction<ServerResponse> preAuthLoginEndpoints() {
-        return RouterFunctions.nest(path("/login"), RouterFunctions.route()
-            .GET("", request -> {
-                var exchange = request.exchange();
-                var contextPath = exchange.getRequest().getPath().contextPath().value();
-                var publicKey = cryptoService.readPublicKey()
-                    .map(key -> Base64.getEncoder().encodeToString(key));
-                var globalInfo = globalInfoService.getGlobalInfo().cache();
-                var authProviders = authProviderService.getEnabledProviders().cache();
+        return RouterFunctions.nest(
+                path("/login"),
+                RouterFunctions.route()
+                        .GET("", request -> {
+                            var exchange = request.exchange();
+                            var contextPath = exchange.getRequest()
+                                    .getPath()
+                                    .contextPath()
+                                    .value();
+                            var publicKey = cryptoService
+                                    .readPublicKey()
+                                    .map(key -> Base64.getEncoder().encodeToString(key));
+                            var globalInfo = globalInfoService.getGlobalInfo().cache();
+                            var authProviders =
+                                    authProviderService.getEnabledProviders().cache();
 
-                var allFormProviders = authProviders
-                    .filter(ap -> AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
-                    .cache();
+                            var allFormProviders = authProviders
+                                    .filter(ap -> AuthProvider.AuthType.FORM.equals(
+                                            ap.getSpec().getAuthType()))
+                                    .cache();
 
-                var authProvider = Mono.justOrEmpty(request.queryParam("method"))
-                    .flatMap(method -> allFormProviders
-                        .filter(ap -> Objects.equals(method, ap.getMetadata().getName()))
-                        .next()
-                        .switchIfEmpty(Mono.error(
-                            () -> new ServerWebInputException("Invalid login method " + method))
-                        )
-                    )
-                    .switchIfEmpty(allFormProviders.next())
-                    .cache();
+                            var authProvider = Mono.justOrEmpty(request.queryParam("method"))
+                                    .flatMap(method -> allFormProviders
+                                            .filter(ap -> Objects.equals(
+                                                    method, ap.getMetadata().getName()))
+                                            .next()
+                                            .switchIfEmpty(Mono.error(() ->
+                                                    new ServerWebInputException("Invalid login method " + method))))
+                                    .switchIfEmpty(allFormProviders.next())
+                                    .cache();
 
-                var fragmentTemplateName = authProvider.map(ap -> {
-                    var templateName = "login_" + ap.getMetadata().getName();
-                    return Optional.ofNullable(ap.getMetadata().getLabels())
-                        .map(labels -> labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME))
-                        .filter(StringUtils::isNotBlank)
-                        .map(pluginName -> String.join(":", "plugin", pluginName, templateName))
-                        .orElse(templateName);
-                });
+                            var fragmentTemplateName = authProvider.map(ap -> {
+                                var templateName = "login_" + ap.getMetadata().getName();
+                                return Optional.ofNullable(ap.getMetadata().getLabels())
+                                        .map(labels -> labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME))
+                                        .filter(StringUtils::isNotBlank)
+                                        .map(pluginName -> String.join(":", "plugin", pluginName, templateName))
+                                        .orElse(templateName);
+                            });
 
-                var socialAuthProviders = authProviders
-                    .filter(ap -> !AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
-                    .cache();
-                var formAuthProviders = allFormProviders
-                    .filterWhen(ap -> authProvider
-                        .map(provider -> !Objects.equals(provider.getMetadata().getName(),
-                            ap.getMetadata().getName())
-                        )
-                    )
-                    .cache();
+                            var socialAuthProviders = authProviders
+                                    .filter(ap -> !AuthProvider.AuthType.FORM.equals(
+                                            ap.getSpec().getAuthType()))
+                                    .cache();
+                            var formAuthProviders = allFormProviders
+                                    .filterWhen(ap -> authProvider.map(provider -> !Objects.equals(
+                                            provider.getMetadata().getName(),
+                                            ap.getMetadata().getName())))
+                                    .cache();
 
-                return serverRequestCache.saveRequest(exchange).then(Mono.defer(() ->
-                    ServerResponse.ok().render("login", Map.of(
-                        "action", contextPath + "/login",
-                        "publicKey", publicKey,
-                        "globalInfo", globalInfo,
-                        "authProvider", authProvider,
-                        "fragmentTemplateName", fragmentTemplateName,
-                        "socialAuthProviders", socialAuthProviders,
-                        "formAuthProviders", formAuthProviders,
-                        "rememberMe",
-                        parameterRequestCache.getParameter(exchange, REMEMBER_ME_PARAMETER_NAME),
-                        "username",
-                        parameterRequestCache.getParameter(exchange, USERNAME_PARAMETER_NAME)
-                        // TODO Add more models here
-                    ))
-                ));
-            })
-            .POST("/social/{authProviderName}", request -> {
-                var authProviderName = request.pathVariable("authProviderName");
-                return authProviderService.getEnabledProviders()
-                    .filter(ap -> Objects.equals(authProviderName, ap.getMetadata().getName()))
-                    .filter(ap -> !AuthProvider.AuthType.FORM.equals(ap.getSpec().getAuthType()))
-                    .next()
-                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                        "Auth provider " + authProviderName + " not found or not enabled."
-                    )))
-                    .flatMap(ap -> {
-                        var authenticationUrl = ap.getSpec().getAuthenticationUrl();
-                        return parameterRequestCache.saveParameter(
-                                request.exchange(), REMEMBER_ME_PARAMETER_NAME
-                            )
-                            .then(Mono.defer(() -> ServerResponse.status(HttpStatus.FOUND)
-                                .location(URI.create(authenticationUrl))
-                                .build()
-                            ));
-                    });
-            })
-            .before(HaloUtils.noCache())
-            .build());
+                            return serverRequestCache
+                                    .saveRequest(exchange)
+                                    .then(Mono.defer(() -> ServerResponse.ok()
+                                            .render(
+                                                    "login",
+                                                    Map.of(
+                                                            "action",
+                                                            contextPath + "/login",
+                                                            "publicKey",
+                                                            publicKey,
+                                                            "globalInfo",
+                                                            globalInfo,
+                                                            "authProvider",
+                                                            authProvider,
+                                                            "fragmentTemplateName",
+                                                            fragmentTemplateName,
+                                                            "socialAuthProviders",
+                                                            socialAuthProviders,
+                                                            "formAuthProviders",
+                                                            formAuthProviders,
+                                                            "rememberMe",
+                                                            parameterRequestCache.getParameter(
+                                                                    exchange, REMEMBER_ME_PARAMETER_NAME),
+                                                            "username",
+                                                            parameterRequestCache.getParameter(
+                                                                    exchange, USERNAME_PARAMETER_NAME)
+                                                            // TODO Add more models here
+                                                            ))));
+                        })
+                        .POST("/social/{authProviderName}", request -> {
+                            var authProviderName = request.pathVariable("authProviderName");
+                            return authProviderService
+                                    .getEnabledProviders()
+                                    .filter(ap -> Objects.equals(
+                                            authProviderName, ap.getMetadata().getName()))
+                                    .filter(ap -> !AuthProvider.AuthType.FORM.equals(
+                                            ap.getSpec().getAuthType()))
+                                    .next()
+                                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                                            "Auth provider " + authProviderName + " not found or not enabled.")))
+                                    .flatMap(ap -> {
+                                        var authenticationUrl = ap.getSpec().getAuthenticationUrl();
+                                        return parameterRequestCache
+                                                .saveParameter(request.exchange(), REMEMBER_ME_PARAMETER_NAME)
+                                                .then(Mono.defer(() -> ServerResponse.status(HttpStatus.FOUND)
+                                                        .location(URI.create(authenticationUrl))
+                                                        .build()));
+                                    });
+                        })
+                        .before(HaloUtils.noCache())
+                        .build());
     }
 }

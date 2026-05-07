@@ -1,11 +1,7 @@
 package run.halo.app.plugin;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.endpoint.console.CustomEndpointsBuilder;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -22,8 +18,7 @@ public class AggregatedRouterFunction implements RouterFunction<ServerResponse> 
 
     public AggregatedRouterFunction(ObjectProvider<CustomEndpoint> customEndpoints) {
         var builder = new CustomEndpointsBuilder();
-        customEndpoints.orderedStream()
-            .forEach(builder::add);
+        customEndpoints.orderedStream().forEach(builder::add);
         this.aggregated = builder.build();
     }
 

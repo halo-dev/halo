@@ -20,5 +20,4 @@ public interface PluginFinder {
      * @throws PluginRuntimeException if any error occurs during finding plugin
      */
     Plugin find(Path pluginPath);
-
 }

@@ -23,16 +23,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Flux<Category> listChildren(String categoryName) {
-        return client.fetch(Category.class, categoryName)
-            .expand(category -> {
-                var children = category.getSpec().getChildren();
-                if (children == null || children.isEmpty()) {
-                    return Mono.empty();
-                }
-                return Flux.fromIterable(children)
+        return client.fetch(Category.class, categoryName).expand(category -> {
+            var children = category.getSpec().getChildren();
+            if (children == null || children.isEmpty()) {
+                return Mono.empty();
+            }
+            return Flux.fromIterable(children)
                     .flatMap(name -> client.fetch(Category.class, name))
                     .filter(this::isNotIndependent);
-            });
+        });
     }
 
     @Override
@@ -41,27 +40,24 @@ public class CategoryServiceImpl implements CategoryService {
             return Mono.empty();
         }
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            equal("spec.children", name)
-        ));
-        return client.listBy(Category.class, listOptions,
-                PageRequestImpl.of(1, 1, defaultSort())
-            )
-            .flatMap(result -> Mono.justOrEmpty(ListResult.first(result)));
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.children", name)));
+        return client.listBy(Category.class, listOptions, PageRequestImpl.of(1, 1, defaultSort()))
+                .flatMap(result -> Mono.justOrEmpty(ListResult.first(result)));
     }
 
     @Override
     public Mono<Boolean> isCategoryHidden(String categoryName) {
         return client.fetch(Category.class, categoryName)
-            .expand(category -> getParentByName(category.getMetadata().getName()))
-            .filter(category -> category.getSpec().isHideFromList())
-            .hasElements();
+                .expand(category -> getParentByName(category.getMetadata().getName()))
+                .filter(category -> category.getSpec().isHideFromList())
+                .hasElements();
     }
 
     static Sort defaultSort() {
-        return Sort.by(Sort.Order.desc("spec.priority"),
-            Sort.Order.desc("metadata.creationTimestamp"),
-            Sort.Order.desc("metadata.name"));
+        return Sort.by(
+                Sort.Order.desc("spec.priority"),
+                Sort.Order.desc("metadata.creationTimestamp"),
+                Sort.Order.desc("metadata.name"));
     }
 
     private boolean isNotIndependent(Category category) {

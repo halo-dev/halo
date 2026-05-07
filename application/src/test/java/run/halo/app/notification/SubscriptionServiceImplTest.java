@@ -2,9 +2,7 @@ package run.halo.app.notification;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
@@ -50,20 +48,20 @@ class SubscriptionServiceImplTest {
         subscription.getMetadata().setName("fake-subscription");
         subscription.getMetadata().setVersion(0L);
 
-        when(client.fetch(eq(Subscription.class), eq("fake-subscription")))
-            .thenAnswer(invocation -> {
-                if (i.incrementAndGet() > 3) {
-                    subscription.getMetadata().setVersion(i.get());
-                } else {
-                    subscription.getMetadata().setVersion(i.get() - 1);
-                }
-                return Mono.just(subscription);
-            });
+        when(client.fetch(eq(Subscription.class), eq("fake-subscription"))).thenAnswer(invocation -> {
+            if (i.incrementAndGet() > 3) {
+                subscription.getMetadata().setVersion(i.get());
+            } else {
+                subscription.getMetadata().setVersion(i.get() - 1);
+            }
+            return Mono.just(subscription);
+        });
 
-        subscriptionService.remove(subscription)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        subscriptionService
+                .remove(subscription)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
 
         // give version=0, but the real version is 1
         // give version=1, but the real version is 2

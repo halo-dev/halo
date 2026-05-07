@@ -54,21 +54,18 @@ class InitializeRedirectionWebFilterTest {
         WebFilterChain chain = mock(WebFilterChain.class);
         var paths = new String[] {"/", "/console/test", "/uc/test", "/login", "/signup"};
         for (String path : paths) {
-            MockServerHttpRequest request = MockServerHttpRequest.get(path)
-                .accept(MediaType.TEXT_HTML).build();
+            MockServerHttpRequest request =
+                    MockServerHttpRequest.get(path).accept(MediaType.TEXT_HTML).build();
             MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
-            when(serverRedirectStrategy.sendRedirect(any(), any())).thenReturn(Mono.empty().then());
+            when(serverRedirectStrategy.sendRedirect(any(), any()))
+                    .thenReturn(Mono.empty().then());
 
             Mono<Void> result = filter.filter(exchange, chain);
 
-            StepVerifier.create(result)
-                .expectNextCount(0)
-                .expectComplete()
-                .verify();
+            StepVerifier.create(result).expectNextCount(0).expectComplete().verify();
 
-            verify(serverRedirectStrategy).sendRedirect(eq(exchange),
-                eq(URI.create("/system/setup")));
+            verify(serverRedirectStrategy).sendRedirect(eq(exchange), eq(URI.create("/system/setup")));
             verify(chain, never()).filter(eq(exchange));
         }
     }
@@ -81,16 +78,13 @@ class InitializeRedirectionWebFilterTest {
 
         var paths = new String[] {"/test", "/apis/test", "system/setup", "/logout"};
         for (String path : paths) {
-            MockServerHttpRequest request = MockServerHttpRequest.get(path)
-                .accept(MediaType.TEXT_HTML).build();
+            MockServerHttpRequest request =
+                    MockServerHttpRequest.get(path).accept(MediaType.TEXT_HTML).build();
             MockServerWebExchange exchange = MockServerWebExchange.from(request);
             when(chain.filter(any())).thenReturn(Mono.empty().then());
             Mono<Void> result = filter.filter(exchange, chain);
 
-            StepVerifier.create(result)
-                .expectNextCount(0)
-                .expectComplete()
-                .verify();
+            StepVerifier.create(result).expectNextCount(0).expectComplete().verify();
 
             verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange), any());
             verify(chain).filter(eq(exchange));
@@ -101,16 +95,13 @@ class InitializeRedirectionWebFilterTest {
     void shouldNotRedirectTest() {
         WebFilterChain chain = mock(WebFilterChain.class);
 
-        MockServerHttpRequest request = MockServerHttpRequest.get("/test")
-            .accept(MediaType.TEXT_HTML).build();
+        MockServerHttpRequest request =
+                MockServerHttpRequest.get("/test").accept(MediaType.TEXT_HTML).build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         when(chain.filter(any())).thenReturn(Mono.empty().then());
         Mono<Void> result = filter.filter(exchange, chain);
 
-        StepVerifier.create(result)
-            .expectNextCount(0)
-            .expectComplete()
-            .verify();
+        StepVerifier.create(result).expectNextCount(0).expectComplete().verify();
 
         verify(serverRedirectStrategy, never()).sendRedirect(eq(exchange), any());
         verify(chain).filter(eq(exchange));

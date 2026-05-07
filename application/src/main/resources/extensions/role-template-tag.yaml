@@ -6,11 +6,11 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-tags\" ]"
+    rbac.authorization.halo.run/dependencies: '[ "role-template-view-tags" ]'
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "tags" ]
-    verbs: [ "*" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["tags"]
+    verbs: ["*"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -20,9 +20,9 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "tags" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "tags" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["tags"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["tags"]
+    verbs: ["get", "list"]

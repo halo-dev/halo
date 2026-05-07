@@ -18,10 +18,12 @@ public interface ReasonNotificationTemplateSelector {
 
     /**
      * Select notification template by reason type and locale.
-     * <p>Locale order is important: as we will let values from more specific to less specific (e.g.
-     * a value for gl_ES will have more precedence than a value for gl).</p>
+     *
+     * <p>Locale order is important: as we will let values from more specific to less specific (e.g. a value for gl_ES
+     * will have more precedence than a value for gl).
+     *
      * <p>If specific locale found and has multiple templates, we will order them by
-     * {@link Metadata#getCreationTimestamp()} and return the latest one.</p>
+     * {@link Metadata#getCreationTimestamp()} and return the latest one.
      *
      * @param reasonType reason type
      * @param locale locale

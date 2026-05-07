@@ -18,23 +18,23 @@ metadata:
         "role-template-user-notification"
       ]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "configmaps" ]
-    resourceNames: [ "system-states" ]
-    verbs: [ "get" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "auth-providers" ]
-    verbs: [ "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins/bundle.js", "plugins/bundle.css" ]
-    resourceNames: [ "-" ]
-    verbs: [ "get" ]
-  - apiGroups: [ "uc.api.auth.halo.run" ]
-    resources: [ "user-connections/disconnect" ]
-    verbs: [ "update" ]
-  - apiGroups: [ "uc.api.halo.run" ]
-    resources: [ "user-preferences", "annotationsettings" ]
-    verbs: [ "get", "list", "update" ]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["system-states"]
+    verbs: ["get"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["auth-providers"]
+    verbs: ["list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["plugins/bundle.js", "plugins/bundle.css"]
+    resourceNames: ["-"]
+    verbs: ["get"]
+  - apiGroups: ["uc.api.auth.halo.run"]
+    resources: ["user-connections/disconnect"]
+    verbs: ["update"]
+  - apiGroups: ["uc.api.halo.run"]
+    resources: ["user-preferences", "annotationsettings"]
+    verbs: ["get", "list", "update"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -44,18 +44,18 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users" ]
-    resourceNames: [ "-" ]
-    verbs: [ "get", "update" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users/avatar" ]
-    resourceNames: [ "-" ]
-    verbs: [ "create", "delete" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users/send-email-verification-code", "users/verify-email" ]
-    resourceNames: [ "-" ]
-    verbs: [ "create" ]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users"]
+    resourceNames: ["-"]
+    verbs: ["get", "update"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users/avatar"]
+    resourceNames: ["-"]
+    verbs: ["create", "delete"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users/send-email-verification-code", "users/verify-email"]
+    resourceNames: ["-"]
+    verbs: ["create"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -65,10 +65,10 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users/permissions" ]
-    resourceNames: [ "-" ]
-    verbs: [ "list", "get" ]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users/permissions"]
+    resourceNames: ["-"]
+    verbs: ["list", "get"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -78,10 +78,10 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users/password" ]
-    resourceNames: [ "-" ]
-    verbs: [ "update" ]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users/password"]
+    resourceNames: ["-"]
+    verbs: ["update"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -91,9 +91,9 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "stats" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["stats"]
+    verbs: ["get", "list"]
 
 ---
 apiVersion: v1alpha1
@@ -104,9 +104,9 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "annotationsettings" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: [""]
+    resources: ["annotationsettings"]
+    verbs: ["get", "list"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -116,12 +116,12 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "uc.api.security.halo.run" ]
-    resources: [ "personalaccesstokens" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "uc.api.security.halo.run" ]
-    resources: [ "personalaccesstokens/actions" ]
-    verbs: [ "update" ]
+  - apiGroups: ["uc.api.security.halo.run"]
+    resources: ["personalaccesstokens"]
+    verbs: ["*"]
+  - apiGroups: ["uc.api.security.halo.run"]
+    resources: ["personalaccesstokens/actions"]
+    verbs: ["update"]
 
 ---
 apiVersion: v1alpha1
@@ -132,12 +132,13 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "uc.api.security.halo.run" ]
-    resources: [ "authentications", "authentications/totp", "authentications/settings" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "uc.api.security.halo.run" ]
-    resources: [ "devices" ]
-    verbs: [ "get", "list", "delete" ]
+  - apiGroups: ["uc.api.security.halo.run"]
+    resources:
+      ["authentications", "authentications/totp", "authentications/settings"]
+    verbs: ["*"]
+  - apiGroups: ["uc.api.security.halo.run"]
+    resources: ["devices"]
+    verbs: ["get", "list", "delete"]
 ---
 apiVersion: v1alpha1
 kind: Role
@@ -147,15 +148,16 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.notification.halo.run" ]
-    resources: [ "notifications" ]
-    verbs: [ "get", "list", "delete" ]
-  - apiGroups: [ "api.notification.halo.run" ]
-    resources: [ "notifications/mark-as-read", "notifications/mark-specified-as-read" ]
-    verbs: [ "update" ]
-  - apiGroups: [ "api.notification.halo.run" ]
-    resources: [ "notifiers/receiver-config" ]
-    verbs: [ "get", "update" ]
-  - apiGroups: [ "api.notification.halo.run" ]
-    resources: [ "notification-preferences" ]
-    verbs: [ "create", "list" ]
+  - apiGroups: ["api.notification.halo.run"]
+    resources: ["notifications"]
+    verbs: ["get", "list", "delete"]
+  - apiGroups: ["api.notification.halo.run"]
+    resources:
+      ["notifications/mark-as-read", "notifications/mark-specified-as-read"]
+    verbs: ["update"]
+  - apiGroups: ["api.notification.halo.run"]
+    resources: ["notifiers/receiver-config"]
+    verbs: ["get", "update"]
+  - apiGroups: ["api.notification.halo.run"]
+    resources: ["notification-preferences"]
+    verbs: ["create", "list"]

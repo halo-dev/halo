@@ -18,24 +18,21 @@ class TwoFactorAuthSettingsTest {
 
     static Stream<Arguments> isAvailableCases() {
         return Stream.of(
-            arguments(settings(false, true, true), false),
-            arguments(settings(false, false, false), false),
-            arguments(settings(false, false, true), false),
-            arguments(settings(false, true, false), false),
-            arguments(settings(true, true, true), true),
-            arguments(settings(true, false, false), false),
-            arguments(settings(true, false, true), true),
-            arguments(settings(true, true, false), false)
-        );
+                arguments(settings(false, true, true), false),
+                arguments(settings(false, false, false), false),
+                arguments(settings(false, false, true), false),
+                arguments(settings(false, true, false), false),
+                arguments(settings(true, true, true), true),
+                arguments(settings(true, false, false), false),
+                arguments(settings(true, false, true), true),
+                arguments(settings(true, true, false), false));
     }
 
-    static TwoFactorAuthSettings settings(boolean enabled, boolean emailVerified,
-        boolean totpConfigured) {
+    static TwoFactorAuthSettings settings(boolean enabled, boolean emailVerified, boolean totpConfigured) {
         var settings = new TwoFactorAuthSettings();
         settings.setEnabled(enabled);
         settings.setEmailVerified(emailVerified);
         settings.setTotpConfigured(totpConfigured);
         return settings;
     }
-
 }

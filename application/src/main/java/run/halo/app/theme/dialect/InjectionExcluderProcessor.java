@@ -13,13 +13,14 @@ import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * <p>Determine whether the current template being rendered needs to exclude the processor of
- * code injection. If it needs to be excluded, set a local variable.</p>
- * <p>Why do you need to set a local variable here instead of directly judging in the processor?</p>
+ * Determine whether the current template being rendered needs to exclude the processor of code injection. If it needs
+ * to be excluded, set a local variable.
+ *
+ * <p>Why do you need to set a local variable here instead of directly judging in the processor?
+ *
  * <p>Because the processor will process the fragment, and if you need to exclude the <code>login
- * .html</code> template and the login.html is only a fragment, then the exclusion logic will
- * fail, so here use {@link ITemplateBoundariesProcessor} events are only fired for the
- * first-level template to solve this problem.</p>
+ * .html</code> template and the login.html is only a fragment, then the exclusion logic will fail, so here use
+ * {@link ITemplateBoundariesProcessor} events are only fired for the first-level template to solve this problem.
  *
  * @author guqing
  * @since 2.20.0
@@ -27,7 +28,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProcessor {
 
     public static final String EXCLUDE_INJECTION_VARIABLE =
-        InjectionExcluderProcessor.class.getName() + ".EXCLUDE_INJECTION";
+            InjectionExcluderProcessor.class.getName() + ".EXCLUDE_INJECTION";
 
     private final PageInjectionExcluder injectionExcluder = new PageInjectionExcluder();
 
@@ -36,16 +37,18 @@ public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProces
     }
 
     @Override
-    public void doProcessTemplateStart(ITemplateContext context, ITemplateStart templateStart,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateStart(
+            ITemplateContext context,
+            ITemplateStart templateStart,
+            ITemplateBoundariesStructureHandler structureHandler) {
         if (isExcluded(context)) {
             structureHandler.setLocalVariable(EXCLUDE_INJECTION_VARIABLE, true);
         }
     }
 
     @Override
-    public void doProcessTemplateEnd(ITemplateContext context, ITemplateEnd templateEnd,
-        ITemplateBoundariesStructureHandler structureHandler) {
+    public void doProcessTemplateEnd(
+            ITemplateContext context, ITemplateEnd templateEnd, ITemplateBoundariesStructureHandler structureHandler) {
         structureHandler.removeLocalVariable(EXCLUDE_INJECTION_VARIABLE);
     }
 
@@ -61,17 +64,10 @@ public class InjectionExcluderProcessor extends AbstractTemplateBoundariesProces
 
     static class PageInjectionExcluder {
 
-        private final Set<String> exactMatches = Set.of(
-            "login",
-            "signup",
-            "logout"
-        );
+        private final Set<String> exactMatches = Set.of("login", "signup", "logout");
 
         private final Set<Pattern> regexPatterns = Set.of(
-            Pattern.compile("error/.*"),
-            Pattern.compile("challenges/.*"),
-            Pattern.compile("password-reset/.*")
-        );
+                Pattern.compile("error/.*"), Pattern.compile("challenges/.*"), Pattern.compile("password-reset/.*"));
 
         public boolean isExcluded(String templateName) {
             Assert.notNull(templateName, "Template name must not be null");

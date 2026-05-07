@@ -7,5 +7,4 @@ public interface Controller extends Disposable {
     String getName();
 
     void start();
-
 }

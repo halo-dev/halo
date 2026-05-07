@@ -42,7 +42,7 @@ Automatically closes linked issue when PR is merged.
 用法：`Fixes #<issue 号>`，或者 `Fixes (粘贴 issue 完整链接)`
 Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.
 -->
-Fixes #
+Fixe-->
 
 #### Special notes for your reviewer:
 
@@ -59,3 +59,4 @@ Enter your extended release note in the block below. If the PR requires addition
 
 ```release-note
 ```
+

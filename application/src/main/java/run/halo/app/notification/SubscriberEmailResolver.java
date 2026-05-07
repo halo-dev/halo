@@ -4,8 +4,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.Subscription;
 
 /**
- * <p>{@link SubscriberEmailResolver} used to resolve email from {@link Subscription.Subscriber}
- * .</p>
+ * {@link SubscriberEmailResolver} used to resolve email from {@link Subscription.Subscriber} .
  *
  * @author guqing
  * @since 2.10.0

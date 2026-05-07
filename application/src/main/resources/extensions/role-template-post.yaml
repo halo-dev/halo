@@ -12,12 +12,21 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:posts:manage"]
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "posts" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "posts", "posts/publish", "posts/unpublish", "posts/recycle", "posts/content", "indices/post", "posts/revert-content" ]
-    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["posts"]
+    verbs: ["*"]
+  - apiGroups: ["api.console.halo.run"]
+    resources:
+      [
+        "posts",
+        "posts/publish",
+        "posts/unpublish",
+        "posts/recycle",
+        "posts/content",
+        "indices/post",
+        "posts/revert-content",
+      ]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -33,9 +42,16 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:posts:view"]
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "posts" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "posts", "posts/head-content", "posts/release-content", "posts/snapshot", "posts/content" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["posts"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources:
+      [
+        "posts",
+        "posts/head-content",
+        "posts/release-content",
+        "posts/snapshot",
+        "posts/content",
+      ]
+    verbs: ["get", "list"]

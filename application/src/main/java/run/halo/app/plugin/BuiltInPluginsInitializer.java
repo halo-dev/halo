@@ -70,23 +70,24 @@ class BuiltInPluginsInitializer implements ApplicationListener<ExtensionInitiali
                 var pluginName = preflightPlugin.getMetadata().getName();
 
                 log.info("Try to installing built-in plugin '{}'...", pluginName);
-                var plugin = pluginService.install(pluginPath)
-                    .doOnNext(created -> {
-                        log.info("Built-in plugin '{}' has been installed.",
-                            created.getMetadata().getName());
-                    })
-                    .onErrorResume(PluginAlreadyExistsException.class, e -> {
-                        log.info("Built-in plugin '{}' already installed, trying to upgrade...",
-                            pluginName);
-                        return pluginService.upgrade(pluginName, pluginPath)
-                            .doOnNext(updated -> log.info("Built-in plugin '{}' has been upgraded.",
-                                updated.getMetadata().getName()));
-                    })
-                    .blockOptional(Duration.ofSeconds(10)).orElseThrow(
-                        () -> new IllegalStateException(
-                            "Failed to install or upgrade built-in plugin '" + pluginName + "'"
-                        )
-                    );
+                var plugin = pluginService
+                        .install(pluginPath)
+                        .doOnNext(created -> {
+                            log.info(
+                                    "Built-in plugin '{}' has been installed.",
+                                    created.getMetadata().getName());
+                        })
+                        .onErrorResume(PluginAlreadyExistsException.class, e -> {
+                            log.info("Built-in plugin '{}' already installed, trying to upgrade...", pluginName);
+                            return pluginService
+                                    .upgrade(pluginName, pluginPath)
+                                    .doOnNext(updated -> log.info(
+                                            "Built-in plugin '{}' has been upgraded.",
+                                            updated.getMetadata().getName()));
+                        })
+                        .blockOptional(Duration.ofSeconds(10))
+                        .orElseThrow(() -> new IllegalStateException(
+                                "Failed to install or upgrade built-in plugin '" + pluginName + "'"));
                 // try to update metadata to add system reserved label and finalizer
                 var metadata = plugin.getMetadata();
                 metadata.setDeletionTimestamp(null);

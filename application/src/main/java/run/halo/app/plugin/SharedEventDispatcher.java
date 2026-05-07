@@ -41,5 +41,4 @@ public class SharedEventDispatcher {
     void onApplicationEvent(PluginSharedEventDelegator event) {
         publisher.publishEvent(event.getDelegate());
     }
-
 }

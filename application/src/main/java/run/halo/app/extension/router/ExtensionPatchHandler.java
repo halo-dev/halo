@@ -26,8 +26,7 @@ import run.halo.app.extension.router.ExtensionRouterFunctionFactory.PatchHandler
 @Slf4j
 public class ExtensionPatchHandler implements PatchHandler {
 
-    private static final MediaType JSON_PATCH_MEDIA_TYPE =
-        MediaType.valueOf("application/json-patch+json");
+    private static final MediaType JSON_PATCH_MEDIA_TYPE = MediaType.valueOf("application/json-patch+json");
 
     private final Scheme scheme;
 
@@ -44,39 +43,33 @@ public class ExtensionPatchHandler implements PatchHandler {
         var contentTypeOpt = request.headers().contentType();
         if (contentTypeOpt.isEmpty()) {
             return Mono.error(
-                new UnsupportedMediaTypeStatusException((MediaType) null,
-                    List.of(JSON_PATCH_MEDIA_TYPE))
-            );
+                    new UnsupportedMediaTypeStatusException((MediaType) null, List.of(JSON_PATCH_MEDIA_TYPE)));
         }
         var contentType = contentTypeOpt.get();
         if (!contentType.isCompatibleWith(JSON_PATCH_MEDIA_TYPE)) {
-            return Mono.error(
-                new UnsupportedMediaTypeStatusException(contentType, List.of(JSON_PATCH_MEDIA_TYPE))
-            );
+            return Mono.error(new UnsupportedMediaTypeStatusException(contentType, List.of(JSON_PATCH_MEDIA_TYPE)));
         }
 
         return request.bodyToMono(JsonPatch.class)
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .flatMap(jsonPatch -> client.getJsonExtension(scheme.groupVersionKind(), name)
-                .flatMap(jsonExtension -> {
-                    try {
-                        // apply the patch
-                        var appliedJsonNode =
-                            (ObjectNode) jsonPatch.apply(jsonExtension.getInternal());
-                        var patchedExtension =
-                            new JsonExtension(jsonExtension.getObjectMapper(), appliedJsonNode);
-                        // update the patched extension
-                        return client.update(patchedExtension);
-                    } catch (JsonPatchException e) {
-                        return Mono.error(e);
-                    }
-                }))
-            .flatMap(updated -> ServerResponse.ok().bodyValue(updated));
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
+                .flatMap(jsonPatch -> client.getJsonExtension(scheme.groupVersionKind(), name)
+                        .flatMap(jsonExtension -> {
+                            try {
+                                // apply the patch
+                                var appliedJsonNode = (ObjectNode) jsonPatch.apply(jsonExtension.getInternal());
+                                var patchedExtension =
+                                        new JsonExtension(jsonExtension.getObjectMapper(), appliedJsonNode);
+                                // update the patched extension
+                                return client.update(patchedExtension);
+                            } catch (JsonPatchException e) {
+                                return Mono.error(e);
+                            }
+                        }))
+                .flatMap(updated -> ServerResponse.ok().bodyValue(updated));
     }
 
     @Override
     public String pathPattern() {
         return buildExtensionPathPattern(scheme) + "/{name}";
     }
-
 }

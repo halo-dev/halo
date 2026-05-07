@@ -16,9 +16,7 @@ class HaloUtilsTest {
     @Test
     void checkNoCache() {
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/").build());
-        var request = MockServerRequest.builder()
-            .exchange(exchange)
-            .build();
+        var request = MockServerRequest.builder().exchange(exchange).build();
         var applied = HaloUtils.noCache().apply(request);
         assertEquals(applied, request);
         assertTrue(() -> exchange.getRequiredAttribute(ModelConst.NO_CACHE));

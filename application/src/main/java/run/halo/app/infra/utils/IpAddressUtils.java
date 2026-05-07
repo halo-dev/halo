@@ -5,10 +5,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
-/**
- * Ip address utils.
- * Code from internet.
- */
+/** Ip address utils. Code from internet. */
 @Slf4j
 public class IpAddressUtils {
     public static final String UNKNOWN = "unknown";
@@ -49,9 +46,9 @@ public class IpAddressUtils {
         }
         var remoteAddress = request.getRemoteAddress();
         return remoteAddress == null || remoteAddress.isUnresolved()
-            ? UNKNOWN : remoteAddress.getAddress().getHostAddress();
+                ? UNKNOWN
+                : remoteAddress.getAddress().getHostAddress();
     }
-
 
     /**
      * Gets the ip address from request.
@@ -67,5 +64,4 @@ public class IpAddressUtils {
             return UNKNOWN;
         }
     }
-
 }

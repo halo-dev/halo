@@ -8,6 +8,6 @@ metadata:
     halo.run/module: "Apples Management"
     halo.run/alias-name: "Apples View"
 rules:
-  - apiGroups: [ "apples.guqing.github.com" ]
-    resources: [ "apples" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["apples.guqing.github.com"]
+    resources: ["apples"]
+    verbs: ["get", "list"]

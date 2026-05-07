@@ -15,8 +15,7 @@ public class HaloExpressionObjectFactory implements IExpressionObjectFactory {
 
     public static final String ANNOTATIONS_EXPRESSION_OBJECT_NAME = "annotations";
 
-    protected static final Set<String> ALL_EXPRESSION_OBJECT_NAMES = Set.of(
-        ANNOTATIONS_EXPRESSION_OBJECT_NAME);
+    protected static final Set<String> ALL_EXPRESSION_OBJECT_NAMES = Set.of(ANNOTATIONS_EXPRESSION_OBJECT_NAME);
 
     private static final Annotations ANNOTATIONS = new Annotations();
 

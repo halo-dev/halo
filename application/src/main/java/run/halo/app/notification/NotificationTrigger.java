@@ -16,11 +16,12 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 
 /**
- * <p>Notification trigger for {@link Reason}.</p>
- * <p>Triggered when a new {@link Reason} is received, and then notify through
- * {@link NotificationCenter}.</p>
- * <p>It will add a finalizer to the {@link Reason} to avoid duplicate notification, In other
- * words, it will only notify once.</p>
+ * Notification trigger for {@link Reason}.
+ *
+ * <p>Triggered when a new {@link Reason} is received, and then notify through {@link NotificationCenter}.
+ *
+ * <p>It will add a finalizer to the {@link Reason} to avoid duplicate notification, In other words, it will only notify
+ * once.
  *
  * @author guqing
  * @since 2.10.0
@@ -65,9 +66,6 @@ public class NotificationTrigger implements Reconciler<Reconciler.Request> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Reason())
-            .workerCount(10)
-            .build();
+        return builder.extension(new Reason()).workerCount(10).build();
     }
 }
