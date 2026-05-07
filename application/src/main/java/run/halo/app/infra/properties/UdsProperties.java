@@ -28,7 +28,7 @@ public class UdsProperties {
 
     /**
      * The path of the Unix Domain Socket file.
-     * <p>If not specified, defaults to {@code ${halo.work-dir}/halo.sock}.</p>
+     * If not specified, defaults to {@code ${halo.work-dir}/halo.sock}.
      */
     private Path path;
 
