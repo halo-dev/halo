@@ -25,8 +25,7 @@ def excludePatterns = [
 spotless {
     format 'misc', {
         target fileTree(layout.projectDirectory) {
-            include '**/*.xml', '**/*.properties', '**/*.gitignore',
-                    '**/*.editorconfig'
+            include '**/*.xml', '**/*.properties', '**/*.gitignore', '**/*.editorconfig'
             exclude excludePatterns
         }
         trimTrailingWhitespace()
@@ -38,14 +37,14 @@ spotless {
             include '**/*.json'
             exclude excludePatterns
         }
-        prettier().config(['parser': 'json'])
+        gson().sortByKeys()
     }
     yaml {
         target fileTree(layout.projectDirectory) {
             include '**/*.yml', '**/*.yaml'
             exclude excludePatterns
         }
-        prettier()
+        prettier().config(['parser': 'yaml'])
     }
     flexmark {
         target fileTree(layout.projectDirectory) {
