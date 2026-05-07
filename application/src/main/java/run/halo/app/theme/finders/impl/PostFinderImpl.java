@@ -5,10 +5,13 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.in;
 import static run.halo.app.extension.index.query.Queries.notEqual;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -311,14 +314,36 @@ class PostFinderImpl implements PostFinder {
             .flatMap(listOptions -> client.countBy(Post.class, listOptions)
                 .filter(total -> total > 0)
                 .flatMap(total -> {
-                    // calculate random page number
-                    var totalPages = (int) Math.ceil((double) total / maxSize);
+                    var totalInt = total.intValue();
+                    var effectiveSize = Math.min(maxSize, totalInt);
+                    var totalPages = (int) Math.ceil((double) totalInt / effectiveSize);
                     var page = RandomUtils.insecure().randomInt(1, totalPages + 1);
-                    var pageRequest = PageRequestImpl.of(page, maxSize, defaultSort());
-                    return client.listBy(Post.class, listOptions, pageRequest)
+                    var sort = defaultSort();
+                    var firstRequest = PageRequestImpl.of(page, effectiveSize, sort);
+                    return client.listBy(Post.class, listOptions, firstRequest)
                         .map(ListResult::getItems)
-                        .flatMap(postPublicQueryService::convertToListedVos);
+                        .flatMap(items -> {
+                            if (items.size() >= effectiveSize || total <= effectiveSize) {
+                                return Mono.just(items);
+                            }
+                            // wrap around to the beginning to fill up to effectiveSize
+                            var remaining = effectiveSize - items.size();
+                            var wrapRequest = PageRequestImpl.of(1, remaining, sort);
+                            return client.listBy(Post.class, listOptions, wrapRequest)
+                                .map(ListResult::getItems)
+                                .flatMap(wrapItems -> {
+                                    var combined = new ArrayList<>(items);
+                                    combined.addAll(wrapItems);
+                                    return Mono.just(combined);
+                                });
+                        });
                 })
+                .map(items -> {
+                    var randomItems = new ArrayList<>(items);
+                    Collections.shuffle(randomItems, ThreadLocalRandom.current());
+                    return randomItems;
+                })
+                .flatMap(postPublicQueryService::convertToListedVos)
                 .switchIfEmpty(Mono.fromSupplier(List::of))
             );
     }

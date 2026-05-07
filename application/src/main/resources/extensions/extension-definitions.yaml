@@ -1,30 +1,6 @@
 ## TODO: Currently, Halo does not support i18n for configuration file descriptions
 ## So Simplified Chinese is temporarily used as the default description language.
 
-apiVersion: plugin.halo.run/v1alpha1
-kind: ExtensionDefinition
-metadata:
-  name: username-password-logout-handler
-  labels:
-    auth.halo.run/extension-point-name: "additional-webfilter"
-spec:
-  className: run.halo.app.security.authentication.login.UsernamePasswordLogoutHandler
-  extensionPointName: additional-webfilter
-  displayName: "用户名密码注销处理器"
-  description: "用于用户名和密码认证的注销处理器"
----
-apiVersion: plugin.halo.run/v1alpha1
-kind: ExtensionDefinition
-metadata:
-  name: delegating-logout-page-generating-webfilter
-  labels:
-    auth.halo.run/extension-point-name: "additional-webfilter"
-spec:
-  className: run.halo.app.security.authentication.login.DelegatingLogoutPageGeneratingWebFilter
-  extensionPointName: additional-webfilter
-  displayName: "注销页面生成过滤器"
-  description: "用于生成默认的注销页面"
-
 ---
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
@@ -47,21 +23,196 @@ spec:
   displayName: "Lucene 搜索引擎"
   description: "Halo 自带的本地搜索引擎"
   icon: /images/extension-points/lucene.png
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: default-favicon-head-processor
+spec:
+  className: run.halo.app.theme.dialect.DefaultFaviconHeadProcessor
+  extensionPointName: template-head-processor
+  displayName: "默认 Favicon 页头处理器"
+  description: "为页面添加默认的 favicon 链接"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: generator-meta-processor
+spec:
+  className: run.halo.app.theme.dialect.GeneratorMetaProcessor
+  extensionPointName: template-head-processor
+  displayName: "Generator Meta 页头处理器"
+  description: "为页面添加 generator meta 标签"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: halo-tracker-processor
+spec:
+  className: run.halo.app.theme.dialect.HaloTrackerProcessor
+  extensionPointName: template-head-processor
+  displayName: "Halo 统计页头处理器"
+  description: "为页面添加 Halo 统计相关代码"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: content-template-head-processor
+spec:
+  className: run.halo.app.theme.dialect.ContentTemplateHeadProcessor
+  extensionPointName: template-head-processor
+  displayName: "内容模板页头处理器"
+  description: "为内容页面添加特定的页头内容"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: template-global-head-processor
+spec:
+  className: run.halo.app.theme.dialect.TemplateGlobalHeadProcessor
+  extensionPointName: template-head-processor
+  displayName: "全局模板页头处理器"
+  description: "为所有页面添加全局页头内容"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: duplicate-meta-tag-processor
+spec:
+  className: run.halo.app.theme.dialect.DuplicateMetaTagProcessor
+  extensionPointName: template-head-processor
+  displayName: "重复 Meta 标签处理器"
+  description: "处理页面中重复的 meta 标签"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: index-seo-processor
+spec:
+  className: run.halo.app.theme.dialect.IndexSeoProcessor
+  extensionPointName: template-head-processor
+  displayName: "首页 SEO 页头处理器"
+  description: "为首页添加 SEO 相关的页头内容"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: global-seo-processor
+spec:
+  className: run.halo.app.theme.dialect.GlobalSeoProcessor
+  extensionPointName: template-head-processor
+  displayName: "全局 SEO 页头处理器"
+  description: "为所有页面添加全局 SEO 相关的页头内容"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: thumbnail-img-tag-post-processor
+spec:
+  className: run.halo.app.core.attachment.thumbnail.ThumbnailImgTagPostProcessor
+  extensionPointName: element-tag-post-processor
+  displayName: "缩略图图片标签处理器"
+  description: "为图片标签添加缩略图支持"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: local-attachment-upload-handler
+spec:
+  className: run.halo.app.core.attachment.endpoint.LocalAttachmentUploadHandler
+  extensionPointName: attachment-handler
+  displayName: "本地附件上传处理器"
+  description: "提供本地存储的附件上传和删除功能"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: post-halo-documents-provider
+spec:
+  className: run.halo.app.search.post.PostHaloDocumentsProvider
+  extensionPointName: halo-documents-provider
+  displayName: "文章搜索文档提供者"
+  description: "为搜索引擎提供文章类型的文档数据"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: post-comment-subject
+spec:
+  className: run.halo.app.content.comment.PostCommentSubject
+  extensionPointName: comment-subject
+  displayName: "文章评论主体"
+  description: "提供文章类型的评论主体展示"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: single-page-comment-subject
+spec:
+  className: run.halo.app.content.comment.SinglePageCommentSubject
+  extensionPointName: comment-subject
+  displayName: "自定义页面评论主体"
+  description: "提供自定义页面类型的评论主体展示"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: username-password-logout-handler
+  deletionTimestamp: 2026-04-29T00:00:00Z
+  labels:
+    auth.halo.run/extension-point-name: "additional-webfilter"
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordLogoutHandler
+  extensionPointName: additional-webfilter
+  displayName: "用户名密码注销处理器"
+  description: "用于用户名和密码认证的注销处理器"
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: delegating-logout-page-generating-webfilter
+  deletionTimestamp: 2026-04-29T00:00:00Z
+  labels:
+    auth.halo.run/extension-point-name: "additional-webfilter"
+spec:
+  className: run.halo.app.security.authentication.login.DelegatingLogoutPageGeneratingWebFilter
+  extensionPointName: additional-webfilter
+  displayName: "注销页面生成过滤器"
+  description: "用于生成默认的注销页面"
+
 ---
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
 metadata:
   name: post-content-thumbnail-handler
+  deletionTimestamp: 2026-04-29T00:00:00Z
 spec:
   className: run.halo.app.content.PostContentThumbnailHandler
   extensionPointName: reactive-post-content-handler
   displayName: "文章内容缩略图处理"
   description: "处理文章的 HTML 内容为 img 标签追加缩略图"
+
 ---
 apiVersion: plugin.halo.run/v1alpha1
 kind: ExtensionDefinition
 metadata:
   name: page-content-thumbnail-handler
+  deletionTimestamp: 2026-04-29T00:00:00Z
 spec:
   className: run.halo.app.content.PageContentThumbnailHandler
   extensionPointName: reactive-page-content-handler

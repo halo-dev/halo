@@ -180,6 +180,20 @@ function onUploaded(attachment: Attachment) {
   throttledFetchAttachments();
 }
 
+function handleSelectAll() {
+  attachments.value?.forEach((attachment) => {
+    if (!isDisabled(attachment) && !isChecked(attachment)) {
+      handleSelect(attachment);
+    }
+  });
+}
+
+function handleDeselectAll() {
+  selectedAttachments.value.forEach((attachment) => {
+    handleSelect(attachment);
+  });
+}
+
 function handleToggleUploadView() {
   if (uploadVisible.value) {
     uploadVisible.value = false;
@@ -278,17 +292,35 @@ function handleToggleUploadView() {
 
   <HasPermission :permissions="['system:attachments:manage']">
     <div class="my-5 space-y-3">
-      <VButton @click="handleToggleUploadView">
-        <template #icon>
-          <IconUpload v-if="!uploadVisible" />
-          <IconClose v-else />
+      <VSpace>
+        <VButton @click="handleToggleUploadView">
+          <template #icon>
+            <IconUpload v-if="!uploadVisible" />
+            <IconClose v-else />
+          </template>
+          {{
+            uploadVisible
+              ? $t("core.common.buttons.cancel_upload")
+              : $t("core.common.buttons.upload")
+          }}
+        </VButton>
+        <template
+          v-if="(props.max === undefined || props.max > 1) && !uploadVisible"
+        >
+          <VButton v-if="attachments?.length" ghost @click="handleSelectAll">
+            {{
+              $t("core.attachment.select_modal.operations.select_page.button")
+            }}
+          </VButton>
+          <VButton
+            v-if="selectedAttachments.length"
+            ghost
+            @click="handleDeselectAll"
+          >
+            {{ $t("core.attachment.select_modal.operations.deselect.button") }}
+          </VButton>
         </template>
-        {{
-          uploadVisible
-            ? $t("core.common.buttons.cancel_upload")
-            : $t("core.common.buttons.upload")
-        }}
-      </VButton>
+      </VSpace>
 
       <Transition v-if="uploadVisible" appear name="fade">
         <AttachmentUploadArea

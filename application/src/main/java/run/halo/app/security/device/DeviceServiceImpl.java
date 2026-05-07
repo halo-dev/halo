@@ -8,6 +8,7 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -84,9 +85,13 @@ class DeviceServiceImpl implements DeviceService {
                         .flatMap(session -> {
                             device.getSpec().setSessionId(session.getId());
                             device.getSpec().setLastAccessedTime(session.getLastAccessTime());
-                            device.getSpec().setRememberMeSeriesId(
-                                exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
-                            );
+                            Optional.ofNullable(
+                                    exchange.getAttribute(REMEMBER_ME_SERIES_REQUEST_NAME)
+                                )
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .filter(Predicate.not(String::isBlank))
+                                .ifPresent(id -> device.getSpec().setRememberMeSeriesId(id));
                             return sessionRepository.deleteById(oldSessionId);
                         })
                         .thenReturn(device);

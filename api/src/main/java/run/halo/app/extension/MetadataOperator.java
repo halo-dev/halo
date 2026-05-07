@@ -43,7 +43,7 @@ public interface MetadataOperator {
 
     @Schema(name = "creationTimestamp", nullable = true)
     @JsonProperty("creationTimestamp")
-    @Nullable Instant getCreationTimestamp();
+    Instant getCreationTimestamp();
 
     @Schema(name = "deletionTimestamp", nullable = true)
     @JsonProperty("deletionTimestamp")
