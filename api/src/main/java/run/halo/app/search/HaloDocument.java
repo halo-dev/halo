@@ -65,7 +65,7 @@ public final class HaloDocument {
     private String permalink;
 
     /**
-     * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment .halo.run,
+     * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment.halo.run,
      * doc.doc.halo.run.
      */
     @NotBlank
