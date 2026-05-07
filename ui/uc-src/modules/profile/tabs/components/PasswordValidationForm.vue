@@ -42,9 +42,7 @@ function onSubmit(data: { password: string; totpCode?: string }) {
       validation="required"
       name="totpCode"
       :help="
-        $t(
-          'core.uc_profile.2fa.password_validation_form.fields.totp_code.help'
-        )
+        $t('core.uc_profile.2fa.password_validation_form.fields.totp_code.help')
       "
     ></FormKit>
   </FormKit>
