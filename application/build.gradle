@@ -5,7 +5,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.util.StringUtils
 
 plugins {
-    id 'checkstyle'
     id 'java'
     id 'idea'
     id 'jacoco'
@@ -17,6 +16,7 @@ plugins {
     alias(libs.plugins.checksum)
     alias(libs.plugins.springdoc.openapi)
     alias(libs.plugins.versions)
+    alias(libs.plugins.spotless)
 }
 
 group = 'run.halo.app'
@@ -36,12 +36,6 @@ idea {
     module {
         resourceDirs += file("../ui/build/dist/")
     }
-}
-
-checkstyle {
-    toolVersion = libs.versions.checkstyle.get()
-    showViolations = false
-    ignoreFailures = false
 }
 
 repositories {
@@ -177,9 +171,11 @@ openApi {
             'http://localhost:8091/v3/api-docs/apis_extension.api_v1alpha1' : 'apis_extension.api_v1alpha1.json',
     ]
     customBootRun {
-        args = ['--server.port=8091',
+        args = [
+                '--server.port=8091',
                 '--spring.profiles.active=doc',
-                "--halo.work-dir=${layout.buildDirectory.get()}/tmp/workdir-for-generating-apidocs"]
+                "--halo.work-dir=${layout.buildDirectory.get()}/tmp/workdir-for-generating-apidocs"
+        ]
     }
 }
 
@@ -253,4 +249,10 @@ tasks.register('publishToAllRegistries') {
     group = 'publishing'
     description = 'Build and publish the Docker image to all configured registries.'
     dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub')
+}
+
+spotless {
+    java {
+        palantirJavaFormat("2.90.0").formatJavadoc(true)
+    }
 }
