@@ -16,11 +16,11 @@
 
 export interface Subject {
     /**
-     * APIGroup holds the API group of the referenced subject.  Defaults to \"\" for ServiceAccount subjects.  Defaults to \"rbac.authorization.halo.run\" for User and Group subjects.
+     * APIGroup holds the API group of the referenced subject. Defaults to \"\" for ServiceAccount subjects. Defaults  to \"rbac.authorization.halo.run\" for User and Group subjects.
      */
     'apiGroup'?: string;
     /**
-     * Kind of object being referenced. Values defined by this API group are \"User\", \"Group\",  and \"ServiceAccount\".  If the Authorizer does not recognize the kind value, the Authorizer should report  an error.
+     * Kind of object being referenced. Values defined by this API group are \"User\", \"Group\", and \"ServiceAccount\".  If the Authorizer does not recognize the kind value, the Authorizer should report an error.
      */
     'kind'?: string;
     /**

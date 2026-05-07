@@ -24,7 +24,7 @@ import type { SinglePageSpec } from './single-page-spec';
 import type { SinglePageStatus } from './single-page-status';
 
 /**
- * <p>Single page extension.</p>
+ * Single page extension.
  */
 export interface SinglePage {
     'apiVersion': string;

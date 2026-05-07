@@ -24,7 +24,7 @@ import type { ThemeSpec } from './theme-spec';
 import type { ThemeStatus } from './theme-status';
 
 /**
- * <p>Theme extension.</p>
+ * Theme extension.
  */
 export interface Theme {
     'apiVersion': string;

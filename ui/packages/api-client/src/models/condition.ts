@@ -15,7 +15,7 @@
 
 
 /**
- * EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新  导致 equals 为 false，一直被加入队列.
+ * EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新 导致 equals 为 false，一直被加入队列.
  */
 export interface Condition {
     /**
@@ -23,7 +23,7 @@ export interface Condition {
      */
     'lastTransitionTime': string;
     /**
-     * Human-readable message indicating details about last transition.  This may be an empty string.
+     * Human-readable message indicating details about last transition. This may be an empty string.
      */
     'message'?: string;
     /**
@@ -35,7 +35,7 @@ export interface Condition {
      */
     'status': ConditionStatusEnum;
     /**
-     * type of condition in CamelCase or in foo.example.com/CamelCase.  example: Ready, Initialized.  maxLength: 316.
+     * type of condition in CamelCase or in foo.example.com/CamelCase. example: Ready, Initialized. maxLength: 316.
      */
     'type': string;
 }
