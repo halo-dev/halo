@@ -41,9 +41,9 @@ import run.halo.app.security.device.DeviceService;
  * <p>User management such as changing passwords, removing users and setting user status should be combined with
  * maintenance of the user's persistent tokens.
  *
- * <p>Note that while this class will use the date a token was created to check whether a presented cookie is older than
- * the configured <tt>tokenValiditySeconds</tt> property and deny authentication in this case, it will not delete these
- * tokens from storage. A suitable batch process should be run periodically to remove expired tokens from the database.
+ * <p>When a presented cookie is older than the configured <tt>tokenValiditySeconds</tt> property, authentication will
+ * be denied and the expired token will be removed from storage immediately. A suitable batch process may also be run
+ * periodically to remove any remaining expired tokens from the database.
  *
  * @author guqing
  * @see <a
@@ -136,12 +136,13 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                 token.getSpec().getSeries());
                     }
                     if (isTokenExpired(token)) {
-                        log.debug(
-                                "Remember-me token expired for user '{}', series '{}', lastUsed={}",
+                        log.warn(
+                                "Remember-me token expired for user '{}', series '{}', lastUsed={}, removing all user tokens",
                                 token.getSpec().getUsername(),
                                 token.getSpec().getSeries(),
                                 token.getSpec().getLastUsed());
-                        return Mono.error(new InvalidCookieException("Remember-me login has expired"));
+                        return this.tokenRepository.removeUserTokens(token.getSpec().getUsername())
+                                .then(Mono.error(new InvalidCookieException("Remember-me login has expired")));
                     }
                     return Mono.empty();
                 })
