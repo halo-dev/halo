@@ -2012,7 +2012,7 @@
           "type": {
             "minLength": 1,
             "type": "string",
-            "description": "Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment .halo.run,\n doc.doc.halo.run."
+            "description": "Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment.halo.run,\n doc.doc.halo.run."
           },
           "updateTimestamp": {
             "type": "string",

@@ -75,7 +75,7 @@ export interface HaloDocument {
      */
     'title': string;
     /**
-     * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment .halo.run,  doc.doc.halo.run.
+     * Document type. e.g.: post.content.halo.run, singlepage.content.halo.run, moment.moment.halo.run,  doc.doc.halo.run.
      */
     'type': string;
     /**
