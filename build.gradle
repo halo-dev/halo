@@ -39,28 +39,11 @@ spotless {
         }
         gson().sortByKeys()
     }
-    yaml {
-        target fileTree(layout.projectDirectory) {
-            include '**/*.yml', '**/*.yaml'
-            exclude excludePatterns
-        }
-        prettier().config(['parser': 'yaml'])
-    }
     flexmark {
         target fileTree(layout.projectDirectory) {
             include '**/*.md'
             exclude excludePatterns
         }
         flexmark()
-    }
-    groovyGradle {
-        target fileTree(layout.projectDirectory) {
-            include '**/*.gradle'
-            exclude excludePatterns
-        }
-        greclipse()
-        trimTrailingWhitespace()
-        leadingTabsToSpaces()
-        endWithNewline()
     }
 }

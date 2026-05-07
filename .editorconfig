@@ -5,7 +5,8 @@ charset = utf-8
 end_of_line = lf
 indent_size = 4
 indent_style = space
-insert_final_newline = false
+insert_final_newline = true
+trim_trailing_whitespace = true
 max_line_length = 120
 tab_width = 4
 ij_continuation_indent_size = 8
@@ -16,7 +17,6 @@ ij_smart_tabs = false
 ij_wrap_on_typing = false
 
 [*.java]
-max_line_length = 100
 ij_continuation_indent_size = 4
 ij_java_align_consecutive_assignments = false
 ij_java_align_consecutive_variable_declarations = false
@@ -288,6 +288,11 @@ ij_shell_minify_program = false
 ij_shell_redirect_followed_by_space = false
 ij_shell_switch_cases_indented = false
 
+[*.gradle]
+indent_size = 4
+tab_width = 4
+ij_continuation_indent_size = 4
+
 [{*.gant, *.gradle, *.groovy, *.gy}]
 ij_groovy_align_group_field_declarations = false
 ij_groovy_align_multiline_array_initializer_expression = false
@@ -513,3 +518,4 @@ ij_yaml_keep_line_breaks = true
 
 [*.md]
 indent_size = 2
+trim_trailing_whitespace = false
