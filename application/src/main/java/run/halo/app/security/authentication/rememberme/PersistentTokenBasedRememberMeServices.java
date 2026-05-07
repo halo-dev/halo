@@ -40,11 +40,10 @@ import run.halo.app.security.device.DeviceService;
  * <p>User management such as changing passwords, removing users and setting user status
  * should be combined with maintenance of the user's persistent tokens.</p>
  * <p>
- * Note that while this class will use the date a token was created to check whether a
- * presented cookie is older than the configured <tt>tokenValiditySeconds</tt> property
- * and deny authentication in this case, it will not delete these tokens from storage. A
- * suitable batch process should be run periodically to remove expired tokens from the
- * database.
+ * When a presented cookie is older than the configured <tt>tokenValiditySeconds</tt>
+ * property, authentication will be denied and the expired token will be removed from
+ * storage immediately. A suitable batch process may also be run periodically to remove
+ * any remaining expired tokens from the database.
  * </p>
  *
  * @author guqing
@@ -135,7 +134,9 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                     );
                 }
                 if (isTokenExpired(token)) {
-                    return Mono.error(new InvalidCookieException("Remember-me login has expired"));
+                    return this.tokenRepository.removeUserTokens(token.getSpec().getUsername())
+                        .then(Mono.error(
+                            new InvalidCookieException("Remember-me login has expired")));
                 }
                 return Mono.empty();
             })
