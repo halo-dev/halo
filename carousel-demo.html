@@ -65,28 +65,57 @@
       object-fit: cover;
     }
 
-    /* 文章卡片 */
+    /* 博客内容区 */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
 
+    /* 大卡片样式（封面图更突出） */
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 12px;
+      overflow: hidden; /* 让封面图圆角生效 */
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 卡片封面图 */
+    .card-cover {
+      width: 100%;
+      height: 220px; /* 加大高度，让封面更突出 */
+      object-fit: cover;
+    }
+
+    /* 卡片内容区 */
+    .card-content {
       padding: 20px;
-      margin-bottom: 15px;
     }
 
-    .card h3 {
+    /* 卡片标题：加大加粗 */
+    .card-title {
+      font-size: 22px;
+      font-weight: bold;
       color: var(--primary-color);
-      margin-top: 0;
+      margin: 0 0 10px;
     }
 
-    .card p {
+    /* 卡片摘要 */
+    .card-excerpt {
       color: var(--light-text);
+      line-height: 1.6;
+      margin: 0 0 15px;
+    }
+
+    /* 卡片底部信息（发布时间+作者） */
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #94A3B8;
+      font-size: 14px;
     }
 
     /* 页脚信息 */
@@ -116,15 +145,32 @@
     <img src="https://picsum.photos/1200/400?random=1" alt="校园活动轮播图">
   </div>
 
-  <!-- 博客内容区 -->
+  <!-- 博客内容区：大卡片样式文章列表 -->
   <div class="container">
+    <!-- 文章卡片1 -->
     <div class="card">
-      <h3>校园生活分享</h3>
-      <p>记录在校园里的日常点滴，分享学习与生活的小确幸...</p>
+      <img class="card-cover" src="https://picsum.photos/800/400?random=2" alt="文章封面">
+      <div class="card-content">
+        <h3 class="card-title">校园生活分享：期末备考日常</h3>
+        <p class="card-excerpt">记录在图书馆泡馆的日子，分享高效复习方法和心态调整技巧...</p>
+        <div class="card-meta">
+          <span>发布时间：2026-05-05</span>
+          <span>作者：NiuYimin</span>
+        </div>
+      </div>
     </div>
+
+    <!-- 文章卡片2 -->
     <div class="card">
-      <h3>期末复习指南</h3>
-      <p>整理了各科的复习重点和笔记，希望能帮到大家...</p>
+      <img class="card-cover" src="https://picsum.photos/800/400?random=3" alt="文章封面">
+      <div class="card-content">
+        <h3 class="card-title">期末复习指南：各科重点梳理</h3>
+        <p class="card-excerpt">整理了本学期各科的核心考点和复习计划，帮你高效备考不踩坑...</p>
+        <div class="card-meta">
+          <span>发布时间：2026-05-05</span>
+          <span>作者：NiuYimin</span>
+        </div>
+      </div>
     </div>
   </div>
 
