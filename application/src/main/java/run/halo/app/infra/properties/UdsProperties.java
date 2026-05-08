@@ -8,11 +8,9 @@ import org.springframework.validation.annotation.Validated;
 /**
  * Properties for Unix Domain Socket (UDS) support.
  *
- * <p>
  * When enabled, Halo will additionally listen on a Unix Domain Socket path,
  * allowing reverse proxies (e.g., Nginx) to forward requests via UDS,
  * without interfering with the existing TCP port listener.
- * </p>
  *
  * @author drin-love
  */

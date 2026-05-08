@@ -17,9 +17,9 @@ import reactor.netty.http.server.HttpServer;
 /**
  * Configuration for Unix Domain Socket (UDS) support.
  *
- * <p>Creates an additional Netty {@link HttpServer} bound to a Unix Domain Socket
+ * Creates an additional Netty {@link HttpServer} bound to a Unix Domain Socket
  * path when UDS is enabled. This server runs alongside the main TCP listener
- * without interfering with it.</p>
+ * without interfering with it.
  *
  * @author drin-love
  */
