@@ -5,16 +5,8 @@ import lombok.Data;
 /**
  * Configuration properties for automatic notification cleanup.
  *
- * <p>Supports two cleanup strategies:</p>
- * <ul>
- *   <li><b>Retention by days</b>: removes notifications older than {@code retentionDays} days
- *       (when {@code retentionDays} &gt; 0)</li>
- *   <li><b>Retention by count</b>: keeps at most {@code maxCountPerUser} notifications per user,
- *       deleting the oldest ones when the limit is exceeded
- *       (when {@code maxCountPerUser} &gt; 0)</li>
- * </ul>
- *
- * <p>Both strategies can be enabled simultaneously.</p>
+ * <p>Notifications older than {@code retentionDays} days will be deleted
+ * when {@code retentionDays} is greater than 0.</p>
  *
  * <p>Example configuration in application.yaml:</p>
  * <pre>
@@ -23,7 +15,6 @@ import lombok.Data;
  *     auto-cleanup:
  *       enabled: true
  *       retention-days: 30
- *       max-count-per-user: 200
  *       cleanup-cron: "0 0 3 * * ?"
  * </pre>
  *
@@ -47,15 +38,6 @@ public class NotificationAutoCleanupProperties {
     private int retentionDays = 30;
 
     /**
-     * Maximum number of notifications to retain per user.
-     * When the number of notifications for a user exceeds this limit,
-     * the oldest notifications will be deleted.
-     * A value of 0 or negative disables this strategy.
-     * Default is 200.
-     */
-    private int maxCountPerUser = 200;
-
-    /**
      * Cron expression for the cleanup schedule.
      * Default is every day at 3:00 AM: {@code "0 0 3 * * ?"}.
      */
@@ -66,12 +48,5 @@ public class NotificationAutoCleanupProperties {
      */
     public boolean isRetentionByDaysEnabled() {
         return enabled && retentionDays > 0;
-    }
-
-    /**
-     * Returns true if the retention-by-count strategy is active.
-     */
-    public boolean isRetentionByCountEnabled() {
-        return enabled && maxCountPerUser > 0;
     }
 }
