@@ -2,9 +2,7 @@ package run.halo.app.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,8 +41,10 @@ class ExtensionResourceInitializerTest {
 
     @Mock
     ReactiveExtensionClient extensionClient;
+
     @Mock
     HaloProperties haloProperties;
+
     @Mock
     ApplicationStartedEvent applicationStartedEvent;
 
@@ -63,7 +63,7 @@ class ExtensionResourceInitializerTest {
         Path tempDirectory = Files.createTempDirectory("extension-resource-initializer-test");
         dirsToClean.add(tempDirectory);
         Path multiDirectory =
-            Files.createDirectories(tempDirectory.resolve("a").resolve("b").resolve("c"));
+                Files.createDirectories(tempDirectory.resolve("a").resolve("b").resolve("c"));
         Files.writeString(tempDirectory.resolve("hello.yml"), """
                 kind: FakeExtension
                 apiVersion: v1
@@ -71,14 +71,12 @@ class ExtensionResourceInitializerTest {
                   name: fake-extension
                 spec:
                   hello: world
-                """,
-            StandardCharsets.UTF_8);
+                """, StandardCharsets.UTF_8);
 
         Files.writeString(multiDirectory.getParent().resolve("fake-1.txt"), """
                 kind: FakeExtension
                 name: fake-extension
-                """,
-            StandardCharsets.UTF_8);
+                """, StandardCharsets.UTF_8);
         Files.writeString(multiDirectory.resolve("fake.yaml"), """
                 kind: FakeExtension
                 apiVersion: v1
@@ -86,8 +84,7 @@ class ExtensionResourceInitializerTest {
                   name: fake-extension
                 spec:
                   hello: world
-                """,
-            StandardCharsets.UTF_8);
+                """, StandardCharsets.UTF_8);
 
         // test file in directory
         Path secondTempDir = Files.createTempDirectory("extension-resource-file-test");
@@ -100,13 +97,13 @@ class ExtensionResourceInitializerTest {
                   name: config-file-is-ok
                 spec:
                   key: value
-                """,
-            StandardCharsets.UTF_8);
+                """, StandardCharsets.UTF_8);
 
         when(haloProperties.getInitialExtensionLocations())
-            .thenReturn(Set.of("file:" + tempDirectory + "/**/*.yaml",
-                "file:" + tempDirectory + "/**/*.yml",
-                "file:" + filePath));
+                .thenReturn(Set.of(
+                        "file:" + tempDirectory + "/**/*.yaml",
+                        "file:" + tempDirectory + "/**/*.yml",
+                        "file:" + filePath));
     }
 
     @AfterEach
@@ -123,8 +120,7 @@ class ExtensionResourceInitializerTest {
         when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
         var argumentCaptor = ArgumentCaptor.forClass(Unstructured.class);
 
-        when(extensionClient.fetch(any(GroupVersionKind.class), any()))
-            .thenReturn(Mono.empty());
+        when(extensionClient.fetch(any(GroupVersionKind.class), any())).thenReturn(Mono.empty());
         when(extensionClient.create(any())).thenReturn(Mono.empty());
 
         extensionResourceInitializer.start();

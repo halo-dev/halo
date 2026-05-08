@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.notification;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

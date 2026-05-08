@@ -25,7 +25,7 @@ metadata:
     storage.halo.run/policy-owner: default-policy
     halo.run/do-not-overwrite: "true"
 data:
-  default: "{\"location\":\"\"}"
+  default: '{"location":""}'
 ---
 apiVersion: v1alpha1
 kind: Setting
@@ -43,7 +43,7 @@ spec:
         - $formkit: text
           name: maxFileSize
           label: 最大单文件大小
-          validation: [ [ 'matches', '/^(0|[1-9]\d*)(?:[KMG]B)?$/' ] ]
+          validation: [["matches", '/^(0|[1-9]\d*)(?:[KMG]B)?$/']]
           validation-visibility: "live"
           validation-messages:
             matches: "输入格式错误，遵循：整数 + 大写的单位（KB, MB, GB）"

@@ -1,11 +1,7 @@
 package run.halo.app.extension.index;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -28,8 +24,7 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 @Slf4j
-class MultiValueIndex<E extends Extension, K extends Comparable<K>>
-    implements ValueIndexQuery<K>, Index<E, K> {
+class MultiValueIndex<E extends Extension, K extends Comparable<K>> implements ValueIndexQuery<K>, Index<E, K> {
 
     private final ConcurrentNavigableMap<K, Set<String>> index;
 
@@ -99,14 +94,12 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
     @Override
     public Set<String> between(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support between operation");
+        throw new UnsupportedOperationException("Multi-value index does not support between operation");
     }
 
     @Override
     public Set<String> notBetween(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support notBetween operation");
+        throw new UnsupportedOperationException("Multi-value index does not support notBetween operation");
     }
 
     @Override
@@ -115,11 +108,11 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
             return Set.of();
         }
         return keys.stream()
-            .distinct()
-            .map(index::get)
-            .filter(Objects::nonNull)
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+                .distinct()
+                .map(index::get)
+                .filter(Objects::nonNull)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -129,23 +122,19 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
         }
         var inResult = in(keys);
         return index.values().stream()
-            .flatMap(Set::stream)
-            .filter(v -> !inResult.contains(v))
-            .collect(Collectors.toSet());
+                .flatMap(Set::stream)
+                .filter(v -> !inResult.contains(v))
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<String> lessThan(K key, boolean inclusive) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support lessThan operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support lessThan operation");
     }
 
     @Override
     public Set<String> greaterThan(K key, boolean inclusive) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support greaterThan operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support greaterThan operation");
     }
 
     @Override
@@ -155,52 +144,37 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
     @Override
     public Set<String> isNotNull() {
-        return index.values()
-            .stream()
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        return index.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     @Override
     public Set<String> stringContains(String keyword) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringContains operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringContains operation");
     }
 
     @Override
     public Set<String> stringNotContains(String keyword) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringNotContains operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotContains operation");
     }
 
     @Override
     public Set<String> stringStartsWith(String prefix) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringStartsWith operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringStartsWith operation");
     }
 
     @Override
     public Set<String> stringNotStartsWith(String prefix) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringNotStartsWith operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotStartsWith operation");
     }
 
     @Override
     public Set<String> stringEndsWith(String suffix) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringEndsWith operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringEndsWith operation");
     }
 
     @Override
     public Set<String> stringNotEndsWith(String suffix) {
-        throw new UnsupportedOperationException(
-            "Multi-value index does not support stringNotEndsWith operation"
-        );
+        throw new UnsupportedOperationException("Multi-value index does not support stringNotEndsWith operation");
     }
 
     @Override
@@ -216,8 +190,8 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
     @Override
     public Set<String> all() {
         return Stream.concat(index.values().stream(), Stream.of(nullKeyValues))
-            .flatMap(Set::stream)
-            .collect(Collectors.toSet());
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     class UpsertTransactionalOperation implements TransactionalOperation {
@@ -269,9 +243,7 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
                         }
                         if (spec.isUnique() && !v.isEmpty()) {
                             throw new DuplicateKeyException(
-                                String.format("Duplicate key '%s' for extension '%s'", k,
-                                    primaryKey)
-                            );
+                                    String.format("Duplicate key '%s' for extension '%s'", k, primaryKey));
                         }
                         v.add(primaryKey);
                         return v;
@@ -316,7 +288,6 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
                 nullKeyValues.remove(primaryKey);
             }
         }
-
     }
 
     class DeleteTransactionalOperation implements TransactionalOperation {
@@ -379,8 +350,7 @@ class MultiValueIndex<E extends Extension, K extends Comparable<K>>
 
     private void ensureStringKeyType() {
         Assert.isTrue(
-            getKeyType() == String.class || getKeyType() == UnknownKey.class,
-            "Key type must be String for this operation"
-        );
+                getKeyType() == String.class || getKeyType() == UnknownKey.class,
+                "Key type must be String for this operation");
     }
 }

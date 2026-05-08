@@ -36,7 +36,6 @@ dependencies {
         api "org.springframework.integration:spring-integration-core"
         api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
     }
-
 }
 
 publishing {

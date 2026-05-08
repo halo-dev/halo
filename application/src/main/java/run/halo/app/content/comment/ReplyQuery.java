@@ -38,14 +38,10 @@ public class ReplyQuery extends SortableRequest {
         return commentName;
     }
 
-    /**
-     * Build list options from query criteria.
-     */
+    /** Build list options from query criteria. */
     public ListOptions toListOptions() {
-        var listOptions =
-            labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
-        var newFieldSelector = listOptions.getFieldSelector()
-            .andQuery(equal("spec.commentName", getCommentName()));
+        var listOptions = labelAndFieldSelectorToListOptions(getLabelSelector(), getFieldSelector());
+        var newFieldSelector = listOptions.getFieldSelector().andQuery(equal("spec.commentName", getCommentName()));
         listOptions.setFieldSelector(newFieldSelector);
         return listOptions;
     }
@@ -58,10 +54,10 @@ public class ReplyQuery extends SortableRequest {
     public static void buildParameters(Builder builder) {
         SortableRequest.buildParameters(builder);
         builder.parameter(parameterBuilder()
-            .in(ParameterIn.QUERY)
-            .name("commentName")
-            .description("Replies filtered by commentName.")
-            .implementation(String.class)
-            .required(true));
+                .in(ParameterIn.QUERY)
+                .name("commentName")
+                .description("Replies filtered by commentName.")
+                .implementation(String.class)
+                .required(true));
     }
 }

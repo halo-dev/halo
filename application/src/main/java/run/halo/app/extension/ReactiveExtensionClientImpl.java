@@ -7,11 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
@@ -54,10 +50,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private TransactionalOperator transactionalOperator;
 
-    public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
-        ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper,
-        IndexEngine indexEngine,
-        ReactiveTransactionManager reactiveTransactionManager) {
+    public ReactiveExtensionClientImpl(
+            ReactiveExtensionStoreClient client,
+            ExtensionConverter converter,
+            SchemeManager schemeManager,
+            ObjectMapper objectMapper,
+            IndexEngine indexEngine,
+            ReactiveTransactionManager reactiveTransactionManager) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
@@ -76,28 +75,25 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         this.scheduler = scheduler;
     }
 
-    /**
-     * Only for test.
-     */
+    /** Only for test. */
     void setTransactionalOperator(TransactionalOperator transactionalOperator) {
         this.transactionalOperator = transactionalOperator;
     }
 
     @Override
-    public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator) {
+    public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate, Comparator<E> comparator) {
         var scheme = schemeManager.get(type);
         var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
 
         return client.listByNamePrefix(prefix)
-            .map(extensionStore -> converter.convertFrom(type, extensionStore))
-            .filter(predicate == null ? Predicates.isTrue() : predicate)
-            .sort(comparator == null ? Comparator.naturalOrder() : comparator);
+                .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                .filter(predicate == null ? Predicates.isTrue() : predicate)
+                .sort(comparator == null ? Comparator.naturalOrder() : comparator);
     }
 
     @Override
-    public <E extends Extension> Mono<ListResult<E>> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size) {
+    public <E extends Extension> Mono<ListResult<E>> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size) {
         var extensions = list(type, predicate, comparator);
         var totalMono = extensions.count();
         if (page > 0) {
@@ -106,97 +102,86 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         if (size > 0) {
             extensions = extensions.take(size);
         }
-        return extensions.collectList().zipWith(totalMono)
-            .map(tuple -> {
-                List<E> content = tuple.getT1();
-                Long total = tuple.getT2();
-                return new ListResult<>(page, size, total, content);
-            });
+        return extensions.collectList().zipWith(totalMono).map(tuple -> {
+            List<E> content = tuple.getT1();
+            Long total = tuple.getT2();
+            return new ListResult<>(page, size, total, content);
+        });
     }
 
     @Override
     public <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort) {
-        var nullSafeSort = Optional.ofNullable(sort)
-            .orElseGet(() -> {
-                log.warn("The sort parameter is null, it is recommended to use Sort.unsorted() "
+        var nullSafeSort = Optional.ofNullable(sort).orElseGet(() -> {
+            log.warn("The sort parameter is null, it is recommended to use Sort.unsorted() "
                     + "instead and the compatibility support for null will be removed in the "
                     + "subsequent version.");
-                return Sort.unsorted();
-            });
+            return Sort.unsorted();
+        });
         var scheme = schemeManager.get(type);
 
-        return Mono.fromCallable(
-                () -> indexEngine.retrieveAll(scheme.type(), options, nullSafeSort)
-            )
-            .flatMapMany(objectKeys -> {
-                var storeNames = StreamSupport.stream(objectKeys.spliterator(), false)
-                    .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
-                    .toList();
-                if (log.isDebugEnabled()) {
-                    if (storeNames.size() > 500) {
-                        log.warn("""
+        return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, nullSafeSort))
+                .flatMapMany(objectKeys -> {
+                    var storeNames = StreamSupport.stream(objectKeys.spliterator(), false)
+                            .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
+                            .toList();
+                    if (log.isDebugEnabled()) {
+                        if (storeNames.size() > 500) {
+                            log.warn("""
                                 The number of objects retrieved by listAll is too large ({}) \
                                 and it is recommended to use paging query.\
-                                """,
-                            storeNames.size()
-                        );
+                                """, storeNames.size());
+                        }
                     }
-                }
-                long startTimeMs = System.currentTimeMillis();
-                return client.listByNames(storeNames)
-                    .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doOnComplete(() -> log.debug(
-                        "Successfully retrieved all by names from db for {} in {}ms",
-                        scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs)
-                    );
-            });
+                    long startTimeMs = System.currentTimeMillis();
+                    return client.listByNames(storeNames)
+                            .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                            .doOnComplete(() -> log.debug(
+                                    "Successfully retrieved all by names from db for {} in {}ms",
+                                    scheme.groupVersionKind(),
+                                    System.currentTimeMillis() - startTimeMs));
+                });
     }
 
     @Override
-    public <E extends Extension> Flux<String> listAllNames(
-        Class<E> type, ListOptions options, Sort sort
-    ) {
+    public <E extends Extension> Flux<String> listAllNames(Class<E> type, ListOptions options, Sort sort) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveAll(scheme.type(), options, sort))
-            .flatMapMany(Flux::fromIterable);
+                .flatMapMany(Flux::fromIterable);
     }
 
     @Override
-    public <E extends Extension> Flux<String> listTopNames(
-        Class<E> type, ListOptions options, Sort sort, int topN
-    ) {
+    public <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort, int topN) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieveTopN(scheme.type(), options, sort, topN))
-            .flatMapMany(Flux::fromIterable);
+                .flatMapMany(Flux::fromIterable);
     }
 
     @Override
-    public <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options,
-        PageRequest page) {
+    public <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options, PageRequest page) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, page))
-            .flatMap(listResult -> {
-                var storeNames = listResult.get()
-                    .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
-                    .toList();
-                final long startTimeMs = System.currentTimeMillis();
-                return client.listByNames(storeNames)
-                    .map(extensionStore -> converter.convertFrom(type, extensionStore))
-                    .doOnComplete(() -> log.debug(
-                        "Successfully retrieved by names from db for {} in {}ms",
-                        scheme.groupVersionKind(), System.currentTimeMillis() - startTimeMs)
-                    )
-                    .collectList()
-                    .map(items -> new ListResult<>(page.getPageNumber(), page.getPageSize(),
-                        listResult.getTotal(), items)
-                    );
-            })
-            .defaultIfEmpty(ListResult.emptyResult());
+                .flatMap(listResult -> {
+                    var storeNames = listResult
+                            .get()
+                            .map(objectKey -> ExtensionStoreUtil.buildStoreName(scheme, objectKey))
+                            .toList();
+                    final long startTimeMs = System.currentTimeMillis();
+                    return client.listByNames(storeNames)
+                            .map(extensionStore -> converter.convertFrom(type, extensionStore))
+                            .doOnComplete(() -> log.debug(
+                                    "Successfully retrieved by names from db for {} in {}ms",
+                                    scheme.groupVersionKind(),
+                                    System.currentTimeMillis() - startTimeMs))
+                            .collectList()
+                            .map(items -> new ListResult<>(
+                                    page.getPageNumber(), page.getPageSize(), listResult.getTotal(), items));
+                })
+                .defaultIfEmpty(ListResult.emptyResult());
     }
 
     @Override
-    public <E extends Extension> Mono<ListResult<String>> listNamesBy(Class<E> type,
-        ListOptions options, PageRequest pageable) {
+    public <E extends Extension> Mono<ListResult<String>> listNamesBy(
+            Class<E> type, ListOptions options, PageRequest pageable) {
         var scheme = schemeManager.get(type);
         return Mono.fromCallable(() -> indexEngine.retrieve(scheme.type(), options, pageable));
     }
@@ -210,47 +195,42 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     @Override
     public <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
         var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(type), name);
-        return client.fetchByName(storeName)
-            .map(extensionStore -> converter.convertFrom(type, extensionStore));
+        return client.fetchByName(storeName).map(extensionStore -> converter.convertFrom(type, extensionStore));
     }
 
     @Override
     public Mono<Unstructured> fetch(GroupVersionKind gvk, String name) {
         var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(gvk), name);
         return client.fetchByName(storeName)
-            .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
+                .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
     }
 
     private Mono<JsonExtension> fetchJsonExtension(GroupVersionKind gvk, String name) {
         var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(gvk), name);
         return client.fetchByName(storeName)
-            .map(extensionStore -> converter.convertFrom(JsonExtension.class, extensionStore));
+                .map(extensionStore -> converter.convertFrom(JsonExtension.class, extensionStore));
     }
 
     @Override
     public <E extends Extension> Mono<E> get(Class<E> type, String name) {
-        return fetch(type, name)
-            .switchIfEmpty(Mono.error(() -> {
-                var gvk = GroupVersionKind.fromExtension(type);
-                return new ExtensionNotFoundException(gvk, name);
-            }));
+        return fetch(type, name).switchIfEmpty(Mono.error(() -> {
+            var gvk = GroupVersionKind.fromExtension(type);
+            return new ExtensionNotFoundException(gvk, name);
+        }));
     }
 
     private Mono<Unstructured> get(GroupVersionKind gvk, String name) {
-        return fetch(gvk, name)
-            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
+        return fetch(gvk, name).switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
 
     @Override
     public Mono<JsonExtension> getJsonExtension(GroupVersionKind gvk, String name) {
-        return fetchJsonExtension(gvk, name)
-            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
+        return fetchJsonExtension(gvk, name).switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
-        return Mono.fromCallable(
-                () -> {
+        return Mono.fromCallable(() -> {
                     var metadata = extension.getMetadata();
                     // those fields should be managed by halo.
                     metadata.setCreationTimestamp(Instant.now());
@@ -260,36 +240,31 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                     if (!hasText(metadata.getName())) {
                         if (!hasText(metadata.getGenerateName())) {
                             throw new IllegalArgumentException(
-                                "The metadata.generateName must not be blank when metadata.name is "
-                                    + "blank");
+                                    "The metadata.generateName must not be blank when metadata.name is " + "blank");
                         }
 
                         // generate name with random text
-                        metadata.setName(metadata.getGenerateName() + secure()
-                            .nextAlphanumeric(GENERATE_NAME_RANDOM_LENGTH)
-                            // Prevent data conflicts caused by database case sensitivity
-                            .toLowerCase()
-                        );
+                        metadata.setName(metadata.getGenerateName()
+                                + secure().nextAlphanumeric(GENERATE_NAME_RANDOM_LENGTH)
+                                        // Prevent data conflicts caused by database case sensitivity
+                                        .toLowerCase());
                     }
                     extension.setMetadata(metadata);
                     return converter.convertTo(extension);
                 })
-            .subscribeOn(this.scheduler)
-            // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
-            // on boundedElastic thread pool.
-            .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData()))
-            .flatMap(created -> Mono.fromCallable(
-                    () -> {
-                        watchers.onAdd(convertToRealExtension(created));
-                        return created;
-                    })
                 .subscribeOn(this.scheduler)
-            )
-            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
-                // retry when generateName is set
-                .filter(t -> t instanceof DataIntegrityViolationException
-                    && hasText(extension.getMetadata().getGenerateName()))
-            );
+                // the method secureStrong() may invoke blocking SecureRandom, so we need to subscribe
+                // on boundedElastic thread pool.
+                .flatMap(extStore -> doCreate(extension, extStore.getName(), extStore.getData()))
+                .flatMap(created -> Mono.fromCallable(() -> {
+                            watchers.onAdd(convertToRealExtension(created));
+                            return created;
+                        })
+                        .subscribeOn(this.scheduler))
+                .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                        // retry when generateName is set
+                        .filter(t -> t instanceof DataIntegrityViolationException
+                                && hasText(extension.getMetadata().getGenerateName())));
     }
 
     @Override
@@ -314,21 +289,16 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 return Mono.just(extension);
             }
 
-            var onlyStatusChanged =
-                isOnlyStatusChanged(oldJsonExt.getInternal(), newJsonExt.getInternal());
+            var onlyStatusChanged = isOnlyStatusChanged(oldJsonExt.getInternal(), newJsonExt.getInternal());
 
             var store = this.converter.convertTo(newJsonExt);
-            var doUpdate =
-                doUpdate(extension, store.getName(), store.getVersion(), store.getData());
+            var doUpdate = doUpdate(extension, store.getName(), store.getVersion(), store.getData());
             if (!onlyStatusChanged) {
-                doUpdate = doUpdate.flatMap(updated -> Mono.fromCallable(
-                        () -> {
-                            watchers.onUpdate(convertToRealExtension(old),
-                                convertToRealExtension(updated));
+                doUpdate = doUpdate.flatMap(updated -> Mono.fromCallable(() -> {
+                            watchers.onUpdate(convertToRealExtension(old), convertToRealExtension(updated));
                             return updated;
                         })
-                    .subscribeOn(this.scheduler)
-                );
+                        .subscribeOn(this.scheduler));
             }
             return doUpdate;
         });
@@ -340,9 +310,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         }
         if (extension instanceof JsonExtension) {
             return getJsonExtension(
-                extension.groupVersionKind(),
-                extension.getMetadata().getName()
-            );
+                    extension.groupVersionKind(), extension.getMetadata().getName());
         }
         return get(extension.getClass(), extension.getMetadata().getName());
     }
@@ -355,21 +323,18 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         extension.getMetadata().setDeletionTimestamp(Instant.now());
         var es = converter.convertTo(extension);
         return doUpdate(extension, es.getName(), es.getVersion(), es.getData())
-            .flatMap(deleted -> Mono.fromCallable(
-                    () -> {
-                        watchers.onDelete(convertToRealExtension(extension));
-                        return deleted;
-                    })
-                .subscribeOn(this.scheduler)
-            );
+                .flatMap(deleted -> Mono.fromCallable(() -> {
+                            watchers.onDelete(convertToRealExtension(extension));
+                            return deleted;
+                        })
+                        .subscribeOn(this.scheduler));
     }
 
     @Override
     public IndexedQueryEngine indexedQueryEngine() {
         return new IndexedQueryEngine() {
             @Override
-            public ListResult<String> retrieve(GroupVersionKind gvk, ListOptions options,
-                PageRequest page) {
+            public ListResult<String> retrieve(GroupVersionKind gvk, ListOptions options, PageRequest page) {
                 var scheme = schemeManager.get(gvk);
                 return indexEngine.retrieve(scheme.type(), options, page);
             }
@@ -378,9 +343,11 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             public List<String> retrieveAll(GroupVersionKind gvk, ListOptions options, Sort sort) {
                 var scheme = schemeManager.get(gvk);
                 return StreamSupport.stream(
-                        indexEngine.retrieveAll(scheme.type(), options, sort).spliterator(), false
-                    )
-                    .toList();
+                                indexEngine
+                                        .retrieveAll(scheme.type(), options, sort)
+                                        .spliterator(),
+                                false)
+                        .toList();
             }
         };
     }
@@ -399,15 +366,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return Mono.defer(() -> {
             var type = (Class<E>) oldExtension.getClass();
             return client.create(name, data)
-                .map(created -> converter.convertFrom(type, created))
-                .flatMap(extension -> Mono.fromCallable(
-                        () -> {
-                            this.indexEngine.insert(List.of(convertToRealExtension(extension)));
-                            return extension;
-                        })
-                    .subscribeOn(this.scheduler)
-                )
-                .as(transactionalOperator::transactional);
+                    .map(created -> converter.convertFrom(type, created))
+                    .flatMap(extension -> Mono.fromCallable(() -> {
+                                this.indexEngine.insert(List.of(convertToRealExtension(extension)));
+                                return extension;
+                            })
+                            .subscribeOn(this.scheduler))
+                    .as(transactionalOperator::transactional);
         });
     }
 
@@ -426,15 +391,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         return Mono.defer(() -> {
             var type = (Class<E>) oldExtension.getClass();
             return client.update(name, version, data)
-                .map(updated -> converter.convertFrom(type, updated))
-                .flatMap(extension -> Mono.fromCallable(
-                        () -> {
-                            this.indexEngine.update(List.of(convertToRealExtension(extension)));
-                            return extension;
-                        })
-                    .subscribeOn(this.scheduler)
-                )
-                .as(transactionalOperator::transactional);
+                    .map(updated -> converter.convertFrom(type, updated))
+                    .flatMap(extension -> Mono.fromCallable(() -> {
+                                this.indexEngine.update(List.of(convertToRealExtension(extension)));
+                                return extension;
+                            })
+                            .subscribeOn(this.scheduler))
+                    .as(transactionalOperator::transactional);
         });
     }
 
@@ -477,5 +440,4 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         }
         return true;
     }
-
 }

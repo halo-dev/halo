@@ -38,9 +38,7 @@ class PolicyRuleTest {
                 "nonResourceURLs": [],
                 "verbs": []
             }
-            """,
-            JsonUtils.objectToJson(policyRule),
-            true);
+            """, JsonUtils.objectToJson(policyRule), true);
 
         Role.PolicyRule policyByBuilder = new Role.PolicyRule.Builder().build();
         JSONAssert.assertEquals("""
@@ -51,17 +49,15 @@ class PolicyRuleTest {
                 "nonResourceURLs": [],
                 "verbs": []
             }
-            """,
-            JsonUtils.objectToJson(policyByBuilder),
-            true);
+            """, JsonUtils.objectToJson(policyByBuilder), true);
 
         Role.PolicyRule policyNonNull = new Role.PolicyRule.Builder()
-            .apiGroups("group")
-            .resources("resource-1", "resource-2")
-            .resourceNames("resourceName")
-            .nonResourceURLs("non resource url")
-            .verbs("verbs")
-            .build();
+                .apiGroups("group")
+                .resources("resource-1", "resource-2")
+                .resourceNames("resourceName")
+                .nonResourceURLs("non resource url")
+                .verbs("verbs")
+                .build();
 
         JsonNode expected = objectMapper.readTree("""
             {

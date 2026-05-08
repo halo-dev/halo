@@ -22,8 +22,7 @@ import run.halo.app.extension.GroupVersionKind;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION,
-    kind = KIND, plural = "categories", singular = "category")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "categories", singular = "category")
 @EqualsAndHashCode(callSuper = true)
 public class Category extends AbstractExtension {
 
@@ -62,9 +61,11 @@ public class Category extends AbstractExtension {
         private String template;
 
         /**
-         * <p>Used to specify the template for the posts associated with the category.</p>
-         * <p>The priority is not as high as that of the post.</p>
-         * <p>If the post also specifies a template, the post's template will prevail.</p>
+         * Used to specify the template for the posts associated with the category.
+         *
+         * <p>The priority is not as high as that of the post.
+         *
+         * <p>If the post also specifies a template, the post's template will prevail.
          */
         @Schema(requiredMode = NOT_REQUIRED, maxLength = 255)
         private String postTemplate;
@@ -75,21 +76,24 @@ public class Category extends AbstractExtension {
         private @Nullable List<String> children;
 
         /**
-         * <p>if a category is queried for related posts, the default behavior is to
-         * query all posts under the category including its subcategories, but if this field is
-         * set to true, cascade query behavior will be terminated here.</p>
-         * <p>For example, if a category has subcategories A and B, and A has subcategories C and
-         * D and C marked this field as true, when querying posts under A category,all posts under A
-         * and B will be queried, but C and D will not be queried.</p>
+         * if a category is queried for related posts, the default behavior is to query all posts under the category
+         * including its subcategories, but if this field is set to true, cascade query behavior will be terminated
+         * here.
+         *
+         * <p>For example, if a category has subcategories A and B, and A has subcategories C and D and C marked this
+         * field as true, when querying posts under A category,all posts under A and B will be queried, but C and D will
+         * not be queried.
          */
         private boolean preventParentPostCascadeQuery;
 
         /**
-         * <p>Whether to hide the category from the category list.</p>
-         * <p>When set to true, the category including its subcategories and related posts will
-         * not be displayed in the category list, but it can still be accessed by permalink.</p>
-         * <p>Limitation: It only takes effect on the theme-side categorized list and it only
-         * allows to be set to true on the first level(root node) of categories.</p>
+         * Whether to hide the category from the category list.
+         *
+         * <p>When set to true, the category including its subcategories and related posts will not be displayed in the
+         * category list, but it can still be accessed by permalink.
+         *
+         * <p>Limitation: It only takes effect on the theme-side categorized list and it only allows to be set to true
+         * on the first level(root node) of categories.
          */
         private boolean hideFromList;
     }
@@ -107,14 +111,10 @@ public class Category extends AbstractExtension {
 
         private String permalink;
 
-        /**
-         * 包括当前和其下所有层级的文章数量 (depth=max).
-         */
+        /** 包括当前和其下所有层级的文章数量 (depth=max). */
         public Integer postCount;
 
-        /**
-         * 包括当前和其下所有层级的已发布且公开的文章数量 (depth=max).
-         */
+        /** 包括当前和其下所有层级的已发布且公开的文章数量 (depth=max). */
         public Integer visiblePostCount;
     }
 }

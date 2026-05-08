@@ -31,15 +31,13 @@ import run.halo.app.theme.router.ModelConst;
 @UtilityClass
 public class HaloUtils {
 
-    /**
-     * Check if the request is an XMLHttpRequest.
-     */
+    /** Check if the request is an XMLHttpRequest. */
     public static boolean isXhr(HttpHeaders headers) {
         return headers.getOrEmpty("X-Requested-With").contains("XMLHttpRequest");
     }
 
     /**
-     * <p>Read the file under the classpath as a string.</p>
+     * Read the file under the classpath as a string.
      *
      * @param location the file location relative to classpath
      * @return file content
@@ -50,8 +48,7 @@ public class HaloUtils {
             return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalArgumentException(
-                String.format("Failed to read class path file as string from location [%s]",
-                    location), e);
+                    String.format("Failed to read class path file as string from location [%s]", location), e);
         }
     }
 
@@ -102,8 +99,8 @@ public class HaloUtils {
     }
 
     /**
-     * Safely convert string to URI. This method will assume the input string is already encoded.
-     * If failed, it will try to encode the string.
+     * Safely convert string to URI. This method will assume the input string is already encoded. If failed, it will try
+     * to encode the string.
      *
      * @param uri the uri string
      * @return the uri
@@ -117,10 +114,6 @@ public class HaloUtils {
         } catch (InvalidUrlException e) {
             uriBuilder = UriComponentsBuilder.fromUriString(decodedUri, ParserType.WHAT_WG);
         }
-        return uriBuilder
-            .build(false)
-            .encode()
-            .toUri();
+        return uriBuilder.build(false).encode().toUri();
     }
-
 }

@@ -11,8 +11,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 
 /**
- * An aggregate object of {@link Post} and {@link Category}
- * and {@link Tag} and more for post list.
+ * An aggregate object of {@link Post} and {@link Category} and {@link Tag} and more for post list.
  *
  * @author guqing
  * @since 2.0.0

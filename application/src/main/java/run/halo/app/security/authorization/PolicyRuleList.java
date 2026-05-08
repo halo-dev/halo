@@ -12,9 +12,7 @@ import run.halo.app.core.extension.Role;
 public class PolicyRuleList extends LinkedList<Role.PolicyRule> {
     private final List<Throwable> errors = new ArrayList<>(4);
 
-    /**
-     * @return true if an error occurred when parsing PolicyRules
-     */
+    /** @return true if an error occurred when parsing PolicyRules */
     public boolean hasErrors() {
         return !errors.isEmpty();
     }

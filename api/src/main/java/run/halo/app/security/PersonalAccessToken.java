@@ -14,8 +14,12 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "security.halo.run", version = "v1alpha1", kind = PersonalAccessToken.KIND,
-    plural = "personalaccesstokens", singular = "personalaccesstoken")
+@GVK(
+        group = "security.halo.run",
+        version = "v1alpha1",
+        kind = PersonalAccessToken.KIND,
+        plural = "personalaccesstokens",
+        singular = "personalaccesstoken")
 public class PersonalAccessToken extends AbstractExtension {
 
     public static final String KIND = "PersonalAccessToken";
@@ -50,6 +54,5 @@ public class PersonalAccessToken extends AbstractExtension {
 
         @Schema(requiredMode = REQUIRED)
         private String tokenId;
-
     }
 }

@@ -67,8 +67,7 @@ class JsonExtensionConverterTest {
         store.setVersion(20L);
         store.setData("{".getBytes());
 
-        assertThrows(ExtensionConvertException.class,
-            () -> converter.convertFrom(FakeExtension.class, store));
+        assertThrows(ExtensionConvertException.class, () -> converter.convertFrom(FakeExtension.class, store));
     }
 
     @Test

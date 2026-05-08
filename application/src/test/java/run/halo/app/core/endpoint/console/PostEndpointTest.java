@@ -3,9 +3,7 @@ package run.halo.app.core.endpoint.console;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +36,7 @@ class PostEndpointTest {
 
     @Mock
     PostService postService;
+
     @Mock
     ReactiveExtensionClient client;
 
@@ -52,36 +51,37 @@ class PostEndpointTest {
     @BeforeEach
     void setUp() {
         postEndpoint.setMaxAttemptsWaitForPublish(3);
-        webTestClient = WebTestClient
-            .bindToRouterFunction(postEndpoint.endpoint())
-            .build();
+        webTestClient =
+                WebTestClient.bindToRouterFunction(postEndpoint.endpoint()).build();
     }
 
     @Test
     void draftPost() {
         when(postService.draftPost(any())).thenReturn(Mono.just(TestPost.postV1()));
-        webTestClient.post()
-            .uri("/posts")
-            .bodyValue(postRequest(TestPost.postV1()))
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(Post.class)
-            .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
+        webTestClient
+                .post()
+                .uri("/posts")
+                .bodyValue(postRequest(TestPost.postV1()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Post.class)
+                .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
     }
 
     @Test
     void updatePost() {
         when(postService.updatePost(any())).thenReturn(Mono.just(TestPost.postV1()));
 
-        webTestClient.put()
-            .uri("/posts/post-A")
-            .bodyValue(postRequest(TestPost.postV1()))
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(Post.class)
-            .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
+        webTestClient
+                .put()
+                .uri("/posts/post-A")
+                .bodyValue(postRequest(TestPost.postV1()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Post.class)
+                .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
     }
 
     @Test
@@ -93,14 +93,15 @@ class PostEndpointTest {
         when(client.get(eq(Post.class), eq("post-1"))).thenReturn(Mono.just(post));
 
         when(client.update(any(Post.class)))
-            .thenReturn(Mono.error(new OptimisticLockingFailureException("fake-error")));
+                .thenReturn(Mono.error(new OptimisticLockingFailureException("fake-error")));
 
         // Send request
-        webTestClient.put()
-            .uri("/posts/{name}/publish?async=false", "post-1")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError();
+        webTestClient
+                .put()
+                .uri("/posts/{name}/publish?async=false", "post-1")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
 
         // Verify WebClient retry behavior
         verify(client, times(6)).get(eq(Post.class), eq("post-1"));
@@ -123,18 +124,18 @@ class PostEndpointTest {
         publishedPost.setSpec(publishedPostSpec);
 
         when(client.get(eq(Post.class), eq("post-1")))
-            .thenReturn(Mono.just(post))
-            .thenReturn(Mono.just(publishedPost));
+                .thenReturn(Mono.just(post))
+                .thenReturn(Mono.just(publishedPost));
 
-        when(client.update(any(Post.class)))
-            .thenReturn(Mono.just(post));
+        when(client.update(any(Post.class))).thenReturn(Mono.just(post));
 
         // Send request
-        webTestClient.put()
-            .uri("/posts/{name}/publish?async=false", "post-1")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful();
+        webTestClient
+                .put()
+                .uri("/posts/{name}/publish?async=false", "post-1")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
 
         // Verify WebClient retry behavior
         verify(client, times(2)).get(eq(Post.class), eq("post-1"));
@@ -150,26 +151,25 @@ class PostEndpointTest {
 
         var publishedPost = new Post();
         var publishedMetadata = new Metadata();
-        publishedMetadata.setAnnotations(
-            Map.of(Post.LAST_RELEASED_SNAPSHOT_ANNO, "old-my-release"));
+        publishedMetadata.setAnnotations(Map.of(Post.LAST_RELEASED_SNAPSHOT_ANNO, "old-my-release"));
         publishedPost.setMetadata(publishedMetadata);
         var publishedPostSpec = new PostSpec();
         publishedPostSpec.setReleaseSnapshot("my-release");
         publishedPost.setSpec(publishedPostSpec);
 
         when(client.get(eq(Post.class), eq("post-1")))
-            .thenReturn(Mono.just(post))
-            .thenReturn(Mono.just(publishedPost));
+                .thenReturn(Mono.just(post))
+                .thenReturn(Mono.just(publishedPost));
 
-        when(client.update(any(Post.class)))
-            .thenReturn(Mono.just(post));
+        when(client.update(any(Post.class))).thenReturn(Mono.just(post));
 
         // Send request
-        webTestClient.put()
-            .uri("/posts/{name}/publish?async=false", "post-1")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError();
+        webTestClient
+                .put()
+                .uri("/posts/{name}/publish?async=false", "post-1")
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
 
         // Verify WebClient retry behavior
         verify(client, times(5)).get(eq(Post.class), eq("post-1"));

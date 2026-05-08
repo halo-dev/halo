@@ -25,16 +25,14 @@ class ExtensionDeleteHandler implements DeleteHandler {
     public Mono<ServerResponse> handle(ServerRequest request) {
         var name = request.pathVariable("name");
         return client.get(scheme.type(), name)
-            .flatMap(client::delete)
-            .flatMap(deleted -> ServerResponse
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(deleted));
+                .flatMap(client::delete)
+                .flatMap(deleted -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(deleted));
     }
 
     @Override
     public String pathPattern() {
         return buildExtensionPathPattern(scheme) + "/{name}";
     }
-
 }

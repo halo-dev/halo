@@ -40,10 +40,8 @@ class MenuFinderImplTest {
     @Test
     void listAsTree() {
         Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
-        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null)))
-            .thenReturn(Flux.fromIterable(tuple.getT1()));
-        Mockito.when(client.list(eq(MenuItem.class), eq(null), any()))
-            .thenReturn(Flux.fromIterable(tuple.getT2()));
+        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null))).thenReturn(Flux.fromIterable(tuple.getT1()));
+        Mockito.when(client.list(eq(MenuItem.class), eq(null), any())).thenReturn(Flux.fromIterable(tuple.getT2()));
 
         List<MenuVo> menuVos = menuFinder.listAsTree().collectList().block();
         assertThat(visualizeTree(menuVos)).isEqualTo("""
@@ -60,9 +58,7 @@ class MenuFinderImplTest {
             """);
     }
 
-    /**
-     * Visualize a tree.
-     */
+    /** Visualize a tree. */
     String visualizeTree(List<MenuVo> menuVos) {
         StringBuilder stringBuilder = new StringBuilder();
         for (MenuVo menuVo : menuVos) {
@@ -93,8 +89,7 @@ class MenuFinderImplTest {
         MenuItem itemB = menuItem("B", null);
         MenuItem itemC = menuItem("C", null);
         MenuItem itemH = menuItem("H", null);
-        return Tuples.of(List.of(menuD, menuX, menuY),
-            List.of(itemE, itemG, itemF, itemA, itemB, itemC, itemH));
+        return Tuples.of(List.of(menuD, menuX, menuY), List.of(itemE, itemG, itemF, itemA, itemB, itemC, itemH));
     }
 
     LinkedHashSet<String> of(String... names) {

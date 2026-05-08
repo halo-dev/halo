@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { NotificationTemplateSpec } from './notification-template-spec';
 
 /**
- * <p>{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.</p>  <p>It describes the notification template\'s name, description, and the template content.</p>  <p>{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,  if multiple templates are matched, the best match will be selected. This is useful when you  want to override the default template.</p>
+ * {@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.   <p>It describes the notification template\'s name, description, and the template content.   <p>{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language, if multiple templates  are matched, the best match will be selected. This is useful when you want to override the default template.
  */
 export interface NotificationTemplate {
     'apiVersion': string;

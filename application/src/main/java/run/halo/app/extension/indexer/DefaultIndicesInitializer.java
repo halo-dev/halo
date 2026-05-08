@@ -26,9 +26,8 @@ class DefaultIndicesInitializer implements IndicesInitializer {
 
     private final ExtensionConverter extensionConverter;
 
-    DefaultIndicesInitializer(IndexEngine indexEngine,
-        ExtensionStoreClient client,
-        ExtensionConverter extensionConverter) {
+    DefaultIndicesInitializer(
+            IndexEngine indexEngine, ExtensionStoreClient client, ExtensionConverter extensionConverter) {
         this.indexEngine = indexEngine;
         this.client = client;
         this.extensionConverter = extensionConverter;
@@ -56,17 +55,17 @@ class DefaultIndicesInitializer implements IndicesInitializer {
         do {
             watch.start("Indexing from " + (nameCursor == null ? "@start" : nameCursor));
             extensionStores = client.listBy(prefix, nameCursor, 100);
-            indexEngine.insert(extensionStores.stream()
-                .map(es -> this.extensionConverter.convertFrom(type, es))::iterator
-            );
+            indexEngine.insert(
+                    extensionStores.stream().map(es -> this.extensionConverter.convertFrom(type, es))::iterator);
             if (!extensionStores.isEmpty()) {
                 nameCursor = extensionStores.getLast().getName();
             }
             indexedCount += extensionStores.size();
             watch.stop();
         } while (!extensionStores.isEmpty());
-        log.info("Total indexed count: {}, initialization summary: {}",
-            indexedCount, watch.prettyPrint(TimeUnit.MILLISECONDS));
+        log.info(
+                "Total indexed count: {}, initialization summary: {}",
+                indexedCount,
+                watch.prettyPrint(TimeUnit.MILLISECONDS));
     }
-
 }

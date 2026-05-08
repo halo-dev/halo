@@ -23,8 +23,7 @@ public interface Watcher extends Disposable {
         // Do nothing here
     }
 
-    default void registerDisposeHook(Runnable dispose) {
-    }
+    default void registerDisposeHook(Runnable dispose) {}
 
     class WatcherComposite implements Watcher {
 

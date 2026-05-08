@@ -43,8 +43,8 @@ public class CommentVo implements ExtensionVoOperator {
      */
     public static CommentVo from(Comment comment) {
         return new CommentVo()
-            .setMetadata(comment.getMetadata())
-            .setSpec(comment.getSpec())
-            .setStatus(comment.getStatus());
+                .setMetadata(comment.getMetadata())
+                .setSpec(comment.getSpec())
+                .setStatus(comment.getStatus());
     }
 }

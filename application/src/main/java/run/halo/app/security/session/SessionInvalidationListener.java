@@ -19,8 +19,7 @@ public class SessionInvalidationListener {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
-    private final ReactiveFindByIndexNameSessionRepository<? extends Session>
-        indexedSessionRepository;
+    private final ReactiveFindByIndexNameSessionRepository<? extends Session> indexedSessionRepository;
     private final ReactiveSessionRepository<? extends Session> sessionRepository;
 
     @Async
@@ -32,11 +31,12 @@ public class SessionInvalidationListener {
     }
 
     private void invalidateUserSessions(String username) {
-        indexedSessionRepository.findByPrincipalName(username)
-            .map(Map::keySet)
-            .flatMapMany(Flux::fromIterable)
-            .flatMap(sessionRepository::deleteById)
-            .then()
-            .block(BLOCKING_TIMEOUT);
+        indexedSessionRepository
+                .findByPrincipalName(username)
+                .map(Map::keySet)
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(sessionRepository::deleteById)
+                .then()
+                .block(BLOCKING_TIMEOUT);
     }
 }

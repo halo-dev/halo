@@ -2,10 +2,7 @@ package run.halo.app.content.comment;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Map;
@@ -38,12 +35,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Ref;
+import run.halo.app.extension.*;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
@@ -95,28 +87,25 @@ class CommentServiceImplTest {
     void listComment() {
         var comments = new ListResult<Comment>(1, 10, 3, comments());
         when(client.listBy(eq(Comment.class), any(ListOptions.class), any(PageRequest.class)))
-            .thenReturn(Mono.just(comments));
+                .thenReturn(Mono.just(comments));
 
         PostCommentSubject postCommentSubject = Mockito.mock(PostCommentSubject.class);
-        when(extensionGetter.getExtensions(CommentSubject.class))
-            .thenReturn(Flux.just(postCommentSubject));
+        when(extensionGetter.getExtensions(CommentSubject.class)).thenReturn(Flux.just(postCommentSubject));
 
         when(postCommentSubject.supports(any())).thenReturn(true);
         when(postCommentSubject.get(eq("fake-post"))).thenReturn(Mono.just(post()));
 
-        when(userService.getUserOrGhost(any()))
-            .thenReturn(Mono.just(ghostUser()));
+        when(userService.getUserOrGhost(any())).thenReturn(Mono.just(ghostUser()));
         // when(userService.getUserOrGhost("A-owner"))
         //     .thenReturn(Mono.just(createUser("A-owner")));
-        when(userService.getUserOrGhost("B-owner"))
-            .thenReturn(Mono.just(createUser("B-owner")));
+        when(userService.getUserOrGhost("B-owner")).thenReturn(Mono.just(createUser("B-owner")));
 
         ServerWebExchange exchange = mock(ServerWebExchange.class);
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         MockServerRequest request = MockServerRequest.builder()
-            .queryParams(queryParams)
-            .exchange(exchange)
-            .build();
+                .queryParams(queryParams)
+                .exchange(exchange)
+                .build();
         ServerHttpRequest httpRequest = mock(ServerHttpRequest.class);
         when(exchange.getRequest()).thenReturn(httpRequest);
         when(httpRequest.getQueryParams()).thenReturn(queryParams);
@@ -137,16 +126,14 @@ class CommentServiceImplTest {
         when(counterService.getByName(eq(commentCCounter))).thenReturn(Mono.just(counterC));
 
         StepVerifier.create(listResultMono)
-            .consumeNextWith(result -> {
-                try {
-                    JSONAssert.assertEquals(expectListResultJson(),
-                        JsonUtils.objectToJson(result),
-                        true);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .verifyComplete();
+                .consumeNextWith(result -> {
+                    try {
+                        JSONAssert.assertEquals(expectListResultJson(), JsonUtils.objectToJson(result), true);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -154,9 +141,8 @@ class CommentServiceImplTest {
     void create() throws JSONException {
         var commentSetting = getCommentSetting();
         when(environmentFetcher.fetchComment()).thenReturn(Mono.just(commentSetting));
-        when(roleService.contains(Set.of("USER"),
-            Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME)))
-            .thenReturn(Mono.just(false));
+        when(roleService.contains(Set.of("USER"), Set.of(AuthorityUtils.COMMENT_MANAGEMENT_ROLE_NAME)))
+                .thenReturn(Mono.just(false));
 
         CommentRequest commentRequest = new CommentRequest();
         commentRequest.setRaw("fake-raw");
@@ -166,14 +152,12 @@ class CommentServiceImplTest {
 
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
 
-        when(client.fetch(eq(User.class), eq("B-owner")))
-            .thenReturn(Mono.just(createUser("B-owner")));
+        when(client.fetch(eq(User.class), eq("B-owner"))).thenReturn(Mono.just(createUser("B-owner")));
         Comment commentToCreate = commentRequest.toComment();
         commentToCreate.getMetadata().setName("fake");
         Mono<Comment> commentMono = commentService.create(commentToCreate);
         when(client.create(any())).thenReturn(Mono.empty());
-        StepVerifier.create(commentMono)
-            .verifyComplete();
+        StepVerifier.create(commentMono).verifyComplete();
 
         verify(client, times(1)).create(captor.capture());
         Comment comment = captor.getValue();
@@ -206,17 +190,16 @@ class CommentServiceImplTest {
                         "name": "fake"
                     }
                 }
-                """,
-            JsonUtils.objectToJson(comment),
-            true);
+                """, JsonUtils.objectToJson(comment), true);
     }
 
     private List<Comment> comments() {
         Comment a = comment("A");
         a.getSpec().getOwner().setKind(Comment.CommentOwner.KIND_EMAIL);
-        a.getSpec().getOwner()
-            .setAnnotations(Map.of(Comment.CommentOwner.AVATAR_ANNO, "avatar",
-                Comment.CommentOwner.WEBSITE_ANNO, "website"));
+        a.getSpec()
+                .getOwner()
+                .setAnnotations(Map.of(
+                        Comment.CommentOwner.AVATAR_ANNO, "avatar", Comment.CommentOwner.WEBSITE_ANNO, "website"));
         return List.of(a, comment("B"), comment("C"));
     }
 

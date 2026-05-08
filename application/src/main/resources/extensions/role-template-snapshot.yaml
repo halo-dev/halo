@@ -6,11 +6,11 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-snapshots\" ]"
+    rbac.authorization.halo.run/dependencies: '[ "role-template-view-snapshots" ]'
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "snapshots" ]
-    verbs: [ "*" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["snapshots"]
+    verbs: ["*"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -20,6 +20,6 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "content.halo.run" ]
-    resources: [ "snapshots" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["content.halo.run"]
+    resources: ["snapshots"]
+    verbs: ["get", "list"]

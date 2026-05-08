@@ -32,5 +32,4 @@ public interface IndicesManager extends Closeable {
      * @param <E> type of the extension
      */
     <E extends Extension> void remove(Class<E> type);
-
 }

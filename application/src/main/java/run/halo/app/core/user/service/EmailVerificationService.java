@@ -29,8 +29,7 @@ public interface EmailVerificationService {
     Mono<Void> verify(String username, String code);
 
     /**
-     * Send verification code.
-     * The only difference is use email as username.
+     * Send verification code. The only difference is use email as username.
      *
      * @param email email to send must not be blank
      */

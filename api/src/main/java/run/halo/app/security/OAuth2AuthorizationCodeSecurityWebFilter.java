@@ -9,6 +9,4 @@ import org.springframework.web.server.WebFilter;
  * @author johnniang
  * @since 2.20.0
  */
-public interface OAuth2AuthorizationCodeSecurityWebFilter extends WebFilter, ExtensionPoint {
-
-}
+public interface OAuth2AuthorizationCodeSecurityWebFilter extends WebFilter, ExtensionPoint {}

@@ -16,8 +16,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.test.StepVerifier;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT,
-    properties = "server.forward-headers-strategy=native")
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = "server.forward-headers-strategy=native")
 class XForwardHeaderTest {
 
     @LocalServerPort
@@ -26,18 +25,19 @@ class XForwardHeaderTest {
     @Test
     void shouldGetCorrectProtoFromXForwardHeaders() {
         var response = WebClient.create("http://localhost:" + port)
-            .get().uri("/print-uri")
-            .header("X-Forwarded-Proto", "https")
-            .header("X-Forwarded-Host", "halo.run")
-            .header("X-Forwarded-Port", "6666")
-            .retrieve()
-            .toEntity(String.class);
+                .get()
+                .uri("/print-uri")
+                .header("X-Forwarded-Proto", "https")
+                .header("X-Forwarded-Host", "halo.run")
+                .header("X-Forwarded-Port", "6666")
+                .retrieve()
+                .toEntity(String.class);
         StepVerifier.create(response)
-            .assertNext(entity -> {
-                assertEquals(HttpStatus.OK, entity.getStatusCode());
-                assertEquals("\"https://halo.run:6666/print-uri\"", entity.getBody());
-            })
-            .verifyComplete();
+                .assertNext(entity -> {
+                    assertEquals(HttpStatus.OK, entity.getStatusCode());
+                    assertEquals("\"https://halo.run:6666/print-uri\"", entity.getBody());
+                })
+                .verifyComplete();
     }
 
     @TestConfiguration
@@ -45,11 +45,10 @@ class XForwardHeaderTest {
 
         @Bean
         RouterFunction<ServerResponse> printUri() {
-            return route(GET("/print-uri"),
-                request -> {
-                    var uri = request.exchange().getRequest().getURI();
-                    return ServerResponse.ok().bodyValue(uri);
-                });
+            return route(GET("/print-uri"), request -> {
+                var uri = request.exchange().getRequest().getURI();
+                return ServerResponse.ok().bodyValue(uri);
+            });
         }
     }
 }

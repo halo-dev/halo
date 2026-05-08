@@ -28,12 +28,9 @@ public class Menu extends AbstractExtension {
         private String displayName;
 
         @ArraySchema(
-            uniqueItems = true,
-            arraySchema = @Schema(description = "Menu items of this menu."),
-            schema = @Schema(description = "Name of menu item.")
-        )
+                uniqueItems = true,
+                arraySchema = @Schema(description = "Menu items of this menu."),
+                schema = @Schema(description = "Name of menu item."))
         private LinkedHashSet<String> menuItems;
-
     }
-
 }

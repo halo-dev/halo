@@ -31,23 +31,22 @@ public class SiteStatsQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "SystemV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("stats/-", this::getStats,
-                builder -> builder.operationId("queryStats")
-                    .description("Gets site stats")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .implementation(SiteStatsVo.class)
-                    )
-            )
-            .build();
+                .GET(
+                        "stats/-",
+                        this::getStats,
+                        builder -> builder.operationId("queryStats")
+                                .description("Gets site stats")
+                                .tag(tag)
+                                .response(responseBuilder().implementation(SiteStatsVo.class)))
+                .build();
     }
 
     private Mono<ServerResponse> getStats(ServerRequest request) {
-        return siteStatsFinder.getStats()
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return siteStatsFinder
+                .getStats()
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     @Override

@@ -13,5 +13,4 @@ public class InvalidResetTokenException extends ServerWebInputException {
     public InvalidResetTokenException() {
         super("Invalid reset token");
     }
-
 }

@@ -2,11 +2,7 @@ package run.halo.app.extension.gc;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -20,12 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.ReactiveTransaction;
 import org.springframework.transaction.ReactiveTransactionManager;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionConverter;
-import run.halo.app.extension.FakeExtension;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.Scheme;
-import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.*;
 import run.halo.app.extension.index.IndexEngine;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
@@ -63,8 +54,7 @@ class GcReconcilerTest {
     @Test
     void shouldDoNothingIfExtensionNotFound() {
         var fake = createExtension();
-        when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.empty());
+        when(client.fetch(FakeExtension.class, fake.getMetadata().getName())).thenReturn(Optional.empty());
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -77,8 +67,7 @@ class GcReconcilerTest {
         var fake = createExtension();
         fake.getMetadata().setFinalizers(Set.of("fake-finalizer"));
         fake.getMetadata().setDeletionTimestamp(null);
-        when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+        when(client.fetch(FakeExtension.class, fake.getMetadata().getName())).thenReturn(Optional.of(fake));
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -91,8 +80,7 @@ class GcReconcilerTest {
         var fake = createExtension();
         fake.getMetadata().setDeletionTimestamp(null);
         fake.getMetadata().setFinalizers(null);
-        when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+        when(client.fetch(FakeExtension.class, fake.getMetadata().getName())).thenReturn(Optional.of(fake));
 
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
@@ -105,8 +93,7 @@ class GcReconcilerTest {
         var fake = createExtension();
         fake.getMetadata().setDeletionTimestamp(Instant.now());
         fake.getMetadata().setFinalizers(null);
-        when(client.fetch(FakeExtension.class, fake.getMetadata().getName()))
-            .thenReturn(Optional.of(fake));
+        when(client.fetch(FakeExtension.class, fake.getMetadata().getName())).thenReturn(Optional.of(fake));
 
         ExtensionStore store = new ExtensionStore();
         store.setName("fake-store-name");

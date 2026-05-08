@@ -16,7 +16,7 @@
 
 export interface TagSpec {
     /**
-     * Color regex explanation.  <pre>  ^                 # start of the line  #                 # start with a number sign `#`  (                 # start of (group 1)    [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6    |               # or    [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3  )                 # end of (group 1)  $                 # end of the line  </pre>
+     * Color regex explanation.   <pre>  ^                 # start of the line  #                 # start with a number sign `#`  (                 # start of (group 1)    [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6    |               # or    [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3  )                 # end of (group 1)  $                 # end of the line  </pre>
      */
     'color'?: string;
     'cover'?: string;

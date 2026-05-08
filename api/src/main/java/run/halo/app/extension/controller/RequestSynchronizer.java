@@ -15,9 +15,7 @@ import run.halo.app.extension.index.query.Queries;
 @Slf4j
 public class RequestSynchronizer implements Synchronizer<Request> {
 
-    /**
-     * Default batch size for listing Extension names.
-     */
+    /** Default batch size for listing Extension names. */
     private static final Integer DEFAULT_BATCH_SIZE = 100;
 
     private final ExtensionClient client;
@@ -35,11 +33,12 @@ public class RequestSynchronizer implements Synchronizer<Request> {
     @Getter
     private volatile boolean started = false;
 
-    public RequestSynchronizer(boolean syncAllOnStart,
-        ExtensionClient client,
-        Extension extension,
-        Watcher watcher,
-        ListOptions listOptions) {
+    public RequestSynchronizer(
+            boolean syncAllOnStart,
+            ExtensionClient client,
+            Extension extension,
+            Watcher watcher,
+            ListOptions listOptions) {
         this.syncAllOnStart = syncAllOnStart;
         this.client = client;
         this.type = extension.getClass();
@@ -65,8 +64,8 @@ public class RequestSynchronizer implements Synchronizer<Request> {
             while (names.size() == batchSize) {
                 var lastName = names.getLast();
                 var augmentedOptions = ListOptions.builder(listOptions)
-                    .andQuery(Queries.greaterThan("metadata.name", lastName))
-                    .build();
+                        .andQuery(Queries.greaterThan("metadata.name", lastName))
+                        .build();
                 names = client.listTopNames(type, augmentedOptions, sort, batchSize);
                 names.forEach(name -> watcher.onAdd(new Request(name)));
             }

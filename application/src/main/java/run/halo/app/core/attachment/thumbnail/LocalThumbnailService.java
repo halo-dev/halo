@@ -14,8 +14,7 @@ import run.halo.app.core.attachment.ThumbnailSize;
 public interface LocalThumbnailService {
 
     /**
-     * Generates thumbnail for the source image. If the thumbnail already exists, it will return the
-     * existing one.
+     * Generates thumbnail for the source image. If the thumbnail already exists, it will return the existing one.
      *
      * @param source the source image path
      * @param size the thumbnail size
@@ -29,5 +28,4 @@ public interface LocalThumbnailService {
      * @param source the source image path
      */
     void delete(Path source);
-
 }

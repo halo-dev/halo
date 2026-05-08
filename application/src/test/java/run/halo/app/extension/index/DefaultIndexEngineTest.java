@@ -1,9 +1,7 @@
 package run.halo.app.extension.index;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -85,9 +83,8 @@ class DefaultIndexEngineTest {
 
     @Test
     void shouldRetrieveWithConditionsAndPage() {
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 2);
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
@@ -100,9 +97,8 @@ class DefaultIndexEngineTest {
     void shouldRetrieveWithConditionsAndFirstPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(1, 4);
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
@@ -113,9 +109,8 @@ class DefaultIndexEngineTest {
     void shouldRetrieveWithConditionsAndLastPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(2, 4);
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
@@ -126,9 +121,8 @@ class DefaultIndexEngineTest {
     void shouldRetrieveWithConditionsAndExceededPage() {
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5", "6"));
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(4, 2);
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(6, result.getTotal());
@@ -138,14 +132,13 @@ class DefaultIndexEngineTest {
     @Test
     void shouldRetrieveAllWithConditionsAndNonPositiveSize() {
         var allResult = IntStream.rangeClosed(1, 1001)
-            .boxed()
-            .map(o -> String.format("%04d", o))
-            .collect(Collectors.toSet());
+                .boxed()
+                .map(o -> String.format("%04d", o))
+                .collect(Collectors.toSet());
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(allResult);
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         var page = PageRequestImpl.of(1, 0);
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(1001, result.getTotal());
@@ -156,25 +149,23 @@ class DefaultIndexEngineTest {
 
     @Test
     void shouldRetrieveAllWithConditions() {
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
         when(singleValueIndex.getKey("2")).thenReturn("2");
         when(singleValueIndex.getKey("3")).thenReturn("3");
         var result = engine.retrieveAll(Fake.class, options, Sort.by(DESC, "metadata.name"));
-        assertEquals(List.of("3", "2", "1"),
-            StreamSupport.stream(result.spliterator(), false).toList()
-        );
+        assertEquals(
+                List.of("3", "2", "1"),
+                StreamSupport.stream(result.spliterator(), false).toList());
     }
 
     @Test
     void shouldRetrieveTopNWithConditions() {
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4", "5"));
         when(singleValueIndex.getKey("1")).thenReturn("1");
@@ -183,19 +174,20 @@ class DefaultIndexEngineTest {
         when(singleValueIndex.getKey("4")).thenReturn("4");
         when(singleValueIndex.getKey("5")).thenReturn("5");
         var result = engine.retrieveTopN(Fake.class, options, Sort.by(DESC, "metadata.name"), 3);
-        assertEquals(List.of("5", "4", "3"),
-            StreamSupport.stream(result.spliterator(), false).toList()
-        );
+        assertEquals(
+                List.of("5", "4", "3"),
+                StreamSupport.stream(result.spliterator(), false).toList());
 
         result = engine.retrieveTopN(Fake.class, options, Sort.by(ASC, "metadata.name"), 2);
-        assertEquals(List.of("1", "2"), StreamSupport.stream(result.spliterator(), false).toList());
+        assertEquals(
+                List.of("1", "2"),
+                StreamSupport.stream(result.spliterator(), false).toList());
     }
 
     @Test
     void shouldCountWithConditions() {
-        var options = ListOptions.builder()
-            .andQuery(Queries.all("metadata.name"))
-            .build();
+        var options =
+                ListOptions.builder().andQuery(Queries.all("metadata.name")).build();
         when(indices.<String>getIndex("metadata.name")).thenReturn(singleValueIndex);
         when(singleValueIndex.all()).thenReturn(Set.of("1", "2", "3", "4"));
         var count = engine.count(Fake.class, options);
@@ -208,5 +200,4 @@ class DefaultIndexEngineTest {
         fake.getMetadata().setName(name);
         return fake;
     }
-
 }

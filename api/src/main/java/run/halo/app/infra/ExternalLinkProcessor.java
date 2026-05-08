@@ -14,8 +14,8 @@ import reactor.core.publisher.Mono;
 public interface ExternalLinkProcessor {
 
     /**
-     * If the link is in-site link, then process it to an external link with
-     * {@link ExternalUrlSupplier#getRaw()}, otherwise return the original link.
+     * If the link is in-site link, then process it to an external link with {@link ExternalUrlSupplier#getRaw()},
+     * otherwise return the original link.
      *
      * @param link link to process
      * @return processed link or original link
@@ -24,15 +24,12 @@ public interface ExternalLinkProcessor {
 
     /**
      * Process the URI to an external URL.
-     * <p>
-     * If the URI is an in-site link, then process it to an external link with
-     * {@link ExternalUrlSupplier#getRaw()} or {@link ExternalUrlSupplier#getURL(HttpRequest)},
-     * otherwise return the original URI.
-     * </p>
+     *
+     * <p>If the URI is an in-site link, then process it to an external link with {@link ExternalUrlSupplier#getRaw()}
+     * or {@link ExternalUrlSupplier#getURL(HttpRequest)}, otherwise return the original URI.
      *
      * @param uri uri to process
      * @return processed URI or original URI
      */
     Mono<URI> processLink(URI uri);
-
 }

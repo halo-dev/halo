@@ -20,11 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionStoreUtil;
-import run.halo.app.extension.PageRequestImpl;
-import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.*;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -70,42 +66,45 @@ class ReplyServiceImplIntegrationTest {
 
             // delete from db
             var storeName = ExtensionStoreUtil.buildStoreName(scheme, name);
-            return storeClient.delete(storeName, extension.getMetadata().getVersion())
-                .thenReturn(extension);
+            return storeClient
+                    .delete(storeName, extension.getMetadata().getVersion())
+                    .thenReturn(extension);
         }
 
         @BeforeEach
         void setUp() {
             Flux.fromIterable(storedReplies)
-                .flatMap(post -> reactiveClient.create(post))
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(post -> reactiveClient.create(post))
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @AfterEach
         void tearDown() {
             Flux.fromIterable(storedReplies)
-                .flatMap(this::deleteImmediately)
-                .as(StepVerifier::create)
-                .expectNextCount(storedReplies.size())
-                .verifyComplete();
+                    .flatMap(this::deleteImmediately)
+                    .as(StepVerifier::create)
+                    .expectNextCount(storedReplies.size())
+                    .verifyComplete();
         }
 
         @Test
         void removeAllByComment() {
             String commentName = "fake-comment";
-            replyService.removeAllByComment(commentName)
-                .as(StepVerifier::create)
-                .verifyComplete();
+            replyService
+                    .removeAllByComment(commentName)
+                    .as(StepVerifier::create)
+                    .verifyComplete();
 
             verify(reactiveClient, times(storedReplies.size())).delete(any(Reply.class));
             verify(replyService, times(2)).listRepliesByComment(eq(commentName), any());
 
-            replyService.listRepliesByComment(commentName, PageRequestImpl.ofSize(1))
-                .as(StepVerifier::create)
-                .consumeNextWith(result -> assertThat(result.getTotal()).isEqualTo(0))
-                .verifyComplete();
+            replyService
+                    .listRepliesByComment(commentName, PageRequestImpl.ofSize(1))
+                    .as(StepVerifier::create)
+                    .consumeNextWith(result -> assertThat(result.getTotal()).isEqualTo(0))
+                    .verifyComplete();
         }
     }
 

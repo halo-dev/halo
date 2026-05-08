@@ -8,9 +8,6 @@ package run.halo.app.theme;
 public enum Constant {
     ;
 
-    /**
-     * The name of the variable that holds the SEO meta description.
-     */
+    /** The name of the variable that holds the SEO meta description. */
     public static final String META_DESCRIPTION_VARIABLE_NAME = "seoMetaDescription";
-
 }

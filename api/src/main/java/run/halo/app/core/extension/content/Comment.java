@@ -24,8 +24,7 @@ import run.halo.app.extension.Ref;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Comment.KIND,
-    plural = "comments", singular = "comment")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Comment.KIND, plural = "comments", singular = "comment")
 @EqualsAndHashCode(callSuper = true)
 public class Comment extends AbstractExtension {
 
@@ -76,9 +75,7 @@ public class Comment extends AbstractExtension {
 
         private Instant approvedTime;
 
-        /**
-         * The user-defined creation time default is <code>metadata.creationTimestamp</code>.
-         */
+        /** The user-defined creation time default is <code>metadata.creationTimestamp</code>. */
         private Instant creationTime;
 
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
@@ -150,15 +147,16 @@ public class Comment extends AbstractExtension {
             return 0;
         }
         long unreadReplyCount = replies.stream()
-            .filter(existingReply -> {
-                if (lastReadTime == null) {
-                    return true;
-                }
-                Instant creationTime = defaultIfNull(existingReply.getSpec().getCreationTime(),
-                    existingReply.getMetadata().getCreationTimestamp());
-                return creationTime.isAfter(lastReadTime);
-            })
-            .count();
+                .filter(existingReply -> {
+                    if (lastReadTime == null) {
+                        return true;
+                    }
+                    Instant creationTime = defaultIfNull(
+                            existingReply.getSpec().getCreationTime(),
+                            existingReply.getMetadata().getCreationTimestamp());
+                    return creationTime.isAfter(lastReadTime);
+                })
+                .count();
         return (int) unreadReplyCount;
     }
 }

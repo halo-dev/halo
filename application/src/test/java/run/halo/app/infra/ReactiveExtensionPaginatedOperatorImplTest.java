@@ -17,12 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.FakeExtension;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReactiveExtensionPaginatedOperatorImplTest {
@@ -52,8 +47,7 @@ class ReactiveExtensionPaginatedOperatorImplTest {
                 PageRequest pageRequest = invocation.getArgument(2);
                 int pageNumber = pageRequest.getPageNumber();
                 var list = ListResult.subList(items, pageNumber, pageRequest.getPageSize());
-                var result = new ListResult<>(pageNumber, pageRequest.getPageSize(),
-                    items.size(), list);
+                var result = new ListResult<>(pageNumber, pageRequest.getPageSize(), items.size(), list);
                 return Mono.just(result);
             });
         }
@@ -61,8 +55,8 @@ class ReactiveExtensionPaginatedOperatorImplTest {
         @Test
         public void listTest() {
             StepVerifier.create(service.list(FakeExtension.class, new ListOptions()))
-                .expectNextCount(900)
-                .verifyComplete();
+                    .expectNextCount(900)
+                    .verifyComplete();
         }
     }
 

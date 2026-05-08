@@ -17,8 +17,7 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Reply.KIND,
-    plural = "replies", singular = "reply")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Reply.KIND, plural = "replies", singular = "reply")
 @EqualsAndHashCode(callSuper = true)
 public class Reply extends AbstractExtension {
 

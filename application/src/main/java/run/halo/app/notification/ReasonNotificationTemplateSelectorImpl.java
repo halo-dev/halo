@@ -3,11 +3,7 @@ package run.halo.app.notification;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static run.halo.app.extension.index.query.Queries.equal;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -36,37 +32,34 @@ public class ReasonNotificationTemplateSelectorImpl implements ReasonNotificatio
     @Override
     public Mono<NotificationTemplate> select(String reasonType, Locale locale) {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            equal("spec.reasonSelector.reasonType", reasonType))
-        );
+        listOptions.setFieldSelector(FieldSelector.of(equal("spec.reasonSelector.reasonType", reasonType)));
         return client.listAll(NotificationTemplate.class, listOptions, Sort.unsorted())
-            .collect(Collectors.groupingBy(
-                getLanguageKey(),
-                Collectors.maxBy(Comparator.comparing(t -> t.getMetadata().getCreationTimestamp()))
-            ))
-            .mapNotNull(map -> lookupTemplateByLocale(locale, map));
+                .collect(Collectors.groupingBy(
+                        getLanguageKey(),
+                        Collectors.maxBy(
+                                Comparator.comparing(t -> t.getMetadata().getCreationTimestamp()))))
+                .mapNotNull(map -> lookupTemplateByLocale(locale, map));
     }
 
-    static @Nullable NotificationTemplate lookupTemplateByLocale(Locale locale,
-        Map<String, Optional<NotificationTemplate>> map) {
+    static @Nullable NotificationTemplate lookupTemplateByLocale(
+            Locale locale, Map<String, Optional<NotificationTemplate>> map) {
         return LanguageUtils.computeLangFromLocale(locale).stream()
-            // reverse order to ensure that the variant is the first element and the default
-            // is the last element
-            .sorted(Collections.reverseOrder())
-            .map(key -> map.getOrDefault(key, Optional.empty()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst()
-            .orElse(null);
+                // reverse order to ensure that the variant is the first element and the default
+                // is the last element
+                .sorted(Collections.reverseOrder())
+                .map(key -> map.getOrDefault(key, Optional.empty()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst()
+                .orElse(null);
     }
 
     static Predicate<NotificationTemplate> matchReasonType(String reasonType) {
-        return template -> template.getSpec().getReasonSelector().getReasonType()
-            .equals(reasonType);
+        return template ->
+                template.getSpec().getReasonSelector().getReasonType().equals(reasonType);
     }
 
     static Function<NotificationTemplate, String> getLanguageKey() {
-        return template -> defaultIfBlank(template.getSpec().getReasonSelector().getLanguage(),
-            "default");
+        return template -> defaultIfBlank(template.getSpec().getReasonSelector().getLanguage(), "default");
     }
 }

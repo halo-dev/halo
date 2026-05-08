@@ -44,87 +44,72 @@ public class TagQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "TagV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("tags", this::listTags,
-                builder -> {
+                .GET("tags", this::listTags, builder -> {
                     builder.operationId("queryTags")
-                        .description("Lists tags")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(
-                                ListResult.generateGenericClass(TagVo.class))
-                        );
+                            .description("Lists tags")
+                            .tag(tag)
+                            .response(responseBuilder().implementation(ListResult.generateGenericClass(TagVo.class)));
                     TagPublicQuery.buildParameters(builder);
-                }
-            )
-            .GET("tags/{name}", this::getTagByName,
-                builder -> builder.operationId("queryTagByName")
-                    .description("Gets tag by name")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Tag name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(TagVo.class)
-                    )
-            )
-            .GET("tags/{name}/posts", this::listPostsByTagName,
-                builder -> {
+                })
+                .GET(
+                        "tags/{name}",
+                        this::getTagByName,
+                        builder -> builder.operationId("queryTagByName")
+                                .description("Gets tag by name")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("Tag name")
+                                        .required(true))
+                                .response(responseBuilder().implementation(TagVo.class)))
+                .GET("tags/{name}/posts", this::listPostsByTagName, builder -> {
                     builder.operationId("queryPostsByTagName")
-                        .description("Lists posts by tag name")
-                        .tag(tag)
-                        .parameter(parameterBuilder()
-                            .in(ParameterIn.PATH)
-                            .name("name")
-                            .description("Tag name")
-                            .required(true)
-                        )
-                        .response(responseBuilder()
-                            .implementation(ListedPostVo.class)
-                        );
+                            .description("Lists posts by tag name")
+                            .tag(tag)
+                            .parameter(parameterBuilder()
+                                    .in(ParameterIn.PATH)
+                                    .name("name")
+                                    .description("Tag name")
+                                    .required(true))
+                            .response(responseBuilder().implementation(ListedPostVo.class));
                     PostPublicQuery.buildParameters(builder);
-                }
-            )
-            .build();
+                })
+                .build();
     }
 
     private Mono<ServerResponse> getTagByName(ServerRequest request) {
         String name = request.pathVariable("name");
-        return tagFinder.getByName(name)
-            .flatMap(tag -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(tag)
-            );
+        return tagFinder
+                .getByName(name)
+                .flatMap(tag -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(tag));
     }
 
     private Mono<ServerResponse> listPostsByTagName(ServerRequest request) {
         final var name = request.pathVariable("name");
         final var query = new PostPublicQuery(request.exchange());
         var listOptions = query.toListOptions();
-        var newFieldSelector = listOptions.getFieldSelector()
-            .andQuery(Queries.equal("spec.tags", name));
+        var newFieldSelector = listOptions.getFieldSelector().andQuery(Queries.equal("spec.tags", name));
         listOptions.setFieldSelector(newFieldSelector);
-        return postPublicQueryService.list(listOptions, query.toPageRequest())
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return postPublicQueryService
+                .list(listOptions, query.toPageRequest())
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     private Mono<ServerResponse> listTags(ServerRequest request) {
         var query = new TagPublicQuery(request.exchange());
         return client.listBy(Tag.class, query.toListOptions(), query.toPageRequest())
-            .map(result -> {
-                var tagVos = tagFinder.convertToVo(result.getItems());
-                return new ListResult<>(result.getPage(), result.getSize(),
-                    result.getTotal(), tagVos);
-            })
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+                .map(result -> {
+                    var tagVos = tagFinder.convertToVo(result.getItems());
+                    return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(), tagVos);
+                })
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     static class TagPublicQuery extends SortableRequest {

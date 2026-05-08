@@ -11,25 +11,13 @@ import run.halo.app.infra.SystemSetting.ThemeRouteRules;
 class PatternUtilsTest {
 
     @ParameterizedTest
-    @CsvSource({
-        "test, /test",
-        "/test/, /test",
-        "/test, /test",
-        "test/, /test",
-        "path/to/resource/, /path/to/resource"
-    })
+    @CsvSource({"test, /test", "/test/, /test", "/test, /test", "test/, /test", "path/to/resource/, /path/to/resource"})
     void normalizePatternTest(String pattern, String expected) {
         assertEquals(expected, PatternUtils.normalizePattern(pattern));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "",
-        " ",
-        "/",
-        " /",
-        "/ "
-    })
+    @ValueSource(strings = {"", " ", "/", " /", "/ "})
     void shouldThrowExceptionWhen(String pattern) {
         assertThrows(IllegalArgumentException.class, () -> PatternUtils.normalizePattern(pattern));
     }
@@ -52,8 +40,7 @@ class PatternUtilsTest {
             /blog/archives/categories/{slug}""",
     })
     void normalizePostPatternTest(
-        String postPattern, String archivesPattern, String categoriesPattern, String expected
-    ) {
+            String postPattern, String archivesPattern, String categoriesPattern, String expected) {
         var rules = new ThemeRouteRules();
         rules.setPost(postPattern);
         rules.setArchives(archivesPattern);
@@ -61,6 +48,4 @@ class PatternUtilsTest {
         var result = PatternUtils.normalizePostPattern(rules);
         assertEquals(expected, result);
     }
-
-
 }

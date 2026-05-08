@@ -24,8 +24,7 @@ public interface RoleService {
     Mono<Boolean> contains(Collection<String> source, Collection<String> candidates);
 
     /**
-     * This method lists all role templates as permissions recursively according to given role
-     * name set.
+     * This method lists all role templates as permissions recursively according to given role name set.
      *
      * @param names is role name set.
      * @return an array of permissions.

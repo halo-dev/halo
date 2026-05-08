@@ -38,31 +38,38 @@ class ServerCodecTest {
     @Test
     @WithMockUser
     void timeSerializationTest() {
-        webClient.get().uri("/fake/api/times")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.instant").value(equalTo(INSTANT))
-            .jsonPath("$.localDateTime").value(equalTo(LOCAL_DATE_TIME))
-        ;
+        webClient
+                .get()
+                .uri("/fake/api/times")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.instant")
+                .value(equalTo(INSTANT))
+                .jsonPath("$.localDateTime")
+                .value(equalTo(LOCAL_DATE_TIME));
     }
 
     @Test
     @WithMockUser
     void timeDeserializationTest() {
         webClient
-            .mutateWith(csrf())
-            .post().uri("/fake/api/time/report")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(Map.of("now", Instant.parse(INSTANT)))
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody(new ParameterizedTypeReference<Map<String, Instant>>() {
-            }).isEqualTo(Map.of("now", Instant.parse(INSTANT)))
-        ;
+                .mutateWith(csrf())
+                .post()
+                .uri("/fake/api/time/report")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("now", Instant.parse(INSTANT)))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody(new ParameterizedTypeReference<Map<String, Instant>>() {})
+                .isEqualTo(Map.of("now", Instant.parse(INSTANT)));
     }
 
     @TestConfiguration(proxyBeanMethods = false)
@@ -71,24 +78,26 @@ class ServerCodecTest {
         @Bean
         RouterFunction<ServerResponse> timesRouter() {
             return route().GET("/fake/api/times", request -> {
-                var times = Map.of("instant", Instant.parse(INSTANT),
-                    "localDateTime", LocalDateTime.parse(LOCAL_DATE_TIME));
-                return ServerResponse
-                    .ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(times);
-            }).build();
+                        var times = Map.of(
+                                "instant",
+                                Instant.parse(INSTANT),
+                                "localDateTime",
+                                LocalDateTime.parse(LOCAL_DATE_TIME));
+                        return ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(times);
+                    })
+                    .build();
         }
 
         @Bean
         RouterFunction<ServerResponse> reportTime() {
-            final var type = new ParameterizedTypeReference<Map<String, Instant>>() {
-            };
-            return route().POST("/fake/api/time/report",
-                    contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
-                    request -> ServerResponse.ok()
-                        .body(request.bodyToMono(type), type))
-                .build();
+            final var type = new ParameterizedTypeReference<Map<String, Instant>>() {};
+            return route().POST(
+                            "/fake/api/time/report",
+                            contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
+                            request -> ServerResponse.ok().body(request.bodyToMono(type), type))
+                    .build();
         }
     }
 }

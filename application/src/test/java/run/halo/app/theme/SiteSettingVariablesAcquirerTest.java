@@ -2,9 +2,7 @@ package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.github.zafarkhaja.semver.Version;
 import java.net.MalformedURLException;
@@ -50,20 +48,17 @@ public class SiteSettingVariablesAcquirerTest {
         when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0-alpha.1"));
         when(environmentFetcher.getConfig()).thenReturn(Mono.just(Map.of()));
 
-        siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
-            .as(StepVerifier::create)
-            .consumeNextWith(result -> {
-                assertThat(result).containsKey("site");
-                assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
-                var site = (SiteSettingVo) result.get("site");
-                assertThat(site)
-                    .extracting(SiteSettingVo::url)
-                    .isEqualTo(url);
-                assertThat(site)
-                    .extracting(SiteSettingVo::version)
-                    .isEqualTo("0.0.0-alpha.1");
-            })
-            .verifyComplete();
+        siteSettingVariablesAcquirer
+                .acquire(mock(ServerWebExchange.class))
+                .as(StepVerifier::create)
+                .consumeNextWith(result -> {
+                    assertThat(result).containsKey("site");
+                    assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
+                    var site = (SiteSettingVo) result.get("site");
+                    assertThat(site).extracting(SiteSettingVo::url).isEqualTo(url);
+                    assertThat(site).extracting(SiteSettingVo::version).isEqualTo("0.0.0-alpha.1");
+                })
+                .verifyComplete();
         verify(externalUrlSupplier).getURL(any());
     }
 }

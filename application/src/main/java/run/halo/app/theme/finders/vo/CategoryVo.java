@@ -37,10 +37,10 @@ public class CategoryVo implements ExtensionVoOperator {
      */
     public static CategoryVo from(Category category) {
         return CategoryVo.builder()
-            .metadata(category.getMetadata())
-            .spec(category.getSpec())
-            .status(category.getStatus())
-            .postCount(category.getStatusOrDefault().getVisiblePostCount())
-            .build();
+                .metadata(category.getMetadata())
+                .spec(category.getSpec())
+                .status(category.getStatus())
+                .postCount(category.getStatusOrDefault().getVisiblePostCount())
+                .build();
     }
 }

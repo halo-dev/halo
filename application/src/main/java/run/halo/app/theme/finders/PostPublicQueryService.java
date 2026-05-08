@@ -34,8 +34,9 @@ public interface PostPublicQueryService {
 
     /**
      * Converts {@link Post} to post vo and populate post content by the given snapshot name.
-     * <p> This method will get post content by {@code snapshotName} and try to find
-     * {@link ReactivePostContentHandler}s to extend the content</p>
+     *
+     * <p>This method will get post content by {@code snapshotName} and try to find {@link ReactivePostContentHandler}s
+     * to extend the content
      *
      * @param post post must not be null
      * @param snapshotName snapshot name must not be blank
@@ -45,8 +46,9 @@ public interface PostPublicQueryService {
 
     /**
      * Gets post content by post name.
-     * <p> This method will get post released content by post name and try to find
-     * {@link ReactivePostContentHandler}s to extend the content</p>
+     *
+     * <p>This method will get post released content by post name and try to find {@link ReactivePostContentHandler}s to
+     * extend the content
      *
      * @param postName post name must not be blank
      * @return post content for theme-side

@@ -41,7 +41,7 @@ class VersionUtilsTest {
         result = VersionUtils.satisfiesRequires(systemVersion, requires);
         assertThat(result).isFalse();
 
-        //an exact version x.y.z will implicitly mean the same as >=x.y.z
+        // an exact version x.y.z will implicitly mean the same as >=x.y.z
         systemVersion = "2.1.0";
         // means >=2.0.0
         requires = "2.0.0";

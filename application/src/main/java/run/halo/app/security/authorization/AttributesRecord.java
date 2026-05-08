@@ -19,9 +19,7 @@ public class AttributesRecord implements Attributes {
     @Override
     public boolean isReadOnly() {
         String verb = requestInfo.getVerb();
-        return "get".equals(verb)
-            || "list".equals(verb)
-            || "watch".equals(verb);
+        return "get".equals(verb) || "list".equals(verb) || "watch".equals(verb);
     }
 
     @Override

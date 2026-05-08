@@ -55,31 +55,34 @@ class MenuQueryEndpointTest {
         Metadata metadata = new Metadata();
         metadata.setName("fake-primary");
         MenuVo menuVo = MenuVo.builder()
-            .metadata(metadata)
-            .spec(new Menu.Spec())
-            .menuItems(List.of(MenuItemVo.from(createMenuItem("item1"))))
-            .build();
-        when(menuFinder.getByName(eq("fake-primary")))
-            .thenReturn(Mono.just(menuVo));
+                .metadata(metadata)
+                .spec(new Menu.Spec())
+                .menuItems(List.of(MenuItemVo.from(createMenuItem("item1"))))
+                .build();
+        when(menuFinder.getByName(eq("fake-primary"))).thenReturn(Mono.just(menuVo));
 
         SystemSetting.Menu menuSetting = new SystemSetting.Menu();
         menuSetting.setPrimary("fake-primary");
         when(environmentFetcher.fetch(eq(SystemSetting.Menu.GROUP), eq(SystemSetting.Menu.class)))
-            .thenReturn(Mono.just(menuSetting));
+                .thenReturn(Mono.just(menuSetting));
 
-        webClient.get().uri("/menus/-")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("fake-primary")
-            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item1");
+        webClient
+                .get()
+                .uri("/menus/-")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("fake-primary")
+                .jsonPath("$.menuItems[0].metadata.name")
+                .isEqualTo("item1");
 
         verify(menuFinder).getByName(eq("fake-primary"));
-        verify(environmentFetcher).fetch(eq(SystemSetting.Menu.GROUP),
-            eq(SystemSetting.Menu.class));
+        verify(environmentFetcher).fetch(eq(SystemSetting.Menu.GROUP), eq(SystemSetting.Menu.class));
     }
-
 
     private static MenuItem createMenuItem(String name) {
         MenuItem menuItem = new MenuItem();
@@ -95,20 +98,25 @@ class MenuQueryEndpointTest {
         Metadata metadata = new Metadata();
         metadata.setName("test-menu");
         MenuVo menuVo = MenuVo.builder()
-            .metadata(metadata)
-            .spec(new Menu.Spec())
-            .menuItems(List.of(MenuItemVo.from(createMenuItem("item2"))))
-            .build();
-        when(menuFinder.getByName(eq("test-menu")))
-            .thenReturn(Mono.just(menuVo));
+                .metadata(metadata)
+                .spec(new Menu.Spec())
+                .menuItems(List.of(MenuItemVo.from(createMenuItem("item2"))))
+                .build();
+        when(menuFinder.getByName(eq("test-menu"))).thenReturn(Mono.just(menuVo));
 
-        webClient.get().uri("/menus/test-menu")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("test-menu")
-            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item2");
+        webClient
+                .get()
+                .uri("/menus/test-menu")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("test-menu")
+                .jsonPath("$.menuItems[0].metadata.name")
+                .isEqualTo("item2");
 
         verify(menuFinder).getByName(eq("test-menu"));
     }

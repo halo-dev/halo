@@ -2,9 +2,7 @@ package run.halo.app.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,10 +71,11 @@ class AuthProviderServiceImplTest {
         pileSystemConfigMap();
 
         // Call the method being tested
-        authProviderService.enable("github")
-            .as(StepVerifier::create)
-            .expectNext(authProvider)
-            .verifyComplete();
+        authProviderService
+                .enable("github")
+                .as(StepVerifier::create)
+                .expectNext(authProvider)
+                .verifyComplete();
 
         ConfigMap value = captor.getValue();
         JSONAssert.assertEquals("""
@@ -89,9 +88,7 @@ class AuthProviderServiceImplTest {
                         }
                     ]
                 }
-                """,
-            value.getData().get(SystemSetting.AuthProvider.GROUP),
-            true);
+                """, value.getData().get(SystemSetting.AuthProvider.GROUP), true);
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
     }
@@ -125,9 +122,7 @@ class AuthProviderServiceImplTest {
                         }
                     ]
                 }
-                """,
-            value.getData().get(SystemSetting.AuthProvider.GROUP),
-            true);
+                """, value.getData().get(SystemSetting.AuthProvider.GROUP), true);
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
     }
@@ -144,18 +139,19 @@ class AuthProviderServiceImplTest {
         AuthProvider gitee = createAuthProvider("gitee");
 
         when(client.listAll(same(AuthProvider.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.just(github, gitlab, gitee));
+                .thenReturn(Flux.just(github, gitlab, gitee));
         when(client.listAll(same(UserConnection.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.empty());
+                .thenReturn(Flux.empty());
 
         pileSystemConfigMap();
 
-        authProviderService.listAll()
-            .as(StepVerifier::create)
-            .consumeNextWith(result -> {
-                assertThat(result).hasSize(3);
-                try {
-                    JSONAssert.assertEquals("""
+        authProviderService
+                .listAll()
+                .as(StepVerifier::create)
+                .consumeNextWith(result -> {
+                    assertThat(result).hasSize(3);
+                    try {
+                        JSONAssert.assertEquals("""
                             [{
                                  "name": "gitee",
                                  "displayName": "gitee",
@@ -188,14 +184,12 @@ class AuthProviderServiceImplTest {
                                  "supportsBinding": false,
                                  "privileged": false
                             }]
-                            """,
-                        JsonUtils.objectToJson(result),
-                        true);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .verifyComplete();
+                            """, JsonUtils.objectToJson(result), true);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
     }
 
     AuthProvider createAuthProvider(String name) {
@@ -212,7 +206,6 @@ class AuthProviderServiceImplTest {
     void pileSystemConfigMap() {
         ConfigMap configMap = new ConfigMap();
         configMap.setData(new HashMap<>());
-        when(systemConfigFetcher.getConfigMap())
-            .thenReturn(Mono.just(configMap));
+        when(systemConfigFetcher.getConfigMap()).thenReturn(Mono.just(configMap));
     }
 }

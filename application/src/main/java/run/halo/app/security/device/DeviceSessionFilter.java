@@ -18,17 +18,15 @@ class DeviceSessionFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return exchange.getSession().flatMap(session -> {
             var previousId = session.getId();
-            return chain.filter(exchange)
-                .then(Mono.defer(() -> {
-                    var currentId = session.getId();
-                    if (Objects.equals(previousId, currentId)) {
-                        return Mono.empty();
-                    }
-                    // only when session id changed
-                    log.debug("Session ID changed from {} to {}, updating device info.",
-                        previousId, currentId);
-                    return deviceService.changeSessionId(exchange);
-                }));
+            return chain.filter(exchange).then(Mono.defer(() -> {
+                var currentId = session.getId();
+                if (Objects.equals(previousId, currentId)) {
+                    return Mono.empty();
+                }
+                // only when session id changed
+                log.debug("Session ID changed from {} to {}, updating device info.", previousId, currentId);
+                return deviceService.changeSessionId(exchange);
+            }));
         });
     }
 }

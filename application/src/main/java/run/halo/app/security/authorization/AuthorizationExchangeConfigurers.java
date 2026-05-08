@@ -11,11 +11,7 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.SwitchUserWebFilter;
-import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import org.springframework.security.web.server.util.matcher.*;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.RoleService;
@@ -31,14 +27,12 @@ import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 @Component
 class AuthorizationExchangeConfigurers {
 
-    private final AuthenticationTrustResolver authenticationTrustResolver =
-        new AuthenticationTrustResolverImpl();
+    private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     @Bean
     @Order(0)
     SecurityConfigurer apiAuthorizationConfigurer(RoleService roleService) {
-        return http -> http.authorizeExchange(
-            spec -> spec.pathMatchers("/api/**", "/apis/**", "/actuator/**")
+        return http -> http.authorizeExchange(spec -> spec.pathMatchers("/api/**", "/apis/**", "/actuator/**")
                 .access(new RequestInfoAuthorizationManager(roleService)));
     }
 
@@ -47,41 +41,32 @@ class AuthorizationExchangeConfigurers {
     SecurityConfigurer unauthenticatedAuthorizationConfigurer() {
         return http -> http.authorizeExchange(spec -> {
             spec.pathMatchers(HttpMethod.GET, "/login", "/signup")
-                .access((authentication, context) -> authentication.map(
-                        a -> !authenticationTrustResolver.isAuthenticated(a)
-                    )
-                    .defaultIfEmpty(true)
-                    .map(AuthorizationDecision::new));
+                    .access((authentication, context) -> authentication
+                            .map(a -> !authenticationTrustResolver.isAuthenticated(a))
+                            .defaultIfEmpty(true)
+                            .map(AuthorizationDecision::new));
         });
     }
 
     @Bean
     @Order(200)
     SecurityConfigurer preAuthenticationAuthorizationConfigurer() {
-        return http -> http.authorizeExchange(spec -> spec
-            .pathMatchers("/login/impersonate")
-            .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
-            .pathMatchers("/logout/impersonate")
-            .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)
-            .pathMatchers("/challenges/**")
-            .access((authentication, context) ->
-                authentication.map(TwoFactorAuthentication.class::isInstance)
-                    .<AuthorizationResult>map(AuthorizationDecision::new)
-                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
-            )
-            .pathMatchers(
-                "/login/**",
-                "/password-reset/**",
-                "/signup"
-            )
-            .permitAll()
-            .pathMatchers("/logout")
-            .access((authentication, context) ->
-                authentication.map(a -> !authenticationTrustResolver.isAnonymous(a))
-                    .<AuthorizationResult>map(AuthorizationDecision::new)
-                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
-            )
-        );
+        return http -> http.authorizeExchange(spec -> spec.pathMatchers("/login/impersonate")
+                .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
+                .pathMatchers("/logout/impersonate")
+                .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)
+                .pathMatchers("/challenges/**")
+                .access((authentication, context) -> authentication
+                        .map(TwoFactorAuthentication.class::isInstance)
+                        .<AuthorizationResult>map(AuthorizationDecision::new)
+                        .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false))))
+                .pathMatchers("/login/**", "/password-reset/**", "/signup")
+                .permitAll()
+                .pathMatchers("/logout")
+                .access((authentication, context) -> authentication
+                        .map(a -> !authenticationTrustResolver.isAnonymous(a))
+                        .<AuthorizationResult>map(AuthorizationDecision::new)
+                        .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))));
     }
 
     @Bean
@@ -89,26 +74,20 @@ class AuthorizationExchangeConfigurers {
     SecurityConfigurer authenticatedAuthorizationConfigurer() {
         // Anonymous user is not allowed
         return http -> http.authorizeExchange(
-            spec -> spec.pathMatchers(
-                    "/console/**",
-                    "/uc/**"
-                )
-                .authenticated()
-        );
+                spec -> spec.pathMatchers("/console/**", "/uc/**").authenticated());
     }
 
     @Bean
     @Order(400)
     SecurityConfigurer anonymousOrAuthenticatedAuthorizationConfigurer() {
-        return http -> http.authorizeExchange(
-            spec -> spec.matchers(createHtmlMatcher()).access((authentication, context) ->
-                // we only need to check the authentication is authenticated
-                // because we treat anonymous user as authenticated
-                authentication.map(Authentication::isAuthenticated)
-                    .<AuthorizationResult>map(AuthorizationDecision::new)
-                    .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))
-            )
-        );
+        return http -> http.authorizeExchange(spec -> spec.matchers(createHtmlMatcher())
+                .access((authentication, context) ->
+                        // we only need to check the authentication is authenticated
+                        // because we treat anonymous user as authenticated
+                        authentication
+                                .map(Authentication::isAuthenticated)
+                                .<AuthorizationResult>map(AuthorizationDecision::new)
+                                .switchIfEmpty(Mono.fromSupplier(() -> new AuthorizationDecision(false)))));
     }
 
     @Bean
@@ -118,14 +97,11 @@ class AuthorizationExchangeConfigurers {
     }
 
     private static ServerWebExchangeMatcher createHtmlMatcher() {
-        ServerWebExchangeMatcher get =
-            ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/**");
-        ServerWebExchangeMatcher notFavicon = new NegatedServerWebExchangeMatcher(
-            ServerWebExchangeMatchers.pathMatchers("/favicon.*"));
-        MediaTypeServerWebExchangeMatcher html =
-            new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
+        ServerWebExchangeMatcher get = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/**");
+        ServerWebExchangeMatcher notFavicon =
+                new NegatedServerWebExchangeMatcher(ServerWebExchangeMatchers.pathMatchers("/favicon.*"));
+        MediaTypeServerWebExchangeMatcher html = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         html.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
         return new AndServerWebExchangeMatcher(get, notFavicon, html);
     }
-
 }

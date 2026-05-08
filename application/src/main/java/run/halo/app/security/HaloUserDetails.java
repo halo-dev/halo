@@ -17,5 +17,4 @@ public interface HaloUserDetails extends UserDetails {
      * @return encrypted secret of TOTP.
      */
     String getTotpEncryptedSecret();
-
 }

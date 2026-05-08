@@ -6,5 +6,4 @@ record EmptyCondition() implements Condition {
     public String toString() {
         return "EMPTY";
     }
-
 }

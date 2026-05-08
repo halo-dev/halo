@@ -19,8 +19,7 @@ import run.halo.app.extension.GroupVersionKind;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = Setting.KIND,
-    plural = "settings", singular = "setting")
+@GVK(group = "", version = "v1alpha1", kind = Setting.KIND, plural = "settings", singular = "setting")
 public class Setting extends AbstractExtension {
 
     public static final String KIND = "Setting";

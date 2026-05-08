@@ -56,11 +56,21 @@ git checkout -b feat/short-description
 
 Run relevant checks before opening a PR.
 
-Backend and general checks:
+Backend and general checks (including Spotless):
 
 ```bash
+./gradlew spotlessApply
+./gradlew spotlessCheck
 ./gradlew clean check
 ```
+
+Install the pre-push hook once to run Spotless checks automatically before `git push`:
+
+```bash
+./gradlew spotlessInstallGitPrePushHook
+```
+
+If `spotlessCheck` fails, run `./gradlew spotlessApply`, review the formatting changes, and re-run checks.
 
 Frontend checks (in `ui`):
 
@@ -114,7 +124,8 @@ In short: AI assistance is allowed, but unreviewed AI output is not acceptable.
 
 - Follow the project coding style guide: <https://docs.halo.run/developer-guide/core/code-style>
 - Keep changes focused and avoid unrelated refactors in the same PR.
-- Run formatters and linters before pushing.
+- Run `./gradlew spotlessApply` before pushing changes outside `ui`.
+- Spotless does not format files under `ui`; continue to run frontend lint/typecheck/test commands there.
 
 ## Keep Your Fork Updated
 

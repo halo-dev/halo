@@ -37,34 +37,32 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Reply.class, request.name())
-            .ifPresent(reply -> {
-                if (reply.getMetadata().getDeletionTimestamp() != null) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return;
-                }
-                if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
-                    replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
-                    client.update(reply);
-                    eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
-                }
-
-                if (reply.getSpec().getCreationTime() == null) {
-                    reply.getSpec().setCreationTime(
-                        defaultIfNull(reply.getSpec().getApprovedTime(),
-                            reply.getMetadata().getCreationTimestamp()
-                        )
-                    );
-                }
-
-                // version + 1 is required to truly equal version
-                // as a version will be incremented after the update
-                reply.getStatus().setObservedVersion(reply.getMetadata().getVersion() + 1);
-
+        client.fetch(Reply.class, request.name()).ifPresent(reply -> {
+            if (reply.getMetadata().getDeletionTimestamp() != null) {
+                cleanUpResourcesAndRemoveFinalizer(request.name());
+                return;
+            }
+            if (addFinalizers(reply.getMetadata(), Set.of(FINALIZER_NAME))) {
+                replyNotificationSubscriptionHelper.subscribeNewReplyReasonForReply(reply);
                 client.update(reply);
+                eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
+            }
 
-                eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
-            });
+            if (reply.getSpec().getCreationTime() == null) {
+                reply.getSpec()
+                        .setCreationTime(defaultIfNull(
+                                reply.getSpec().getApprovedTime(),
+                                reply.getMetadata().getCreationTimestamp()));
+            }
+
+            // version + 1 is required to truly equal version
+            // as a version will be incremented after the update
+            reply.getStatus().setObservedVersion(reply.getMetadata().getVersion() + 1);
+
+            client.update(reply);
+
+            eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
+        });
         return new Result(false, null);
     }
 
@@ -83,11 +81,10 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var extension = new Reply();
-        return builder
-            .extension(extension)
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
-                .build())
-            .build();
+        return builder.extension(extension)
+                .syncAllListOptions(ListOptions.builder()
+                        .andQuery(equal(Reply.REQUIRE_SYNC_ON_STARTUP_INDEX_NAME, true))
+                        .build())
+                .build();
     }
 }

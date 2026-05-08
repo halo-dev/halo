@@ -19,5 +19,4 @@ public interface LabelCondition extends Condition {
 
     @Override
     LabelCondition not();
-
 }

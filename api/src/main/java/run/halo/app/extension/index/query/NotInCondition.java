@@ -17,8 +17,6 @@ record NotInCondition(String indexName, Collection<Object> keys) implements Inde
 
     @Override
     public String toString() {
-        return indexName + " NOT IN ("
-            + keys.stream().map(Object::toString).collect(Collectors.joining(", "))
-            + ")";
+        return indexName + " NOT IN (" + keys.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")";
     }
 }

@@ -11,7 +11,7 @@ public class SortUtils {
     static final String delimiter = ",";
 
     /**
-     * <p>Resolve from direction params, e.g. "name,asc" or "name"</p>
+     * Resolve from direction params, e.g. "name,asc" or "name"
      *
      * @param directionParams direction params
      * @return sort object

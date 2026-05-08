@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * <p>Base62 tool class, which provides the encoding and decoding scheme of base62.</p>
+ * Base62 tool class, which provides the encoding and decoding scheme of base62.
  *
  * @author guqing
  * @since 2.0.0

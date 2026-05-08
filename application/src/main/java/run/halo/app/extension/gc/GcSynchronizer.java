@@ -6,12 +6,7 @@ import static run.halo.app.extension.index.query.Queries.not;
 import java.util.List;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.domain.Sort;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.Scheme;
-import run.halo.app.extension.SchemeManager;
-import run.halo.app.extension.Watcher;
+import run.halo.app.extension.*;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.controller.Synchronizer;
 import run.halo.app.extension.event.SchemeAddedEvent;
@@ -29,9 +24,7 @@ class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<Sch
 
     private final Watcher watcher;
 
-    GcSynchronizer(ExtensionClient client,
-        RequestQueue<GcRequest> queue,
-        SchemeManager schemeManager) {
+    GcSynchronizer(ExtensionClient client, RequestQueue<GcRequest> queue, SchemeManager schemeManager) {
         this.client = client;
         this.schemeManager = schemeManager;
         this.watcher = new GcWatcher(queue);
@@ -67,15 +60,12 @@ class GcSynchronizer implements Synchronizer<GcRequest>, ApplicationListener<Sch
         this.started = true;
         client.watch(watcher);
         schemeManager.schemes().stream()
-            .map(Scheme::type)
-            .forEach(type -> listDeleted(type).forEach(watcher::onDelete));
+                .map(Scheme::type)
+                .forEach(type -> listDeleted(type).forEach(watcher::onDelete));
     }
 
     <E extends Extension> List<E> listDeleted(Class<E> type) {
-        var options = new ListOptions()
-            .setFieldSelector(
-                FieldSelector.of(not(isNull("metadata.deletionTimestamp")))
-            );
+        var options = new ListOptions().setFieldSelector(FieldSelector.of(not(isNull("metadata.deletionTimestamp"))));
         // TODO Refine with scrolling query
         return client.listAll(type, options, Sort.by(Sort.Order.asc("metadata.creationTimestamp")));
     }

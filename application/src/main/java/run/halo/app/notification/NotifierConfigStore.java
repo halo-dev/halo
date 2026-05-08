@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>{@link NotifierConfigStore} to store notifier config.</p>
- * <p>It provides methods to fetch and save config for receiver and sender.</p>
+ * {@link NotifierConfigStore} to store notifier config.
+ *
+ * <p>It provides methods to fetch and save config for receiver and sender.
  *
  * @author guqing
  * @since 2.10.0

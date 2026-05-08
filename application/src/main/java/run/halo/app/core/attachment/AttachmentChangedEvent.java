@@ -18,5 +18,4 @@ public class AttachmentChangedEvent extends ApplicationEvent {
         super(source);
         this.attachment = attachment;
     }
-
 }

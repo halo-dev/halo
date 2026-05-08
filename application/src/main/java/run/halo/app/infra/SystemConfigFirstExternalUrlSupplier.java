@@ -34,9 +34,10 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     @Nullable
     private URL externalUrl;
 
-    public SystemConfigFirstExternalUrlSupplier(HaloProperties haloProperties,
-        WebFluxProperties webFluxProperties,
-        SystemConfigFetcher systemConfigFetcher) {
+    public SystemConfigFirstExternalUrlSupplier(
+            HaloProperties haloProperties,
+            WebFluxProperties webFluxProperties,
+            SystemConfigFetcher systemConfigFetcher) {
         this.haloProperties = haloProperties;
         this.webFluxProperties = webFluxProperties;
         this.systemConfigFetcher = systemConfigFetcher;
@@ -53,22 +54,23 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     }
 
     Optional<URL> refetchExternalUrl() {
-        return systemConfigFetcher.getBasic()
-            .mapNotNull(SystemSetting.Basic::getExternalUrl)
-            .filter(StringUtils::hasText)
-            .mapNotNull(externalUrlString -> {
-                try {
-                    return URI.create(externalUrlString).toURL();
-                } catch (MalformedURLException e) {
-                    log.error("""
+        return systemConfigFetcher
+                .getBasic()
+                .mapNotNull(SystemSetting.Basic::getExternalUrl)
+                .filter(StringUtils::hasText)
+                .mapNotNull(externalUrlString -> {
+                    try {
+                        return URI.create(externalUrlString).toURL();
+                    } catch (MalformedURLException e) {
+                        log.error("""
                         Cannot parse external URL {} from system config. Fallback to default \
                         external URL supplier from properties.\
                         """, externalUrlString, e);
-                    // For continuing the application startup, we need to return null here.
-                    return null;
-                }
-            })
-            .blockOptional(Duration.ofSeconds(10));
+                        // For continuing the application startup, we need to return null here.
+                        return null;
+                    }
+                })
+                .blockOptional(Duration.ofSeconds(10));
     }
 
     @Override

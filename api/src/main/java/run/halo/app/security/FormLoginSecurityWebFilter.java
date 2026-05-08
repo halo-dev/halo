@@ -8,6 +8,4 @@ import org.springframework.web.server.WebFilter;
  *
  * @author johnniang
  */
-public interface FormLoginSecurityWebFilter extends WebFilter, ExtensionPoint {
-
-}
+public interface FormLoginSecurityWebFilter extends WebFilter, ExtensionPoint {}

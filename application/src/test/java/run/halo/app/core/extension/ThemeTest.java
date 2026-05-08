@@ -27,7 +27,6 @@ class ThemeTest {
         metadata.setName("test-theme");
         theme.setMetadata(metadata);
 
-
         Theme.ThemeSpec themeSpec = new Theme.ThemeSpec();
         theme.setSpec(themeSpec);
         themeSpec.setDisplayName("test-theme");
@@ -66,9 +65,7 @@ class ThemeTest {
                         "name": "test-theme"
                     }
                 }
-                """,
-            JsonUtils.objectToJson(theme),
-            true);
+                """, JsonUtils.objectToJson(theme), true);
 
         themeSpec.setVersion("1.0.0");
         themeSpec.setRequires("2.0.0");
@@ -106,8 +103,7 @@ class ThemeTest {
                     screenshot: foo.png
                     file: page_template_1.html
             """;
-        List<Unstructured> unstructuredList =
-            new YamlUnstructuredLoader(new InMemoryResource(themeYaml)).load();
+        List<Unstructured> unstructuredList = new YamlUnstructuredLoader(new InMemoryResource(themeYaml)).load();
         assertThat(unstructuredList).hasSize(1);
         Theme theme = Unstructured.OBJECT_MAPPER.convertValue(unstructuredList.get(0), Theme.class);
         assertThat(theme).isNotNull();
@@ -142,8 +138,6 @@ class ThemeTest {
                             "file": "page_template_1.html"
                         }]
                 }
-                """,
-            JsonUtils.objectToJson(theme.getSpec().getCustomTemplates()),
-            true);
+                """, JsonUtils.objectToJson(theme.getSpec().getCustomTemplates()), true);
     }
 }

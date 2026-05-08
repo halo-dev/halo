@@ -2,9 +2,7 @@ package run.halo.app.plugin.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,8 +67,7 @@ class ReverseProxyRouterFunctionRegistryTest {
         when(mock.getMetadata()).thenReturn(metadata);
         RouterFunction<ServerResponse> routerFunction = request -> Mono.empty();
 
-        when(reverseProxyRouterFunctionFactory.create(any(), any()))
-            .thenReturn(routerFunction);
+        when(reverseProxyRouterFunctionFactory.create(any(), any())).thenReturn(routerFunction);
         return mock;
     }
 }

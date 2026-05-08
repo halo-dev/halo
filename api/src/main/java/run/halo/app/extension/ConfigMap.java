@@ -8,7 +8,7 @@ import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 
 /**
- * <p>ConfigMap holds configuration data to consume.</p>
+ * ConfigMap holds configuration data to consume.
  *
  * @author guqing
  * @since 2.0.0
@@ -16,8 +16,7 @@ import org.jspecify.annotations.Nullable;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = ConfigMap.KIND, plural = "configmaps",
-    singular = "configmap")
+@GVK(group = "", version = "v1alpha1", kind = ConfigMap.KIND, plural = "configmaps", singular = "configmap")
 public class ConfigMap extends AbstractExtension {
 
     public static final String KIND = "ConfigMap";

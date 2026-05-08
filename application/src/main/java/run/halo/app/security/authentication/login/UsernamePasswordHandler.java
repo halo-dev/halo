@@ -33,8 +33,7 @@ import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Slf4j
 @RequiredArgsConstructor
-class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
-    ServerAuthenticationFailureHandler {
+class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler, ServerAuthenticationFailureHandler {
 
     private final ServerResponse.Context context;
 
@@ -47,46 +46,43 @@ class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     private final ServerAuthenticationSuccessHandler defaultSuccessHandler =
-        new RedirectServerAuthenticationSuccessHandler("/uc");
+            new RedirectServerAuthenticationSuccessHandler("/uc");
 
     @Override
-    public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
-        AuthenticationException exception) {
+    public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
         var exchange = webFilterExchange.getExchange();
-        return loginHandlerEnhancer.onLoginFailure(exchange, exception)
-            .then(ignoringMediaTypeAll(APPLICATION_JSON)
-                .matches(exchange)
-                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                .switchIfEmpty(Mono.defer(
-                    () -> {
-                        var location = URI.create("/login?error&method=local");
-                        if (exception instanceof DisabledException) {
-                            location = URI.create("/login?error=account-disabled&method=local");
-                        }
-                        if (exception instanceof BadCredentialsException) {
-                            location = URI.create("/login?error=invalid-credential&method=local");
-                        }
-                        if (exception instanceof TooManyRequestsException) {
-                            location = URI.create("/login?error=rate-limit-exceeded&method=local");
-                        }
-                        return redirectStrategy.sendRedirect(exchange, location);
-                    }).then(Mono.empty())
-                )
-                .flatMap(matchResult -> handleAuthenticationException(exception, exchange)));
+        return loginHandlerEnhancer
+                .onLoginFailure(exchange, exception)
+                .then(ignoringMediaTypeAll(APPLICATION_JSON)
+                        .matches(exchange)
+                        .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                        .switchIfEmpty(Mono.defer(() -> {
+                                    var location = URI.create("/login?error&method=local");
+                                    if (exception instanceof DisabledException) {
+                                        location = URI.create("/login?error=account-disabled&method=local");
+                                    }
+                                    if (exception instanceof BadCredentialsException) {
+                                        location = URI.create("/login?error=invalid-credential&method=local");
+                                    }
+                                    if (exception instanceof TooManyRequestsException) {
+                                        location = URI.create("/login?error=rate-limit-exceeded&method=local");
+                                    }
+                                    return redirectStrategy.sendRedirect(exchange, location);
+                                })
+                                .then(Mono.empty()))
+                        .flatMap(matchResult -> handleAuthenticationException(exception, exchange)));
     }
 
     @Override
-    public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
-        Authentication authentication) {
+    public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
         if (authentication instanceof TwoFactorAuthentication) {
             var exchange = webFilterExchange.getExchange();
             // This will save the remember-me state into request cache
-            return parameterRequestCache.saveParameter(exchange, REMEMBER_ME_PARAMETER_NAME)
-                // Do not use RedirectServerAuthenticationSuccessHandler to redirect
-                // because it will use request cache to redirect
-                .then(redirectStrategy.sendRedirect(
-                    exchange, URI.create("/challenges/two-factor/totp")
-                ));
+            return parameterRequestCache
+                    .saveParameter(exchange, REMEMBER_ME_PARAMETER_NAME)
+                    // Do not use RedirectServerAuthenticationSuccessHandler to redirect
+                    // because it will use request cache to redirect
+                    .then(redirectStrategy.sendRedirect(exchange, URI.create("/challenges/two-factor/totp")));
         }
 
         if (authentication instanceof CredentialsContainer container) {
@@ -94,38 +90,38 @@ class UsernamePasswordHandler implements ServerAuthenticationSuccessHandler,
         }
 
         ServerWebExchangeMatcher xhrMatcher = exchange -> {
-            if (exchange.getRequest().getHeaders().getOrEmpty("X-Requested-With")
-                .contains("XMLHttpRequest")) {
+            if (exchange.getRequest()
+                    .getHeaders()
+                    .getOrEmpty("X-Requested-With")
+                    .contains("XMLHttpRequest")) {
                 return ServerWebExchangeMatcher.MatchResult.match();
             }
             return ServerWebExchangeMatcher.MatchResult.notMatch();
         };
 
         var exchange = webFilterExchange.getExchange();
-        return loginHandlerEnhancer.onLoginSuccess(webFilterExchange.getExchange(), authentication)
-            .then(xhrMatcher.matches(exchange)
-                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                .switchIfEmpty(Mono.defer(
-                    () -> defaultSuccessHandler.onAuthenticationSuccess(webFilterExchange,
-                            authentication)
-                        .then(Mono.empty())))
-                .flatMap(isXhr -> ServerResponse.ok()
-                    .bodyValue(authentication.getPrincipal())
-                    .flatMap(response -> response.writeTo(exchange, context))));
+        return loginHandlerEnhancer
+                .onLoginSuccess(webFilterExchange.getExchange(), authentication)
+                .then(xhrMatcher
+                        .matches(exchange)
+                        .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                        .switchIfEmpty(Mono.defer(() -> defaultSuccessHandler
+                                .onAuthenticationSuccess(webFilterExchange, authentication)
+                                .then(Mono.empty())))
+                        .flatMap(isXhr -> ServerResponse.ok()
+                                .bodyValue(authentication.getPrincipal())
+                                .flatMap(response -> response.writeTo(exchange, context))));
     }
 
-    private Mono<Void> handleAuthenticationException(Throwable exception,
-        ServerWebExchange exchange) {
+    private Mono<Void> handleAuthenticationException(Throwable exception, ServerWebExchange exchange) {
         var errorResponse = createErrorResponse(exception, UNAUTHORIZED, exchange, messageSource);
         return writeErrorResponse(errorResponse, exchange);
     }
 
-    private Mono<Void> writeErrorResponse(ErrorResponse errorResponse,
-        ServerWebExchange exchange) {
+    private Mono<Void> writeErrorResponse(ErrorResponse errorResponse, ServerWebExchange exchange) {
         return ServerResponse.status(errorResponse.getStatusCode())
-            .contentType(APPLICATION_JSON)
-            .bodyValue(errorResponse.getBody())
-            .flatMap(response -> response.writeTo(exchange, context));
+                .contentType(APPLICATION_JSON)
+                .bodyValue(errorResponse.getBody())
+                .flatMap(response -> response.writeTo(exchange, context));
     }
-
 }

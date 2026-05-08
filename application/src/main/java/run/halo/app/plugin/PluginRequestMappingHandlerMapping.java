@@ -22,17 +22,15 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 import run.halo.app.extension.GroupVersion;
 
 /**
- * An extension of {@link RequestMappingInfoHandlerMapping} that creates
- * {@link RequestMappingInfo} instances from class-level and method-level
- * {@link RequestMapping} annotations used by plugin.
+ * An extension of {@link RequestMappingInfoHandlerMapping} that creates {@link RequestMappingInfo} instances from
+ * class-level and method-level {@link RequestMapping} annotations used by plugin.
  *
  * @author guqing
  * @since 2.0.0
  */
 public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
-    private final MultiValueMap<String, RequestMappingInfo> pluginMappingInfo =
-        new LinkedMultiValueMap<>();
+    private final MultiValueMap<String, RequestMappingInfo> pluginMappingInfo = new LinkedMultiValueMap<>();
 
     @Override
     protected void initHandlerMethods() {
@@ -42,21 +40,21 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
     }
 
     /**
-     * Register handler methods according to the plugin id and the controller(annotated
-     * {@link Controller}) bean.
+     * Register handler methods according to the plugin id and the controller(annotated {@link Controller}) bean.
      *
      * @param pluginId plugin id to be registered
      * @param handler controller bean
      */
     public void registerHandlerMethods(String pluginId, Object handler) {
         Class<?> handlerType = (handler instanceof String beanName
-            ? obtainApplicationContext().getType(beanName) : handler.getClass());
+                ? obtainApplicationContext().getType(beanName)
+                : handler.getClass());
 
         if (handlerType != null) {
             final Class<?> userType = ClassUtils.getUserClass(handlerType);
-            Map<Method, RequestMappingInfo> methods = MethodIntrospector.selectMethods(userType,
-                (MethodIntrospector.MetadataLookup<RequestMappingInfo>)
-                    method -> getPluginMappingForMethod(pluginId, method, userType));
+            Map<Method, RequestMappingInfo> methods =
+                    MethodIntrospector.selectMethods(userType, (MethodIntrospector.MetadataLookup<RequestMappingInfo>)
+                            method -> getPluginMappingForMethod(pluginId, method, userType));
             if (logger.isTraceEnabled()) {
                 logger.trace(formatMappings(userType, methods));
             } else if (mappingsLogger.isDebugEnabled()) {
@@ -73,20 +71,19 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
     private String formatMappings(Class<?> userType, Map<Method, RequestMappingInfo> methods) {
         String packageName = ClassUtils.getPackageName(userType);
         String formattedType = (StringUtils.hasText(packageName)
-            ? Arrays.stream(packageName.split("\\."))
-            .map(packageSegment -> packageSegment.substring(0, 1))
-            .collect(Collectors.joining(".", "", "." + userType.getSimpleName())) :
-            userType.getSimpleName());
-        Function<Method, String> methodFormatter =
-            method -> Arrays.stream(method.getParameterTypes())
+                ? Arrays.stream(packageName.split("\\."))
+                        .map(packageSegment -> packageSegment.substring(0, 1))
+                        .collect(Collectors.joining(".", "", "." + userType.getSimpleName()))
+                : userType.getSimpleName());
+        Function<Method, String> methodFormatter = method -> Arrays.stream(method.getParameterTypes())
                 .map(Class::getSimpleName)
                 .collect(Collectors.joining(",", "(", ")"));
         return methods.entrySet().stream()
-            .map(e -> {
-                Method method = e.getKey();
-                return e.getValue() + ": " + method.getName() + methodFormatter.apply(method);
-            })
-            .collect(Collectors.joining("\n\t", "\n\t" + formattedType + ":" + "\n\t", ""));
+                .map(e -> {
+                    Method method = e.getKey();
+                    return e.getValue() + ": " + method.getName() + methodFormatter.apply(method);
+                })
+                .collect(Collectors.joining("\n\t", "\n\t" + formattedType + ":" + "\n\t", ""));
     }
 
     /**
@@ -110,16 +107,16 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return List.copyOf(requestMappingInfos);
     }
 
-    protected RequestMappingInfo getPluginMappingForMethod(String pluginId,
-        Method method, Class<?> handlerType) {
+    protected RequestMappingInfo getPluginMappingForMethod(String pluginId, Method method, Class<?> handlerType) {
         RequestMappingInfo info = super.getMappingForMethod(method, handlerType);
         if (info != null) {
             ApiVersion apiVersion = handlerType.getAnnotation(ApiVersion.class);
             if (apiVersion == null) {
                 return info;
             }
-            info = RequestMappingInfo.paths(buildPrefix(pluginId, apiVersion.value())).build()
-                .combine(info);
+            info = RequestMappingInfo.paths(buildPrefix(pluginId, apiVersion.value()))
+                    .build()
+                    .combine(info);
         }
         return info;
     }
@@ -131,7 +128,6 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
             return String.format("/apis/%s/%s", groupVersion.group(), groupVersion.version());
         }
         // apis/api.plugin.halo.run/{version}/plugins/{pluginName}
-        return String.format("/apis/api.plugin.halo.run/%s/plugins/%s", groupVersion.version(),
-            pluginName);
+        return String.format("/apis/api.plugin.halo.run/%s/plugins/%s", groupVersion.version(), pluginName);
     }
 }

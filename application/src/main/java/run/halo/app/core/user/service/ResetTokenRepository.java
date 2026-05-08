@@ -34,5 +34,4 @@ public interface ResetTokenRepository {
      * @return empty mono if removed successfully.
      */
     Mono<Void> removeByTokenHash(String tokenHash);
-
 }

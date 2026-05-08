@@ -4,9 +4,10 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * <p>This event will be triggered when the unread reply count of the comment is changed.</p>
- * <p>It is used to update the unread reply count of the comment,such as when the user reads the
- * reply(lastReadTime changed in comment), the unread reply count will be updated.</p>
+ * This event will be triggered when the unread reply count of the comment is changed.
+ *
+ * <p>It is used to update the unread reply count of the comment,such as when the user reads the reply(lastReadTime
+ * changed in comment), the unread reply count will be updated.
  *
  * @author guqing
  * @since 2.14.0

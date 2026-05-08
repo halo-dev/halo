@@ -16,8 +16,7 @@ public interface ExternalUrlSupplier extends Supplier<URI> {
     /**
      * Gets URI according to external URL and use-absolute-permalink properties.
      *
-     * @return URI "/" returned if use-absolute-permalink is false. Or external URL will be
-     * returned.(never null)
+     * @return URI "/" returned if use-absolute-permalink is false. Or external URL will be returned.(never null)
      */
     @Override
     URI get();
@@ -26,8 +25,7 @@ public interface ExternalUrlSupplier extends Supplier<URI> {
      * Gets URL according to external URL and server request URL.
      *
      * @param request represents an HTTP request message, consisting of a method and a URI.
-     * @return External URL will be return if it is provided, or request URI will be returned.
-     * (never null)
+     * @return External URL will be return if it is provided, or request URI will be returned. (never null)
      */
     URL getURL(HttpRequest request);
 

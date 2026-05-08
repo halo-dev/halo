@@ -50,10 +50,9 @@ class PolicyConfigChangeDetectorTest {
         configMap.setMetadata(new Metadata());
         configMap.getMetadata().setLabels(Map.of(Policy.POLICY_OWNER_LABEL, "fake-policy"));
 
-        when(client.fetch(eq(ConfigMap.class), eq("fake-config")))
-            .thenReturn(Optional.of(configMap));
+        when(client.fetch(eq(ConfigMap.class), eq("fake-config"))).thenReturn(Optional.of(configMap));
         when(client.listAllNames(same(Attachment.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(List.of("fake-attachment"));
+                .thenReturn(List.of("fake-attachment"));
 
         spyDetector.reconcile(new Reconciler.Request("fake-config"));
 

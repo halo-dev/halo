@@ -59,5 +59,4 @@ public interface UserService {
     Mono<User> disable(String username);
 
     Mono<User> enable(String username);
-
 }

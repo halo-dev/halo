@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
-import run.halo.app.core.reconciler.UserReconciler;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -62,25 +61,21 @@ class UserReconcilerTest {
     void permalinkForFakeUser() throws URISyntaxException {
         when(externalUrlSupplier.get()).thenReturn(new URI("http://localhost:8090"));
 
-        when(roleService.getRolesByUsername("fake-user"))
-            .thenReturn(Flux.empty());
+        when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.empty());
 
-        when(client.fetch(eq(User.class), eq("fake-user")))
-            .thenReturn(Optional.of(user("fake-user")));
+        when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Optional.of(user("fake-user")));
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
 
-        verify(client).<User>update(assertArg(user ->
-            assertEquals(
-                "http://localhost:8090/authors/fake-user",
-                user.getStatus().getPermalink()
-            )
-        ));
+        verify(client)
+                .<User>update(assertArg(user -> assertEquals(
+                        "http://localhost:8090/authors/fake-user",
+                        user.getStatus().getPermalink())));
     }
 
     @Test
     void permalinkForAnonymousUser() {
         when(client.fetch(eq(User.class), eq(AnonymousUserConst.PRINCIPAL)))
-            .thenReturn(Optional.of(user(AnonymousUserConst.PRINCIPAL)));
+                .thenReturn(Optional.of(user(AnonymousUserConst.PRINCIPAL)));
         when(roleService.getRolesByUsername(AnonymousUserConst.PRINCIPAL)).thenReturn(Flux.empty());
         userReconciler.reconcile(new Reconciler.Request(AnonymousUserConst.PRINCIPAL));
         verify(client).update(any(User.class));
@@ -89,8 +84,7 @@ class UserReconcilerTest {
     @Test
     void ensureRoleNamesAnno() {
         when(roleService.getRolesByUsername("fake-user")).thenReturn(Flux.just("fake-role"));
-        when(client.fetch(eq(User.class), eq("fake-user")))
-            .thenReturn(Optional.of(user("fake-user")));
+        when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Optional.of(user("fake-user")));
         when(externalUrlSupplier.get()).thenReturn(URI.create("/"));
 
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
@@ -98,8 +92,7 @@ class UserReconcilerTest {
         verify(client).update(assertArg(user -> {
             assertEquals("""
                     ["fake-role"]\
-                    """,
-                user.getMetadata().getAnnotations().get(User.ROLE_NAMES_ANNO));
+                    """, user.getMetadata().getAnnotations().get(User.ROLE_NAMES_ANNO));
         }));
     }
 

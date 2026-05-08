@@ -11,5 +11,4 @@ record StringNotContainsCondition(String indexName, String keyword) implements I
     public String toString() {
         return indexName + " NOT CONTAINS " + keyword;
     }
-
 }

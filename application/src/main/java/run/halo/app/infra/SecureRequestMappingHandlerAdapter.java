@@ -17,5 +17,4 @@ public class SecureRequestMappingHandlerAdapter extends RequestMappingHandlerAda
     public Mono<HandlerResult> handle(ServerWebExchange exchange, Object handler) {
         return super.handle(new SecureServerWebExchange(exchange), handler);
     }
-
 }

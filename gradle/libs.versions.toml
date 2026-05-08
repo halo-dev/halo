@@ -2,7 +2,6 @@
 lucene = '10.3.2'
 resilience4j = '2.3.0'
 therapi = '0.15.0'
-checkstyle = "12.1.0"
 
 [libraries]
 lucene-core = { module = 'org.apache.lucene:lucene-core', version.ref = 'lucene' }
@@ -51,3 +50,4 @@ node = 'com.github.node-gradle.node:7.1.0'
 openapi-generator = 'org.openapi.generator:7.12.0'
 springdoc-openapi = 'org.springdoc.openapi-gradle-plugin:1.9.0'
 versions = 'com.github.ben-manes.versions:0.53.0'
+spotless = 'com.diffplug.spotless:8.4.0'

@@ -35,36 +35,38 @@ public class HaloDocumentEventsListener {
     @Async
     void onApplicationEvent(HaloDocumentRebuildRequestEvent event) {
         getSearchEngine()
-            .doOnNext(SearchEngine::deleteAll)
-            .flatMap(searchEngine -> extensionGetter.getExtensions(HaloDocumentsProvider.class)
-                .flatMap(HaloDocumentsProvider::fetchAll)
-                .buffer(this.bufferSize)
-                .doOnNext(searchEngine::addOrUpdate)
-                .then())
-            .blockOptional(Duration.ofMinutes(1));
+                .doOnNext(SearchEngine::deleteAll)
+                .flatMap(searchEngine -> extensionGetter
+                        .getExtensions(HaloDocumentsProvider.class)
+                        .flatMap(HaloDocumentsProvider::fetchAll)
+                        .buffer(this.bufferSize)
+                        .doOnNext(searchEngine::addOrUpdate)
+                        .then())
+                .blockOptional(Duration.ofMinutes(1));
     }
 
     @EventListener
     @Async
     void onApplicationEvent(HaloDocumentAddRequestEvent event) {
         getSearchEngine()
-            .doOnNext(searchEngine -> searchEngine.addOrUpdate(event.getDocuments()))
-            .then()
-            .blockOptional(Duration.ofMinutes(1));
+                .doOnNext(searchEngine -> searchEngine.addOrUpdate(event.getDocuments()))
+                .then()
+                .blockOptional(Duration.ofMinutes(1));
     }
 
     @EventListener
     @Async
     void onApplicationEvent(HaloDocumentDeleteRequestEvent event) {
         getSearchEngine()
-            .doOnNext(searchEngine -> searchEngine.deleteDocument(event.getDocIds()))
-            .then()
-            .blockOptional(Duration.ofMinutes(1));
+                .doOnNext(searchEngine -> searchEngine.deleteDocument(event.getDocIds()))
+                .then()
+                .blockOptional(Duration.ofMinutes(1));
     }
 
     private Mono<SearchEngine> getSearchEngine() {
-        return extensionGetter.getEnabledExtension(SearchEngine.class)
-            .filter(SearchEngine::available)
-            .switchIfEmpty(Mono.error(SearchEngineUnavailableException::new));
+        return extensionGetter
+                .getEnabledExtension(SearchEngine.class)
+                .filter(SearchEngine::available)
+                .switchIfEmpty(Mono.error(SearchEngineUnavailableException::new));
     }
 }

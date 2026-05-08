@@ -30,12 +30,7 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.HandlerStrategies;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.i18n.LocaleContextResolver;
@@ -87,73 +82,60 @@ class SinglePageRouteTest {
     void handlerFunction() {
         // fix gh-3448
         when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
-            .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
+                .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
 
         String pageName = "fake-page";
-        when(viewResolver.resolveViewName(any(), any()))
-            .thenReturn(Mono.just(new EmptyView() {
-                @Override
-                public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-                    ServerWebExchange exchange) {
-                    assertThat(model).containsKey(ModelConst.TEMPLATE_ID);
-                    assertThat(model.get(ModelConst.TEMPLATE_ID))
-                        .isEqualTo(DefaultTemplateEnum.SINGLE_PAGE.getValue());
-                    assertThat(model.get("name"))
-                        .isEqualTo(pageName);
-                    assertThat(model.get("plural")).isEqualTo("singlepages");
-                    assertThat(model.get("singlePage")).isNotNull();
-                    assertThat(model.get("groupVersionKind"))
-                        .isEqualTo(GroupVersionKind.fromExtension(SinglePage.class));
-                    return super.render(model, contentType, exchange);
-                }
-            }));
+        when(viewResolver.resolveViewName(any(), any())).thenReturn(Mono.just(new EmptyView() {
+            @Override
+            public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
+                assertThat(model).containsKey(ModelConst.TEMPLATE_ID);
+                assertThat(model.get(ModelConst.TEMPLATE_ID)).isEqualTo(DefaultTemplateEnum.SINGLE_PAGE.getValue());
+                assertThat(model.get("name")).isEqualTo(pageName);
+                assertThat(model.get("plural")).isEqualTo("singlepages");
+                assertThat(model.get("singlePage")).isNotNull();
+                assertThat(model.get("groupVersionKind")).isEqualTo(GroupVersionKind.fromExtension(SinglePage.class));
+                return super.render(model, contentType, exchange);
+            }
+        }));
 
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName(pageName);
         singlePage.setSpec(new SinglePage.SinglePageSpec());
-        when(singlePageFinder.getByName(eq(pageName)))
-            .thenReturn(Mono.just(SinglePageVo.from(singlePage)));
+        when(singlePageFinder.getByName(eq(pageName))).thenReturn(Mono.just(SinglePageVo.from(singlePage)));
 
-        HandlerFunction<ServerResponse> handlerFunction =
-            singlePageRoute.handlerFunction(pageName);
+        HandlerFunction<ServerResponse> handlerFunction = singlePageRoute.handlerFunction(pageName);
         RouterFunction<ServerResponse> routerFunction =
-            RouterFunctions.route().GET("/archives/{name}", handlerFunction).build();
+                RouterFunctions.route().GET("/archives/{name}", handlerFunction).build();
 
         WebTestClient webTestClient = WebTestClient.bindToRouterFunction(routerFunction)
-            .handlerStrategies(HandlerStrategies.builder()
-                .viewResolver(viewResolver)
-                .build())
-            .build();
+                .handlerStrategies(
+                        HandlerStrategies.builder().viewResolver(viewResolver).build())
+                .build();
 
         when(localeContextResolver.resolveLocaleContext(any()))
-            .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
-        webTestClient.get()
-            .uri("/archives/fake-name")
-            .exchange()
-            .expectStatus().isOk();
+                .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
+        webTestClient.get().uri("/archives/fake-name").exchange().expectStatus().isOk();
     }
 
     @Test
     void shouldNotThrowErrorIfSlugNameContainsSpecialChars() {
         var specialChars = "/with-special-chars-{}-[]-{{}}-{[]}-[{}]";
-        var specialCharsUri =
-            URI.create(UriUtils.encodePath(specialChars, UTF_8));
+        var specialCharsUri = URI.create(UriUtils.encodePath(specialChars, UTF_8));
         var mockHttpRequest = MockServerHttpRequest.get(specialCharsUri.toString())
-            .accept(MediaType.TEXT_HTML)
-            .build();
+                .accept(MediaType.TEXT_HTML)
+                .build();
         var mockExchange = MockServerWebExchange.from(mockHttpRequest);
         var request = MockServerRequest.builder()
-            .exchange(mockExchange)
-            .uri(specialCharsUri)
-            .method(HttpMethod.GET)
-            .header(HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE)
-            .build();
+                .exchange(mockExchange)
+                .uri(specialCharsUri)
+                .method(HttpMethod.GET)
+                .header(HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE)
+                .build();
         var nameSlugPair = new NameSlugPair("fake-single-page", specialChars);
-        singlePageRoute.setQuickRouteMap(Map.of(nameSlugPair, r -> ServerResponse.ok().build()));
-        StepVerifier.create(singlePageRoute.route(request))
-            .expectNextCount(1)
-            .verifyComplete();
+        singlePageRoute.setQuickRouteMap(
+                Map.of(nameSlugPair, r -> ServerResponse.ok().build()));
+        StepVerifier.create(singlePageRoute.route(request)).expectNextCount(1).verifyComplete();
     }
 
     @Nested
@@ -163,11 +145,10 @@ class SinglePageRouteTest {
         void shouldRemoveRouteIfSinglePageUnpublished() {
             var name = "fake-single-page";
             var page = newSinglePage(name, false);
-            when(client.fetch(SinglePage.class, name)).thenReturn(
-                Optional.of(page));
+            when(client.fetch(SinglePage.class, name)).thenReturn(Optional.of(page));
 
             var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
-                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+                    invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
             singlePageRoute.setQuickRouteMap(routeMap);
             var result = singlePageRoute.reconcile(new Reconciler.Request(name));
             assertNotNull(result);
@@ -180,11 +161,10 @@ class SinglePageRouteTest {
         void shouldAddRouteIfSinglePagePublished() {
             var name = "fake-single-page";
             var page = newSinglePage(name, true);
-            when(client.fetch(SinglePage.class, name)).thenReturn(
-                Optional.of(page));
+            when(client.fetch(SinglePage.class, name)).thenReturn(Optional.of(page));
 
             var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
-                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+                    invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
             singlePageRoute.setQuickRouteMap(routeMap);
             var result = singlePageRoute.reconcile(new Reconciler.Request(name));
             assertNotNull(result);
@@ -197,11 +177,10 @@ class SinglePageRouteTest {
         void shouldRemoveRouteIfSinglePageDeleted() {
             var name = "fake-single-page";
             var page = newDeletedSinglePage(name);
-            when(client.fetch(SinglePage.class, name)).thenReturn(
-                Optional.of(page));
+            when(client.fetch(SinglePage.class, name)).thenReturn(Optional.of(page));
 
             var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
-                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+                    invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
             singlePageRoute.setQuickRouteMap(routeMap);
             var result = singlePageRoute.reconcile(new Reconciler.Request(name));
             assertNotNull(result);
@@ -214,11 +193,10 @@ class SinglePageRouteTest {
         void shouldRemoveRouteIfSinglePageRecycled() {
             var name = "fake-single-page";
             var page = newRecycledSinglePage(name);
-            when(client.fetch(SinglePage.class, name)).thenReturn(
-                Optional.of(page));
+            when(client.fetch(SinglePage.class, name)).thenReturn(Optional.of(page));
 
             var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
-                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+                    invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
             singlePageRoute.setQuickRouteMap(routeMap);
             var result = singlePageRoute.reconcile(new Reconciler.Request(name));
             assertNotNull(result);
@@ -226,7 +204,6 @@ class SinglePageRouteTest {
             verify(client).fetch(SinglePage.class, name);
             verify(routeMap).remove(NameSlugPair.from(page));
         }
-
 
         SinglePage newSinglePage(String name, boolean published) {
             var metadata = new Metadata();

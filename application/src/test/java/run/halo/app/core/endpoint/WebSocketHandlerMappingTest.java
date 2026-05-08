@@ -51,5 +51,4 @@ class WebSocketHandlerMappingTest {
             return WebSocketSession::close;
         }
     }
-
 }

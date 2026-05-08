@@ -40,17 +40,18 @@ import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.SecurityConstant;
 
 /**
- * <p>An {@link org.springframework.security.core.userdetails.UserDetailsService} is required
- * by this implementation, so that it can construct a valid <code>Authentication</code>
- * from the returned {@link org.springframework.security.core.userdetails.UserDetails}.</p>
- * <p>This is also necessary so that the user's password is available and can be checked as
- * part of the encoded cookie.</p>
+ * An {@link org.springframework.security.core.userdetails.UserDetailsService} is required by this implementation, so
+ * that it can construct a valid <code>Authentication</code> from the returned
+ * {@link org.springframework.security.core.userdetails.UserDetails}.
+ *
+ * <p>This is also necessary so that the user's password is available and can be checked as part of the encoded cookie.
+ *
  * <p>The cookie encoded by this implementation adopts the following form:
+ *
  * <pre>
  * username + ":" + expiryTime + ":" + algorithmName + ":"
  *   + algorithmHex(username + ":" + expiryTime + ":" + password + ":" + key)
  * </pre>
- * </p>
  *
  * @see org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices
  */
@@ -100,17 +101,16 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
             return Mono.empty();
         }
         log.debug("Remember-me cookie detected");
-        return Mono.defer(
-                () -> {
+        return Mono.defer(() -> {
                     String[] cookieTokens = decodeCookie(rememberMeCookie.getValue());
                     return processAutoLoginCookie(cookieTokens, exchange);
                 })
-            .flatMap(user -> {
-                this.userDetailsChecker.check(user);
-                log.debug("Remember-me cookie accepted");
-                return createSuccessfulAuthentication(exchange, user);
-            })
-            .onErrorResume(ex -> handleError(exchange, ex));
+                .flatMap(user -> {
+                    this.userDetailsChecker.check(user);
+                    log.debug("Remember-me cookie accepted");
+                    return createSuccessfulAuthentication(exchange, user);
+                })
+                .onErrorResume(ex -> handleError(exchange, ex));
     }
 
     private Mono<Authentication> handleError(ServerWebExchange exchange, Throwable ex) {
@@ -134,55 +134,55 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         rememberMeCookieResolver.expireCookie(exchange);
     }
 
-    protected Mono<UserDetails> processAutoLoginCookie(String[] cookieTokens,
-        ServerWebExchange exchange) {
+    protected Mono<UserDetails> processAutoLoginCookie(String[] cookieTokens, ServerWebExchange exchange) {
         if (!isValidCookieTokensLength(cookieTokens)) {
             throw new InvalidCookieException(
-                "Cookie token did not contain 3 or 4 tokens, but contained '" + Arrays.asList(
-                    cookieTokens) + "'");
+                    "Cookie token did not contain 3 or 4 tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
         }
 
         long tokenExpiryTime = getTokenExpiryTime(cookieTokens);
         if (isTokenExpired(tokenExpiryTime)) {
-            throw new InvalidCookieException(
-                "Cookie token[1] has expired (expired on '" + new Date(tokenExpiryTime)
+            throw new InvalidCookieException("Cookie token[1] has expired (expired on '" + new Date(tokenExpiryTime)
                     + "'; current time is '" + new Date() + "')");
         }
 
         // Check the user exists. Defer lookup until after expiry time checked, to
         // possibly avoid expensive database call.
-        return getUserDetailsService().findByUsername(cookieTokens[0])
-            .switchIfEmpty(Mono.error(new UsernameNotFoundException("User '" + cookieTokens[0]
-                + "' not found")))
-            .flatMap(userDetails -> {
-                // Check signature of token matches remaining details. Must do this after user
-                // lookup, as we need the DAO-derived password. If efficiency was a major issue,
-                // just add in a UserCache implementation, but recall that this method is usually
-                // only called once per HttpSession - if the token is valid, it will cause
-                // SecurityContextHolder population, whilst if invalid, will cause the cookie to
-                // be cancelled.
-                String actualTokenSignature;
-                String actualAlgorithm = DEFAULT_ALGORITHM;
-                // If the cookie value contains the algorithm, we use that algorithm to check the
-                // signature
-                if (cookieTokens.length == 4) {
-                    actualTokenSignature = cookieTokens[3];
-                    actualAlgorithm = cookieTokens[2];
-                } else {
-                    actualTokenSignature = cookieTokens[2];
-                }
-                return makeTokenSignature(tokenExpiryTime, userDetails.getUsername(),
-                    userDetails.getPassword(), actualAlgorithm)
-                    .doOnNext(expectedTokenSignature -> {
-                        if (!equals(expectedTokenSignature, actualTokenSignature)) {
-                            throw new InvalidCookieException(
-                                "Cookie contained signature '" + actualTokenSignature
-                                    + "' but expected '"
-                                    + expectedTokenSignature + "'");
-                        }
-                    })
-                    .thenReturn(userDetails);
-            });
+        return getUserDetailsService()
+                .findByUsername(cookieTokens[0])
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User '" + cookieTokens[0] + "' not found")))
+                .flatMap(userDetails -> {
+                    // Check signature of token matches remaining details. Must do this after user
+                    // lookup, as we need the DAO-derived password. If efficiency was a major issue,
+                    // just add in a UserCache implementation, but recall that this method is usually
+                    // only called once per HttpSession - if the token is valid, it will cause
+                    // SecurityContextHolder population, whilst if invalid, will cause the cookie to
+                    // be cancelled.
+                    String actualTokenSignature;
+                    String actualAlgorithm = DEFAULT_ALGORITHM;
+                    // If the cookie value contains the algorithm, we use that algorithm to check the
+                    // signature
+                    if (cookieTokens.length == 4) {
+                        actualTokenSignature = cookieTokens[3];
+                        actualAlgorithm = cookieTokens[2];
+                    } else {
+                        actualTokenSignature = cookieTokens[2];
+                    }
+                    return makeTokenSignature(
+                                    tokenExpiryTime,
+                                    userDetails.getUsername(),
+                                    userDetails.getPassword(),
+                                    actualAlgorithm)
+                            .doOnNext(expectedTokenSignature -> {
+                                if (!equals(expectedTokenSignature, actualTokenSignature)) {
+                                    throw new InvalidCookieException(
+                                            "Cookie contained signature '" + actualTokenSignature
+                                                    + "' but expected '"
+                                                    + expectedTokenSignature + "'");
+                                }
+                            })
+                            .thenReturn(userDetails);
+                });
     }
 
     protected boolean isTokenExpired(long tokenExpiryTime) {
@@ -194,17 +194,13 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
             return Long.parseLong(cookieTokens[1]);
         } catch (NumberFormatException nfe) {
             throw new InvalidCookieException(
-                "Cookie token[1] did not contain a valid number (contained '" + cookieTokens[1]
-                    + "')");
+                    "Cookie token[1] did not contain a valid number (contained '" + cookieTokens[1] + "')");
         }
     }
 
-    protected Mono<Authentication> createSuccessfulAuthentication(ServerWebExchange exchange,
-        UserDetails user) {
-        return getKey()
-            .map(key -> new RememberMeAuthenticationToken(key, user,
-                this.authoritiesMapper.mapAuthorities(user.getAuthorities()))
-            );
+    protected Mono<Authentication> createSuccessfulAuthentication(ServerWebExchange exchange, UserDetails user) {
+        return getKey().map(key -> new RememberMeAuthenticationToken(
+                key, user, this.authoritiesMapper.mapAuthorities(user.getAuthorities())));
     }
 
     private boolean isValidCookieTokensLength(String[] cookieTokens) {
@@ -219,56 +215,52 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
     }
 
     @Override
-    public Mono<Void> loginSuccess(ServerWebExchange exchange,
-        Authentication successfulAuthentication) {
+    public Mono<Void> loginSuccess(ServerWebExchange exchange, Authentication successfulAuthentication) {
         return rememberMeRequested(exchange)
-            .filter(Boolean::booleanValue)
-            .flatMap(rememberMeRequest -> onLoginSuccess(exchange, successfulAuthentication))
-            .then(parameterRequestCache.removeParameter(exchange, parameterName));
+                .filter(Boolean::booleanValue)
+                .flatMap(rememberMeRequest -> onLoginSuccess(exchange, successfulAuthentication))
+                .then(parameterRequestCache.removeParameter(exchange, parameterName));
     }
 
-    protected Mono<Void> onLoginSuccess(ServerWebExchange exchange,
-        Authentication successfulAuthentication) {
+    protected Mono<Void> onLoginSuccess(ServerWebExchange exchange, Authentication successfulAuthentication) {
         return Mono.defer(() -> retrieveUsernamePassword(successfulAuthentication))
-            .flatMap(pair -> {
-                var username = pair.username();
-                var password = pair.password();
-                var expiryTimeMs = calculateExpireTime(exchange, successfulAuthentication);
-                return makeTokenSignature(expiryTimeMs, username, password, DEFAULT_ALGORITHM)
-                    .doOnNext(signatureValue -> {
-                        setCookie(
-                            new String[] {username, Long.toString(expiryTimeMs), DEFAULT_ALGORITHM,
-                                signatureValue},
-                            exchange);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Added remember-me cookie for user '{}', expiry: '{}'",
-                                username,
-                                new Date(expiryTimeMs));
-                        }
-                    });
-            })
-            .then();
+                .flatMap(pair -> {
+                    var username = pair.username();
+                    var password = pair.password();
+                    var expiryTimeMs = calculateExpireTime(exchange, successfulAuthentication);
+                    return makeTokenSignature(expiryTimeMs, username, password, DEFAULT_ALGORITHM)
+                            .doOnNext(signatureValue -> {
+                                setCookie(
+                                        new String[] {
+                                            username, Long.toString(expiryTimeMs), DEFAULT_ALGORITHM, signatureValue
+                                        },
+                                        exchange);
+                                if (log.isDebugEnabled()) {
+                                    log.debug(
+                                            "Added remember-me cookie for user '{}', expiry: '{}'",
+                                            username,
+                                            new Date(expiryTimeMs));
+                                }
+                            });
+                })
+                .then();
     }
 
     private Mono<Boolean> rememberMeRequested(ServerWebExchange exchange) {
         // load from query
         return Mono.justOrEmpty(exchange.getRequest().getQueryParams().getFirst(parameterName))
-            .filter(Predicate.not(String::isBlank))
-            // load from form data
-            .switchIfEmpty(Mono.defer(() -> exchange.getFormData()
-                .mapNotNull(f -> f.getFirst(parameterName))
-                .filter(Predicate.not(String::isBlank)))
-            )
-            // load from request cache
-            .switchIfEmpty(
-                Mono.defer(() -> parameterRequestCache.getParameter(exchange, parameterName))
-            )
-            .map(Boolean::parseBoolean)
-            .defaultIfEmpty(false);
+                .filter(Predicate.not(String::isBlank))
+                // load from form data
+                .switchIfEmpty(Mono.defer(() -> exchange.getFormData()
+                        .mapNotNull(f -> f.getFirst(parameterName))
+                        .filter(Predicate.not(String::isBlank))))
+                // load from request cache
+                .switchIfEmpty(Mono.defer(() -> parameterRequestCache.getParameter(exchange, parameterName)))
+                .map(Boolean::parseBoolean)
+                .defaultIfEmpty(false);
     }
 
-    private Mono<UsernamePassword> retrieveUsernamePassword(
-        Authentication successfulAuthentication) {
+    private Mono<UsernamePassword> retrieveUsernamePassword(Authentication successfulAuthentication) {
         return Mono.defer(() -> {
             String username = retrieveUserName(successfulAuthentication);
             String password = retrievePassword(successfulAuthentication);
@@ -280,15 +272,14 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
                 return Mono.empty();
             }
             if (!StringUtils.hasLength(password)) {
-                return getUserDetailsService().findByUsername(username)
-                    .flatMap(user -> {
-                        String existingPassword = user.getPassword();
-                        if (!StringUtils.hasLength(existingPassword)) {
-                            log.debug("Unable to obtain password for user: {}", username);
-                            return Mono.empty();
-                        }
-                        return Mono.just(new UsernamePassword(username, existingPassword));
-                    });
+                return getUserDetailsService().findByUsername(username).flatMap(user -> {
+                    String existingPassword = user.getPassword();
+                    if (!StringUtils.hasLength(existingPassword)) {
+                        log.debug("Unable to obtain password for user: {}", username);
+                        return Mono.empty();
+                    }
+                    return Mono.just(new UsernamePassword(username, existingPassword));
+                });
             }
             return Mono.just(new UsernamePassword(username, password));
         });
@@ -299,8 +290,7 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         rememberMeCookieResolver.setRememberMeCookie(exchange, cookieValue);
     }
 
-    protected long calculateExpireTime(ServerWebExchange exchange,
-        Authentication authentication) {
+    protected long calculateExpireTime(ServerWebExchange exchange, Authentication authentication) {
         var tokenLifetime = rememberMeCookieResolver.getCookieMaxAge().toSeconds();
         return Instant.now().plusSeconds(tokenLifetime).toEpochMilli();
     }
@@ -316,8 +306,7 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         try {
             cookieAsPlainText = new String(Base64.getDecoder().decode(cookieValue.getBytes()));
         } catch (IllegalArgumentException ex) {
-            throw new InvalidCookieException(
-                "Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
+            throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
         }
         String[] tokens = StringUtils.delimitedListToStringArray(cookieAsPlainText, DELIMITER);
         for (int i = 0; i < tokens.length; i++) {
@@ -348,17 +337,16 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         return sb.toString();
     }
 
-    protected Mono<String> makeTokenSignature(long tokenExpiryTime, String username,
-        String password, String algorithm) {
-        return getKey()
-            .flatMap(key -> Mono.fromCallable(() -> {
-                var data = username + ":" + tokenExpiryTime + ":" + password + ":" + key;
-                var digest = MessageDigest.getInstance(algorithm);
-                return new String(Hex.encode(digest.digest(data.getBytes())));
-            }))
-            .onErrorMap(NoSuchAlgorithmException.class, ex ->
-                new IllegalStateException("No " + algorithm + " algorithm available!", ex)
-            );
+    protected Mono<String> makeTokenSignature(
+            long tokenExpiryTime, String username, String password, String algorithm) {
+        return getKey().flatMap(key -> Mono.fromCallable(() -> {
+                    var data = username + ":" + tokenExpiryTime + ":" + password + ":" + key;
+                    var digest = MessageDigest.getInstance(algorithm);
+                    return new String(Hex.encode(digest.digest(data.getBytes())));
+                }))
+                .onErrorMap(
+                        NoSuchAlgorithmException.class,
+                        ex -> new IllegalStateException("No " + algorithm + " algorithm available!", ex));
     }
 
     protected String retrieveUserName(Authentication authentication) {
@@ -389,8 +377,7 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
     @Override
     public Mono<Void> logout(WebFilterExchange exchange, Authentication authentication) {
         if (log.isDebugEnabled()) {
-            log.debug("Logout of user {}", (authentication != null) ? authentication.getName()
-                : "Unknown");
+            log.debug("Logout of user {}", (authentication != null) ? authentication.getName() : "Unknown");
         }
         return loginFail(exchange.getExchange()).then(onLogout(exchange, authentication));
     }
@@ -399,6 +386,5 @@ class TokenBasedRememberMeServices implements ServerLogoutHandler, RememberMeSer
         return Mono.empty();
     }
 
-    record UsernamePassword(String username, String password) {
-    }
+    record UsernamePassword(String username, String password) {}
 }

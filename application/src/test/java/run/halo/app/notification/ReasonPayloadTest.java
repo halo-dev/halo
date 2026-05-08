@@ -19,23 +19,23 @@ class ReasonPayloadTest {
     @Test
     public void testReasonPayloadBuilder() {
         Reason.Subject subject = Reason.Subject.builder()
-            .kind("Post")
-            .apiVersion("content.halo.run/v1alpha1")
-            .name("fake-post")
-            .title("Fake post title")
-            .url("https://halo.run/fake-post")
-            .build();
+                .kind("Post")
+                .apiVersion("content.halo.run/v1alpha1")
+                .name("fake-post")
+                .title("Fake post title")
+                .url("https://halo.run/fake-post")
+                .build();
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("key1", "value1");
         attributes.put("key2", 2);
         attributes.put("key3", "value3");
 
         ReasonPayload reasonPayload = ReasonPayload.builder()
-            .subject(subject)
-            .attribute("key1", "value1")
-            .attribute("key2", 2)
-            .attributes(Map.of("key3", "value3"))
-            .build();
+                .subject(subject)
+                .attribute("key1", "value1")
+                .attribute("key2", 2)
+                .attributes(Map.of("key3", "value3"))
+                .build();
 
         assertNotNull(reasonPayload);
         assertThat(reasonPayload).isNotNull();

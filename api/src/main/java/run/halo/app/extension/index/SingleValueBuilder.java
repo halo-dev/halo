@@ -14,8 +14,8 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 class SingleValueBuilder<E extends Extension, K extends Comparable<K>>
-    extends AbstractValueIndexSpecBuilder<E, K, SingleValueIndexSpecBuilder<E, K>>
-    implements SingleValueIndexSpecBuilder<E, K> {
+        extends AbstractValueIndexSpecBuilder<E, K, SingleValueIndexSpecBuilder<E, K>>
+        implements SingleValueIndexSpecBuilder<E, K> {
 
     private Function<E, @Nullable K> indexFunc;
 

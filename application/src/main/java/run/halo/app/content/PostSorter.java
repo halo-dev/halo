@@ -44,17 +44,13 @@ public enum PostSorter {
             return defaultComparator();
         }
         if (CREATE_TIME.equals(sorter)) {
-            Function<Post, Instant> comparatorFunc =
-                post -> post.getMetadata().getCreationTimestamp();
-            return Comparator.comparing(comparatorFunc)
-                .thenComparing(name);
+            Function<Post, Instant> comparatorFunc = post -> post.getMetadata().getCreationTimestamp();
+            return Comparator.comparing(comparatorFunc).thenComparing(name);
         }
 
         if (PUBLISH_TIME.equals(sorter)) {
-            Function<Post, Instant> comparatorFunc =
-                post -> post.getSpec().getPublishTime();
-            return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
-                .thenComparing(name);
+            Function<Post, Instant> comparatorFunc = post -> post.getSpec().getPublishTime();
+            return Comparator.comparing(comparatorFunc, Comparators.nullsLow()).thenComparing(name);
         }
 
         throw new IllegalArgumentException("Unsupported sort value: " + sorter);
@@ -70,9 +66,7 @@ public enum PostSorter {
     }
 
     static Comparator<Post> defaultComparator() {
-        Function<Post, Instant> createTime =
-            post -> post.getMetadata().getCreationTimestamp();
-        return Comparator.comparing(createTime)
-            .thenComparing(name);
+        Function<Post, Instant> createTime = post -> post.getMetadata().getCreationTimestamp();
+        return Comparator.comparing(createTime).thenComparing(name);
     }
 }

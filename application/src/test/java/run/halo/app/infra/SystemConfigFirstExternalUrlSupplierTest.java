@@ -2,9 +2,7 @@ package run.halo.app.infra;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -72,7 +70,6 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("https://halo.run/fake"), externalUrl.get());
         }
 
-
         @Test
         void getURIWhenUsingRelativePermalink() throws MalformedURLException {
             when(haloProperties.isUseAbsolutePermalink()).thenReturn(false);
@@ -130,7 +127,6 @@ class SystemConfigFirstExternalUrlSupplierTest {
             when(haloProperties.getExternalUrl()).thenReturn(null);
             assertNull(externalUrl.getRaw());
         }
-
     }
 
     @Nested
@@ -147,8 +143,7 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("https://www.halo.run"), externalUrl.get());
 
             var mockRequest = mock(HttpRequest.class);
-            assertEquals(URI.create("https://www.halo.run").toURL(),
-                externalUrl.getURL(mockRequest));
+            assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getURL(mockRequest));
         }
 
         @Test
@@ -163,10 +158,7 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getRaw());
             assertEquals(URI.create("/fake"), externalUrl.get());
             var mockRequest = mock(HttpRequest.class);
-            assertEquals(URI.create("https://www.halo.run").toURL(),
-                externalUrl.getURL(mockRequest));
+            assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getURL(mockRequest));
         }
-
     }
-
 }

@@ -50,8 +50,7 @@ class YamlPluginFinderTest {
     void find() throws IOException {
         var tempDirectory = Files.createTempDirectory("halo-test-plugin");
         try {
-            var directories =
-                Files.createDirectories(tempDirectory.resolve("build/resources/main"));
+            var directories = Files.createDirectories(tempDirectory.resolve("build/resources/main"));
             FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
 
             var plugin = pluginFinder.find(tempDirectory);
@@ -68,8 +67,8 @@ class YamlPluginFinderTest {
     void findFromJar() throws IOException, URISyntaxException {
         Path tempDirectory = Files.createTempDirectory("halo-plugin");
         try {
-            var plugin002Uri = requireNonNull(
-                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+            var plugin002Uri = requireNonNull(getClass().getClassLoader().getResource("plugin/plugin-0.0.2"))
+                    .toURI();
 
             Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
             FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
@@ -113,17 +112,15 @@ class YamlPluginFinderTest {
                         "name": "plugin-1"
                     }
                 }
-                  """,
-            JsonUtils.objectToJson(plugin),
-            true);
+                  """, JsonUtils.objectToJson(plugin), true);
     }
 
     @Test
     void findFailedWhenFileNotFound() {
         var test = Paths.get("");
         assertThatThrownBy(() -> pluginFinder.find(test))
-            .isInstanceOf(PluginRuntimeException.class)
-            .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
+                .isInstanceOf(PluginRuntimeException.class)
+                .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
     }
 
     @Test

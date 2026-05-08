@@ -38,9 +38,9 @@ public class ThemeVo implements ExtensionVoOperator {
      */
     public static ThemeVo from(Theme theme) {
         return ThemeVo.builder()
-            .metadata(theme.getMetadata())
-            .spec(theme.getSpec())
-            .config(null)
-            .build();
+                .metadata(theme.getMetadata())
+                .spec(theme.getSpec())
+                .config(null)
+                .build();
     }
 }

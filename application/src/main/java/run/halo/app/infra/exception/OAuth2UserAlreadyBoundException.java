@@ -19,5 +19,4 @@ public class OAuth2UserAlreadyBoundException extends ServerWebInputException {
             connection.getSpec().getUpdatedAt()
         });
     }
-
 }

@@ -2,11 +2,7 @@ package run.halo.app.theme.dialect;
 
 import static org.thymeleaf.spring6.expression.ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.context.ITemplateContext;
@@ -26,8 +22,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 class SecureTemplateContext implements ITemplateContext {
 
-    private static final Set<String> DANGEROUS_VARIABLES =
-        Set.of(THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
+    private static final Set<String> DANGEROUS_VARIABLES = Set.of(THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
 
     private final ITemplateContext delegate;
 
@@ -82,11 +77,7 @@ class SecureTemplateContext implements ITemplateContext {
 
     @Override
     public String getMessage(
-        Class<?> origin,
-        String key,
-        Object[] messageParameters,
-        boolean useAbsentMessageRepresentation
-    ) {
+            Class<?> origin, String key, Object[] messageParameters, boolean useAbsentMessageRepresentation) {
         return delegate.getMessage(origin, key, messageParameters, useAbsentMessageRepresentation);
     }
 
@@ -125,10 +116,9 @@ class SecureTemplateContext implements ITemplateContext {
 
     @Override
     public Set<String> getVariableNames() {
-        return delegate.getVariableNames()
-            .stream()
-            .filter(name -> !DANGEROUS_VARIABLES.contains(name))
-            .collect(Collectors.toSet());
+        return delegate.getVariableNames().stream()
+                .filter(name -> !DANGEROUS_VARIABLES.contains(name))
+                .collect(Collectors.toSet());
     }
 
     @Override

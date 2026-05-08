@@ -4,11 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -35,18 +31,17 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
 
     public DefaultIndices(List<Index<E, ?>> indices) {
         this.indexMap = indices.stream()
-            .collect(Collectors.toMap(
-                Index::getName,
-                Function.identity(),
-                // keep existing in case of duplicate names
-                (existing, replacing) -> existing,
-                // keep insertion order
-                LinkedHashMap::new)
-            );
+                .collect(Collectors.toMap(
+                        Index::getName,
+                        Function.identity(),
+                        // keep existing in case of duplicate names
+                        (existing, replacing) -> existing,
+                        // keep insertion order
+                        LinkedHashMap::new));
         this.lockCache = Caffeine.newBuilder()
-            .expireAfterAccess(Duration.ofHours(1))
-            .maximumSize(10_000)
-            .build();
+                .expireAfterAccess(Duration.ofHours(1))
+                .maximumSize(10_000)
+                .build();
     }
 
     @Override
@@ -61,9 +56,8 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
         ensureNotClosed();
         // get primary key
         var primaryKey = extension.getMetadata().getName();
-        var lock = Objects.requireNonNull(
-            lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock())
-        ).writeLock();
+        var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
+                .writeLock();
         var ops = new ArrayList<TransactionalOperation>();
         lock.lock();
         try {
@@ -86,9 +80,8 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     public void update(E extension) {
         ensureNotClosed();
         var primaryKey = extension.getMetadata().getName();
-        var lock = Objects.requireNonNull(
-            lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock())
-        ).writeLock();
+        var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
+                .writeLock();
         var updaters = new ArrayList<TransactionalOperation>();
         lock.lock();
         try {
@@ -110,9 +103,8 @@ class DefaultIndices<E extends Extension> implements Indices<E> {
     public void delete(E extension) {
         ensureNotClosed();
         var primaryKey = extension.getMetadata().getName();
-        var lock = Objects.requireNonNull(
-            lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock())
-        ).writeLock();
+        var lock = Objects.requireNonNull(lockCache.get(primaryKey, pk -> new ReentrantReadWriteLock()))
+                .writeLock();
         var updaters = new ArrayList<TransactionalOperation>();
         lock.lock();
         try {

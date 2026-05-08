@@ -23,7 +23,6 @@ public class DefaultPluginGetter implements PluginGetter {
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("Plugin name must not be blank");
         }
-        return client.fetch(Plugin.class, name)
-            .orElseThrow(() -> new NotFoundException("Plugin not found"));
+        return client.fetch(Plugin.class, name).orElseThrow(() -> new NotFoundException("Plugin not found"));
     }
 }

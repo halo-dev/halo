@@ -1,8 +1,6 @@
 package run.halo.app.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,6 +73,7 @@ class JsonExtensionTest {
         assertNull(ext.getMetadata().getGenerateName());
         assertNull(ext.getMetadata().getCreationTimestamp());
         assertNull(ext.getMetadata().getDeletionTimestamp());
-        assertEquals("otherPropertyValue", ext.getInternal().get("otherProperty").asText());
+        assertEquals(
+                "otherPropertyValue", ext.getInternal().get("otherProperty").asText());
     }
 }

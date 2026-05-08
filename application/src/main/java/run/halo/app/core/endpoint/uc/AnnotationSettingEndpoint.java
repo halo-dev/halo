@@ -48,53 +48,44 @@ class AnnotationSettingEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "AnnotationSettingV1AlphaUc";
         return SpringdocRouteBuilder.route()
-            .GET(
-                "/annotationsettings",
-                this::listAvailableAnnotationSettings,
-                builder -> builder
-                    .operationId("listAvailableAnnotationSettings")
-                    .description("""
+                .GET(
+                        "/annotationsettings",
+                        this::listAvailableAnnotationSettings,
+                        builder -> builder.operationId("listAvailableAnnotationSettings")
+                                .description("""
                         List available AnnotationSettings for the given targetRef. \
                         The available AnnotationSettings are determined by \
                         the currently activated theme and started plugins.""")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .name("targetRef")
-                        .in(ParameterIn.QUERY)
-                        .description(
-                            "The targetRef of the AnnotationSetting. e.g.: 'content.halo.run/Post"
-                        )
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(Builder.responseBuilder()
-                        .implementationArray(AnnotationSetting.class)
-                    )
-            )
-            .build();
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .name("targetRef")
+                                        .in(ParameterIn.QUERY)
+                                        .description(
+                                                "The targetRef of the AnnotationSetting. e.g.: 'content.halo.run/Post")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .response(Builder.responseBuilder().implementationArray(AnnotationSetting.class)))
+                .build();
     }
 
     private Mono<ServerResponse> listAvailableAnnotationSettings(ServerRequest serverRequest) {
-        var targetRef = serverRequest.queryParam("targetRef")
-            .filter(StringUtils::hasText)
-            .orElse(null);
+        var targetRef = serverRequest
+                .queryParam("targetRef")
+                .filter(StringUtils::hasText)
+                .orElse(null);
         if (targetRef == null) {
             return Mono.error(new ServerWebInputException("Query param 'targetRef' is required"));
         }
-        var getActivatedTheme = themeService.fetchActivatedThemeName()
-            .map(Optional::of)
-            .defaultIfEmpty(Optional.empty());
+        var getActivatedTheme =
+                themeService.fetchActivatedThemeName().map(Optional::of).defaultIfEmpty(Optional.empty());
         var getStartedPlugins = pluginService.getStartedPluginNames().collectList();
-        var annotationSettings = Mono.zip(getActivatedTheme, getStartedPlugins,
-                (themeName, pluginNames) -> {
+        var annotationSettings = Mono.zip(getActivatedTheme, getStartedPlugins, (themeName, pluginNames) -> {
                     Condition labelConditions = null;
                     if (themeName.isPresent()) {
-                        labelConditions = Queries.labelEqual(Theme.THEME_NAME_LABEL,
-                            themeName.get());
+                        labelConditions = Queries.labelEqual(Theme.THEME_NAME_LABEL, themeName.get());
                     }
                     if (!CollectionUtils.isEmpty(pluginNames)) {
-                        var pluginLabelCondition =
-                            Queries.labelIn(PluginConst.PLUGIN_NAME_LABEL_NAME, pluginNames);
+                        var pluginLabelCondition = Queries.labelIn(PluginConst.PLUGIN_NAME_LABEL_NAME, pluginNames);
                         if (labelConditions == null) {
                             labelConditions = pluginLabelCondition;
                         } else {
@@ -105,13 +96,11 @@ class AnnotationSettingEndpoint implements CustomEndpoint {
                         labelConditions = Queries.empty();
                     }
                     var builder = ListOptions.builder()
-                        .andQuery(labelConditions)
-                        .andQuery(Queries.equal("spec.targetRef", targetRef));
+                            .andQuery(labelConditions)
+                            .andQuery(Queries.equal("spec.targetRef", targetRef));
                     return builder.build();
                 })
-            .flatMapMany(
-                listOptions -> client.listAll(AnnotationSetting.class, listOptions, defaultSort())
-            );
+                .flatMapMany(listOptions -> client.listAll(AnnotationSetting.class, listOptions, defaultSort()));
         return ServerResponse.ok().body(annotationSettings, AnnotationSetting.class);
     }
 
@@ -119,5 +108,4 @@ class AnnotationSettingEndpoint implements CustomEndpoint {
     public GroupVersion groupVersion() {
         return GroupVersion.parseAPIVersion("uc.api.halo.run/v1alpha1");
     }
-
 }

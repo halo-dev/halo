@@ -16,8 +16,7 @@ public enum GenericClassUtils {
      * @return generated class
      */
     public static <T> Class<?> generateConcreteClass(Class<?> rawClass, Class<T> parameterType) {
-        return generateConcreteClass(rawClass, parameterType, () ->
-            parameterType.getName() + rawClass.getSimpleName());
+        return generateConcreteClass(rawClass, parameterType, () -> parameterType.getName() + rawClass.getSimpleName());
     }
 
     /**
@@ -29,14 +28,12 @@ public enum GenericClassUtils {
      * @param <T> parameter type
      * @return generated class
      */
-    public static <T> Class<?> generateConcreteClass(Class<?> rawClass, Class<T> parameterType,
-        Supplier<String> nameGenerator) {
-        var concreteType =
-            TypeDescription.Generic.Builder.parameterizedType(rawClass, parameterType).build();
-        try (var unloaded = new ByteBuddy()
-            .subclass(concreteType)
-            .name(nameGenerator.get())
-            .make()) {
+    public static <T> Class<?> generateConcreteClass(
+            Class<?> rawClass, Class<T> parameterType, Supplier<String> nameGenerator) {
+        var concreteType = TypeDescription.Generic.Builder.parameterizedType(rawClass, parameterType)
+                .build();
+        try (var unloaded =
+                new ByteBuddy().subclass(concreteType).name(nameGenerator.get()).make()) {
             return unloaded.load(parameterType.getClassLoader()).getLoaded();
         }
     }

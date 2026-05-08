@@ -17,20 +17,22 @@ import org.apache.commons.lang3.StringUtils;
 public class PathUtils {
 
     /**
-     * Every HTTP URL conforms to the syntax of a generic URI. The URI generic syntax consists of
-     * components organized hierarchically in order of decreasing significance from left to
-     * right:
+     * Every HTTP URL conforms to the syntax of a generic URI. The URI generic syntax consists of components organized
+     * hierarchically in order of decreasing significance from left to right:
+     *
      * <pre>
      * URI = scheme ":" ["//" authority] path ["?" query] ["#" fragment]
      * </pre>
+     *
      * The authority component consists of subcomponents:
+     *
      * <pre>
      * authority = [userinfo "@"] host [":" port]
      * </pre>
-     * Examples of popular schemes include http, https, ftp, mailto, file, data and irc. URI
-     * schemes should be registered with the
-     * <a href="https://en.wikipedia.org/wiki/Internet_Assigned_Numbers_Authority">Internet Assigned Numbers Authority (IANA)</a>, although
-     * non-registered schemes are used in practice.
+     *
+     * Examples of popular schemes include http, https, ftp, mailto, file, data and irc. URI schemes should be
+     * registered with the <a href="https://en.wikipedia.org/wiki/Internet_Assigned_Numbers_Authority">Internet Assigned
+     * Numbers Authority (IANA)</a>, although non-registered schemes are used in practice.
      *
      * @param uriString url or path
      * @return true if the linkBase is absolute, otherwise false
@@ -51,8 +53,8 @@ public class PathUtils {
     }
 
     /**
-     * Combine paths based on the passed in path segments parameters.
-     * <br/><br/>
+     * Combine paths based on the passed in path segments parameters. <br>
+     * <br>
      * This method doesn't work for Windows system currently.
      *
      * @param pathSegments Path segments to be combined
@@ -71,10 +73,9 @@ public class PathUtils {
         return sb.toString();
     }
 
-
     /**
-     * <p>Append a {@code '/'} if the path does not end with a {@code '/'}.</p>
-     * Examples are as follows:
+     * Append a {@code '/'} if the path does not end with a {@code '/'}. Examples are as follows:
+     *
      * <pre>
      *     PathUtils.appendPathSeparatorIfMissing("hello") -> hello/
      *     PathUtils.appendPathSeparatorIfMissing("some-path/") -> some-path/
@@ -89,13 +90,14 @@ public class PathUtils {
     }
 
     /**
-     * <p>Remove the regex in the path pattern placeholder.</p>
-     * <p>For example: </p>
+     * Remove the regex in the path pattern placeholder.
+     *
+     * <p>For example:
+     *
      * <ul>
-     * <li>'{@code /{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /{year}/{month}}'</li>
-     * <li>'{@code /archives/{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /archives/{year}/{month}
-     * }'</li>
-     * <li>'{@code /archives/{year:\d{4}}/{slug}}' &rarr; '{@code /archives/{year}/{slug}}'</li>
+     *   <li>'{@code /{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /{year}/{month}}'
+     *   <li>'{@code /archives/{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /archives/{year}/{month} }'
+     *   <li>'{@code /archives/{year:\d{4}}/{slug}}' &rarr; '{@code /archives/{year}/{slug}}'
      * </ul>
      *
      * @param pattern path pattern
@@ -113,7 +115,6 @@ public class PathUtils {
                 if (colonIdx != -1) {
                     parts[i] = part.substring(0, colonIdx) + part.charAt(part.length() - 1);
                 }
-
             }
         }
         return combinePath(parts);

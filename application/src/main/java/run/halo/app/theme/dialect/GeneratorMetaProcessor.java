@@ -12,8 +12,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
 
 /**
- * Processor for generating generator meta.
- * Set the order to 0 for removing the meta in later TemplateHeadProcessor.
+ * Processor for generating generator meta. Set the order to 0 for removing the meta in later TemplateHeadProcessor.
  *
  * @author johnniang
  */
@@ -23,21 +22,20 @@ public class GeneratorMetaProcessor implements TemplateHeadProcessor {
     private final String generatorValue;
 
     public GeneratorMetaProcessor(ObjectProvider<BuildProperties> buildProperties) {
-        this.generatorValue = "Halo " + buildProperties.stream().findFirst()
-            .map(BuildProperties::getVersion)
-            .orElse("Unknown");
+        this.generatorValue = "Halo "
+                + buildProperties.stream()
+                        .findFirst()
+                        .map(BuildProperties::getVersion)
+                        .orElse("Unknown");
     }
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler) {
         return Mono.fromRunnable(() -> {
             var modelFactory = context.getModelFactory();
-            var generatorMeta = modelFactory.createStandaloneElementTag("meta",
-                Map.of("name", "generator", "content", generatorValue),
-                DOUBLE, false, true);
+            var generatorMeta = modelFactory.createStandaloneElementTag(
+                    "meta", Map.of("name", "generator", "content", generatorValue), DOUBLE, false, true);
             model.add(generatorMeta);
         });
     }
-
 }

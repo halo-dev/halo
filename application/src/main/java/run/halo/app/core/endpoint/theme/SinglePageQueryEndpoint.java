@@ -42,48 +42,43 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "SinglePageV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET("singlepages", this::listSinglePages,
-                builder -> {
+                .GET("singlepages", this::listSinglePages, builder -> {
                     builder.operationId("querySinglePages")
-                        .description("Lists single pages")
-                        .tag(tag)
-                        .response(responseBuilder()
-                            .implementation(
-                                ListResult.generateGenericClass(ListedSinglePageVo.class))
-                        );
+                            .description("Lists single pages")
+                            .tag(tag)
+                            .response(responseBuilder()
+                                    .implementation(ListResult.generateGenericClass(ListedSinglePageVo.class)));
                     SinglePagePublicQuery.buildParameters(builder);
-                }
-            )
-            .GET("singlepages/{name}", this::getByName,
-                builder -> builder.operationId("querySinglePageByName")
-                    .description("Gets single page by name")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("SinglePage name")
-                        .required(true)
-                    )
-                    .response(responseBuilder()
-                        .implementation(SinglePageVo.class)
-                    )
-            )
-            .build();
+                })
+                .GET(
+                        "singlepages/{name}",
+                        this::getByName,
+                        builder -> builder.operationId("querySinglePageByName")
+                                .description("Gets single page by name")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("SinglePage name")
+                                        .required(true))
+                                .response(responseBuilder().implementation(SinglePageVo.class)))
+                .build();
     }
 
     private Mono<ServerResponse> getByName(ServerRequest request) {
         var name = request.pathVariable("name");
-        return singlePageFinder.getByName(name)
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        return singlePageFinder
+                .getByName(name)
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     private Mono<ServerResponse> listSinglePages(ServerRequest request) {
         var query = new SinglePagePublicQuery(request.exchange());
-        return singlePageConversionService.listBy(query.toListOptions(), query.toPageRequest())
-            .flatMap(result -> ServerResponse.ok().bodyValue(result));
+        return singlePageConversionService
+                .listBy(query.toListOptions(), query.toPageRequest())
+                .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     static class SinglePagePublicQuery extends SortableRequest {

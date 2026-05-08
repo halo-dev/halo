@@ -16,8 +16,7 @@ public class NotFoundException extends ResponseStatusException {
         this(reason, null);
     }
 
-    public NotFoundException(@Nullable String reason,
-        @Nullable Throwable cause) {
+    public NotFoundException(@Nullable String reason, @Nullable Throwable cause) {
         super(HttpStatus.NOT_FOUND, reason, cause);
     }
 

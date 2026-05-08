@@ -28,26 +28,28 @@ public class IndexEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "IndexV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .POST("/indices/-/search", this::indicesSearch,
-                builder -> builder.operationId("IndicesSearch")
-                    .tag(tag)
-                    .description("Search indices.")
-                    .requestBody(requestBodyBuilder().implementation(SearchOption.class)
-                        .description("""
+                .POST(
+                        "/indices/-/search",
+                        this::indicesSearch,
+                        builder -> builder.operationId("IndicesSearch")
+                                .tag(tag)
+                                .description("Search indices.")
+                                .requestBody(requestBodyBuilder()
+                                        .implementation(SearchOption.class)
+                                        .description("""
                             Please note that the "filterPublished", "filterExposed" and \
                             "filterRecycled" fields are ignored in this endpoint.\
-                            """)
-                    )
-                    .response(responseBuilder().implementation(SearchResult.class))
-            )
-            .build();
+                            """))
+                                .response(responseBuilder().implementation(SearchResult.class)))
+                .build();
     }
 
     private Mono<ServerResponse> indicesSearch(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(SearchOption.class)
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
-            .flatMap(this::performSearch)
-            .flatMap(result -> ServerResponse.ok().bodyValue(result));
+        return serverRequest
+                .bodyToMono(SearchOption.class)
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body required.")))
+                .flatMap(this::performSearch)
+                .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     private Mono<SearchResult> performSearch(SearchOption option) {

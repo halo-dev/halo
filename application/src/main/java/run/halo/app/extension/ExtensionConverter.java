@@ -27,5 +27,4 @@ public interface ExtensionConverter {
      * @return an Extension
      */
     <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore);
-
 }

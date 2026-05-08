@@ -16,8 +16,7 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 
 /**
- * <p>A cache that caches system setup state.</p>
- * when setUp state changed, the cache will be updated.
+ * A cache that caches system setup state. when setUp state changed, the cache will be updated.
  *
  * @author guqing
  * @since 2.5.2
@@ -35,8 +34,7 @@ public class DefaultInitializationStateGetter implements InitializationStateGett
         if (userInitialized.get()) {
             return Mono.just(true);
         }
-        return hasUser()
-            .doOnNext(userInitialized::set);
+        return hasUser().doOnNext(userInitialized::set);
     }
 
     @Override
@@ -45,24 +43,21 @@ public class DefaultInitializationStateGetter implements InitializationStateGett
             return Mono.just(true);
         }
         return client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)
-            .map(config -> {
-                SystemState systemState = SystemState.deserialize(config);
-                return isTrue(systemState.getIsSetup());
-            })
-            .defaultIfEmpty(false)
-            .doOnNext(dataInitialized::set);
+                .map(config -> {
+                    SystemState systemState = SystemState.deserialize(config);
+                    return isTrue(systemState.getIsSetup());
+                })
+                .defaultIfEmpty(false)
+                .doOnNext(dataInitialized::set);
     }
 
     private Mono<Boolean> hasUser() {
         var listOptions = new ListOptions();
-        listOptions.setLabelSelector(LabelSelector.builder()
-            .notEq(User.HIDDEN_USER_LABEL, "true")
-            .build()
-        );
-        listOptions.setFieldSelector(
-            FieldSelector.of(isNull("metadata.deletionTimestamp")));
+        listOptions.setLabelSelector(
+                LabelSelector.builder().notEq(User.HIDDEN_USER_LABEL, "true").build());
+        listOptions.setFieldSelector(FieldSelector.of(isNull("metadata.deletionTimestamp")));
         return client.listBy(User.class, listOptions, PageRequestImpl.ofSize(1))
-            .map(result -> result.getTotal() > 0)
-            .defaultIfEmpty(false);
+                .map(result -> result.getTotal() > 0)
+                .defaultIfEmpty(false);
     }
 }

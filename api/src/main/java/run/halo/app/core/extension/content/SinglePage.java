@@ -17,15 +17,19 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 
 /**
- * <p>Single page extension.</p>
+ * Single page extension.
  *
  * @author guqing
  * @since 2.0.0
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = SinglePage.KIND,
-    plural = "singlepages", singular = "singlepage")
+@GVK(
+        group = Constant.GROUP,
+        version = Constant.VERSION,
+        kind = SinglePage.KIND,
+        plural = "singlepages",
+        singular = "singlepage")
 @EqualsAndHashCode(callSuper = true)
 public class SinglePage extends AbstractExtension {
 
@@ -34,8 +38,7 @@ public class SinglePage extends AbstractExtension {
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
-    public static final String LAST_RELEASED_SNAPSHOT_ANNO =
-        "content.halo.run/last-released-snapshot";
+    public static final String LAST_RELEASED_SNAPSHOT_ANNO = "content.halo.run/last-released-snapshot";
     public static final String OWNER_LABEL = "content.halo.run/owner";
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
 
@@ -69,9 +72,7 @@ public class SinglePage extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
-        /**
-         * 引用到的已发布的内容，用于主题端显示.
-         */
+        /** 引用到的已发布的内容，用于主题端显示. */
         private String releaseSnapshot;
 
         private String headSnapshot;
@@ -112,9 +113,7 @@ public class SinglePage extends AbstractExtension {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class SinglePageStatus extends Post.PostStatus {
-
-    }
+    public static class SinglePageStatus extends Post.PostStatus {}
 
     public static void changePublishedState(SinglePage page, boolean value) {
         Map<String, String> labels = MetadataUtil.nullSafeLabels(page);

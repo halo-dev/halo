@@ -21,6 +21,5 @@ public interface CommentSubject<T extends Extension> extends ExtensionPoint {
 
     boolean supports(Ref ref);
 
-    record SubjectDisplay(String title, String url, String kindName) {
-    }
+    record SubjectDisplay(String title, String url, String kindName) {}
 }

@@ -12,8 +12,7 @@ public interface SortResolver {
 
     Sort resolve(ServerWebExchange exchange);
 
-    class DefaultSortResolver extends ReactiveSortHandlerMethodArgumentResolver
-        implements SortResolver {
+    class DefaultSortResolver extends ReactiveSortHandlerMethodArgumentResolver implements SortResolver {
 
         @Override
         protected Sort getDefaultFromAnnotationOrFallback(@Nullable MethodParameter parameter) {

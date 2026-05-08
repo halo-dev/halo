@@ -3,4 +3,4 @@ kind: Setting
 metadata:
   name: fake-setting
 spec:
-  forms: [ ]
+  forms: []

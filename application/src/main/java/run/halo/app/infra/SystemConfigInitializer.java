@@ -23,18 +23,18 @@ class SystemConfigInitializer {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     Mono<Void> onApplicationEvent(ExtensionInitializedEvent ignored) {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
-            .switchIfEmpty(Mono.defer(() -> {
-                log.info("Initializing system config...");
-                var configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
-                configMap.setData(new HashMap<>());
-                return client.create(configMap)
-                    .doOnSuccess(created -> {
-                        log.info("System config initialized: {}", created.getMetadata().getName());
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.info("Initializing system config...");
+                    var configMap = new ConfigMap();
+                    configMap.setMetadata(new Metadata());
+                    configMap.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
+                    configMap.setData(new HashMap<>());
+                    return client.create(configMap).doOnSuccess(created -> {
+                        log.info(
+                                "System config initialized: {}",
+                                created.getMetadata().getName());
                     });
-            }))
-            .then();
+                }))
+                .then();
     }
-
 }

@@ -1,10 +1,10 @@
 plugins {
-    id 'checkstyle'
     id 'java-library'
     id 'halo.publish'
     id 'jacoco'
     alias(libs.plugins.lombok)
     alias(libs.plugins.versions)
+    alias(libs.plugins.spotless)
 }
 
 group = 'run.halo.app'
@@ -27,19 +27,13 @@ java {
     withSourcesJar()
 }
 
-checkstyle {
-    toolVersion = libs.versions.checkstyle.get()
-    showViolations = false
-    ignoreFailures = false
-}
-
 jar {
     manifest {
         attributes(
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
                 'Implementation-Vendor': 'Halo Project',
-        )
+                )
     }
 }
 
@@ -147,4 +141,10 @@ tasks.named('jacocoTestReport') {
 
 tasks.named('uploadBundle') {
     mustRunAfter project(':platform:application').tasks.named('uploadBundle')
+}
+
+spotless {
+    java {
+        palantirJavaFormat("2.90.0").formatJavadoc(true)
+    }
 }

@@ -26,10 +26,8 @@ class SwitchUserConfigurer implements SecurityConfigurer {
     @Override
     public void configure(ServerHttpSecurity http) {
         var successHandler = new HaloRedirectAuthenticationSuccessHandler("/console");
-        var failureHandler =
-            new RedirectServerAuthenticationFailureHandler("/login?error=impersonate");
+        var failureHandler = new RedirectServerAuthenticationFailureHandler("/login?error=impersonate");
         var filter = new SwitchUserWebFilter(userDetailsService, successHandler, failureHandler);
         http.addFilterAfter(filter, SecurityWebFiltersOrder.AUTHORIZATION);
     }
-
 }

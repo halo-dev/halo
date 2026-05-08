@@ -9,8 +9,8 @@ public interface EmailSenderHelper {
 
     JavaMailSender createJavaMailSender(EmailSenderConfig senderConfig);
 
-    MimeMessagePreparator createMimeMessagePreparator(EmailSenderConfig senderConfig,
-        String toEmail, String subject, String raw, String html);
+    MimeMessagePreparator createMimeMessagePreparator(
+            EmailSenderConfig senderConfig, String toEmail, String subject, String raw, String html);
 
     @Data
     class EmailSenderConfig {

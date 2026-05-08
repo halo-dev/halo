@@ -36,63 +36,61 @@ public class SystemConfigEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "SystemConfigV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET("/systemconfigs/{group}", this::getConfigByGroup,
-                builder -> builder.operationId("getSystemConfigByGroup")
-                    .description("Get system config by group")
-                    .tag(tag)
-                    .response(responseBuilder()
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                        )
-                        .implementation(Object.class))
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .required(true)
-                        .description("Group of the system config")
-                    )
-            )
-            .PUT("/systemconfigs/{group}", this::updateConfigByGroup,
-                builder -> builder.operationId("updateSystemConfigByGroup")
-                    .description("Update system config by group")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .required(true)
-                        .description("Group of the system config")
-                    )
-                    .requestBody(requestBodyBuilder().implementation(Object.class))
-                    .response(responseBuilder()
-                        .responseCode(String.valueOf(HttpStatus.NO_CONTENT))
-                        .implementation(Void.class)
-                    )
-            )
-            .build();
+                .GET(
+                        "/systemconfigs/{group}",
+                        this::getConfigByGroup,
+                        builder -> builder.operationId("getSystemConfigByGroup")
+                                .description("Get system config by group")
+                                .tag(tag)
+                                .response(responseBuilder()
+                                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE))
+                                        .implementation(Object.class))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("group")
+                                        .required(true)
+                                        .description("Group of the system config")))
+                .PUT(
+                        "/systemconfigs/{group}",
+                        this::updateConfigByGroup,
+                        builder -> builder.operationId("updateSystemConfigByGroup")
+                                .description("Update system config by group")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("group")
+                                        .required(true)
+                                        .description("Group of the system config"))
+                                .requestBody(requestBodyBuilder().implementation(Object.class))
+                                .response(responseBuilder()
+                                        .responseCode(String.valueOf(HttpStatus.NO_CONTENT))
+                                        .implementation(Void.class)))
+                .build();
     }
 
     private Mono<ServerResponse> updateConfigByGroup(ServerRequest request) {
         final var group = request.pathVariable("group");
         return request.bodyToMono(ObjectNode.class)
-            .flatMap(objectNode -> configurableEnvironmentFetcher.getConfigMap()
-                .flatMap(cm -> {
-                    if (cm.getData() == null) {
-                        cm.setData(new HashMap<>());
-                    }
-                    cm.getData().put(group, objectNode.toString());
-                    return client.update(cm);
-                })
-            )
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance))
-            .then(ServerResponse.noContent().build());
+                .flatMap(objectNode -> configurableEnvironmentFetcher
+                        .getConfigMap()
+                        .flatMap(cm -> {
+                            if (cm.getData() == null) {
+                                cm.setData(new HashMap<>());
+                            }
+                            cm.getData().put(group, objectNode.toString());
+                            return client.update(cm);
+                        }))
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance))
+                .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> getConfigByGroup(ServerRequest request) {
         final var group = request.pathVariable("group");
-        return configurableEnvironmentFetcher.fetch(group, ObjectNode.class)
-            .switchIfEmpty(Mono.fromSupplier(JsonMapper.shared()::createObjectNode))
-            .flatMap(json -> ServerResponse.ok().bodyValue(json));
+        return configurableEnvironmentFetcher
+                .fetch(group, ObjectNode.class)
+                .switchIfEmpty(Mono.fromSupplier(JsonMapper.shared()::createObjectNode))
+                .flatMap(json -> ServerResponse.ok().bodyValue(json));
     }
 
     @Override

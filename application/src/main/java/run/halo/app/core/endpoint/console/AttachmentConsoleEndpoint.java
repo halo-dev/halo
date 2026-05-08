@@ -38,31 +38,25 @@ class AttachmentConsoleEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "AttachmentV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST(
-                path("/attachments/-/upload")
-                    .and(contentType(MediaType.MULTIPART_FORM_DATA)),
-                this::handleUpload,
-                builder -> {
-                    builder.operationId("uploadAttachmentForConsole")
-                        .tag(tag)
-                        .description("Upload attachment endpoint for console.");
-                    this.attachmentHandler.buildDoc(builder);
-                }
-            )
-            .build();
+                .POST(
+                        path("/attachments/-/upload").and(contentType(MediaType.MULTIPART_FORM_DATA)),
+                        this::handleUpload,
+                        builder -> {
+                            builder.operationId("uploadAttachmentForConsole")
+                                    .tag(tag)
+                                    .description("Upload attachment endpoint for console.");
+                            this.attachmentHandler.buildDoc(builder);
+                        })
+                .build();
     }
 
     private Mono<ServerResponse> handleUpload(ServerRequest serverRequest) {
-        var getConfig = systemConfigFetcher.fetch(
-                SystemSetting.Attachment.GROUP,
-                SystemSetting.Attachment.class
-            )
-            .mapNotNull(SystemSetting.Attachment::console)
-            .filter(ac -> StringUtils.hasText(ac.policyName()))
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "Attachment system setting is not configured for console"
-            )));
+        var getConfig = systemConfigFetcher
+                .fetch(SystemSetting.Attachment.GROUP, SystemSetting.Attachment.class)
+                .mapNotNull(SystemSetting.Attachment::console)
+                .filter(ac -> StringUtils.hasText(ac.policyName()))
+                .switchIfEmpty(Mono.error(
+                        () -> new ServerWebInputException("Attachment system setting is not configured for console")));
         return attachmentHandler.handleUpload(serverRequest, getConfig);
     }
-
 }

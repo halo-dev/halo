@@ -57,8 +57,7 @@ public class PageRequestImpl implements PageRequest {
 
     @Override
     public PageRequest previous() {
-        return getPageNumber() == 0 ? this
-            : new PageRequestImpl(getPageNumber() - 1, getPageSize(), getSort());
+        return getPageNumber() == 0 ? this : new PageRequestImpl(getPageNumber() - 1, getPageSize(), getSort());
     }
 
     @Override
@@ -88,8 +87,7 @@ public class PageRequestImpl implements PageRequest {
 
     @Override
     public PageRequestImpl withSort(Sort sort) {
-        return new PageRequestImpl(getPageNumber(), getPageSize(),
-            defaultIfNull(sort, Sort.unsorted()));
+        return new PageRequestImpl(getPageNumber(), getPageSize(), defaultIfNull(sort, Sort.unsorted()));
     }
 
     @Override

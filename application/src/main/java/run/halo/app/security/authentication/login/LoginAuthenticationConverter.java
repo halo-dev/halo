@@ -24,8 +24,7 @@ public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationC
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
-    public LoginAuthenticationConverter(CryptoService cryptoService,
-        RateLimiterRegistry rateLimiterRegistry) {
+    public LoginAuthenticationConverter(CryptoService cryptoService, RateLimiterRegistry rateLimiterRegistry) {
         this.cryptoService = cryptoService;
         this.rateLimiterRegistry = rateLimiterRegistry;
     }
@@ -33,43 +32,44 @@ public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationC
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         return super.convert(exchange)
-            // validate the password
-            .<Authentication>flatMap(token -> {
-                if (token.getCredentials() == null) {
-                    return Mono.error(new BadCredentialsException("Empty credentials."));
-                }
-                var credentials = (String) token.getCredentials();
-                byte[] credentialsBytes;
-                try {
-                    credentialsBytes = Base64.getDecoder().decode(credentials);
-                } catch (IllegalArgumentException e) {
-                    // the credentials are not in valid Base64 scheme
-                    return Mono.error(new BadCredentialsException("Invalid Base64 scheme."));
-                }
-                return cryptoService.decrypt(credentialsBytes)
-                    .onErrorMap(InvalidEncryptedMessageException.class,
-                        error -> new BadCredentialsException("Invalid credential.", error))
-                    .map(decryptedCredentials -> new UsernamePasswordAuthenticationToken(
-                        token.getPrincipal(),
-                        new String(decryptedCredentials, UTF_8)));
-            })
-            .transformDeferred(createIpBasedRateLimiter(exchange))
-            // We have to remap the exception to an AuthenticationException
-            // for using in failure handler
-            .onErrorMap(RequestNotPermitted.class, TooManyRequestsException::new);
+                // validate the password
+                .<Authentication>flatMap(token -> {
+                    if (token.getCredentials() == null) {
+                        return Mono.error(new BadCredentialsException("Empty credentials."));
+                    }
+                    var credentials = (String) token.getCredentials();
+                    byte[] credentialsBytes;
+                    try {
+                        credentialsBytes = Base64.getDecoder().decode(credentials);
+                    } catch (IllegalArgumentException e) {
+                        // the credentials are not in valid Base64 scheme
+                        return Mono.error(new BadCredentialsException("Invalid Base64 scheme."));
+                    }
+                    return cryptoService
+                            .decrypt(credentialsBytes)
+                            .onErrorMap(
+                                    InvalidEncryptedMessageException.class,
+                                    error -> new BadCredentialsException("Invalid credential.", error))
+                            .map(decryptedCredentials -> new UsernamePasswordAuthenticationToken(
+                                    token.getPrincipal(), new String(decryptedCredentials, UTF_8)));
+                })
+                .transformDeferred(createIpBasedRateLimiter(exchange))
+                // We have to remap the exception to an AuthenticationException
+                // for using in failure handler
+                .onErrorMap(RequestNotPermitted.class, TooManyRequestsException::new);
     }
 
     private <T> RateLimiterOperator<T> createIpBasedRateLimiter(ServerWebExchange exchange) {
         var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
-        var rateLimiter = rateLimiterRegistry.rateLimiter("authentication-from-ip-" + clientIp,
-            "authentication");
+        var rateLimiter = rateLimiterRegistry.rateLimiter("authentication-from-ip-" + clientIp, "authentication");
         if (log.isDebugEnabled()) {
             var metrics = rateLimiter.getMetrics();
             log.debug(
-                "Authentication with Rate Limiter: {}, available permissions: {}, number of "
-                    + "waiting threads: {}",
-                rateLimiter, metrics.getAvailablePermissions(),
-                metrics.getNumberOfWaitingThreads());
+                    "Authentication with Rate Limiter: {}, available permissions: {}, number of "
+                            + "waiting threads: {}",
+                    rateLimiter,
+                    metrics.getAvailablePermissions(),
+                    metrics.getNumberOfWaitingThreads());
         }
         return RateLimiterOperator.of(rateLimiter);
     }

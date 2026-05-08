@@ -15,8 +15,6 @@ public class CommentStatsVo {
     Integer upvote;
 
     public static CommentStatsVo empty() {
-        return CommentStatsVo.builder()
-            .upvote(0)
-            .build();
+        return CommentStatsVo.builder().upvote(0).build();
     }
 }

@@ -10,15 +10,11 @@ import run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternG
 
 class PathPatternGeneratorTest {
 
-    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Fake",
-        singular = "fake", plural = "fakes")
-    private static class GroupExtension extends AbstractExtension {
-    }
+    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Fake", singular = "fake", plural = "fakes")
+    private static class GroupExtension extends AbstractExtension {}
 
-    @GVK(group = "", version = "v1alpha1", kind = "Fake",
-        singular = "fake", plural = "fakes")
-    private static class GrouplessExtension extends AbstractExtension {
-    }
+    @GVK(group = "", version = "v1alpha1", kind = "Fake", singular = "fake", plural = "fakes")
+    private static class GrouplessExtension extends AbstractExtension {}
 
     @Test
     void buildGroupedExtensionPathPattern() {

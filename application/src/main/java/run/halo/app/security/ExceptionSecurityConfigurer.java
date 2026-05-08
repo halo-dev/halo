@@ -31,9 +31,8 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerRequestCache serverRequestCache;
 
-    public ExceptionSecurityConfigurer(MessageSource messageSource,
-        ServerResponse.Context context,
-        ServerRequestCache serverRequestCache) {
+    public ExceptionSecurityConfigurer(
+            MessageSource messageSource, ServerResponse.Context context, ServerRequestCache serverRequestCache) {
         this.messageSource = messageSource;
         this.context = context;
         this.serverRequestCache = serverRequestCache;
@@ -43,46 +42,26 @@ public class ExceptionSecurityConfigurer implements SecurityConfigurer {
     public void configure(ServerHttpSecurity http) {
         http.exceptionHandling(exception -> {
             var accessDeniedHandlers =
-                new ArrayList<ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry>(
-                    3
-                );
-            accessDeniedHandlers.add(
-                new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
-                    new AuthenticationConverterServerWebExchangeMatcher(
-                        new ServerBearerTokenAuthenticationConverter()
-                    ),
-                    new BearerTokenServerAccessDeniedHandler()
-                ));
-            accessDeniedHandlers.add(
-                new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
-                    pathMatchers(HttpMethod.GET, "/login", "/signup"),
-                    new RedirectAccessDeniedHandler("/uc")
-                ));
-            accessDeniedHandlers.add(
-                new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
-                    anyExchange(),
-                    new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN)
-                )
-            );
+                    new ArrayList<ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry>(3);
+            accessDeniedHandlers.add(new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
+                    new AuthenticationConverterServerWebExchangeMatcher(new ServerBearerTokenAuthenticationConverter()),
+                    new BearerTokenServerAccessDeniedHandler()));
+            accessDeniedHandlers.add(new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
+                    pathMatchers(HttpMethod.GET, "/login", "/signup"), new RedirectAccessDeniedHandler("/uc")));
+            accessDeniedHandlers.add(new ServerWebExchangeDelegatingServerAccessDeniedHandler.DelegateEntry(
+                    anyExchange(), new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN)));
 
-            var entryPoints =
-                new ArrayList<DelegatingServerAuthenticationEntryPoint.DelegateEntry>(2);
+            var entryPoints = new ArrayList<DelegatingServerAuthenticationEntryPoint.DelegateEntry>(2);
             entryPoints.add(new DelegatingServerAuthenticationEntryPoint.DelegateEntry(
-                TwoFactorAuthenticationEntryPoint.MATCHER,
-                new TwoFactorAuthenticationEntryPoint(messageSource, context)
-            ));
+                    TwoFactorAuthenticationEntryPoint.MATCHER,
+                    new TwoFactorAuthenticationEntryPoint(messageSource, context)));
             entryPoints.add(new DelegatingServerAuthenticationEntryPoint.DelegateEntry(
-                anyExchange(),
-                new DefaultServerAuthenticationEntryPoint(serverRequestCache)
-            ));
+                    anyExchange(), new DefaultServerAuthenticationEntryPoint(serverRequestCache)));
 
-            exception.authenticationEntryPoint(
-                    new DelegatingServerAuthenticationEntryPoint(entryPoints)
-                )
-                .accessDeniedHandler(
-                    new ServerWebExchangeDelegatingServerAccessDeniedHandler(accessDeniedHandlers)
-                );
+            exception
+                    .authenticationEntryPoint(new DelegatingServerAuthenticationEntryPoint(entryPoints))
+                    .accessDeniedHandler(
+                            new ServerWebExchangeDelegatingServerAccessDeniedHandler(accessDeniedHandlers));
         });
     }
-
 }

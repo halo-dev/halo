@@ -5,11 +5,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -28,10 +24,8 @@ public enum SettingUtils {
     ;
 
     private static final JsonMapper MAPPER = JsonMapper.builder()
-        .changeDefaultPropertyInclusion(v ->
-            v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
-        )
-        .build();
+            .changeDefaultPropertyInclusion(v -> v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL))
+            .build();
 
     private static final String VALUE_FIELD = "value";
     private static final String NAME_FIELD = "name";
@@ -42,7 +36,6 @@ public enum SettingUtils {
      * @param setting {@link Setting} extension
      * @return a map of setting default value
      */
-
     public static Map<String, String> settingDefinedDefaultValueMap(Setting setting) {
         List<Setting.SettingForm> forms = setting.getSpec().getForms();
         if (CollectionUtils.isEmpty(forms)) {
@@ -52,15 +45,14 @@ public enum SettingUtils {
         for (Setting.SettingForm form : forms) {
             String group = form.getGroup();
             Map<String, JsonNode> groupValue = form.getFormSchema().stream()
-                .map(o -> MAPPER.convertValue(o, JsonNode.class))
-                .filter(jsonNode -> jsonNode.isObject() && jsonNode.has(NAME_FIELD)
-                    && jsonNode.has(VALUE_FIELD))
-                .map(jsonNode -> {
-                    String name = jsonNode.get(NAME_FIELD).asString();
-                    JsonNode value = jsonNode.get(VALUE_FIELD);
-                    return Map.entry(name, value);
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .map(o -> MAPPER.convertValue(o, JsonNode.class))
+                    .filter(jsonNode -> jsonNode.isObject() && jsonNode.has(NAME_FIELD) && jsonNode.has(VALUE_FIELD))
+                    .map(jsonNode -> {
+                        String name = jsonNode.get(NAME_FIELD).asString();
+                        JsonNode value = jsonNode.get(VALUE_FIELD);
+                        return Map.entry(name, value);
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             data.put(group, MAPPER.writeValueAsString(groupValue));
         }
         return data;
@@ -73,40 +65,42 @@ public enum SettingUtils {
      * @param settingName a name for {@link Setting}
      * @param configMapName a name for {@link ConfigMap}
      */
-    public static void createOrUpdateConfigMap(ExtensionClient client, String settingName,
-        String configMapName) {
+    public static void createOrUpdateConfigMap(ExtensionClient client, String settingName, String configMapName) {
         Assert.notNull(client, "Extension client must not be null");
         Assert.hasText(settingName, "Setting name must not be blank");
         Assert.hasText(configMapName, "Config map name must not be blank");
 
         client.fetch(Setting.class, settingName)
-            .ifPresentOrElse(setting -> {
-                final var source = SettingUtils.settingDefinedDefaultValueMap(setting);
-                client.fetch(ConfigMap.class, configMapName)
-                    .ifPresentOrElse(configMap -> {
-                        Map<String, String> modified =
-                            Objects.requireNonNullElse(configMap.getData(), Map.of());
-                        var copy = new HashMap<>(modified);
+                .ifPresentOrElse(
+                        setting -> {
+                            final var source = SettingUtils.settingDefinedDefaultValueMap(setting);
+                            client.fetch(ConfigMap.class, configMapName)
+                                    .ifPresentOrElse(
+                                            configMap -> {
+                                                Map<String, String> modified =
+                                                        Objects.requireNonNullElse(configMap.getData(), Map.of());
+                                                var copy = new HashMap<>(modified);
 
-                        var merged = SettingUtils.mergePatch(modified, source);
-                        configMap.setData(merged);
+                                                var merged = SettingUtils.mergePatch(modified, source);
+                                                configMap.setData(merged);
 
-                        if (!Objects.equals(copy, configMap.getData())) {
-                            client.update(configMap);
-                        }
-                    }, () -> {
-                        ConfigMap configMap = new ConfigMap();
-                        configMap.setMetadata(new Metadata());
-                        configMap.getMetadata().setName(configMapName);
-                        configMap.setData(source);
-                        client.create(configMap);
-                    });
-            }, () -> {
-                // requeue if setting was not found
-                throw new RequeueException(Result.requeue(null),
-                    "Theme setting %s was not found".formatted(settingName)
-                );
-            });
+                                                if (!Objects.equals(copy, configMap.getData())) {
+                                                    client.update(configMap);
+                                                }
+                                            },
+                                            () -> {
+                                                ConfigMap configMap = new ConfigMap();
+                                                configMap.setMetadata(new Metadata());
+                                                configMap.getMetadata().setName(configMapName);
+                                                configMap.setData(source);
+                                                client.create(configMap);
+                                            });
+                        },
+                        () -> {
+                            // requeue if setting was not found
+                            throw new RequeueException(
+                                    Result.requeue(null), "Theme setting %s was not found".formatted(settingName));
+                        });
     }
 
     public static ConfigMap populateDefaultConfig(Setting setting, String configMapName) {
@@ -119,15 +113,13 @@ public enum SettingUtils {
     }
 
     /**
-     * Construct a JsonMergePatch from a difference between two Maps and apply patch to
-     * {@code source}.
+     * Construct a JsonMergePatch from a difference between two Maps and apply patch to {@code source}.
      *
      * @param modified the modified object
      * @param source the source object
      * @return patched map object
      */
-    public static Map<String, String> mergePatch(Map<String, String> modified,
-        Map<String, String> source) {
+    public static Map<String, String> mergePatch(Map<String, String> modified, Map<String, String> source) {
         var modifiedJson = mapToJsonNode(modified);
         // original
         var sourceJson = mapToJsonNode(source);
@@ -166,14 +158,12 @@ public enum SettingUtils {
     }
 
     /**
-     * Convert {@code Map<String, String>} to
-     * {@link com.fasterxml.jackson.databind.node.ObjectNode}.
+     * Convert {@code Map<String, String>} to {@link com.fasterxml.jackson.databind.node.ObjectNode}.
      *
      * @param map source map
      * @return ObjectNode
      */
-    private static com.fasterxml.jackson.databind.node.ObjectNode mapToJsonNode(
-        Map<String, String> map) {
+    private static com.fasterxml.jackson.databind.node.ObjectNode mapToJsonNode(Map<String, String> map) {
         var objectNode = JsonUtils.mapper().createObjectNode();
         map.forEach((k, v) -> {
             if (v == null) {
@@ -209,9 +199,7 @@ public enum SettingUtils {
         return objectNode;
     }
 
-    private static Map<String, String> jsonNodeToStringMap(
-        com.fasterxml.jackson.databind.JsonNode node
-    ) {
+    private static Map<String, String> jsonNodeToStringMap(com.fasterxml.jackson.databind.JsonNode node) {
         Map<String, String> stringMap = new LinkedHashMap<>();
         node.forEachEntry((k, v) -> {
             if (v == null || v.isNull() || v.isMissingNode()) {
@@ -250,5 +238,4 @@ public enum SettingUtils {
         });
         return stringMap;
     }
-
 }

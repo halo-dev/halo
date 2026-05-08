@@ -5,9 +5,8 @@ import org.jspecify.annotations.Nullable;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 
 /**
- * <p>Expression Object for performing annotations operations inside Halo Extra Expressions.</p>
- * An object of this class is usually available in variable evaluation expressions with the name
- * <code>#annotations</code>.
+ * Expression Object for performing annotations operations inside Halo Extra Expressions. An object of this class is
+ * usually available in variable evaluation expressions with the name <code>#annotations</code>.
  *
  * @author guqing
  * @since 2.0.2
@@ -30,8 +29,8 @@ public class Annotations {
     }
 
     /**
-     * Returns the value to which the specified key is mapped, or defaultValue if
-     * <code>extension</code> contains no mapping for the key.
+     * Returns the value to which the specified key is mapped, or defaultValue if <code>extension</code> contains no
+     * mapping for the key.
      *
      * @param extension extension vo
      * @param key the key of annotation

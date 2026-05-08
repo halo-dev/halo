@@ -18,5 +18,4 @@ public class SchemeAddedEvent extends ApplicationEvent {
         super(source);
         this.scheme = scheme;
     }
-
 }

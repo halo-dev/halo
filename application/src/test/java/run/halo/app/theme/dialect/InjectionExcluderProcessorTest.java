@@ -1,6 +1,5 @@
 package run.halo.app.theme.dialect;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Nested;
@@ -17,18 +16,12 @@ class InjectionExcluderProcessorTest {
     @Nested
     class PageInjectionExcluderTest {
         final InjectionExcluderProcessor.PageInjectionExcluder pageInjectionExcluder =
-            new InjectionExcluderProcessor.PageInjectionExcluder();
+                new InjectionExcluderProcessor.PageInjectionExcluder();
 
         @Test
         void excludeTest() {
             var cases = new String[] {
-                "login",
-                "signup",
-                "logout",
-                "password-reset/email/reset",
-                "error/404",
-                "error/500",
-                "challenges/totp"
+                "login", "signup", "logout", "password-reset/email/reset", "error/404", "error/500", "challenges/totp"
             };
 
             for (String templateName : cases) {

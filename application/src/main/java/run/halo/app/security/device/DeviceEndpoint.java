@@ -50,96 +50,86 @@ public class DeviceEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "DeviceV1alpha1Uc";
         return SpringdocRouteBuilder.route()
-            .GET("devices", this::listDevices,
-                builder -> builder.operationId("ListDevices")
-                    .description("List all user devices")
-                    .tag(tag)
-                    .response(responseBuilder().implementationArray(DeviceDto.class))
-            )
-            .DELETE("devices/{deviceId}", this::revokeDevice, builder -> builder
-                .operationId("RevokeDevice")
-                .description("Revoke a own device")
-                .tag(tag)
-                .parameter(parameterBuilder()
-                    .in(ParameterIn.PATH)
-                    .name("deviceId")
-                    .description("Device ID")
-                    .required(true)
-                )
-                .response(responseBuilder()
-                    .responseCode(String.valueOf(HttpStatus.NO_CONTENT))
-                )
-            )
-            .build();
+                .GET(
+                        "devices",
+                        this::listDevices,
+                        builder -> builder.operationId("ListDevices")
+                                .description("List all user devices")
+                                .tag(tag)
+                                .response(responseBuilder().implementationArray(DeviceDto.class)))
+                .DELETE(
+                        "devices/{deviceId}",
+                        this::revokeDevice,
+                        builder -> builder.operationId("RevokeDevice")
+                                .description("Revoke a own device")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("deviceId")
+                                        .description("Device ID")
+                                        .required(true))
+                                .response(responseBuilder().responseCode(String.valueOf(HttpStatus.NO_CONTENT))))
+                .build();
     }
 
     private Mono<ServerResponse> revokeDevice(ServerRequest request) {
         final var deviceId = request.pathVariable("deviceId");
         return principalName()
-            .flatMap(principalName -> deviceService.revoke(principalName, deviceId))
-            .then(ServerResponse.noContent().build());
+                .flatMap(principalName -> deviceService.revoke(principalName, deviceId))
+                .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> listDevices(ServerRequest request) {
         return getRequestContext(request)
-            .flatMapMany(context -> {
-                var listOptions = new ListOptions();
-                var query = equal("spec.principalName", context.username());
-                listOptions.setFieldSelector(FieldSelector.of(query));
-                return client.listAll(Device.class, listOptions,
-                        Sort.by("metadata.creationTimestamp"))
-                    .map(device -> {
-                        var sessionId = device.getSpec().getSessionId();
-                        var session = context.sessionMap().get(sessionId);
-                        if (session != null) {
-                            device.getSpec().setLastAccessedTime(session.getLastAccessedTime());
-                        }
-                        return new DeviceDto()
-                            .setDevice(device)
-                            .setCurrentDevice(context.sessionId().equals(sessionId))
-                            .setActive(session != null && !session.isExpired());
-                    })
-                    .sort(deviceDtoComparator());
-            })
-            .collectList()
-            .flatMap(deviceDto -> ServerResponse.ok().bodyValue(deviceDto));
+                .flatMapMany(context -> {
+                    var listOptions = new ListOptions();
+                    var query = equal("spec.principalName", context.username());
+                    listOptions.setFieldSelector(FieldSelector.of(query));
+                    return client.listAll(Device.class, listOptions, Sort.by("metadata.creationTimestamp"))
+                            .map(device -> {
+                                var sessionId = device.getSpec().getSessionId();
+                                var session = context.sessionMap().get(sessionId);
+                                if (session != null) {
+                                    device.getSpec().setLastAccessedTime(session.getLastAccessedTime());
+                                }
+                                return new DeviceDto()
+                                        .setDevice(device)
+                                        .setCurrentDevice(context.sessionId().equals(sessionId))
+                                        .setActive(session != null && !session.isExpired());
+                            })
+                            .sort(deviceDtoComparator());
+                })
+                .collectList()
+                .flatMap(deviceDto -> ServerResponse.ok().bodyValue(deviceDto));
     }
 
     Comparator<DeviceDto> deviceDtoComparator() {
         return Comparator.comparing(DeviceDto::isCurrentDevice)
-            .thenComparing(DeviceDto::isActive)
-            .thenComparing(DeviceDto::getDevice, Comparator.comparing(device -> {
-                var accessedTime = device.getSpec().getLastAccessedTime();
-                return accessedTime == null ? device.getMetadata().getCreationTimestamp()
-                    : accessedTime;
-            }))
-            .reversed();
+                .thenComparing(DeviceDto::isActive)
+                .thenComparing(DeviceDto::getDevice, Comparator.comparing(device -> {
+                    var accessedTime = device.getSpec().getLastAccessedTime();
+                    return accessedTime == null ? device.getMetadata().getCreationTimestamp() : accessedTime;
+                }))
+                .reversed();
     }
 
     private Mono<RequestContext> getRequestContext(ServerRequest request) {
-        return principalName()
-            .flatMap(principalName -> {
-                var builder = RequestContext.builder()
-                    .sessionMap(Map.of())
-                    .username(principalName);
-                var sessionMapMono = sessionRepository.findByPrincipalName(principalName)
-                    .doOnNext(builder::sessionMap);
-                var sessionMono = request.exchange().getSession()
-                    .doOnNext(session -> builder.sessionId(session.getId()));
-                return Mono.when(sessionMapMono, sessionMono)
-                    .then(Mono.fromSupplier(builder::build));
-            });
+        return principalName().flatMap(principalName -> {
+            var builder = RequestContext.builder().sessionMap(Map.of()).username(principalName);
+            var sessionMapMono =
+                    sessionRepository.findByPrincipalName(principalName).doOnNext(builder::sessionMap);
+            var sessionMono = request.exchange().getSession().doOnNext(session -> builder.sessionId(session.getId()));
+            return Mono.when(sessionMapMono, sessionMono).then(Mono.fromSupplier(builder::build));
+        });
     }
 
     @Builder
-    record RequestContext(String username, String sessionId,
-                          Map<String, ? extends Session> sessionMap) {
-    }
+    record RequestContext(String username, String sessionId, Map<String, ? extends Session> sessionMap) {}
 
     Mono<String> principalName() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName);
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName);
     }
 
     @Data

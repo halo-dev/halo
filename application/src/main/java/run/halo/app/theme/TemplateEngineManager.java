@@ -20,15 +20,18 @@ import run.halo.app.theme.engine.PluginClassloaderTemplateResolver;
 import run.halo.app.theme.message.ThemeMessageResolver;
 
 /**
- * <p>The {@link TemplateEngineManager} uses an {@link ConcurrentLruCache LRU cache} to manage
- * theme's {@link ISpringWebFluxTemplateEngine}.</p>
+ * The {@link TemplateEngineManager} uses an {@link ConcurrentLruCache LRU cache} to manage theme's
+ * {@link ISpringWebFluxTemplateEngine}.
+ *
  * <p>The default limit size of the {@link ConcurrentLruCache LRU cache} is
- * {@link TemplateEngineManager#CACHE_SIZE_LIMIT} to prevent unnecessary memory occupation.</p>
- * <p>If theme's {@link ISpringWebFluxTemplateEngine} already exists, it returns.</p>
- * <p>Otherwise, it checks whether the theme exists and creates the
- * {@link ISpringWebFluxTemplateEngine} into the LRU cache according to the {@link ThemeContext}
- * .</p>
- * <p>It is thread safe.</p>
+ * {@link TemplateEngineManager#CACHE_SIZE_LIMIT} to prevent unnecessary memory occupation.
+ *
+ * <p>If theme's {@link ISpringWebFluxTemplateEngine} already exists, it returns.
+ *
+ * <p>Otherwise, it checks whether the theme exists and creates the {@link ISpringWebFluxTemplateEngine} into the LRU
+ * cache according to the {@link ThemeContext} .
+ *
+ * <p>It is thread safe.
  *
  * @author johnniang
  * @author guqing
@@ -53,11 +56,14 @@ public class TemplateEngineManager {
 
     private final SystemVersionSupplier systemVersionSupplier;
 
-    public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
-        ExternalUrlSupplier externalUrlSupplier,
-        PluginManager pluginManager, ObjectProvider<ITemplateResolver> templateResolvers,
-        ObjectProvider<IDialect> dialects, ThemeResolver themeResolver,
-        SystemVersionSupplier systemVersionSupplier) {
+    public TemplateEngineManager(
+            ThymeleafProperties thymeleafProperties,
+            ExternalUrlSupplier externalUrlSupplier,
+            PluginManager pluginManager,
+            ObjectProvider<ITemplateResolver> templateResolvers,
+            ObjectProvider<IDialect> dialects,
+            ThemeResolver themeResolver,
+            SystemVersionSupplier systemVersionSupplier) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.pluginManager = pluginManager;
@@ -74,9 +80,10 @@ public class TemplateEngineManager {
     }
 
     public Mono<Void> clearCache(String themeName) {
-        return themeResolver.getThemeContext(themeName)
-            .doOnNext(themeContext -> engineCache.remove(buildCacheKey(themeContext)))
-            .then();
+        return themeResolver
+                .getThemeContext(themeName)
+                .doOnNext(themeContext -> engineCache.remove(buildCacheKey(themeContext)))
+                .then();
     }
 
     /**
@@ -86,8 +93,7 @@ public class TemplateEngineManager {
      * @param active from {@link #context}
      * @param context must not be null
      */
-    private record CacheKey(String name, boolean active, ThemeContext context) {
-    }
+    private record CacheKey(String name, boolean active, ThemeContext context) {}
 
     CacheKey buildCacheKey(ThemeContext context) {
         return new CacheKey(context.getName(), context.isActive(), context);
@@ -98,8 +104,7 @@ public class TemplateEngineManager {
         var engine = new HaloTemplateEngine(new ThemeMessageResolver(cacheKey.context()));
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
         engine.setLinkBuilder(new ThemeLinkBuilder(cacheKey.context(), externalUrlSupplier));
-        engine.setRenderHiddenMarkersBeforeCheckboxes(
-            thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
+        engine.setRenderHiddenMarkersBeforeCheckboxes(thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 
         var mainResolver = haloTemplateResolver();
         mainResolver.setPrefix(cacheKey.context().getPath().resolve("templates") + "/");
@@ -119,8 +124,7 @@ public class TemplateEngineManager {
 
         // we collect all template resolvers and add them into composite template resolver
         // to control the resolution flow
-        var compositeTemplateResolver =
-            new CompositeTemplateResolver(engine.getTemplateResolvers());
+        var compositeTemplateResolver = new CompositeTemplateResolver(engine.getTemplateResolvers());
         engine.setTemplateResolver(compositeTemplateResolver);
 
         dialects.orderedStream().forEach(engine::addDialect);
@@ -135,7 +139,8 @@ public class TemplateEngineManager {
         pluginTemplateResolver.setTemplateMode(thymeleafProperties.getMode());
         pluginTemplateResolver.setOrder(1);
         if (thymeleafProperties.getEncoding() != null) {
-            pluginTemplateResolver.setCharacterEncoding(thymeleafProperties.getEncoding().name());
+            pluginTemplateResolver.setCharacterEncoding(
+                    thymeleafProperties.getEncoding().name());
         }
         return pluginTemplateResolver;
     }
