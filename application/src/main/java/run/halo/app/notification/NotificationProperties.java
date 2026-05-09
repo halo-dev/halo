@@ -5,10 +5,11 @@ import lombok.Data;
 /**
  * Configuration properties for notifications.
  *
- * <p>The auto-cleanup feature removes notifications older than {@code retentionDays} days
- * when {@code retentionDays} is greater than 0.</p>
+ * <p>The auto-cleanup feature removes notifications older than {@code retentionDays} days when {@code retentionDays} is
+ * greater than 0.
  *
- * <p>Example configuration in application.yaml:</p>
+ * <p>Example configuration in application.yaml:
+ *
  * <pre>
  * halo:
  *   notification:
@@ -24,28 +25,19 @@ import lombok.Data;
 @Data
 public class NotificationProperties {
 
-    /**
-     * Whether to enable automatic notification cleanup. Default is {@code false}.
-     */
+    /** Whether to enable automatic notification cleanup. Default is {@code false}. */
     private boolean enabled = false;
 
     /**
-     * Number of days to retain notifications.
-     * Notifications older than this value will be deleted.
-     * A value of 0 or negative disables this strategy.
-     * Default is 30 days.
+     * Number of days to retain notifications. Notifications older than this value will be deleted. A value of 0 or
+     * negative disables this strategy. Default is 30 days.
      */
     private int retentionDays = 30;
 
-    /**
-     * Cron expression for the cleanup schedule.
-     * Default is every day at 3:00 AM: {@code "0 0 3 * * ?"}.
-     */
+    /** Cron expression for the cleanup schedule. Default is every day at 3:00 AM: {@code "0 0 3 * * ?"}. */
     private String cleanupCron = "0 0 3 * * ?";
 
-    /**
-     * Returns true if the retention-by-days strategy is active.
-     */
+    /** Returns true if the retention-by-days strategy is active. */
     public boolean isRetentionByDaysEnabled() {
         return enabled && retentionDays > 0;
     }

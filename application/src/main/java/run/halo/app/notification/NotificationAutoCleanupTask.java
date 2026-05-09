@@ -24,10 +24,9 @@ import run.halo.app.infra.utils.ReactiveUtils;
 /**
  * Periodically cleans up old {@link Notification} records to prevent unbounded data growth.
  *
- * <p>Read notifications older than the configured retention period are deleted.</p>
+ * <p>Read notifications older than the configured retention period are deleted.
  *
- * <p>The cleanup is skipped entirely when
- * {@link NotificationProperties#isEnabled()} is {@code false}.</p>
+ * <p>The cleanup is skipped entirely when {@link NotificationProperties#isEnabled()} is {@code false}.
  *
  * @author programmerloverun
  * @see RememberTokenCleaner the pattern this class follows
@@ -44,8 +43,8 @@ public class NotificationAutoCleanupTask {
     private final HaloProperties haloProperties;
 
     /**
-     * Triggered by the cron expression configured via
-     * {@code halo.notification.auto-cleanup.cleanup-cron} (defaults to 3:00 AM daily).
+     * Triggered by the cron expression configured via {@code halo.notification.auto-cleanup.cleanup-cron} (defaults to
+     * 3:00 AM daily).
      */
     @Scheduled(cron = "${halo.notification.auto-cleanup.cleanup-cron:0 0 3 * * ?}")
     public void cleanUp() {
@@ -57,8 +56,7 @@ public class NotificationAutoCleanupTask {
         log.info("Starting notification auto-cleanup job...");
 
         long deleted = cleanUpByRetentionDays();
-        log.info("Deleted {} notification(s) older than {} day(s).",
-            deleted, properties.getRetentionDays());
+        log.info("Deleted {} notification(s) older than {} day(s).", deleted, properties.getRetentionDays());
 
         log.info("Notification auto-cleanup finished. Total deleted: {}.", deleted);
     }
@@ -66,37 +64,35 @@ public class NotificationAutoCleanupTask {
     long cleanUpByRetentionDays() {
         var listOptions = buildExpiredListOptions(getRetentionThreshold());
         var count = new AtomicLong(0);
-        paginatedOperator.deleteInitialBatch(Notification.class, listOptions)
-            .doOnNext(n -> count.incrementAndGet())
-            .then()
-            .block(BLOCKING_TIMEOUT);
+        paginatedOperator
+                .deleteInitialBatch(Notification.class, listOptions)
+                .doOnNext(n -> count.incrementAndGet())
+                .then()
+                .block(BLOCKING_TIMEOUT);
         return count.get();
     }
 
     /**
      * Builds a {@link ListOptions} that matches notifications which:
+     *
      * <ul>
-     *   <li>are not already being deleted ({@code metadata.deletionTimestamp} is null)</li>
-     *   <li>were created before {@code threshold}</li>
-     *   <li>have already been read ({@code spec.unread} is {@code false})</li>
+     *   <li>are not already being deleted ({@code metadata.deletionTimestamp} is null)
+     *   <li>were created before {@code threshold}
+     *   <li>have already been read ({@code spec.unread} is {@code false})
      * </ul>
      */
     ListOptions buildExpiredListOptions(Instant threshold) {
         Query query = and(
-            isNull("metadata.deletionTimestamp"),
-            lessThan("metadata.creationTimestamp", threshold),
-            equal("spec.unread", false)
-        );
+                isNull("metadata.deletionTimestamp"),
+                lessThan("metadata.creationTimestamp", threshold),
+                equal("spec.unread", false));
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(query));
         return listOptions;
     }
 
-    /**
-     * Returns the cut-off instant: notifications created before this point are expired.
-     */
+    /** Returns the cut-off instant: notifications created before this point are expired. */
     Instant getRetentionThreshold() {
-        return Instant.now()
-            .minus(haloProperties.getNotification().getRetentionDays(), ChronoUnit.DAYS);
+        return Instant.now().minus(haloProperties.getNotification().getRetentionDays(), ChronoUnit.DAYS);
     }
 }

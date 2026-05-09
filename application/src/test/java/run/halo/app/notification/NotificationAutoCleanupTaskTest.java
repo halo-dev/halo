@@ -98,20 +98,19 @@ class NotificationAutoCleanupTaskTest {
             Notification n1 = buildNotification("n1", false);
             Notification n2 = buildNotification("n2", false);
             when(paginatedOperator.deleteInitialBatch(eq(Notification.class), any()))
-                .thenReturn(Flux.just(n1, n2));
+                    .thenReturn(Flux.just(n1, n2));
 
             long deleted = task.cleanUpByRetentionDays();
 
             assertThat(deleted).isEqualTo(2);
-            verify(paginatedOperator, times(1))
-                .deleteInitialBatch(eq(Notification.class), any(ListOptions.class));
+            verify(paginatedOperator, times(1)).deleteInitialBatch(eq(Notification.class), any(ListOptions.class));
         }
 
         @Test
         @DisplayName("cleanUpByRetentionDays() returns 0 when no expired notifications")
         void cleanUpByRetentionDays_returnsZero_whenNothingExpired() {
             when(paginatedOperator.deleteInitialBatch(eq(Notification.class), any()))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.empty());
 
             long deleted = task.cleanUpByRetentionDays();
 
