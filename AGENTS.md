@@ -1,124 +1,47 @@
-# AGENTS.md — Halo
+# Halo — AGENTS.md
 
-Open-source website builder — Java 21, Spring Boot WebFlux + R2DBC, Vue 3 + TailwindCSS. Versions: `gradle/libs.versions.toml`, `gradle.properties`, `ui/package.json`.
+Open-source website builder. Java 21 / Spring Boot WebFlux + R2DBC / Vue 3 + TailwindCSS.
 
-## Commands
+Versions live in `gradle/libs.versions.toml`, `gradle.properties`, `ui/package.json`. Do not hard-code them.
 
-### File-scoped (preferred — fast feedback)
+## Subproject AGENTS.md files
+
+This is a multi-module Gradle project. Each subproject has its own `AGENTS.md` with specialized
+conventions. Load them when working in that area:
+
+| Subproject | Path | What it is |
+|---|---|---|
+| API library | [`api/AGENTS.md`](api/AGENTS.md) | Extension model, reactive interfaces, security abstractions |
+| Application | [`application/AGENTS.md`](application/AGENTS.md) | Spring Boot app, service implementations, routers |
+| Frontend | [`ui/AGENTS.md`](ui/AGENTS.md) | pnpm workspace, Vue 3, TailwindCSS, packages |
+| Platform BOMs | [`platform/application/AGENTS.md`](platform/application/AGENTS.md) | Dependency version constraints |
+| Plugin BOM | [`platform/plugin/AGENTS.md`](platform/plugin/AGENTS.md) | Plugin development dependency platform |
+
+## Build Commands (Quick Reference)
 
 ```bash
-./gradlew :api:compileJava                        # Compile API module
-./gradlew :application:compileJava                # Compile application module
-./gradlew :application:test --tests "*PostService*"    # Run specific test class
-./gradlew spotlessCheck                           # Check formatting only
-./gradlew spotlessApply                           # Auto-fix formatting
-cd ui && pnpm build                               # Build frontend only
+# File-scoped (fast feedback — preferred during development)
+./gradlew :api:compileJava                         # Compile API module only
+./gradlew :application:compileJava                 # Compile application module only
+./gradlew :application:test --tests "*ClassName*"  # Run specific test class
+./gradlew spotlessCheck                            # Check formatting (all modules)
+./gradlew spotlessApply                            # Auto-fix formatting
+
+# Full verification (before pushing)
+./gradlew spotlessCheck build -x test              # Format + compile (skip tests)
+./gradlew build                                    # Everything: format + compile + test + UI
+
+# Frontend
+cd ui && pnpm build                                # Build frontend only
 ```
-
-### Full build (before pushing)
-
-```bash
-./gradlew spotlessCheck build -x test             # Format + compile (no tests)
-./gradlew build                                   # Everything: format + compile + test + UI
-```
-
-## Project Structure
-
-5 Gradle submodules: `api`, `application`, `platform:application`, `platform:plugin`, `ui`. Key source: `application/src/main/java/run/halo/app/`.
 
 ## Code Formatting
 
-- **Spotless** is the sole formatter (Checkstyle removed in #9963).
-- Java: `palantirJavaFormat("2.90.0")` — 4-space indent, 120-char line limit.
-- The `format 'misc'` block (XML, properties, gitignore, editorconfig) MUST live in root `build.gradle` — putting it in a submodule alongside `java` causes a Gradle classloader conflict.
-- Use `leadingTabsToSpaces()` — `indentWithSpaces()` is deprecated in Spotless 8.x.
+**Spotless** is the sole formatter (Checkstyle removed in #9963).
+Java: `palantirJavaFormat("2.90.0")` — 4-space indent, 120-char line limit.
 
-### ✅ Good patterns
-
-- `application/.../security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` — reactive filter with proper null-safety
-- `application/.../core/user/service/impl/UserServiceImpl.java` — service pattern with extension hooks, duplicate checking
-- `application/src/main/resources/extensions/role-template-authenticated.yaml` — extension resource registration
-
-## UI (Frontend)
-
-pnpm workspace at `ui/`. Build tool: **vite-plus** (`vp`). Vue 3 + TypeScript + TailwindCSS 3.4 + Vitest.
-
-### Key directories
-
-| Directory | Purpose |
-|---|---|
-| `ui/console-src/` | Admin console (main application) — modules, stores, layouts, router |
-| `ui/src/` | Shared code: components, composables, stores, i18n locales, FormKit, styles, setup |
-| `ui/packages/` | Workspace packages (see below) |
-
-### Commands
-
-```bash
-cd ui
-pnpm install                # Install dependencies (required before any other command)
-pnpm dev                    # Dev server with HMR
-pnpm build                  # Full build: typecheck + bundle
-pnpm build:packages         # Build workspace packages only (faster)
-pnpm test:unit              # Run unit tests (Vitest)
-pnpm lint                   # ESLint
-pnpm format                 # Format code (vp fmt)
-pnpm format:check           # Check formatting
-pnpm api-client:gen         # Generate API client from OpenAPI spec
-pnpm typecheck              # vue-tsc type checking
-```
-
-The `Makefile` wraps common workflows: `make -C ui dev`, `make -C ui build`, `make -C ui test`, `make -C ui api-client-gen`.
-
-### Packages (`ui/packages/`)
-
-| Package | Purpose |
-|---|---|
-| `api-client` | Generated Axios-based API client from OpenAPI spec |
-| `components` | Shared UI component library (Vue) + icons (Iconify) |
-| `editor` | Rich-text editor (Tiptap-based) |
-| `console-shared` | Console-specific shared code (stores, events, utils) |
-| `shared` | Cross-platform shared code (plugin system, types, stores) |
-| `ui-plugin-bundler-kit` | Build tooling for Halo UI plugins |
-
-### Conventions
-
-- **Module pattern:** Each feature in `ui/console-src/modules/<feature>/module.ts` uses `definePlugin()` to register routes, menus, and permissions. Modules are auto-discovered via `import.meta.glob("./**/module.ts")`.
-- **Main.ts setup chain:** components → i18n → vue-query → api-client → pinia → core modules → user → permissions → plugin modules → router → mount.
-- **Path aliases:** `@/*` → `src/*`, `@console/*` → `console-src/*`, `@uc/*` → `uc-src/*` (see `tsconfig.app.json`).
-- **State:** Pinia stores in `console-src/stores/` (console-specific) and `src/stores/` (shared: `plugin.ts`, `role.ts`).
-- **i18n:** vue-i18n with JSON locale files in `src/locales/` (en, zh-CN, zh-TW, es). Translation keys in `meta.title` on routes.
-- **Forms:** FormKit with custom inputs/plugins in `src/formkit/`. Theme config: `src/formkit/theme.ts`.
-- **Icons:** Iconify via `@iconify/vue`. Icon sets: lucide, mdi, ri, fluent, material-symbols, etc. (installed as `@iconify-json/*` devDeps).
-- **Shared composables:** `src/composables/` (e.g. `use-auto-save-content`, `use-role`, `use-title`).
-- **Tailwind theming:** `tailwindcss-themer` plugin with default theme (primary `#4CCBA0`, secondary `#0E1731`, danger `#D71D1D`). FormKit theme integrated.
-
-### Pitfalls
-
-- **Pre-commit hooks run lint-staged on UI files.** If `node_modules/@halo-dev/components` is missing (no `pnpm install`), `git commit` fails on Java-only changes. Use `git commit --no-verify` or `cd ui && pnpm install` first.
-- **API client regeneration needs two commands in order:** `./gradlew generateOpenApiDocs` (slow, ~28s, boots Spring), then `cd ui && pnpm api-client:gen`.
-
-## Critical Pitfalls
-
-1. **Never `git add -A` or `git add .`** — H2 database artifacts in `application/`. Stage specific files only.
-
-2. **H2 database paths must be absolute.** Use `r2dbc:h2:file:///tmp/halo-db`. Relative paths (`file:./tmp/...`) create stray `application/tmp/` directories.
-
-3. **`@Schema(pattern=...)` must be inline.** Extracting the regex to a `static final String` constant puts the literal constant name (not the regex) into the generated OpenAPI spec.
-
-4. **Resilience4j rate limiter keys must NOT include user-controlled values.** Each unique key creates an independent limiter — including email, phone, or request body fields allows bypass by varying those values. Use only authenticated identity or client IP.
-
-5. **Gradle wrapper upgrade requires TWO commands:**
-   ```bash
-   ./gradlew wrapper --gradle-version=X.Y.Z
-   ./gradlew wrapper
-   ```
-   First updates `gradle-wrapper.properties`; second regenerates the wrapper JAR and scripts.
-
-6. **Stale worktrees lock `main`.** If `git checkout main` fails with "already used by worktree":
-   ```bash
-   git worktree list
-   git worktree remove --force <path>
-   ```
+The `format 'misc'` block (XML, properties, gitignore, editorconfig) MUST live in root
+`build.gradle`. Putting it in a submodule alongside `java` causes a Gradle classloader conflict.
 
 ## Git Workflow
 
@@ -130,15 +53,46 @@ git fetch upstream && git checkout upstream/main && git checkout -b feat/xxx
 - **Branch naming:** `upgrade/gradle-X`, `feat/name`, `fix/name`, `improvement/name`
 - **PR template:** `.github/pull_request_template.md`
 - **CI:** `.github/workflows/halo.yaml`
+- **Never `git add -A` or `git add .`** — H2 database artifacts live in `application/`. Stage specific files only.
+- **Stale worktrees lock `main`.** If `git checkout main` fails: `git worktree list && git worktree remove --force <path>`
 
-## Key Files
+## Critical Pitfalls (Project-Wide)
 
-| Purpose | Path |
+### 1. H2 database paths must be absolute
+Use `r2dbc:h2:file:///tmp/halo-db`. Relative paths (`file:./tmp/...`) create stray `application/tmp/` directories.
+
+### 2. `@Schema(pattern=...)` must be inline
+Extracting the regex to a `static final String` puts the literal constant name into the generated
+OpenAPI spec, not the regex. Keep it inline even if it exceeds the 120-char line limit.
+
+### 3. Resilience4j rate limiter keys MUST NOT include user-controlled values
+Each unique key creates an independent limiter. Including email, phone, or request body fields
+allows bypass by varying those values. Use only authenticated identity or client IP.
+
+### 4. Gradle wrapper upgrade requires TWO commands
+```bash
+./gradlew wrapper --gradle-version=X.Y.Z   # Updates gradle-wrapper.properties
+./gradlew wrapper                           # Regenerates wrapper JAR + scripts
+```
+
+### 5. `format 'misc'` placement
+Must be in root `build.gradle`, never in `application/build.gradle`. Co-locating `java` and `misc`
+in the same submodule causes a Gradle 9.x implicit dependency validation error.
+
+### 6. API client regeneration needs two commands in order
+```bash
+./gradlew generateOpenApiDocs    # Boots Spring, extracts OpenAPI JSON (~28s)
+cd ui && pnpm api-client:gen     # Runs openapi-generator
+```
+
+## Config & Version Files
+
+| What | Where |
 |---|---|
-| Dependency catalog | `gradle/libs.versions.toml` |
-| Gradle properties (version) | `gradle.properties` |
-| Root build config | `build.gradle`, `settings.gradle` |
-| Module build configs | `api/build.gradle`, `application/build.gradle` |
-| App config | `application/src/main/resources/application.yaml` |
-| Frontend | `ui/package.json` (pnpm, Vue 3, TailwindCSS) |
+| Dependency versions | `gradle/libs.versions.toml` |
+| Project version | `gradle.properties` → `version=` |
+| Spring Boot version | `gradle/libs.versions.toml` → `[plugins] spring-boot` |
+| JDK version | `api/build.gradle` / `application/build.gradle` → `options.release = 21` |
+| Frontend deps | `ui/package.json` |
+| App configuration | `application/src/main/resources/application.yaml` |
 | Extension points | `application/src/main/resources/extensions/` |
