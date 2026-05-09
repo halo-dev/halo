@@ -100,9 +100,9 @@ Open a PR from your branch to `main` and fill out the PR template carefully:
 
 ## AI-Assisted Contribution Policy
 
-AI-assisted development is not prohibited, including code generation and refactoring support.
+We encourage the use of AI Agents to assist with code generation, refactoring, and design exploration. AI-assisted development is a powerful tool that can improve productivity and code quality when used responsibly.
 
-However, you are fully responsible for any code in your PR.
+However, **you are personally responsible for every line of code you submit**. AI-generated code must be treated as a draft that requires your thorough review and understanding.
 
 If you used AI tools, please follow these rules:
 
@@ -113,6 +113,22 @@ If you used AI tools, please follow these rules:
 - Mention AI assistance in your PR description when AI materially contributed to the final changes.
 
 In short: AI assistance is allowed, but unreviewed AI output is not acceptable.
+
+### OpenSpec Workflow for Feature and API Changes
+
+For **functional changes** or **API changes** (new endpoints, breaking changes, or behavioral modifications), you **must** use [OpenSpec](https://github.com/Fission-AI/OpenSpec) to create a proposal before implementation.
+
+OpenSpec is a spec-driven development workflow that helps align design intent between humans and AI before coding begins.
+
+For detailed documentation, visit: https://github.com/Fission-AI/OpenSpec/tree/main/docs
+
+#### Why OpenSpec?
+
+- **Design alignment**: Forces upfront design thinking before coding, reducing rework.
+- **Clear scope**: The proposal serves as a contract between the contributor, reviewers, and AI tools.
+- **Traceability**: Every change has a documented rationale and decision history.
+- **Consistency**: Ensures AI-generated implementations follow the project's agreed-upon design.
+- **Review efficiency**: Reviewers can focus on high-level design before line-by-line code review.
 
 ## Testing Expectations
 
