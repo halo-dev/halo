@@ -48,12 +48,21 @@ export const ExtensionSmartScroll = Extension.create<SmartScrollOptions>({
 
   addProseMirrorPlugins() {
     const options = this.options;
-    let lastMouseDownTime = 0;
+    let isMouseSelecting = false;
+    let lastMouseInteractionTime = 0;
 
     return [
       new Plugin({
         key: new PluginKey("smartScroll"),
         view() {
+          const handleMouseUp = () => {
+            isMouseSelecting = false;
+            lastMouseInteractionTime = Date.now();
+          };
+
+          window.addEventListener("mouseup", handleMouseUp, true);
+          window.addEventListener("dragend", handleMouseUp, true);
+
           return {
             update(view, prevState) {
               if (!prevState) {
@@ -66,23 +75,43 @@ export const ExtensionSmartScroll = Extension.create<SmartScrollOptions>({
               const docChanged = prevState.doc !== doc;
               const selectionChanged = !prevState.selection.eq(selection);
 
-              const isRecentMouseClick = Date.now() - lastMouseDownTime < 100;
+              const isRecentMouseInteraction =
+                isMouseSelecting || Date.now() - lastMouseInteractionTime < 150;
 
               // The conditions for triggering scrolling:
               // 1. Document content changed (input, delete, etc.)
-              // 2. Selection changed but not caused by mouse click (arrow keys, etc.)
-              if (docChanged || (selectionChanged && !isRecentMouseClick)) {
+              // 2. Selection changed but not caused by mouse interaction
+              // (arrow keys, keyboard selection, etc.)
+              if (
+                docChanged ||
+                (selectionChanged && !isRecentMouseInteraction)
+              ) {
                 requestAnimationFrame(() => {
                   smartScroll(view, options);
                 });
               }
+            },
+            destroy() {
+              window.removeEventListener("mouseup", handleMouseUp, true);
+              window.removeEventListener("dragend", handleMouseUp, true);
             },
           };
         },
         props: {
           handleDOMEvents: {
             mousedown: () => {
-              lastMouseDownTime = Date.now();
+              isMouseSelecting = true;
+              lastMouseInteractionTime = Date.now();
+              return false;
+            },
+            mouseup: () => {
+              isMouseSelecting = false;
+              lastMouseInteractionTime = Date.now();
+              return false;
+            },
+            dragend: () => {
+              isMouseSelecting = false;
+              lastMouseInteractionTime = Date.now();
               return false;
             },
           },
