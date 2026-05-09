@@ -25,6 +25,7 @@ import run.halo.app.core.extension.notification.Notification;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Tests for {@link NotificationAutoCleanupTask}.
@@ -40,10 +41,18 @@ class NotificationAutoCleanupTaskTest {
     private ReactiveExtensionPaginatedOperator paginatedOperator;
 
     @Mock
-    private NotificationProperties properties;
+    private HaloProperties haloProperties;
+
+    @Mock
+    private NotificationProperties notificationProperties;
 
     @InjectMocks
     private NotificationAutoCleanupTask task;
+
+    @BeforeEach
+    void setupHaloProperties() {
+        when(haloProperties.getNotification()).thenReturn(notificationProperties);
+    }
 
     // -----------------------------------------------------------------------
     // Guard: disabled
@@ -52,7 +61,7 @@ class NotificationAutoCleanupTaskTest {
     @Test
     @DisplayName("cleanUp() skips everything when auto-cleanup is disabled")
     void cleanUp_skips_whenDisabled() {
-        when(properties.isEnabled()).thenReturn(false);
+        when(notificationProperties.isEnabled()).thenReturn(false);
 
         task.cleanUp();
 
@@ -69,8 +78,8 @@ class NotificationAutoCleanupTaskTest {
 
         @BeforeEach
         void setup() {
-            when(properties.isEnabled()).thenReturn(true);
-            when(properties.getRetentionDays()).thenReturn(30);
+            when(notificationProperties.isEnabled()).thenReturn(true);
+            when(notificationProperties.getRetentionDays()).thenReturn(30);
         }
 
         @Test

@@ -18,6 +18,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.index.query.Query;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
@@ -40,7 +41,7 @@ public class NotificationAutoCleanupTask {
     static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
-    private final NotificationProperties properties;
+    private final HaloProperties haloProperties;
 
     /**
      * Triggered by the cron expression configured via
@@ -48,6 +49,7 @@ public class NotificationAutoCleanupTask {
      */
     @Scheduled(cron = "${halo.notification.auto-cleanup.cleanup-cron:0 0 3 * * ?}")
     public void cleanUp() {
+        var properties = haloProperties.getNotification();
         if (!properties.isEnabled()) {
             log.debug("Notification auto-cleanup is disabled, skipping.");
             return;
@@ -94,6 +96,7 @@ public class NotificationAutoCleanupTask {
      * Returns the cut-off instant: notifications created before this point are expired.
      */
     Instant getRetentionThreshold() {
-        return Instant.now().minus(properties.getRetentionDays(), ChronoUnit.DAYS);
+        return Instant.now()
+            .minus(haloProperties.getNotification().getRetentionDays(), ChronoUnit.DAYS);
     }
 }
