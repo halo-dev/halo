@@ -1,43 +1,49 @@
 # Platform Application BOM — AGENTS.md
 
-`java-platform` module at `platform/application/`. Bill of Materials that declares version
-constraints for all application dependencies. Published as `run.halo.tools.platform:platform-application`.
+`java-platform` module at `platform/application/`. This BOM declares shared dependency constraints for the application-side modules and is published as `run.halo.tools.platform:platform-application`.
 
-## Build
+Read this file together with the root [`AGENTS.md`](../../AGENTS.md). If the dependency change affects code in `api` or `application`, also load the corresponding nested `AGENTS.md`.
+
+## Quick commands
 
 ```bash
-./gradlew :platform:application:compileJava    # Compile only
+./gradlew :platform:application:compileJava
 ```
 
-This module has no source code — it's purely dependency constraint declarations.
+This module has no source code; changes here are dependency-constraint changes only.
 
 ## Purpose
 
-Centralizes dependency versions so `api` and `application` modules don't need to repeat
-version numbers. Applies the Spring Boot BOM via `SpringBootPlugin.BOM_COORDINATES`.
+- centralize dependency versions used by `api` and `application`
+- import the Spring Boot BOM baseline
+- keep downstream build files versionless wherever possible
 
-## Key Dependencies
+## Key dependencies
 
-See `platform/application/build.gradle` for the full constraint list. Key ones:
+See `platform/application/build.gradle` for the full constraint list. Important families include:
 
-| Dependency | Purpose |
-|---|---|
-| Spring Boot BOM | Framework baseline (`org.springframework.boot:spring-boot-dependencies`) |
-| Lucene bundles | Search engine |
-| Resilience4j | Rate limiting / circuit breaker |
-| PF4J | Plugin framework |
-| Guava | Utility library |
+|    Dependency     |           Purpose            |
+|-------------------|------------------------------|
+| Spring Boot BOM   | Framework baseline           |
+| Lucene            | Search engine                |
+| Resilience4j      | Rate limiting and resilience |
+| PF4J              | Plugin framework             |
+| Guava             | Shared utilities             |
 | SpringDoc OpenAPI | API documentation generation |
-| Bouncy Castle | Cryptographic operations |
-| jsoup | HTML parsing |
-| Thumbnailator | Image thumbnail generation |
-| UA Parser | User-agent parsing |
+| Bouncy Castle     | Cryptography                 |
+| jsoup             | HTML parsing                 |
+| Thumbnailator     | Thumbnail generation         |
+| UA Parser         | User-agent parsing           |
 
-## Pitfalls
+## Rules
 
-- **Version constraints go here, not in `api/build.gradle` or `application/build.gradle`.**
-  The `api` module uses `api platform(project(':platform:application'))` to import these constraints.
-- **Adding a new dependency?** If it's used by both `api` and `application`, add the version
-  constraint here first, then use the versionless dependency in `api/build.gradle`.
-- **Upgrading a version?** If the version is pinned in `gradle/libs.versions.toml`, update it there.
-  If only in this BOM, update the constraint directly.
+- Put shared versions here instead of repeating them in `api/build.gradle` or `application/build.gradle`.
+- If a version is already managed in `gradle/libs.versions.toml`, update it there instead of duplicating it here.
+- If a dependency is shared by `api` and `application`, add the constraint here first, then use the dependency without an inline version downstream.
+
+## Boundaries
+
+- ✅ **Always:** Keep version management centralized and consistent with `gradle/libs.versions.toml`.
+- ⚠️ **Ask first:** New shared libraries, major upgrades with compatibility risk, or BOM changes that affect plugin consumers indirectly.
+- 🚫 **Never:** Scatter shared versions back into module build files; add implementation-style logic to this `java-platform` module.
+

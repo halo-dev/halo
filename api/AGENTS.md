@@ -1,68 +1,101 @@
 # API Module — AGENTS.md
 
-`java-library` module at `api/`. Defines the extension model, reactive interfaces, security
-abstractions, and service contracts used by the `application` module and plugins.
+`java-library` module at `api/`. It defines the extension model, reactive interfaces, security abstractions, and service contracts used by `application` and external plugins.
 
-## Build
+Read this file together with the root [`AGENTS.md`](../AGENTS.md). If a task changes both contracts and implementations, also load [`application/AGENTS.md`](../application/AGENTS.md). If API or OpenAPI-visible DTOs affect the console or user center, also load [`ui/AGENTS.md`](../ui/AGENTS.md).
+
+## Quick commands
 
 ```bash
-./gradlew :api:compileJava              # Compile only
-./gradlew :api:test                     # Run all tests
-./gradlew :api:test --tests "*Xxx*"     # Run specific test
-./gradlew :api:spotlessApply            # Format only API module
+./gradlew :api:compileJava
+./gradlew :api:test
+./gradlew :api:test --tests "*Xxx*"
+./gradlew :api:spotlessApply
 ```
 
-## Key Packages
+## When to work here
 
-| Package | Purpose |
-|---|---|
-| `run.halo.app.extension` | Kubernetes-style extension model: `Extension`, `Metadata`, `Scheme`, `ReactiveExtensionClient`, `Unstructured` |
-| `run.halo.app.extension.router` | REST router framework for extensions: `IListRequest`, `SortableRequest`, `QueryParamBuildUtil` |
-| `run.halo.app.extension.controller` | Controller pattern for reconciling extensions |
-| `run.halo.app.core.extension` | Core extensions: `Post`, `Category`, `Tag`, `Comment`, `User`, `Role`, `Plugin`, `Theme`, `Setting` |
-| `run.halo.app.core.extension.service` | Core service interfaces: `UserService`, `RoleService`, `PostService`, etc. |
-| `run.halo.app.infra` | Infrastructure: `SystemSetting`, `SystemConfigurableEnvironmentFetcher` |
-| `run.halo.app.security` | Security abstractions: `HaloOAuth2AuthenticationToken`, authorization interfaces |
-| `run.halo.app.plugin` | Plugin API: `PluginApplicationContext`, extension points |
-| `run.halo.app.theme` | Theme API: `ThemeSetting`, template interfaces |
-| `run.halo.app.content` | Content abstractions: `Snapshot`, `ContentWrapper`, `Contributor` |
-| `run.halo.app.event` | Event types (Spring `ApplicationEvent` subclasses) |
-| `run.halo.app.search` | Search abstractions |
-| `run.halo.app.migration` | Migration framework |
-| `run.halo.app.notification` | Notification abstractions: `Reason`, `ReasonType`, `NotificationCenter` |
+- service interfaces implemented in `application`
+- extension model types and metadata contracts
+- public security abstractions
+- plugin-facing APIs and extension points
+- shared DTOs or annotations that affect generated OpenAPI
 
-## Extension Model
+Because plugins depend on this module, changes here are higher risk than ordinary backend refactors.
+
+## Key packages
+
+|                Package                |                                                    Purpose                                                     |
+|---------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| `run.halo.app.extension`              | Kubernetes-style extension model: `Extension`, `Metadata`, `Scheme`, `ReactiveExtensionClient`, `Unstructured` |
+| `run.halo.app.extension.router`       | REST router framework for extensions: `IListRequest`, `SortableRequest`, `QueryParamBuildUtil`                 |
+| `run.halo.app.extension.controller`   | Controller pattern for reconciling extensions                                                                  |
+| `run.halo.app.core.extension`         | Core extensions: `Post`, `Category`, `Tag`, `Comment`, `User`, `Role`, `Plugin`, `Theme`, `Setting`            |
+| `run.halo.app.core.extension.service` | Core service interfaces such as `UserService`, `RoleService`, `PostService`                                    |
+| `run.halo.app.infra`                  | Infrastructure abstractions                                                                                    |
+| `run.halo.app.security`               | Security abstractions including `HaloOAuth2AuthenticationToken`                                                |
+| `run.halo.app.plugin`                 | Plugin API and extension points                                                                                |
+| `run.halo.app.theme`                  | Theme API                                                                                                      |
+| `run.halo.app.content`                | Content abstractions                                                                                           |
+| `run.halo.app.event`                  | Event types                                                                                                    |
+| `run.halo.app.search`                 | Search abstractions                                                                                            |
+| `run.halo.app.migration`              | Migration framework                                                                                            |
+| `run.halo.app.notification`           | Notification abstractions                                                                                      |
+
+## Extension model
 
 Halo's core data model uses a Kubernetes-style extension system:
 
-- **`Extension`** interface — all domain objects implement this. Provides `getMetadata()`, `getApiVersion()`, `getKind()`.
-- **`Metadata`** — contains `name`, `labels`, `annotations`, `version`, `creationTimestamp`.
-- **`Scheme`** — registers an Extension type with its `GroupVersionKind`, Java type, and JSON schema.
-- **`ReactiveExtensionClient`** — the primary CRUD API: `create()`, `fetch()`, `update()`, `delete()`, `list()`.
-- **`Unstructured`** — generic representation when the concrete type is unknown (e.g., plugin config).
+- **`Extension`** — all domain objects implement this and expose metadata, API version, and kind.
+- **`Metadata`** — holds `name`, labels, annotations, version, and timestamps.
+- **`Scheme`** — registers an extension type with its `GroupVersionKind`, Java type, and JSON schema.
+- **`ReactiveExtensionClient`** — the generic CRUD entry point.
+- **`Unstructured`** — fallback representation when the concrete type is unknown.
 
-### Custom Resource Patterns
+Example:
 
 ```java
-// Most extensions follow this pattern
 @GVK(group = "content.halo.run", version = "v1alpha1", kind = "Post",
-     singular = "post", plural = "posts")
+    singular = "post", plural = "posts")
 public class Post extends AbstractExtension { ... }
 ```
 
-## Service Interfaces
+## Service interfaces
 
-Services are defined in `api` as interfaces, implemented in `application`.
-Key ones:
+Interfaces live here; implementations belong in `application`.
 
-- `UserService` — user CRUD, role assignment, password management. Prefer over raw `ReactiveExtensionClient` for user operations (handles duplicate checking, extensions hooks).
+- `UserService` — prefer this over raw `ReactiveExtensionClient` for user creation and role wiring.
 - `RoleService` — role CRUD and dependency resolution.
 - `PostService` / `SinglePageService` — content publishing pipeline.
 - `NotificationCenter` — notification dispatch.
-- `ThemeService` / `PluginService` — theme/plugin lifecycle.
+- `ThemeService` / `PluginService` — theme and plugin lifecycle.
+
+If an interface signature changes, expect follow-on changes in `application` and often in `ui`.
+
+## OpenAPI and downstream impact
+
+Changes in `api` can surface in generated docs and the UI API client. If you touch OpenAPI-visible DTOs, schema annotations, or route-facing types, regenerate the client from the repo root:
+
+```bash
+./gradlew generateOpenApiDocs
+pnpm -C ui api-client:gen
+```
+
+## Test patterns
+
+- Run focused tests with `./gradlew :api:test --tests "*NamePattern*"`.
+- Add or update tests for any changed contract behavior.
+- Prefer contract-level assertions that make downstream breakage obvious.
 
 ## Pitfalls
 
-- **`@Schema(pattern=...)` must be inline** in DTOs/extensions. Extracting the regex to a `static final String` puts the literal constant name (not the regex) into the generated OpenAPI spec.
-- **Rate limiter keys** in `api` module abstractions must not include user-controlled parameters. Each unique key is an independent limiter. Use authenticated identity or client IP only.
-- **`Extension` metadata name convention:** use `setName("prefix-" + UUID)` not `setGenerateName()`. Service implementations like `UserServiceImpl` call `grantRoles(user.getMetadata().getName())` on the original reference — `generateName` returns null until persisted.
+- **`@Schema(pattern = ...)` must stay inline.** Extracting the regex into a constant makes the generated OpenAPI contain the constant name instead of the pattern.
+- **Rate limiter keys must not include user-controlled input.** Each unique key becomes its own limiter; use authenticated identity or client IP only.
+- **Use `setName("prefix-" + UUID)`, not `setGenerateName()`.** Service implementations often read `metadata.name` before persistence; `generateName` is still null at that point.
+
+## Boundaries
+
+- ✅ **Always:** Keep API contracts minimal and stable; update downstream implementations and tests together; think about plugin compatibility before changing signatures.
+- ⚠️ **Ask first:** Breaking changes to public APIs, plugin extension points, public annotations, or serialization shape.
+- 🚫 **Never:** Hide a breaking API change behind silent defaults; change public contracts without updating `application`; edit generated UI client files instead of regenerating them.
+

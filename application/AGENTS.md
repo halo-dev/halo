@@ -1,37 +1,45 @@
 # Application Module — AGENTS.md
 
-Executable Spring Boot WebFlux application at `application/`. Implements all service interfaces
-from `api`, REST routers, security filters, and extension controllers.
+Executable Spring Boot WebFlux application at `application/`. This module implements the contracts from `api`, owns routers, security, migrations, plugin/theme runtime behavior, and packages the UI into the backend artifact.
 
-## Build
+Read this file together with the root [`AGENTS.md`](../AGENTS.md). If a change affects public contracts, also load [`api/AGENTS.md`](../api/AGENTS.md). If a change affects console or user-center payloads, auth flows, or generated OpenAPI, also load [`ui/AGENTS.md`](../ui/AGENTS.md).
+
+## Quick commands
 
 ```bash
-./gradlew :application:compileJava                      # Compile only
-./gradlew :application:test --tests "*PostService*"     # Run specific test class
-./gradlew :application:test                             # Run all tests
-./gradlew :application:spotlessApply                    # Format only application module
-./gradlew :application:bootRun                          # Start dev server (port 8090)
+./gradlew :application:compileJava
+./gradlew :application:test
+./gradlew :application:test --tests "*PostService*"
+./gradlew :application:spotlessApply
+./gradlew :application:bootRun
+./gradlew generateOpenApiDocs
 ```
 
-## Key Packages
+## Cross-stack touchpoints
 
-| Package | Purpose |
-|---|---|
-| `run.halo.app.core.extension.service.impl` | Service implementations: `UserServiceImpl`, `PostServiceImpl`, `RoleServiceImpl` |
-| `run.halo.app.content` | Content management: post/page publishing, snapshots, contributors |
-| `run.halo.app.security` | Security: authentication filters, OAuth2, authorization |
-| `run.halo.app.security.authentication.oauth2` | OAuth2 login: `MapOAuth2AuthenticationFilter`, login handlers |
-| `run.halo.app.extension.controller` | Extension controllers (reconcilers) |
-| `run.halo.app.infra` | Infrastructure: system config, theme/plugin management |
-| `run.halo.app.notification` | Notification implementation: `DefaultNotificationCenter` |
-| `run.halo.app.plugin` | Plugin lifecycle: `PluginApplicationContextFactory`, extension point registration |
-| `run.halo.app.theme` | Theme engine: template resolution, theme routes |
-| `run.halo.app.search` | Search implementation (Lucene) |
-| `run.halo.app.migration` | Database migration (r2dbc-migrate) |
+- `generateOpenApiDocs` is driven from this module and feeds the generated UI API client.
+- `copyUiDist` pulls `ui/build/dist` into the backend resources during packaging.
+- If request/response shape, auth behavior, or route semantics change here, assume the UI may need changes too.
 
-## Service Implementation Pattern
+## Key packages
 
-All service implementations follow the same reactive pattern:
+|                    Package                    |                                         Purpose                                         |
+|-----------------------------------------------|-----------------------------------------------------------------------------------------|
+| `run.halo.app.core.extension.service.impl`    | Service implementations such as `UserServiceImpl`, `PostServiceImpl`, `RoleServiceImpl` |
+| `run.halo.app.content`                        | Content management: publishing, snapshots, contributors                                 |
+| `run.halo.app.security`                       | Security filters, OAuth2, authorization                                                 |
+| `run.halo.app.security.authentication.oauth2` | OAuth2 login flow                                                                       |
+| `run.halo.app.extension.controller`           | Extension reconcilers and controllers                                                   |
+| `run.halo.app.infra`                          | System config, theme/plugin management                                                  |
+| `run.halo.app.notification`                   | `DefaultNotificationCenter` and related behavior                                        |
+| `run.halo.app.plugin`                         | Plugin lifecycle and extension registration                                             |
+| `run.halo.app.theme`                          | Theme engine and route integration                                                      |
+| `run.halo.app.search`                         | Lucene-backed search                                                                    |
+| `run.halo.app.migration`                      | `r2dbc-migrate` integration                                                             |
+
+## Service implementation pattern
+
+Most services follow the same reactive shape:
 
 ```java
 @Component
@@ -50,30 +58,33 @@ public class XxxServiceImpl implements XxxService {
 }
 ```
 
-### Key service classes:
-- `UserServiceImpl` — handles duplicate checking, `UserPreCreatingHandler`/`UserPostCreatingHandler` extension hooks, `grantRoles()`. Always use this for user creation, not raw `ReactiveExtensionClient`.
-- `UserConnectionServiceImpl` — OAuth2 connection management: `createUserConnection()`.
-- `DefaultNotificationCenter` — notification dispatch via `ReasonType` resolution.
+Key service reminders:
+
+- `UserServiceImpl` owns duplicate checks, create hooks, and role grants. Use it instead of raw `ReactiveExtensionClient` for user creation.
+- `UserConnectionServiceImpl` owns OAuth2 connection persistence.
+- `DefaultNotificationCenter` resolves `ReasonType` and dispatches notifications.
 
 ## Security
 
-### OAuth2 Authentication Flow
+### OAuth2 authentication flow
 
-1. `MapOAuth2AuthenticationFilter` maps OAuth2 `OAuth2User` to Halo `UserDetails`
-2. Auto-registration creates a new Halo user from OAuth2 attributes
-3. `DefaultOAuth2LoginHandlerEnhancer` creates/updates `UserConnection`
+1. `MapOAuth2AuthenticationFilter` maps `OAuth2User` to Halo `UserDetails`.
+2. Auto-registration creates the Halo user from OAuth2 attributes.
+3. `DefaultOAuth2LoginHandlerEnhancer` creates or updates `UserConnection`.
 
-### OAuth2 key classes:
-- `MapOAuth2AuthenticationFilter.java` — central filter, maps OAuth2 to Halo user
-- `OAuth2SecurityConfigurer.java` — registers filter in Spring Security chain
-- `HaloOAuth2AuthenticationToken.java` (in `api`) — wraps OAuth2 token + UserDetails
+Key classes:
 
-### Pitfalls:
-- Pre-auth check in `MapOAuth2AuthenticationFilter` MUST exclude `OAuth2AuthenticationToken` instances. Without `!(preAuth instanceof OAuth2AuthenticationToken)`, the OAuth2-only flow tries to bind to the OAuth2 user's "name" attribute as a Halo username.
-- Use `UserService.createUser()`, not `ReactiveExtensionClient.create()` followed by manual `RoleBinding.create()`.
-- Do NOT use `setGenerateName()` with `createUser()` — it returns null from `getName()`.
+- `MapOAuth2AuthenticationFilter.java`
+- `OAuth2SecurityConfigurer.java`
+- `HaloOAuth2AuthenticationToken.java` in `api`
 
-## REST Router Pattern
+Pitfalls:
+
+- The pre-auth check in `MapOAuth2AuthenticationFilter` must exclude `OAuth2AuthenticationToken` instances.
+- Use `UserService.createUser()`, not raw extension creation plus manual role binding.
+- Do not use `setGenerateName()` with `createUser()` because the name is still null when downstream code reads it.
+
+## REST router pattern
 
 Routers use Spring WebFlux functional endpoints:
 
@@ -91,36 +102,40 @@ public class PostRouter implements RouterFunction<ServerResponse> {
 ```
 
 Router packages:
-- `run.halo.app.core.extension.router` — core extension CRUD routes
-- `run.halo.app.content.router` — content management endpoints
-- `run.halo.app.security.router` — auth endpoints (login, token refresh)
 
-## Config & Resources
+- `run.halo.app.core.extension.router`
+- `run.halo.app.content.router`
+- `run.halo.app.security.router`
 
-| What | Path |
-|---|---|
-| Application YAML | `application/src/main/resources/application.yaml` |
-| Extension point files | `application/src/main/resources/extensions/` |
-| Role templates | `application/src/main/resources/extensions/role-template-*.yaml` |
-| i18n resources | `application/src/main/resources/i18n/` |
+## Config and resources
 
-## Test Patterns
+|       What        |                               Path                               |
+|-------------------|------------------------------------------------------------------|
+| Application YAML  | `application/src/main/resources/application.yaml`                |
+| Extension schemas | `application/src/main/resources/extensions/`                     |
+| Role templates    | `application/src/main/resources/extensions/role-template-*.yaml` |
+| i18n resources    | `application/src/main/resources/i18n/`                           |
+| DB migrations     | `application/src/main/resources/db/migration/`                   |
+
+## Test patterns
 
 ```bash
-# Run specific test class
 ./gradlew :application:test --tests "*ClassName*"
-
-# Run tests matching a pattern (e.g., all OAuth2 tests)
 ./gradlew :application:test --tests "*oauth2*"
-
-# Run multiple patterns
 ./gradlew :application:test --tests "*PostService*" --tests "*ContentService*"
 ```
 
-Tests use JUnit 5 + Spring Boot Test + Mockito + `StepVerifier` for reactive chains.
-Lombok available in test scope.
+Tests use JUnit 5, Spring Boot Test, Mockito, and `StepVerifier`.
 
 When testing OAuth2 auto-registration:
-- Mock `UserService` with `when(userService.createUser(any(User.class), anySet()))`
-- Use `ArgumentCaptor` to inspect created User fields
-- Use `@MockitoSettings(strictness = Strictness.LENIENT)` to handle reactive chain stubbing
+
+- mock `UserService.createUser(any(User.class), anySet())`
+- inspect created users with `ArgumentCaptor`
+- use lenient Mockito settings only when the reactive setup truly requires it
+
+## Boundaries
+
+- ✅ **Always:** Preserve reactive, non-blocking behavior; update API contracts and UI consumers together when backend behavior changes; run focused backend tests for the touched area.
+- ⚠️ **Ask first:** Security model changes, migration scripts, plugin preset behavior, or anything that breaks public API assumptions.
+- 🚫 **Never:** Add blocking I/O in the request path; bypass `UserService` for user creation flows; change generated OpenAPI behavior without considering UI regeneration.
+

@@ -1,65 +1,81 @@
 # UI (Frontend) — AGENTS.md
 
-pnpm monorepo at `ui/`. Admin console + user center. Vue 3 + TypeScript + TailwindCSS 3.4.
+pnpm workspace at `ui/`. It contains the admin console, user center, shared packages, and the generated API client used by the frontend.
 
-## Quick Commands
+Read this file together with the root [`AGENTS.md`](../AGENTS.md). If a change touches backend contracts, auth flows, or generated OpenAPI, also load [`application/AGENTS.md`](../application/AGENTS.md). If a shared public type or extension contract changes, also load [`api/AGENTS.md`](../api/AGENTS.md).
+
+## Quick commands
+
+Prefer root-scoped commands:
 
 ```bash
-cd ui
-pnpm install                # Required before any other command
-pnpm dev                    # Dev server with HMR (port varies by route)
-pnpm build                  # Full: typecheck + bundle (console + UC)
-pnpm build:packages         # Build workspace packages only (faster)
-pnpm test:unit              # Vitest unit tests
-pnpm lint                   # ESLint
-pnpm format                 # Format code (vp fmt)
-pnpm format:check           # Check formatting
-pnpm api-client:gen         # Generate API client from OpenAPI spec
-pnpm typecheck              # vue-tsc type checking
+pnpm -C ui install
+pnpm -C ui dev
+pnpm -C ui build
+pnpm -C ui build:packages
+pnpm -C ui test:unit
+pnpm -C ui lint
+pnpm -C ui format
+pnpm -C ui format:check
+pnpm -C ui typecheck
+pnpm -C ui api-client:gen
 ```
 
-Or use Makefile wrappers: `make -C ui dev`, `make -C ui build`, `make -C ui test`, `make -C ui api-client-gen`.
+Local wrappers also exist:
 
-## Directory Layout
-
+```bash
+make -C ui dev
+make -C ui build
+make -C ui test
+make -C ui api-client-gen
 ```
+
+## Cross-stack touchpoints
+
+- `packages/api-client` is generated from backend OpenAPI docs. Do not hand-edit generated files.
+- Backend route, DTO, auth, or schema changes often require `./gradlew generateOpenApiDocs && pnpm -C ui api-client:gen`.
+- The frontend build output is bundled into the backend JAR during the application build.
+
+## Directory layout
+
+```text
 ui/
-├── console-src/            # Admin console (main application)
-│   ├── modules/            # Feature modules — auto-discovered via import.meta.glob
-│   ├── stores/             # Pinia stores (console-specific)
-│   ├── router/             # Vue Router config
-│   ├── layouts/            # Layout components
-│   └── styles/             # Console-specific styles
-├── src/                    # Shared code
+├── console-src/            # Admin console
+│   ├── modules/            # Feature modules, auto-discovered via import.meta.glob
+│   ├── stores/             # Console-specific Pinia stores
+│   ├── router/             # Console router config
+│   ├── layouts/            # Console layouts
+│   └── styles/             # Console styles
+├── src/                    # Shared frontend code
 │   ├── components/         # Shared Vue components
-│   ├── composables/        # Shared composables (use-auto-save-content, use-role, etc.)
-│   ├── stores/             # Shared Pinia stores (plugin.ts, role.ts)
-│   ├── formkit/            # FormKit config + custom inputs/plugins
-│   ├── locales/            # i18n JSON files (en, zh-CN, zh-TW, es)
-│   └── styles/             # Shared TailwindCSS + theme config
-├── uc-src/                 # User center (public-facing)
-│   ├── modules/            # Feature modules — auto-discovered
-│   └── router/             # Router with auth guards
-├── packages/               # Workspace packages (see below)
+│   ├── composables/        # Shared composables
+│   ├── stores/             # Shared Pinia stores
+│   ├── formkit/            # FormKit setup and theme
+│   ├── locales/            # i18n JSON files
+│   └── styles/             # Shared Tailwind/theme files
+├── uc-src/                 # User center
+├── packages/               # Workspace packages
 ├── public/                 # Static assets
 └── scripts/                # Build scripts
 ```
 
-## Workspace Packages (`ui/packages/`)
+## Workspace packages
 
-| Package | Purpose |
-|---|---|
-| `api-client` | Generated Axios-based API client from OpenAPI spec |
-| `components` | Shared UI component library + icons (Iconify) |
-| `editor` | Rich-text editor (Tiptap-based) |
-| `console-shared` | Console-specific shared code (stores, events, utils) |
-| `shared` | Cross-platform shared code (plugin system, types, stores) |
-| `ui-plugin-bundler-kit` | Build tooling for Halo UI plugins |
+| Package                 | Purpose                                           |
+| ----------------------- | ------------------------------------------------- |
+| `api-client`            | Generated Axios-based API client from OpenAPI     |
+| `components`            | Shared UI components and icons                    |
+| `editor`                | Tiptap-based rich-text editor                     |
+| `console-shared`        | Console-specific shared stores, events, and utils |
+| `shared`                | Cross-platform shared types and utilities         |
+| `ui-plugin-bundler-kit` | Build tooling for Halo UI plugins                 |
 
 ## Conventions
 
-### Module Pattern
+### Module pattern
+
 Each feature in `console-src/modules/<feature>/module.ts` uses `definePlugin()`:
+
 ```ts
 export default definePlugin({
   name: 'posts',
@@ -68,54 +84,75 @@ export default definePlugin({
   permissions: [...],
 })
 ```
+
 Modules are auto-discovered via `import.meta.glob("./**/module.ts")`.
 
-### Startup Order (main.ts)
-components → i18n → vue-query → api-client → pinia → core modules → user → permissions → plugin modules → router → mount
+### Startup order
 
-### Path Aliases
+`components -> i18n -> vue-query -> api-client -> pinia -> core modules -> user -> permissions -> plugin modules -> router -> mount`
+
+### Path aliases
+
 - `@/*` → `src/*`
 - `@console/*` → `console-src/*`
 - `@uc/*` → `uc-src/*`
+
 Defined in `tsconfig.app.json`.
 
-### Tech Stack
-- **State:** Pinia stores
-- **i18n:** vue-i18n with JSON locale files in `src/locales/`
-- **Forms:** FormKit (`src/formkit/theme.ts`)
-- **Icons:** Iconify via `@iconify/vue`. Icon sets: lucide, mdi, ri, fluent (installed as `@iconify-json/*` devDeps)
-- **CSS:** TailwindCSS 3.4 with `tailwindcss-themer` plugin
+### Tech stack
+
+- **State:** Pinia
+- **i18n:** `vue-i18n` with JSON locale files in `src/locales/`
+- **Forms:** FormKit
+- **Icons:** Iconify via `@iconify/vue`
+- **CSS:** TailwindCSS 3.4 + `tailwindcss-themer`
 - **Build tool:** `vite-plus` (`vp`)
 - **Testing:** Vitest
-- **API:** vue-query (TanStack Query)
+- **Data fetching:** TanStack Query (`@tanstack/vue-query`)
 
 ### Theme
-Default theme via `tailwindcss-themer`:
+
+Default theme tokens:
+
 - Primary: `#4CCBA0`
 - Secondary: `#0E1731`
 - Danger: `#D71D1D`
-FormKit theme integrated with TailwindCSS theme tokens.
+
+Prefer theme tokens over hard-coded colors in features.
 
 ### Formatting
-Uses `vp fmt` (vite-plus format wrapper) and ESLint.
-Pre-commit hooks run lint-staged on staged UI files.
+
+Use `vp fmt` via `pnpm -C ui format`. Pre-commit hooks run `lint-staged` for staged UI files.
+
+## Testing
+
+- **Framework:** Vitest with jsdom
+- **Location:** colocated `.spec.ts` files
+- **Single file:** `pnpm -C ui test:unit -- src/utils/foo.spec.ts`
+- **Pattern:** `pnpm -C ui test:unit -- -t "test name pattern"`
+- **Watch:** `pnpm -C ui test:unit:watch`
+
+Add or update tests for changed UI behavior, especially utilities, composables, and package exports.
+
+## Validation flow
+
+- Run `pnpm -C ui build:packages` before `pnpm -C ui build` when workspace packages changed.
+- Use `pnpm -C ui typecheck && pnpm -C ui lint` as the normal validation path.
+- Regenerate the API client after backend contract changes:
+
+```bash
+./gradlew generateOpenApiDocs
+pnpm -C ui api-client:gen
+```
+
+## Boundaries
+
+- ✅ **Always:** Work from the repo root for command orchestration; run `pnpm -C ui format`; run `pnpm -C ui build:packages` when package code changes; keep frontend behavior in sync with backend contract changes.
+- ⚠️ **Ask first:** Public exports from `packages/*`; new npm dependencies; `vite.config.ts` or `tsconfig*.json` changes; global FormKit or theme token changes.
+- 🚫 **Never:** Commit `node_modules/`; hand-edit `packages/api-client/src/`; hard-code theme colors in feature code when a token exists; treat `--no-verify` as a normal fix for broken hooks.
 
 ## Pitfalls
 
-1. **Pre-commit hooks run lint-staged on UI files.** If `node_modules/@halo-dev/components` is missing
-   (no `pnpm install` after fresh clone), `git commit` fails even on Java-only changes.
-   Fix: `git commit --no-verify` or `cd ui && pnpm install`.
-
-2. **API client regeneration requires two commands in order:**
-   ```bash
-   ./gradlew generateOpenApiDocs    # from project root (~28s, boots Spring)
-   cd ui && pnpm api-client:gen     # runs openapi-generator
-   ```
-   The Gradle task must complete before the pnpm script can run.
-
-3. **Build order matters.** Run `pnpm build:packages` before `pnpm build` when packages changed.
-   The full `pnpm build` includes typecheck, which can be slow. For package-only changes,
-   `pnpm build:packages` then `pnpm dev` is the fast path.
-
-4. **`pnpm install` required after `git pull`.** The `node_modules` may include workspace
-   protocol links that break after upstream dependency changes.
+1. **`pnpm install` is required after dependency changes or fresh clones.** Missing workspace links can break lint-staged and local package resolution.
+2. **API client generation is a two-step flow.** `generateOpenApiDocs` must finish before `pnpm -C ui api-client:gen`.
+3. **Package build order matters.** Run `pnpm -C ui build:packages` first when `packages/*` changed.
