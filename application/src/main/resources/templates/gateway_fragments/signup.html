@@ -116,6 +116,19 @@
         <p class="alert alert-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
     </div>
 
+    <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
+        <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
+        <label for="agreedToTerms">
+            <span th:text="#{form.agreedToTerms.label}">I have read and agree to</span>
+            <th:block th:each="page, iterStat : ${agreementPages}">
+                <a th:if="${page.permalink != null}" th:href="${page.permalink}" target="_blank" th:text="${page.title}"></a>
+                <span th:if="${page.permalink == null}" th:text="${page.title}"></span>
+                <span th:if="${!iterStat.last}">,</span>
+            </th:block>
+        </label>
+    </div>
+    <p class="alert alert-error" th:if="${#fields.hasErrors('agreedToTerms')}" th:errors="*{agreedToTerms}"></p>
+
     <div class="form-item">
         <button type="submit" th:text="#{form.submit}"></button>
     </div>

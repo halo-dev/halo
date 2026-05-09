@@ -113,6 +113,8 @@ public class SystemSetting {
         String ucAttachmentPolicy;
 
         String protectedUsernames;
+
+        List<String> requiredAgreementPages;
     }
 
     @Data
