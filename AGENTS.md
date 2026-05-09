@@ -35,9 +35,43 @@ cd ui && pnpm build                               # Build frontend only
 
 ### ✅ Good patterns
 
-- `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` — reactive filter with proper null-safety
-- `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java` — service pattern with extension hooks, duplicate checking
+- `application/.../security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` — reactive filter with proper null-safety
+- `application/.../core/user/service/impl/UserServiceImpl.java` — service pattern with extension hooks, duplicate checking
 - `application/src/main/resources/extensions/role-template-authenticated.yaml` — extension resource registration
+
+## UI (Frontend)
+
+pnpm workspace at `ui/`. Build tool: **vite-plus** (`vp`). Vue 3 + TypeScript + TailwindCSS 3.4 + Vitest.
+
+### Key directories
+
+| Directory | Purpose |
+|---|---|
+| `ui/console-src/` | Admin console (main application) |
+| `ui/packages/` | Shared packages: api-client, components, editor, console-shared |
+
+### Commands
+
+```bash
+cd ui
+pnpm install                # Install dependencies (required before any other command)
+pnpm dev                    # Dev server with HMR
+pnpm build                  # Full build: typecheck + bundle
+pnpm build:packages         # Build workspace packages only (faster)
+pnpm test:unit              # Run unit tests (Vitest)
+pnpm lint                   # ESLint
+pnpm format                 # Format code (vp fmt)
+pnpm format:check           # Check formatting
+pnpm api-client:gen         # Generate API client from OpenAPI spec
+pnpm typecheck              # vue-tsc type checking
+```
+
+The `Makefile` wraps common workflows: `make -C ui dev`, `make -C ui build`, `make -C ui test`, `make -C ui api-client-gen`.
+
+### Pitfalls
+
+- **Pre-commit hooks run lint-staged on UI files.** If `node_modules/@halo-dev/components` is missing (no `pnpm install`), `git commit` fails on Java-only changes. Use `git commit --no-verify` or `cd ui && pnpm install` first.
+- **API client regeneration needs two commands in order:** `./gradlew generateOpenApiDocs` (slow, ~28s, boots Spring), then `cd ui && pnpm api-client:gen`.
 
 ## Critical Pitfalls
 
