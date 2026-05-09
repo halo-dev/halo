@@ -262,28 +262,20 @@ class PostFinderImplTest {
         }
 
         @Test
-        void withoutCategories_shouldNotAddCategoryFilter() {
+        void withoutCategories_shouldReturnEmptyNavigation() {
             var currentPost = post(1);
             currentPost.getSpec().setCategories(null);
             currentPost.getSpec().setPublishTime(Instant.parse("2023-06-15T00:00:00Z"));
 
             when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(currentPost));
 
-            var listOptions = ListOptions.builder().build();
-            when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+            var result = postFinder.cursorByCategory("post-1").block();
+            assertThat(result).isNotNull();
+            assertThat(result.hasPrevious()).isFalse();
+            assertThat(result.hasNext()).isFalse();
 
-            when(client.listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class)))
-                    .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
-
-            postFinder.cursorByCategory("post-1").block();
-
-            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
-            verify(client, times(2)).listBy(eq(Post.class), listOptionsCaptor.capture(), any(PageRequest.class));
-
-            var capturedOptions = listOptionsCaptor.getAllValues();
-            for (var options : capturedOptions) {
-                assertThat(options.toCondition().toString()).doesNotContain("spec.categories");
-            }
+            verify(client, never()).listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class));
+            verify(postPredicateResolver, never()).getListOptions();
         }
     }
 }

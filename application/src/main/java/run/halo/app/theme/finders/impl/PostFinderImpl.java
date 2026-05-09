@@ -108,7 +108,7 @@ class PostFinderImpl implements PostFinder {
                 .flatMap(currentPost -> {
                     var categories = currentPost.getSpec().getCategories();
                     if (categories == null || categories.isEmpty()) {
-                        return cursor(currentName);
+                        return Mono.fromSupplier(NavigationPostVo::empty);
                     }
                     var primaryCategory = categories.get(0);
                     var findPreviousPost = findPreviousPostByCategory(currentPost, primaryCategory)
