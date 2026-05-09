@@ -82,8 +82,8 @@ public class NotificationAutoCleanupTask {
     ListOptions buildExpiredListOptions(Instant threshold) {
         Query query = and(
             isNull("metadata.deletionTimestamp"),
-            lessThan("metadata.creationTimestamp", threshold.toString()),
-            equal("spec.unread", Boolean.FALSE.toString())
+            lessThan("metadata.creationTimestamp", threshold),
+            equal("spec.unread", false)
         );
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(query));
