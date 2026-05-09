@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,7 +30,7 @@ import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
  * Tests for {@link NotificationAutoCleanupTask}.
  *
  * @author programmerloverun
- * @since 2.22.0
+ * @since 2.25.0
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -41,7 +40,7 @@ class NotificationAutoCleanupTaskTest {
     private ReactiveExtensionPaginatedOperator paginatedOperator;
 
     @Mock
-    private NotificationAutoCleanupProperties properties;
+    private NotificationProperties properties;
 
     @InjectMocks
     private NotificationAutoCleanupTask task;
@@ -87,8 +86,8 @@ class NotificationAutoCleanupTaskTest {
         @Test
         @DisplayName("cleanUpByRetentionDays() returns count of deleted notifications")
         void cleanUpByRetentionDays_returnsDeletedCount() {
-            Notification n1 = buildNotification("n1");
-            Notification n2 = buildNotification("n2");
+            Notification n1 = buildNotification("n1", false);
+            Notification n2 = buildNotification("n2", false);
             when(paginatedOperator.deleteInitialBatch(eq(Notification.class), any()))
                 .thenReturn(Flux.just(n1, n2));
 
@@ -109,19 +108,30 @@ class NotificationAutoCleanupTaskTest {
 
             assertThat(deleted).isZero();
         }
+
+        @Test
+        @DisplayName("buildExpiredListOptions() includes spec.unread=false condition")
+        void buildExpiredListOptions_includesUnreadFalse() {
+            Instant threshold = Instant.now().minus(Duration.ofDays(30));
+            ListOptions opts = task.buildExpiredListOptions(threshold);
+
+            String selector = opts.getFieldSelector().query().toString();
+            assertThat(selector).contains("spec.unread");
+            assertThat(selector).contains("false");
+        }
     }
 
     // -----------------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------------
 
-    private static Notification buildNotification(String name) {
+    private static Notification buildNotification(String name, boolean unread) {
         var notification = new Notification();
         var metadata = new Metadata();
         metadata.setName(name);
         notification.setMetadata(metadata);
         var spec = new Notification.NotificationSpec();
-        spec.setUnread(true);
+        spec.setUnread(unread);
         notification.setSpec(spec);
         return notification;
     }

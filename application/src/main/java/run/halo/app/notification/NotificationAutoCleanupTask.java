@@ -1,6 +1,7 @@
 package run.halo.app.notification;
 
 import static run.halo.app.extension.index.query.Queries.and;
+import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.index.query.Queries.isNull;
 import static run.halo.app.extension.index.query.Queries.lessThan;
 
@@ -14,22 +15,22 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.notification.Notification;
 import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.ReactiveExtensionPaginatedOperator;
 import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
  * Periodically cleans up old {@link Notification} records to prevent unbounded data growth.
  *
- * <p>Notifications older than the configured retention period are deleted.</p>
+ * <p>Read notifications older than the configured retention period are deleted.</p>
  *
  * <p>The cleanup is skipped entirely when
- * {@link NotificationAutoCleanupProperties#isEnabled()} is {@code false}.</p>
+ * {@link NotificationProperties#isEnabled()} is {@code false}.</p>
  *
  * @author programmerloverun
  * @see RememberTokenCleaner the pattern this class follows
- * @since 2.22.0
+ * @since 2.25.0
  */
 @Slf4j
 @Component
@@ -39,7 +40,7 @@ public class NotificationAutoCleanupTask {
     static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
-    private final NotificationAutoCleanupProperties properties;
+    private final NotificationProperties properties;
 
     /**
      * Triggered by the cron expression configured via
@@ -71,14 +72,18 @@ public class NotificationAutoCleanupTask {
     }
 
     /**
-     * Builds a {@link ListOptions} that matches notifications whose
-     * {@code metadata.creationTimestamp} is older than {@code threshold} and are not already
-     * being deleted ({@code metadata.deletionTimestamp} is null).
+     * Builds a {@link ListOptions} that matches notifications which:
+     * <ul>
+     *   <li>are not already being deleted ({@code metadata.deletionTimestamp} is null)</li>
+     *   <li>were created before {@code threshold}</li>
+     *   <li>have already been read ({@code spec.unread} is {@code false})</li>
+     * </ul>
      */
     ListOptions buildExpiredListOptions(Instant threshold) {
         Query query = and(
             isNull("metadata.deletionTimestamp"),
-            lessThan("metadata.creationTimestamp", threshold.toString())
+            lessThan("metadata.creationTimestamp", threshold.toString()),
+            equal("spec.unread", Boolean.FALSE.toString())
         );
         var listOptions = new ListOptions();
         listOptions.setFieldSelector(FieldSelector.of(query));

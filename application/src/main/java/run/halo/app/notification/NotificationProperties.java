@@ -3,9 +3,9 @@ package run.halo.app.notification;
 import lombok.Data;
 
 /**
- * Configuration properties for automatic notification cleanup.
+ * Configuration properties for notifications.
  *
- * <p>Notifications older than {@code retentionDays} days will be deleted
+ * <p>The auto-cleanup feature removes notifications older than {@code retentionDays} days
  * when {@code retentionDays} is greater than 0.</p>
  *
  * <p>Example configuration in application.yaml:</p>
@@ -19,10 +19,10 @@ import lombok.Data;
  * </pre>
  *
  * @author programmerloverun
- * @since 2.22.0
+ * @since 2.25.0
  */
 @Data
-public class NotificationAutoCleanupProperties {
+public class NotificationProperties {
 
     /**
      * Whether to enable automatic notification cleanup. Default is {@code false}.
