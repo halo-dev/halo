@@ -100,6 +100,34 @@ class PostFinderImpl implements PostFinder {
                 .switchIfEmpty(Mono.fromSupplier(NavigationPostVo::empty));
     }
 
+    @Override
+    public Mono<NavigationPostVo> cursorByCategory(String currentName) {
+        return client.fetch(Post.class, currentName)
+                .filter(p -> Post.isPublished(p.getMetadata()))
+                .filter(p -> p.getSpec() != null && p.getSpec().getPublishTime() != null)
+                .flatMap(currentPost -> {
+                    var categories = currentPost.getSpec().getCategories();
+                    if (categories == null || categories.isEmpty()) {
+                        return cursor(currentName);
+                    }
+                    var primaryCategory = categories.get(0);
+                    var findPreviousPost = findPreviousPostByCategory(currentPost, primaryCategory)
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty());
+                    var findNextPost = findNextPostByCategory(currentPost, primaryCategory)
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty());
+                    return Mono.zip(
+                            findPreviousPost,
+                            findNextPost,
+                            (previous, next) -> NavigationPostVo.builder()
+                                    .previous(previous.map(ListedPostVo::from).orElse(null))
+                                    .next(next.map(ListedPostVo::from).orElse(null))
+                                    .build());
+                })
+                .switchIfEmpty(Mono.fromSupplier(NavigationPostVo::empty));
+    }
+
     private Mono<Post> findPreviousPost(Post currentPost) {
         var publishTime = currentPost.getSpec().getPublishTime();
         return postPredicateResolver
@@ -123,6 +151,38 @@ class PostFinderImpl implements PostFinder {
                 .map(listOptions -> ListOptions.builder(listOptions)
                         .andQuery(notHiddenPostQuery())
                         .andQuery(Queries.greaterThan("spec.publishTime", publishTime))
+                        .build())
+                .flatMap(listOptions -> {
+                    var sort = Sort.by(Sort.Order.asc("spec.publishTime"), Sort.Order.asc("metadata.name"));
+                    return client.listBy(Post.class, listOptions, ofSize(1).withSort(sort));
+                })
+                .flatMap(listResult ->
+                        Mono.justOrEmpty(listResult.getItems().stream().findFirst()));
+    }
+
+    private Mono<Post> findPreviousPostByCategory(Post currentPost, String categoryName) {
+        var publishTime = currentPost.getSpec().getPublishTime();
+        return postPredicateResolver
+                .getListOptions()
+                .map(listOptions -> ListOptions.builder(listOptions)
+                        .andQuery(Queries.lessThan("spec.publishTime", publishTime))
+                        .andQuery(Queries.equal("spec.categories", categoryName))
+                        .build())
+                .flatMap(listOptions -> {
+                    var sort = Sort.by(Sort.Order.desc("spec.publishTime"), Sort.Order.desc("metadata.name"));
+                    return client.listBy(Post.class, listOptions, ofSize(1).withSort(sort));
+                })
+                .flatMap(listResult ->
+                        Mono.justOrEmpty(listResult.getItems().stream().findFirst()));
+    }
+
+    private Mono<Post> findNextPostByCategory(Post currentPost, String categoryName) {
+        var publishTime = currentPost.getSpec().getPublishTime();
+        return postPredicateResolver
+                .getListOptions()
+                .map(listOptions -> ListOptions.builder(listOptions)
+                        .andQuery(Queries.greaterThan("spec.publishTime", publishTime))
+                        .andQuery(Queries.equal("spec.categories", categoryName))
                         .build())
                 .flatMap(listOptions -> {
                     var sort = Sort.by(Sort.Order.asc("spec.publishTime"), Sort.Order.asc("metadata.name"));

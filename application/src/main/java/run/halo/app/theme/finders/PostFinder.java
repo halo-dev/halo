@@ -29,6 +29,8 @@ public interface PostFinder {
 
     Mono<NavigationPostVo> cursor(String current);
 
+    Mono<NavigationPostVo> cursorByCategory(String current);
+
     Flux<ListedPostVo> listAll();
 
     /**
