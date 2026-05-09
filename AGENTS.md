@@ -47,8 +47,9 @@ pnpm workspace at `ui/`. Build tool: **vite-plus** (`vp`). Vue 3 + TypeScript + 
 
 | Directory | Purpose |
 |---|---|
-| `ui/console-src/` | Admin console (main application) |
-| `ui/packages/` | Shared packages: api-client, components, editor, console-shared |
+| `ui/console-src/` | Admin console (main application) — modules, stores, layouts, router |
+| `ui/src/` | Shared code: components, composables, stores, i18n locales, FormKit, styles, setup |
+| `ui/packages/` | Workspace packages (see below) |
 
 ### Commands
 
@@ -67,6 +68,29 @@ pnpm typecheck              # vue-tsc type checking
 ```
 
 The `Makefile` wraps common workflows: `make -C ui dev`, `make -C ui build`, `make -C ui test`, `make -C ui api-client-gen`.
+
+### Packages (`ui/packages/`)
+
+| Package | Purpose |
+|---|---|
+| `api-client` | Generated Axios-based API client from OpenAPI spec |
+| `components` | Shared UI component library (Vue) + icons (Iconify) |
+| `editor` | Rich-text editor (Tiptap-based) |
+| `console-shared` | Console-specific shared code (stores, events, utils) |
+| `shared` | Cross-platform shared code (plugin system, types, stores) |
+| `ui-plugin-bundler-kit` | Build tooling for Halo UI plugins |
+
+### Conventions
+
+- **Module pattern:** Each feature in `ui/console-src/modules/<feature>/module.ts` uses `definePlugin()` to register routes, menus, and permissions. Modules are auto-discovered via `import.meta.glob("./**/module.ts")`.
+- **Main.ts setup chain:** components → i18n → vue-query → api-client → pinia → core modules → user → permissions → plugin modules → router → mount.
+- **Path aliases:** `@/*` → `src/*`, `@console/*` → `console-src/*`, `@uc/*` → `uc-src/*` (see `tsconfig.app.json`).
+- **State:** Pinia stores in `console-src/stores/` (console-specific) and `src/stores/` (shared: `plugin.ts`, `role.ts`).
+- **i18n:** vue-i18n with JSON locale files in `src/locales/` (en, zh-CN, zh-TW, es). Translation keys in `meta.title` on routes.
+- **Forms:** FormKit with custom inputs/plugins in `src/formkit/`. Theme config: `src/formkit/theme.ts`.
+- **Icons:** Iconify via `@iconify/vue`. Icon sets: lucide, mdi, ri, fluent, material-symbols, etc. (installed as `@iconify-json/*` devDeps).
+- **Shared composables:** `src/composables/` (e.g. `use-auto-save-content`, `use-role`, `use-title`).
+- **Tailwind theming:** `tailwindcss-themer` plugin with default theme (primary `#4CCBA0`, secondary `#0E1731`, danger `#D71D1D`). FormKit theme integrated.
 
 ### Pitfalls
 
