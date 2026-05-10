@@ -57,8 +57,8 @@ class YamlUnstructuredLoaderTest {
             """;
 
         yamlResources = Stream.of(viewCategoriesRoleYaml, multipleRoleYaml, notSpecYaml)
-            .map(InMemoryResource::new)
-            .toList();
+                .map(InMemoryResource::new)
+                .toList();
     }
 
     @Test
@@ -112,5 +112,4 @@ class YamlUnstructuredLoaderTest {
         List<Unstructured> unstructuredList = yamlUnstructuredLoader.load();
         assertThat(unstructuredList).isEmpty();
     }
-
 }

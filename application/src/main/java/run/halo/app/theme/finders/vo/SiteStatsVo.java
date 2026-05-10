@@ -25,11 +25,11 @@ public class SiteStatsVo {
 
     public static SiteStatsVo empty() {
         return SiteStatsVo.builder()
-            .visit(0)
-            .upvote(0)
-            .comment(0)
-            .post(0)
-            .category(0)
-            .build();
+                .visit(0)
+                .upvote(0)
+                .comment(0)
+                .post(0)
+                .category(0)
+                .build();
     }
 }

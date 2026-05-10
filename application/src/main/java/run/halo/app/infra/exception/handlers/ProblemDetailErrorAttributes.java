@@ -22,13 +22,11 @@ public class ProblemDetailErrorAttributes extends DefaultErrorAttributes {
     }
 
     @Override
-    public Map<String, Object> getErrorAttributes(ServerRequest request,
-        ErrorAttributeOptions options) {
+    public Map<String, Object> getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
         final var errAttributes = super.getErrorAttributes(request, options);
         var error = getError(request);
         var errorResponse = createErrorResponse(error, null, request.exchange(), messageSource);
         errAttributes.put("error", errorResponse.getBody());
         return errAttributes;
     }
-
 }

@@ -21,27 +21,23 @@ import tools.jackson.databind.MapperFeature;
 public class HaloConfiguration {
 
     @Bean
-    JsonMapperBuilderCustomizer objectMapperCustomizer(
-        ObjectProvider<ObjectMapper> objectMapperProvider
-    ) {
+    JsonMapperBuilderCustomizer objectMapperCustomizer(ObjectProvider<ObjectMapper> objectMapperProvider) {
         return builder -> {
-            builder.changeDefaultPropertyInclusion(v ->
-                v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL)
-            );
+            builder.changeDefaultPropertyInclusion(
+                    v -> v.withValueInclusion(NON_NULL).withContentInclusion(NON_NULL));
             builder.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-            builder.addModule(
-                new JacksonAdapterModule(objectMapperProvider::getIfAvailable)
-            );
+            builder.addModule(new JacksonAdapterModule(objectMapperProvider::getIfAvailable));
         };
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "halo.search-engine.lucene", name = "enabled",
-        havingValue = "true",
-        matchIfMissing = true)
+    @ConditionalOnProperty(
+            prefix = "halo.search-engine.lucene",
+            name = "enabled",
+            havingValue = "true",
+            matchIfMissing = true)
     LuceneSearchEngine luceneSearchEngine(HaloProperties haloProperties) throws IOException {
-        return new LuceneSearchEngine(haloProperties.getWorkDir()
-            .resolve("indices")
-            .resolve("halo"));
+        return new LuceneSearchEngine(
+                haloProperties.getWorkDir().resolve("indices").resolve("halo"));
     }
 }

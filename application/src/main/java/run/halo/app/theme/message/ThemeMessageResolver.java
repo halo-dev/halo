@@ -22,15 +22,13 @@ public class ThemeMessageResolver extends StandardMessageResolver {
     }
 
     @Override
-    protected Map<String, String> resolveMessagesForTemplate(String template,
-        ITemplateResource templateResource,
-        Locale locale) {
+    protected Map<String, String> resolveMessagesForTemplate(
+            String template, ITemplateResource templateResource, Locale locale) {
         var properties = new HashMap<String, String>();
         Optional.ofNullable(ThemeMessageResolutionUtils.resolveMessagesForTemplate(locale, theme))
-            .ifPresent(properties::putAll);
+                .ifPresent(properties::putAll);
         Optional.ofNullable(super.resolveMessagesForTemplate(template, templateResource, locale))
-            .ifPresent(properties::putAll);
+                .ifPresent(properties::putAll);
         return Collections.unmodifiableMap(properties);
     }
-
 }

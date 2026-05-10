@@ -35,19 +35,22 @@ class PostPublicQueryServiceImplTest {
 
     @Test
     void extendPostContent() {
-        when(extensionGetter.getEnabledExtensions(
-            eq(ReactivePostContentHandler.class))).thenReturn(
-            Flux.just(new PostContentHandlerB(), new PostContentHandlerA(),
-                new PostContentHandlerC()));
+        when(extensionGetter.getEnabledExtensions(eq(ReactivePostContentHandler.class)))
+                .thenReturn(Flux.just(new PostContentHandlerB(), new PostContentHandlerA(), new PostContentHandlerC()));
         Post post = TestPost.postV1();
         post.getMetadata().setName("fake-post");
-        ContentWrapper contentWrapper =
-            ContentWrapper.builder().content("fake-content").raw("fake-raw").rawType("markdown")
+        ContentWrapper contentWrapper = ContentWrapper.builder()
+                .content("fake-content")
+                .raw("fake-raw")
+                .rawType("markdown")
                 .build();
-        postPublicQueryService.extendPostContent(post, contentWrapper)
-            .as(StepVerifier::create).consumeNextWith(contentVo -> {
-                assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
-            }).verifyComplete();
+        postPublicQueryService
+                .extendPostContent(post, contentWrapper)
+                .as(StepVerifier::create)
+                .consumeNextWith(contentVo -> {
+                    assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
+                })
+                .verifyComplete();
     }
 
     static class PostContentHandlerA implements ReactivePostContentHandler {

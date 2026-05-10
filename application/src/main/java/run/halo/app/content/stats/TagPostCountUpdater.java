@@ -34,8 +34,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.13.0
  */
 @Component
-public class TagPostCountUpdater
-    extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
+public class TagPostCountUpdater extends AbstractEventReconciler<TagPostCountUpdater.PostRelatedTags> {
     private final ExtensionClient client;
 
     public TagPostCountUpdater(ExtensionClient client) {
@@ -64,9 +63,7 @@ public class TagPostCountUpdater
         return Result.doNotRetry();
     }
 
-    /**
-     * Listen to post event to calculate post related to tag for updating.
-     */
+    /** Listen to post event to calculate post related to tag for updating. */
     @EventListener(PostEvent.class)
     public void onPostUpdated(PostEvent postEvent) {
         var postName = postEvent.getName();
@@ -77,8 +74,7 @@ public class TagPostCountUpdater
         }
 
         if (postEvent instanceof PostDeletedEvent deletedEvent) {
-            var tags = defaultIfNull(deletedEvent.getPost().getSpec().getTags(),
-                List.<String>of());
+            var tags = defaultIfNull(deletedEvent.getPost().getSpec().getTags(), List.<String>of());
             queue.addImmediately(new PostRelatedTags(postName, Sets.newHashSet(tags)));
         }
     }
@@ -87,9 +83,9 @@ public class TagPostCountUpdater
         var post = client.fetch(Post.class, postName).orElseThrow();
         var annotations = MetadataUtil.nullSafeAnnotations(post);
         var oldTags = Optional.ofNullable(annotations.get(Post.LAST_ASSOCIATED_TAGS_ANNO))
-            .filter(StringUtils::isNotBlank)
-            .map(tagsJson -> JsonUtils.jsonToObject(tagsJson, String[].class))
-            .orElse(new String[0]);
+                .filter(StringUtils::isNotBlank)
+                .map(tagsJson -> JsonUtils.jsonToObject(tagsJson, String[].class))
+                .orElse(new String[0]);
 
         var tagsToUpdate = Sets.newHashSet(oldTags);
         var newTags = post.getSpec().getTags();
@@ -99,15 +95,12 @@ public class TagPostCountUpdater
         return tagsToUpdate;
     }
 
-    public record PostRelatedTags(String postName, Set<String> tags) {
-    }
+    public record PostRelatedTags(String postName, Set<String> tags) {}
 
     private void updateTagRelatedPostCount(String tagName) {
         client.fetch(Tag.class, tagName).ifPresent(tag -> {
-            var commonFieldQuery = and(
-                equal("spec.tags", tag.getMetadata().getName()),
-                isNull("metadata.deletionTimestamp")
-            );
+            var commonFieldQuery =
+                    and(equal("spec.tags", tag.getMetadata().getName()), isNull("metadata.deletionTimestamp"));
             // Update post count
             var allPostOptions = new ListOptions();
             allPostOptions.setFieldSelector(FieldSelector.of(commonFieldQuery));
@@ -116,18 +109,13 @@ public class TagPostCountUpdater
 
             // Update visible post count
             var publicPostOptions = new ListOptions();
-            publicPostOptions.setLabelSelector(LabelSelector.builder()
-                .eq(Post.PUBLISHED_LABEL, "true")
-                .build());
-            publicPostOptions.setFieldSelector(FieldSelector.of(
-                and(
+            publicPostOptions.setLabelSelector(
+                    LabelSelector.builder().eq(Post.PUBLISHED_LABEL, "true").build());
+            publicPostOptions.setFieldSelector(FieldSelector.of(and(
                     commonFieldQuery,
                     equal("spec.deleted", "false"),
-                    equal("spec.visible", Post.VisibleEnum.PUBLIC.name())
-                )
-            ));
-            var publicPosts =
-                client.listBy(Post.class, publicPostOptions, PageRequestImpl.ofSize(1));
+                    equal("spec.visible", Post.VisibleEnum.PUBLIC.name()))));
+            var publicPosts = client.listBy(Post.class, publicPostOptions, PageRequestImpl.ofSize(1));
             tag.getStatusOrDefault().setVisiblePostCount((int) publicPosts.getTotal());
 
             client.update(tag);

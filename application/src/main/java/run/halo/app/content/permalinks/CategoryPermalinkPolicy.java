@@ -26,7 +26,7 @@ import run.halo.app.theme.utils.PatternUtils;
 public class CategoryPermalinkPolicy implements PermalinkPolicy<Category> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String DEFAULT_PERMALINK_PREFIX =
-        SystemSetting.ThemeRouteRules.empty().getCategories();
+            SystemSetting.ThemeRouteRules.empty().getCategories();
 
     private final ExternalUrlSupplier externalUrlSupplier;
     private final SystemConfigFetcher environmentFetcher;
@@ -34,20 +34,18 @@ public class CategoryPermalinkPolicy implements PermalinkPolicy<Category> {
     @Override
     public String permalink(Category category) {
         Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(category);
-        String permalinkPrefix =
-            annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
+        String permalinkPrefix = annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
         String slug = encode(category.getSpec().getSlug(), StandardCharsets.UTF_8);
         String path = PathUtils.combinePath(permalinkPrefix, slug);
-        return externalUrlSupplier.get()
-            .resolve(path)
-            .normalize().toString();
+        return externalUrlSupplier.get().resolve(path).normalize().toString();
     }
 
     public String pattern() {
-        return environmentFetcher.fetchRouteRules()
-            .map(SystemSetting.ThemeRouteRules::getCategories)
-            .defaultIfEmpty(DEFAULT_PERMALINK_PREFIX)
-            .map(PatternUtils::normalizePattern)
-            .block(BLOCKING_TIMEOUT);
+        return environmentFetcher
+                .fetchRouteRules()
+                .map(SystemSetting.ThemeRouteRules::getCategories)
+                .defaultIfEmpty(DEFAULT_PERMALINK_PREFIX)
+                .map(PatternUtils::normalizePattern)
+                .block(BLOCKING_TIMEOUT);
     }
 }

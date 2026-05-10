@@ -1,13 +1,8 @@
 package run.halo.app.core.attachment.endpoint;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -72,9 +67,8 @@ class LocalAttachmentUploadHandlerTest {
     }
 
     public static Stream<Arguments> testUploadWithRenameStrategy() {
-        return Stream.of(arguments(
-                "Random file name with length 10",
-                """
+        return Stream.of(
+                arguments("Random file name with length 10", """
                     {
                       "alwaysRenameFilename": true,
                       "renameStrategy": {
@@ -82,8 +76,7 @@ class LocalAttachmentUploadHandlerTest {
                         "randomLength": 10
                       }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
+                    """, (Consumer<Attachment>) attachment -> {
                     var displayName = attachment.getSpec().getDisplayName();
                     assertTrue(displayName.startsWith("halo-"));
                     assertTrue(displayName.endsWith(".png"));
@@ -92,9 +85,7 @@ class LocalAttachmentUploadHandlerTest {
                     // fake-content
                     assertEquals(12L, attachment.getSpec().getSize());
                 }),
-            arguments(
-                "Random file name with length 10 but without original filename",
-                """
+                arguments("Random file name with length 10 but without original filename", """
                     {
                       "alwaysRenameFilename": true,
                       "renameStrategy": {
@@ -103,19 +94,17 @@ class LocalAttachmentUploadHandlerTest {
                         "excludeOriginalFilename": true
                       }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
-                    var displayName = attachment.getSpec().getDisplayName();
-                    assertFalse(displayName.startsWith("halo-"));
-                    assertTrue(displayName.endsWith(".png"));
-                    // halo-xxxxxx.png
-                    assertEquals(10 + 4, displayName.length());
-                    // fake-content
-                    assertEquals(12L, attachment.getSpec().getSize());
-                }),
-            arguments(
-                "Rename filename with UUID but exclude original filename",
-                """
+                    """, (Consumer<Attachment>)
+                        attachment -> {
+                            var displayName = attachment.getSpec().getDisplayName();
+                            assertFalse(displayName.startsWith("halo-"));
+                            assertTrue(displayName.endsWith(".png"));
+                            // halo-xxxxxx.png
+                            assertEquals(10 + 4, displayName.length());
+                            // fake-content
+                            assertEquals(12L, attachment.getSpec().getSize());
+                        }),
+                arguments("Rename filename with UUID but exclude original filename", """
                     {
                       "alwaysRenameFilename": true,
                       "renameStrategy": {
@@ -123,20 +112,17 @@ class LocalAttachmentUploadHandlerTest {
                         "excludeOriginalFilename": true
                       }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
-                    var displayName = attachment.getSpec().getDisplayName();
-                    assertFalse(displayName.startsWith("halo-"));
-                    assertTrue(displayName.endsWith(".png"));
-                    // xxxxxx.png
-                    assertEquals(36 + 4, displayName.length());
-                    // fake-content
-                    assertEquals(12L, attachment.getSpec().getSize());
-                }
-            ),
-            arguments(
-                "Rename filename with UUID",
-                """
+                    """, (Consumer<Attachment>)
+                        attachment -> {
+                            var displayName = attachment.getSpec().getDisplayName();
+                            assertFalse(displayName.startsWith("halo-"));
+                            assertTrue(displayName.endsWith(".png"));
+                            // xxxxxx.png
+                            assertEquals(36 + 4, displayName.length());
+                            // fake-content
+                            assertEquals(12L, attachment.getSpec().getSize());
+                        }),
+                arguments("Rename filename with UUID", """
                     {
                       "alwaysRenameFilename": true,
                       "renameStrategy": {
@@ -144,8 +130,7 @@ class LocalAttachmentUploadHandlerTest {
                         "excludeOriginalFilename": false
                       }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
+                    """, (Consumer<Attachment>) attachment -> {
                     var displayName = attachment.getSpec().getDisplayName();
                     assertTrue(displayName.startsWith("halo-"));
                     assertTrue(displayName.endsWith(".png"));
@@ -153,11 +138,8 @@ class LocalAttachmentUploadHandlerTest {
                     assertEquals(5 + 36 + 4, displayName.length());
                     // fake-content
                     assertEquals(12L, attachment.getSpec().getSize());
-                }
-            ),
-            arguments(
-                "Rename filename with timestamp but without original filename",
-                """
+                }),
+                arguments("Rename filename with timestamp but without original filename", """
                     {
                         "alwaysRenameFilename": true,
                         "renameStrategy": {
@@ -165,28 +147,22 @@ class LocalAttachmentUploadHandlerTest {
                             "excludeOriginalFilename": true
                         }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
-                    var expect = clock.instant().toEpochMilli() + ".png";
-                    assertEquals(expect, attachment.getSpec().getDisplayName());
-                }
-            ),
-            arguments(
-                "Rename filename with timestamp",
-                """
+                    """, (Consumer<Attachment>)
+                        attachment -> {
+                            var expect = clock.instant().toEpochMilli() + ".png";
+                            assertEquals(expect, attachment.getSpec().getDisplayName());
+                        }),
+                arguments("Rename filename with timestamp", """
                     {
                         "alwaysRenameFilename": true,
                         "renameStrategy": {
                             "method": "TIMESTAMP"
                         }
                     }
-                    """,
-                (Consumer<Attachment>) attachment -> {
+                    """, (Consumer<Attachment>) attachment -> {
                     var expect = "halo-" + clock.instant().toEpochMilli() + ".png";
                     assertEquals(expect, attachment.getSpec().getDisplayName());
-                }
-            )
-        );
+                }));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -206,28 +182,25 @@ class LocalAttachmentUploadHandlerTest {
         var configMap = new ConfigMap();
         configMap.setData(Map.of("default", config));
 
-        var uploadOption =
-            UploadOption.from("halo.png", content, MediaType.IMAGE_PNG, policy, configMap);
+        var uploadOption = UploadOption.from("halo.png", content, MediaType.IMAGE_PNG, policy, configMap);
 
         when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
-        uploadHandler.upload(uploadOption)
-            .as(StepVerifier::create)
-            .assertNext(attachment -> {
-                assertion.accept(attachment);
-                assertNotNull(attachment.getStatus().getPermalink());
-                assertNotNull(attachment.getStatus().getThumbnails());
-            })
-            .verifyComplete();
-
+        uploadHandler
+                .upload(uploadOption)
+                .as(StepVerifier::create)
+                .assertNext(attachment -> {
+                    assertion.accept(attachment);
+                    assertNotNull(attachment.getStatus().getPermalink());
+                    assertNotNull(attachment.getStatus().getThumbnails());
+                })
+                .verifyComplete();
     }
 
     @Test
     void shouldGetPermalinkWhenUriContainsIllegalChars() {
         var attachment = new Attachment();
         attachment.setMetadata(new Metadata());
-        attachment.getMetadata().setAnnotations(Map.of(
-            Constant.URI_ANNO_KEY, "/path/with space.png"
-        ));
+        attachment.getMetadata().setAnnotations(Map.of(Constant.URI_ANNO_KEY, "/path/with space.png"));
         var permalink = uploadHandler.doGetPermalink(attachment);
         assertTrue(permalink.isPresent());
         assertEquals("/path/with%20space.png", permalink.get().toASCIIString());
@@ -237,20 +210,17 @@ class LocalAttachmentUploadHandlerTest {
     void shouldDeleteWithThumbnails() {
         var deleteContext = Mockito.mock(AttachmentHandler.DeleteContext.class);
         when(deleteContext.policy()).thenReturn(createPolicy("local"));
-        var attachment =
-            createAttachment(Map.of(Constant.LOCAL_REL_PATH_ANNO_KEY, "path/to/file.png"));
+        var attachment = createAttachment(Map.of(Constant.LOCAL_REL_PATH_ANNO_KEY, "path/to/file.png"));
         when(deleteContext.attachment()).thenReturn(attachment);
         when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
-        uploadHandler.delete(deleteContext)
-            .as(StepVerifier::create)
-            .expectNext(attachment)
-            .verifyComplete();
+        uploadHandler
+                .delete(deleteContext)
+                .as(StepVerifier::create)
+                .expectNext(attachment)
+                .verifyComplete();
 
-        verify(this.localThumbnailService).delete(attachmentRoot
-            .resolve("path")
-            .resolve("to")
-            .resolve("file.png")
-        );
+        verify(this.localThumbnailService)
+                .delete(attachmentRoot.resolve("path").resolve("to").resolve("file.png"));
     }
 
     Attachment createAttachment(Map<String, String> annotations) {

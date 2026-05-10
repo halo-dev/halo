@@ -35,17 +35,15 @@ class RequestSynchronizerTest {
 
     @BeforeEach
     void setUp() {
-        synchronizer =
-            new RequestSynchronizer(true, client, new FakeExtension(), watcher, new ListOptions());
+        synchronizer = new RequestSynchronizer(true, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
     }
 
     @Test
     void shouldStartCorrectlyWhenSyncingAllOnStart() {
-        when(client.listTopNames(
-            eq(FakeExtension.class), isA(ListOptions.class), isA(Sort.class), any(Integer.class))
-        ).thenReturn(List.of("fake-01", "fake-02"));
+        when(client.listTopNames(eq(FakeExtension.class), isA(ListOptions.class), isA(Sort.class), any(Integer.class)))
+                .thenReturn(List.of("fake-01", "fake-02"));
 
         synchronizer.start();
 
@@ -57,8 +55,7 @@ class RequestSynchronizerTest {
 
     @Test
     void shouldStartCorrectlyWhenNotSyncingAllOnStart() {
-        synchronizer =
-            new RequestSynchronizer(false, client, new FakeExtension(), watcher, new ListOptions());
+        synchronizer = new RequestSynchronizer(false, client, new FakeExtension(), watcher, new ListOptions());
         assertFalse(synchronizer.isDisposed());
         assertFalse(synchronizer.isStarted());
 
@@ -94,5 +91,4 @@ class RequestSynchronizerTest {
         verify(watcher, times(0)).onAdd(isA(Reconciler.Request.class));
         verify(client, times(0)).watch(any());
     }
-
 }

@@ -29,10 +29,9 @@ public enum PatternUtils {
         return removeEnd(pattern, "/");
     }
 
-
     /**
-     * Normalize the post pattern, if the post pattern starts with /archives/ or /categories/,
-     * replace it with the corresponding pattern from rules.
+     * Normalize the post pattern, if the post pattern starts with /archives/ or /categories/, replace it with the
+     * corresponding pattern from rules.
      *
      * @param rules the theme route rules
      * @return the normalized post pattern

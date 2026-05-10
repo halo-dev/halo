@@ -26,8 +26,8 @@ public abstract class BundleResourceUtils {
      *
      * @return js bundle resource if exists, otherwise null
      */
-    public static @Nullable Resource getJsBundleResource(PluginManager pluginManager,
-        String pluginName, String bundleName) {
+    public static @Nullable Resource getJsBundleResource(
+            PluginManager pluginManager, String pluginName, String bundleName) {
         Assert.hasText(pluginName, "The pluginName must not be blank");
         Assert.hasText(bundleName, "Bundle name must not be blank");
 
@@ -42,8 +42,7 @@ public abstract class BundleResourceUtils {
         return resource.exists() ? resource : null;
     }
 
-    public static @Nullable DefaultResourceLoader getResourceLoader(PluginManager pluginManager,
-        String pluginName) {
+    public static @Nullable DefaultResourceLoader getResourceLoader(PluginManager pluginManager, String pluginName) {
         Assert.notNull(pluginManager, "Plugin manager must not be null");
         PluginWrapper plugin = pluginManager.getPlugin(pluginName);
         if (plugin == null) {

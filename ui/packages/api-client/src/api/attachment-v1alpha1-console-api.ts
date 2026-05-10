@@ -215,7 +215,7 @@ export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configura
         /**
          * Upload attachment endpoint for console.
          * @param {File} [file] The file to upload. If not provided, the url will be used.
-         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be extracted from the url.
          * @param {string} [url] The url to upload from. If not provided, the file will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -325,7 +325,7 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
         /**
          * Upload attachment endpoint for console.
          * @param {File} [file] The file to upload. If not provided, the url will be used.
-         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+         * @param {string} [filename] The filename to use when uploading from url. If not provided, the filename will be extracted from the url.
          * @param {string} [url] The url to upload from. If not provided, the file will be used.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -463,7 +463,7 @@ export interface AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest {
     readonly file?: File
 
     /**
-     * The filename to use when uploading from url. If not provided, the filename will be  extracted from the url.
+     * The filename to use when uploading from url. If not provided, the filename will be extracted from the url.
      */
     readonly filename?: string
 

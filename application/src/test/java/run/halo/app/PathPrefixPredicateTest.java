@@ -19,22 +19,19 @@ public class PathPrefixPredicateTest {
     @Test
     public void prefixPredicate() {
         boolean falseResult = HandlerTypePredicate.forAnnotation(RestController.class)
-            .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))
-            .test(getClass());
+                .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))
+                .test(getClass());
         assertThat(falseResult).isFalse();
 
         boolean result = HandlerTypePredicate.forAnnotation(RestController.class)
-            .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))
-            .test(TestController.class);
+                .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))
+                .test(TestController.class);
         assertThat(result).isTrue();
     }
 
     @RestController("controller-for-test")
     @RequestMapping("/test-prefix")
-    class TestController {
-
-    }
-
+    class TestController {}
 
     @Test
     void urlTest() {

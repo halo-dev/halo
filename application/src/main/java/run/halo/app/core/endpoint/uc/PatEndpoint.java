@@ -27,75 +27,70 @@ class PatEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = PersonalAccessToken.KIND + "V1alpha1Uc";
-        return route().nest(path("/personalaccesstokens"),
-                () -> route()
-                    .POST(patHandler::create,
-                        builder -> builder
-                            .tag(tag)
-                            .operationId("GeneratePat")
-                            .description("Generate a PAT.")
-                            .requestBody(requestBodyBuilder()
-                                .required(true)
-                                .implementation(PersonalAccessToken.class))
-                            .response(responseBuilder().implementation(PersonalAccessToken.class))
-                    )
-                    .GET(patHandler::list,
-                        builder -> builder
-                            .tag(tag)
-                            .operationId("ObtainPats")
-                            .description("Obtain PAT list.")
-                            .response(responseBuilder()
-                                .implementationArray(PersonalAccessToken.class)
-                            )
-                    )
-                    .GET("/{name}", patHandler::get,
-                        builder -> builder
-                            .tag(tag)
-                            .operationId("ObtainPat")
-                            .description("Obtain a PAT.")
-                            .parameter(parameterBuilder()
-                                .in(ParameterIn.PATH)
-                                .required(true)
-                                .name("name")))
-                    .PUT("/{name}/actions/revocation",
-                        patHandler::revoke,
-                        builder -> builder.tag(tag)
-                            .operationId("RevokePat")
-                            .description("Revoke a PAT")
-                            .parameter(parameterBuilder()
-                                .in(ParameterIn.PATH)
-                                .required(true)
-                                .name("name"))
-                    )
-                    .PUT("/{name}/actions/restoration",
-                        patHandler::restore,
-                        builder -> builder.tag(tag)
-                            .operationId("RestorePat")
-                            .description("Restore a PAT.")
-                            .parameter(parameterBuilder()
-                                .in(ParameterIn.PATH)
-                                .required(true)
-                                .name("name")
-                            )
-                    )
-                    .DELETE("/{name}",
-                        patHandler::delete,
-                        builder -> builder.tag(tag)
-                            .operationId("DeletePat")
-                            .description("Delete a PAT")
-                            .parameter(parameterBuilder()
-                                .in(ParameterIn.PATH)
-                                .required(true)
-                                .name("name")
-                            ))
-                    .build()
-            )
-            .build();
+        return route().nest(
+                        path("/personalaccesstokens"),
+                        () -> route().POST(
+                                        patHandler::create,
+                                        builder -> builder.tag(tag)
+                                                .operationId("GeneratePat")
+                                                .description("Generate a PAT.")
+                                                .requestBody(requestBodyBuilder()
+                                                        .required(true)
+                                                        .implementation(PersonalAccessToken.class))
+                                                .response(responseBuilder().implementation(PersonalAccessToken.class)))
+                                .GET(
+                                        patHandler::list,
+                                        builder -> builder.tag(tag)
+                                                .operationId("ObtainPats")
+                                                .description("Obtain PAT list.")
+                                                .response(responseBuilder()
+                                                        .implementationArray(PersonalAccessToken.class)))
+                                .GET(
+                                        "/{name}",
+                                        patHandler::get,
+                                        builder -> builder.tag(tag)
+                                                .operationId("ObtainPat")
+                                                .description("Obtain a PAT.")
+                                                .parameter(parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .name("name")))
+                                .PUT(
+                                        "/{name}/actions/revocation",
+                                        patHandler::revoke,
+                                        builder -> builder.tag(tag)
+                                                .operationId("RevokePat")
+                                                .description("Revoke a PAT")
+                                                .parameter(parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .name("name")))
+                                .PUT(
+                                        "/{name}/actions/restoration",
+                                        patHandler::restore,
+                                        builder -> builder.tag(tag)
+                                                .operationId("RestorePat")
+                                                .description("Restore a PAT.")
+                                                .parameter(parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .name("name")))
+                                .DELETE(
+                                        "/{name}",
+                                        patHandler::delete,
+                                        builder -> builder.tag(tag)
+                                                .operationId("DeletePat")
+                                                .description("Delete a PAT")
+                                                .parameter(parameterBuilder()
+                                                        .in(ParameterIn.PATH)
+                                                        .required(true)
+                                                        .name("name")))
+                                .build())
+                .build();
     }
 
     @Override
     public GroupVersion groupVersion() {
         return GroupVersion.parseAPIVersion("uc.api.security.halo.run/v1alpha1");
     }
-
 }

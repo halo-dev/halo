@@ -14,9 +14,7 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 class PluginSharedEventDelegator extends ApplicationEvent {
 
-    /**
-     * The delegate event.
-     */
+    /** The delegate event. */
     private final ApplicationEvent delegate;
 
     public PluginSharedEventDelegator(Object source, ApplicationEvent delegate) {

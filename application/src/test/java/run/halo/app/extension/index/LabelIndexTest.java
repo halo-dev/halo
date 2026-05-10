@@ -163,13 +163,7 @@ class LabelIndexTest {
         return fake;
     }
 
-    @GVK(
-        group = "fake.halo.app",
-        version = "v1",
-        kind = "Fake",
-        singular = "fake",
-        plural = "fakes"
-    )
+    @GVK(group = "fake.halo.app", version = "v1", kind = "Fake", singular = "fake", plural = "fakes")
     @Data
     @EqualsAndHashCode(callSuper = true)
     static class Fake extends AbstractExtension {

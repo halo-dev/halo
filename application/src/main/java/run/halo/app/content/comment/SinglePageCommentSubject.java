@@ -31,19 +31,17 @@ public class SinglePageCommentSubject implements CommentSubject<SinglePage> {
 
     @Override
     public Mono<SubjectDisplay> getSubjectDisplay(String name) {
-        return get(name)
-            .map(page -> {
-                var url = externalLinkProcessor
-                    .processLink(page.getStatusOrDefault().getPermalink());
-                return new SubjectDisplay(page.getSpec().getTitle(), url, "页面");
-            });
+        return get(name).map(page -> {
+            var url =
+                    externalLinkProcessor.processLink(page.getStatusOrDefault().getPermalink());
+            return new SubjectDisplay(page.getSpec().getTitle(), url, "页面");
+        });
     }
 
     @Override
     public boolean supports(Ref ref) {
         Assert.notNull(ref, "Subject ref must not be null.");
         var gvk = SinglePage.GVK;
-        return Objects.equals(gvk.group(), ref.getGroup())
-            && Objects.equals(gvk.kind(), ref.getKind());
+        return Objects.equals(gvk.group(), ref.getGroup()) && Objects.equals(gvk.kind(), ref.getKind());
     }
 }

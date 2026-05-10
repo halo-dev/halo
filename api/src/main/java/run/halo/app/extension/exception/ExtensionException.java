@@ -19,8 +19,12 @@ public class ExtensionException extends ResponseStatusException {
         this(HttpStatus.INTERNAL_SERVER_ERROR, reason, cause, null, new Object[] {reason});
     }
 
-    protected ExtensionException(HttpStatusCode status, String reason, Throwable cause,
-        String messageDetailCode, Object[] messageDetailArguments) {
+    protected ExtensionException(
+            HttpStatusCode status,
+            String reason,
+            Throwable cause,
+            String messageDetailCode,
+            Object[] messageDetailArguments) {
         super(status, reason, cause, messageDetailCode, messageDetailArguments);
     }
 }

@@ -26,28 +26,21 @@ public enum Exceptions {
 
     public static final String DEFAULT_TYPE = "about:blank";
 
-    public static final String THEME_ALREADY_EXISTS_TYPE =
-        "https://halo.run/probs/theme-alreay-exists";
+    public static final String THEME_ALREADY_EXISTS_TYPE = "https://halo.run/probs/theme-alreay-exists";
 
-    public static final String INVALID_CREDENTIAL_TYPE =
-        "https://halo.run/probs/invalid-credential";
+    public static final String INVALID_CREDENTIAL_TYPE = "https://halo.run/probs/invalid-credential";
 
-    public static final String REQUEST_NOT_PERMITTED_TYPE =
-        "https://halo.run/probs/request-not-permitted";
+    public static final String REQUEST_NOT_PERMITTED_TYPE = "https://halo.run/probs/request-not-permitted";
 
-    public static final String CONFLICT_TYPE =
-        "https://halo.run/probs/conflict";
+    public static final String CONFLICT_TYPE = "https://halo.run/probs/conflict";
 
-    /**
-     * Non-ErrorResponse exception to type map.
-     */
+    /** Non-ErrorResponse exception to type map. */
     public static final Map<Class<? extends Throwable>, String> EXCEPTION_TYPE_MAP = Map.of(
-        RequestNotPermitted.class, REQUEST_NOT_PERMITTED_TYPE,
-        BadCredentialsException.class, INVALID_CREDENTIAL_TYPE
-    );
+            RequestNotPermitted.class, REQUEST_NOT_PERMITTED_TYPE,
+            BadCredentialsException.class, INVALID_CREDENTIAL_TYPE);
 
-    public static ErrorResponse createErrorResponse(Throwable t, @Nullable HttpStatusCode status,
-        ServerWebExchange exchange, MessageSource messageSource) {
+    public static ErrorResponse createErrorResponse(
+            Throwable t, @Nullable HttpStatusCode status, ServerWebExchange exchange, MessageSource messageSource) {
         final ErrorResponse errorResponse;
         if (t instanceof ErrorResponse er) {
             errorResponse = er;
@@ -66,20 +59,17 @@ public enum Exceptions {
     }
 
     private static ErrorResponse handleException(Throwable t, @Nullable HttpStatusCode status) {
-        var responseStatusAnno = MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY)
-            .get(ResponseStatus.class);
+        var responseStatusAnno =
+                MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY).get(ResponseStatus.class);
         if (status == null) {
-            status = responseStatusAnno.getValue("code", HttpStatus.class)
-                .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+            status = responseStatusAnno.getValue("code", HttpStatus.class).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
-        var detail = responseStatusAnno.getValue("reason", String.class)
-            .orElseGet(t::getMessage);
-        var builder = ErrorResponse.builder(t, status, detail)
-            .type(URI.create(type));
+        var detail = responseStatusAnno.getValue("reason", String.class).orElseGet(t::getMessage);
+        var builder = ErrorResponse.builder(t, status, detail).type(URI.create(type));
         if (status.is5xxServerError()) {
             builder.detailMessageCode("problemDetail.internalServerError")
-                .titleMessageCode("problemDetail.title.internalServerError");
+                    .titleMessageCode("problemDetail.title.internalServerError");
         }
         return builder.build();
     }
@@ -87,14 +77,13 @@ public enum Exceptions {
     private static @Nullable ErrorResponse handleConflictException(Throwable t) {
         if (t instanceof ConcurrencyFailureException) {
             return ErrorResponse.builder(t, ProblemDetail.forStatus(HttpStatus.CONFLICT))
-                .type(URI.create(CONFLICT_TYPE))
-                .titleMessageCode("problemDetail.title.conflict")
-                .detailMessageCode("problemDetail.conflict")
-                .build();
+                    .type(URI.create(CONFLICT_TYPE))
+                    .titleMessageCode("problemDetail.title.conflict")
+                    .detailMessageCode("problemDetail.conflict")
+                    .build();
         }
         return null;
     }
-
 
     public static Locale getLocale(ServerWebExchange exchange) {
         var locale = exchange.getLocaleContext().getLocale();

@@ -113,9 +113,7 @@ public class MeterUtils {
      */
     private static Counter counter(MeterRegistry registry, String name, Tag... tags) {
         Tags withTags = Tags.of(METRICS_COMMON_TAG).and(tags);
-        Counter counter = registry.find(name)
-            .tags(withTags)
-            .counter();
+        Counter counter = registry.find(name).tags(withTags).counter();
         if (counter == null) {
             return registry.counter(name, withTags);
         }

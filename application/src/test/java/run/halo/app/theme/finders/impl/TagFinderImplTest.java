@@ -47,8 +47,7 @@ class TagFinderImplTest {
 
     @Test
     void getByName() throws JSONException {
-        when(client.fetch(eq(Tag.class), eq("t1")))
-            .thenReturn(Mono.just(tag(1)));
+        when(client.fetch(eq(Tag.class), eq("t1"))).thenReturn(Mono.just(tag(1)));
         TagVo tagVo = tagFinder.getByName("t1").block();
         tagVo.getMetadata().setCreationTimestamp(null);
         JSONAssert.assertEquals("""
@@ -72,44 +71,36 @@ class TagFinderImplTest {
                      },
                      "postCount": 1
                 }
-                """,
-            JsonUtils.objectToJson(tagVo),
-            true);
+                """, JsonUtils.objectToJson(tagVo), true);
     }
 
     @Test
     void getByNames() {
         // tags sorted by default (descending creation timestamp): t3, t2, t1
         var sortedTags = tags().stream()
-            .sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed())
-            .toList();
+                .sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed())
+                .toList();
         when(client.listAll(eq(Tag.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(sortedTags));
+                .thenReturn(Flux.fromIterable(sortedTags));
 
         // request in a specific order that differs from natural sort: t1, t3, t2
-        var result = tagFinder.getByNames(List.of("t1", "t3", "t2"))
-            .collectList()
-            .block();
+        var result =
+                tagFinder.getByNames(List.of("t1", "t3", "t2")).collectList().block();
         assertThat(result).hasSize(3);
-        assertThat(result.stream()
-            .map(vo -> vo.getMetadata().getName())
-            .toList())
-            .isEqualTo(List.of("t1", "t3", "t2"));
+        assertThat(result.stream().map(vo -> vo.getMetadata().getName()).toList())
+                .isEqualTo(List.of("t1", "t3", "t2"));
     }
 
     @Test
     void listAll() {
         when(client.listAll(eq(Tag.class), any(ListOptions.class), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(
-                    tags().stream().sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed()).toList()
-                )
-            );
+                .thenReturn(Flux.fromIterable(tags().stream()
+                        .sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed())
+                        .toList()));
         List<TagVo> tags = tagFinder.listAll().collectList().block();
         assertThat(tags).hasSize(3);
-        assertThat(tags.stream()
-            .map(tag -> tag.getMetadata().getName())
-            .collect(Collectors.toList()))
-            .isEqualTo(List.of("t3", "t2", "t1"));
+        assertThat(tags.stream().map(tag -> tag.getMetadata().getName()).collect(Collectors.toList()))
+                .isEqualTo(List.of("t3", "t2", "t1"));
     }
 
     List<Tag> tags() {

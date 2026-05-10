@@ -5,8 +5,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * OAuth2 authentication token cache. Saving OAuth2AuthenticationToken is mainly for further binding
- * to Halo user.
+ * OAuth2 authentication token cache. Saving OAuth2AuthenticationToken is mainly for further binding to Halo user.
  *
  * @author johnniang
  * @since 2.20.0
@@ -37,5 +36,4 @@ public interface OAuth2AuthenticationTokenCache {
      * @return empty
      */
     Mono<Void> removeToken(ServerWebExchange exchange);
-
 }

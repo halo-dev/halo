@@ -2,9 +2,7 @@ package run.halo.app.notification;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -46,8 +44,7 @@ class NotificationTriggerTest {
         when(metadata.getDeletionTimestamp()).thenReturn(null);
         when(metadata.getFinalizers()).thenReturn(Set.of());
 
-        when(client.fetch(eq(Reason.class), eq("fake-reason")))
-            .thenReturn(Optional.of(reason));
+        when(client.fetch(eq(Reason.class), eq("fake-reason"))).thenReturn(Optional.of(reason));
 
         when(notificationCenter.notify(eq(reason))).thenReturn(Mono.empty());
         notificationTrigger.reconcile(new Reconciler.Request("fake-reason"));
@@ -63,11 +60,9 @@ class NotificationTriggerTest {
         var metadata = mock(Metadata.class);
         when(reason.getMetadata()).thenReturn(metadata);
         when(metadata.getDeletionTimestamp()).thenReturn(Instant.now());
-        when(metadata.getFinalizers())
-            .thenReturn(Set.of(NotificationTrigger.TRIGGERED_FINALIZER));
+        when(metadata.getFinalizers()).thenReturn(Set.of(NotificationTrigger.TRIGGERED_FINALIZER));
 
-        when(client.fetch(eq(Reason.class), eq("fake-reason")))
-            .thenReturn(Optional.of(reason));
+        when(client.fetch(eq(Reason.class), eq("fake-reason"))).thenReturn(Optional.of(reason));
 
         notificationTrigger.reconcile(new Reconciler.Request("fake-reason"));
 

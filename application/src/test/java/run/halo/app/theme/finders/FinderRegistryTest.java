@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 class FinderRegistryTest {
 
     private DefaultFinderRegistry finderRegistry;
+
     @Mock
     private ApplicationContext applicationContext;
 
@@ -33,9 +34,10 @@ class FinderRegistryTest {
     @Test
     void registerFinder() {
         assertThatThrownBy(() -> {
-            finderRegistry.putFinder(new Object());
-        }).isInstanceOf(IllegalStateException.class)
-            .hasMessage("Finder must be annotated with @Finder");
+                    finderRegistry.putFinder(new Object());
+                })
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Finder must be annotated with @Finder");
 
         String s = finderRegistry.putFinder(new FakeFinder());
         assertThat(s).isEqualTo("test");
@@ -66,8 +68,7 @@ class FinderRegistryTest {
     void registerAndUnregisterPlugin() {
         var pluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
         var finder = new FakeFinder();
-        when(pluginContext.getBeansWithAnnotation(Finder.class))
-            .thenReturn(Map.of("fakeFinder", finder));
+        when(pluginContext.getBeansWithAnnotation(Finder.class)).thenReturn(Map.of("fakeFinder", finder));
 
         finderRegistry.register("plugin-a", pluginContext);
         assertThat(finderRegistry.get("test")).isNotNull();
@@ -80,8 +81,7 @@ class FinderRegistryTest {
     void reRegisterCleansStaleFinders() {
         var pluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
         var finder1 = new FakeFinder();
-        when(pluginContext.getBeansWithAnnotation(Finder.class))
-            .thenReturn(Map.of("fakeFinder", finder1));
+        when(pluginContext.getBeansWithAnnotation(Finder.class)).thenReturn(Map.of("fakeFinder", finder1));
 
         // First registration (simulates a previous plugin start that registered finders)
         finderRegistry.register("plugin-a", pluginContext);
@@ -92,8 +92,7 @@ class FinderRegistryTest {
         // Now re-register with new finders (e.g., after plugin upgrade)
         var newPluginContext = org.mockito.Mockito.mock(ApplicationContext.class);
         var finder2 = new FakeFinder();
-        when(newPluginContext.getBeansWithAnnotation(Finder.class))
-            .thenReturn(Map.of("fakeFinder", finder2));
+        when(newPluginContext.getBeansWithAnnotation(Finder.class)).thenReturn(Map.of("fakeFinder", finder2));
 
         // register should not throw "Finder with name 'test' is already registered"
         finderRegistry.register("plugin-a", newPluginContext);
@@ -102,7 +101,5 @@ class FinderRegistryTest {
     }
 
     @Finder("test")
-    static class FakeFinder {
-
-    }
+    static class FakeFinder {}
 }

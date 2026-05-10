@@ -48,22 +48,25 @@ class PostQueryEndpointTest {
 
     @BeforeEach
     public void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
     @Test
     public void listPosts() {
         ListResult<ListedPostVo> result = new ListResult<>(List.of());
-        when(postPublicQueryService.list(any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(result));
+        when(postPublicQueryService.list(any(), any(PageRequest.class))).thenReturn(Mono.just(result));
 
-        webClient.get().uri("/posts")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.items").isArray();
+        webClient
+                .get()
+                .uri("/posts")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.items")
+                .isArray();
 
         verify(postPublicQueryService).list(any(), any(PageRequest.class));
     }
@@ -72,17 +75,20 @@ class PostQueryEndpointTest {
     public void getPostByName() {
         Metadata metadata = new Metadata();
         metadata.setName("test");
-        PostVo post = PostVo.builder()
-            .metadata(metadata)
-            .build();
+        PostVo post = PostVo.builder().metadata(metadata).build();
         when(postFinder.getByName(anyString())).thenReturn(Mono.just(post));
 
-        webClient.get().uri("/posts/{name}", "test")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("test");
+        webClient
+                .get()
+                .uri("/posts/{name}", "test")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("test");
 
         verify(postFinder).getByName(anyString());
     }
@@ -92,17 +98,21 @@ class PostQueryEndpointTest {
         Metadata metadata = new Metadata();
         metadata.setName("test");
         NavigationPostVo navigation = NavigationPostVo.builder()
-            .next(ListedPostVo.builder().metadata(metadata).build())
-            .build();
-        when(postFinder.cursor(anyString()))
-            .thenReturn(Mono.just(navigation));
+                .next(ListedPostVo.builder().metadata(metadata).build())
+                .build();
+        when(postFinder.cursor(anyString())).thenReturn(Mono.just(navigation));
 
-        webClient.get().uri("/posts/{name}/navigation", "test")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.next.metadata.name").isEqualTo("test");
+        webClient
+                .get()
+                .uri("/posts/{name}/navigation", "test")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.next.metadata.name")
+                .isEqualTo("test");
 
         verify(postFinder).cursor(anyString());
     }

@@ -12,5 +12,4 @@ public interface WebSocketEndpointManager {
     void register(Collection<WebSocketEndpoint> endpoints);
 
     void unregister(Collection<WebSocketEndpoint> endpoints);
-
 }

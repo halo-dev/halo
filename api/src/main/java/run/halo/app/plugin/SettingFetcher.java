@@ -47,5 +47,4 @@ public interface SettingFetcher {
      * @return all setting values, never null
      */
     Map<String, JsonNode> getSettingValues();
-
 }

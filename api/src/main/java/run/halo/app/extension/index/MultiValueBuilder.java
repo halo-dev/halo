@@ -14,8 +14,8 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 class MultiValueBuilder<E extends Extension, K extends Comparable<K>>
-    extends AbstractValueIndexSpecBuilder<E, K, MultiValueIndexSpecBuilder<E, K>>
-    implements MultiValueIndexSpecBuilder<E, K> {
+        extends AbstractValueIndexSpecBuilder<E, K, MultiValueIndexSpecBuilder<E, K>>
+        implements MultiValueIndexSpecBuilder<E, K> {
 
     private Function<E, Set<K>> indexFunc;
 

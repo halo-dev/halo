@@ -1,9 +1,6 @@
 package run.halo.app.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,38 +10,38 @@ class SchemeTest {
 
     @Test
     void requiredFieldTest() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new Scheme(null, new GroupVersionKind("", "v1alpha1", ""), "", "", null));
-        assertThrows(IllegalArgumentException.class,
-            () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "", ""), "", "",
-                null));
-        assertThrows(IllegalArgumentException.class,
-            () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", ""), "",
-                "", null));
-        assertThrows(IllegalArgumentException.class,
-            () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "",
-                "", null));
-        assertThrows(IllegalArgumentException.class,
-            () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"),
-                "fakes", "", null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Scheme(null, new GroupVersionKind("", "v1alpha1", ""), "", "", null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "", ""), "", "", null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", ""), "", "", null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "", "", null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes", "", null));
         assertThrows(IllegalArgumentException.class, () -> {
-            new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes",
-                "fake", null);
+            new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes", "fake", null);
         });
-        new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes",
-            "fake", new ObjectNode(null));
+        new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("", "v1alpha1", "Fake"),
+                "fakes",
+                "fake",
+                new ObjectNode(null));
     }
-
 
     @Test
     void shouldThrowExceptionWhenTypeHasNoGvkAnno() {
-        class NoGvkExtension extends AbstractExtension {
-        }
+        class NoGvkExtension extends AbstractExtension {}
 
-        assertThrows(IllegalArgumentException.class,
-            () -> Scheme.getGvkFromType(NoGvkExtension.class));
-        assertThrows(IllegalArgumentException.class,
-            () -> Scheme.buildFromType(NoGvkExtension.class));
+        assertThrows(IllegalArgumentException.class, () -> Scheme.getGvkFromType(NoGvkExtension.class));
+        assertThrows(IllegalArgumentException.class, () -> Scheme.buildFromType(NoGvkExtension.class));
     }
 
     @Test
@@ -60,8 +57,7 @@ class SchemeTest {
     @Test
     void shouldCreateSchemeSuccessfully() {
         var scheme = Scheme.buildFromType(FakeExtension.class);
-        assertEquals(new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"),
-            scheme.groupVersionKind());
+        assertEquals(new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"), scheme.groupVersionKind());
         assertEquals("fake", scheme.singular());
         assertEquals("fakes", scheme.plural());
         assertNotNull(scheme.openApiSchema());
@@ -76,39 +72,56 @@ class SchemeTest {
         assertEquals(scheme1.hashCode(), scheme2.hashCode());
 
         // openApiSchema is not included in equals and hashCode.
-        var scheme3 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
-            scheme1.plural(), scheme1.singular(), JsonNodeFactory.instance.objectNode());
+        var scheme3 = new Scheme(
+                FakeExtension.class,
+                scheme1.groupVersionKind(),
+                scheme1.plural(),
+                scheme1.singular(),
+                JsonNodeFactory.instance.objectNode());
         assertEquals(scheme1, scheme3);
 
         // singular and plural are not included in equals and hashCode.
-        var scheme4 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
-            scheme1.plural(), "other", scheme1.openApiSchema());
+        var scheme4 = new Scheme(
+                FakeExtension.class, scheme1.groupVersionKind(), scheme1.plural(), "other", scheme1.openApiSchema());
         assertEquals(scheme1, scheme4);
 
         // plural is not included in equals and hashCode.
-        var scheme5 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
-            "other", scheme1.singular(), scheme1.openApiSchema());
+        var scheme5 = new Scheme(
+                FakeExtension.class, scheme1.groupVersionKind(), "other", scheme1.singular(), scheme1.openApiSchema());
         assertEquals(scheme1, scheme5);
 
         // type is not included in equals and hashCode.
-        var scheme6 = new Scheme(FakeExtension.class, scheme1.groupVersionKind(),
-            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        var scheme6 = new Scheme(
+                FakeExtension.class,
+                scheme1.groupVersionKind(),
+                scheme1.plural(),
+                scheme1.singular(),
+                scheme1.openApiSchema());
         assertEquals(scheme1, scheme6);
 
         // groupVersionKind is included in equals and hashCode.
-        var scheme7 = new Scheme(FakeExtension.class,
-            new GroupVersionKind("other.halo.run", "v1alpha1", "Fake"),
-            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        var scheme7 = new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("other.halo.run", "v1alpha1", "Fake"),
+                scheme1.plural(),
+                scheme1.singular(),
+                scheme1.openApiSchema());
         assertNotEquals(scheme1, scheme7);
 
-        scheme7 = new Scheme(FakeExtension.class,
-            new GroupVersionKind("fake.halo.run", "v1alpha2", "Fake"),
-            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        scheme7 = new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("fake.halo.run", "v1alpha2", "Fake"),
+                scheme1.plural(),
+                scheme1.singular(),
+                scheme1.openApiSchema());
         assertNotEquals(scheme1, scheme7);
 
-        scheme7 = new Scheme(FakeExtension.class,
-            new GroupVersionKind("fake.halo.run", "v1alpha1", "Other"),
-            scheme1.plural(), scheme1.singular(), scheme1.openApiSchema());
+        scheme7 = new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("fake.halo.run", "v1alpha1", "Other"),
+                scheme1.plural(),
+                scheme1.singular(),
+                scheme1.openApiSchema());
         assertNotEquals(scheme1, scheme7);
     }
 }

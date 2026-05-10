@@ -121,8 +121,7 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringContains(String keyword);
 
     /**
-     * Gets entity IDs where the string representation of the key does not contain the specified
-     * keyword.
+     * Gets entity IDs where the string representation of the key does not contain the specified keyword.
      *
      * @param keyword the keyword to search for
      * @return the set of entity IDs that do not contain the keyword
@@ -140,8 +139,7 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringStartsWith(String prefix);
 
     /**
-     * Gets entity IDs where the string representation of the key does not start with the
-     * specified prefix.
+     * Gets entity IDs where the string representation of the key does not start with the specified prefix.
      *
      * @param prefix the prefix to search for
      * @return the set of entity IDs that do not start with the prefix
@@ -159,13 +157,11 @@ public interface ValueIndexQuery<K extends Comparable<K>> {
     Set<String> stringEndsWith(String suffix);
 
     /**
-     * Gets entity IDs where the string representation of the key does not end with the specified
-     * suffix.
+     * Gets entity IDs where the string representation of the key does not end with the specified suffix.
      *
      * @param suffix the suffix to search for
      * @return the set of entity IDs that do not end with the suffix
      * @throws IllegalArgumentException if the key type is not String
      */
     Set<String> stringNotEndsWith(String suffix);
-
 }

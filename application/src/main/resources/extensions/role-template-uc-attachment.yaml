@@ -10,6 +10,7 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       [ "uc:attachments:manage" ]
 rules:
-  - apiGroups: [ "uc.api.storage.halo.run" ]
-    resources: [ "attachments", "attachments/upload", "attachments/upload-from-url" ]
-    verbs: [ "create", "list" ]
+  - apiGroups: ["uc.api.storage.halo.run"]
+    resources:
+      ["attachments", "attachments/upload", "attachments/upload-from-url"]
+    verbs: ["create", "list"]

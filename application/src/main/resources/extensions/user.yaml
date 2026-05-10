@@ -25,4 +25,3 @@ spec:
   email: ghost@example.com
   disabled: true
   bio: 该用户已被删除。
-

@@ -1,9 +1,7 @@
 package run.halo.app.core.endpoint.uc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,8 +42,7 @@ class AnnotationSettingEndpointTest {
 
     @BeforeEach
     void setUp() {
-        webTestClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
+        webTestClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
     @Test
@@ -56,30 +53,32 @@ class AnnotationSettingEndpointTest {
         var annotationSetting = new AnnotationSetting();
         annotationSetting.setMetadata(new Metadata());
         annotationSetting.getMetadata().setName("fake-annotation");
-        when(
-            client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class))
-        ).thenReturn(Flux.just(annotationSetting));
+        when(client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.just(annotationSetting));
 
-        webTestClient.get()
-            .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBodyList(AnnotationSetting.class)
-            .isEqualTo(List.of(annotationSetting));
+        webTestClient
+                .get()
+                .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(AnnotationSetting.class)
+                .isEqualTo(List.of(annotationSetting));
 
-        verify(client).listAll(
-            same(AnnotationSetting.class),
-            assertArg(listOptions -> {
-                var condition = listOptions.toCondition();
-                assertEquals("""
+        verify(client)
+                .listAll(
+                        same(AnnotationSetting.class),
+                        assertArg(listOptions -> {
+                            var condition = listOptions.toCondition();
+                            assertEquals("""
                     (\
                     (metadata.labels['theme.halo.run/theme-name'] = 'fake-theme' \
                     OR metadata.labels['plugin.halo.run/plugin-name'] IN ('plugin-1', 'plugin-2')\
                     ) \
                     AND spec.targetRef = content.halo.run/Post\
                     )""", condition.toString());
-            }),
-            any(Sort.class));
+                        }),
+                        any(Sort.class));
     }
 
     @Test
@@ -90,28 +89,30 @@ class AnnotationSettingEndpointTest {
         var annotationSetting = new AnnotationSetting();
         annotationSetting.setMetadata(new Metadata());
         annotationSetting.getMetadata().setName("fake-annotation");
-        when(
-            client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class))
-        ).thenReturn(Flux.just(annotationSetting));
+        when(client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.just(annotationSetting));
 
-        webTestClient.get()
-            .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBodyList(AnnotationSetting.class)
-            .isEqualTo(List.of(annotationSetting));
+        webTestClient
+                .get()
+                .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(AnnotationSetting.class)
+                .isEqualTo(List.of(annotationSetting));
 
-        verify(client).listAll(
-            same(AnnotationSetting.class),
-            assertArg(listOptions -> {
-                var condition = listOptions.toCondition();
-                assertEquals("""
+        verify(client)
+                .listAll(
+                        same(AnnotationSetting.class),
+                        assertArg(listOptions -> {
+                            var condition = listOptions.toCondition();
+                            assertEquals("""
                     (\
                     metadata.labels['plugin.halo.run/plugin-name'] IN ('plugin-1', 'plugin-2') \
                     AND spec.targetRef = content.halo.run/Post\
                     )""", condition.toString());
-            }),
-            any(Sort.class));
+                        }),
+                        any(Sort.class));
     }
 
     @Test
@@ -122,28 +123,30 @@ class AnnotationSettingEndpointTest {
         var annotationSetting = new AnnotationSetting();
         annotationSetting.setMetadata(new Metadata());
         annotationSetting.getMetadata().setName("fake-annotation");
-        when(
-            client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class))
-        ).thenReturn(Flux.just(annotationSetting));
+        when(client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.just(annotationSetting));
 
-        webTestClient.get()
-            .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBodyList(AnnotationSetting.class)
-            .isEqualTo(List.of(annotationSetting));
+        webTestClient
+                .get()
+                .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(AnnotationSetting.class)
+                .isEqualTo(List.of(annotationSetting));
 
-        verify(client).listAll(
-            same(AnnotationSetting.class),
-            assertArg(listOptions -> {
-                var condition = listOptions.toCondition();
-                assertEquals("""
+        verify(client)
+                .listAll(
+                        same(AnnotationSetting.class),
+                        assertArg(listOptions -> {
+                            var condition = listOptions.toCondition();
+                            assertEquals("""
                     (\
                     metadata.labels['theme.halo.run/theme-name'] = 'fake-theme' \
                     AND spec.targetRef = content.halo.run/Post\
                     )""", condition.toString());
-            }),
-            any(Sort.class));
+                        }),
+                        any(Sort.class));
     }
 
     @Test
@@ -154,26 +157,28 @@ class AnnotationSettingEndpointTest {
         var annotationSetting = new AnnotationSetting();
         annotationSetting.setMetadata(new Metadata());
         annotationSetting.getMetadata().setName("fake-annotation");
-        when(
-            client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class))
-        ).thenReturn(Flux.just(annotationSetting));
+        when(client.listAll(same(AnnotationSetting.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.just(annotationSetting));
 
-        webTestClient.get()
-            .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBodyList(AnnotationSetting.class)
-            .isEqualTo(List.of(annotationSetting));
+        webTestClient
+                .get()
+                .uri("/annotationsettings?targetRef={targetRef}", "content.halo.run/Post")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(AnnotationSetting.class)
+                .isEqualTo(List.of(annotationSetting));
 
-        verify(client).listAll(
-            same(AnnotationSetting.class),
-            assertArg(listOptions -> {
-                var condition = listOptions.toCondition();
-                assertEquals("""
+        verify(client)
+                .listAll(
+                        same(AnnotationSetting.class),
+                        assertArg(listOptions -> {
+                            var condition = listOptions.toCondition();
+                            assertEquals("""
                     (\
                     EMPTY AND spec.targetRef = content.halo.run/Post\
                     )""", condition.toString());
-            }),
-            any(Sort.class));
+                        }),
+                        any(Sort.class));
     }
 }

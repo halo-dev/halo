@@ -6,10 +6,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>Halo uses this interface to enhance the processing of login success, such as device management
- * and remember me, etc. The login method of the plugin extension needs to call this interface in
- * the processing method of login success to ensure the normal operation of some enhanced
- * functions.</p>
+ * Halo uses this interface to enhance the processing of login success, such as device management and remember me, etc.
+ * The login method of the plugin extension needs to call this interface in the processing method of login success to
+ * ensure the normal operation of some enhanced functions.
  *
  * @author guqing
  * @since 2.17.0

@@ -90,11 +90,9 @@ class SystemConfigUtilsTest {
     @Test
     void mergeMapShouldHandleComplexNestedStructures() throws JsonProcessingException {
         Map<String, String> defaultMap = new HashMap<>();
-        defaultMap.put("config",
-            "{\"server\":{\"port\":8080,\"host\":\"localhost\"},\"features\":{\"auth\":true}}");
+        defaultMap.put("config", "{\"server\":{\"port\":8080,\"host\":\"localhost\"},\"features\":{\"auth\":true}}");
         Map<String, String> overrideMap = new HashMap<>();
-        overrideMap.put("config",
-            "{\"server\":{\"port\":9090},\"features\":{\"logging\":true}}");
+        overrideMap.put("config", "{\"server\":{\"port\":9090},\"features\":{\"logging\":true}}");
 
         Map<String, String> result = SystemConfigUtils.mergeMap(defaultMap, overrideMap);
 
@@ -142,8 +140,7 @@ class SystemConfigUtilsTest {
         Map<String, String> overrideMap = new HashMap<>();
         overrideMap.put("group1", "{\"key1\":\"value1\"}");
 
-        assertThrows(JsonProcessingException.class,
-            () -> SystemConfigUtils.mergeMap(defaultMap, overrideMap));
+        assertThrows(JsonProcessingException.class, () -> SystemConfigUtils.mergeMap(defaultMap, overrideMap));
     }
 
     @Test
@@ -270,11 +267,9 @@ class SystemConfigUtilsTest {
     @Test
     void mergeMapShouldHandleDeepNesting() throws JsonProcessingException {
         Map<String, String> defaultMap = new HashMap<>();
-        defaultMap.put("group1",
-            "{\"level1\":{\"level2\":{\"level3\":{\"key\":\"value1\"}}}}");
+        defaultMap.put("group1", "{\"level1\":{\"level2\":{\"level3\":{\"key\":\"value1\"}}}}");
         Map<String, String> overrideMap = new HashMap<>();
-        overrideMap.put("group1",
-            "{\"level1\":{\"level2\":{\"level3\":{\"newKey\":\"value2\"}}}}");
+        overrideMap.put("group1", "{\"level1\":{\"level2\":{\"level3\":{\"newKey\":\"value2\"}}}}");
 
         Map<String, String> result = SystemConfigUtils.mergeMap(defaultMap, overrideMap);
 

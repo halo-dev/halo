@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { NotifierDescriptorSpec } from './notifier-descriptor-spec';
 
 /**
- * <p>{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.</p>  <p>It describes the notifier\'s name, description, and the extension name of the notifier to  let the user know what the notifier is and what it can do in the UI and also let the  <code>NotificationCenter</code> know how to load the notifier and prepare the notifier\'s settings.</p>
+ * {@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.   <p>It describes the notifier\'s name, description, and the extension name of the notifier to let the user know what  the notifier is and what it can do in the UI and also let the <code>NotificationCenter</code> know how to load the  notifier and prepare the notifier\'s settings.
  */
 export interface NotifierDescriptor {
     'apiVersion': string;

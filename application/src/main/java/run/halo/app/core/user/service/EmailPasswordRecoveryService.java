@@ -12,9 +12,8 @@ import run.halo.app.infra.exception.AccessDeniedException;
 public interface EmailPasswordRecoveryService {
 
     /**
-     * <p>Send password reset email.</p>
-     * if the user does not exist, it will return {@link Mono#empty()}
-     * if the user exists, but the email is not the same, it will return {@link Mono#empty()}
+     * Send password reset email. if the user does not exist, it will return {@link Mono#empty()} if the user exists,
+     * but the email is not the same, it will return {@link Mono#empty()}
      *
      * @param username username to request password reset
      * @param email email to match the user with the username
@@ -25,10 +24,8 @@ public interface EmailPasswordRecoveryService {
     Mono<Void> sendPasswordResetEmail(String email);
 
     /**
-     * <p>Reset password by token.</p>
-     * if the token is invalid, it will return {@link Mono#error(Throwable)}}
-     * if the token is valid, but the username is not the same, it will return
-     * {@link Mono#error(Throwable)}
+     * Reset password by token. if the token is invalid, it will return {@link Mono#error(Throwable)}} if the token is
+     * valid, but the username is not the same, it will return {@link Mono#error(Throwable)}
      *
      * @param newPassword new password
      * @param token token to validate the user
@@ -38,5 +35,4 @@ public interface EmailPasswordRecoveryService {
     Mono<Void> changePassword(String newPassword, String token);
 
     Mono<ResetToken> getValidResetToken(String token);
-
 }

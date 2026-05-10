@@ -32,7 +32,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 public class SubscriptionRouter {
 
     public static final String UNSUBSCRIBE_PATTERN =
-        "/apis/api.notification.halo.run/v1alpha1/subscriptions/{name}/unsubscribe";
+            "/apis/api.notification.halo.run/v1alpha1/subscriptions/{name}/unsubscribe";
 
     private final ExternalUrlSupplier externalUrlSupplier;
     private final ReactiveExtensionClient client;
@@ -41,40 +41,37 @@ public class SubscriptionRouter {
     RouterFunction<ServerResponse> notificationSubscriptionRouter() {
         final var tag = "NotificationV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .GET(UNSUBSCRIBE_PATTERN, this::unsubscribe, builder -> {
-                builder.operationId("Unsubscribe")
-                    .tag(tag)
-                    .description("Unsubscribe a subscription")
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Subscription name")
-                        .required(true)
-                    ).parameter(parameterBuilder()
-                        .in(ParameterIn.QUERY)
-                        .name("token")
-                        .description("Unsubscribe token")
-                        .required(true)
-                    )
-                    .response(responseBuilder().implementation(String.class))
-                    .build();
-            })
-            .build();
+                .GET(UNSUBSCRIBE_PATTERN, this::unsubscribe, builder -> {
+                    builder.operationId("Unsubscribe")
+                            .tag(tag)
+                            .description("Unsubscribe a subscription")
+                            .parameter(parameterBuilder()
+                                    .in(ParameterIn.PATH)
+                                    .name("name")
+                                    .description("Subscription name")
+                                    .required(true))
+                            .parameter(parameterBuilder()
+                                    .in(ParameterIn.QUERY)
+                                    .name("token")
+                                    .description("Unsubscribe token")
+                                    .required(true))
+                            .response(responseBuilder().implementation(String.class))
+                            .build();
+                })
+                .build();
     }
 
     Mono<ServerResponse> unsubscribe(ServerRequest request) {
         var name = request.pathVariable("name");
         var token = request.queryParam("token").orElse("");
         return client.fetch(Subscription.class, name)
-            .filter(subscription -> {
-                var unsubscribeToken = subscription.getSpec().getUnsubscribeToken();
-                return StringUtils.equals(token, unsubscribeToken);
-            })
-            .flatMap(client::delete)
-            .then(Mono.defer(() -> ServerResponse.ok()
-                .contentType(MediaType.TEXT_PLAIN)
-                .bodyValue("Unsubscribe successfully."))
-            );
+                .filter(subscription -> {
+                    var unsubscribeToken = subscription.getSpec().getUnsubscribeToken();
+                    return StringUtils.equals(token, unsubscribeToken);
+                })
+                .flatMap(client::delete)
+                .then(Mono.defer(() ->
+                        ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).bodyValue("Unsubscribe successfully.")));
     }
 
     /**
@@ -88,9 +85,9 @@ public class SubscriptionRouter {
         var token = subscription.getSpec().getUnsubscribeToken();
         var externalUrl = defaultIfNull(externalUrlSupplier.getRaw(), URI.create("/"));
         return UriComponentsBuilder.fromUriString(externalUrl.toString())
-            .path(UNSUBSCRIBE_PATTERN)
-            .queryParam("token", token)
-            .build(name)
-            .toString();
+                .path(UNSUBSCRIBE_PATTERN)
+                .queryParam("token", token)
+                .build(name)
+                .toString();
     }
 }

@@ -35,27 +35,23 @@ class SinglePageConversionServiceImplTest {
 
     @Test
     void extendPageContent() {
-        when(extensionGetter.getEnabledExtensions(
-            eq(ReactiveSinglePageContentHandler.class)))
-            .thenReturn(
-                Flux.just(new PageContentHandlerB(),
-                    new PageContentHandlerA(),
-                    new PageContentHandlerC())
-            );
+        when(extensionGetter.getEnabledExtensions(eq(ReactiveSinglePageContentHandler.class)))
+                .thenReturn(Flux.just(new PageContentHandlerB(), new PageContentHandlerA(), new PageContentHandlerC()));
         ContentWrapper contentWrapper = ContentWrapper.builder()
-            .content("fake-content")
-            .raw("fake-raw")
-            .rawType("markdown")
-            .build();
+                .content("fake-content")
+                .raw("fake-raw")
+                .rawType("markdown")
+                .build();
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName("fake-page");
-        pageConversionService.extendPageContent(singlePage, contentWrapper)
-            .as(StepVerifier::create)
-            .consumeNextWith(contentVo -> {
-                assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
-            })
-            .verifyComplete();
+        pageConversionService
+                .extendPageContent(singlePage, contentWrapper)
+                .as(StepVerifier::create)
+                .consumeNextWith(contentVo -> {
+                    assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
+                })
+                .verifyComplete();
     }
 
     static class PageContentHandlerA implements ReactiveSinglePageContentHandler {

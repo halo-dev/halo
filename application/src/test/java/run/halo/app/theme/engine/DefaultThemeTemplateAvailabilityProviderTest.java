@@ -31,10 +31,8 @@ class DefaultThemeTemplateAvailabilityProviderTest {
         var themePath = Path.of(themeUrl.toURI());
 
         when(thymeleafProperties.getSuffix()).thenReturn(".html");
-        var themeContext = ThemeContext.builder()
-            .name("default")
-            .path(themePath)
-            .build();
+        var themeContext =
+                ThemeContext.builder().name("default").path(themePath).build();
         boolean templateAvailable = provider.isTemplateAvailable(themeContext, "fake");
         assertFalse(templateAvailable);
 

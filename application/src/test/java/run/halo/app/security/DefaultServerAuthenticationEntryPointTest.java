@@ -29,30 +29,26 @@ class DefaultServerAuthenticationEntryPointTest {
     @Test
     void commenceForXhrRequest() {
         var mockReq = MockServerHttpRequest.get("/protected")
-            .header("X-Requested-With", "XMLHttpRequest")
-            .build();
-        var mockExchange = MockServerWebExchange.builder(mockReq)
-            .build();
-        var commenceMono = entryPoint.commence(mockExchange,
-            new AuthenticationCredentialsNotFoundException("Not Found"));
-        StepVerifier.create(commenceMono)
-            .verifyComplete();
+                .header("X-Requested-With", "XMLHttpRequest")
+                .build();
+        var mockExchange = MockServerWebExchange.builder(mockReq).build();
+        var commenceMono =
+                entryPoint.commence(mockExchange, new AuthenticationCredentialsNotFoundException("Not Found"));
+        StepVerifier.create(commenceMono).verifyComplete();
         var headers = mockExchange.getResponse().getHeaders();
         assertEquals("FormLogin realm=\"console\"", headers.getFirst(WWW_AUTHENTICATE));
     }
 
     @Test
     void commenceForNormalRequest() {
-        var mockReq = MockServerHttpRequest.get("/protected")
-            .build();
-        var mockExchange = MockServerWebExchange.builder(mockReq)
-            .build();
+        var mockReq = MockServerHttpRequest.get("/protected").build();
+        var mockExchange = MockServerWebExchange.builder(mockReq).build();
         Mockito.when(requestCache.saveRequest(mockExchange)).thenReturn(Mono.empty());
-        var commenceMono = entryPoint.commence(mockExchange,
-            new AuthenticationCredentialsNotFoundException("Not Found"));
-        StepVerifier.create(commenceMono)
-            .verifyComplete();
-        assertEquals(URI.create("/login?authentication_required"),
-            mockExchange.getResponse().getHeaders().getLocation());
+        var commenceMono =
+                entryPoint.commence(mockExchange, new AuthenticationCredentialsNotFoundException("Not Found"));
+        StepVerifier.create(commenceMono).verifyComplete();
+        assertEquals(
+                URI.create("/login?authentication_required"),
+                mockExchange.getResponse().getHeaders().getLocation());
     }
 }

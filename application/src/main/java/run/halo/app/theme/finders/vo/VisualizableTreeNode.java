@@ -11,9 +11,7 @@ import java.util.List;
  */
 public interface VisualizableTreeNode<T extends VisualizableTreeNode<T>> {
 
-    /**
-     * Visualize tree node.
-     */
+    /** Visualize tree node. */
     default void print(StringBuilder buffer, String prefix, String childrenPrefix) {
         buffer.append(prefix);
         buffer.append(nodeText());

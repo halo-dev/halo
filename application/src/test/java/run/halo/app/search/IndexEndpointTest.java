@@ -1,13 +1,9 @@
 package run.halo.app.search;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,17 +32,15 @@ class IndexEndpointTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .handlerStrategies(HandlerStrategies.builder()
-                .exceptionHandler(new ResponseStatusExceptionHandler())
-                .build())
-            .build();
+                .handlerStrategies(HandlerStrategies.builder()
+                        .exceptionHandler(new ResponseStatusExceptionHandler())
+                        .build())
+                .build();
     }
 
     @Test
     void shouldResponseBadRequestIfNotRequestBody() {
-        client.post().uri("/indices/-/search")
-            .exchange()
-            .expectStatus().isBadRequest();
+        client.post().uri("/indices/-/search").exchange().expectStatus().isBadRequest();
     }
 
     @Test
@@ -54,12 +48,14 @@ class IndexEndpointTest {
         var option = new SearchOption();
         var errors = mock(Errors.class);
         when(searchService.search(any(SearchOption.class)))
-            .thenReturn(Mono.error(new RequestBodyValidationException(errors)));
+                .thenReturn(Mono.error(new RequestBodyValidationException(errors)));
 
-        client.post().uri("/indices/-/search")
-            .bodyValue(option)
-            .exchange()
-            .expectStatus().isBadRequest();
+        client.post()
+                .uri("/indices/-/search")
+                .bodyValue(option)
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
     }
 
     @Test
@@ -69,12 +65,14 @@ class IndexEndpointTest {
         var searchResult = new SearchResult();
         when(searchService.search(any(SearchOption.class))).thenReturn(Mono.just(searchResult));
 
-        client.post().uri("/indices/-/search")
-            .bodyValue(option)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(SearchResult.class)
-            .isEqualTo(searchResult);
+        client.post()
+                .uri("/indices/-/search")
+                .bodyValue(option)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(SearchResult.class)
+                .isEqualTo(searchResult);
 
         verify(searchService).search(assertArg(o -> {
             assertEquals("halo", o.getKeyword());
@@ -88,12 +86,14 @@ class IndexEndpointTest {
     @Test
     void shouldFailWhenSearchEngineIsUnavailable() {
         when(searchService.search(any(SearchOption.class)))
-            .thenReturn(Mono.error(new SearchEngineUnavailableException()));
+                .thenReturn(Mono.error(new SearchEngineUnavailableException()));
 
-        client.post().uri("/indices/-/search")
-            .bodyValue(new SearchOption())
-            .exchange()
-            .expectStatus().is4xxClientError();
+        client.post()
+                .uri("/indices/-/search")
+                .bodyValue(new SearchOption())
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
     }
 
     @Test

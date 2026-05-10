@@ -21,8 +21,8 @@ import tools.jackson.databind.exc.JsonNodeException;
 import tools.jackson.databind.module.SimpleModule;
 
 /**
- * Jackson module to adapt legacy {@link JsonNode} serialization and deserialization.
- * This module makes sure the plugin system using legacy Jackson can correctly
+ * Jackson module to adapt legacy {@link JsonNode} serialization and deserialization. This module makes sure the plugin
+ * system using legacy Jackson can correctly
  *
  * @author johnniang
  * @since 2.23.0
@@ -46,8 +46,7 @@ public class JacksonAdapterModule extends SimpleModule {
     class JsonExtensionDeSerializer extends ValueDeserializer<JsonExtension> {
 
         @Override
-        public JsonExtension deserialize(JsonParser p,
-            DeserializationContext ctxt) throws JacksonException {
+        public JsonExtension deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
             var json = p.readValueAsTree().toString();
             try {
                 return objectMapper.get().readValue(json, JsonExtension.class);
@@ -55,14 +54,13 @@ public class JacksonAdapterModule extends SimpleModule {
                 throw InvalidFormatException.from(p, "Failed to deserialize JsonExtension");
             }
         }
-
     }
 
     class JsonExtensionSerializer extends ValueSerializer<JsonExtension> {
 
         @Override
-        public void serialize(JsonExtension value, JsonGenerator gen,
-            SerializationContext ctxt) throws JacksonException {
+        public void serialize(JsonExtension value, JsonGenerator gen, SerializationContext ctxt)
+                throws JacksonException {
             try {
                 var raw = objectMapper.get().writeValueAsString(value);
                 gen.writeRawValue(raw);
@@ -80,9 +78,7 @@ public class JacksonAdapterModule extends SimpleModule {
     class JsonPatchSerializer extends ValueSerializer<JsonPatch> {
 
         @Override
-        public void serialize(JsonPatch value, JsonGenerator gen,
-            SerializationContext ctxt)
-            throws JacksonException {
+        public void serialize(JsonPatch value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
             try {
                 gen.writeRawValue(objectMapper.get().writeValueAsString(value));
             } catch (JsonProcessingException e) {
@@ -94,15 +90,12 @@ public class JacksonAdapterModule extends SimpleModule {
         public Class<?> handledType() {
             return JsonPatch.class;
         }
-
     }
 
     class JsonNodeSerializer extends ValueSerializer<JsonNode> {
 
         @Override
-        public void serialize(JsonNode value, JsonGenerator gen,
-            SerializationContext ctxt)
-            throws JacksonException {
+        public void serialize(JsonNode value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
             try {
                 gen.writeRawValue(objectMapper.get().writeValueAsString(value));
             } catch (JsonProcessingException e) {
@@ -114,11 +107,9 @@ public class JacksonAdapterModule extends SimpleModule {
         public Class<?> handledType() {
             return JsonNode.class;
         }
-
     }
 
-    class JsonNodeDeserializer<T extends JsonNode>
-        extends ValueDeserializer<T> {
+    class JsonNodeDeserializer<T extends JsonNode> extends ValueDeserializer<T> {
 
         private final Class<T> type;
 
@@ -134,11 +125,8 @@ public class JacksonAdapterModule extends SimpleModule {
             try {
                 return mapper.readValue(json, type);
             } catch (JsonProcessingException e) {
-                throw JsonNodeException.from(
-                    p, "Failed to bridge legacy JSON node", e
-                );
+                throw JsonNodeException.from(p, "Failed to bridge legacy JSON node", e);
             }
         }
     }
-
 }

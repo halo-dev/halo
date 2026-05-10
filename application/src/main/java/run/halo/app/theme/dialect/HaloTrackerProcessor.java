@@ -13,8 +13,8 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 
 /**
- * Get {@link GroupVersionKind} and {@code plural} from the view model to construct tracker
- * script tag and insert it into the head tag.
+ * Get {@link GroupVersionKind} and {@code plural} from the view model to construct tracker script tag and insert it
+ * into the head tag.
  *
  * @author guqing
  * @since 2.0.0
@@ -22,8 +22,7 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
-    public static final String SKIP_TRACKER =
-        HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
+    public static final String SKIP_TRACKER = HaloTrackerProcessor.class.getName() + ".SKIP_TRACKER";
 
     private final ExternalUrlSupplier externalUrlGetter;
 
@@ -32,8 +31,7 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
     }
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler) {
         // Check if tracker should be skipped
         var isSkip = (Boolean) context.getVariable(SKIP_TRACKER);
         if (BooleanUtils.isTrue(isSkip)) {
@@ -42,12 +40,12 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
         final IModelFactory modelFactory = context.getModelFactory();
         return Mono.just(getTrackerScript(context))
-            .filter(StringUtils::isNotBlank)
-            .map(trackerScript -> {
-                model.add(modelFactory.createText(trackerScript));
-                return trackerScript;
-            })
-            .then();
+                .filter(StringUtils::isNotBlank)
+                .map(trackerScript -> {
+                    model.add(modelFactory.createText(trackerScript));
+                    return trackerScript;
+                })
+                .then();
     }
 
     private String getTrackerScript(ITemplateContext context) {

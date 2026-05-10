@@ -14,8 +14,8 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class RememberMeAuthenticationManager implements ReactiveAuthenticationManager,
-    InitializingBean, MessageSourceAware {
+public class RememberMeAuthenticationManager
+        implements ReactiveAuthenticationManager, InitializingBean, MessageSourceAware {
 
     private final CookieSignatureKeyResolver cookieSignatureKeyResolver;
     protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
@@ -23,9 +23,9 @@ public class RememberMeAuthenticationManager implements ReactiveAuthenticationMa
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         return Mono.justOrEmpty(authentication)
-            .filter(RememberMeAuthenticationToken.class::isInstance)
-            .cast(RememberMeAuthenticationToken.class)
-            .flatMap(this::doAuthenticate);
+                .filter(RememberMeAuthenticationToken.class::isInstance)
+                .cast(RememberMeAuthenticationToken.class)
+                .flatMap(this::doAuthenticate);
     }
 
     @Override
@@ -39,14 +39,16 @@ public class RememberMeAuthenticationManager implements ReactiveAuthenticationMa
     }
 
     private Mono<Authentication> doAuthenticate(RememberMeAuthenticationToken token) {
-        return cookieSignatureKeyResolver.resolveSigningKey()
-            .filter(key -> key.hashCode() == token.getKeyHash())
-            .switchIfEmpty(Mono.error(() -> new BadCredentialsException(badCredentialMessage())))
-            .thenReturn(token);
+        return cookieSignatureKeyResolver
+                .resolveSigningKey()
+                .filter(key -> key.hashCode() == token.getKeyHash())
+                .switchIfEmpty(Mono.error(() -> new BadCredentialsException(badCredentialMessage())))
+                .thenReturn(token);
     }
 
     private String badCredentialMessage() {
-        return this.messages.getMessage("RememberMeAuthenticationProvider.incorrectKey",
-            "The presented RememberMeAuthenticationToken does not contain the expected key");
+        return this.messages.getMessage(
+                "RememberMeAuthenticationProvider.incorrectKey",
+                "The presented RememberMeAuthenticationToken does not contain the expected key");
     }
 }

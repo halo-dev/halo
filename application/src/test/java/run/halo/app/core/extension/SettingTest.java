@@ -48,8 +48,8 @@ class SettingTest {
                       validation: required
             """;
         var unstructureds = new YamlUnstructuredLoader(
-            new InMemoryResource(settingYaml.getBytes(UTF_8), "In-memory setting YAML"))
-            .load();
+                        new InMemoryResource(settingYaml.getBytes(UTF_8), "In-memory setting YAML"))
+                .load();
         assertThat(unstructureds).hasSize(1);
         Unstructured unstructured = unstructureds.get(0);
 
@@ -97,7 +97,6 @@ class SettingTest {
                          "name": "setting-name"
                      }
                 }
-                """,
-            JsonUtils.objectToJson(setting), false);
+                """, JsonUtils.objectToJson(setting), false);
     }
 }

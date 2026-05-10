@@ -78,33 +78,34 @@ public class ThemeServiceImpl implements ThemeService {
         var themeProps = haloProperties.getTheme();
         var location = themeProps.getInitializer().getLocation();
         return Mono.using(
-                () -> Files.createTempDirectory("halo-theme-preset"),
-                tempDir -> Mono.fromCallable(() -> {
-                    var themeUrl = ResourceUtils.getURL(location);
-                    var resource = new UrlResource(themeUrl);
-                    var tempThemePath = tempDir.resolve("theme.zip");
-                    FileUtils.copyResource(resource, tempThemePath);
-                    return tempThemePath;
-                }).flatMap(themePath -> {
-                    var content = DataBufferUtils.read(new FileSystemResource(themePath),
-                        DefaultDataBufferFactory.sharedInstance,
-                        StreamUtils.BUFFER_SIZE);
-                    // We don't want to run on the bounded elastic scheduler again, so pass null
-                    // here.
-                    return doInstall(content, null);
-                }),
-                FileUtils::deleteRecursivelyAndSilently
-            )
-            .subscribeOn(scheduler)
-            .onErrorResume(IOException.class, e -> {
-                log.warn("Failed to initialize theme from {}", location, e);
-                return Mono.empty();
-            })
-            .onErrorResume(ThemeAlreadyExistsException.class, e -> {
-                log.warn("Failed to initialize theme from {}, because it already exists", location);
-                return Mono.empty();
-            })
-            .then();
+                        () -> Files.createTempDirectory("halo-theme-preset"),
+                        tempDir -> Mono.fromCallable(() -> {
+                                    var themeUrl = ResourceUtils.getURL(location);
+                                    var resource = new UrlResource(themeUrl);
+                                    var tempThemePath = tempDir.resolve("theme.zip");
+                                    FileUtils.copyResource(resource, tempThemePath);
+                                    return tempThemePath;
+                                })
+                                .flatMap(themePath -> {
+                                    var content = DataBufferUtils.read(
+                                            new FileSystemResource(themePath),
+                                            DefaultDataBufferFactory.sharedInstance,
+                                            StreamUtils.BUFFER_SIZE);
+                                    // We don't want to run on the bounded elastic scheduler again, so pass null
+                                    // here.
+                                    return doInstall(content, null);
+                                }),
+                        FileUtils::deleteRecursivelyAndSilently)
+                .subscribeOn(scheduler)
+                .onErrorResume(IOException.class, e -> {
+                    log.warn("Failed to initialize theme from {}", location, e);
+                    return Mono.empty();
+                })
+                .onErrorResume(ThemeAlreadyExistsException.class, e -> {
+                    log.warn("Failed to initialize theme from {}, because it already exists", location);
+                    return Mono.empty();
+                })
+                .then();
     }
 
     @Override
@@ -115,149 +116,146 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content) {
         var checkTheme = client.fetch(Theme.class, themeName)
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "The given theme with name " + themeName + " did not exist")
-            ));
+                .switchIfEmpty(Mono.error(() ->
+                        new ServerWebInputException("The given theme with name " + themeName + " did not exist")));
         var upgradeTheme = Mono.using(
-            () -> Files.createTempDirectory("halo-theme-"),
-            tempDir -> {
-                var locateThemeManifest = Mono.fromCallable(
-                        () -> locateThemeManifest(tempDir).orElse(null)
-                    )
-                    .switchIfEmpty(Mono.error(() -> new ThemeUpgradeException(
-                        "Missing theme manifest file: theme.yaml or theme.yml",
-                        "problemDetail.theme.upgrade.missingManifest", null)
-                    ));
-                return unzip(content, tempDir)
-                    .then(locateThemeManifest)
-                    .flatMap(themeManifest -> {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Found theme manifest file: {}", themeManifest);
-                        }
-                        var newTheme = loadThemeManifest(themeManifest);
-                        if (!Objects.equals(themeName, newTheme.getMetadata().getName())) {
-                            if (log.isDebugEnabled()) {
-                                log.error("Want theme name: {}, but provided: {}", themeName,
-                                    newTheme.getMetadata().getName());
-                            }
-                            return Mono.error(new ThemeUpgradeException(
-                                "Please make sure the theme name is correct",
-                                "problemDetail.theme.upgrade.nameMismatch",
-                                new Object[] {newTheme.getMetadata().getName(), themeName}));
-                        }
-                        var copyTheme = Mono.fromCallable(() -> {
-                            var themePath = themeRoot.get().resolve(themeName);
-                            // TODO Create backup before deleting
-                            deleteRecursivelyAndSilently(themePath);
-                            copyRecursively(themeManifest.getParent(), themePath);
-                            return themePath;
-                        });
-                        return copyTheme.then(this.persistent(newTheme, true));
-                    });
-            },
-            FileUtils::deleteRecursivelyAndSilently
-        ).subscribeOn(scheduler);
+                        () -> Files.createTempDirectory("halo-theme-"),
+                        tempDir -> {
+                            var locateThemeManifest = Mono.fromCallable(
+                                            () -> locateThemeManifest(tempDir).orElse(null))
+                                    .switchIfEmpty(Mono.error(() -> new ThemeUpgradeException(
+                                            "Missing theme manifest file: theme.yaml or theme.yml",
+                                            "problemDetail.theme.upgrade.missingManifest",
+                                            null)));
+                            return unzip(content, tempDir)
+                                    .then(locateThemeManifest)
+                                    .flatMap(themeManifest -> {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Found theme manifest file: {}", themeManifest);
+                                        }
+                                        var newTheme = loadThemeManifest(themeManifest);
+                                        if (!Objects.equals(
+                                                themeName,
+                                                newTheme.getMetadata().getName())) {
+                                            if (log.isDebugEnabled()) {
+                                                log.error(
+                                                        "Want theme name: {}, but provided: {}",
+                                                        themeName,
+                                                        newTheme.getMetadata().getName());
+                                            }
+                                            return Mono.error(new ThemeUpgradeException(
+                                                    "Please make sure the theme name is correct",
+                                                    "problemDetail.theme.upgrade.nameMismatch",
+                                                    new Object[] {
+                                                        newTheme.getMetadata().getName(), themeName
+                                                    }));
+                                        }
+                                        var copyTheme = Mono.fromCallable(() -> {
+                                            var themePath = themeRoot.get().resolve(themeName);
+                                            // TODO Create backup before deleting
+                                            deleteRecursivelyAndSilently(themePath);
+                                            copyRecursively(themeManifest.getParent(), themePath);
+                                            return themePath;
+                                        });
+                                        return copyTheme.then(this.persistent(newTheme, true));
+                                    });
+                        },
+                        FileUtils::deleteRecursivelyAndSilently)
+                .subscribeOn(scheduler);
         return checkTheme.then(upgradeTheme);
     }
 
     private Mono<Theme> doInstall(Publisher<DataBuffer> content, @Nullable Scheduler scheduler) {
         var themeRoot = this.themeRoot.get();
-        return unzipThemeTo(content, themeRoot, scheduler)
-            .flatMap(theme -> persistent(theme, false));
+        return unzipThemeTo(content, themeRoot, scheduler).flatMap(theme -> persistent(theme, false));
     }
 
     /**
-     * Creates theme manifest and related unstructured resources.
-     * TODO: In case of failure in saving midway, the problem of data consistency needs to be
-     * solved.
+     * Creates theme manifest and related unstructured resources. TODO: In case of failure in saving midway, the problem
+     * of data consistency needs to be solved.
      *
      * @param themeManifest the theme custom model
      * @return a theme custom model
      * @see Theme
      */
     private Mono<Theme> persistent(Unstructured themeManifest, boolean isUpgrade) {
-        Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
-            "Theme manifest kind must be Theme.");
+        Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()), "Theme manifest kind must be Theme.");
         var newTheme = Unstructured.OBJECT_MAPPER.convertValue(themeManifest, Theme.class);
         final Mono<Theme> createOrUpdateTheme;
         if (isUpgrade) {
             createOrUpdateTheme = client.get(Theme.class, newTheme.getMetadata().getName())
-                .doOnNext(theme -> updateTheme(theme, newTheme))
-                .flatMap(client::update);
+                    .doOnNext(theme -> updateTheme(theme, newTheme))
+                    .flatMap(client::update);
         } else {
             createOrUpdateTheme = client.create(newTheme);
         }
         return createOrUpdateTheme
-            .doOnNext(theme -> {
-                String systemVersion = systemVersionSupplier.get().toStableVersion().toString();
-                String requires = theme.getSpec().getRequires();
-                if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-                    throw new UnsatisfiedAttributeValueException(
-                        String.format("The theme requires a minimum system version of %s, "
-                                + "but the current version is %s.",
-                            requires, systemVersion),
-                        "problemDetail.theme.version.unsatisfied.requires",
-                        new String[] {requires, systemVersion});
-                }
-            })
-            .delayUntil(theme -> {
-                var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
-                if (unstructureds.stream()
-                    .filter(hasSettingsYaml(theme))
-                    .count() > 1) {
-                    return Mono.error(new IllegalStateException(
-                        "Theme must only have one settings.yaml or settings.yml."));
-                }
-                if (unstructureds.stream()
-                    .filter(hasConfigYaml(theme))
-                    .count() > 1) {
-                    return Mono.error(new IllegalStateException(
-                        "Theme must only have one config.yaml or config.yml."));
-                }
-                return Mono.empty();
-            });
+                .doOnNext(theme -> {
+                    String systemVersion =
+                            systemVersionSupplier.get().toStableVersion().toString();
+                    String requires = theme.getSpec().getRequires();
+                    if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+                        throw new UnsatisfiedAttributeValueException(
+                                String.format(
+                                        "The theme requires a minimum system version of %s, "
+                                                + "but the current version is %s.",
+                                        requires, systemVersion),
+                                "problemDetail.theme.version.unsatisfied.requires",
+                                new String[] {requires, systemVersion});
+                    }
+                })
+                .delayUntil(theme -> {
+                    var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
+                    if (unstructureds.stream().filter(hasSettingsYaml(theme)).count() > 1) {
+                        return Mono.error(
+                                new IllegalStateException("Theme must only have one settings.yaml or settings.yml."));
+                    }
+                    if (unstructureds.stream().filter(hasConfigYaml(theme)).count() > 1) {
+                        return Mono.error(
+                                new IllegalStateException("Theme must only have one config.yaml or config.yml."));
+                    }
+                    return Mono.empty();
+                });
     }
 
     @Override
     public Mono<Theme> reloadTheme(String name) {
         return client.fetch(Theme.class, name)
-            .delayUntil(oldTheme -> {
-                String settingName = oldTheme.getSpec().getSettingName();
-                return waitForSettingDeleted(settingName)
-                    .then(waitForAnnotationSettingsDeleted(name));
-            })
-            .flatMap(oldTheme -> {
-                var themePath = themeRoot.get().resolve(name);
-                var themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
-                if (themeManifestPath == null) {
-                    return Mono.error(new ServerWebInputException(
-                        "The manifest file [theme.yaml] is required."
-                    ));
-                }
-                var unstructured = loadThemeManifest(themeManifestPath);
-                var newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class);
-                updateTheme(oldTheme, newTheme);
-                return client.update(oldTheme);
-            });
+                .delayUntil(oldTheme -> {
+                    String settingName = oldTheme.getSpec().getSettingName();
+                    return waitForSettingDeleted(settingName).then(waitForAnnotationSettingsDeleted(name));
+                })
+                .flatMap(oldTheme -> {
+                    var themePath = themeRoot.get().resolve(name);
+                    var themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
+                    if (themeManifestPath == null) {
+                        return Mono.error(new ServerWebInputException("The manifest file [theme.yaml] is required."));
+                    }
+                    var unstructured = loadThemeManifest(themeManifestPath);
+                    var newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class);
+                    updateTheme(oldTheme, newTheme);
+                    return client.update(oldTheme);
+                });
     }
 
     @Override
     public Mono<ConfigMap> resetSettingConfig(String name) {
         return client.fetch(Theme.class, name)
-            .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
-            .flatMap(theme -> {
-                String configMapName = theme.getSpec().getConfigMapName();
-                String settingName = theme.getSpec().getSettingName();
-                return client.fetch(Setting.class, settingName)
-                    .map(SettingUtils::settingDefinedDefaultValueMap)
-                    .flatMap(data -> updateConfigMapData(configMapName, data));
-            });
+                .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
+                .flatMap(theme -> {
+                    String configMapName = theme.getSpec().getConfigMapName();
+                    String settingName = theme.getSpec().getSettingName();
+                    return client.fetch(Setting.class, settingName)
+                            .map(SettingUtils::settingDefinedDefaultValueMap)
+                            .flatMap(data -> updateConfigMapData(configMapName, data));
+                });
     }
 
     @Override
     public Mono<Theme> fetchActivatedTheme() {
-        return fetchSystemSetting().mapNotNull(SystemSetting.Theme::getActive)
-            .flatMap(name -> client.fetch(Theme.class, name));
+        return fetchSystemSetting()
+                .mapNotNull(SystemSetting.Theme::getActive)
+                .flatMap(name -> client.fetch(Theme.class, name));
     }
 
     @Override
@@ -267,47 +265,42 @@ public class ThemeServiceImpl implements ThemeService {
 
     private Mono<ConfigMap> updateConfigMapData(String configMapName, Map<String, String> data) {
         return client.fetch(ConfigMap.class, configMapName)
-            .flatMap(configMap -> {
-                configMap.setData(data);
-                return client.update(configMap);
-            })
-            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                .filter(t -> t instanceof OptimisticLockingFailureException));
+                .flatMap(configMap -> {
+                    configMap.setData(data);
+                    return client.update(configMap);
+                })
+                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof OptimisticLockingFailureException));
     }
 
     private Mono<Void> waitForSettingDeleted(String settingName) {
         return client.fetch(Setting.class, settingName)
-            .flatMap(setting -> client.delete(setting)
-                .flatMap(deleted -> client.fetch(Setting.class, settingName)
-                    .flatMap(s -> Mono.error(
-                        () -> new IllegalStateException("Re-check if the setting is deleted.")
-                    ))
-                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                        .filter(IllegalStateException.class::isInstance)
-                    )
-                )
-            )
-            .then();
+                .flatMap(setting -> client.delete(setting)
+                        .flatMap(deleted -> client.fetch(Setting.class, settingName)
+                                .flatMap(s -> Mono.error(
+                                        () -> new IllegalStateException("Re-check if the setting is deleted.")))
+                                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                                        .filter(IllegalStateException.class::isInstance))))
+                .then();
     }
 
     private Mono<Void> waitForAnnotationSettingsDeleted(String themeName) {
-        return client.list(AnnotationSetting.class,
-                annotationSetting -> {
-                    Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
-                    return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
-                }, null)
-            .flatMap(annotationSetting -> client.delete(annotationSetting)
-                .flatMap(deleted -> client.fetch(AnnotationSetting.class,
-                        annotationSetting.getMetadata().getName())
-                    .flatMap(latest -> Mono.error(
-                        new IllegalStateException("AnnotationSetting is not deleted yet.")
-                    ))
-                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                        .filter(t -> t instanceof IllegalStateException)
-                    )
-                )
-            )
-            .then();
+        return client.list(
+                        AnnotationSetting.class,
+                        annotationSetting -> {
+                            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
+                            return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
+                        },
+                        null)
+                .flatMap(annotationSetting -> client.delete(annotationSetting)
+                        .flatMap(deleted -> client.fetch(
+                                        AnnotationSetting.class,
+                                        annotationSetting.getMetadata().getName())
+                                .flatMap(latest ->
+                                        Mono.error(new IllegalStateException("AnnotationSetting is not deleted yet.")))
+                                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                                        .filter(t -> t instanceof IllegalStateException))))
+                .then();
     }
 
     private Path getThemePath(Theme theme) {
@@ -316,31 +309,33 @@ public class ThemeServiceImpl implements ThemeService {
 
     private Predicate<Unstructured> hasSettingsYaml(Theme theme) {
         return unstructured -> Setting.KIND.equals(unstructured.getKind())
-            && theme.getSpec().getSettingName().equals(unstructured.getMetadata().getName());
+                && theme.getSpec()
+                        .getSettingName()
+                        .equals(unstructured.getMetadata().getName());
     }
 
     private Predicate<Unstructured> hasConfigYaml(Theme theme) {
         return unstructured -> ConfigMap.KIND.equals(unstructured.getKind())
-            && theme.getSpec().getConfigMapName().equals(unstructured.getMetadata().getName());
+                && theme.getSpec()
+                        .getConfigMapName()
+                        .equals(unstructured.getMetadata().getName());
     }
 
     Mono<Theme> deleteThemeAndWaitForComplete(String themeName) {
         return client.fetch(Theme.class, themeName)
-            .flatMap(client::delete)
-            .flatMap(deletingTheme -> waitForThemeDeleted(themeName)
-                .thenReturn(deletingTheme));
+                .flatMap(client::delete)
+                .flatMap(deletingTheme -> waitForThemeDeleted(themeName).thenReturn(deletingTheme));
     }
 
     Mono<Void> waitForThemeDeleted(String themeName) {
         return client.fetch(Theme.class, themeName)
-            .flatMap(theme -> Mono.error(
-                new IllegalStateException("Re-check if the theme is deleted successfully")
-            ))
-            .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
-                .filter(IllegalStateException.class::isInstance)
-                .onRetryExhaustedThrow((spec, signal) ->
-                    new ServerErrorException("Wait timeout for theme deleted", null)))
-            .then();
+                .flatMap(
+                        theme -> Mono.error(new IllegalStateException("Re-check if the theme is deleted successfully")))
+                .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
+                        .filter(IllegalStateException.class::isInstance)
+                        .onRetryExhaustedThrow(
+                                (spec, signal) -> new ServerErrorException("Wait timeout for theme deleted", null)))
+                .then();
     }
 
     private static void updateTheme(Theme existing, Theme updating) {
@@ -375,12 +370,12 @@ public class ThemeServiceImpl implements ThemeService {
         }
         // make sure the theme will be reloaded after upgrade by adding a special annotation with
         // current timestamp
-        existingMeta.getAnnotations()
-            .put(Theme.REQUEST_RELOAD_ANNOTATION, Instant.now().toString());
+        existingMeta
+                .getAnnotations()
+                .put(Theme.REQUEST_RELOAD_ANNOTATION, Instant.now().toString());
         // merge annotations
         if (updatingMeta.getAnnotations() != null) {
             existingMeta.getAnnotations().putAll(updatingMeta.getAnnotations());
         }
     }
-
 }

@@ -36,9 +36,7 @@ import run.halo.app.search.SearchOption;
 import run.halo.app.search.SearchResult;
 
 @DirtiesContext
-@SpringBootTest(properties = {
-    "halo.search-engine.lucene.enabled=true",
-    "halo.extension.controller.disabled=false"})
+@SpringBootTest(properties = {"halo.search-engine.lucene.enabled=true", "halo.extension.controller.disabled=false"})
 @AutoConfigureWebTestClient
 public class LuceneSearchEngineIntegrationTest {
 
@@ -85,41 +83,45 @@ public class LuceneSearchEngineIntegrationTest {
 
     void assertHasResult(int maxAttempts) throws RetryException {
         var retryTemplate = new RetryTemplate(RetryPolicy.builder()
-            .delay(Duration.ofSeconds(1))
-            .maxRetries(maxAttempts)
-            .predicate(AssertionFailedError.class::isInstance)
-            .build());
+                .delay(Duration.ofSeconds(1))
+                .maxRetries(maxAttempts)
+                .predicate(AssertionFailedError.class::isInstance)
+                .build());
         var option = new SearchOption();
         option.setKeyword("halo");
         option.setHighlightPreTag("<my-tag>");
         option.setHighlightPostTag("</my-tag>");
         retryTemplate.execute(() -> {
-            webClient.post().uri("/apis/api.halo.run/v1alpha1/indices/-/search")
-                .bodyValue(option)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(SearchResult.class).value(result -> {
-                    assertEquals(1, result.getTotal());
-                    assertEquals("halo", result.getKeyword());
-                    var hits = result.getHits();
-                    assertEquals(1, hits.size());
-                    var doc = hits.get(0);
-                    assertEquals("post.content.halo.run-first-post", doc.getId());
-                    assertEquals("post.content.halo.run", doc.getType());
-                    assertEquals("first <my-tag>halo</my-tag> post", doc.getTitle());
-                    assertNull(doc.getDescription());
-                    assertEquals("<my-tag>halo</my-tag>", doc.getContent());
-                });
+            webClient
+                    .post()
+                    .uri("/apis/api.halo.run/v1alpha1/indices/-/search")
+                    .bodyValue(option)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(SearchResult.class)
+                    .value(result -> {
+                        assertEquals(1, result.getTotal());
+                        assertEquals("halo", result.getKeyword());
+                        var hits = result.getHits();
+                        assertEquals(1, hits.size());
+                        var doc = hits.get(0);
+                        assertEquals("post.content.halo.run-first-post", doc.getId());
+                        assertEquals("post.content.halo.run", doc.getType());
+                        assertEquals("first <my-tag>halo</my-tag> post", doc.getTitle());
+                        assertNull(doc.getDescription());
+                        assertEquals("<my-tag>halo</my-tag>", doc.getContent());
+                    });
             return null;
         });
     }
 
     void assertNoResult(int maxAttempts) throws RetryException {
         var retryTemplate = new RetryTemplate(RetryPolicy.builder()
-            .delay(Duration.ofSeconds(1))
-            .maxRetries(maxAttempts)
-            .predicate(AssertionFailedError.class::isInstance)
-            .build());
+                .delay(Duration.ofSeconds(1))
+                .maxRetries(maxAttempts)
+                .predicate(AssertionFailedError.class::isInstance)
+                .build());
 
         var option = new SearchOption();
         option.setKeyword("halo");
@@ -129,83 +131,87 @@ public class LuceneSearchEngineIntegrationTest {
         option.setIncludeCategoryNames(List.of("halo"));
         option.setIncludeOwnerNames(List.of("admin"));
         retryTemplate.execute(() -> {
-            webClient.post().uri("/apis/api.halo.run/v1alpha1/indices/-/search")
-                .bodyValue(option)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(SearchResult.class).value(result -> {
-                    assertEquals(0, result.getTotal());
-                    assertEquals("halo", result.getKeyword());
-                });
+            webClient
+                    .post()
+                    .uri("/apis/api.halo.run/v1alpha1/indices/-/search")
+                    .bodyValue(option)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(SearchResult.class)
+                    .value(result -> {
+                        assertEquals(0, result.getTotal());
+                        assertEquals("halo", result.getKeyword());
+                    });
             return null;
         });
     }
 
     void deletePostPermanently(String postName) {
         client.get(Post.class, postName)
-            .flatMap(client::delete)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .flatMap(client::delete)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void recoverPost(String postName) {
         client.get(Post.class, postName)
-            .doOnNext(post -> post.getSpec().setDeleted(false))
-            .flatMap(client::update)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .doOnNext(post -> post.getSpec().setDeleted(false))
+                .flatMap(client::update)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void recyclePost(String postName) {
         client.get(Post.class, postName)
-            .doOnNext(post -> post.getSpec().setDeleted(true))
-            .flatMap(client::update)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .doOnNext(post -> post.getSpec().setDeleted(true))
+                .flatMap(client::update)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void publicPost(String postName) {
         client.get(Post.class, postName)
-            .doOnNext(post -> post.getSpec().setVisible(PUBLIC))
-            .flatMap(client::update)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .doOnNext(post -> post.getSpec().setVisible(PUBLIC))
+                .flatMap(client::update)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void privatePost(String postName) {
         client.get(Post.class, postName)
-            .doOnNext(post -> post.getSpec().setVisible(PRIVATE))
-            .flatMap(client::update)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .doOnNext(post -> post.getSpec().setVisible(PRIVATE))
+                .flatMap(client::update)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void publishPost(String postName) {
         client.get(Post.class, postName)
-            .flatMap(postService::publish)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .flatMap(postService::publish)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void unpublishPost(String postName) {
         client.get(Post.class, postName)
-            .flatMap(postService::unpublish)
-            .retryWhen(optimisticLockRetry())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+                .flatMap(postService::unpublish)
+                .retryWhen(optimisticLockRetry())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     void createPost(String postName) {
@@ -233,15 +239,14 @@ public class LuceneSearchEngineIntegrationTest {
         var content = new Content("halo", "halo", "Markdown");
         var contentParam = ContentUpdateParam.from(content);
         var postRequest = new PostRequest(post, contentParam);
-        postService.draftPost(postRequest)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        postService
+                .draftPost(postRequest)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     Retry optimisticLockRetry() {
-        return Retry.backoff(5, Duration.ofMillis(100))
-            .filter(OptimisticLockingFailureException.class::isInstance);
+        return Retry.backoff(5, Duration.ofMillis(100)).filter(OptimisticLockingFailureException.class::isInstance);
     }
-
 }

@@ -25,9 +25,9 @@ public record UserIdentity(String name) {
     }
 
     /**
-     * <p>Create identity with email to identify a user,
-     * the name will be {@code anonymousUser#email}.</p>
-     * <p>An anonymous user can not be identified by username so we use email to identify it.</p>
+     * Create identity with email to identify a user, the name will be {@code anonymousUser#email}.
+     *
+     * <p>An anonymous user can not be identified by username so we use email to identify it.
      *
      * @param email email
      * @return identity
@@ -49,8 +49,7 @@ public record UserIdentity(String name) {
      */
     public Optional<String> getEmail() {
         if (isAnonymous()) {
-            return Optional.of(name().substring(name().indexOf(SEPARATOR) + 1))
-                .filter(StringUtils::isNotBlank);
+            return Optional.of(name().substring(name().indexOf(SEPARATOR) + 1)).filter(StringUtils::isNotBlank);
         }
         return Optional.empty();
     }

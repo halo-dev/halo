@@ -30,5 +30,4 @@ class DefaultPluginRouterFunctionRegistryTest {
         routerFunctionRegistry.register(Set.of(routerFunction));
         assertEquals(Set.of(routerFunction), routerFunctionRegistry.getRouterFunctions());
     }
-
 }

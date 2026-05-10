@@ -8,6 +8,4 @@ import java.util.function.Supplier;
  *
  * @author johnniang
  */
-public interface ThemeRootGetter extends Supplier<Path> {
-
-}
+public interface ThemeRootGetter extends Supplier<Path> {}

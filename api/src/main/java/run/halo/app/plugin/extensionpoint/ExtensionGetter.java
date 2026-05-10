@@ -11,19 +11,18 @@ public interface ExtensionGetter {
      * Get only one enabled extension from system configuration.
      *
      * @param extensionPoint is extension point class.
-     * @return implementation of the corresponding extension point. If no configuration is found,
-     * we will use the default implementation from application context instead.
+     * @return implementation of the corresponding extension point. If no configuration is found, we will use the
+     *     default implementation from application context instead.
      */
     <T extends ExtensionPoint> Mono<T> getEnabledExtension(Class<T> extensionPoint);
 
     /**
-     * Get the extension(s) according to the {@code ExtensionPointDefinition} queried
-     * by incoming extension point class.
+     * Get the extension(s) according to the {@code ExtensionPointDefinition} queried by incoming extension point class.
      *
      * @param extensionPoint extension point class
      * @return implementations of the corresponding extension point.
-     * @throws IllegalArgumentException if the incoming extension point class does not have
-     *                                  the {@code ExtensionPointDefinition}.
+     * @throws IllegalArgumentException if the incoming extension point class does not have the
+     *     {@code ExtensionPointDefinition}.
      */
     <T extends ExtensionPoint> Flux<T> getEnabledExtensions(Class<T> extensionPoint);
 
@@ -44,5 +43,4 @@ public interface ExtensionGetter {
      * @return a bunch of extension points.
      */
     <T extends ExtensionPoint> List<T> getExtensionList(Class<T> extensionPointClass);
-
 }

@@ -18,7 +18,7 @@ public interface PluginGetter {
      * @param name plugin name must not be null
      * @return plugin
      * @throws IllegalArgumentException if plugin name is null
-     * @throws NotFoundException    if plugin not found
+     * @throws NotFoundException if plugin not found
      */
     Plugin getPlugin(String name);
 }

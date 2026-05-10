@@ -5,11 +5,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.Data;
@@ -19,12 +15,14 @@ import run.halo.app.infra.utils.GenericClassUtils;
 @Data
 public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
 
-    @Schema(description = "Page number, starts from 1. If not set or equal to 0, it means no "
-        + "pagination.", requiredMode = REQUIRED)
+    @Schema(
+            description = "Page number, starts from 1. If not set or equal to 0, it means no " + "pagination.",
+            requiredMode = REQUIRED)
     private final int page;
 
-    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.",
-        requiredMode = REQUIRED)
+    @Schema(
+            description = "Size of each page. If not set or equal to 0, it means no pagination.",
+            requiredMode = REQUIRED)
     private final int size;
 
     @Schema(description = "Total elements.", requiredMode = REQUIRED)
@@ -35,10 +33,10 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
 
     @JsonCreator
     public ListResult(
-        @JsonProperty("page") int page,
-        @JsonProperty("size") int size,
-        @JsonProperty("total") long total,
-        @JsonProperty("items") List<T> items) {
+            @JsonProperty("page") int page,
+            @JsonProperty("size") int size,
+            @JsonProperty("total") long total,
+            @JsonProperty("items") List<T> items) {
         Assert.isTrue(total >= 0, "Total elements must be greater than or equal to 0");
         if (page < 0) {
             page = 0;
@@ -59,20 +57,17 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         this(0, 0, items.size(), items);
     }
 
-    @Schema(description = "Indicates whether current page is the first page.",
-        requiredMode = REQUIRED)
+    @Schema(description = "Indicates whether current page is the first page.", requiredMode = REQUIRED)
     public boolean isFirst() {
         return !hasPrevious();
     }
 
-    @Schema(description = "Indicates whether current page is the last page.",
-        requiredMode = REQUIRED)
+    @Schema(description = "Indicates whether current page is the last page.", requiredMode = REQUIRED)
     public boolean isLast() {
         return !hasNext();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.",
-        requiredMode = REQUIRED)
+    @Schema(description = "Indicates whether current page has previous page.", requiredMode = REQUIRED)
     @JsonProperty("hasNext")
     public boolean hasNext() {
         if (page <= 0) {
@@ -81,8 +76,7 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return page < getTotalPages();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.",
-        requiredMode = REQUIRED)
+    @Schema(description = "Indicates whether current page has previous page.", requiredMode = REQUIRED)
     @JsonProperty("hasPrevious")
     public boolean hasPrevious() {
         return page > 1;
@@ -100,40 +94,33 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
     }
 
     /**
-     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>},
-     * etc.
+     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>}, etc.
      *
      * @param scheme scheme of the generic type.
      * @return generic ListResult class.
      */
     public static Class<?> generateGenericClass(Scheme scheme) {
-        return GenericClassUtils.generateConcreteClass(ListResult.class,
-            scheme.type(),
-            () -> {
-                var pkgName = scheme.type().getPackageName();
-                return pkgName + '.' + scheme.groupVersionKind().kind() + "List";
-            });
+        return GenericClassUtils.generateConcreteClass(ListResult.class, scheme.type(), () -> {
+            var pkgName = scheme.type().getPackageName();
+            return pkgName + '.' + scheme.groupVersionKind().kind() + "List";
+        });
     }
 
     /**
-     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>},
-     * etc.
+     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>}, etc.
      *
      * @param type the generic type of {@link ListResult}.
      * @return generic ListResult class.
      */
     public static <T> Class<?> generateGenericClass(Class<T> type) {
-        return GenericClassUtils.generateConcreteClass(ListResult.class, type,
-            () -> type.getName() + "List");
+        return GenericClassUtils.generateConcreteClass(ListResult.class, type, () -> type.getName() + "List");
     }
 
     public static <T> ListResult<T> emptyResult() {
         return new ListResult<>(List.of());
     }
 
-    /**
-     * Manually paginate the List collection.
-     */
+    /** Manually paginate the List collection. */
     public static <T> List<T> subList(List<T> list, int page, int size) {
         if (page < 1) {
             page = 1;
@@ -151,13 +138,11 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return listSort;
     }
 
-    /**
-     * Gets the first element of the list result.
-     */
+    /** Gets the first element of the list result. */
     public static <T> Optional<T> first(ListResult<T> listResult) {
         return Optional.ofNullable(listResult)
-            .map(ListResult::getItems)
-            .map(list -> list.isEmpty() ? null : list.get(0));
+                .map(ListResult::getItems)
+                .map(list -> list.isEmpty() ? null : list.get(0));
     }
 
     @Override

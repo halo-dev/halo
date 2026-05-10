@@ -48,10 +48,10 @@ public class ListedSinglePageVo implements ExtensionVoOperator {
         SinglePage.SinglePageSpec spec = singlePage.getSpec();
         SinglePage.SinglePageStatus pageStatus = singlePage.getStatus();
         return ListedSinglePageVo.builder()
-            .metadata(singlePage.getMetadata())
-            .spec(spec)
-            .status(pageStatus)
-            .contributors(List.of())
-            .build();
+                .metadata(singlePage.getMetadata())
+                .spec(spec)
+                .status(pageStatus)
+                .contributors(List.of())
+                .build();
     }
 }

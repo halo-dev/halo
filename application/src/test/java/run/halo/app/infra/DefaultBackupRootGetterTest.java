@@ -28,6 +28,4 @@ class DefaultBackupRootGetterTest {
         assertEquals(Path.of("workdir", "backups"), backupRoot);
         verify(haloProperties).getWorkDir();
     }
-
-
 }

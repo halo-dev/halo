@@ -38,93 +38,86 @@ public class TrackerEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "MetricsV1alpha1Public";
         return SpringdocRouteBuilder.route()
-            .POST("trackers/counter", this::increaseVisit,
-                builder -> builder.operationId("count")
-                    .description("Count an extension resource visits.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(CounterRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Void.class))
-            )
-            .POST("trackers/upvote", this::upvote,
-                builder -> builder.operationId("upvote")
-                    .description("Upvote an extension resource.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(VoteRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Void.class))
-            )
-            .POST("trackers/downvote", this::downvote,
-                builder -> builder.operationId("downvote")
-                    .description("Downvote an extension resource.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(VoteRequest.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(Void.class))
-            )
-            .build();
+                .POST(
+                        "trackers/counter",
+                        this::increaseVisit,
+                        builder -> builder.operationId("count")
+                                .description("Count an extension resource visits.")
+                                .tag(tag)
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .content(contentBuilder()
+                                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                                .schema(Builder.schemaBuilder().implementation(CounterRequest.class))))
+                                .response(responseBuilder().implementation(Void.class)))
+                .POST(
+                        "trackers/upvote",
+                        this::upvote,
+                        builder -> builder.operationId("upvote")
+                                .description("Upvote an extension resource.")
+                                .tag(tag)
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .content(contentBuilder()
+                                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                                .schema(Builder.schemaBuilder().implementation(VoteRequest.class))))
+                                .response(responseBuilder().implementation(Void.class)))
+                .POST(
+                        "trackers/downvote",
+                        this::downvote,
+                        builder -> builder.operationId("downvote")
+                                .description("Downvote an extension resource.")
+                                .tag(tag)
+                                .requestBody(requestBodyBuilder()
+                                        .required(true)
+                                        .content(contentBuilder()
+                                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                                .schema(Builder.schemaBuilder().implementation(VoteRequest.class))))
+                                .response(responseBuilder().implementation(Void.class)))
+                .build();
     }
 
     private Mono<ServerResponse> increaseVisit(ServerRequest request) {
         return request.bodyToMono(CounterRequest.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
-            .doOnNext(counterRequest -> {
-                eventPublisher.publishEvent(new VisitedEvent(this, counterRequest.group(),
-                    counterRequest.name(), counterRequest.plural()));
-            })
-            .then(ServerResponse.ok().build());
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
+                .doOnNext(counterRequest -> {
+                    eventPublisher.publishEvent(new VisitedEvent(
+                            this, counterRequest.group(), counterRequest.name(), counterRequest.plural()));
+                })
+                .then(ServerResponse.ok().build());
     }
 
     private Mono<ServerResponse> upvote(ServerRequest request) {
         return request.bodyToMono(VoteRequest.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalArgumentException("Upvote request body must not be empty")))
-            .doOnNext(voteRequest -> {
-                eventPublisher.publishEvent(new UpvotedEvent(this, voteRequest.group(),
-                    voteRequest.name(), voteRequest.plural()));
-            })
-            .then(ServerResponse.ok().build());
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Upvote request body must not be empty")))
+                .doOnNext(voteRequest -> {
+                    eventPublisher.publishEvent(
+                            new UpvotedEvent(this, voteRequest.group(), voteRequest.name(), voteRequest.plural()));
+                })
+                .then(ServerResponse.ok().build());
     }
 
     private Mono<ServerResponse> downvote(ServerRequest request) {
         return request.bodyToMono(VoteRequest.class)
-            .switchIfEmpty(
-                Mono.error(new IllegalArgumentException("Downvote request body must not be empty")))
-            .doOnNext(voteRequest -> {
-                eventPublisher.publishEvent(new DownvotedEvent(this, voteRequest.group(),
-                    voteRequest.name(), voteRequest.plural()));
-            })
-            .then(ServerResponse.ok().build());
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Downvote request body must not be empty")))
+                .doOnNext(voteRequest -> {
+                    eventPublisher.publishEvent(
+                            new DownvotedEvent(this, voteRequest.group(), voteRequest.name(), voteRequest.plural()));
+                })
+                .then(ServerResponse.ok().build());
     }
 
-    public record VoteRequest(String group, String plural, String name) {
-    }
+    public record VoteRequest(String group, String plural, String name) {}
 
-    public record CounterRequest(String group, String plural, String name, String hostname,
-                                 String screen, String language, String referrer) {
-        /**
-         * Construct counter request.
-         * group and session uid can be empty.
-         */
+    public record CounterRequest(
+            String group,
+            String plural,
+            String name,
+            String hostname,
+            String screen,
+            String language,
+            String referrer) {
+        /** Construct counter request. group and session uid can be empty. */
         public CounterRequest {
             Assert.notNull(plural, "The plural must not be null.");
             Assert.notNull(name, "The name must not be null.");

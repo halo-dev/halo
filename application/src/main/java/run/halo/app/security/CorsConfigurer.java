@@ -36,16 +36,20 @@ public class CorsConfigurer implements SecurityConfigurer {
     CorsConfigurationSource apiCorsConfigSource() {
         var source = new UrlBasedCorsConfigurationSource();
         // additional CORS configuration
-        this.corsOptions.getConfigs().forEach(corsConfig -> source.registerCorsConfiguration(
-            corsConfig.getPathPattern(), corsConfig.getConfig().toCorsConfiguration()
-        ));
+        this.corsOptions
+                .getConfigs()
+                .forEach(corsConfig -> source.registerCorsConfiguration(
+                        corsConfig.getPathPattern(), corsConfig.getConfig().toCorsConfiguration()));
 
         // default CORS configuration
         var configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedHeaders(
-            List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT,
-                "X-XSRF-TOKEN", HttpHeaders.COOKIE));
+        configuration.setAllowedHeaders(List.of(
+                HttpHeaders.AUTHORIZATION,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.ACCEPT,
+                "X-XSRF-TOKEN",
+                HttpHeaders.COOKIE));
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         source.registerCorsConfiguration("/api/**", configuration);

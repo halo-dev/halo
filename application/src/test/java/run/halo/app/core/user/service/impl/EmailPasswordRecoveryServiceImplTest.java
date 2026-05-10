@@ -10,6 +10,4 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @since 2.11.0
  */
 @ExtendWith(MockitoExtension.class)
-class EmailPasswordRecoveryServiceImplTest {
-
-}
+class EmailPasswordRecoveryServiceImplTest {}

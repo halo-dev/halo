@@ -51,9 +51,7 @@ public interface LabelIndexQuery {
      *
      * @param labelKey the label key
      * @param labelValues the collection of label values
-     * @return the set of entity IDs that have the label key with values not in the specified
-     * collection.
+     * @return the set of entity IDs that have the label key with values not in the specified collection.
      */
     Set<String> notIn(String labelKey, Collection<String> labelValues);
-
 }

@@ -10,13 +10,8 @@ import run.halo.app.extension.controller.DefaultControllerManager;
 public class ExtensionConfiguration {
 
     @Bean
-    @ConditionalOnProperty(
-        name = "halo.extension.controller.disabled",
-        havingValue = "false",
-        matchIfMissing = true
-    )
+    @ConditionalOnProperty(name = "halo.extension.controller.disabled", havingValue = "false", matchIfMissing = true)
     DefaultControllerManager controllerManager(ExtensionClient client) {
         return new DefaultControllerManager(client);
     }
-
 }

@@ -20,10 +20,8 @@ public record GroupVersion(String group, String version) {
     /**
      * Parses APIVersion into GroupVersion record.
      *
-     * @param apiVersion must not be blank.
-     * 1. If the given apiVersion does not contain any "/", we treat the group is empty.
-     * 2. If the given apiVersion contains more than 1 "/", we will throw an
-     * IllegalArgumentException.
+     * @param apiVersion must not be blank. 1. If the given apiVersion does not contain any "/", we treat the group is
+     *     empty. 2. If the given apiVersion contains more than 1 "/", we will throw an IllegalArgumentException.
      * @return record contains group and version.
      */
     public static GroupVersion parseAPIVersion(String apiVersion) {
@@ -33,8 +31,7 @@ public record GroupVersion(String group, String version) {
         return switch (groupVersion.length) {
             case 1 -> new GroupVersion("", apiVersion);
             case 2 -> new GroupVersion(groupVersion[0], groupVersion[1]);
-            default ->
-                throw new IllegalArgumentException("Unexpected APIVersion string: " + apiVersion);
+            default -> throw new IllegalArgumentException("Unexpected APIVersion string: " + apiVersion);
         };
     }
 }

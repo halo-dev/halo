@@ -1,9 +1,6 @@
 package run.halo.app.notification;
 
-import static run.halo.app.extension.index.query.Queries.and;
-import static run.halo.app.extension.index.query.Queries.equal;
-import static run.halo.app.extension.index.query.Queries.isNull;
-import static run.halo.app.extension.index.query.Queries.startsWith;
+import static run.halo.app.extension.index.query.Queries.*;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
 
     @Override
-    public Mono<Void> remove(Subscription.Subscriber subscriber,
-        Subscription.InterestReason interestReason) {
+    public Mono<Void> remove(Subscription.Subscriber subscriber, Subscription.InterestReason interestReason) {
         Assert.notNull(subscriber, "The subscriber must not be null");
         Assert.notNull(interestReason, "The interest reason must not be null");
         var reasonType = interestReason.getReasonType();
@@ -37,9 +33,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var subject = interestReason.getSubject();
 
         var listOptions = new ListOptions();
-        var fieldQuery = and(isNull("metadata.deletionTimestamp"),
-            equal("spec.subscriber", subscriber.toString()),
-            equal("spec.reason.reasonType", reasonType));
+        var fieldQuery = and(
+                isNull("metadata.deletionTimestamp"),
+                equal("spec.subscriber", subscriber.toString()),
+                equal("spec.reason.reasonType", reasonType));
 
         if (subject != null) {
             fieldQuery = and(fieldQuery, reasonSubjectMatch(subject));
@@ -48,24 +45,27 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             fieldQuery = and(fieldQuery, equal("spec.reason.expression", expression));
         }
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return paginatedOperator.deleteInitialBatch(Subscription.class, listOptions).then();
+        return paginatedOperator
+                .deleteInitialBatch(Subscription.class, listOptions)
+                .then();
     }
 
     @Override
     public Mono<Void> remove(Subscription.Subscriber subscriber) {
         var listOptions = new ListOptions();
-        var fieldQuery = and(isNull("metadata.deletionTimestamp"),
-            equal("spec.subscriber", subscriber.toString()));
+        var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.subscriber", subscriber.toString()));
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return paginatedOperator.deleteInitialBatch(Subscription.class, listOptions)
-            .then();
+        return paginatedOperator
+                .deleteInitialBatch(Subscription.class, listOptions)
+                .then();
     }
 
     @Override
     public Mono<Subscription> remove(Subscription subscription) {
         return client.delete(subscription)
-            .onErrorResume(OptimisticLockingFailureException.class,
-                e -> attemptToDelete(subscription.getMetadata().getName()));
+                .onErrorResume(
+                        OptimisticLockingFailureException.class,
+                        e -> attemptToDelete(subscription.getMetadata().getName()));
     }
 
     @Override
@@ -76,18 +76,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public Flux<Subscription> listByPerPage(String reasonType) {
         final var listOptions = new ListOptions();
-        var fieldQuery = and(isNull("metadata.deletionTimestamp"),
-            equal("spec.reason.reasonType", reasonType));
+        var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.reason.reasonType", reasonType));
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
         return paginatedOperator.list(Subscription.class, listOptions);
     }
 
     private Mono<Subscription> attemptToDelete(String subscriptionName) {
-        return Mono.defer(() -> client.fetch(Subscription.class, subscriptionName)
-                .flatMap(client::delete)
-            )
-            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
-                .filter(OptimisticLockingFailureException.class::isInstance));
+        return Mono.defer(
+                        () -> client.fetch(Subscription.class, subscriptionName).flatMap(client::delete))
+                .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                        .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     Condition reasonSubjectMatch(Subscription.ReasonSubject reasonSubject) {

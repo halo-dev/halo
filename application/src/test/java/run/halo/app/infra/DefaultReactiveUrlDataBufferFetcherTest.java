@@ -28,164 +28,157 @@ class DefaultReactiveUrlDataBufferFetcherTest {
     @Test
     void fetchShouldReturnDataBuffers() {
         var response = ClientResponse.create(HttpStatus.OK)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
-            .body("hello world")
-            .build();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .body("hello world")
+                .build();
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.just(response))
-            .build());
+                .exchangeFunction(request -> Mono.just(response))
+                .build());
 
         StepVerifier.create(fetcher.fetch(URI.create("http://example.com/file")))
-            .expectNextCount(1)
-            .verifyComplete();
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     @Test
     void fetchShouldMapUnknownHostExceptionToServerWebInputException() {
         var cause = new UnknownHostException("nonexistent-host");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.fetch(URI.create("http://nonexistent-host/")))
-            .expectErrorSatisfies(e -> {
-                assertThat(e).isInstanceOf(ServerWebInputException.class);
-                assertThat(e.getMessage()).contains("Unable to resolve host");
-                assertThat(e.getMessage()).contains("nonexistent-host");
-            })
-            .verify();
+                .expectErrorSatisfies(e -> {
+                    assertThat(e).isInstanceOf(ServerWebInputException.class);
+                    assertThat(e.getMessage()).contains("Unable to resolve host");
+                    assertThat(e.getMessage()).contains("nonexistent-host");
+                })
+                .verify();
     }
 
     @Test
     void fetchShouldPassThroughOtherWebClientRequestExceptions() {
         var cause = new RuntimeException("connection refused");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.fetch(URI.create("http://example.com/")))
-            .expectError(WebClientRequestException.class)
-            .verify();
+                .expectError(WebClientRequestException.class)
+                .verify();
     }
 
     @Test
     void headShouldReturnHeaders() {
         var response = ClientResponse.create(HttpStatus.OK)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
-            .header(HttpHeaders.CONTENT_LENGTH, "42")
-            .body("")
-            .build();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .header(HttpHeaders.CONTENT_LENGTH, "42")
+                .body("")
+                .build();
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.just(response))
-            .build());
+                .exchangeFunction(request -> Mono.just(response))
+                .build());
 
         StepVerifier.create(fetcher.head(URI.create("http://example.com/file")))
-            .expectNextMatches(headers -> {
-                assertThat(headers.getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
-                assertThat(headers.getContentLength()).isEqualTo(42L);
-                return true;
-            })
-            .verifyComplete();
+                .expectNextMatches(headers -> {
+                    assertThat(headers.getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
+                    assertThat(headers.getContentLength()).isEqualTo(42L);
+                    return true;
+                })
+                .verifyComplete();
     }
 
     @Test
     void headShouldMapUnknownHostExceptionToServerWebInputException() {
         var cause = new UnknownHostException("nonexistent-host");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.head(URI.create("http://nonexistent-host/")))
-            .expectErrorSatisfies(e -> {
-                assertThat(e).isInstanceOf(ServerWebInputException.class);
-                assertThat(e.getMessage()).contains("Unable to resolve host");
-            })
-            .verify();
+                .expectErrorSatisfies(e -> {
+                    assertThat(e).isInstanceOf(ServerWebInputException.class);
+                    assertThat(e.getMessage()).contains("Unable to resolve host");
+                })
+                .verify();
     }
 
     @Test
     void headShouldPassThroughOtherWebClientRequestExceptions() {
         var cause = new RuntimeException("connection refused");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.head(URI.create("http://example.com/")))
-            .expectError(WebClientRequestException.class)
-            .verify();
+                .expectError(WebClientRequestException.class)
+                .verify();
     }
 
     @Test
     void fetchResponseEntityShouldReturnEntityWithStatusAndHeaders() {
         var response = ClientResponse.create(HttpStatus.OK)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
-            .body("hello world")
-            .build();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .body("hello world")
+                .build();
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.just(response))
-            .build());
+                .exchangeFunction(request -> Mono.just(response))
+                .build());
 
         StepVerifier.create(fetcher.fetchResponseEntity(URI.create("http://example.com/file")))
-            .expectNextMatches(entity -> {
-                assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
-                assertThat(entity.getHeaders().getContentType())
-                    .isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
-                return true;
-            })
-            .verifyComplete();
+                .expectNextMatches(entity -> {
+                    assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                    assertThat(entity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
+                    return true;
+                })
+                .verifyComplete();
     }
 
     @Test
     void fetchResponseEntityShouldMapUnknownHostExceptionToServerWebInputException() {
         var cause = new UnknownHostException("nonexistent-host");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://nonexistent-host/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.fetchResponseEntity(URI.create("http://nonexistent-host/")))
-            .expectErrorSatisfies(e -> {
-                assertThat(e).isInstanceOf(ServerWebInputException.class);
-                assertThat(e.getMessage()).contains("Unable to resolve host");
-            })
-            .verify();
+                .expectErrorSatisfies(e -> {
+                    assertThat(e).isInstanceOf(ServerWebInputException.class);
+                    assertThat(e.getMessage()).contains("Unable to resolve host");
+                })
+                .verify();
     }
 
     @Test
     void fetchResponseEntityShouldPassThroughOtherWebClientRequestExceptions() {
         var cause = new RuntimeException("connection refused");
         var error = new WebClientRequestException(
-            cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY
-        );
+                cause, HttpMethod.GET, URI.create("http://example.com/"), HttpHeaders.EMPTY);
 
         fetcher.setWebClient(WebClient.builder()
-            .exchangeFunction(request -> Mono.error(error))
-            .build());
+                .exchangeFunction(request -> Mono.error(error))
+                .build());
 
         StepVerifier.create(fetcher.fetchResponseEntity(URI.create("http://example.com/")))
-            .expectError(WebClientRequestException.class)
-            .verify();
+                .expectError(WebClientRequestException.class)
+                .verify();
     }
 }

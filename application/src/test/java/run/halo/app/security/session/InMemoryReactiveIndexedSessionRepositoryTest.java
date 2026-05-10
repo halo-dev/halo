@@ -25,29 +25,28 @@ class InMemoryReactiveIndexedSessionRepositoryTest {
 
     @Test
     void principalNameIndexTest() {
-        sessionRepository.createSession()
-            .doOnNext(session -> {
-                session.setAttribute(PRINCIPAL_NAME_INDEX_NAME,
-                    "test");
-            })
-            .map(session -> sessionRepository.indexResolver.resolveIndexesFor(session))
-            .as(StepVerifier::create)
-            .consumeNextWith(map -> {
-                assertThat(map).containsEntry(
-                    PRINCIPAL_NAME_INDEX_NAME,
-                    "test");
-            });
+        sessionRepository
+                .createSession()
+                .doOnNext(session -> {
+                    session.setAttribute(PRINCIPAL_NAME_INDEX_NAME, "test");
+                })
+                .map(session -> sessionRepository.indexResolver.resolveIndexesFor(session))
+                .as(StepVerifier::create)
+                .consumeNextWith(map -> {
+                    assertThat(map).containsEntry(PRINCIPAL_NAME_INDEX_NAME, "test");
+                });
 
-        sessionRepository.findByPrincipalName("test")
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        sessionRepository
+                .findByPrincipalName("test")
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
 
-        sessionRepository.findByIndexNameAndIndexValue(
-                PRINCIPAL_NAME_INDEX_NAME, "test")
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        sessionRepository
+                .findByIndexNameAndIndexValue(PRINCIPAL_NAME_INDEX_NAME, "test")
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
     }
 
     @Test
@@ -55,13 +54,13 @@ class InMemoryReactiveIndexedSessionRepositoryTest {
         var indexKey = createSession("fake-session-1", "test");
 
         assertThat(sessionRepository.getSessionIdIndexMap()).hasSize(1);
-        assertThat(
-            sessionRepository.getSessionIdIndexMap().containsValue(Set.of(indexKey))).isTrue();
+        assertThat(sessionRepository.getSessionIdIndexMap().containsValue(Set.of(indexKey)))
+                .isTrue();
 
         assertThat(sessionRepository.getIndexSessionIdMap()).hasSize(1);
-        assertThat(sessionRepository.getIndexSessionIdMap().containsKey(indexKey)).isTrue();
-        assertThat(sessionRepository.getIndexSessionIdMap().get(indexKey)).isEqualTo(
-            Set.of("fake-session-1"));
+        assertThat(sessionRepository.getIndexSessionIdMap().containsKey(indexKey))
+                .isTrue();
+        assertThat(sessionRepository.getIndexSessionIdMap().get(indexKey)).isEqualTo(Set.of("fake-session-1"));
     }
 
     @Test
@@ -71,37 +70,34 @@ class InMemoryReactiveIndexedSessionRepositoryTest {
         var indexKey2 = createSession("fake-session-1", "test2");
 
         assertThat(sessionRepository.getSessionIdIndexMap()).hasSize(1);
-        assertThat(
-            sessionRepository.getSessionIdIndexMap().containsValue(Set.of(indexKey2))).isTrue();
+        assertThat(sessionRepository.getSessionIdIndexMap().containsValue(Set.of(indexKey2)))
+                .isTrue();
 
         assertThat(sessionRepository.getIndexSessionIdMap()).hasSize(1);
-        assertThat(sessionRepository.getIndexSessionIdMap().containsKey(indexKey2)).isTrue();
-        assertThat(sessionRepository.getIndexSessionIdMap().get(indexKey2)).isEqualTo(
-            Set.of("fake-session-1"));
+        assertThat(sessionRepository.getIndexSessionIdMap().containsKey(indexKey2))
+                .isTrue();
+        assertThat(sessionRepository.getIndexSessionIdMap().get(indexKey2)).isEqualTo(Set.of("fake-session-1"));
     }
 
     @Test
     void deleteByIdTest() {
         createSession("fake-session-2", "test1");
-        sessionRepository.deleteById("fake-session-2")
-            .as(StepVerifier::create)
-            .verifyComplete();
+        sessionRepository.deleteById("fake-session-2").as(StepVerifier::create).verifyComplete();
         assertThat(sessionRepository.getSessionIdIndexMap()).isEmpty();
         assertThat(sessionRepository.getIndexSessionIdMap()).isEmpty();
     }
 
-    InMemoryReactiveIndexedSessionRepository.IndexKey createSession(String sessionId,
-        String principalName) {
-        var indexKey = new InMemoryReactiveIndexedSessionRepository.IndexKey(
-            PRINCIPAL_NAME_INDEX_NAME, principalName);
-        sessionRepository.createSession()
-            .doOnNext(session -> {
-                session.setAttribute(indexKey.attributeName(), indexKey.attributeValue());
-                session.setId(sessionId);
-            })
-            .flatMap(sessionRepository::save)
-            .as(StepVerifier::create)
-            .verifyComplete();
+    InMemoryReactiveIndexedSessionRepository.IndexKey createSession(String sessionId, String principalName) {
+        var indexKey = new InMemoryReactiveIndexedSessionRepository.IndexKey(PRINCIPAL_NAME_INDEX_NAME, principalName);
+        sessionRepository
+                .createSession()
+                .doOnNext(session -> {
+                    session.setAttribute(indexKey.attributeName(), indexKey.attributeValue());
+                    session.setId(sessionId);
+                })
+                .flatMap(sessionRepository::save)
+                .as(StepVerifier::create)
+                .verifyComplete();
         return indexKey;
     }
 }

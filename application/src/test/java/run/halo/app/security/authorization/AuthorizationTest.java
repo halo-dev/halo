@@ -2,9 +2,7 @@ package run.halo.app.security.authorization;
 
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 import static run.halo.app.core.extension.Role.ROLE_AGGREGATE_LABEL_PREFIX;
 
@@ -68,17 +66,24 @@ class AuthorizationTest {
     @Test
     void anonymousUserAccessProtectedApi() {
         when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts")
-            .header("X-Requested-With", "XMLHttpRequest")
-            .exchange()
-            .expectStatus().isUnauthorized();
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts")
+                .header("X-Requested-With", "XMLHttpRequest")
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts")
-            .exchange()
-            .expectStatus().isFound()
-            .expectHeader().location("/login?authentication_required");
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts")
+                .exchange()
+                .expectStatus()
+                .isFound()
+                .expectHeader()
+                .location("/login?authentication_required");
 
         verify(roleService, times(2)).listDependenciesFlux(anySet());
     }
@@ -86,33 +91,43 @@ class AuthorizationTest {
     @Test
     void anonymousUserAccessAuthenticationFreeApi() {
         when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
-            .thenReturn(Mono.empty());
+                .thenReturn(Mono.empty());
         Role role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName(AnonymousUserConst.Role);
         role.setRules(new ArrayList<>());
         PolicyRule policyRule = new PolicyRule.Builder()
-            .apiGroups("fake.halo.run")
-            .verbs("list")
-            .resources("posts")
-            .build();
+                .apiGroups("fake.halo.run")
+                .verbs("list")
+                .resources("posts")
+                .build();
         role.getRules().add(policyRule);
         when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
-        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
-            .isOk()
-            .expectBody(String.class).isEqualTo("returned posts");
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .isEqualTo("returned posts");
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
-            .header("X-Requested-With", "XMLHttpRequest")
-            .exchange()
-            .expectStatus()
-            .isUnauthorized();
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts/hello-halo")
+                .header("X-Requested-With", "XMLHttpRequest")
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo")
-            .exchange()
-            .expectStatus()
-            .isFound()
-            .expectHeader().location("/login?authentication_required");
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts/hello-halo")
+                .exchange()
+                .expectStatus()
+                .isFound()
+                .expectHeader()
+                .location("/login?authentication_required");
 
         verify(roleService, times(3)).listDependenciesFlux(anySet());
     }
@@ -125,17 +140,22 @@ class AuthorizationTest {
         role.getMetadata().setName(AnonymousUserConst.Role);
         role.setRules(new ArrayList<>());
         PolicyRule policyRule = new PolicyRule.Builder()
-            .apiGroups("fake.halo.run")
-            .verbs("list")
-            .resources("posts")
-            .build();
+                .apiGroups("fake.halo.run")
+                .verbs("list")
+                .resources("posts")
+                .build();
         role.getRules().add(policyRule);
 
         when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
 
-        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
-            .isOk()
-            .expectBody(String.class).isEqualTo("returned posts");
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/posts")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .isEqualTo("returned posts");
         verify(roleService).listDependenciesFlux(anySet());
     }
 
@@ -145,21 +165,23 @@ class AuthorizationTest {
         var role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName("fake-role-with-aggregate-to-anonymous");
-        role.getMetadata().setLabels(new HashMap<>(Map.of(
-            ROLE_AGGREGATE_LABEL_PREFIX + AnonymousUserConst.Role, "true"
-        )));
+        role.getMetadata()
+                .setLabels(new HashMap<>(Map.of(ROLE_AGGREGATE_LABEL_PREFIX + AnonymousUserConst.Role, "true")));
         role.setRules(new ArrayList<>());
         var policyRule = new PolicyRule.Builder()
-            .apiGroups("fake.halo.run")
-            .verbs("list")
-            .resources("fakes")
-            .build();
+                .apiGroups("fake.halo.run")
+                .verbs("list")
+                .resources("fakes")
+                .build();
         role.getRules().add(policyRule);
         client.create(role);
 
-        webClient.get().uri("/apis/fake.halo.run/v1/fakes").exchange()
-            .expectStatus()
-            .isOk();
+        webClient
+                .get()
+                .uri("/apis/fake.halo.run/v1/fakes")
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 
     @TestConfiguration
@@ -168,28 +190,29 @@ class AuthorizationTest {
         @Bean
         public RouterFunction<ServerResponse> postRoute() {
             return RouterFunctions.route()
-                .GET("/apis/fake.halo.run/v1/posts", request -> ServerResponse.ok()
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .bodyValue("returned posts")
-                )
-                .PUT("/apis/fake.halo.run/v1/posts/{name}", request -> ServerResponse.ok()
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .bodyValue("updated post " + request.pathVariable("name"))
-                )
-                .GET("/apis/fake.halo.run/v1/fakes", request -> ServerResponse.ok().build())
-                .build();
+                    .GET(
+                            "/apis/fake.halo.run/v1/posts",
+                            request -> ServerResponse.ok()
+                                    .contentType(MediaType.TEXT_PLAIN)
+                                    .bodyValue("returned posts"))
+                    .PUT(
+                            "/apis/fake.halo.run/v1/posts/{name}",
+                            request -> ServerResponse.ok()
+                                    .contentType(MediaType.TEXT_PLAIN)
+                                    .bodyValue("updated post " + request.pathVariable("name")))
+                    .GET(
+                            "/apis/fake.halo.run/v1/fakes",
+                            request -> ServerResponse.ok().build())
+                    .build();
         }
 
         Mono<ServerResponse> queryPosts(ServerRequest request) {
-            return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
-                .bodyValue("returned posts");
+            return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).bodyValue("returned posts");
         }
 
         Mono<ServerResponse> updatePost(ServerRequest request) {
             var name = request.pathVariable("name");
-            return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
-                .bodyValue("updated post " + name);
+            return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).bodyValue("updated post " + name);
         }
-
     }
 }

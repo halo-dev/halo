@@ -1,8 +1,6 @@
 package run.halo.app.security.authentication.rememberme;
 
-import static run.halo.app.extension.index.query.Queries.and;
-import static run.halo.app.extension.index.query.Queries.isNull;
-import static run.halo.app.extension.index.query.Queries.lessThan;
+import static run.halo.app.extension.index.query.Queries.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,23 +28,21 @@ public class RememberTokenCleaner {
     private final ReactiveExtensionPaginatedOperator paginatedOperator;
     private final RememberMeCookieResolver rememberMeCookieResolver;
 
-    /**
-     * Clean up expired tokens every day at 3:00 AM.
-     */
+    /** Clean up expired tokens every day at 3:00 AM. */
     @Scheduled(cron = "0 0 3 * * ?")
     public void cleanUpExpiredTokens() {
-        paginatedOperator.deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
-            .then().block(BLOCKING_TIMEOUT);
+        paginatedOperator
+                .deleteInitialBatch(RememberMeToken.class, getExpiredTokensListOptions())
+                .then()
+                .block(BLOCKING_TIMEOUT);
         log.info("Expired remember me tokens have been cleaned up.");
     }
 
     ListOptions getExpiredTokensListOptions() {
         var listOptions = new ListOptions();
-        listOptions.setFieldSelector(FieldSelector.of(
-            and(isNull("metadata.deletionTimestamp"),
-                lessThan("metadata.creationTimestamp", getExpirationThreshold().toString())
-            )
-        ));
+        listOptions.setFieldSelector(FieldSelector.of(and(
+                isNull("metadata.deletionTimestamp"),
+                lessThan("metadata.creationTimestamp", getExpirationThreshold().toString()))));
         return listOptions;
     }
 

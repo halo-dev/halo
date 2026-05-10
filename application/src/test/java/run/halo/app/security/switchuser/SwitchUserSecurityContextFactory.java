@@ -18,15 +18,12 @@ class SwitchUserSecurityContextFactory implements WithSecurityContextFactory<Wit
         var switchToUsername = annotation.targetUsername();
         var switchToRoles = annotation.targetRoles();
 
-        var currentAuthentication =
-            authenticated(username, "password", AuthorityUtils.createAuthorityList(roles));
-        var switchAuthority =
-            new SwitchUserGrantedAuthority(ROLE_PREVIOUS_ADMINISTRATOR, currentAuthentication);
+        var currentAuthentication = authenticated(username, "password", AuthorityUtils.createAuthorityList(roles));
+        var switchAuthority = new SwitchUserGrantedAuthority(ROLE_PREVIOUS_ADMINISTRATOR, currentAuthentication);
 
         var targetAuthorities = AuthorityUtils.createAuthorityList(switchToRoles);
         targetAuthorities.add(switchAuthority);
-        var authentication = authenticated(switchToUsername, "password",
-            targetAuthorities);
+        var authentication = authenticated(switchToUsername, "password", targetAuthorities);
         return new SecurityContextImpl(authentication);
     }
 }

@@ -7,17 +7,19 @@ import org.springframework.core.io.Resource;
 import run.halo.app.extension.Unstructured;
 
 /**
- * <p>Process the content in yaml that matches the {@link DocumentMatcher} and convert it to an
- * unstructured list.</p>
- * <p>Multiple resources can be processed at one time.</p>
+ * Process the content in yaml that matches the {@link DocumentMatcher} and convert it to an unstructured list.
+ *
+ * <p>Multiple resources can be processed at one time.
+ *
  * <p>The following specified key must be included before the resource can be processed:
+ *
  * <pre>
  *     apiVersion
  *     kind
  *     metadata.name
  * </pre>
+ *
  * Otherwise, skip it and continue to read the next resource.
- * </p>
  *
  * @author guqing
  * @since 2.0.0
@@ -26,9 +28,8 @@ public class YamlUnstructuredLoader extends YamlProcessor {
 
     private static final DocumentMatcher DEFAULT_UNSTRUCTURED_MATCHER = properties -> {
         if (properties.containsKey("apiVersion")
-            && properties.containsKey("kind")
-            && (properties.containsKey("metadata.name")
-            || properties.containsKey("metadata.generateName"))) {
+                && properties.containsKey("kind")
+                && (properties.containsKey("metadata.name") || properties.containsKey("metadata.generateName"))) {
             return YamlProcessor.MatchStatus.FOUND;
         }
         return MatchStatus.NOT_FOUND;

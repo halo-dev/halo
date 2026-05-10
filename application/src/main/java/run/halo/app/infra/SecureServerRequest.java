@@ -25,5 +25,4 @@ public class SecureServerRequest extends ServerRequestWrapper {
     public ServerWebExchange exchange() {
         return new SecureServerWebExchange(super.exchange());
     }
-
 }

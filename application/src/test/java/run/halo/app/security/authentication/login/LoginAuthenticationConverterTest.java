@@ -1,11 +1,7 @@
 package run.halo.app.security.authentication.login;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
@@ -56,9 +52,8 @@ class LoginAuthenticationConverterTest {
 
         when(request.getHeaders()).thenReturn(headers);
         when(exchange.getRequest()).thenReturn(request);
-        when(rateLimiterRegistry.rateLimiter("authentication-from-ip-unknown",
-            "authentication"))
-            .thenReturn(RateLimiter.ofDefaults("authentication"));
+        when(rateLimiterRegistry.rateLimiter("authentication-from-ip-unknown", "authentication"))
+                .thenReturn(RateLimiter.ofDefaults("authentication"));
     }
 
     @Test
@@ -68,17 +63,19 @@ class LoginAuthenticationConverterTest {
 
         formData.add("username", username);
         formData.add("password", Base64.getEncoder().encodeToString(password.getBytes()));
-        var rateLimiter = RateLimiter.of("authentication", RateLimiterConfig.custom()
-            .limitForPeriod(1)
-            .limitRefreshPeriod(Duration.ofSeconds(1))
-            .timeoutDuration(Duration.ofMillis(0))
-            .build());
+        var rateLimiter = RateLimiter.of(
+                "authentication",
+                RateLimiterConfig.custom()
+                        .limitForPeriod(1)
+                        .limitRefreshPeriod(Duration.ofSeconds(1))
+                        .timeoutDuration(Duration.ofMillis(0))
+                        .build());
         assertTrue(rateLimiter.acquirePermission(1));
         when(rateLimiterRegistry.rateLimiter("authentication-from-ip-unknown", "authentication"))
-            .thenReturn(rateLimiter);
+                .thenReturn(rateLimiter);
         StepVerifier.create(converter.convert(exchange))
-            .expectError(TooManyRequestsException.class)
-            .verify();
+                .expectError(TooManyRequestsException.class)
+                .verify();
 
         verify(cryptoService, never()).decrypt(password.getBytes());
     }
@@ -92,11 +89,10 @@ class LoginAuthenticationConverterTest {
         formData.add("username", username);
         formData.add("password", Base64.getEncoder().encodeToString(password.getBytes()));
 
-        when(cryptoService.decrypt(password.getBytes()))
-            .thenReturn(Mono.just(decryptedPassword.getBytes()));
+        when(cryptoService.decrypt(password.getBytes())).thenReturn(Mono.just(decryptedPassword.getBytes()));
         StepVerifier.create(converter.convert(exchange))
-            .expectNext(new UsernamePasswordAuthenticationToken(username, decryptedPassword))
-            .verifyComplete();
+                .expectNext(new UsernamePasswordAuthenticationToken(username, decryptedPassword))
+                .verifyComplete();
 
         verify(cryptoService).decrypt(password.getBytes());
     }
@@ -109,8 +105,7 @@ class LoginAuthenticationConverterTest {
         formData.add("username", username);
         formData.add("password", password);
 
-        StepVerifier.create(converter.convert(exchange))
-            .verifyError(BadCredentialsException.class);
+        StepVerifier.create(converter.convert(exchange)).verifyError(BadCredentialsException.class);
     }
 
     @Test
@@ -122,10 +117,8 @@ class LoginAuthenticationConverterTest {
         formData.add("password", Base64.getEncoder().encodeToString(password.getBytes()));
 
         when(cryptoService.decrypt(password.getBytes()))
-            .thenReturn(Mono.error(() -> new InvalidEncryptedMessageException("invalid message")));
-        StepVerifier.create(converter.convert(exchange))
-            .verifyError(BadCredentialsException.class);
+                .thenReturn(Mono.error(() -> new InvalidEncryptedMessageException("invalid message")));
+        StepVerifier.create(converter.convert(exchange)).verifyError(BadCredentialsException.class);
         verify(cryptoService).decrypt(password.getBytes());
     }
-
 }

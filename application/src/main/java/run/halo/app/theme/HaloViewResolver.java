@@ -1,10 +1,6 @@
 package run.halo.app.theme;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import org.attoparser.ParseException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,45 +30,36 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
 
     private final ThymeleafProperties thymeleafProperties;
 
-    public HaloViewResolver(FinderRegistry finderRegistry,
-        ThymeleafProperties thymeleafProperties) {
+    public HaloViewResolver(FinderRegistry finderRegistry, ThymeleafProperties thymeleafProperties) {
         this.finderRegistry = finderRegistry;
         this.thymeleafProperties = thymeleafProperties;
     }
 
     @Override
     protected Mono<View> loadView(String viewName, Locale locale) {
-        return super.loadView(viewName, locale)
-            .cast(HaloView.class)
-            .map(view -> {
-                // populate finders to view static variables
-                finderRegistry.getFinders().forEach(view::addStaticVariable);
-                return view;
-            });
+        return super.loadView(viewName, locale).cast(HaloView.class).map(view -> {
+            // populate finders to view static variables
+            finderRegistry.getFinders().forEach(view::addStaticVariable);
+            return view;
+        });
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         setViewClass(HaloView.class);
         var map = PropertyMapper.get();
-        map.from(thymeleafProperties::getEncoding)
-            .to(this::setDefaultCharset);
-        map.from(thymeleafProperties::getExcludedViewNames)
-            .to(this::setExcludedViewNames);
-        map.from(thymeleafProperties::getViewNames)
-            .to(this::setViewNames);
+        map.from(thymeleafProperties::getEncoding).to(this::setDefaultCharset);
+        map.from(thymeleafProperties::getExcludedViewNames).to(this::setExcludedViewNames);
+        map.from(thymeleafProperties::getViewNames).to(this::setViewNames);
 
         var reactive = thymeleafProperties.getReactive();
-        map.from(reactive::getMediaTypes)
-            .to(this::setSupportedMediaTypes);
-        map.from(reactive::getFullModeViewNames)
-            .to(this::setFullModeViewNames);
-        map.from(reactive::getChunkedModeViewNames)
-            .to(this::setChunkedModeViewNames);
+        map.from(reactive::getMediaTypes).to(this::setSupportedMediaTypes);
+        map.from(reactive::getFullModeViewNames).to(this::setFullModeViewNames);
+        map.from(reactive::getChunkedModeViewNames).to(this::setChunkedModeViewNames);
         map.from(reactive::getMaxChunkSize)
-            .asInt(DataSize::toBytes)
-            .when(size -> size > 0)
-            .to(this::setResponseMaxChunkSizeBytes);
+                .asInt(DataSize::toBytes)
+                .when(size -> size > 0)
+                .to(this::setResponseMaxChunkSizeBytes);
         setOrder(Ordered.LOWEST_PRECEDENCE - 5);
     }
 
@@ -87,69 +74,57 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
         private ThemeResolver themeResolver;
 
         @Override
-        public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-            ServerWebExchange exchange) {
+        public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
             return themeResolver.getTheme(exchange).flatMap(theme -> {
                 // calculate the engine before rendering
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
-                var noCache = (Boolean) exchange.getAttributes()
-                    .getOrDefault(ModelConst.NO_CACHE, false);
-                exchange.getAttributes()
-                    .put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, !noCache);
+                var noCache = (Boolean) exchange.getAttributes().getOrDefault(ModelConst.NO_CACHE, false);
+                exchange.getAttributes().put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, !noCache);
                 return super.render(model, contentType, exchange)
-                    .onErrorMap(TemplateProcessingException.class::isInstance, tee -> {
-                        if (tee instanceof TemplateInputException) {
-                            // map the error response exception while fragment not found
+                        .onErrorMap(TemplateProcessingException.class::isInstance, tee -> {
+                            if (tee instanceof TemplateInputException) {
+                                // map the error response exception while fragment not found
+                                return Optional.of(tee)
+                                        .map(Throwable::getCause)
+                                        .filter(ParseException.class::isInstance)
+                                        .map(Throwable::getCause)
+                                        .filter(TemplateProcessingException.class::isInstance)
+                                        .map(Throwable::getCause)
+                                        .filter(ErrorResponse.class::isInstance)
+                                        .orElse(tee);
+                            }
+                            // map the error response exception while template not found
                             return Optional.of(tee)
-                                .map(Throwable::getCause)
-                                .filter(ParseException.class::isInstance)
-                                .map(Throwable::getCause)
-                                .filter(TemplateProcessingException.class::isInstance)
-                                .map(Throwable::getCause)
-                                .filter(ErrorResponse.class::isInstance)
-                                .orElse(tee);
-                        }
-                        // map the error response exception while template not found
-                        return Optional.of(tee)
-                            .map(Throwable::getCause)
-                            .filter(ErrorResponse.class::isInstance)
-                            .orElse(tee);
-                    });
-
+                                    .map(Throwable::getCause)
+                                    .filter(ErrorResponse.class::isInstance)
+                                    .orElse(tee);
+                        });
             });
         }
 
         @Override
-        protected Mono<Map<String, Object>> getModelAttributes(Map<String, ?> model,
-            ServerWebExchange exchange) {
-            Mono<Map<String, Object>> contextBasedStaticVariables =
-                getContextBasedStaticVariables(exchange);
+        protected Mono<Map<String, Object>> getModelAttributes(Map<String, ?> model, ServerWebExchange exchange) {
+            Mono<Map<String, Object>> contextBasedStaticVariables = getContextBasedStaticVariables(exchange);
             Mono<Map<String, Object>> modelAttributes = super.getModelAttributes(model, exchange);
-            return Mono.deferContextual(
-                contextView -> Flux.merge(modelAttributes, contextBasedStaticVariables)
+            return Mono.deferContextual(contextView -> Flux.merge(modelAttributes, contextBasedStaticVariables)
                     .collectList()
                     .map(modelMapList -> {
                         Map<String, Object> result = new HashMap<>();
                         modelMapList.forEach(result::putAll);
                         return result;
                     })
-                    .doOnNext(attributes -> attributes.put(CONTEXT_VIEW_KEY, contextView))
-            );
+                    .doOnNext(attributes -> attributes.put(CONTEXT_VIEW_KEY, contextView)));
         }
 
-        private Mono<Map<String, Object>> getContextBasedStaticVariables(
-            ServerWebExchange exchange) {
+        private Mono<Map<String, Object>> getContextBasedStaticVariables(ServerWebExchange exchange) {
             ApplicationContext applicationContext = obtainApplicationContext();
 
-            return Mono.just(new HashMap<String, Object>())
-                .flatMap(staticVariables -> {
-                    List<Mono<Map<String, Object>>> monoList = applicationContext.getBeansOfType(
-                            ViewContextBasedVariablesAcquirer.class)
-                        .values()
-                        .stream()
-                        .map(acquirer -> acquirer.acquire(exchange))
-                        .toList();
-                    return Flux.merge(monoList)
+            return Mono.just(new HashMap<String, Object>()).flatMap(staticVariables -> {
+                List<Mono<Map<String, Object>>> monoList =
+                        applicationContext.getBeansOfType(ViewContextBasedVariablesAcquirer.class).values().stream()
+                                .map(acquirer -> acquirer.acquire(exchange))
+                                .toList();
+                return Flux.merge(monoList)
                         .collectList()
                         .map(modelList -> {
                             Map<String, Object> mergedModel = new HashMap<>();
@@ -160,7 +135,7 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
                             staticVariables.putAll(mergedModel);
                             return staticVariables;
                         });
-                });
+            });
         }
     }
 }

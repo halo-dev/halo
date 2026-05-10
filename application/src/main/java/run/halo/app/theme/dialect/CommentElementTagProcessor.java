@@ -7,8 +7,9 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
- * <p>Comment element tag processor.</p>
- * <p>Replace the comment tag <code>&#x3C;halo:comment /&#x3E;</code> with the given content.</p>
+ * Comment element tag processor.
+ *
+ * <p>Replace the comment tag <code>&#x3C;halo:comment /&#x3E;</code> with the given content.
  *
  * @author guqing
  * @see CommentEnabledVariableProcessor
@@ -27,20 +28,20 @@ public class CommentElementTagProcessor extends AbstractElementTagProcessor {
      */
     public CommentElementTagProcessor(final String dialectPrefix) {
         super(
-            TemplateMode.HTML, // This processor will apply only to HTML mode
-            dialectPrefix,     // Prefix to be applied to name for matching
-            TAG_NAME,          // Tag name: match specifically this tag
-            true,              // Apply dialect prefix to tag name
-            null,              // No attribute name: will match by tag name
-            false,             // No prefix to be applied to attribute name
-            PRECEDENCE);       // Precedence (inside dialect's own precedence)
+                TemplateMode.HTML, // This processor will apply only to HTML mode
+                dialectPrefix, // Prefix to be applied to name for matching
+                TAG_NAME, // Tag name: match specifically this tag
+                true, // Apply dialect prefix to tag name
+                null, // No attribute name: will match by tag name
+                false, // No prefix to be applied to attribute name
+                PRECEDENCE); // Precedence (inside dialect's own precedence)
     }
 
     @Override
-    protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
-        IElementTagStructureHandler structureHandler) {
-        var commentWidget = (CommentWidget) context.getVariable(
-            CommentEnabledVariableProcessor.COMMENT_WIDGET_OBJECT_VARIABLE);
+    protected void doProcess(
+            ITemplateContext context, IProcessableElementTag tag, IElementTagStructureHandler structureHandler) {
+        var commentWidget =
+                (CommentWidget) context.getVariable(CommentEnabledVariableProcessor.COMMENT_WIDGET_OBJECT_VARIABLE);
         if (commentWidget == null) {
             structureHandler.replaceWith("", false);
             return;

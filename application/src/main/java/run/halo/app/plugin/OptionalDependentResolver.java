@@ -7,10 +7,11 @@ import org.pf4j.PluginDescriptor;
 import org.pf4j.util.DirectedGraph;
 
 /**
- * <p>Pass in a list of started plugin names to resolve dependency relationships, and return a
- * list of plugin names that depend on the specified plugin.</p>
- * <p>Do not consider the problem of circular dependency, because all the plugins that have been
- * started must not have this problem.</p>
+ * Pass in a list of started plugin names to resolve dependency relationships, and return a list of plugin names that
+ * depend on the specified plugin.
+ *
+ * <p>Do not consider the problem of circular dependency, because all the plugins that have been started must not have
+ * this problem.
  */
 public class OptionalDependentResolver {
     private final DirectedGraph<String> dependentsGraph;

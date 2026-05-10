@@ -3,8 +3,8 @@ package run.halo.app.search;
 import org.pf4j.ExtensionPoint;
 
 /**
- * Search engine is used to index and search halo documents. Meanwhile, it is also an extension
- * point for adding different search engine implementations.
+ * Search engine is used to index and search halo documents. Meanwhile, it is also an extension point for adding
+ * different search engine implementations.
  *
  * @author johnniang
  */
@@ -31,9 +31,7 @@ public interface SearchEngine extends ExtensionPoint {
      */
     void deleteDocument(Iterable<String> haloDocIds);
 
-    /**
-     * Delete all halo documents.
-     */
+    /** Delete all halo documents. */
     void deleteAll();
 
     /**
@@ -43,5 +41,4 @@ public interface SearchEngine extends ExtensionPoint {
      * @return search result of halo documents
      */
     SearchResult search(SearchOption option);
-
 }

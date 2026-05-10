@@ -34,16 +34,16 @@ class DatabaseInfoContributor implements InfoContributor, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         var connectionMetadata = Mono.usingWhen(
-                this.connectionFactory.create(),
-                connection -> Mono.just(connection.getMetadata()),
-                Connection::close
-            )
-            .blockOptional(BLOCKING_TIMEOUT)
-            .orElseThrow(() -> new IllegalStateException("Unable to get database metadata"));
+                        this.connectionFactory.create(),
+                        connection -> Mono.just(connection.getMetadata()),
+                        Connection::close)
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElseThrow(() -> new IllegalStateException("Unable to get database metadata"));
         if (log.isDebugEnabled()) {
-            log.debug("Database Metadata initialized: name={}, version={}",
-                connectionMetadata.getDatabaseProductName(),
-                connectionMetadata.getDatabaseVersion());
+            log.debug(
+                    "Database Metadata initialized: name={}, version={}",
+                    connectionMetadata.getDatabaseProductName(),
+                    connectionMetadata.getDatabaseVersion());
         }
         this.connectionMetadata = connectionMetadata;
     }
@@ -51,11 +51,11 @@ class DatabaseInfoContributor implements InfoContributor, InitializingBean {
     @Override
     public void contribute(Info.Builder builder) {
         if (this.connectionMetadata != null) {
-            builder.withDetail(DATABASE_INFO_KEY, Map.of(
-                "name", this.connectionMetadata.getDatabaseProductName(),
-                "version", this.connectionMetadata.getDatabaseVersion()
-            ));
+            builder.withDetail(
+                    DATABASE_INFO_KEY,
+                    Map.of(
+                            "name", this.connectionMetadata.getDatabaseProductName(),
+                            "version", this.connectionMetadata.getDatabaseVersion()));
         }
     }
-
 }

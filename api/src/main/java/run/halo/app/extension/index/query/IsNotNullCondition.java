@@ -11,5 +11,4 @@ record IsNotNullCondition(String indexName) implements IndexCondition {
     public String toString() {
         return indexName + " IS NOT NULL";
     }
-
 }

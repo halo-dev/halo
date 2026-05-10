@@ -5,9 +5,8 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ExtensionClient;
 
 @Component
-public class ExtensionPointDefinitionGetterImpl
-    extends AbstractDefinitionGetter<ExtensionPointDefinition>
-    implements ExtensionPointDefinitionGetter {
+public class ExtensionPointDefinitionGetterImpl extends AbstractDefinitionGetter<ExtensionPointDefinition>
+        implements ExtensionPointDefinitionGetter {
 
     public ExtensionPointDefinitionGetterImpl(ExtensionClient client) {
         super(client, new ExtensionPointDefinition());

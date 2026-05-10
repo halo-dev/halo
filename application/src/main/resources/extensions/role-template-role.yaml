@@ -12,9 +12,9 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:roles:manage"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "roles" ]
-    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: [""]
+    resources: ["roles"]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -28,6 +28,6 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:roles:view"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "roles" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: [""]
+    resources: ["roles"]
+    verbs: ["get", "list"]

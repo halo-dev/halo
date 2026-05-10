@@ -16,15 +16,14 @@ import run.halo.app.infra.properties.SecurityProperties.PasswordResetMethod;
  * @since 2.20.0
  */
 @Component
-public class DefaultPasswordResetAvailabilityProviders
-    implements PasswordResetAvailabilityProviders {
+public class DefaultPasswordResetAvailabilityProviders implements PasswordResetAvailabilityProviders {
 
     private final SecurityProperties securityProperties;
 
     private final List<PasswordResetAvailabilityProvider> providers;
 
-    public DefaultPasswordResetAvailabilityProviders(HaloProperties haloProperties,
-        ObjectProvider<PasswordResetAvailabilityProvider> providers) {
+    public DefaultPasswordResetAvailabilityProviders(
+            HaloProperties haloProperties, ObjectProvider<PasswordResetAvailabilityProvider> providers) {
         this.securityProperties = haloProperties.getSecurity();
         this.providers = providers.orderedStream().toList();
     }
@@ -32,11 +31,10 @@ public class DefaultPasswordResetAvailabilityProviders
     @Override
     public Flux<PasswordResetMethod> getAvailableMethods() {
         return Flux.fromIterable(securityProperties.getPasswordResetMethods())
-            .filterWhen(method -> providers.stream()
-                .filter(provider -> provider.support(method.getName()))
-                .findFirst()
-                .map(provider -> provider.isAvailable(method))
-                .orElseGet(() -> Mono.just(false))
-            );
+                .filterWhen(method -> providers.stream()
+                        .filter(provider -> provider.support(method.getName()))
+                        .findFirst()
+                        .map(provider -> provider.isAvailable(method))
+                        .orElseGet(() -> Mono.just(false)));
     }
 }

@@ -3,11 +3,7 @@ package run.halo.app.plugin;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SecureServerRequest;
@@ -21,7 +17,7 @@ import run.halo.app.infra.exception.PluginRuntimeIncompatibleException;
  */
 @Component
 public class DefaultPluginRouterFunctionRegistry
-    implements RouterFunction<ServerResponse>, PluginRouterFunctionRegistry {
+        implements RouterFunction<ServerResponse>, PluginRouterFunctionRegistry {
 
     private final Collection<RouterFunction<ServerResponse>> routerFunctions;
 
@@ -33,20 +29,19 @@ public class DefaultPluginRouterFunctionRegistry
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         var secureRequest = new SecureServerRequest(request);
         return Flux.fromIterable(this.routerFunctions)
-            .concatMap(routerFunction -> {
-                // wrap the handler function
-                return routerFunction.route(secureRequest)
-                    .map(hf -> (HandlerFunction<ServerResponse>)
-                        serverRequest -> {
-                            try {
-                                return hf.handle(secureRequest);
-                            } catch (LinkageError le) {
-                                return Mono.error(new PluginRuntimeIncompatibleException(le));
-                            }
-                        }
-                    );
-            })
-            .next();
+                .concatMap(routerFunction -> {
+                    // wrap the handler function
+                    return routerFunction
+                            .route(secureRequest)
+                            .map(hf -> (HandlerFunction<ServerResponse>) serverRequest -> {
+                                try {
+                                    return hf.handle(secureRequest);
+                                } catch (LinkageError le) {
+                                    return Mono.error(new PluginRuntimeIncompatibleException(le));
+                                }
+                            });
+                })
+                .next();
     }
 
     @Override

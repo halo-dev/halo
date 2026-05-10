@@ -13,5 +13,4 @@ public class SinglePageUpdatedEvent extends ApplicationEvent {
         super(source);
         this.singlePage = singlePage;
     }
-
 }

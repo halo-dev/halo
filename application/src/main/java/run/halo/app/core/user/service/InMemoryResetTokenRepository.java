@@ -17,16 +17,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class InMemoryResetTokenRepository implements ResetTokenRepository {
 
-    /**
-     * Key: Token Hash.
-     */
+    /** Key: Token Hash. */
     private final Cache<String, ResetToken> tokens;
 
     public InMemoryResetTokenRepository() {
         this.tokens = Caffeine.newBuilder()
-            .expireAfterWrite(Duration.ofDays(1))
-            .maximumSize(10000)
-            .build();
+                .expireAfterWrite(Duration.ofDays(1))
+                .maximumSize(10000)
+                .build();
     }
 
     @Override
@@ -50,5 +48,4 @@ public class InMemoryResetTokenRepository implements ResetTokenRepository {
     public Mono<Void> removeByTokenHash(String tokenHash) {
         return Mono.fromRunnable(() -> tokens.invalidate(tokenHash));
     }
-
 }

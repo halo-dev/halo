@@ -24,9 +24,8 @@ public interface AttachmentService {
 
     /**
      * Uploads the given attachment to specific storage using handlers in plugins.
-     * <p>
-     * If no handler can be found to upload the given attachment, ServerError exception will be
-     * thrown.
+     *
+     * <p>If no handler can be found to upload the given attachment, ServerError exception will be thrown.
      *
      * @param policyName is attachment policy name.
      * @param groupName is group name the attachment belongs.
@@ -34,15 +33,18 @@ public interface AttachmentService {
      * @param beforeCreating is an attachment modifier before creating.
      * @return attachment.
      */
-    Mono<Attachment> upload(String username, String policyName, @Nullable String groupName,
-        FilePart filePart, @Nullable Consumer<Attachment> beforeCreating);
+    Mono<Attachment> upload(
+            String username,
+            String policyName,
+            @Nullable String groupName,
+            FilePart filePart,
+            @Nullable Consumer<Attachment> beforeCreating);
 
     /**
-     * Uploads the given attachment to specific storage using handlers in plugins. Please note
-     * that we will make sure the request is authenticated, or an unauthorized exception throws.
-     * <p>
-     * If no handler can be found to upload the given attachment, ServerError exception will be
-     * thrown.
+     * Uploads the given attachment to specific storage using handlers in plugins. Please note that we will make sure
+     * the request is authenticated, or an unauthorized exception throws.
+     *
+     * <p>If no handler can be found to upload the given attachment, ServerError exception will be thrown.
      *
      * @param policyName is attachment policy name.
      * @param groupName is group name the attachment belongs.
@@ -51,13 +53,17 @@ public interface AttachmentService {
      * @param mediaType is media type of the attachment.
      * @return attachment.
      */
-    Mono<Attachment> upload(String policyName, @Nullable String groupName, String filename,
-        Flux<DataBuffer> content, @Nullable MediaType mediaType);
+    Mono<Attachment> upload(
+            String policyName,
+            @Nullable String groupName,
+            String filename,
+            Flux<DataBuffer> content,
+            @Nullable MediaType mediaType);
 
     /**
      * Deletes an attachment using handlers in plugins.
-     * <p>
-     * If no handler can be found to delete the given attachment, Mono.empty() will return.
+     *
+     * <p>If no handler can be found to delete the given attachment, Mono.empty() will return.
      *
      * @param attachment is to be deleted.
      * @return deleted attachment.
@@ -66,8 +72,8 @@ public interface AttachmentService {
 
     /**
      * Gets permalink using handlers in plugins.
-     * <p>
-     * If no handler can be found to delete the given attachment, Mono.empty() will return.
+     *
+     * <p>If no handler can be found to delete the given attachment, Mono.empty() will return.
      *
      * @param attachment is created attachment.
      * @return permalink
@@ -76,19 +82,18 @@ public interface AttachmentService {
 
     /**
      * Gets shared URL using handlers in plugins.
-     * <p>
-     * If no handler can be found to delete the given attachment, Mono.empty() will return.
+     *
+     * <p>If no handler can be found to delete the given attachment, Mono.empty() will return.
      *
      * @param attachment is created attachment.
      * @param ttl is time to live of the shared URL.
-     * @return time-to-live shared URL. Please note that, if the attachment is stored in local, the
-     * shared URL is equal to permalink.
+     * @return time-to-live shared URL. Please note that, if the attachment is stored in local, the shared URL is equal
+     *     to permalink.
      */
     Mono<URI> getSharedURL(Attachment attachment, Duration ttl);
 
     /**
-     * Gets thumbnail links using handlers in plugins. Please make sure the attachment has
-     * permalink.
+     * Gets thumbnail links using handlers in plugins. Please make sure the attachment has permalink.
      *
      * @param attachment is created attachment.
      * @return thumbnail links
@@ -104,6 +109,5 @@ public interface AttachmentService {
      * @param filename filename
      * @return attachment
      */
-    Mono<Attachment> uploadFromUrl(URL url, String policyName,
-        @Nullable String groupName, @Nullable String filename);
+    Mono<Attachment> uploadFromUrl(URL url, String policyName, @Nullable String groupName, @Nullable String filename);
 }

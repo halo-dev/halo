@@ -37,50 +37,49 @@ class AttachmentReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(Attachment.class, request.name()).map(attachment -> {
-            if (ExtensionUtil.isDeleted(attachment)) {
-                if (removeFinalizers(attachment.getMetadata(),
-                    Set.of(Constant.FINALIZER_NAME))) {
-                    cleanUpResources(attachment);
+        return client.fetch(Attachment.class, request.name())
+                .map(attachment -> {
+                    if (ExtensionUtil.isDeleted(attachment)) {
+                        if (removeFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME))) {
+                            cleanUpResources(attachment);
+                            client.update(attachment);
+                            this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
+                        }
+                        return null;
+                    }
+                    // add finalizer
+                    addFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME));
+
+                    if (attachment.getStatus() == null) {
+                        attachment.setStatus(new AttachmentStatus());
+                    }
+                    var permalink = attachmentService
+                            .getPermalink(attachment)
+                            .map(URI::toASCIIString)
+                            .blockOptional(Duration.ofSeconds(10))
+                            .orElseThrow(() -> new RequeueException(
+                                    new Result(true, null), "Attachment handler is unavailable, requeue the request"));
+                    log.debug("Set attachment permalink: {} for {}", permalink, request.name());
+                    attachment.getStatus().setPermalink(permalink);
+                    var thumbnails = attachmentService
+                            .getThumbnailLinks(attachment)
+                            .map(map -> map.keySet().stream()
+                                    .collect(Collectors.toMap(
+                                            Enum::name, k -> map.get(k).toString())))
+                            .blockOptional(Duration.ofSeconds(10))
+                            .orElse(null);
+                    attachment.getStatus().setThumbnails(thumbnails);
+                    log.debug("Set attachment thumbnails: {} for {}", thumbnails, request.name());
                     client.update(attachment);
                     this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
-                }
-                return null;
-            }
-            // add finalizer
-            addFinalizers(attachment.getMetadata(), Set.of(Constant.FINALIZER_NAME));
-
-            if (attachment.getStatus() == null) {
-                attachment.setStatus(new AttachmentStatus());
-            }
-            var permalink = attachmentService.getPermalink(attachment)
-                .map(URI::toASCIIString)
-                .blockOptional(Duration.ofSeconds(10))
-                .orElseThrow(() -> new RequeueException(new Result(true, null),
-                    "Attachment handler is unavailable, requeue the request"
-                ));
-            log.debug("Set attachment permalink: {} for {}", permalink, request.name());
-            attachment.getStatus().setPermalink(permalink);
-            var thumbnails = attachmentService.getThumbnailLinks(attachment)
-                .map(map -> map.keySet()
-                    .stream()
-                    .collect(Collectors.toMap(Enum::name, k -> map.get(k).toString()))
-                )
-                .blockOptional(Duration.ofSeconds(10))
+                    return Result.doNotRetry();
+                })
                 .orElse(null);
-            attachment.getStatus().setThumbnails(thumbnails);
-            log.debug("Set attachment thumbnails: {} for {}", thumbnails, request.name());
-            client.update(attachment);
-            this.eventPublisher.publishEvent(new AttachmentChangedEvent(this, attachment));
-            return Result.doNotRetry();
-        }).orElse(null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new Attachment())
-            .build();
+        return builder.extension(new Attachment()).build();
     }
 
     void cleanUpResources(Attachment attachment) {

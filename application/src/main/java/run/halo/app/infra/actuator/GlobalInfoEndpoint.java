@@ -5,9 +5,7 @@ import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-/**
- * Global info endpoint.
- */
+/** Global info endpoint. */
 @WebEndpoint(id = "globalinfo")
 @Component
 class GlobalInfoEndpoint {
@@ -22,5 +20,4 @@ class GlobalInfoEndpoint {
     public Mono<GlobalInfo> globalInfo() {
         return globalInfoService.getGlobalInfo();
     }
-
 }

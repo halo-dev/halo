@@ -7,8 +7,7 @@ import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 
 @Deprecated(forRemoval = true, since = "2.22.0")
-class DefaultIndexAttribute<E extends Extension, K extends Comparable<K>>
-    implements IndexAttribute<E, K> {
+class DefaultIndexAttribute<E extends Extension, K extends Comparable<K>> implements IndexAttribute<E, K> {
 
     private final Class<E> objectType;
 
@@ -19,11 +18,7 @@ class DefaultIndexAttribute<E extends Extension, K extends Comparable<K>>
     private final boolean singleValue;
 
     public DefaultIndexAttribute(
-        Function<E, Set<K>> valuesFunc,
-        Class<E> objectType,
-        Class<K> keyType,
-        boolean singleValue
-    ) {
+            Function<E, Set<K>> valuesFunc, Class<E> objectType, Class<K> keyType, boolean singleValue) {
         this.singleValue = singleValue;
         Assert.notNull(valuesFunc, "Values function must not be null");
         Assert.notNull(objectType, "Cannot resolve object type");

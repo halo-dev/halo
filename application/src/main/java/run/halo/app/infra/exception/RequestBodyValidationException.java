@@ -55,11 +55,10 @@ public class RequestBodyValidationException extends ServerWebInputException {
     }
 
     private static List<String> resolveErrors(
-        List<? extends MessageSourceResolvable> errors,
-        @Nullable MessageSource messageSource,
-        Locale locale) {
+            List<? extends MessageSourceResolvable> errors, @Nullable MessageSource messageSource, Locale locale) {
         return messageSource == null
-            ? BindErrorUtils.resolve(errors).values().stream().toList()
-            : BindErrorUtils.resolve(errors, messageSource, locale).values().stream().toList();
+                ? BindErrorUtils.resolve(errors).values().stream().toList()
+                : BindErrorUtils.resolve(errors, messageSource, locale).values().stream()
+                        .toList();
     }
 }

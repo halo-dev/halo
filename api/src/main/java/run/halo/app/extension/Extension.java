@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.Objects;
 
 /**
- * Extension is an interface which represents an Extension. It contains setters and getters of
- * GroupVersionKind and Metadata.
+ * Extension is an interface which represents an Extension. It contains setters and getters of GroupVersionKind and
+ * Metadata.
  */
 public interface Extension extends ExtensionOperator, Comparable<Extension> {
 
@@ -17,7 +17,6 @@ public interface Extension extends ExtensionOperator, Comparable<Extension> {
         if (getMetadata() == null) {
             return -1;
         }
-        return Objects.compare(getMetadata().getName(), another.getMetadata().getName(),
-            Comparator.naturalOrder());
+        return Objects.compare(getMetadata().getName(), another.getMetadata().getName(), Comparator.naturalOrder());
     }
 }

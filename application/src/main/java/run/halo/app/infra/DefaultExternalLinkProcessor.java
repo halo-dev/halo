@@ -36,31 +36,29 @@ public class DefaultExternalLinkProcessor implements ExternalLinkProcessor {
         if (uri.isAbsolute()) {
             return Mono.just(uri);
         }
-        return Mono.deferContextual(contextView -> Mono.fromSupplier(
-            () -> ServerWebExchangeContextFilter.getExchange(contextView)
+        return Mono.deferContextual(contextView -> Mono.fromSupplier(() -> ServerWebExchangeContextFilter.getExchange(
+                        contextView)
                 .map(exchange -> externalUrlSupplier.getURL(exchange.getRequest()))
                 .or(() -> Optional.ofNullable(externalUrlSupplier.getRaw()))
                 .map(externalUrl -> {
                     try {
                         var uriComponents = UriComponentsBuilder.fromUriString(uri.toASCIIString())
-                            .build(true);
+                                .build(true);
                         return UriComponentsBuilder.fromUri(externalUrl.toURI())
-                            .pathSegment(uriComponents.getPathSegments().toArray(new String[0]))
-                            .queryParams(uriComponents.getQueryParams())
-                            .fragment(uriComponents.getFragment())
-                            .build(true)
-                            .toUri();
+                                .pathSegment(uriComponents.getPathSegments().toArray(new String[0]))
+                                .queryParams(uriComponents.getQueryParams())
+                                .fragment(uriComponents.getFragment())
+                                .build(true)
+                                .toUri();
                     } catch (URISyntaxException e) {
                         // should never happen
                         return uri;
                     }
                 })
-                .orElse(uri)
-        ));
+                .orElse(uri)));
     }
 
     String append(String externalLink, String link) {
-        return StringUtils.removeEnd(externalLink, "/")
-            + StringUtils.prependIfMissing(link, "/");
+        return StringUtils.removeEnd(externalLink, "/") + StringUtils.prependIfMissing(link, "/");
     }
 }

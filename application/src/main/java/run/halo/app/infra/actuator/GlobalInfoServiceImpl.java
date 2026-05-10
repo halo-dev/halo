@@ -1,10 +1,6 @@
 package run.halo.app.infra.actuator;
 
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.ObjectProvider;
@@ -42,32 +38,28 @@ public class GlobalInfoServiceImpl implements GlobalInfoService {
 
     private Mono<Void> handleSettings(GlobalInfo info) {
         return Optional.ofNullable(systemConfigFetcher.getIfUnique())
-            .map(fetcher -> fetcher.getConfig()
-                .doOnNext(config -> {
-                    handleCommentSetting(info, config);
-                    handleUserSetting(info, config);
-                    handleBasicSetting(info, config);
-                    handlePostSlugGenerationStrategy(info, config);
-                })
-                .then()
-            )
-            .orElseGet(Mono::empty);
+                .map(fetcher -> fetcher.getConfig()
+                        .doOnNext(config -> {
+                            handleCommentSetting(info, config);
+                            handleUserSetting(info, config);
+                            handleBasicSetting(info, config);
+                            handlePostSlugGenerationStrategy(info, config);
+                        })
+                        .then())
+                .orElseGet(Mono::empty);
     }
 
     private void handleCommentSetting(GlobalInfo info, Map<String, String> config) {
-        var comment =
-            SystemSetting.get(config, SystemSetting.Comment.GROUP, SystemSetting.Comment.class);
+        var comment = SystemSetting.get(config, SystemSetting.Comment.GROUP, SystemSetting.Comment.class);
         if (comment == null) {
             info.setAllowAnonymousComments(true);
         } else {
-            info.setAllowAnonymousComments(
-                comment.getSystemUserOnly() == null || !comment.getSystemUserOnly());
+            info.setAllowAnonymousComments(comment.getSystemUserOnly() == null || !comment.getSystemUserOnly());
         }
     }
 
     private void handleUserSetting(GlobalInfo info, Map<String, String> config) {
-        var userSetting =
-            SystemSetting.get(config, SystemSetting.User.GROUP, SystemSetting.User.class);
+        var userSetting = SystemSetting.get(config, SystemSetting.User.GROUP, SystemSetting.User.class);
         if (userSetting == null) {
             info.setAllowRegistration(false);
             info.setMustVerifyEmailOnRegistration(false);
@@ -92,5 +84,4 @@ public class GlobalInfoServiceImpl implements GlobalInfoService {
             basic.useSystemLocale().ifPresent(info::setLocale);
         }
     }
-
 }

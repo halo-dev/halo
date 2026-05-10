@@ -15,26 +15,26 @@ class WebSocketServerWebExchangeMatcherTest {
     @Test
     void shouldMatchIfWebSocketProtocol() {
         var httpRequest = MockServerHttpRequest.get("")
-            .header(HttpHeaders.CONNECTION, HttpHeaders.UPGRADE)
-            .header(HttpHeaders.UPGRADE, "websocket")
-            .build();
+                .header(HttpHeaders.CONNECTION, HttpHeaders.UPGRADE)
+                .header(HttpHeaders.UPGRADE, "websocket")
+                .build();
         var wsExchange = MockServerWebExchange.from(httpRequest);
         var wsMatcher = new WebSocketServerWebExchangeMatcher();
         StepVerifier.create(wsMatcher.matches(wsExchange))
-            .consumeNextWith(result -> assertTrue(result.isMatch()))
-            .verifyComplete();
+                .consumeNextWith(result -> assertTrue(result.isMatch()))
+                .verifyComplete();
     }
 
     @Test
     void shouldNotMatchIfNotWebSocketProtocol() {
         var httpRequest = MockServerHttpRequest.get("")
-            .header(HttpHeaders.CONNECTION, HttpHeaders.UPGRADE)
-            .header(HttpHeaders.UPGRADE, "not-a-websocket")
-            .build();
+                .header(HttpHeaders.CONNECTION, HttpHeaders.UPGRADE)
+                .header(HttpHeaders.UPGRADE, "not-a-websocket")
+                .build();
         var wsExchange = MockServerWebExchange.from(httpRequest);
         var wsMatcher = new WebSocketServerWebExchangeMatcher();
         StepVerifier.create(wsMatcher.matches(wsExchange))
-            .consumeNextWith(result -> assertFalse(result.isMatch()))
-            .verifyComplete();
+                .consumeNextWith(result -> assertFalse(result.isMatch()))
+                .verifyComplete();
     }
 }

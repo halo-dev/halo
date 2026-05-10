@@ -34,15 +34,19 @@ class PublicApiUtilsTest {
         assertThat(PublicApiUtils.containsElement(List.of("test"), "test1")).isFalse();
     }
 
-    @GVK(group = "fake.halo.run", version = "v1", kind = "FakeGroupExtension", plural =
-        "fakegroupextensions", singular = "fakegroupextension")
-    static class FakeGroupExtension extends AbstractExtension {
+    @GVK(
+            group = "fake.halo.run",
+            version = "v1",
+            kind = "FakeGroupExtension",
+            plural = "fakegroupextensions",
+            singular = "fakegroupextension")
+    static class FakeGroupExtension extends AbstractExtension {}
 
-    }
-
-    @GVK(group = "", version = "v1alpha1", kind = "FakeExtension", plural =
-        "fakeextensions", singular = "fakeextension")
-    static class FakExtension extends AbstractExtension {
-
-    }
+    @GVK(
+            group = "",
+            version = "v1alpha1",
+            kind = "FakeExtension",
+            plural = "fakeextensions",
+            singular = "fakeextension")
+    static class FakExtension extends AbstractExtension {}
 }

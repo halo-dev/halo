@@ -26,5 +26,4 @@ class PluginsRootGetterImplTest {
         when(haloProperties.getWorkDir()).thenReturn(haloWorkDir);
         assertEquals(haloWorkDir.resolve("plugins"), pluginsRootGetter.get());
     }
-
 }

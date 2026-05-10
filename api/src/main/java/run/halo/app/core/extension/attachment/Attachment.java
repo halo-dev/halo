@@ -17,8 +17,7 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
-    plural = "attachments", singular = "attachment")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "attachments", singular = "attachment")
 public class Attachment extends AbstractExtension {
 
     public static final String KIND = "Attachment";
@@ -51,10 +50,9 @@ public class Attachment extends AbstractExtension {
         private Long size;
 
         @ArraySchema(
-            arraySchema = @Schema(description = "Tags of attachment"),
-            schema = @Schema(description = "Tag name"))
+                arraySchema = @Schema(description = "Tags of attachment"),
+                schema = @Schema(description = "Tag name"))
         private Set<String> tags;
-
     }
 
     @Data

@@ -13,23 +13,22 @@ class HaloPropertiesTest {
 
     static Stream<Arguments> validateTest() throws MalformedURLException {
         return Stream.of(
-            Arguments.of(true, new URL("http://localhost:8080"), true),
-            Arguments.of(false, new URL("http://localhost:8080"), true),
-            Arguments.of(true, new URL("https://localhost:8080"), true),
-            Arguments.of(false, new URL("https://localhost:8080"), true),
-            Arguments.of(true, new URL("ftp://localhost:8080"), false),
-            Arguments.of(false, new URL("ftp://localhost:8080"), false),
-            Arguments.of(true, new URL("http:www/halo/run"), false),
-            Arguments.of(false, new URL("http:www/halo.run"), false),
-            Arguments.of(true, new URL("https:www/halo/run"), false),
-            Arguments.of(false, new URL("https:www/halo/run"), false),
-            Arguments.of(true, new URL("https:///path"), false),
-            Arguments.of(false, new URL("https:///path"), false),
-            Arguments.of(true, new URL("http:///path"), false),
-            Arguments.of(false, new URL("http:///path"), false),
-            Arguments.of(true, null, false),
-            Arguments.of(false, null, true)
-        );
+                Arguments.of(true, new URL("http://localhost:8080"), true),
+                Arguments.of(false, new URL("http://localhost:8080"), true),
+                Arguments.of(true, new URL("https://localhost:8080"), true),
+                Arguments.of(false, new URL("https://localhost:8080"), true),
+                Arguments.of(true, new URL("ftp://localhost:8080"), false),
+                Arguments.of(false, new URL("ftp://localhost:8080"), false),
+                Arguments.of(true, new URL("http:www/halo/run"), false),
+                Arguments.of(false, new URL("http:www/halo.run"), false),
+                Arguments.of(true, new URL("https:www/halo/run"), false),
+                Arguments.of(false, new URL("https:www/halo/run"), false),
+                Arguments.of(true, new URL("https:///path"), false),
+                Arguments.of(false, new URL("https:///path"), false),
+                Arguments.of(true, new URL("http:///path"), false),
+                Arguments.of(false, new URL("http:///path"), false),
+                Arguments.of(true, null, false),
+                Arguments.of(false, null, true));
     }
 
     @ParameterizedTest

@@ -21,7 +21,7 @@ import run.halo.app.infra.SystemVersionSupplier;
  * @since 2.0.0
  */
 public class HaloProcessorDialect extends AbstractProcessorDialect
-    implements IExpressionObjectDialect, IPostProcessorDialect {
+        implements IExpressionObjectDialect, IPostProcessorDialect {
     private static final String DIALECT_NAME = "haloThemeProcessorDialect";
 
     private final IExpressionObjectFactory expressionObjectFactory;

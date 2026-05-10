@@ -2,17 +2,9 @@ package run.halo.app.core.user.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.assertj.core.api.AssertionsForInterfaceTypes;
@@ -29,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
-import run.halo.app.core.user.service.DefaultRoleService;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -52,10 +43,11 @@ class DefaultRoleServiceTest {
     @ParameterizedTest
     @MethodSource("usernamesProvider")
     void shouldReturnEmptyMapIfNoUsernamesProvided(Collection<String> usernames) {
-        roleService.getRolesByUsernames(usernames)
-            .as(StepVerifier::create)
-            .expectNext(Map.of())
-            .verifyComplete();
+        roleService
+                .getRolesByUsernames(usernames)
+                .as(StepVerifier::create)
+                .expectNext(Map.of())
+                .verifyComplete();
     }
 
     static Stream<Collection<String>> usernamesProvider() {
@@ -73,29 +65,24 @@ class DefaultRoleServiceTest {
 
             var roleNames = Set.of("role1");
 
-
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role1))
-                .thenReturn(Flux.just(role2))
-                .thenReturn(Flux.just(role3))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.just(role1))
+                    .thenReturn(Flux.just(role2))
+                    .thenReturn(Flux.just(role3))
+                    .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
 
             // verify the result
             StepVerifier.create(result)
-                .expectNext(role1)
-                .expectNext(role2)
-                .expectNext(role3)
-                .verifyComplete();
+                    .expectNext(role1)
+                    .expectNext(role2)
+                    .expectNext(role3)
+                    .verifyComplete();
 
             // verify the mock invocations
-            verify(client, times(4)).listAll(
-                same(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, times(4)).listAll(same(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
@@ -109,27 +96,23 @@ class DefaultRoleServiceTest {
 
             // setup mocks
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role1))
-                .thenReturn(Flux.just(role2))
-                .thenReturn(Flux.just(role3))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.just(role1))
+                    .thenReturn(Flux.just(role2))
+                    .thenReturn(Flux.just(role3))
+                    .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
 
             // verify the result
             StepVerifier.create(result)
-                .expectNext(role1)
-                .expectNext(role2)
-                .expectNext(role3)
-                .verifyComplete();
+                    .expectNext(role1)
+                    .expectNext(role2)
+                    .expectNext(role3)
+                    .verifyComplete();
 
             // verify the mock invocations
-            verify(client, times(4)).listAll(
-                same(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, times(4)).listAll(same(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
@@ -145,29 +128,25 @@ class DefaultRoleServiceTest {
             var roleNames = Set.of("role1");
 
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role1))
-                .thenReturn(Flux.just(role2))
-                .thenReturn(Flux.just(role3))
-                .thenReturn(Flux.just(role4))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.just(role1))
+                    .thenReturn(Flux.just(role2))
+                    .thenReturn(Flux.just(role3))
+                    .thenReturn(Flux.just(role4))
+                    .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
 
             // verify the result
             StepVerifier.create(result)
-                .expectNext(role1)
-                .expectNext(role2)
-                .expectNext(role3)
-                .expectNext(role4)
-                .verifyComplete();
+                    .expectNext(role1)
+                    .expectNext(role2)
+                    .expectNext(role3)
+                    .expectNext(role4)
+                    .verifyComplete();
 
             // verify the mock invocations
-            verify(client, times(5)).listAll(
-                same(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, times(5)).listAll(same(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
@@ -183,21 +162,21 @@ class DefaultRoleServiceTest {
             Set<String> roleNames = Set.of("role1");
 
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role1))
-                .thenReturn(Flux.just(role4, role2))
-                .thenReturn(Flux.just(role3))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.just(role1))
+                    .thenReturn(Flux.just(role4, role2))
+                    .thenReturn(Flux.just(role3))
+                    .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
 
             // verify the result
             StepVerifier.create(result)
-                .expectNext(role1)
-                .expectNext(role4)
-                .expectNext(role2)
-                .expectNext(role3)
-                .verifyComplete();
+                    .expectNext(role1)
+                    .expectNext(role4)
+                    .expectNext(role2)
+                    .expectNext(role3)
+                    .verifyComplete();
 
             // verify the mock invocations
             verify(client, times(4)).listAll(same(Role.class), any(), any());
@@ -216,25 +195,18 @@ class DefaultRoleServiceTest {
             Set<String> roleNames = Set.of("role2");
 
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role2))
-                .thenReturn(Flux.just(role3))
-                .thenReturn(Flux.empty());
+                    .thenReturn(Flux.just(role2))
+                    .thenReturn(Flux.just(role3))
+                    .thenReturn(Flux.empty());
 
             // call the method under test
             var result = roleService.listDependenciesFlux(roleNames);
 
             // verify the result
-            StepVerifier.create(result)
-                .expectNext(role2)
-                .expectNext(role3)
-                .verifyComplete();
+            StepVerifier.create(result).expectNext(role2).expectNext(role3).verifyComplete();
 
             // verify the mock invocations
-            verify(client, times(3)).listAll(
-                same(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, times(3)).listAll(same(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
@@ -242,19 +214,13 @@ class DefaultRoleServiceTest {
             var result = roleService.listDependenciesFlux(null);
 
             // verify the result
-            StepVerifier.create(result)
-                .verifyComplete();
+            StepVerifier.create(result).verifyComplete();
 
             result = roleService.listDependenciesFlux(Set.of());
-            StepVerifier.create(result)
-                .verifyComplete();
+            StepVerifier.create(result).verifyComplete();
 
             // verify the mock invocations
-            verify(client, never()).listAll(
-                eq(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, never()).listAll(eq(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
@@ -266,36 +232,29 @@ class DefaultRoleServiceTest {
             var roleNames = Set.of("role1");
 
             when(client.listAll(same(Role.class), any(ListOptions.class), any(Sort.class)))
-                .thenReturn(Flux.just(role1))
-                .thenReturn(Flux.just(role2))
-                .thenReturn(Flux.just(role4))
-                .thenReturn(Flux.empty())
-            ;
+                    .thenReturn(Flux.just(role1))
+                    .thenReturn(Flux.just(role2))
+                    .thenReturn(Flux.just(role4))
+                    .thenReturn(Flux.empty());
 
             var result = roleService.listDependenciesFlux(roleNames);
             // verify the result
             StepVerifier.create(result)
-                .expectNext(role1)
-                .expectNext(role2)
-                .expectNext(role4)
-                .verifyComplete();
+                    .expectNext(role1)
+                    .expectNext(role2)
+                    .expectNext(role4)
+                    .verifyComplete();
 
             // verify the mock invocations
-            verify(client, times(4)).listAll(
-                same(Role.class),
-                any(ListOptions.class),
-                any(Sort.class)
-            );
+            verify(client, times(4)).listAll(same(Role.class), any(ListOptions.class), any(Sort.class));
         }
 
         @Test
         void testSubjectMatch() {
             RoleBinding fakeAuthenticatedBinding =
-                createRoleBinding("authenticated-fake-binding", "fake", "authenticated");
-            RoleBinding fakeEditorBinding =
-                createRoleBinding("editor-fake-binding", "fake", "editor");
-            RoleBinding fakeAnonymousBinding =
-                createRoleBinding("test-anonymous-binding", "test", "anonymous");
+                    createRoleBinding("authenticated-fake-binding", "fake", "authenticated");
+            RoleBinding fakeEditorBinding = createRoleBinding("editor-fake-binding", "fake", "editor");
+            RoleBinding fakeAnonymousBinding = createRoleBinding("test-anonymous-binding", "test", "anonymous");
 
             RoleBinding.Subject subject = new RoleBinding.Subject();
             subject.setName("authenticated");
@@ -303,17 +262,14 @@ class DefaultRoleServiceTest {
             subject.setApiGroup(Role.GROUP);
 
             Predicate<RoleBinding> predicate = roleService.getRoleBindingPredicate(subject);
-            List<RoleBinding> result =
-                Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
+            List<RoleBinding> result = Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
                     .filter(predicate)
                     .toList();
-            AssertionsForInterfaceTypes.assertThat(result)
-                .containsExactly(fakeAuthenticatedBinding);
+            AssertionsForInterfaceTypes.assertThat(result).containsExactly(fakeAuthenticatedBinding);
 
             subject.setName("editor");
             predicate = roleService.getRoleBindingPredicate(subject);
-            result =
-                Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
+            result = Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
                     .filter(predicate)
                     .toList();
             AssertionsForInterfaceTypes.assertThat(result).containsExactly(fakeEditorBinding);

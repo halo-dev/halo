@@ -9,5 +9,4 @@ public class HaloDocumentRebuildRequestEvent extends ApplicationEvent {
     public HaloDocumentRebuildRequestEvent(Object source) {
         super(source);
     }
-
 }

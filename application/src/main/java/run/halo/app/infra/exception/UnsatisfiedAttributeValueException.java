@@ -5,8 +5,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.server.ServerWebInputException;
 
 /**
- * {@link ServerWebInputException} subclass that indicates an unsatisfied
- * attribute value in request parameters.
+ * {@link ServerWebInputException} subclass that indicates an unsatisfied attribute value in request parameters.
  *
  * @author guqing
  * @since 2.2.0
@@ -17,8 +16,8 @@ public class UnsatisfiedAttributeValueException extends ServerWebInputException 
         super(reason);
     }
 
-    public UnsatisfiedAttributeValueException(String reason, @Nullable String messageDetailCode,
-        @Null Object[] messageDetailArguments) {
+    public UnsatisfiedAttributeValueException(
+            String reason, @Nullable String messageDetailCode, @Null Object[] messageDetailArguments) {
         super(reason, null, null, messageDetailCode, messageDetailArguments);
     }
 }

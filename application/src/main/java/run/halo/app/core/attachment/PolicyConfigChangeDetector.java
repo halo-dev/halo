@@ -26,10 +26,11 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 
 /**
- * <p>Detects changes to {@link ConfigMap} that are referenced by {@link Policy} and updates the
- * {@link Attachment} with the {@link Policy} reference to reflect the change.</p>
- * <p>Without this, the link to the attachment corresponding to the storage policy configuration
- * change may not be correctly updated and only the service can be restarted.</p>
+ * Detects changes to {@link ConfigMap} that are referenced by {@link Policy} and updates the {@link Attachment} with
+ * the {@link Policy} reference to reflect the change.
+ *
+ * <p>Without this, the link to the attachment corresponding to the storage policy configuration change may not be
+ * correctly updated and only the service can be restarted.
  *
  * @author guqing
  * @since 2.20.0
@@ -44,22 +45,20 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(ConfigMap.class, request.name())
-            .ifPresent(configMap -> {
-                var labels = configMap.getMetadata().getLabels();
-                if (labels == null) {
-                    return;
-                }
-                var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
-                if (StringUtils.hasText(policyName)) {
-                    var options = ListOptions.builder()
+        client.fetch(ConfigMap.class, request.name()).ifPresent(configMap -> {
+            var labels = configMap.getMetadata().getLabels();
+            if (labels == null) {
+                return;
+            }
+            var policyName = labels.get(Policy.POLICY_OWNER_LABEL);
+            if (StringUtils.hasText(policyName)) {
+                var options = ListOptions.builder()
                         .andQuery(equal("spec.policyName", policyName))
                         .build();
-                    var attachmentNames =
-                        client.listAllNames(Attachment.class, options, Sort.unsorted());
-                    attachmentUpdateTrigger.addAll(attachmentNames);
-                }
-            });
+                var attachmentNames = client.listAllNames(Attachment.class, options, Sort.unsorted());
+                attachmentUpdateTrigger.addAll(attachmentNames);
+            }
+        });
         return Result.doNotRetry();
     }
 
@@ -70,13 +69,12 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
             var labels = configMap.getMetadata().getLabels();
             return labels != null && labels.containsKey(Policy.POLICY_OWNER_LABEL);
         };
-        return builder
-            .extension(new ConfigMap())
-            .syncAllOnStart(false)
-            .onAddMatcher(matcher)
-            .onUpdateMatcher(matcher)
-            .onDeleteMatcher(matcher)
-            .build();
+        return builder.extension(new ConfigMap())
+                .syncAllOnStart(false)
+                .onAddMatcher(matcher)
+                .onUpdateMatcher(matcher)
+                .onDeleteMatcher(matcher)
+                .build();
     }
 
     @Component
@@ -114,13 +112,7 @@ public class PolicyConfigChangeDetector implements Reconciler<Reconciler.Request
         @Override
         public Controller setupWith(ControllerBuilder builder) {
             return new DefaultController<>(
-                "PolicyChangeAttachmentUpdater",
-                this,
-                queue,
-                null,
-                Duration.ofMillis(100),
-                Duration.ofMinutes(10)
-            );
+                    "PolicyChangeAttachmentUpdater", this, queue, null, Duration.ofMillis(100), Duration.ofMinutes(10));
         }
 
         @Override

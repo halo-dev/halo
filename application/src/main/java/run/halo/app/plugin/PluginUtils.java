@@ -25,11 +25,10 @@ public class PluginUtils {
      * Determine if the plugin is in development mode. Currently, we detect it from annotations.
      *
      * @param plugin is a manifest about plugin.
-     * @return true if the plugin  is in development mode; false otherwise.
+     * @return true if the plugin is in development mode; false otherwise.
      */
     public static boolean isDevelopmentMode(Plugin plugin) {
         var annotations = plugin.getMetadata().getAnnotations();
-        return annotations != null
-            && Objects.equals("dev", annotations.get(PluginConst.RUNTIME_MODE_ANNO));
+        return annotations != null && Objects.equals("dev", annotations.get(PluginConst.RUNTIME_MODE_ANNO));
     }
 }

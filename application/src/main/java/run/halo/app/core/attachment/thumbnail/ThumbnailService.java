@@ -29,5 +29,4 @@ public interface ThumbnailService {
      * @return the map of thumbnail size to thumbnail link
      */
     Mono<Map<ThumbnailSize, URI>> get(URI permalink);
-
 }

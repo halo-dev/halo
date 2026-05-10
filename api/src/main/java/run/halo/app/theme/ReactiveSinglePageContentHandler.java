@@ -7,8 +7,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
 
 /**
- * <p>{@link ReactiveSinglePageContentHandler} provides a way to extend the content to be
- * displayed in the theme.</p>
+ * {@link ReactiveSinglePageContentHandler} provides a way to extend the content to be displayed in the theme.
  *
  * @author guqing
  * @see ReactivePostContentHandler
@@ -17,9 +16,9 @@ import run.halo.app.core.extension.content.SinglePage;
 public interface ReactiveSinglePageContentHandler extends ExtensionPoint {
 
     /**
-     * <p>Methods for handling {@link run.halo.app.core.extension.content.SinglePage} content.</p>
-     * <p>For example, you can use this method to change the content for a better display in
-     * theme-side.</p>
+     * Methods for handling {@link run.halo.app.core.extension.content.SinglePage} content.
+     *
+     * <p>For example, you can use this method to change the content for a better display in theme-side.
      *
      * @param singlePageContent content to be handled
      * @return handled content

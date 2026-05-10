@@ -11,8 +11,8 @@ import run.halo.app.security.PersonalAccessToken;
 public interface PatService {
 
     /**
-     * Create a new personal access token. We will automatically use the current user as the
-     * owner of the token from the security context.
+     * Create a new personal access token. We will automatically use the current user as the owner of the token from the
+     * security context.
      *
      * @param patRequest the personal access token request
      * @return the created personal access token
@@ -71,5 +71,4 @@ public interface PatService {
      * @return the generated token
      */
     Mono<String> generateToken(PersonalAccessToken pat);
-
 }

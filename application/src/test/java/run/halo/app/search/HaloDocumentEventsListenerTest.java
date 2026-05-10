@@ -2,10 +2,7 @@ package run.halo.app.search;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -34,15 +31,13 @@ class HaloDocumentEventsListenerTest {
         listener.setBufferSize(1);
         var searchEngine = mock(SearchEngine.class);
         when(searchEngine.available()).thenReturn(true);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
+        when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         var docsProvider = mock(HaloDocumentsProvider.class);
 
         var docs = List.of(new HaloDocument(), new HaloDocument(), new HaloDocument());
 
         when(docsProvider.fetchAll()).thenReturn(Flux.fromIterable(docs));
-        when(extensionGetter.getExtensions(HaloDocumentsProvider.class))
-            .thenReturn(Flux.just(docsProvider));
+        when(extensionGetter.getExtensions(HaloDocumentsProvider.class)).thenReturn(Flux.just(docsProvider));
         listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this));
         verify(searchEngine, times(3)).addOrUpdate(any());
     }
@@ -51,8 +46,7 @@ class HaloDocumentEventsListenerTest {
     void shouldAddDocsWhenReceivingAddRequestEvent() {
         var searchEngine = mock(SearchEngine.class);
         when(searchEngine.available()).thenReturn(true);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
+        when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         var docs = List.of(new HaloDocument());
         listener.onApplicationEvent(new HaloDocumentAddRequestEvent(this, docs));
         verify(searchEngine).addOrUpdate(docs);
@@ -62,8 +56,7 @@ class HaloDocumentEventsListenerTest {
     void shouldDeleteDocsWhenReceivingDeleteRequestEvent() {
         var searchEngine = mock(SearchEngine.class);
         when(searchEngine.available()).thenReturn(true);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
+        when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         var docIds = List.of("1", "2", "3");
         listener.onApplicationEvent(new HaloDocumentDeleteRequestEvent(this, docIds));
         verify(searchEngine).deleteDocument(docIds);
@@ -73,12 +66,9 @@ class HaloDocumentEventsListenerTest {
     void shouldFailWhenSearchEngineIsUnavailable() {
         var searchEngine = mock(SearchEngine.class);
         when(searchEngine.available()).thenReturn(false);
-        when(extensionGetter.getEnabledExtension(SearchEngine.class))
-            .thenReturn(Mono.just(searchEngine));
+        when(extensionGetter.getEnabledExtension(SearchEngine.class)).thenReturn(Mono.just(searchEngine));
         assertThrows(
-            SearchEngineUnavailableException.class,
-            () -> listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this))
-        );
+                SearchEngineUnavailableException.class,
+                () -> listener.onApplicationEvent(new HaloDocumentRebuildRequestEvent(this)));
     }
-
 }

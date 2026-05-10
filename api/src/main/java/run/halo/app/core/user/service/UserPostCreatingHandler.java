@@ -19,5 +19,4 @@ public interface UserPostCreatingHandler extends ExtensionPoint {
      * @return {@code Mono.empty()} if handling successfully.
      */
     Mono<Void> postCreating(User user);
-
 }

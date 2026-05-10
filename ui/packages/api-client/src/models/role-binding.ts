@@ -24,7 +24,7 @@ import type { RoleRef } from './role-ref';
 import type { Subject } from './subject';
 
 /**
- * RoleBinding references a role, but does not contain it.  It can reference a Role in the global.  It adds who information via Subjects.
+ * RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who  information via Subjects.
  */
 export interface RoleBinding {
     'apiVersion': string;

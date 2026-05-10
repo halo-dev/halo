@@ -48,8 +48,7 @@ class PolicyEndpointTest {
 
     @BeforeEach
     void setUp() {
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build();
     }
 
     @Test
@@ -57,12 +56,14 @@ class PolicyEndpointTest {
         // Implement test logic here
         var policyScheme = Scheme.buildFromType(Policy.class);
         when(client.get(Policy.class, "fake-policy"))
-            .thenReturn(Mono.error(() -> new ExtensionNotFoundException(
-                policyScheme.groupVersionKind(), "fake-policy")
-            ));
-        webClient.get().uri("/policies/fake-policy/configs/fake-group")
-            .exchange()
-            .expectStatus().isNotFound();
+                .thenReturn(Mono.error(
+                        () -> new ExtensionNotFoundException(policyScheme.groupVersionKind(), "fake-policy")));
+        webClient
+                .get()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 
     @Test
@@ -74,14 +75,16 @@ class PolicyEndpointTest {
             return policy;
         }));
 
-        when(client.fetch(ConfigMap.class, "fake-config-map"))
-            .thenReturn(Mono.empty());
+        when(client.fetch(ConfigMap.class, "fake-config-map")).thenReturn(Mono.empty());
 
-        webClient.get().uri("/policies/fake-policy/configs/fake-group")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(String.class)
-            .isEqualTo("null");
+        webClient
+                .get()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .isEqualTo("null");
     }
 
     @Test
@@ -93,18 +96,20 @@ class PolicyEndpointTest {
             return policy;
         }));
 
-        when(client.fetch(ConfigMap.class, "fake-config-map"))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var cm = new ConfigMap();
-                cm.setData(new HashMap<>());
-                return cm;
-            }));
+        when(client.fetch(ConfigMap.class, "fake-config-map")).thenReturn(Mono.fromSupplier(() -> {
+            var cm = new ConfigMap();
+            cm.setData(new HashMap<>());
+            return cm;
+        }));
 
-        webClient.get().uri("/policies/fake-policy/configs/fake-group")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(String.class)
-            .isEqualTo("null");
+        webClient
+                .get()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .isEqualTo("null");
     }
 
     @Test
@@ -116,24 +121,26 @@ class PolicyEndpointTest {
             return policy;
         }));
 
-        when(client.fetch(ConfigMap.class, "fake-config-map"))
-            .thenReturn(Mono.fromSupplier(() -> {
-                var cm = new ConfigMap();
-                cm.setData(new HashMap<>());
-                cm.getData().put("fake-group", """
+        when(client.fetch(ConfigMap.class, "fake-config-map")).thenReturn(Mono.fromSupplier(() -> {
+            var cm = new ConfigMap();
+            cm.setData(new HashMap<>());
+            cm.getData().put("fake-group", """
                     {
                       "halo": "awesome"
                     }""");
-                return cm;
-            }));
+            return cm;
+        }));
 
-        webClient.get().uri("/policies/fake-policy/configs/fake-group")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.halo").isEqualTo("awesome");
+        webClient
+                .get()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.halo")
+                .isEqualTo("awesome");
     }
-
 
     @Test
     void shouldUpdateConfigIfPresent() {
@@ -153,8 +160,7 @@ class PolicyEndpointTest {
             {
               "halo": "awesome"
             }""");
-        when(client.fetch(ConfigMap.class, "fake-config-map"))
-            .thenReturn(Mono.just(cm));
+        when(client.fetch(ConfigMap.class, "fake-config-map")).thenReturn(Mono.just(cm));
 
         var tx = mock(ReactiveTransaction.class);
         when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
@@ -168,11 +174,14 @@ class PolicyEndpointTest {
               "key": "value"
             }""";
 
-        webClient.put().uri("/policies/fake-policy/configs/fake-group")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isNoContent();
+        webClient
+                .put()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         verify(client).<ConfigMap>update(assertArg(gotCm -> {
             var data = gotCm.getData();
@@ -185,7 +194,6 @@ class PolicyEndpointTest {
         var policy = new Policy();
         policy.setSpec(new Policy.PolicySpec());
         when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
-
 
         var tx = mock(ReactiveTransaction.class);
         when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
@@ -211,19 +219,22 @@ class PolicyEndpointTest {
               "key": "value"
             }""";
 
-        webClient.put().uri("/policies/fake-policy/configs/fake-group")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(body)
-            .exchange()
-            .expectStatus().isNoContent();
+        webClient
+                .put()
+                .uri("/policies/fake-policy/configs/fake-group")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         verify(client).<ConfigMap>create(assertArg(gotCm -> {
             var data = gotCm.getData();
             JSONAssert.assertEquals(body, data.get("fake-group"), true);
         }));
 
-        verify(client).<Policy>update(assertArg(
-            gotPolicy -> assertEquals("fake-config-map", gotPolicy.getSpec().getConfigMapName())
-        ));
+        verify(client)
+                .<Policy>update(assertArg(gotPolicy ->
+                        assertEquals("fake-config-map", gotPolicy.getSpec().getConfigMapName())));
     }
 }

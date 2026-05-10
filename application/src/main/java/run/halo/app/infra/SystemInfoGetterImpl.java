@@ -25,32 +25,31 @@ public class SystemInfoGetterImpl implements SystemInfoGetter {
     @Override
     public Mono<SystemInfo> get() {
         var systemInfo = new SystemInfo()
-            .setVersion(systemVersionSupplier.get())
-            .setUrl(getExternalUrl())
-            // TODO populate locale and timezone from system settings in the future
-            .setLocale(Locale.getDefault())
-            .setTimeZone(TimeZone.getDefault());
+                .setVersion(systemVersionSupplier.get())
+                .setUrl(getExternalUrl())
+                // TODO populate locale and timezone from system settings in the future
+                .setLocale(Locale.getDefault())
+                .setTimeZone(TimeZone.getDefault());
 
-        var basicMono =
-            environmentFetcher.fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class)
-                .doOnNext(basic -> systemInfo.setTitle(basic.getTitle())
-                    .setSubtitle(basic.getSubtitle())
-                    .setLogo(basic.getLogo())
-                    .setFavicon(basic.getFavicon())
-                );
+        var basicMono = environmentFetcher
+                .fetch(SystemSetting.Basic.GROUP, SystemSetting.Basic.class)
+                .doOnNext(basic -> systemInfo
+                        .setTitle(basic.getTitle())
+                        .setSubtitle(basic.getSubtitle())
+                        .setLogo(basic.getLogo())
+                        .setFavicon(basic.getFavicon()));
 
-        var seoMono = environmentFetcher.fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
-            .doOnNext(seo -> systemInfo.setSeo(new SystemInfo.SeoProp()
-                .setBlockSpiders(BooleanUtils.isTrue(seo.blockSpiders))
-                .setKeywords(seo.getKeywords())
-                .setDescription(seo.getDescription())
-            ));
+        var seoMono = environmentFetcher
+                .fetch(SystemSetting.Seo.GROUP, SystemSetting.Seo.class)
+                .doOnNext(seo -> systemInfo.setSeo(new SystemInfo.SeoProp()
+                        .setBlockSpiders(BooleanUtils.isTrue(seo.blockSpiders))
+                        .setKeywords(seo.getKeywords())
+                        .setDescription(seo.getDescription())));
 
-        var themeMono =
-            environmentFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
+        var themeMono = environmentFetcher
+                .fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
                 .doOnNext(theme -> systemInfo.setActivatedThemeName(theme.getActive()));
-        return Mono.when(basicMono, seoMono, themeMono)
-            .thenReturn(systemInfo);
+        return Mono.when(basicMono, seoMono, themeMono).thenReturn(systemInfo);
     }
 
     private URL getExternalUrl() {

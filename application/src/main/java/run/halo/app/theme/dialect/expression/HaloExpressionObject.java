@@ -20,12 +20,15 @@ public class HaloExpressionObject {
 
     /**
      * Checks if the current Halo version matches the specified SemVer constraint.
-     * <p>Examples:</p>
+     *
+     * <p>Examples:
+     *
      * <ul>
-     *   <li>{@code #halo.matchVersion('>=2.24.0')}</li>
-     *   <li>{@code #halo.matchVersion('>2.0.0 & <3.0.0')}</li>
+     *   <li>{@code #halo.matchVersion('>=2.24.0')}
+     *   <li>{@code #halo.matchVersion('>2.0.0 & <3.0.0')}
      * </ul>
-     * <p>Note: development version {@code 0.0.0} always returns {@code true}.</p>
+     *
+     * <p>Note: development version {@code 0.0.0} always returns {@code true}.
      *
      * @param constraint the SemVer expression string to check against
      * @return {@code true} if the current version satisfies the constraint

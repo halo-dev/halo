@@ -24,7 +24,7 @@ import type { PostSpec } from './post-spec';
 import type { PostStatus } from './post-status';
 
 /**
- * <p>Post extension.</p>
+ * Post extension.
  */
 export interface Post {
     'apiVersion': string;

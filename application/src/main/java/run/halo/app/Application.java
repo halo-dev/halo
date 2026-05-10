@@ -16,15 +16,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @date 2017-11-14
  */
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = "run.halo.app", exclude =
-    IntegrationAutoConfiguration.class)
+@SpringBootApplication(scanBasePackages = "run.halo.app", exclude = IntegrationAutoConfiguration.class)
 @ConfigurationPropertiesScan(basePackages = "run.halo.app.infra.properties")
 public class Application {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(Application.class)
-            .applicationStartup(new BufferingApplicationStartup(1024))
-            .run(args);
+                .applicationStartup(new BufferingApplicationStartup(1024))
+                .run(args);
     }
-
 }

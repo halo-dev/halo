@@ -16,5 +16,4 @@ public interface GlobalInfoService {
      * @return global info
      */
     Mono<GlobalInfo> getGlobalInfo();
-
 }

@@ -16,12 +16,13 @@ import run.halo.app.extension.Ref;
  * @since 2.0.0
  */
 @Builder
-public record ContentRequest(@Schema(requiredMode = REQUIRED) Ref subjectRef,
-                             String headSnapshotName,
-                             @Schema(requiredMode = NOT_REQUIRED) Long version,
-                             @Schema(requiredMode = REQUIRED) String raw,
-                             @Schema(requiredMode = REQUIRED) String content,
-                             @Schema(requiredMode = REQUIRED) String rawType) {
+public record ContentRequest(
+        @Schema(requiredMode = REQUIRED) Ref subjectRef,
+        String headSnapshotName,
+        @Schema(requiredMode = NOT_REQUIRED) Long version,
+        @Schema(requiredMode = REQUIRED) String raw,
+        @Schema(requiredMode = REQUIRED) String content,
+        @Schema(requiredMode = REQUIRED) String rawType) {
 
     public Snapshot toSnapshot() {
         final Snapshot snapshot = new Snapshot();

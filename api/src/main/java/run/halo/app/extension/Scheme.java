@@ -18,11 +18,12 @@ import run.halo.app.extension.exception.ExtensionException;
  * @param openApiSchema is JSON schema of Extension.
  * @author johnniang
  */
-public record Scheme(Class<? extends Extension> type,
-                     GroupVersionKind groupVersionKind,
-                     String plural,
-                     String singular,
-                     ObjectNode openApiSchema) {
+public record Scheme(
+        Class<? extends Extension> type,
+        GroupVersionKind groupVersionKind,
+        String plural,
+        String singular,
+        ObjectNode openApiSchema) {
     public Scheme {
         Assert.notNull(type, "Type of Extension must not be null");
         Assert.notNull(groupVersionKind, "GroupVersionKind of Extension must not be null");
@@ -48,15 +49,15 @@ public record Scheme(Class<? extends Extension> type,
         var mapper = Json.mapper();
         var schema = (ObjectNode) mapper.valueToTree(resolvedSchema.schema);
         // for schema validation.
-        schema.set("components",
-            mapper.valueToTree(Map.of("schemas", resolvedSchema.referencedSchemas)));
+        schema.set("components", mapper.valueToTree(Map.of("schemas", resolvedSchema.referencedSchemas)));
 
-        return new Scheme(type,
-            new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind()),
-            gvk.plural(),
-            gvk.singular(),
-            // Deep copy for schema to avoid mutation by others.
-            schema.deepCopy());
+        return new Scheme(
+                type,
+                new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind()),
+                gvk.plural(),
+                gvk.singular(),
+                // Deep copy for schema to avoid mutation by others.
+                schema.deepCopy());
     }
 
     /**
@@ -68,8 +69,7 @@ public record Scheme(Class<? extends Extension> type,
      */
     public static GVK getGvkFromType(Class<? extends Extension> type) {
         var gvk = type.getAnnotation(GVK.class);
-        Assert.notNull(gvk,
-            "Missing annotation " + GVK.class.getName() + " on type " + type.getName());
+        Assert.notNull(gvk, "Missing annotation " + GVK.class.getName() + " on type " + type.getName());
         return gvk;
     }
 

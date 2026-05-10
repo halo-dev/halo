@@ -15,43 +15,36 @@ import run.halo.app.infra.ui.WebSocketUtils;
  * @since 2.0.0
  */
 public class RequestInfoFactory {
-    public static final RequestInfoFactory INSTANCE =
-        new RequestInfoFactory(Set.of("api", "apis"), Set.of("api"));
+    public static final RequestInfoFactory INSTANCE = new RequestInfoFactory(Set.of("api", "apis"), Set.of("api"));
 
-    /**
-     * without leading and trailing slashes.
-     */
+    /** without leading and trailing slashes. */
     final Set<String> apiPrefixes;
 
-    /**
-     * without leading and trailing slashes.
-     */
+    /** without leading and trailing slashes. */
     final Set<String> grouplessApiPrefixes;
 
-    /**
-     * special verbs no subresources.
-     */
+    /** special verbs no subresources. */
     final Set<String> specialVerbs;
 
     public RequestInfoFactory(Set<String> apiPrefixes, Set<String> grouplessApiPrefixes) {
         this(apiPrefixes, grouplessApiPrefixes, Set.of("proxy", "watch"));
     }
 
-    public RequestInfoFactory(Set<String> apiPrefixes, Set<String> grouplessApiPrefixes,
-        Set<String> specialVerbs) {
+    public RequestInfoFactory(Set<String> apiPrefixes, Set<String> grouplessApiPrefixes, Set<String> specialVerbs) {
         this.apiPrefixes = apiPrefixes;
         this.grouplessApiPrefixes = grouplessApiPrefixes;
         this.specialVerbs = specialVerbs;
     }
 
     /**
-     * <p>newRequestInfo returns the information from the http request.  If error is not occurred,
-     * RequestInfo holds the information as best it is known before the failure
-     * It handles both resource and non-resource requests and fills in all the pertinent
-     * information.</p>
-     * <p>for each.</p>
-     * Valid Inputs:
-     * <p>Resource paths</p>
+     * newRequestInfo returns the information from the http request. If error is not occurred, RequestInfo holds the
+     * information as best it is known before the failure It handles both resource and non-resource requests and fills
+     * in all the pertinent information.
+     *
+     * <p>for each. Valid Inputs:
+     *
+     * <p>Resource paths
+     *
      * <pre>
      * /apis/{api-group}/{version}/namespaces
      * /api/{version}/namespaces
@@ -63,19 +56,23 @@ public class RequestInfoFactory {
      * /api/{version}/{resource}
      * /api/{version}/{resource}/{resourceName}
      * </pre>
-     * <p>Special verbs without subresources:</p>
+     *
+     * <p>Special verbs without subresources:
+     *
      * <pre>
      * /api/{version}/proxy/{resource}/{resourceName}
      * /api/{version}/proxy/namespaces/{namespace}/{resource}/{resourceName}
      * </pre>
      *
-     * <p>Special verbs with subresources:</p>
+     * <p>Special verbs with subresources:
+     *
      * <pre>
      * /api/{version}/watch/{resource}
      * /api/{version}/watch/namespaces/{namespace}/{resource}
      * </pre>
      *
-     * <p>NonResource paths:</p>
+     * <p>NonResource paths:
+     *
      * <pre>
      * /apis/{api-group}/{version}
      * /apis/{api-group}
@@ -92,7 +89,7 @@ public class RequestInfoFactory {
         // non-resource request default
         PathContainer path = request.getPath().pathWithinApplication();
         RequestInfo requestInfo =
-            new RequestInfo(false, path.value(), request.getMethod().name().toLowerCase());
+                new RequestInfo(false, path.value(), request.getMethod().name().toLowerCase());
 
         String[] currentParts = splitPath(path.value());
 
@@ -127,8 +124,7 @@ public class RequestInfoFactory {
         if (specialVerbs.contains(currentParts[0])) {
             if (currentParts.length < 2) {
                 throw new IllegalArgumentException(
-                    String.format("unable to determine kind and namespace from url, %s",
-                        request.getPath()));
+                        String.format("unable to determine kind and namespace from url, %s", request.getPath()));
             }
             requestInfo.verb = currentParts[0];
             currentParts = Arrays.copyOfRange(currentParts, 1, currentParts.length);
@@ -175,8 +171,7 @@ public class RequestInfoFactory {
         requestInfo.parts = currentParts;
         // special verbs no subresources
         // parts look like: resource/resourceName/subresource/other/stuff/we/don't/interpret
-        if (requestInfo.parts.length >= 3 && !specialVerbs.contains(
-            requestInfo.verb)) {
+        if (requestInfo.parts.length >= 3 && !specialVerbs.contains(requestInfo.verb)) {
             requestInfo.subresource = requestInfo.parts[2];
             // if there is another step after the subresource name and it is not a known
             if (requestInfo.parts.length >= 4) {
@@ -193,8 +188,9 @@ public class RequestInfoFactory {
         }
 
         // has name and no subresource but verb=create, then this is a non-resource request
-        if (StringUtils.isNotBlank(requestInfo.name) && StringUtils.isBlank(requestInfo.subresource)
-            && "create".equals(requestInfo.verb)) {
+        if (StringUtils.isNotBlank(requestInfo.name)
+                && StringUtils.isBlank(requestInfo.subresource)
+                && "create".equals(requestInfo.verb)) {
             requestInfo.isResourceRequest = false;
         }
 
@@ -216,8 +212,7 @@ public class RequestInfoFactory {
                 requestInfo.verb = "deletecollection";
             }
         }
-        if ("list".equals(requestInfo.verb)
-            && WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
+        if ("list".equals(requestInfo.verb) && WebSocketUtils.isWebSocketUpgrade(request.getHeaders())) {
             requestInfo.verb = "watch";
         }
         return requestInfo;

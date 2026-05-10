@@ -7,7 +7,8 @@ import org.springframework.web.server.ServerWebExchange;
 
 public interface DeviceCookieResolver {
 
-    @Nullable HttpCookie resolveCookie(ServerWebExchange exchange);
+    @Nullable
+    HttpCookie resolveCookie(ServerWebExchange exchange);
 
     void setCookie(ServerWebExchange exchange, String value);
 

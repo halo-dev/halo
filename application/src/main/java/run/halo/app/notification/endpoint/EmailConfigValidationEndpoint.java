@@ -51,63 +51,55 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "NotifierV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST("/notifiers/default-email-notifier/verify-connection",
-                this::verifyEmailSenderConfig,
-                builder -> builder.operationId("VerifyEmailSenderConfig")
-                    .description("Verify email sender config.")
-                    .tag(tag)
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .implementation(ValidationRequest.class)
-                    )
-                    .response(responseBuilder().implementation(Void.class))
-            )
-            .build();
+                .POST(
+                        "/notifiers/default-email-notifier/verify-connection",
+                        this::verifyEmailSenderConfig,
+                        builder -> builder.operationId("VerifyEmailSenderConfig")
+                                .description("Verify email sender config.")
+                                .tag(tag)
+                                .requestBody(
+                                        requestBodyBuilder().required(true).implementation(ValidationRequest.class))
+                                .response(responseBuilder().implementation(Void.class)))
+                .build();
     }
 
     private Mono<ServerResponse> verifyEmailSenderConfig(ServerRequest request) {
         return request.bodyToMono(ValidationRequest.class)
-            .switchIfEmpty(
-                Mono.error(new ServerWebInputException("Required request body is missing."))
-            )
-            .flatMap(validationRequest -> getCurrentUserEmail()
-                .flatMap(recipient -> {
+                .switchIfEmpty(Mono.error(new ServerWebInputException("Required request body is missing.")))
+                .flatMap(validationRequest -> getCurrentUserEmail().flatMap(recipient -> {
                     var mailSender = emailSenderHelper.createJavaMailSender(validationRequest);
-                    var message = emailSenderHelper.createMimeMessagePreparator(validationRequest,
-                        recipient, EMAIL_SUBJECT, EMAIL_BODY, EMAIL_BODY);
+                    var message = emailSenderHelper.createMimeMessagePreparator(
+                            validationRequest, recipient, EMAIL_SUBJECT, EMAIL_BODY, EMAIL_BODY);
                     try {
                         mailSender.send(message);
                     } catch (MailException e) {
-                        String errorMsg =
-                            "Failed to send email, please check your email configuration.";
+                        String errorMsg = "Failed to send email, please check your email configuration.";
                         log.error(errorMsg, e);
                         throw new ServerWebInputException(errorMsg, null, e);
                     }
                     return ServerResponse.ok().build();
-                })
-            );
+                }));
     }
 
     Mono<String> getCurrentUserEmail() {
         return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName)
-            .flatMap(username -> client.fetch(User.class, username))
-            .flatMap(user -> {
-                var email = user.getSpec().getEmail();
-                if (StringUtils.isBlank(email)) {
-                    return Mono.error(new ServerWebInputException(
-                        "Your email is missing, please set it in your profile."));
-                }
-                return Mono.just(email);
-            });
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .flatMap(username -> client.fetch(User.class, username))
+                .flatMap(user -> {
+                    var email = user.getSpec().getEmail();
+                    if (StringUtils.isBlank(email)) {
+                        return Mono.error(
+                                new ServerWebInputException("Your email is missing, please set it in your profile."));
+                    }
+                    return Mono.just(email);
+                });
     }
 
     @Data
     @EqualsAndHashCode(callSuper = true)
     @Schema(name = "EmailConfigValidationRequest")
-    static class ValidationRequest extends EmailSenderHelper.EmailSenderConfig {
-    }
+    static class ValidationRequest extends EmailSenderHelper.EmailSenderConfig {}
 
     @Override
     public GroupVersion groupVersion() {

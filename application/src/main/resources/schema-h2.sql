@@ -1,7 +1,8 @@
-create table if not exists extensions
-(
-    name    varchar(255) not null,
-    data    blob,
-    version bigint,
-    primary key (name)
-);
+CREATE
+    TABLE
+        IF NOT EXISTS extensions(
+            name VARCHAR(255) NOT NULL,
+            DATA BLOB,
+            version BIGINT,
+            PRIMARY KEY(name)
+        );
