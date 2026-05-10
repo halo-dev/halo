@@ -86,16 +86,16 @@ a, .btn-primary, .button-primary, .highlight {
     border-color: #a84722 !important;
 }
 
-/* 导航栏强制砖红色 */
-header,
-.site-header,
-.header,
-#header,
-.navbar,
-.nav-bar,
-.top-header,
-.site-top,
-.header-wrap,
+/* ====================== 导航栏强制砖红色 ====================== */
+header, 
+.site-header, 
+.header, 
+#header, 
+.navbar, 
+.nav-bar, 
+.top-header, 
+.site-top, 
+.header-wrap, 
 .nav-container,
 .main-header {
     background-color: #c45428 !important;
@@ -116,7 +116,14 @@ header a,
     color: #ffffff !important;
 }
 
-/* 悬浮写文章按钮 */
+/* 导航栏hover效果 */
+header a:hover,
+.site-header a:hover,
+.navbar a:hover {
+    color: #fceee6 !important;
+}
+
+/* ====================== 悬浮写文章按钮 ====================== */
 #float-write-btn {
   position: fixed;
   right: 30px;
@@ -141,11 +148,11 @@ header a,
   background: #a84722;
 }
 
-/* 顶部公告栏 */
+/* ====================== 顶部公告栏 ====================== */
 #top-notice-bar {
   width: 100%;
   background: #fceee6;
-  content: #c45428;
+  color: #c45428;
   text-align: center;
   padding: 10px 0;
   font-size: 14px;
@@ -161,7 +168,7 @@ header a,
   font-weight: bold;
 }
 
-/* 文章点赞 + 收藏按钮 */
+/* ====================== 文章点赞 + 收藏按钮 ====================== */
 .post-actions {
   display: flex;
   gap: 12px;
@@ -181,32 +188,96 @@ header a,
   background: #a84722;
   transform: scale(1.05);
 }
+
+/* ===================== 5号作业：导航栏搜索框 ===================== */
+.search-box {
+  position: relative;
+  width: 240px;
+  height: 36px;
+  margin-left: 15px;
+}
+.search-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 15px 0 35px;
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  outline: none;
+  font-size: 14px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+.search-input:focus {
+  border-color: #c45428;
+  box-shadow: 0 0 0 3px rgba(196,84,40,0.1);
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #999;
+}
+
+/* 手机端自动变小 */
+@media (max-width: 768px) {
+  .search-box {
+    width: 36px;
+    overflow: hidden;
+  }
+  .search-input {
+    opacity: 0;
+    width: 0;
+  }
+  .search-box:hover {
+    width: 160px;
+  }
+  .search-box:hover .search-input {
+    opacity: 1;
+    width: 100%;
+    padding: 0 15px 0 35px;
+  }
+}
 </style>
 
+<!-- 5号作业：搜索框 -->
+<div class="search-box">
+  <span class="search-icon">🔍</span>
+  <input type="text" class="search-input" placeholder="搜索文章...">
+</div>
+
+<!-- ✅ 悬浮写文章按钮（新标签打开，不跳仪表盘） -->
 <button id="float-write-btn" onclick="window.open('/console/#/editor/posts', '_blank')">✏️</button>
 
+<!-- 顶部公告栏 -->
 <div id="top-notice-bar">
   📢 校园博客欢迎你！分享学习、生活、趣事都可以投稿～
   <span id="close-notice" onclick="document.getElementById('top-notice-bar').style.display='none'">×</span>
 </div>
 
 <script>
+// 复制分享链接
 function copyLink() {
   navigator.clipboard.writeText(window.location.href).then(function() {
     alert('链接已复制！');
   });
 }
 
+// 点赞功能
 function likePost() {
   alert("点赞成功！感谢支持～");
 }
 
+// 收藏功能
 function collectPost() {
   alert("收藏成功！快去个人中心查看吧～");
 }
 
+// ✅ 适配你当前文章结构的渲染逻辑
 document.addEventListener('DOMContentLoaded', function() {
   const path = window.location.pathname;
+  // 匹配所有文章详情页路径
   if (path !== '/' && !path.includes('/category/') && !path.includes('/tag/')) {
     const actionDiv = document.createElement('div');
     actionDiv.className = 'post-actions';
@@ -214,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="like-btn" onclick="likePost()">❤️ 点赞</button>
       <button class="collect-btn" onclick="collectPost()">⭐ 收藏</button>
     `;
+    // 适配你当前的文章结构，插入到文章末尾、评论区之前
     const commentSection = document.querySelector('#comment');
     if (commentSection) {
       commentSection.before(actionDiv);
