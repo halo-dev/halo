@@ -1,12 +1,38 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
+  createSection,
+  help,
+  icon,
+  inner,
+  label,
+  message,
+  messages,
+  outer,
+  prefix,
+  suffix,
+  wrapper,
+} from "@formkit/inputs";
+import {
   coreApiClient,
   paginate,
   type Group,
   type GroupV1alpha1ApiListGroupRequest,
 } from "@halo-dev/api-client";
+import { defineAsyncComponent } from "vue";
 import { select } from "./select";
+import { SelectSection } from "./select/sections";
+
+const GroupSettingsButton = defineAsyncComponent(
+  () => import("./GroupSettingsButton.vue")
+);
+
+const GroupSettingsSuffix = createSection("GroupSettingsSuffix", () => ({
+  $cmp: "GroupSettingsButton",
+  props: {
+    context: "$node.context",
+  },
+}));
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
@@ -31,8 +57,27 @@ function optionsHandler(node: FormKitNode) {
 
 export const attachmentGroupSelect: FormKitTypeDefinition = {
   ...select,
+  schema: outer(
+    wrapper(
+      label("$label"),
+      inner(
+        icon("prefix"),
+        prefix(),
+        SelectSection(),
+        suffix(),
+        GroupSettingsSuffix()
+      )
+    ),
+    help("$help"),
+    messages(message("$message.value"))
+  ),
   forceTypeProp: "select",
   features: [optionsHandler],
+  library: {
+    ...select.library,
+    GroupSettingsButton,
+  },
+  schemaMemoKey: "custom-attachment-group-select",
 };
 
 declare module "@formkit/inputs" {

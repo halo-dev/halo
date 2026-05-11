@@ -94,6 +94,9 @@ const isSystemProtection = computed(() => {
 </script>
 <template>
   <VEntity :key="policy.metadata.name">
+    <template v-if="$slots.checkbox" #checkbox>
+      <slot name="checkbox" />
+    </template>
     <template #start>
       <VEntityField
         :title="policy.spec.displayName"
