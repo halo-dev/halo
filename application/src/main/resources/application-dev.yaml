@@ -25,6 +25,9 @@ halo:
   plugin:
     runtime-mode: development # development, deployment
   work-dir: ${user.home}/halo2-dev
+  uds:
+    enabled: false
+    path: ${halo.work-dir}/halo.sock
 logging:
   level:
     org.springframework.data.r2dbc: DEBUG

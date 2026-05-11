@@ -51,6 +51,9 @@ halo:
       - name: email
         href: /password-reset/email
         icon: /images/password-reset-methods/email.svg
+  uds:
+    enabled: false
+    path: ${halo.work-dir}/halo.sock
 
 springdoc:
   api-docs:
