@@ -10,6 +10,8 @@ overrides:
   vite: "catalog:"
   vitest: "catalog:"
 
+ignoreWorkspaceCycles: true
+
 peerDependencyRules:
   allowAny:
     - vite
