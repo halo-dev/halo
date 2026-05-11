@@ -104,6 +104,7 @@ onMounted(() => {
       :config="{ validationVisibility: 'submit' }"
       type="form"
       :actions="false"
+      ignore
       @submit="handleSave"
     >
       <FormKit
