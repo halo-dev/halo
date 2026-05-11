@@ -17,6 +17,19 @@ import { ExtensionImage } from "./index";
 
 const props = defineProps<NodeViewProps>();
 
+const updateAttrsSilently = (attrs: Record<string, unknown>) => {
+  const pos = props.getPos();
+  if (typeof pos !== "number") {
+    return;
+  }
+  const tr = props.editor.state.tr.setNodeMarkup(pos, undefined, {
+    ...props.node.attrs,
+    ...attrs,
+  });
+  tr.setMeta("addToHistory", false);
+  props.editor.view.dispatch(tr);
+};
+
 const src = computed({
   get: () => {
     return props.node?.attrs.src;
@@ -85,7 +98,7 @@ const handleUploadReady = async (file: File) => {
 
 const handleSetExternalLink = (attachment?: AttachmentSimple) => {
   if (!attachment) return;
-  props.updateAttributes({
+  updateAttrsSilently({
     src: attachment.url,
     alt: attachment.alt,
   });
@@ -109,7 +122,7 @@ const resetUpload = () => {
 
   const { file } = props.node.attrs;
   if (file) {
-    props.updateAttributes({
+    updateAttrsSilently({
       width: undefined,
       file: undefined,
     });
@@ -133,6 +146,10 @@ function onImageLoaded(event: Event) {
   if (target instanceof HTMLImageElement) {
     props.editor
       .chain()
+      .command(({ tr }) => {
+        tr.setMeta("addToHistory", false);
+        return true;
+      })
       .updateAttributes(ExtensionImage.name, {
         width: `${target.naturalWidth}px`,
       })

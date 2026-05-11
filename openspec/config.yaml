@@ -1,0 +1,31 @@
+schema: spec-driven
+
+# Shared context injected into ALL AI prompts.
+# Keep concise: tech stack, conventions, and architectural principles.
+# Broader coding standards and detailed guidelines go into AGENTS.md.
+context: |
+  Tech stack:
+    Backend: Java 21, Gradle (Groovy DSL), Spring Boot 4.x, WebFlux/Reactor, R2DBC
+    Frontend: Vue 3, TypeScript, Vite (vite-plus), pnpm workspaces, TailwindCSS
+    Monorepo: api, application, platform:application, platform:plugin, ui
+  Architecture:
+    Plugin-based (PF4J), extensible via Extension Points
+    Theme system with template rendering
+    API documented with SpringDoc / OpenAPI
+  Conventions:
+    Conventional Commits (feat, fix, chore, docs, build, refactor, test, style)
+    Backend formatting: Spotless (`./gradlew spotlessApply`)
+    Frontend checks: `pnpm lint`, `pnpm typecheck`, `pnpm test:unit`
+
+# Per-artifact rules — specific, actionable constraints.
+rules:
+  proposal:
+    - Evaluate impact on existing plugin/theme APIs for compatibility
+    - Database schema changes must include a migration strategy
+    - Security-related changes must assess auth/authorization impact
+    - UI changes must consider i18n support
+  tasks:
+    - Backend changes must pass `./gradlew spotlessCheck`
+    - Frontend changes must pass `pnpm lint` and `pnpm typecheck`
+    - API changes require updating OpenAPI docs and regenerating api-client
+    - New dependencies must be checked for license compatibility

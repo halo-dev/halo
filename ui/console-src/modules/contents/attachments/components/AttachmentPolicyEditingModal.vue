@@ -264,6 +264,7 @@ const modalTitle = props.policy
           :preserve="true"
           type="form"
           :config="{ validationVisibility: 'submit' }"
+          ignore
           @submit="handleSave"
         >
           <FormKit
