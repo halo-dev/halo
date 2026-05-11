@@ -7,9 +7,7 @@ package run.halo.app.plugin;
  * @since 2.0.0
  */
 public interface PluginConst {
-    /**
-     * Plugin metadata labels key.
-     */
+    /** Plugin metadata labels key. */
     String PLUGIN_NAME_LABEL_NAME = "plugin.halo.run/plugin-name";
 
     String SYSTEM_PLUGIN_NAME = "system";
@@ -25,5 +23,4 @@ public interface PluginConst {
     static String assetsRoutePrefix(String pluginName) {
         return "/plugins/" + pluginName + "/assets/";
     }
-
 }

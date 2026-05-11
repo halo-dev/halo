@@ -24,8 +24,7 @@ public class DefaultSchemeManager implements SchemeManager {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public DefaultSchemeManager(IndexEngine indexEngine,
-        ApplicationEventPublisher eventPublisher) {
+    public DefaultSchemeManager(IndexEngine indexEngine, ApplicationEventPublisher eventPublisher) {
         this.indexEngine = indexEngine;
         this.eventPublisher = eventPublisher;
         // we have to use CopyOnWriteArrayList at here to prevent concurrent modification between
@@ -34,8 +33,7 @@ public class DefaultSchemeManager implements SchemeManager {
     }
 
     @Override
-    public <E extends Extension> void register(Class<E> type,
-        Consumer<IndexSpecs<E>> specsConsumer) {
+    public <E extends Extension> void register(Class<E> type, Consumer<IndexSpecs<E>> specsConsumer) {
         var scheme = Scheme.buildFromType(type);
         if (schemes.contains(scheme)) {
             return;
@@ -73,8 +71,9 @@ public class DefaultSchemeManager implements SchemeManager {
 
         @Override
         public <K extends Comparable<K>> void add(ValueIndexSpec<E, K> indexSpec) {
-            Assert.isTrue(!specMap.containsKey(indexSpec.getName()),
-                "Index spec with name " + indexSpec.getName() + " already exists.");
+            Assert.isTrue(
+                    !specMap.containsKey(indexSpec.getName()),
+                    "Index spec with name " + indexSpec.getName() + " already exists.");
             this.specMap.put(indexSpec.getName(), indexSpec);
         }
 
@@ -82,6 +81,5 @@ public class DefaultSchemeManager implements SchemeManager {
         public List<ValueIndexSpec<E, ?>> getIndexSpecs() {
             return specMap.values().stream().toList();
         }
-
     }
 }

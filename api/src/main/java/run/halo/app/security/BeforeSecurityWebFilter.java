@@ -9,6 +9,4 @@ import org.springframework.web.server.WebFilter;
  * @author johnniang
  * @since 2.18
  */
-public interface BeforeSecurityWebFilter extends WebFilter, ExtensionPoint {
-
-}
+public interface BeforeSecurityWebFilter extends WebFilter, ExtensionPoint {}

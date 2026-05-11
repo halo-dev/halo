@@ -2,9 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -54,16 +52,15 @@ class SinglePageFinderImplTest {
         singlePage.getSpec().setDeleted(false);
         singlePage.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
         singlePage.setStatus(new SinglePage.SinglePageStatus());
-        when(client.get(eq(SinglePage.class), eq(fakePageName)))
-            .thenReturn(Mono.just(singlePage));
+        when(client.get(eq(SinglePage.class), eq(fakePageName))).thenReturn(Mono.just(singlePage));
 
-        when(singlePageConversionService.convertToVo(eq(singlePage)))
-            .thenReturn(Mono.just(mock(SinglePageVo.class)));
+        when(singlePageConversionService.convertToVo(eq(singlePage))).thenReturn(Mono.just(mock(SinglePageVo.class)));
 
-        singlePageFinder.getByName(fakePageName)
-            .as(StepVerifier::create)
-            .consumeNextWith(page -> assertThat(page).isNotNull())
-            .verifyComplete();
+        singlePageFinder
+                .getByName(fakePageName)
+                .as(StepVerifier::create)
+                .consumeNextWith(page -> assertThat(page).isNotNull())
+                .verifyComplete();
 
         verify(client).get(SinglePage.class, fakePageName);
     }

@@ -18,7 +18,7 @@
 import type { Metadata } from './metadata';
 
 /**
- * <p>ConfigMap holds configuration data to consume.</p>
+ * ConfigMap holds configuration data to consume.
  */
 export interface ConfigMap {
     'apiVersion': string;

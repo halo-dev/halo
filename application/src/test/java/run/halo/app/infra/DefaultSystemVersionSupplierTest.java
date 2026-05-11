@@ -19,7 +19,6 @@ import org.springframework.boot.info.BuildProperties;
  * @author guqing
  * @since 2.0.0
  */
-
 @ExtendWith(MockitoExtension.class)
 class DefaultSystemVersionSupplierTest {
 

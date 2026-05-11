@@ -7,10 +7,9 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
- * A fetcher that fetches the system configuration from the extension client.
- * If there are {@link ConfigMap}s named <code>system-default</code> and <code>system</code> at
- * the same time, the {@link ConfigMap} named system will be json merge patch to
- * {@link ConfigMap} named <code>system-default</code>
+ * A fetcher that fetches the system configuration from the extension client. If there are {@link ConfigMap}s named
+ * <code>system-default</code> and <code>system</code> at the same time, the {@link ConfigMap} named system will be json
+ * merge patch to {@link ConfigMap} named <code>system-default</code>
  *
  * @author guqing
  * @since 2.0.0
@@ -47,5 +46,4 @@ public interface SystemConfigFetcher {
      * @return latest configMap from {@link ReactiveExtensionClient} without any cache.
      */
     Optional<ConfigMap> getConfigMapBlocking();
-
 }

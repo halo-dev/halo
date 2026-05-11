@@ -28,31 +28,23 @@ class SessionConfiguration<S extends Session> {
 
     @Bean
     SpringSessionBackedReactiveSessionRegistry<S> reactiveSessionRegistry(
-        ReactiveSessionRepository<S> sessionRepository,
-        ReactiveFindByIndexNameSessionRepository<S> indexedSessionRepository
-    ) {
-        return new SpringSessionBackedReactiveSessionRegistry<>(
-            sessionRepository, indexedSessionRepository
-        );
+            ReactiveSessionRepository<S> sessionRepository,
+            ReactiveFindByIndexNameSessionRepository<S> indexedSessionRepository) {
+        return new SpringSessionBackedReactiveSessionRegistry<>(sessionRepository, indexedSessionRepository);
     }
 
     @Configuration
-    @ConditionalOnProperty(
-        value = "halo.session.store-type", havingValue = "in-memory", matchIfMissing = true
-    )
+    @ConditionalOnProperty(value = "halo.session.store-type", havingValue = "in-memory", matchIfMissing = true)
     static class InMemorySessionConfig {
 
         @Bean
         ReactiveIndexedSessionRepository<? extends Session> inMemorySessionRepository(
-            SessionProperties sessionProperties, ServerProperties serverProperties
-        ) {
-            var repository =
-                new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
+                SessionProperties sessionProperties, ServerProperties serverProperties) {
+            var repository = new InMemoryReactiveIndexedSessionRepository(new ConcurrentHashMap<>());
             var timeout = Optional.ofNullable(sessionProperties.getTimeout())
-                .orElseGet(() -> serverProperties.getReactive().getSession().getTimeout());
+                    .orElseGet(() -> serverProperties.getReactive().getSession().getTimeout());
             repository.setDefaultMaxInactiveInterval(timeout);
             return repository;
         }
-
     }
 }

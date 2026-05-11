@@ -15,11 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.User;
-import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.*;
 
 /**
  * Tests for {@link InitializationStateGetter}.
@@ -37,12 +33,12 @@ class InitializationStateGetterTest {
 
     @Test
     void userInitialized() {
-        when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.empty());
-        initializationStateGetter.userInitialized()
-            .as(StepVerifier::create)
-            .expectNext(false)
-            .verifyComplete();
+        when(client.listBy(eq(User.class), any(), any(PageRequest.class))).thenReturn(Mono.empty());
+        initializationStateGetter
+                .userInitialized()
+                .as(StepVerifier::create)
+                .expectNext(false)
+                .verifyComplete();
 
         User user = new User();
         user.setMetadata(new Metadata());
@@ -52,12 +48,12 @@ class InitializationStateGetterTest {
         user.getSpec().setDisplayName("fake-hidden-user");
         ListResult<User> listResult = new ListResult<>(List.of(user));
 
-        when(client.listBy(eq(User.class), any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(listResult));
-        initializationStateGetter.userInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+        when(client.listBy(eq(User.class), any(), any(PageRequest.class))).thenReturn(Mono.just(listResult));
+        initializationStateGetter
+                .userInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
     }
 
     @Test
@@ -67,17 +63,19 @@ class InitializationStateGetterTest {
         configMap.getMetadata().setName(SystemState.SYSTEM_STATES_CONFIGMAP);
         configMap.setData(Map.of("states", "{\"isSetup\":true}"));
         when(client.fetch(eq(ConfigMap.class), eq(SystemState.SYSTEM_STATES_CONFIGMAP)))
-            .thenReturn(Mono.just(configMap));
-        initializationStateGetter.dataInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+                .thenReturn(Mono.just(configMap));
+        initializationStateGetter
+                .dataInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
 
         // call again
-        initializationStateGetter.dataInitialized()
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .verifyComplete();
+        initializationStateGetter
+                .dataInitialized()
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .verifyComplete();
         // execute only once
         verify(client).fetch(eq(ConfigMap.class), eq(SystemState.SYSTEM_STATES_CONFIGMAP));
     }

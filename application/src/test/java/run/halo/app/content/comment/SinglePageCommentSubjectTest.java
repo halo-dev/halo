@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,24 +36,24 @@ class SinglePageCommentSubjectTest {
 
     @Test
     void get() {
-        when(client.fetch(eq(SinglePage.class), any()))
-            .thenReturn(Mono.empty());
+        when(client.fetch(eq(SinglePage.class), any())).thenReturn(Mono.empty());
 
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName("fake-single-page");
 
-        when(client.fetch(eq(SinglePage.class), eq("fake-single-page")))
-            .thenReturn(Mono.just(singlePage));
+        when(client.fetch(eq(SinglePage.class), eq("fake-single-page"))).thenReturn(Mono.just(singlePage));
 
-        singlePageCommentSubject.get("fake-single-page")
-            .as(StepVerifier::create)
-            .expectNext(singlePage)
-            .verifyComplete();
+        singlePageCommentSubject
+                .get("fake-single-page")
+                .as(StepVerifier::create)
+                .expectNext(singlePage)
+                .verifyComplete();
 
-        singlePageCommentSubject.get("fake-single-page-2")
-            .as(StepVerifier::create)
-            .verifyComplete();
+        singlePageCommentSubject
+                .get("fake-single-page-2")
+                .as(StepVerifier::create)
+                .verifyComplete();
 
         verify(client, times(1)).fetch(eq(SinglePage.class), eq("fake-single-page"));
     }
@@ -75,7 +73,6 @@ class SinglePageCommentSubjectTest {
         assertThat(supports).isFalse();
     }
 
-
     @Test
     void shouldSupportRefWithoutVersion() {
         var ref = new Ref();
@@ -84,5 +81,4 @@ class SinglePageCommentSubjectTest {
         ref.setKind(SinglePage.KIND);
         assertTrue(singlePageCommentSubject.supports(ref));
     }
-
 }

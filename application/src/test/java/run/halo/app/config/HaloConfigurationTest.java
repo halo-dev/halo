@@ -1,8 +1,6 @@
 package run.halo.app.config;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,8 +18,7 @@ class HaloConfigurationTest {
     class LuceneSearchEngineDisabled {
 
         @Test
-        void shouldNotCreateLuceneSearchEngineBean(
-            @Autowired ObjectProvider<SearchEngine> searchEngines) {
+        void shouldNotCreateLuceneSearchEngineBean(@Autowired ObjectProvider<SearchEngine> searchEngines) {
             var searchEngine = searchEngines.getIfAvailable();
             assertNull(searchEngine);
         }
@@ -33,12 +30,10 @@ class HaloConfigurationTest {
     class LuceneSearchEngineEnabled {
 
         @Test
-        void shouldCreateLuceneSearchEngineBean(
-            @Autowired ObjectProvider<SearchEngine> searchEngines) {
+        void shouldCreateLuceneSearchEngineBean(@Autowired ObjectProvider<SearchEngine> searchEngines) {
             var searchEngine = searchEngines.getIfAvailable();
             assertNotNull(searchEngine);
             assertInstanceOf(LuceneSearchEngine.class, searchEngine);
         }
     }
-
 }

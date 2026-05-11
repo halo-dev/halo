@@ -34,15 +34,14 @@ import run.halo.app.security.LoginHandlerEnhancer;
 class MapOAuth2AuthenticationFilter implements WebFilter {
 
     private static final String PRE_AUTHENTICATION =
-        MapOAuth2AuthenticationFilter.class.getName() + ".PRE_AUTHENTICATION";
+            MapOAuth2AuthenticationFilter.class.getName() + ".PRE_AUTHENTICATION";
 
     private final UserConnectionService connectionService;
 
     private final ServerSecurityContextRepository securityContextRepository;
 
     @Setter
-    private OAuth2AuthenticationTokenCache authenticationCache =
-        new WebSessionOAuth2AuthenticationTokenCache();
+    private OAuth2AuthenticationTokenCache authenticationCache = new WebSessionOAuth2AuthenticationTokenCache();
 
     private final ReactiveUserDetailsService userDetailsService;
 
@@ -53,14 +52,13 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     @Setter
-    private AuthenticationTrustResolver authenticationTrustResolver
-        = new AuthenticationTrustResolverImpl();
+    private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     public MapOAuth2AuthenticationFilter(
-        ServerSecurityContextRepository securityContextRepository,
-        UserConnectionService connectionService,
-        ReactiveUserDetailsService userDetailsService,
-        LoginHandlerEnhancer loginHandlerEnhancer) {
+            ServerSecurityContextRepository securityContextRepository,
+            UserConnectionService connectionService,
+            ReactiveUserDetailsService userDetailsService,
+            LoginHandlerEnhancer loginHandlerEnhancer) {
         this.connectionService = connectionService;
         this.securityContextRepository = securityContextRepository;
         this.userDetailsService = userDetailsService;
@@ -73,63 +71,55 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return ReactiveSecurityContextHolder.getContext()
-            .mapNotNull(SecurityContext::getAuthentication)
-            .filter(authenticationTrustResolver::isAuthenticated)
-            .doOnNext(
-                // cache the pre-authentication
-                authentication -> exchange.getAttributes().put(PRE_AUTHENTICATION, authentication)
-            )
-            .then(chain.filter(exchange))
-            .then(Mono.defer(() -> ReactiveSecurityContextHolder.getContext()
                 .mapNotNull(SecurityContext::getAuthentication)
-                .filter(OAuth2AuthenticationToken.class::isInstance)
-                .cast(OAuth2AuthenticationToken.class)
-                .flatMap(oauth2Token -> {
-                    var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
-                    var oauth2User = oauth2Token.getPrincipal();
-                    return connectionService.updateUserConnectionIfPresent(
-                            registrationId, oauth2User
-                        )
-                        .switchIfEmpty(Mono.defer(
-                            () -> Mono.justOrEmpty(exchange.getAttribute(PRE_AUTHENTICATION))
-                                .filter(Authentication.class::isInstance)
-                                .cast(Authentication.class)
-                                .filter(authenticationTrustResolver::isAuthenticated)
-                                .flatMap(preAuth -> connectionService.createUserConnection(
-                                    preAuth.getName(), registrationId, oauth2User
-                                )))
-                        )
-                        .switchIfEmpty(Mono.defer(() -> {
-                            // save the OAuth2Authentication into session
-                            return authenticationCache.saveToken(exchange, oauth2Token)
-                                .then(Mono.defer(() -> {
-                                    var webFilterExchange = new WebFilterExchange(exchange, chain);
-                                    // clear the security context
-                                    return logoutHandler.logout(webFilterExchange, oauth2Token);
-                                }))
-                                .then(Mono.defer(() -> redirectStrategy.sendRedirect(exchange,
-                                    URI.create("/login?oauth2_bind")
-                                )))
-                                // skip handling
-                                .then(Mono.empty());
-                        }))
-                        // user bound and remap the authentication
-                        .flatMap(connection ->
-                            userDetailsService.findByUsername(connection.getSpec().getUsername())
-                        )
-                        .map(userDetails -> authenticated(userDetails, oauth2Token))
-                        .flatMap(haloOAuth2Token -> {
-                            var securityContext = new SecurityContextImpl(haloOAuth2Token);
-                            return securityContextRepository.save(exchange, securityContext)
-                                .then(
-                                    loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token)
-                                );
-                            // because this happens after the filter, there is no need to
-                            // write SecurityContext to the context
-                        });
-                })
-                .then())
-            );
+                .filter(authenticationTrustResolver::isAuthenticated)
+                .doOnNext(
+                        // cache the pre-authentication
+                        authentication -> exchange.getAttributes().put(PRE_AUTHENTICATION, authentication))
+                .then(chain.filter(exchange))
+                .then(Mono.defer(() -> ReactiveSecurityContextHolder.getContext()
+                        .mapNotNull(SecurityContext::getAuthentication)
+                        .filter(OAuth2AuthenticationToken.class::isInstance)
+                        .cast(OAuth2AuthenticationToken.class)
+                        .flatMap(oauth2Token -> {
+                            var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
+                            var oauth2User = oauth2Token.getPrincipal();
+                            return connectionService
+                                    .updateUserConnectionIfPresent(registrationId, oauth2User)
+                                    .switchIfEmpty(Mono.defer(
+                                            () -> Mono.justOrEmpty(exchange.getAttribute(PRE_AUTHENTICATION))
+                                                    .filter(Authentication.class::isInstance)
+                                                    .cast(Authentication.class)
+                                                    .filter(authenticationTrustResolver::isAuthenticated)
+                                                    .flatMap(preAuth -> connectionService.createUserConnection(
+                                                            preAuth.getName(), registrationId, oauth2User))))
+                                    .switchIfEmpty(Mono.defer(() -> {
+                                        // save the OAuth2Authentication into session
+                                        return authenticationCache
+                                                .saveToken(exchange, oauth2Token)
+                                                .then(Mono.defer(() -> {
+                                                    var webFilterExchange = new WebFilterExchange(exchange, chain);
+                                                    // clear the security context
+                                                    return logoutHandler.logout(webFilterExchange, oauth2Token);
+                                                }))
+                                                .then(Mono.defer(() -> redirectStrategy.sendRedirect(
+                                                        exchange, URI.create("/login?oauth2_bind"))))
+                                                // skip handling
+                                                .then(Mono.empty());
+                                    }))
+                                    // user bound and remap the authentication
+                                    .flatMap(connection -> userDetailsService.findByUsername(
+                                            connection.getSpec().getUsername()))
+                                    .map(userDetails -> authenticated(userDetails, oauth2Token))
+                                    .flatMap(haloOAuth2Token -> {
+                                        var securityContext = new SecurityContextImpl(haloOAuth2Token);
+                                        return securityContextRepository
+                                                .save(exchange, securityContext)
+                                                .then(loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token));
+                                        // because this happens after the filter, there is no need to
+                                        // write SecurityContext to the context
+                                    });
+                        })
+                        .then()));
     }
-
 }

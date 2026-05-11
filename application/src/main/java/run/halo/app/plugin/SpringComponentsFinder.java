@@ -10,18 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.AbstractExtensionFinder;
-import org.pf4j.PluginManager;
-import org.pf4j.PluginState;
-import org.pf4j.PluginStateEvent;
-import org.pf4j.PluginWrapper;
+import org.pf4j.*;
 import org.pf4j.processor.ExtensionStorage;
 
 /**
- * <p>The spring component finder. it will read {@code META-INF/plugin-components.idx} file in
- * plugin to obtain the class name that needs to be registered in the plugin IOC.</p>
- * <p>Reading index files directly is much faster than dynamically scanning class components when
- * the plugin is enabled.</p>
+ * The spring component finder. it will read {@code META-INF/plugin-components.idx} file in plugin to obtain the class
+ * name that needs to be registered in the plugin IOC.
+ *
+ * <p>Reading index files directly is much faster than dynamically scanning class components when the plugin is enabled.
  *
  * @author guqing
  * @since 2.0.0
@@ -82,5 +78,4 @@ public class SpringComponentsFinder extends AbstractExtensionFinder {
             entries.computeIfAbsent(pluginId, id -> readPluginStorage(event.getPlugin()));
         }
     }
-
 }

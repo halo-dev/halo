@@ -28,8 +28,8 @@ public interface ExtensionStoreRepository extends R2dbcRepository<ExtensionStore
     Mono<Long> countByNameStartingWith(String prefix);
 
     /**
-     * <p>Finds all ExtensionStore by name in, the result no guarantee the same order as the given
-     * names, so if you want this, please order the result by yourself.</p>
+     * Finds all ExtensionStore by name in, the result no guarantee the same order as the given names, so if you want
+     * this, please order the result by yourself.
      *
      * @param names names to find
      * @return a flux of extension stores
@@ -37,6 +37,5 @@ public interface ExtensionStoreRepository extends R2dbcRepository<ExtensionStore
     Flux<ExtensionStore> findByNameIn(Collection<String> names);
 
     Flux<ExtensionStore> findAllByNameStartingWithAndNameGreaterThan(
-        String prefix, String nameCursor, Pageable pageable);
-
+            String prefix, String nameCursor, Pageable pageable);
 }

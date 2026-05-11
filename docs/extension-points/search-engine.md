@@ -33,7 +33,6 @@ Solr、MeiliSearch 或 ElasticSearch，需要通过插件来实现。
     }
   }
   ```
-
 - 删除文档示例如下所示
 
   ```java
@@ -47,7 +46,6 @@ Solr、MeiliSearch 或 ElasticSearch，需要通过插件来实现。
     }
   }
   ```
-
 - 重建索引示例如下所示：
 
   ```java
@@ -61,4 +59,4 @@ Solr、MeiliSearch 或 ElasticSearch，需要通过插件来实现。
 
   }
   ```
-  
+

@@ -1,8 +1,6 @@
 package run.halo.app.webfilter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +35,9 @@ class LocaleChangeWebFilterTest {
             return Mono.empty();
         };
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+                .accept(MediaType.TEXT_HTML)
+                .queryParam("language", "zh-CN")
+                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
@@ -53,11 +50,10 @@ class LocaleChangeWebFilterTest {
             return Mono.empty();
         };
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .cookie(new HttpCookie("language", "zh-HK"))
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+                .accept(MediaType.TEXT_HTML)
+                .cookie(new HttpCookie("language", "zh-HK"))
+                .queryParam("language", "zh-CN")
+                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
@@ -69,11 +65,10 @@ class LocaleChangeWebFilterTest {
             return Mono.empty();
         };
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .cookie(new HttpCookie("language", "zh-CN"))
-            .queryParam("language", "zh-CN")
-            .build()
-        );
+                .accept(MediaType.TEXT_HTML)
+                .cookie(new HttpCookie("language", "zh-CN"))
+                .queryParam("language", "zh-CN")
+                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
@@ -85,10 +80,9 @@ class LocaleChangeWebFilterTest {
             return Mono.empty();
         };
         var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/home")
-            .accept(MediaType.TEXT_HTML)
-            .queryParam("language", "invalid_language_tag")
-            .build()
-        );
+                .accept(MediaType.TEXT_HTML)
+                .queryParam("language", "invalid_language_tag")
+                .build());
         this.filter.filter(exchange, webFilterChain).block();
     }
 
@@ -106,21 +100,18 @@ class LocaleChangeWebFilterTest {
 
     static Stream<MockServerHttpRequest> provideInvalidRequest() {
         return Stream.of(
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.ALL)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.APPLICATION_JSON)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.post("/home")
-                .accept(MediaType.TEXT_HTML)
-                .queryParam("language", "zh-CN")
-                .build(),
-            MockServerHttpRequest.get("/home")
-                .accept(MediaType.TEXT_HTML)
-                .build()
-        );
+                MockServerHttpRequest.get("/home")
+                        .accept(MediaType.ALL)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.get("/home")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.post("/home")
+                        .accept(MediaType.TEXT_HTML)
+                        .queryParam("language", "zh-CN")
+                        .build(),
+                MockServerHttpRequest.get("/home").accept(MediaType.TEXT_HTML).build());
     }
 }

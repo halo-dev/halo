@@ -43,9 +43,6 @@ public class ReplyVo implements ExtensionVoOperator {
      */
     public static ReplyVo from(Reply reply) {
         Reply.ReplySpec spec = reply.getSpec();
-        return ReplyVo.builder()
-            .metadata(reply.getMetadata())
-            .spec(spec)
-            .build();
+        return ReplyVo.builder().metadata(reply.getMetadata()).spec(spec).build();
     }
 }

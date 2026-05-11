@@ -8,15 +8,13 @@ import run.halo.app.extension.ListOptions;
 public interface SubscriptionService {
 
     /**
-     * <p>List subscriptions by page one by one.only consume one page then next page will be
-     * loaded.</p>
-     * <p>Note that: result can not be used to delete the subscription, it is only used to query the
-     * subscription.</p>
+     * List subscriptions by page one by one.only consume one page then next page will be loaded.
+     *
+     * <p>Note that: result can not be used to delete the subscription, it is only used to query the subscription.
      */
     Flux<Subscription> listByPerPage(String reasonType);
 
-    Mono<Void> remove(Subscription.Subscriber subscriber,
-        Subscription.InterestReason interestReasons);
+    Mono<Void> remove(Subscription.Subscriber subscriber, Subscription.InterestReason interestReasons);
 
     Mono<Void> remove(Subscription.Subscriber subscriber);
 

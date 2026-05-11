@@ -15,25 +15,20 @@ import org.springframework.data.relational.core.mapping.Table;
 public class ExtensionStore {
 
     /**
-     * Extension store name, which is globally unique.
-     * We will use it to query Extensions by using left-like query clause.
+     * Extension store name, which is globally unique. We will use it to query Extensions by using left-like query
+     * clause.
      */
     @Id
     private String name;
 
-    /**
-     * Exactly Extension body, which might be base64 format.
-     */
+    /** Exactly Extension body, which might be base64 format. */
     private byte[] data;
 
-    /**
-     * This field only for serving optimistic lock value.
-     */
+    /** This field only for serving optimistic lock value. */
     @Version
     private Long version;
 
-    public ExtensionStore() {
-    }
+    public ExtensionStore() {}
 
     public ExtensionStore(String name, byte[] data) {
         this.name = name;

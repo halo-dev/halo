@@ -30,16 +30,15 @@ import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.infra.InitializationPhase;
 
 /**
- * Update counters after receiving visit event.
- * It will cache the count in memory for one minute and then batch update to the database.
+ * Update counters after receiving visit event. It will cache the count in memory for one minute and then batch update
+ * to the database.
  *
  * @author guqing
  * @since 2.0.0
  */
 @Slf4j
 @Component
-public class VisitedEventReconciler
-    implements Reconciler<VisitedEventReconciler.VisitCountBucket>, SmartLifecycle {
+public class VisitedEventReconciler implements Reconciler<VisitedEventReconciler.VisitCountBucket>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
@@ -61,23 +60,24 @@ public class VisitedEventReconciler
 
     private void createOrUpdateVisits(String name, Integer visits) {
         client.fetch(Counter.class, name)
-            .ifPresentOrElse(counter -> {
-                Integer existingVisit = ObjectUtils.defaultIfNull(counter.getVisit(), 0);
-                counter.setVisit(existingVisit + visits);
-                client.update(counter);
-            }, () -> {
-                Counter counter = Counter.emptyCounter(name);
-                counter.setVisit(visits);
-                client.create(counter);
-            });
+                .ifPresentOrElse(
+                        counter -> {
+                            Integer existingVisit = ObjectUtils.defaultIfNull(counter.getVisit(), 0);
+                            counter.setVisit(existingVisit + visits);
+                            client.update(counter);
+                        },
+                        () -> {
+                            Counter counter = Counter.emptyCounter(name);
+                            counter.setVisit(visits);
+                            client.create(counter);
+                        });
     }
 
-    /**
-     * Put the merged data into the queue every minute for updating to the database.
-     */
+    /** Put the merged data into the queue every minute for updating to the database. */
     @Scheduled(cron = "0 0/1 * * * ?")
     public void queuedVisitBucketTask() {
-        Iterator<Map.Entry<String, Integer>> iterator = pooledVisitsMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Integer>> iterator =
+                pooledVisitsMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, Integer> item = iterator.next();
             visitedEventQueue.addImmediately(new VisitCountBucket(item.getKey(), item.getValue()));
@@ -88,12 +88,12 @@ public class VisitedEventReconciler
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return new DefaultController<>(
-            this.getClass().getName(),
-            this,
-            visitedEventQueue,
-            null,
-            Duration.ofMillis(300),
-            Duration.ofMinutes(5));
+                this.getClass().getName(),
+                this,
+                visitedEventQueue,
+                null,
+                Duration.ofMillis(300),
+                Duration.ofMinutes(5));
     }
 
     @Override
@@ -106,7 +106,8 @@ public class VisitedEventReconciler
     public void stop() {
         log.debug("Persist visits to database before destroy...");
         try {
-            Iterator<Map.Entry<String, Integer>> iterator = pooledVisitsMap.entrySet().iterator();
+            Iterator<Map.Entry<String, Integer>> iterator =
+                    pooledVisitsMap.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Integer> item = iterator.next();
                 createOrUpdateVisits(item.getKey(), item.getValue());
@@ -129,8 +130,7 @@ public class VisitedEventReconciler
         return InitializationPhase.CONTROLLERS.getPhase();
     }
 
-    public record VisitCountBucket(String name, int visits) {
-    }
+    public record VisitCountBucket(String name, int visits) {}
 
     @Component
     @RequiredArgsConstructor
@@ -149,8 +149,7 @@ public class VisitedEventReconciler
                 log.debug("Skip visit event for: {}", gpn);
                 return;
             }
-            String counterName =
-                MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
+            String counterName = MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
             pooledVisitsMap.compute(counterName, (name, visits) -> {
                 if (visits == null) {
                     return 1;
@@ -162,20 +161,18 @@ public class VisitedEventReconciler
 
         private boolean checkVisitSubject(GroupPluralName groupPluralName) {
             Optional<Scheme> schemeOptional = schemeManager.schemes().stream()
-                .filter(scheme -> {
-                    GroupVersionKind gvk = scheme.groupVersionKind();
-                    return scheme.plural().equals(groupPluralName.plural())
-                        && gvk.group().equals(groupPluralName.group());
-                })
-                .findFirst();
-            return schemeOptional.map(
-                    scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
-                        .isPresent()
-                )
-                .orElse(false);
+                    .filter(scheme -> {
+                        GroupVersionKind gvk = scheme.groupVersionKind();
+                        return scheme.plural().equals(groupPluralName.plural())
+                                && gvk.group().equals(groupPluralName.group());
+                    })
+                    .findFirst();
+            return schemeOptional
+                    .map(scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
+                            .isPresent())
+                    .orElse(false);
         }
 
-        record GroupPluralName(String group, String plural, String name) {
-        }
+        record GroupPluralName(String group, String plural, String name) {}
     }
 }

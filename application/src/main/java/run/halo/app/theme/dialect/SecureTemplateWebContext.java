@@ -7,8 +7,8 @@ import org.thymeleaf.web.IWebExchange;
 
 /**
  * Secure template web context.
- * <p>It's used to prevent some dangerous variables such as {@link ApplicationContext} from being
- * accessed.
+ *
+ * <p>It's used to prevent some dangerous variables such as {@link ApplicationContext} from being accessed.
  *
  * @author guqing
  * @see SecureTemplateContext
@@ -17,9 +17,7 @@ import org.thymeleaf.web.IWebExchange;
 class SecureTemplateWebContext extends SecureTemplateContext implements IWebContext {
     private final IWebContext delegate;
 
-    /**
-     * The delegate must be an instance of IWebContext to create a SecureTemplateWebContext.
-     */
+    /** The delegate must be an instance of IWebContext to create a SecureTemplateWebContext. */
     public SecureTemplateWebContext(ITemplateContext delegate) {
         super(delegate);
         if (delegate instanceof IWebContext webContext) {

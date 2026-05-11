@@ -20,10 +20,8 @@ public interface RouteFactory {
     RouterFunction<ServerResponse> create(String pattern);
 
     default Mono<Integer> configuredPageSize(
-        SystemConfigFetcher environmentFetcher,
-        Function<SystemSetting.Post, Integer> mapper) {
-        return environmentFetcher.fetchPost()
-            .map(p -> defaultIfNull(mapper.apply(p), ModelConst.DEFAULT_PAGE_SIZE));
+            SystemConfigFetcher environmentFetcher, Function<SystemSetting.Post, Integer> mapper) {
+        return environmentFetcher.fetchPost().map(p -> defaultIfNull(mapper.apply(p), ModelConst.DEFAULT_PAGE_SIZE));
     }
 
     default int pageNumInPathVariable(ServerRequest request) {

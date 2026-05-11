@@ -22,80 +22,77 @@ class HaloServerRequestCacheTest {
 
     @Test
     void shouldNotSaveIfPageNotCacheable() {
-        var mockExchange =
-            MockServerWebExchange.from(MockServerHttpRequest.get("/login"));
-        requestCache.saveRequest(mockExchange)
-            .then(requestCache.getRedirectUri(mockExchange))
-            .as(StepVerifier::create)
-            .verifyComplete();
+        var mockExchange = MockServerWebExchange.from(MockServerHttpRequest.get("/login"));
+        requestCache
+                .saveRequest(mockExchange)
+                .then(requestCache.getRedirectUri(mockExchange))
+                .as(StepVerifier::create)
+                .verifyComplete();
     }
 
     @Test
     void shouldSaveIfPageCacheable() {
         var mockExchange = MockServerWebExchange.from(
-            MockServerHttpRequest.get("/archives")
-                .queryParam("q", "v")
-                .accept(MediaType.TEXT_HTML)
-        );
-        requestCache.saveRequest(mockExchange)
-            .then(requestCache.getRedirectUri(mockExchange))
-            .as(StepVerifier::create)
-            .expectNext(URI.create("/archives?q=v"))
-            .verifyComplete();
+                MockServerHttpRequest.get("/archives").queryParam("q", "v").accept(MediaType.TEXT_HTML));
+        requestCache
+                .saveRequest(mockExchange)
+                .then(requestCache.getRedirectUri(mockExchange))
+                .as(StepVerifier::create)
+                .expectNext(URI.create("/archives?q=v"))
+                .verifyComplete();
     }
 
     @Test
     void shouldSaveIfRedirectUriPresent() {
         var mockExchange = MockServerWebExchange.from(
-            MockServerHttpRequest.get("/login")
-                .queryParam("redirect_uri", "/halo?q=v#fragment")
-        );
-        requestCache.saveRequest(mockExchange)
-            .then(requestCache.getRedirectUri(mockExchange))
-            .as(StepVerifier::create)
-            .expectNext(URI.create("/halo?q=v#fragment"))
-            .verifyComplete();
+                MockServerHttpRequest.get("/login").queryParam("redirect_uri", "/halo?q=v#fragment"));
+        requestCache
+                .saveRequest(mockExchange)
+                .then(requestCache.getRedirectUri(mockExchange))
+                .as(StepVerifier::create)
+                .expectNext(URI.create("/halo?q=v#fragment"))
+                .verifyComplete();
     }
 
     @Test
     void shouldRemoveIfRedirectUriFound() {
         var sessionManager = new DefaultWebSessionManager();
-        var mockExchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/login")
-                .queryParam("redirect_uri", "/halo")
-            )
-            .sessionManager(sessionManager)
-            .build();
-        var removeExchange = mockExchange.mutate()
-            .request(builder -> builder.uri(URI.create("/halo")))
-            .build();
-        requestCache.saveRequest(mockExchange)
-            .then(Mono.defer(() -> requestCache.removeMatchingRequest(removeExchange)))
-            .as(StepVerifier::create)
-            .assertNext(request -> {
-                Assertions.assertEquals(URI.create("/halo"), request.getURI());
-            })
-            .verifyComplete();
+        var mockExchange = MockServerWebExchange.builder(
+                        MockServerHttpRequest.get("/login").queryParam("redirect_uri", "/halo"))
+                .sessionManager(sessionManager)
+                .build();
+        var removeExchange = mockExchange
+                .mutate()
+                .request(builder -> builder.uri(URI.create("/halo")))
+                .build();
+        requestCache
+                .saveRequest(mockExchange)
+                .then(Mono.defer(() -> requestCache.removeMatchingRequest(removeExchange)))
+                .as(StepVerifier::create)
+                .assertNext(request -> {
+                    Assertions.assertEquals(URI.create("/halo"), request.getURI());
+                })
+                .verifyComplete();
     }
 
     @Test
     void shouldRemoveIfRedirectUriFoundAndContainsFragment() {
         var sessionManager = new DefaultWebSessionManager();
-        var mockExchange =
-            MockServerWebExchange.builder(MockServerHttpRequest.get("/login")
-                    .queryParam("redirect_uri", "/halo#fragment")
-                )
+        var mockExchange = MockServerWebExchange.builder(
+                        MockServerHttpRequest.get("/login").queryParam("redirect_uri", "/halo#fragment"))
                 .sessionManager(sessionManager)
                 .build();
-        var removeExchange = mockExchange.mutate()
-            .request(builder -> builder.uri(URI.create("/halo")))
-            .build();
-        requestCache.saveRequest(mockExchange)
-            .then(Mono.defer(() -> requestCache.removeMatchingRequest(removeExchange)))
-            .as(StepVerifier::create)
-            .assertNext(request -> {
-                Assertions.assertEquals(URI.create("/halo"), request.getURI());
-            })
-            .verifyComplete();
+        var removeExchange = mockExchange
+                .mutate()
+                .request(builder -> builder.uri(URI.create("/halo")))
+                .build();
+        requestCache
+                .saveRequest(mockExchange)
+                .then(Mono.defer(() -> requestCache.removeMatchingRequest(removeExchange)))
+                .as(StepVerifier::create)
+                .assertNext(request -> {
+                    Assertions.assertEquals(URI.create("/halo"), request.getURI());
+                })
+                .verifyComplete();
     }
-
 }

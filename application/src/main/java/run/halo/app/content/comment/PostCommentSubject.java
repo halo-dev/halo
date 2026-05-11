@@ -30,19 +30,17 @@ public class PostCommentSubject implements CommentSubject<Post> {
 
     @Override
     public Mono<SubjectDisplay> getSubjectDisplay(String name) {
-        return get(name)
-            .map(post -> {
-                var url = externalLinkProcessor
-                    .processLink(post.getStatusOrDefault().getPermalink());
-                return new SubjectDisplay(post.getSpec().getTitle(), url, "文章");
-            });
+        return get(name).map(post -> {
+            var url =
+                    externalLinkProcessor.processLink(post.getStatusOrDefault().getPermalink());
+            return new SubjectDisplay(post.getSpec().getTitle(), url, "文章");
+        });
     }
 
     @Override
     public boolean supports(Ref ref) {
         Assert.notNull(ref, "Subject ref must not be null.");
         var gvk = Post.GVK;
-        return Objects.equals(gvk.group(), ref.getGroup())
-            && Objects.equals(gvk.kind(), ref.getKind());
+        return Objects.equals(gvk.group(), ref.getGroup()) && Objects.equals(gvk.kind(), ref.getKind());
     }
 }

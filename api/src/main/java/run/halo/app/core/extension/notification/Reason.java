@@ -4,28 +4,24 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIR
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.notification.ReasonAttributes;
 
 /**
- * <p>{@link Reason} is a custom extension that defines a reason for a notification, It represents
- * an instance of a {@link ReasonType}.</p>
- * <p>It can be understood as an event that triggers a notification.</p>
+ * {@link Reason} is a custom extension that defines a reason for a notification, It represents an instance of a
+ * {@link ReasonType}.
+ *
+ * <p>It can be understood as an event that triggers a notification.
  *
  * @author guqing
  * @since 2.10.0
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Reason", plural =
-    "reasons", singular = "reason")
+@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Reason", plural = "reasons", singular = "reason")
 public class Reason extends AbstractExtension {
 
     @Schema
@@ -44,8 +40,10 @@ public class Reason extends AbstractExtension {
         @Schema(requiredMode = REQUIRED)
         private String author;
 
-        @Schema(implementation = ReasonAttributes.class, requiredMode = NOT_REQUIRED,
-            description = "Attributes used to transfer data")
+        @Schema(
+                implementation = ReasonAttributes.class,
+                requiredMode = NOT_REQUIRED,
+                description = "Attributes used to transfer data")
         private ReasonAttributes attributes;
     }
 

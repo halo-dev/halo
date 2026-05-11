@@ -1,9 +1,6 @@
 package run.halo.app.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -19,11 +16,11 @@ class ListResultTest {
 
     @Test
     void generateGenericClass() {
-        var fakeListClass =
-            ListResult.generateGenericClass(Scheme.buildFromType(FakeExtension.class));
+        var fakeListClass = ListResult.generateGenericClass(Scheme.buildFromType(FakeExtension.class));
         assertTrue(ListResult.class.isAssignableFrom(fakeListClass));
-        assertSame(FakeExtension.class, ((ParameterizedType) fakeListClass.getGenericSuperclass())
-            .getActualTypeArguments()[0]);
+        assertSame(
+                FakeExtension.class,
+                ((ParameterizedType) fakeListClass.getGenericSuperclass()).getActualTypeArguments()[0]);
         assertEquals("FakeList", fakeListClass.getSimpleName());
     }
 
@@ -31,8 +28,9 @@ class ListResultTest {
     void generateGenericClassForClassParam() {
         var fakeListClass = ListResult.generateGenericClass(FakeExtension.class);
         assertTrue(ListResult.class.isAssignableFrom(fakeListClass));
-        assertSame(FakeExtension.class, ((ParameterizedType) fakeListClass.getGenericSuperclass())
-            .getActualTypeArguments()[0]);
+        assertSame(
+                FakeExtension.class,
+                ((ParameterizedType) fakeListClass.getGenericSuperclass()).getActualTypeArguments()[0]);
         assertEquals("FakeExtensionList", fakeListClass.getSimpleName());
     }
 
@@ -72,9 +70,7 @@ class ListResultTest {
     @Test
     void serializationTest() throws JsonProcessingException {
         var result = new ListResult<>(1, 10, 100, List.of("a", "b", "c"));
-        var json = JsonMapper.builder()
-            .build()
-            .writeValueAsString(result);
+        var json = JsonMapper.builder().build().writeValueAsString(result);
         JSONAssert.assertEquals("""
             {
               "page": 1,
@@ -114,10 +110,9 @@ class ListResultTest {
             }
             """;
         var result = JsonMapper.builder()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .build()
-            .readValue(json, new TypeReference<ListResult<String>>() {
-            });
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build()
+                .readValue(json, new TypeReference<ListResult<String>>() {});
         assertEquals(2, result.getPage());
         assertEquals(100, result.getTotal());
         assertEquals(10, result.getTotalPages());

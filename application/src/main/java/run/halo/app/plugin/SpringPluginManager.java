@@ -31,8 +31,7 @@ public interface SpringPluginManager extends PluginManager {
      * Get all dependents recursively.
      *
      * @param pluginId plugin id
-     * @return a list of plugin wrapper. The order of the list is from the farthest dependent to
-     * the nearest dependent.
+     * @return a list of plugin wrapper. The order of the list is from the farthest dependent to the nearest dependent.
      * @since 2.16.0
      */
     List<PluginWrapper> getDependents(String pluginId);
@@ -52,5 +51,4 @@ public interface SpringPluginManager extends PluginManager {
      * @return a list of really started plugins. Immutable.
      */
     List<PluginWrapper> startedPlugins();
-
 }

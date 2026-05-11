@@ -1,11 +1,6 @@
 package run.halo.app.extension.index;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -15,16 +10,15 @@ class MultiValueBuilderTest {
 
     @Test
     void throwIfNoNameProvided() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new MultiValueBuilder<FakeExtension, String>(null, String.class)
-        );
+        assertThrows(
+                IllegalArgumentException.class, () -> new MultiValueBuilder<FakeExtension, String>(null, String.class));
     }
 
     @Test
     void throwIfNoKeyTypeProvided() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new MultiValueBuilder<FakeExtension, String>("metadata.name", null)
-        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new MultiValueBuilder<FakeExtension, String>("metadata.name", null));
     }
 
     @Test
@@ -36,7 +30,7 @@ class MultiValueBuilderTest {
     @Test
     void shouldBuildCorrectly() {
         var builder = new MultiValueBuilder<FakeExtension, String>("metadata.name", String.class)
-            .indexFunc(e -> Collections.singleton(e.getMetadata().getName()));
+                .indexFunc(e -> Collections.singleton(e.getMetadata().getName()));
         var indexSpec = builder.build();
         assertNotNull(indexSpec);
         assertInstanceOf(MultiValueIndexSpec.class, indexSpec);
@@ -45,5 +39,4 @@ class MultiValueBuilderTest {
         assertFalse(indexSpec.isUnique());
         assertTrue(indexSpec.isNullable());
     }
-
 }

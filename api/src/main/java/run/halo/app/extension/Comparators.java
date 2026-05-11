@@ -7,8 +7,7 @@ public enum Comparators {
     ;
 
     public static <E extends Extension> Comparator<E> compareCreationTimestamp(boolean asc) {
-        var comparator =
-            Comparator.<E, Instant>comparing(e -> e.getMetadata().getCreationTimestamp());
+        var comparator = Comparator.<E, Instant>comparing(e -> e.getMetadata().getCreationTimestamp());
         return asc ? comparator : comparator.reversed();
     }
 
@@ -31,7 +30,7 @@ public enum Comparators {
      */
     public static Comparator<Object> nullsComparator(boolean isAscending) {
         return isAscending
-            ? org.springframework.util.comparator.Comparators.nullsHigh()
-            : org.springframework.util.comparator.Comparators.nullsLow();
+                ? org.springframework.util.comparator.Comparators.nullsHigh()
+                : org.springframework.util.comparator.Comparators.nullsLow();
     }
 }

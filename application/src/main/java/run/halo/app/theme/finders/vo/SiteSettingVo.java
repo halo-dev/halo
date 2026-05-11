@@ -20,32 +20,29 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Builder
 public record SiteSettingVo(
+        String title,
 
-    String title,
+        @With URL url,
 
-    @With URL url,
+        @With String version,
 
-    @With String version,
+        String subtitle,
 
-    String subtitle,
+        String logo,
 
-    String logo,
+        String favicon,
 
-    String favicon,
+        String language,
 
-    String language,
+        Boolean allowRegistration,
 
-    Boolean allowRegistration,
+        PostSetting post,
 
-    PostSetting post,
+        SeoSetting seo,
 
-    SeoSetting seo,
+        Routes routes,
 
-    Routes routes,
-
-    CommentSetting comment
-
-) {
+        CommentSetting comment) {
 
     /**
      * Convert to system {@link ConfigMap} to {@link SiteSettingVo}.
@@ -55,53 +52,51 @@ public record SiteSettingVo(
      */
     public static SiteSettingVo from(Map<String, String> data) {
         Assert.notNull(data, "Config data must not be null");
-        SystemSetting.Basic basicSetting =
-            toObject(data.get(SystemSetting.Basic.GROUP), SystemSetting.Basic.class);
+        SystemSetting.Basic basicSetting = toObject(data.get(SystemSetting.Basic.GROUP), SystemSetting.Basic.class);
 
-        SystemSetting.User userSetting =
-            toObject(data.get(SystemSetting.User.GROUP), SystemSetting.User.class);
+        SystemSetting.User userSetting = toObject(data.get(SystemSetting.User.GROUP), SystemSetting.User.class);
 
-        SystemSetting.Post postSetting =
-            toObject(data.get(SystemSetting.Post.GROUP), SystemSetting.Post.class);
+        SystemSetting.Post postSetting = toObject(data.get(SystemSetting.Post.GROUP), SystemSetting.Post.class);
 
-        SystemSetting.Seo seoSetting =
-            toObject(data.get(SystemSetting.Seo.GROUP), SystemSetting.Seo.class);
+        SystemSetting.Seo seoSetting = toObject(data.get(SystemSetting.Seo.GROUP), SystemSetting.Seo.class);
 
         var routeRules = toObject(data.get(ThemeRouteRules.GROUP), ThemeRouteRules.class);
 
-        SystemSetting.Comment commentSetting = toObject(data.get(SystemSetting.Comment.GROUP),
-            SystemSetting.Comment.class);
+        SystemSetting.Comment commentSetting =
+                toObject(data.get(SystemSetting.Comment.GROUP), SystemSetting.Comment.class);
         return builder()
-            .title(basicSetting.getTitle())
-            .subtitle(basicSetting.getSubtitle())
-            .logo(basicSetting.getLogo())
-            .favicon(basicSetting.getFavicon())
-            .allowRegistration(userSetting.isAllowRegistration())
-            .language(basicSetting.useSystemLocale().orElse(Locale.getDefault()).toLanguageTag())
-            .post(PostSetting.builder()
-                .postPageSize(postSetting.getPostPageSize())
-                .archivePageSize(postSetting.getArchivePageSize())
-                .categoryPageSize(postSetting.getCategoryPageSize())
-                .tagPageSize(postSetting.getTagPageSize())
-                .authorPageSize(postSetting.getAuthorPageSize())
-                .build())
-            .seo(SeoSetting.builder()
-                .blockSpiders(seoSetting.getBlockSpiders())
-                .keywords(seoSetting.getKeywords())
-                .description(seoSetting.getDescription())
-                .build())
-            .comment(CommentSetting.builder()
-                .enable(commentSetting.getEnable())
-                .requireReviewForNew(commentSetting.getRequireReviewForNew())
-                .systemUserOnly(commentSetting.getSystemUserOnly())
-                .build())
-            .routes(Routes.builder()
-                .categoriesUri(StringUtils.prependIfMissing(routeRules.getCategories(), "/"))
-                .tagsUri(StringUtils.prependIfMissing(routeRules.getTags(), "/"))
-                .archivesUri(StringUtils.prependIfMissing(routeRules.getArchives(), "/"))
-                .build()
-            )
-            .build();
+                .title(basicSetting.getTitle())
+                .subtitle(basicSetting.getSubtitle())
+                .logo(basicSetting.getLogo())
+                .favicon(basicSetting.getFavicon())
+                .allowRegistration(userSetting.isAllowRegistration())
+                .language(basicSetting
+                        .useSystemLocale()
+                        .orElse(Locale.getDefault())
+                        .toLanguageTag())
+                .post(PostSetting.builder()
+                        .postPageSize(postSetting.getPostPageSize())
+                        .archivePageSize(postSetting.getArchivePageSize())
+                        .categoryPageSize(postSetting.getCategoryPageSize())
+                        .tagPageSize(postSetting.getTagPageSize())
+                        .authorPageSize(postSetting.getAuthorPageSize())
+                        .build())
+                .seo(SeoSetting.builder()
+                        .blockSpiders(seoSetting.getBlockSpiders())
+                        .keywords(seoSetting.getKeywords())
+                        .description(seoSetting.getDescription())
+                        .build())
+                .comment(CommentSetting.builder()
+                        .enable(commentSetting.getEnable())
+                        .requireReviewForNew(commentSetting.getRequireReviewForNew())
+                        .systemUserOnly(commentSetting.getSystemUserOnly())
+                        .build())
+                .routes(Routes.builder()
+                        .categoriesUri(StringUtils.prependIfMissing(routeRules.getCategories(), "/"))
+                        .tagsUri(StringUtils.prependIfMissing(routeRules.getTags(), "/"))
+                        .archivesUri(StringUtils.prependIfMissing(routeRules.getArchives(), "/"))
+                        .build())
+                .build();
     }
 
     private static <T> T toObject(String json, Class<T> type) {
@@ -114,35 +109,18 @@ public record SiteSettingVo(
 
     @Builder
     public record PostSetting(
-        Integer postPageSize,
-        Integer archivePageSize,
-        Integer categoryPageSize,
-        Integer tagPageSize,
-        Integer authorPageSize
-    ) {
-    }
+            Integer postPageSize,
+            Integer archivePageSize,
+            Integer categoryPageSize,
+            Integer tagPageSize,
+            Integer authorPageSize) {}
 
     @Builder
-    public record SeoSetting(
-        Boolean blockSpiders,
-        String keywords,
-        String description
-    ) {
-    }
+    public record SeoSetting(Boolean blockSpiders, String keywords, String description) {}
 
     @Builder
-    public record CommentSetting(
-        Boolean enable,
-        Boolean systemUserOnly,
-        Boolean requireReviewForNew
-    ) {
-    }
+    public record CommentSetting(Boolean enable, Boolean systemUserOnly, Boolean requireReviewForNew) {}
 
     @Builder
-    public record Routes(
-        String categoriesUri,
-        String tagsUri,
-        String archivesUri
-    ) {
-    }
+    public record Routes(String categoriesUri, String tagsUri, String archivesUri) {}
 }

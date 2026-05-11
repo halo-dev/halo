@@ -17,7 +17,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.notification.EmailSenderHelper.EmailSenderConfig;
 
 /**
- * <p>A notifier that can send email.</p>
+ * A notifier that can send email.
  *
  * @author guqing
  * @see ReactiveNotifier
@@ -32,14 +32,13 @@ public class EmailNotifier implements ReactiveNotifier {
     private final SubscriberEmailResolver subscriberEmailResolver;
     private final NotificationTemplateRender notificationTemplateRender;
     private final EmailSenderHelper emailSenderHelper;
-    private final AtomicReference<Pair<EmailSenderConfig, JavaMailSender>>
-        emailSenderConfigPairRef = new AtomicReference<>();
+    private final AtomicReference<Pair<EmailSenderConfig, JavaMailSender>> emailSenderConfigPairRef =
+            new AtomicReference<>();
 
     @Override
     public Mono<Void> notify(NotificationContext context) {
         JsonNode senderConfig = context.getSenderConfig();
-        var emailSenderConfig =
-            JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
+        var emailSenderConfig = JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
 
         if (!emailSenderConfig.isEnable()) {
             log.debug("Email notifier is disabled, skip sending email.");
@@ -52,49 +51,46 @@ public class EmailNotifier implements ReactiveNotifier {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(recipient);
         var payload = context.getMessage().getPayload();
-        return subscriberEmailResolver.resolve(subscriber)
-            .flatMap(toEmail -> {
-                if (StringUtils.isBlank(toEmail)) {
-                    log.debug("Cannot resolve email for subscriber: [{}], skip sending email.",
-                        subscriber);
-                    return Mono.empty();
-                }
-                var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
-                    .doOnNext(footer -> {
+        return subscriberEmailResolver
+                .resolve(subscriber)
+                .flatMap(toEmail -> {
+                    if (StringUtils.isBlank(toEmail)) {
+                        log.debug("Cannot resolve email for subscriber: [{}], skip sending email.", subscriber);
+                        return Mono.empty();
+                    }
+                    var htmlMono = appendHtmlBodyFooter(payload.getAttributes()).doOnNext(footer -> {
                         if (StringUtils.isNotBlank(payload.getHtmlBody())) {
                             payload.setHtmlBody(payload.getHtmlBody() + "\n" + footer);
                         }
                     });
-                var rawMono = appendRawBodyFooter(payload.getAttributes())
-                    .doOnNext(footer -> {
+                    var rawMono = appendRawBodyFooter(payload.getAttributes()).doOnNext(footer -> {
                         if (StringUtils.isNotBlank(payload.getRawBody())) {
                             payload.setRawBody(payload.getRawBody() + "\n" + footer);
                         }
                     });
-                return Mono.when(htmlMono, rawMono)
-                    .thenReturn(toEmail);
-            })
-            .map(toEmail -> getMimeMessagePreparator(toEmail, emailSenderConfig, payload))
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(javaMailSender::send)
-            .then();
+                    return Mono.when(htmlMono, rawMono).thenReturn(toEmail);
+                })
+                .map(toEmail -> getMimeMessagePreparator(toEmail, emailSenderConfig, payload))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(javaMailSender::send)
+                .then();
     }
 
-    private MimeMessagePreparator getMimeMessagePreparator(String toEmail,
-        EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
-        return emailSenderHelper.createMimeMessagePreparator(emailSenderConfig, toEmail,
-            payload.getTitle(),
-            payload.getRawBody(), payload.getHtmlBody());
+    private MimeMessagePreparator getMimeMessagePreparator(
+            String toEmail, EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
+        return emailSenderHelper.createMimeMessagePreparator(
+                emailSenderConfig, toEmail, payload.getTitle(), payload.getRawBody(), payload.getHtmlBody());
     }
 
     JavaMailSender getJavaMailSender(EmailSenderConfig emailSenderConfig) {
-        return emailSenderConfigPairRef.updateAndGet(pair -> {
-            if (pair != null && pair.getFirst().equals(emailSenderConfig)) {
-                return pair;
-            }
-            return Pair.of(emailSenderConfig,
-                emailSenderHelper.createJavaMailSender(emailSenderConfig));
-        }).getSecond();
+        return emailSenderConfigPairRef
+                .updateAndGet(pair -> {
+                    if (pair != null && pair.getFirst().equals(emailSenderConfig)) {
+                        return pair;
+                    }
+                    return Pair.of(emailSenderConfig, emailSenderHelper.createJavaMailSender(emailSenderConfig));
+                })
+                .getSecond();
     }
 
     Mono<String> appendRawBodyFooter(ReasonAttributes attributes) {

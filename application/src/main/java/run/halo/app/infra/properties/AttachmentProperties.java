@@ -21,38 +21,26 @@ public class AttachmentProperties {
     @Data
     public static class ThumbnailProperties {
 
-        /**
-         * Whether to disable thumbnail generation.
-         */
+        /** Whether to disable thumbnail generation. */
         private boolean disabled;
 
-        /**
-         * The concurrent threads for thumbnail generation.
-         */
+        /** The concurrent threads for thumbnail generation. */
         @Min(1)
         private Integer concurrentThreads;
 
-        /**
-         * The quality of generated thumbnails, value between 0.0 and 1.0.
-         */
+        /** The quality of generated thumbnails, value between 0.0 and 1.0. */
         @PositiveOrZero
         @Max(1)
         private Double quality;
-
     }
 
     @Data
     public static class ResourceMapping {
 
-        /**
-         * Like: {@code /upload/**}.
-         */
+        /** Like: {@code /upload/**}. */
         private String pathPattern;
 
-        /**
-         * The location is a relative path to attachments folder in working directory.
-         */
+        /** The location is a relative path to attachments folder in working directory. */
         private List<String> locations;
-
     }
 }

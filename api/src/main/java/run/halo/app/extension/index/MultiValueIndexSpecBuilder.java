@@ -13,7 +13,7 @@ import run.halo.app.extension.Extension;
  * @since 2.22.0
  */
 public interface MultiValueIndexSpecBuilder<E extends Extension, K extends Comparable<K>>
-    extends IndexSpecBuilder<E, K, MultiValueIndexSpecBuilder<E, K>> {
+        extends IndexSpecBuilder<E, K, MultiValueIndexSpecBuilder<E, K>> {
 
     /**
      * Sets the index function.
@@ -22,5 +22,4 @@ public interface MultiValueIndexSpecBuilder<E extends Extension, K extends Compa
      * @return the builder itself
      */
     MultiValueIndexSpecBuilder<E, K> indexFunc(Function<E, Set<K>> indexFunc);
-
 }

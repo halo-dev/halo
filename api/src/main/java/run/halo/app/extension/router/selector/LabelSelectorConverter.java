@@ -17,7 +17,8 @@ public class LabelSelectorConverter implements Converter<SelectorCriteria, Label
                 return Queries.labelEqual(criteria.key(), getSingleValue(criteria));
             }
             case NotEquals -> {
-                return Queries.labelEqual(criteria.key(), getSingleValue(criteria)).not();
+                return Queries.labelEqual(criteria.key(), getSingleValue(criteria))
+                        .not();
             }
             case NotExist -> {
                 return Queries.labelExists(criteria.key()).not();
@@ -28,8 +29,7 @@ public class LabelSelectorConverter implements Converter<SelectorCriteria, Label
             case IN -> {
                 return Queries.labelIn(criteria.key(), defaultIfNull(criteria.values(), Set.of()));
             }
-            default ->
-                throw new IllegalArgumentException("Unsupported operator: " + criteria.operator());
+            default -> throw new IllegalArgumentException("Unsupported operator: " + criteria.operator());
         }
     }
 

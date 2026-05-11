@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>A default implementation of {@link EmailSenderHelper}.</p>
+ * A default implementation of {@link EmailSenderHelper}.
  *
  * @author guqing
  * @since 2.14.0
@@ -50,11 +50,10 @@ public class EmailSenderHelperImpl implements EmailSenderHelper {
     }
 
     @Override
-    public MimeMessagePreparator createMimeMessagePreparator(EmailSenderConfig senderConfig,
-        String toEmail, String subject, String raw, String html) {
+    public MimeMessagePreparator createMimeMessagePreparator(
+            EmailSenderConfig senderConfig, String toEmail, String subject, String raw, String html) {
         return mimeMessage -> {
-            MimeMessageHelper helper =
-                new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setFrom(senderConfig.getSender(), senderConfig.getDisplayName());
 
             helper.setSubject(subject);

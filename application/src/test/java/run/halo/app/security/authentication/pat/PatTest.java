@@ -25,16 +25,17 @@ class PatTest {
         var spec = requestPat.getSpec();
         spec.setRoles(List.of("super-role"));
         spec.setName("Fake PAT");
-        webClient.post()
-            .uri("/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens")
-            .bodyValue(requestPat)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(PersonalAccessToken.class)
-            .value(pat -> {
-                var annotations = pat.getMetadata().getAnnotations();
-                assertTrue(annotations.containsKey("security.halo.run/access-token"));
-            });
+        webClient
+                .post()
+                .uri("/apis/uc.api.security.halo.run/v1alpha1/personalaccesstokens")
+                .bodyValue(requestPat)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(PersonalAccessToken.class)
+                .value(pat -> {
+                    var annotations = pat.getMetadata().getAnnotations();
+                    assertTrue(annotations.containsKey("security.halo.run/access-token"));
+                });
     }
-
 }

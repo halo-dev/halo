@@ -24,35 +24,32 @@ public class DefaultViewNameResolver implements ViewNameResolver {
     private final ThymeleafProperties thymeleafProperties;
 
     /**
-     * Resolves view name.
-     * If the {@param #name} cannot be resolved to the view, the {@param #defaultName} is returned.
+     * Resolves view name. If the {@param #name} cannot be resolved to the view, the {@param #defaultName} is returned.
      */
     @Override
-    public Mono<String> resolveViewNameOrDefault(ServerWebExchange exchange, String name,
-        String defaultName) {
+    public Mono<String> resolveViewNameOrDefault(ServerWebExchange exchange, String name, String defaultName) {
         if (StringUtils.isBlank(name)) {
             return Mono.justOrEmpty(defaultName);
         }
-        return themeResolver.getTheme(exchange)
-            .mapNotNull(themeContext -> {
-                String templateResourceName = computeResourceName(name);
-                var resourcePath = themeContext.getPath()
-                    .resolve(TEMPLATES)
-                    .resolve(templateResourceName);
-                return Files.exists(resourcePath) ? name : defaultName;
-            })
-            .switchIfEmpty(Mono.justOrEmpty(defaultName));
+        return themeResolver
+                .getTheme(exchange)
+                .mapNotNull(themeContext -> {
+                    String templateResourceName = computeResourceName(name);
+                    var resourcePath = themeContext.getPath().resolve(TEMPLATES).resolve(templateResourceName);
+                    return Files.exists(resourcePath) ? name : defaultName;
+                })
+                .switchIfEmpty(Mono.justOrEmpty(defaultName));
     }
 
     @Override
-    public Mono<String> resolveViewNameOrDefault(ServerRequest request, String name,
-        String defaultName) {
+    public Mono<String> resolveViewNameOrDefault(ServerRequest request, String name, String defaultName) {
         return resolveViewNameOrDefault(request.exchange(), name, defaultName);
     }
 
     String computeResourceName(String name) {
         Assert.notNull(name, "Name must not be null");
         return StringUtils.endsWith(name, thymeleafProperties.getSuffix())
-            ? name : name + thymeleafProperties.getSuffix();
+                ? name
+                : name + thymeleafProperties.getSuffix();
     }
 }

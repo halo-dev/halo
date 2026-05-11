@@ -19,8 +19,11 @@ public class EmailVerificationFailed extends ServerWebInputException {
         super(reason, null, cause);
     }
 
-    public EmailVerificationFailed(String reason, @Nullable Throwable cause,
-        @Nullable String messageDetailCode, Object @Nullable [] messageDetailArguments) {
+    public EmailVerificationFailed(
+            String reason,
+            @Nullable Throwable cause,
+            @Nullable String messageDetailCode,
+            Object @Nullable [] messageDetailArguments) {
         super(reason, null, cause, messageDetailCode, messageDetailArguments);
     }
 }

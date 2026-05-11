@@ -36,12 +36,11 @@ public class PostCounterReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var extension = new Counter();
-        return builder
-            .extension(extension)
-            .syncAllListOptions(ListOptions.builder()
-                .andQuery(startsWith("metadata.name", MeterUtils.nameOf(Post.class, "")))
-                .build())
-            .build();
+        return builder.extension(extension)
+                .syncAllListOptions(ListOptions.builder()
+                        .andQuery(startsWith("metadata.name", MeterUtils.nameOf(Post.class, "")))
+                        .build())
+                .build();
     }
 
     static boolean isSameAsPost(String name) {

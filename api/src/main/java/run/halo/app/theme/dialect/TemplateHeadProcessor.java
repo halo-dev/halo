@@ -8,9 +8,10 @@ import reactor.core.publisher.Mono;
 
 /**
  * Theme template <code>head</code> tag snippet injection processor.
- * <p>Head processor is processed order by {@link org.springframework.core.annotation.Order}
- * annotation, Higher order will be processed first and so that low-priority processor can be
- * overwritten head tag written by high-priority processor.</p>
+ *
+ * <p>Head processor is processed order by {@link org.springframework.core.annotation.Order} annotation, Higher order
+ * will be processed first and so that low-priority processor can be overwritten head tag written by high-priority
+ * processor.
  *
  * @author guqing
  * @since 2.0.0
@@ -18,6 +19,5 @@ import reactor.core.publisher.Mono;
 @FunctionalInterface
 public interface TemplateHeadProcessor extends ExtensionPoint {
 
-    Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler);
+    Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler);
 }

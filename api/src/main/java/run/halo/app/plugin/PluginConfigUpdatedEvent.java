@@ -9,10 +9,11 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
 
 /**
- * <p>Event that is triggered when the {@link ConfigMap } represented by
- * {@link Plugin.PluginSpec#getConfigMapName()} in the {@link Plugin} is updated.</p>
- * <p>has two properties, oldConfig and newConfig, which represent the {@link ConfigMap#getData()}
- * property value of the {@link ConfigMap}.</p>
+ * Event that is triggered when the {@link ConfigMap } represented by {@link Plugin.PluginSpec#getConfigMapName()} in
+ * the {@link Plugin} is updated.
+ *
+ * <p>has two properties, oldConfig and newConfig, which represent the {@link ConfigMap#getData()} property value of the
+ * {@link ConfigMap}.
  *
  * @author guqing
  * @since 2.17.0
@@ -36,24 +37,19 @@ public class PluginConfigUpdatedEvent extends ApplicationEvent {
     @Deprecated(forRemoval = true, since = "2.23.0")
     private final Map<String, JsonNode> newConfig;
 
-    /**
-     * Old setting values.
-     */
+    /** Old setting values. */
     private final Map<String, tools.jackson.databind.JsonNode> oldSettingValues;
 
-    /**
-     * New setting values.
-     */
+    /** New setting values. */
     private final Map<String, tools.jackson.databind.JsonNode> newSettingValues;
 
     @Builder
     public PluginConfigUpdatedEvent(
-        Object source,
-        Map<String, JsonNode> oldConfig,
-        Map<String, JsonNode> newConfig,
-        Map<String, tools.jackson.databind.JsonNode> oldSettingValues,
-        Map<String, tools.jackson.databind.JsonNode> newSettingValues
-    ) {
+            Object source,
+            Map<String, JsonNode> oldConfig,
+            Map<String, JsonNode> newConfig,
+            Map<String, tools.jackson.databind.JsonNode> oldSettingValues,
+            Map<String, tools.jackson.databind.JsonNode> newSettingValues) {
         super(source);
         this.oldConfig = oldConfig;
         this.newConfig = newConfig;

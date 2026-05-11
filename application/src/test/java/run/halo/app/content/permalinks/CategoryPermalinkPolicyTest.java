@@ -33,8 +33,7 @@ class CategoryPermalinkPolicyTest {
 
     @BeforeEach
     void setUp() {
-        categoryPermalinkPolicy =
-            new CategoryPermalinkPolicy(externalUrlSupplier, environmentFetcher);
+        categoryPermalinkPolicy = new CategoryPermalinkPolicy(externalUrlSupplier, environmentFetcher);
     }
 
     @Test

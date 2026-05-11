@@ -28,24 +28,24 @@ class ThemeMessageResolutionUtilsTest {
     @Test
     void resolveMessagesForTemplateForDefault() throws URISyntaxException {
         Map<String, String> properties =
-            ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.CHINESE, getTheme());
-        assertThat(properties).isEqualTo(Map.of("index.welcome", "欢迎来到首页",
-            "title", "来自 i18n/zh.properties 的标题"));
+                ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.CHINESE, getTheme());
+        assertThat(properties).isEqualTo(Map.of("index.welcome", "欢迎来到首页", "title", "来自 i18n/zh.properties 的标题"));
     }
 
     @Test
     void resolveMessagesForTemplateForEnglish() throws URISyntaxException {
         Map<String, String> properties =
-            ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.ENGLISH, getTheme());
-        assertThat(properties).isEqualTo(Map.of("index.welcome", "Welcome to the index",
-            "title", "这是来自 i18n/default.properties 的标题"));
+                ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.ENGLISH, getTheme());
+        assertThat(properties)
+                .isEqualTo(
+                        Map.of("index.welcome", "Welcome to the index", "title", "这是来自 i18n/default.properties 的标题"));
     }
 
     ThemeContext getTheme() throws URISyntaxException {
         return ThemeContext.builder()
-            .name("default")
-            .path(Path.of(defaultThemeUrl.toURI()))
-            .active(true)
-            .build();
+                .name("default")
+                .path(Path.of(defaultThemeUrl.toURI()))
+                .active(true)
+                .build();
     }
 }

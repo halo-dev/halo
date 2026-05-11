@@ -3,10 +3,7 @@ package run.halo.app.content;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static run.halo.app.core.extension.content.Post.PostPhase.PENDING_APPROVAL;
 import static run.halo.app.core.extension.content.SinglePage.PUBLISHED_LABEL;
-import static run.halo.app.extension.index.query.Queries.contains;
-import static run.halo.app.extension.index.query.Queries.equal;
-import static run.halo.app.extension.index.query.Queries.in;
-import static run.halo.app.extension.index.query.Queries.or;
+import static run.halo.app.extension.index.query.Queries.*;
 import static run.halo.app.extension.router.QueryParamBuildUtil.sortParameter;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -38,37 +35,35 @@ public class SinglePageQuery extends SortableRequest {
         var builder = ListOptions.builder(super.toListOptions());
 
         Optional.ofNullable(queryParams.getFirst("keyword"))
-            .filter(StringUtils::isNotBlank)
-            .ifPresent(keyword -> builder.andQuery(or(
-                contains("spec.title", keyword),
-                contains("spec.slug", keyword),
-                contains("status.excerpt", keyword)
-            )));
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(keyword -> builder.andQuery(or(
+                        contains("spec.title", keyword),
+                        contains("spec.slug", keyword),
+                        contains("status.excerpt", keyword))));
 
         Optional.ofNullable(queryParams.getFirst("publishPhase"))
-            .filter(StringUtils::isNotBlank)
-            .map(Post.PostPhase::from)
-            .ifPresent(phase -> {
-                if (PENDING_APPROVAL.equals(phase)) {
-                    builder.andQuery(equal("status.phase", phase.name()));
-                }
-                var labelSelector = builder.labelSelector();
-                Optional.of(phase)
-                    .filter(Post.PostPhase.PUBLISHED::equals)
-                    .ifPresentOrElse(
-                        published -> labelSelector.eq(PUBLISHED_LABEL, Boolean.TRUE.toString()),
-                        () -> labelSelector.notEq(PUBLISHED_LABEL, Boolean.TRUE.toString())
-                    );
-            });
+                .filter(StringUtils::isNotBlank)
+                .map(Post.PostPhase::from)
+                .ifPresent(phase -> {
+                    if (PENDING_APPROVAL.equals(phase)) {
+                        builder.andQuery(equal("status.phase", phase.name()));
+                    }
+                    var labelSelector = builder.labelSelector();
+                    Optional.of(phase)
+                            .filter(Post.PostPhase.PUBLISHED::equals)
+                            .ifPresentOrElse(
+                                    published -> labelSelector.eq(PUBLISHED_LABEL, Boolean.TRUE.toString()),
+                                    () -> labelSelector.notEq(PUBLISHED_LABEL, Boolean.TRUE.toString()));
+                });
 
         Optional.ofNullable(queryParams.getFirst("visible"))
-            .filter(StringUtils::isNotBlank)
-            .map(Post.VisibleEnum::from)
-            .ifPresent(visible -> builder.andQuery(equal("spec.visible", visible.name())));
+                .filter(StringUtils::isNotBlank)
+                .map(Post.VisibleEnum::from)
+                .ifPresent(visible -> builder.andQuery(equal("spec.visible", visible.name())));
 
         Optional.ofNullable(queryParams.get("contributor"))
-            .filter(contributors -> !contributors.isEmpty())
-            .ifPresent(contributors -> builder.andQuery(in("status.contributors", contributors)));
+                .filter(contributors -> !contributors.isEmpty())
+                .ifPresent(contributors -> builder.andQuery(in("status.contributors", contributors)));
 
         return builder.build();
     }
@@ -77,45 +72,45 @@ public class SinglePageQuery extends SortableRequest {
     public Sort getSort() {
         var sort = super.getSort();
         var orders = sort.stream()
-            .map(order -> {
-                if ("creationTimestamp".equals(order.getProperty())) {
-                    return order.withProperty("metadata.creationTimestamp");
-                }
-                if ("publishTime".equals(order.getProperty())) {
-                    return order.withProperty("spec.publishTime");
-                }
-                return order;
-            })
-            .toList();
+                .map(order -> {
+                    if ("creationTimestamp".equals(order.getProperty())) {
+                        return order.withProperty("metadata.creationTimestamp");
+                    }
+                    if ("publishTime".equals(order.getProperty())) {
+                        return order.withProperty("spec.publishTime");
+                    }
+                    return order;
+                })
+                .toList();
         return Sort.by(orders);
     }
 
     public static void buildParameters(Builder builder) {
         IListRequest.buildParameters(builder);
         builder.parameter(sortParameter())
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("contributor")
-                .description("SinglePages filtered by contributor.")
-                .implementationArray(String.class)
-                .required(false))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("publishPhase")
-                .description("SinglePages filtered by publish phase.")
-                .implementation(Post.PostPhase.class)
-                .required(false))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("visible")
-                .description("SinglePages filtered by visibility.")
-                .implementation(Post.VisibleEnum.class)
-                .required(false))
-            .parameter(parameterBuilder()
-                .in(ParameterIn.QUERY)
-                .name("keyword")
-                .description("SinglePages filtered by keyword.")
-                .implementation(String.class)
-                .required(false));
+                .parameter(parameterBuilder()
+                        .in(ParameterIn.QUERY)
+                        .name("contributor")
+                        .description("SinglePages filtered by contributor.")
+                        .implementationArray(String.class)
+                        .required(false))
+                .parameter(parameterBuilder()
+                        .in(ParameterIn.QUERY)
+                        .name("publishPhase")
+                        .description("SinglePages filtered by publish phase.")
+                        .implementation(Post.PostPhase.class)
+                        .required(false))
+                .parameter(parameterBuilder()
+                        .in(ParameterIn.QUERY)
+                        .name("visible")
+                        .description("SinglePages filtered by visibility.")
+                        .implementation(Post.VisibleEnum.class)
+                        .required(false))
+                .parameter(parameterBuilder()
+                        .in(ParameterIn.QUERY)
+                        .name("keyword")
+                        .description("SinglePages filtered by keyword.")
+                        .implementation(String.class)
+                        .required(false));
     }
 }

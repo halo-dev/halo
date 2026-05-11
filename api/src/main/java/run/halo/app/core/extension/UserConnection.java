@@ -18,8 +18,12 @@ import run.halo.app.extension.Metadata;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "auth.halo.run", version = "v1alpha1", kind = "UserConnection",
-    singular = "userconnection", plural = "userconnections")
+@GVK(
+        group = "auth.halo.run",
+        version = "v1alpha1",
+        kind = "UserConnection",
+        singular = "userconnection",
+        plural = "userconnections")
 public class UserConnection extends AbstractExtension {
 
     @Schema(requiredMode = REQUIRED)
@@ -28,29 +32,19 @@ public class UserConnection extends AbstractExtension {
     @Data
     public static class UserConnectionSpec {
 
-        /**
-         * The name of the OAuth provider (e.g. Google, Facebook, Twitter).
-         */
+        /** The name of the OAuth provider (e.g. Google, Facebook, Twitter). */
         @Schema(requiredMode = REQUIRED)
         private String registrationId;
 
-        /**
-         * The {@link Metadata#getName()} of the user associated with the OAuth connection.
-         */
+        /** The {@link Metadata#getName()} of the user associated with the OAuth connection. */
         @Schema(requiredMode = REQUIRED)
         private String username;
 
-        /**
-         * The unique identifier for the user's connection to the OAuth provider.
-         * for example, the user's GitHub id.
-         */
+        /** The unique identifier for the user's connection to the OAuth provider. for example, the user's GitHub id. */
         @Schema(requiredMode = REQUIRED)
         private String providerUserId;
 
-        /**
-         * The time when the user connection was last updated.
-         */
+        /** The time when the user connection was last updated. */
         private Instant updatedAt;
-
     }
 }

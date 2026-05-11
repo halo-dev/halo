@@ -18,46 +18,33 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class PluginProperties {
     public static final String GRADLE_LIBS_DIR = "build/libs";
 
-    /**
-     * Auto start plugin when main app is ready.
-     */
+    /** Auto start plugin when main app is ready. */
     private boolean autoStartPlugin = true;
 
     /**
-     * The default plugin path is obtained through file scanning.
-     * In the development mode, you can specify the plugin path as the project directory.
+     * The default plugin path is obtained through file scanning. In the development mode, you can specify the plugin
+     * path as the project directory.
      */
     private List<Path> fixedPluginPath = new ArrayList<>();
 
-    /**
-     * Plugins disabled by default.
-     */
+    /** Plugins disabled by default. */
     private String[] disabledPlugins = new String[0];
 
-    /**
-     * Plugins enabled by default, prior to `disabledPlugins`.
-     */
+    /** Plugins enabled by default, prior to `disabledPlugins`. */
     private String[] enabledPlugins = new String[0];
 
     /**
-     * Set to true to allow requires expression to be exactly x.y.z. The default is false, meaning
-     * that using an exact version x.y.z will implicitly mean the same as >=x.y.z.
+     * Set to true to allow requires expression to be exactly x.y.z. The default is false, meaning that using an exact
+     * version x.y.z will implicitly mean the same as >=x.y.z.
      */
     private boolean exactVersionAllowed = false;
 
-    /**
-     * Extended Plugin Class Directory.
-     */
+    /** Extended Plugin Class Directory. */
     private List<String> classesDirectories = new ArrayList<>();
 
-    /**
-     * Extended Plugin Jar Directory.
-     */
+    /** Extended Plugin Jar Directory. */
     private List<String> libDirectories = new ArrayList<>(List.of(GRADLE_LIBS_DIR));
 
-    /**
-     * Runtime Mode：development/deployment.
-     */
+    /** Runtime Mode：development/deployment. */
     private RuntimeMode runtimeMode = RuntimeMode.DEPLOYMENT;
-
 }

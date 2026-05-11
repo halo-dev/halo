@@ -18,8 +18,7 @@ public class DefaultExtensionMatcher implements ExtensionMatcher {
     private final LabelSelector labelSelector;
     private final FieldSelector fieldSelector;
 
-    public static DefaultExtensionMatcherBuilder builder(ExtensionClient client,
-        GroupVersionKind gvk) {
+    public static DefaultExtensionMatcherBuilder builder(ExtensionClient client, GroupVersionKind gvk) {
         return internalBuilder().client(client).gvk(gvk);
     }
 

@@ -19,9 +19,6 @@ public interface AuthProviderService {
 
     Mono<List<ListedAuthProvider>> listAll();
 
-    /**
-     * Return a list of enabled AuthProviders sorted by priority.
-     */
+    /** Return a list of enabled AuthProviders sorted by priority. */
     Flux<AuthProvider> getEnabledProviders();
-
 }

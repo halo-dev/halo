@@ -1,11 +1,7 @@
 package run.halo.app.plugin;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,9 +31,9 @@ class DefaultPluginApplicationContextFactoryTest {
         var plugin = mock(Plugin.class, withSettings().extraInterfaces(SpringPlugin.class));
         var sp = (SpringPlugin) plugin;
         var pluginContext = new PluginContext.PluginContextBuilder()
-            .name("fake-plugin")
-            .version("1.0.0")
-            .build();
+                .name("fake-plugin")
+                .version("1.0.0")
+                .build();
         when(sp.getPluginContext()).thenReturn(pluginContext);
         when(pw.getPlugin()).thenReturn(plugin);
         when(pluginManager.getPlugin("fake-plugin")).thenReturn(pw);
@@ -50,5 +46,4 @@ class DefaultPluginApplicationContextFactoryTest {
         assertNotNull(context.getBeanProvider(PluginsRootGetter.class).getIfUnique());
         // TODO Add more assertions here.
     }
-
 }

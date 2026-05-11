@@ -56,5 +56,4 @@ public class PluginExtensionLoaderUtils {
         }
         return new Resource[] {};
     }
-
 }

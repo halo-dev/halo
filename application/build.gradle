@@ -5,7 +5,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.util.StringUtils
 
 plugins {
-    id 'checkstyle'
     id 'java'
     id 'idea'
     id 'jacoco'
@@ -17,6 +16,7 @@ plugins {
     alias(libs.plugins.checksum)
     alias(libs.plugins.springdoc.openapi)
     alias(libs.plugins.versions)
+    alias(libs.plugins.spotless)
 }
 
 group = 'run.halo.app'
@@ -36,12 +36,6 @@ idea {
     module {
         resourceDirs += file("../ui/build/dist/")
     }
-}
-
-checkstyle {
-    toolVersion = libs.versions.checkstyle.get()
-    showViolations = false
-    ignoreFailures = false
 }
 
 repositories {
@@ -72,7 +66,7 @@ bootJar {
     archiveBaseName = 'halo'
     manifest {
         attributes 'Implementation-Title': 'Halo Application',
-                'Implementation-Vendor': 'Halo OSS Team'
+        'Implementation-Vendor': 'Halo OSS Team'
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
@@ -148,17 +142,17 @@ tasks.named('jacocoTestReport', JacocoReport) {
 
 tasks.register('downloadPluginPresets', Download) {
     def presetPluginUrls = [
-            'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.1.1/plugin-comment-widget-3.1.1.jar'               : 'plugin-comment-widget.jar',
-            'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.1/plugin-search-widget-1.7.1.jar'                 : 'plugin-search-widget.jar',
-            'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.3.0/plugin-sitemap-1.3.0.jar'                             : 'plugin-sitemap.jar',
-            'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                                   : 'plugin-feed.jar',
-            'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.3.0/plugin-shiki-1.3.0.jar'                                : 'plugin-shiki.jar',
-            'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.8.1/plugin-editor-hyperlink-card-1.8.1.jar': 'plugin-editor-hyperlink-card.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.1.1/plugin-comment-widget-3.1.1.jar'               : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.1/plugin-search-widget-1.7.1.jar'                 : 'plugin-search-widget.jar',
+        'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.3.0/plugin-sitemap-1.3.0.jar'                             : 'plugin-sitemap.jar',
+        'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                                   : 'plugin-feed.jar',
+        'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.3.0/plugin-shiki-1.3.0.jar'                                : 'plugin-shiki.jar',
+        'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.8.1/plugin-editor-hyperlink-card-1.8.1.jar': 'plugin-editor-hyperlink-card.jar',
 
-            // Currently, plugin-app-store is not open source, so we need to download it from the official website.
-            // Please see https://github.com/halo-dev/plugin-app-store/issues/55
-            // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
-            'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err'    : 'appstore.jar',
+        // Currently, plugin-app-store is not open source, so we need to download it from the official website.
+        // Please see https://github.com/halo-dev/plugin-app-store/issues/55
+        // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
+        'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err'    : 'appstore.jar',
     ]
     src presetPluginUrls.keySet()
     dest layout.buildDirectory.dir('resources/main/presets/plugins')
@@ -170,16 +164,18 @@ tasks.register('downloadPluginPresets', Download) {
 openApi {
     outputDir = file("$rootDir/api-docs/openapi/v3_0")
     groupedApiMappings = [
-            'http://localhost:8091/v3/api-docs/apis_aggregated.api_v1alpha1': 'aggregated.json',
-            'http://localhost:8091/v3/api-docs/apis_public.api_v1alpha1'    : 'apis_public.api_v1alpha1.json',
-            'http://localhost:8091/v3/api-docs/apis_console.api_v1alpha1'   : 'apis_console.api_v1alpha1.json',
-            'http://localhost:8091/v3/api-docs/apis_uc.api_v1alpha1'        : 'apis_uc.api_v1alpha1.json',
-            'http://localhost:8091/v3/api-docs/apis_extension.api_v1alpha1' : 'apis_extension.api_v1alpha1.json',
+        'http://localhost:8091/v3/api-docs/apis_aggregated.api_v1alpha1': 'aggregated.json',
+        'http://localhost:8091/v3/api-docs/apis_public.api_v1alpha1'    : 'apis_public.api_v1alpha1.json',
+        'http://localhost:8091/v3/api-docs/apis_console.api_v1alpha1'   : 'apis_console.api_v1alpha1.json',
+        'http://localhost:8091/v3/api-docs/apis_uc.api_v1alpha1'        : 'apis_uc.api_v1alpha1.json',
+        'http://localhost:8091/v3/api-docs/apis_extension.api_v1alpha1' : 'apis_extension.api_v1alpha1.json',
     ]
     customBootRun {
-        args = ['--server.port=8091',
-                '--spring.profiles.active=doc',
-                "--halo.work-dir=${layout.buildDirectory.get()}/tmp/workdir-for-generating-apidocs"]
+        args = [
+            '--server.port=8091',
+            '--spring.profiles.active=doc',
+            "--halo.work-dir=${layout.buildDirectory.get()}/tmp/workdir-for-generating-apidocs"
+        ]
     }
 }
 
@@ -194,13 +190,13 @@ tasks.named('generateOpenApiDocs') {
 }
 
 def branchProvider = providers.exec { commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD' }
-        .standardOutput
-        .asText
-        .map { it.trim().replaceAll("/", "-") }
+.standardOutput
+.asText
+.map { it.trim().replaceAll("/", "-") }
 def abbreviatedIdProvider = providers.exec { commandLine 'git', 'rev-parse', '--short', 'HEAD' }
-        .standardOutput
-        .asText
-        .map { it.trim() }
+.standardOutput
+.asText
+.map { it.trim() }
 
 def isRelease = project.hasProperty('release') && Boolean.parseBoolean(project.property('release').toString())
 def repoProvider = providers.provider { isRelease ? 'halo' : 'halo-dev' }
@@ -253,4 +249,14 @@ tasks.register('publishToAllRegistries') {
     group = 'publishing'
     description = 'Build and publish the Docker image to all configured registries.'
     dependsOn tasks.named('publishToGhcr'), tasks.named('publishToDockerHub')
+}
+
+spotless {
+    java {
+        palantirJavaFormat("2.90.0").formatJavadoc(true)
+    }
+    sql {
+        target 'src/**/*.sql'
+        dbeaver()
+    }
 }

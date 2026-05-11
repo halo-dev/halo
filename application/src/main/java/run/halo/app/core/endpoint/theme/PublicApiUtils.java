@@ -25,8 +25,7 @@ public class PublicApiUtils {
      * Get group version from extension for public api.
      *
      * @param extension extension
-     * @return <code>api.{group}/{version}</code> if group is not empty,
-     * otherwise <code>api.halo.run/{version}</code>.
+     * @return <code>api.{group}/{version}</code> if group is not empty, otherwise <code>api.halo.run/{version}</code>.
      */
     public static GroupVersion groupVersion(Extension extension) {
         GroupVersionKind groupVersionKind = extension.groupVersionKind();
@@ -43,15 +42,11 @@ public class PublicApiUtils {
      * @param <R> converted item type
      * @return converted list result
      */
-    public static <T, R> ListResult<R> toAnotherListResult(ListResult<T> listResult,
-        Function<T, R> mapper) {
+    public static <T, R> ListResult<R> toAnotherListResult(ListResult<T> listResult, Function<T, R> mapper) {
         Assert.notNull(listResult, "List result must not be null");
         Assert.notNull(mapper, "The mapper must not be null");
-        List<R> mappedItems = listResult.get()
-            .map(mapper)
-            .toList();
-        return new ListResult<>(listResult.getPage(), listResult.getSize(), listResult.getTotal(),
-            mappedItems);
+        List<R> mappedItems = listResult.get().map(mapper).toList();
+        return new ListResult<>(listResult.getPage(), listResult.getSize(), listResult.getTotal(), mappedItems);
     }
 
     /**
@@ -60,8 +55,7 @@ public class PublicApiUtils {
      * @param <T> element type
      * @return true if collection contains element, otherwise false.
      */
-    public static <T> boolean containsElement(@Nullable Collection<T> collection,
-        @Nullable T element) {
+    public static <T> boolean containsElement(@Nullable Collection<T> collection, @Nullable T element) {
         if (collection != null && element != null) {
             return collection.contains(element);
         }

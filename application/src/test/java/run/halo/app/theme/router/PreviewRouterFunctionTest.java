@@ -69,23 +69,20 @@ class PreviewRouterFunctionTest {
     @BeforeEach
     void setUp() {
         webTestClient = WebTestClient.bindToRouterFunction(previewRouterFunction.previewRouter())
-            .handlerStrategies(HandlerStrategies.builder()
-                .viewResolver(viewResolver)
-                .build())
-            .build();
+                .handlerStrategies(
+                        HandlerStrategies.builder().viewResolver(viewResolver).build())
+                .build();
     }
 
     @Test
     @WithMockUser(username = "testuser")
     void previewPost() {
-        when(viewResolver.resolveViewName(any(), any()))
-            .thenReturn(Mono.just(new EmptyView() {
-                @Override
-                public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-                    ServerWebExchange exchange) {
-                    return super.render(model, contentType, exchange);
-                }
-            }));
+        when(viewResolver.resolveViewName(any(), any())).thenReturn(Mono.just(new EmptyView() {
+            @Override
+            public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
+                return super.render(model, contentType, exchange);
+            }
+        }));
 
         Post post = new Post();
         post.setMetadata(new Metadata());
@@ -100,14 +97,17 @@ class PreviewRouterFunctionTest {
         PostVo postVo = PostVo.from(post);
         postVo.setContributors(contributorVos());
         when(postPublicQueryService.convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot())))
-            .thenReturn(Mono.just(postVo));
+                .thenReturn(Mono.just(postVo));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class),
-            eq("postTemplate"), eq("post"))).thenReturn(Mono.just("postView"));
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), eq("postTemplate"), eq("post")))
+                .thenReturn(Mono.just("postView"));
 
-        webTestClient.get().uri("/preview/posts/post1")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient
+                .get()
+                .uri("/preview/posts/post1")
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         verify(viewResolver).resolveViewName(any(), any());
         verify(postPublicQueryService).convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot()));
@@ -116,22 +116,23 @@ class PreviewRouterFunctionTest {
 
     @Test
     public void previewPostWhenUnAuthenticated() {
-        webTestClient.get().uri("/preview/posts/post1")
-            .exchange()
-            .expectStatus().isEqualTo(404);
+        webTestClient
+                .get()
+                .uri("/preview/posts/post1")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(404);
     }
 
     @Test
     @WithMockUser(username = "testuser")
     public void previewSinglePage() {
-        when(viewResolver.resolveViewName(any(), any()))
-            .thenReturn(Mono.just(new EmptyView() {
-                @Override
-                public Mono<Void> render(Map<String, ?> model, MediaType contentType,
-                    ServerWebExchange exchange) {
-                    return super.render(model, contentType, exchange);
-                }
-            }));
+        when(viewResolver.resolveViewName(any(), any())).thenReturn(Mono.just(new EmptyView() {
+            @Override
+            public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
+                return super.render(model, contentType, exchange);
+            }
+        }));
 
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
@@ -144,15 +145,17 @@ class PreviewRouterFunctionTest {
 
         SinglePageVo singlePageVo = SinglePageVo.from(singlePage);
         singlePageVo.setContributors(contributorVos());
-        when(singlePageConversionService.convertToVo(singlePage, "snapshot1"))
-            .thenReturn(Mono.just(singlePageVo));
+        when(singlePageConversionService.convertToVo(singlePage, "snapshot1")).thenReturn(Mono.just(singlePageVo));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class),
-            eq("pageTemplate"), eq("page"))).thenReturn(Mono.just("pageView"));
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), eq("pageTemplate"), eq("page")))
+                .thenReturn(Mono.just("pageView"));
 
-        webTestClient.get().uri("/preview/singlepages/page1")
-            .exchange()
-            .expectStatus().isOk();
+        webTestClient
+                .get()
+                .uri("/preview/singlepages/page1")
+                .exchange()
+                .expectStatus()
+                .isOk();
 
         verify(viewResolver).resolveViewName(any(), any());
         verify(client).fetch(eq(SinglePage.class), eq("page1"));
@@ -160,26 +163,28 @@ class PreviewRouterFunctionTest {
 
     @Test
     public void previewSinglePageWhenUnAuthenticated() {
-        webTestClient.get().uri("/preview/singlepages/page1")
-            .exchange()
-            .expectStatus().isEqualTo(404);
+        webTestClient
+                .get()
+                .uri("/preview/singlepages/page1")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(404);
     }
 
     @Test
     @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
     public void previewWithAnonymousUser() {
-        webTestClient.get().uri("/preview/singlepages/page1")
-            .exchange()
-            .expectStatus().isEqualTo(404);
+        webTestClient
+                .get()
+                .uri("/preview/singlepages/page1")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(404);
     }
 
     List<ContributorVo> contributorVos() {
-        ContributorVo contributorA = ContributorVo.builder()
-            .name("fake-user")
-            .build();
-        ContributorVo contributorB = ContributorVo.builder()
-            .name("testuser")
-            .build();
+        ContributorVo contributorA = ContributorVo.builder().name("fake-user").build();
+        ContributorVo contributorB = ContributorVo.builder().name("testuser").build();
         return List.of(contributorA, contributorB);
     }
 }

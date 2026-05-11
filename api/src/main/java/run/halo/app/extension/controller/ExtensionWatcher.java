@@ -72,5 +72,4 @@ public class ExtensionWatcher implements Watcher {
     public boolean isDisposed() {
         return this.disposed;
     }
-
 }

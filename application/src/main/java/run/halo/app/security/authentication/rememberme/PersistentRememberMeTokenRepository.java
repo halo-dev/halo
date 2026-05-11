@@ -13,9 +13,7 @@ public interface PersistentRememberMeTokenRepository {
      *
      * @param token the remember-me token
      * @return updated remember-me token
-     * @throws OptimisticLockingFailureException if the token was concurrently updated by another
-     *                                           request.
-     *
+     * @throws OptimisticLockingFailureException if the token was concurrently updated by another request.
      */
     Mono<RememberMeToken> updateToken(RememberMeToken token);
 

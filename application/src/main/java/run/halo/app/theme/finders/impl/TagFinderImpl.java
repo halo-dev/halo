@@ -30,7 +30,7 @@ import run.halo.app.theme.finders.vo.TagVo;
 public class TagFinderImpl implements TagFinder {
 
     public static final Comparator<Tag> DEFAULT_COMPARATOR =
-        Comparator.comparing(tag -> tag.getMetadata().getCreationTimestamp());
+            Comparator.comparing(tag -> tag.getMetadata().getCreationTimestamp());
 
     private final ReactiveExtensionClient client;
 
@@ -40,8 +40,7 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public Mono<TagVo> getByName(String name) {
-        return client.fetch(Tag.class, name)
-            .map(TagVo::from);
+        return client.fetch(Tag.class, name).map(TagVo::from);
     }
 
     @Override
@@ -50,23 +49,21 @@ public class TagFinderImpl implements TagFinder {
             return Flux.empty();
         }
         var options = ListOptions.builder()
-            .andQuery(Queries.in("metadata.name", names))
-            .build();
+                .andQuery(Queries.in("metadata.name", names))
+                .build();
         return client.listAll(Tag.class, options, Sort.unsorted())
-            .map(TagVo::from)
-            .collectMap(t -> t.getMetadata().getName())
-            .flatMapIterable(map -> names.stream()
-                .distinct()
-                .filter(map::containsKey)
-                .map(map::get)
-                .toList()
-            );
+                .map(TagVo::from)
+                .collectMap(t -> t.getMetadata().getName())
+                .flatMapIterable(map -> names.stream()
+                        .distinct()
+                        .filter(map::containsKey)
+                        .map(map::get)
+                        .toList());
     }
 
     @Override
     public Mono<ListResult<TagVo>> list(Integer page, Integer size) {
-        return listBy(new ListOptions(),
-            PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size)));
+        return listBy(new ListOptions(), PageRequestImpl.of(pageNullSafe(page), sizeNullSafe(size)));
     }
 
     @Override
@@ -74,27 +71,20 @@ public class TagFinderImpl implements TagFinder {
         if (CollectionUtils.isEmpty(tags)) {
             return List.of();
         }
-        return tags.stream()
-            .map(TagVo::from)
-            .collect(Collectors.toList());
+        return tags.stream().map(TagVo::from).collect(Collectors.toList());
     }
 
     @Override
     public Flux<TagVo> listAll() {
-        return client.listAll(Tag.class, new ListOptions(),
-                Sort.by(Sort.Order.desc("metadata.creationTimestamp")))
-            .map(TagVo::from);
+        return client.listAll(Tag.class, new ListOptions(), Sort.by(Sort.Order.desc("metadata.creationTimestamp")))
+                .map(TagVo::from);
     }
 
     private Mono<ListResult<TagVo>> listBy(ListOptions listOptions, PageRequest pageRequest) {
-        return client.listBy(Tag.class, listOptions, pageRequest)
-            .map(result -> {
-                List<TagVo> tagVos = result.get()
-                    .map(TagVo::from)
-                    .collect(Collectors.toList());
-                return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(),
-                    tagVos);
-            });
+        return client.listBy(Tag.class, listOptions, pageRequest).map(result -> {
+            List<TagVo> tagVos = result.get().map(TagVo::from).collect(Collectors.toList());
+            return new ListResult<>(result.getPage(), result.getSize(), result.getTotal(), tagVos);
+        });
     }
 
     int pageNullSafe(Integer page) {

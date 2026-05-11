@@ -23,11 +23,9 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
     private final UserConnectionService connectionService;
 
     @Setter
-    private OAuth2AuthenticationTokenCache oauth2TokenCache =
-        new WebSessionOAuth2AuthenticationTokenCache();
+    private OAuth2AuthenticationTokenCache oauth2TokenCache = new WebSessionOAuth2AuthenticationTokenCache();
 
-    private final AuthenticationTrustResolver authenticationTrustResolver =
-        new AuthenticationTrustResolverImpl();
+    private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     public DefaultOAuth2LoginHandlerEnhancer(UserConnectionService connectionService) {
         this.connectionService = connectionService;
@@ -40,27 +38,20 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
             // Remove token directly if not fully authenticated
             return oauth2TokenCache.removeToken(exchange).then();
         }
-        return oauth2TokenCache.getToken(exchange)
-            .flatMap(oauth2Token -> {
-                var oauth2User = oauth2Token.getPrincipal();
-                var username = authentication.getName();
-                var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
-                return connectionService.updateUserConnectionIfPresent(registrationId, oauth2User)
+        return oauth2TokenCache.getToken(exchange).flatMap(oauth2Token -> {
+            var oauth2User = oauth2Token.getPrincipal();
+            var username = authentication.getName();
+            var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
+            return connectionService
+                    .updateUserConnectionIfPresent(registrationId, oauth2User)
                     .doOnNext(connection -> {
                         if (log.isDebugEnabled()) {
-                            log.debug(
-                                "User connection already exists, skip creating. connection: [{}]",
-                                connection
-                            );
+                            log.debug("User connection already exists, skip creating. connection: [{}]", connection);
                         }
                     })
-                    .switchIfEmpty(Mono.defer(() -> connectionService.createUserConnection(
-                        username,
-                        registrationId,
-                        oauth2User
-                    )))
+                    .switchIfEmpty(Mono.defer(
+                            () -> connectionService.createUserConnection(username, registrationId, oauth2User)))
                     .then(oauth2TokenCache.removeToken(exchange));
-            });
+        });
     }
-
 }

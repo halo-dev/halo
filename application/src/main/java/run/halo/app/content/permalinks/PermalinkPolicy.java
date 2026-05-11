@@ -9,8 +9,7 @@ import run.halo.app.extension.AbstractExtension;
  */
 public interface PermalinkPolicy<T extends AbstractExtension> {
 
-    PropertyPlaceholderHelper PROPERTY_PLACEHOLDER_HELPER =
-        new PropertyPlaceholderHelper("{", "}");
+    PropertyPlaceholderHelper PROPERTY_PLACEHOLDER_HELPER = new PropertyPlaceholderHelper("{", "}");
 
     String permalink(T extension);
 }

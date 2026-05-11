@@ -9,7 +9,7 @@ import run.halo.app.plugin.SharedEvent;
  * User logout event.
  *
  * @author lywq
- **/
+ */
 @SharedEvent
 public class UserLogoutEvent extends ApplicationEvent {
 

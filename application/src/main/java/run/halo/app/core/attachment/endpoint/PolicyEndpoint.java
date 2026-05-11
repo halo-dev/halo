@@ -44,115 +44,105 @@ class PolicyEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "PolicyAlpha1Console";
         return SpringdocRouteBuilder.route()
-            .GET(
-                "/policies/{name}/configs/{group}",
-                this::getPolicyConfigByGroup,
-                builder -> builder.operationId("getPolicyConfigByGroup")
-                    .description("Get policy config by group")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Name of the policy")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .description("Name of the group")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .response(responseBuilder().implementation(Object.class))
-            )
-            .PUT(
-                "/policies/{name}/configs/{group}",
-                RequestPredicates.contentType(MediaType.APPLICATION_JSON),
-                this::updatePolicyConfigByGroup,
-                builder -> builder.operationId("updatePolicyConfigByGroup")
-                    .description("Update policy config by group")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Name of the policy")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("group")
-                        .description("Name of the group")
-                        .required(true)
-                        .implementation(String.class)
-                    )
-                    .requestBody(
-                        requestBodyBuilder().required(true).implementation(Object.class))
-                    .response(
-                        responseBuilder().responseCode(String.valueOf(NO_CONTENT.value()))
-                    )
-            )
-            .build();
+                .GET(
+                        "/policies/{name}/configs/{group}",
+                        this::getPolicyConfigByGroup,
+                        builder -> builder.operationId("getPolicyConfigByGroup")
+                                .description("Get policy config by group")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("Name of the policy")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("group")
+                                        .description("Name of the group")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .response(responseBuilder().implementation(Object.class)))
+                .PUT(
+                        "/policies/{name}/configs/{group}",
+                        RequestPredicates.contentType(MediaType.APPLICATION_JSON),
+                        this::updatePolicyConfigByGroup,
+                        builder -> builder.operationId("updatePolicyConfigByGroup")
+                                .description("Update policy config by group")
+                                .tag(tag)
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("name")
+                                        .description("Name of the policy")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.PATH)
+                                        .name("group")
+                                        .description("Name of the group")
+                                        .required(true)
+                                        .implementation(String.class))
+                                .requestBody(requestBodyBuilder().required(true).implementation(Object.class))
+                                .response(responseBuilder().responseCode(String.valueOf(NO_CONTENT.value()))))
+                .build();
     }
 
     private Mono<ServerResponse> updatePolicyConfigByGroup(ServerRequest serverRequest) {
         var policyName = serverRequest.pathVariable("name");
         var configGroup = serverRequest.pathVariable("group");
-        return serverRequest.bodyToMono(JsonNode.class)
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "Request body is required.")
-            ))
-            .flatMap(jsonNode -> {
-                var tx = TransactionalOperator.create(txManager);
-                return client.get(Policy.class, policyName)
-                    .flatMap(policy -> Mono.justOrEmpty(policy.getSpec())
-                        .mapNotNull(Policy.PolicySpec::getConfigMapName)
-                        .filter(StringUtils::hasText)
-                        .flatMap(cmName -> client.fetch(ConfigMap.class, cmName))
-                        .switchIfEmpty(Mono.fromSupplier(() -> {
-                            // create a new configmap
-                            var cm = new ConfigMap();
-                            cm.setMetadata(new Metadata());
-                            cm.getMetadata().setGenerateName(policyName + "-config-");
-                            return cm;
-                        }))
-                        .flatMap(cm -> Mono.fromCallable(() -> {
-                            if (cm.getData() == null) {
-                                cm.setData(new HashMap<>());
-                            }
-                            var oldJson = cm.getData().get(configGroup);
-                            if (StringUtils.hasText(oldJson)
-                                && Objects.equals(jsonNode, mapper.readTree(oldJson))) {
-                                // skip if no change
-                                return null;
-                            }
-                            var newJson = mapper.writeValueAsString(jsonNode);
-                            cm.getData().put(configGroup, newJson);
-                            return cm;
-                        }))
-                        .flatMap(cm -> {
-                            if (cm.getMetadata().getVersion() != null) {
-                                return client.update(cm);
-                            }
-                            return client.create(cm);
-                        })
-                        .flatMap(cm -> {
-                            var cmName = cm.getMetadata().getName();
-                            if (policy.getSpec() != null
-                                && Objects.equals(policy.getSpec().getConfigMapName(), cmName)) {
-                                return Mono.just(cm);
-                            }
-                            if (policy.getSpec() == null) {
-                                policy.setSpec(new Policy.PolicySpec());
-                            }
-                            policy.getSpec().setConfigMapName(cmName);
-                            return client.update(policy);
-                        })
-                    )
-                    .as(tx::transactional);
-            })
-            .then(ServerResponse.noContent().build());
+        return serverRequest
+                .bodyToMono(JsonNode.class)
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException("Request body is required.")))
+                .flatMap(jsonNode -> {
+                    var tx = TransactionalOperator.create(txManager);
+                    return client.get(Policy.class, policyName)
+                            .flatMap(policy -> Mono.justOrEmpty(policy.getSpec())
+                                    .mapNotNull(Policy.PolicySpec::getConfigMapName)
+                                    .filter(StringUtils::hasText)
+                                    .flatMap(cmName -> client.fetch(ConfigMap.class, cmName))
+                                    .switchIfEmpty(Mono.fromSupplier(() -> {
+                                        // create a new configmap
+                                        var cm = new ConfigMap();
+                                        cm.setMetadata(new Metadata());
+                                        cm.getMetadata().setGenerateName(policyName + "-config-");
+                                        return cm;
+                                    }))
+                                    .flatMap(cm -> Mono.fromCallable(() -> {
+                                        if (cm.getData() == null) {
+                                            cm.setData(new HashMap<>());
+                                        }
+                                        var oldJson = cm.getData().get(configGroup);
+                                        if (StringUtils.hasText(oldJson)
+                                                && Objects.equals(jsonNode, mapper.readTree(oldJson))) {
+                                            // skip if no change
+                                            return null;
+                                        }
+                                        var newJson = mapper.writeValueAsString(jsonNode);
+                                        cm.getData().put(configGroup, newJson);
+                                        return cm;
+                                    }))
+                                    .flatMap(cm -> {
+                                        if (cm.getMetadata().getVersion() != null) {
+                                            return client.update(cm);
+                                        }
+                                        return client.create(cm);
+                                    })
+                                    .flatMap(cm -> {
+                                        var cmName = cm.getMetadata().getName();
+                                        if (policy.getSpec() != null
+                                                && Objects.equals(
+                                                        policy.getSpec().getConfigMapName(), cmName)) {
+                                            return Mono.just(cm);
+                                        }
+                                        if (policy.getSpec() == null) {
+                                            policy.setSpec(new Policy.PolicySpec());
+                                        }
+                                        policy.getSpec().setConfigMapName(cmName);
+                                        return client.update(policy);
+                                    }))
+                            .as(tx::transactional);
+                })
+                .then(ServerResponse.noContent().build());
     }
 
     private Mono<ServerResponse> getPolicyConfigByGroup(ServerRequest serverRequest) {
@@ -160,15 +150,15 @@ class PolicyEndpoint implements CustomEndpoint {
         var configGroup = serverRequest.pathVariable("group");
 
         return client.get(Policy.class, policyName)
-            .filter(p -> p.getSpec() != null)
-            .map(p -> p.getSpec().getConfigMapName())
-            .filter(StringUtils::hasText)
-            .flatMap(cmName -> client.fetch(ConfigMap.class, cmName))
-            .filter(cm -> cm.getData() != null && cm.getData().containsKey(configGroup))
-            .map(cm -> cm.getData().get(configGroup))
-            .flatMap(json -> Mono.fromCallable(() -> mapper.readTree(json)))
-            .defaultIfEmpty(mapper.nullNode())
-            .flatMap(config -> ServerResponse.ok().bodyValue(config));
+                .filter(p -> p.getSpec() != null)
+                .map(p -> p.getSpec().getConfigMapName())
+                .filter(StringUtils::hasText)
+                .flatMap(cmName -> client.fetch(ConfigMap.class, cmName))
+                .filter(cm -> cm.getData() != null && cm.getData().containsKey(configGroup))
+                .map(cm -> cm.getData().get(configGroup))
+                .flatMap(json -> Mono.fromCallable(() -> mapper.readTree(json)))
+                .defaultIfEmpty(mapper.nullNode())
+                .flatMap(config -> ServerResponse.ok().bodyValue(config));
     }
 
     @Override

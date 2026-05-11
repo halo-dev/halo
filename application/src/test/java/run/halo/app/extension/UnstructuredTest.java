@@ -106,22 +106,26 @@ class UnstructuredTest {
     void shouldGetFinalizersCorrectly() throws JsonProcessingException {
         var extension = objectMapper.readValue(extensionJson, Unstructured.class);
 
-        assertEquals(Set.of("finalizer.1", "finalizer.2"), extension.getMetadata().getFinalizers());
+        assertEquals(
+                Set.of("finalizer.1", "finalizer.2"), extension.getMetadata().getFinalizers());
 
         extension.getMetadata().setFinalizers(Set.of("finalizer.3", "finalizer.4"));
-        assertEquals(Set.of("finalizer.3", "finalizer.4"), extension.getMetadata().getFinalizers());
+        assertEquals(
+                Set.of("finalizer.3", "finalizer.4"), extension.getMetadata().getFinalizers());
     }
 
     @Test
     void shouldSetLabelsCorrectly() throws JsonProcessingException {
         var extension = objectMapper.readValue(extensionJson, Unstructured.class);
 
-        assertEquals(Map.of("category", "fake", "default", "true"),
-            extension.getMetadata().getLabels());
+        assertEquals(
+                Map.of("category", "fake", "default", "true"),
+                extension.getMetadata().getLabels());
 
         extension.getMetadata().setLabels(Map.of("category", "fake", "default", "false"));
-        assertEquals(Map.of("category", "fake", "default", "false"),
-            extension.getMetadata().getLabels());
+        assertEquals(
+                Map.of("category", "fake", "default", "false"),
+                extension.getMetadata().getLabels());
     }
 
     @Test
@@ -130,10 +134,10 @@ class UnstructuredTest {
 
         assertNull(extension.getMetadata().getAnnotations());
 
-        extension.getMetadata()
-            .setAnnotations(Map.of("annotation1", "value1", "annotation2", "value2"));
-        assertEquals(Map.of("annotation1", "value1", "annotation2", "value2"),
-            extension.getMetadata().getAnnotations());
+        extension.getMetadata().setAnnotations(Map.of("annotation1", "value1", "annotation2", "value2"));
+        assertEquals(
+                Map.of("annotation1", "value1", "annotation2", "value2"),
+                extension.getMetadata().getAnnotations());
     }
 
     @Nested
@@ -168,14 +172,15 @@ class UnstructuredTest {
             assertEquals("Fake", unstructured.getKind());
             assertEquals("fake", unstructured.getMetadata().getLabels().get("category"));
             assertEquals("true", unstructured.getMetadata().getLabels().get("default"));
-            assertEquals(Instant.parse("2011-12-03T10:15:30Z"),
-                unstructured.getMetadata().getCreationTimestamp());
+            assertEquals(
+                    Instant.parse("2011-12-03T10:15:30Z"),
+                    unstructured.getMetadata().getCreationTimestamp());
             assertEquals(12345L, unstructured.getMetadata().getVersion());
 
-            var field1 =
-                Unstructured.getNestedValue(unstructured.getData(), "spec", "field1").orElse(null);
-            var field2 =
-                Unstructured.getNestedValue(unstructured.getData(), "spec", "field2").orElse(null);
+            var field1 = Unstructured.getNestedValue(unstructured.getData(), "spec", "field1")
+                    .orElse(null);
+            var field2 = Unstructured.getNestedValue(unstructured.getData(), "spec", "field2")
+                    .orElse(null);
             assertEquals("value1", field1);
             assertEquals(2, field2);
         }
@@ -223,5 +228,4 @@ class UnstructuredTest {
         metadata.setVersion(12345L);
         return metadata;
     }
-
 }

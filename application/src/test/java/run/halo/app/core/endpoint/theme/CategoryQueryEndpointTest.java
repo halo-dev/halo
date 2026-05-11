@@ -17,12 +17,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
-import run.halo.app.extension.GroupVersion;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
-import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.*;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 
@@ -40,6 +35,7 @@ class CategoryQueryEndpointTest {
 
     @Mock
     private PostPublicQueryService postPublicQueryService;
+
     private CategoryQueryEndpoint endpoint;
     private WebTestClient webTestClient;
 
@@ -54,16 +50,21 @@ class CategoryQueryEndpointTest {
     void listCategories() {
         ListResult<Category> listResult = new ListResult<>(List.of());
         when(client.listBy(eq(Category.class), any(ListOptions.class), any(PageRequest.class)))
-            .thenReturn(Mono.just(listResult));
+                .thenReturn(Mono.just(listResult));
 
-        webTestClient.get()
-            .uri("/categories?page=1&size=10")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.total").isEqualTo(listResult.getTotal())
-            .jsonPath("$.items").isArray();
+        webTestClient
+                .get()
+                .uri("/categories?page=1&size=10")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(listResult.getTotal())
+                .jsonPath("$.items")
+                .isArray();
     }
 
     @Test
@@ -73,29 +74,37 @@ class CategoryQueryEndpointTest {
         category.getMetadata().setName("test");
         when(client.get(eq(Category.class), eq("test"))).thenReturn(Mono.just(category));
 
-        webTestClient.get()
-            .uri("/categories/test")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo(category.getMetadata().getName());
+        webTestClient
+                .get()
+                .uri("/categories/test")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo(category.getMetadata().getName());
     }
 
     @Test
     void listPostsByCategoryName() {
         ListResult<ListedPostVo> listResult = new ListResult<>(List.of());
-        when(postPublicQueryService.list(any(), any(PageRequest.class)))
-            .thenReturn(Mono.just(listResult));
+        when(postPublicQueryService.list(any(), any(PageRequest.class))).thenReturn(Mono.just(listResult));
 
-        webTestClient.get()
-            .uri("/categories/test/posts?page=1&size=10")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.total").isEqualTo(listResult.getTotal())
-            .jsonPath("$.items").isArray();
+        webTestClient
+                .get()
+                .uri("/categories/test/posts?page=1&size=10")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.total")
+                .isEqualTo(listResult.getTotal())
+                .jsonPath("$.items")
+                .isArray();
     }
 
     @Test

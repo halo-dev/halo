@@ -19,5 +19,4 @@ public interface UserPreCreatingHandler extends ExtensionPoint {
      * @return {@code Mono.empty()} if handling successfully.
      */
     Mono<Void> preCreating(User user);
-
 }

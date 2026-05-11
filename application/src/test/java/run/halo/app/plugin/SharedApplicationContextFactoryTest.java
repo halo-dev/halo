@@ -21,7 +21,7 @@ class SharedApplicationContextFactoryTest {
 
     @Test
     void createSharedApplicationContext() {
-        var sharedContext =  SharedApplicationContextFactory.create(applicationContext);
+        var sharedContext = SharedApplicationContextFactory.create(applicationContext);
         assertNotNull(sharedContext);
     }
 }

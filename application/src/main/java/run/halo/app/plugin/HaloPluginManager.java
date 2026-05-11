@@ -5,24 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.CompoundPluginLoader;
-import org.pf4j.CompoundPluginRepository;
-import org.pf4j.DefaultPluginManager;
-import org.pf4j.DefaultPluginRepository;
-import org.pf4j.DefaultPluginStatusProvider;
-import org.pf4j.ExtensionFactory;
-import org.pf4j.ExtensionFinder;
-import org.pf4j.JarPluginLoader;
-import org.pf4j.JarPluginRepository;
-import org.pf4j.PluginDescriptorFinder;
-import org.pf4j.PluginFactory;
-import org.pf4j.PluginLoader;
-import org.pf4j.PluginRepository;
-import org.pf4j.PluginState;
-import org.pf4j.PluginStateEvent;
-import org.pf4j.PluginStateListener;
-import org.pf4j.PluginStatusProvider;
-import org.pf4j.PluginWrapper;
+import org.pf4j.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Lazy;
@@ -30,16 +13,14 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.plugin.event.PluginStartedEvent;
 
 /**
- * PluginManager to hold the main ApplicationContext.
- * It provides methods for managing the plugin lifecycle.
+ * PluginManager to hold the main ApplicationContext. It provides methods for managing the plugin lifecycle.
  *
  * @author guqing
  * @author johnniang
  * @since 2.0.0
  */
 @Slf4j
-class HaloPluginManager extends DefaultPluginManager
-    implements SpringPluginManager, InitializingBean {
+class HaloPluginManager extends DefaultPluginManager implements SpringPluginManager, InitializingBean {
 
     private final ApplicationContext rootContext;
 
@@ -51,10 +32,11 @@ class HaloPluginManager extends DefaultPluginManager
 
     private final SystemVersionSupplier systemVersionSupplier;
 
-    public HaloPluginManager(ApplicationContext rootContext,
-        PluginProperties pluginProperties,
-        SystemVersionSupplier systemVersionSupplier,
-        PluginsRootGetter pluginsRootGetter) {
+    public HaloPluginManager(
+            ApplicationContext rootContext,
+            PluginProperties pluginProperties,
+            SystemVersionSupplier systemVersionSupplier,
+            PluginsRootGetter pluginsRootGetter) {
         this.pluginProperties = pluginProperties;
         this.rootContext = rootContext;
         this.pluginsRootGetter = pluginsRootGetter;
@@ -122,14 +104,12 @@ class HaloPluginManager extends DefaultPluginManager
 
     @Override
     protected PluginRepository createPluginRepository() {
-        var developmentPluginRepository =
-            new DefaultDevelopmentPluginRepository(getPluginsRoots());
-        developmentPluginRepository
-            .setFixedPaths(pluginProperties.getFixedPluginPath());
+        var developmentPluginRepository = new DefaultDevelopmentPluginRepository(getPluginsRoots());
+        developmentPluginRepository.setFixedPaths(pluginProperties.getFixedPluginPath());
         return new CompoundPluginRepository()
-            .add(developmentPluginRepository, this::isDevelopment)
-            .add(new JarPluginRepository(getPluginsRoots()))
-            .add(new DefaultPluginRepository(getPluginsRoots()));
+                .add(developmentPluginRepository, this::isDevelopment)
+                .add(new JarPluginRepository(getPluginsRoots()))
+                .add(new DefaultPluginRepository(getPluginsRoots()));
     }
 
     @Override
@@ -139,16 +119,12 @@ class HaloPluginManager extends DefaultPluginManager
 
     @Override
     public void startPlugins() {
-        throw new UnsupportedOperationException(
-            "The operation of starting all plugins is not supported."
-        );
+        throw new UnsupportedOperationException("The operation of starting all plugins is not supported.");
     }
 
     @Override
     public void stopPlugins() {
-        throw new UnsupportedOperationException(
-            "The operation of stopping all plugins is not supported."
-        );
+        throw new UnsupportedOperationException("The operation of stopping all plugins is not supported.");
     }
 
     @Override
@@ -183,11 +159,10 @@ class HaloPluginManager extends DefaultPluginManager
 
     @Override
     public List<PluginWrapper> startedPlugins() {
-        return List.copyOf(super.getStartedPlugins())
-            .stream()
-            // Make sure the plugin is really started
-            .filter(p -> p.getPluginState().isStarted())
-            .toList();
+        return List.copyOf(super.getStartedPlugins()).stream()
+                // Make sure the plugin is really started
+                .filter(p -> p.getPluginState().isStarted())
+                .toList();
     }
 
     /**
@@ -204,12 +179,10 @@ class HaloPluginManager extends DefaultPluginManager
                 var plugin = event.getPlugin().getPlugin();
                 if (plugin instanceof SpringPlugin springPlugin) {
                     try {
-                        springPlugin.getApplicationContext()
-                            .publishEvent(new PluginStartedEvent(this));
+                        springPlugin.getApplicationContext().publishEvent(new PluginStartedEvent(this));
                     } catch (Throwable t) {
                         var pluginId = event.getPlugin().getPluginId();
-                        log.warn("Error while publishing plugin started event for plugin {}",
-                            pluginId, t);
+                        log.warn("Error while publishing plugin started event for plugin {}", pluginId, t);
                     }
                 }
             }

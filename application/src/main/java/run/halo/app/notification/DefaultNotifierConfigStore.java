@@ -34,15 +34,15 @@ public class DefaultNotifierConfigStore implements NotifierConfigStore {
     @Override
     public Mono<ObjectNode> fetchReceiverConfig(String notifierDescriptorName) {
         return fetchConfig(notifierDescriptorName)
-            .mapNotNull(setting -> (ObjectNode) setting.get(RECEIVER_KEY))
-            .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
+                .mapNotNull(setting -> (ObjectNode) setting.get(RECEIVER_KEY))
+                .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
     }
 
     @Override
     public Mono<ObjectNode> fetchSenderConfig(String notifierDescriptorName) {
         return fetchConfig(notifierDescriptorName)
-            .mapNotNull(setting -> (ObjectNode) setting.get(SENDER_KEY))
-            .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
+                .mapNotNull(setting -> (ObjectNode) setting.get(SENDER_KEY))
+                .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
     }
 
     @Override
@@ -57,34 +57,34 @@ public class DefaultNotifierConfigStore implements NotifierConfigStore {
 
     Mono<Void> saveConfig(String notifierDescriptorName, String key, ObjectNode config) {
         return client.fetch(Secret.class, SECRET_NAME)
-            .switchIfEmpty(Mono.defer(() -> {
-                Secret secret = new Secret();
-                secret.setMetadata(new Metadata());
-                secret.getMetadata().setName(SECRET_NAME);
-                secret.getMetadata().setFinalizers(Set.of(SYSTEM_FINALIZER));
-                secret.setStringData(new HashMap<>());
-                return client.create(secret);
-            }))
-            .flatMap(secret -> {
-                if (secret.getStringData() == null) {
+                .switchIfEmpty(Mono.defer(() -> {
+                    Secret secret = new Secret();
+                    secret.setMetadata(new Metadata());
+                    secret.getMetadata().setName(SECRET_NAME);
+                    secret.getMetadata().setFinalizers(Set.of(SYSTEM_FINALIZER));
                     secret.setStringData(new HashMap<>());
-                }
-                Map<String, String> map = secret.getStringData();
-                ObjectNode wrapperNode = JsonNodeFactory.instance.objectNode();
-                wrapperNode.set(key, config);
-                map.put(resolveKey(notifierDescriptorName), JsonUtils.objectToJson(wrapperNode));
-                return client.update(secret);
-            })
-            .then();
+                    return client.create(secret);
+                }))
+                .flatMap(secret -> {
+                    if (secret.getStringData() == null) {
+                        secret.setStringData(new HashMap<>());
+                    }
+                    Map<String, String> map = secret.getStringData();
+                    ObjectNode wrapperNode = JsonNodeFactory.instance.objectNode();
+                    wrapperNode.set(key, config);
+                    map.put(resolveKey(notifierDescriptorName), JsonUtils.objectToJson(wrapperNode));
+                    return client.update(secret);
+                })
+                .then();
     }
 
     Mono<ObjectNode> fetchConfig(String notifierDescriptorName) {
         return client.fetch(Secret.class, SECRET_NAME)
-            .mapNotNull(Secret::getStringData)
-            .mapNotNull(map -> map.get(resolveKey(notifierDescriptorName)))
-            .filter(StringUtils::isNotBlank)
-            .map(value -> JsonUtils.jsonToObject(value, ObjectNode.class))
-            .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
+                .mapNotNull(Secret::getStringData)
+                .mapNotNull(map -> map.get(resolveKey(notifierDescriptorName)))
+                .filter(StringUtils::isNotBlank)
+                .map(value -> JsonUtils.jsonToObject(value, ObjectNode.class))
+                .defaultIfEmpty(JsonNodeFactory.instance.objectNode());
     }
 
     String resolveKey(String notifierDescriptorName) {

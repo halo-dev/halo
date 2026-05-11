@@ -190,7 +190,7 @@ spec:
 1. 获取个人中心获取用户通知列表的 APIs 规则：
    `GET /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications`
 2. 将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-as-read`
-3.
+   3.
 
 批量将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-specified-as-read`
 

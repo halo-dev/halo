@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { ReverseProxyRule } from './reverse-proxy-rule';
 
 /**
- * <p>The reverse proxy custom resource is used to configure a path to proxy it to a directory or  file.</p>  <p>HTTP proxy may be added in the future.</p>
+ * The reverse proxy custom resource is used to configure a path to proxy it to a directory or file.   <p>HTTP proxy may be added in the future.
  */
 export interface ReverseProxy {
     'apiVersion': string;

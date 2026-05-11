@@ -25,13 +25,11 @@ public class UserNotificationPreference {
          * Gets notifiers by reason type.
          *
          * @param reasonType reason type
-         * @return if key of reasonType not exists, return default notifier, otherwise return the
-         * notifiers
+         * @return if key of reasonType not exists, return default notifier, otherwise return the notifiers
          */
         public Set<String> getNotifiers(String reasonType) {
             var result = this.get(reasonType);
-            return result == null ? Set.of(DEFAULT_NOTIFIER)
-                : defaultIfNull(result.getNotifiers(), Set.of());
+            return result == null ? Set.of(DEFAULT_NOTIFIER) : defaultIfNull(result.getNotifiers(), Set.of());
         }
     }
 

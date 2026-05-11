@@ -5,31 +5,29 @@ metadata:
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-attachments\" ]"
+    rbac.authorization.halo.run/dependencies: '[ "role-template-view-attachments" ]'
     rbac.authorization.halo.run/module: "Attachments Management"
     rbac.authorization.halo.run/display-name: "Attachment Manage"
     rbac.authorization.halo.run/ui-permissions: |
       ["system:attachments:manage"]
 rules:
-  - apiGroups: [ "storage.halo.run" ]
-    resources: [ "attachments", "policies", "policytemplates", "groups" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "attachments" ]
-    verbs: [ "*" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "attachments/upload-from-url" ]
-    verbs: [ "create" ]
-  - apiGroups: [ "" ]
-    resources: [ "settings" ]
-    verbs: [ "get" ]
-  - nonResourceURLs: [
-      "/apis/api.console.halo.run/v1alpha1/attachments/upload"
-    ]
-    verbs: [ "create" ]
-  - apiGroups: [ "console.api.storage.halo.run" ]
-    resources: [ "attachments/upload" ]
-    verbs: [ "create" ]
+  - apiGroups: ["storage.halo.run"]
+    resources: ["attachments", "policies", "policytemplates", "groups"]
+    verbs: ["*"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["attachments"]
+    verbs: ["*"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["attachments/upload-from-url"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["settings"]
+    verbs: ["get"]
+  - nonResourceURLs: ["/apis/api.console.halo.run/v1alpha1/attachments/upload"]
+    verbs: ["create"]
+  - apiGroups: ["console.api.storage.halo.run"]
+    resources: ["attachments/upload"]
+    verbs: ["create"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -43,9 +41,9 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:attachments:view"]
 rules:
-  - apiGroups: [ "storage.halo.run" ]
-    resources: [ "attachments", "policies", "policytemplates", "groups" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "attachments" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: ["storage.halo.run"]
+    resources: ["attachments", "policies", "policytemplates", "groups"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["attachments"]
+    verbs: ["get", "list"]

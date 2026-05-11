@@ -31,7 +31,8 @@ class SubscriptionRouterTest {
 
     @Test
     void getUnsubscribeUrlTest() throws MalformedURLException {
-        when(externalUrlSupplier.getRaw()).thenReturn(URI.create("https://halo.run").toURL());
+        when(externalUrlSupplier.getRaw())
+                .thenReturn(URI.create("https://halo.run").toURL());
         var subscription = new Subscription();
         subscription.setMetadata(new Metadata());
         subscription.getMetadata().setName("fake-subscription");
@@ -39,8 +40,9 @@ class SubscriptionRouterTest {
         subscription.getSpec().setUnsubscribeToken("fake-unsubscribe-token");
 
         var url = subscriptionRouter.getUnsubscribeUrl(subscription);
-        assertThat(url).isEqualTo("https://halo.run/apis/api.notification.halo.run/v1alpha1"
-            + "/subscriptions/fake-subscription/unsubscribe"
-            + "?token=fake-unsubscribe-token");
+        assertThat(url)
+                .isEqualTo("https://halo.run/apis/api.notification.halo.run/v1alpha1"
+                        + "/subscriptions/fake-subscription/unsubscribe"
+                        + "?token=fake-unsubscribe-token");
     }
 }

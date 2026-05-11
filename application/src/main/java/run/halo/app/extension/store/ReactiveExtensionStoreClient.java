@@ -40,5 +40,4 @@ public interface ReactiveExtensionStoreClient {
     Mono<ExtensionStore> update(String name, Long version, byte[] data);
 
     Mono<ExtensionStore> delete(String name, Long version);
-
 }

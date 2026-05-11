@@ -21,13 +21,18 @@ class RbacRequestEvaluationTest {
         assertThat(matchResourceName(rbacRequestEvaluation, "", "")).isTrue();
         assertThat(matchResourceName(rbacRequestEvaluation, "*", null)).isTrue();
 
-        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "fake/test")).isTrue();
+        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "fake/test"))
+                .isTrue();
 
-        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "hello/test")).isTrue();
-        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "hello/fake")).isFalse();
+        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "hello/test"))
+                .isTrue();
+        assertThat(matchResourceName(rbacRequestEvaluation, "*/test", "hello/fake"))
+                .isFalse();
 
-        assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "hello/fake")).isFalse();
-        assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "test/fake")).isTrue();
+        assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "hello/fake"))
+                .isFalse();
+        assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "test/fake"))
+                .isTrue();
         assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "test")).isTrue();
         assertThat(matchResourceName(rbacRequestEvaluation, "test/*", "hello")).isFalse();
 
@@ -38,10 +43,8 @@ class RbacRequestEvaluationTest {
         assertThat(matchResourceName(rbacRequestEvaluation, "*", "hello")).isTrue();
     }
 
-    boolean matchResourceName(RbacRequestEvaluation rbacRequestEvaluation, String rule,
-        String requestedName) {
-        return rbacRequestEvaluation.resourceNameMatches(new Role.PolicyRule.Builder()
-            .resourceNames(rule)
-            .build(), requestedName);
+    boolean matchResourceName(RbacRequestEvaluation rbacRequestEvaluation, String rule, String requestedName) {
+        return rbacRequestEvaluation.resourceNameMatches(
+                new Role.PolicyRule.Builder().resourceNames(rule).build(), requestedName);
     }
 }

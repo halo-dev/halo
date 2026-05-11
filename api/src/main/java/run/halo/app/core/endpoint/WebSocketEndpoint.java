@@ -30,5 +30,4 @@ public interface WebSocketEndpoint {
      * @return WebSocket handler.
      */
     WebSocketHandler handler();
-
 }

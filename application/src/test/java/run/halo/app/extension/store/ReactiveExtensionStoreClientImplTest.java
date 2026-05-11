@@ -34,9 +34,8 @@ class ReactiveExtensionStoreClientImplTest {
     @Test
     void listByNamePrefix() {
         var expectedExtensions = List.of(
-            new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L),
-            new ExtensionStore("/registry/posts/hello-halo", "this is post".getBytes(), 1L)
-        );
+                new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L),
+                new ExtensionStore("/registry/posts/hello-halo", "this is post".getBytes(), 1L));
 
         var select = mock(ReactiveSelectOperation.ReactiveSelect.class);
         var selectWithQuery = mock(ReactiveSelectOperation.SelectWithQuery.class);
@@ -46,19 +45,18 @@ class ReactiveExtensionStoreClientImplTest {
         when(select.withFetchSize(100)).thenReturn(selectWithQuery);
         when(entityOperations.select(ExtensionStore.class)).thenReturn(select);
 
-        client.listByNamePrefix("/registry/posts").collectList()
-            .as(StepVerifier::create)
-            .expectNext(expectedExtensions)
-            .verifyComplete();
+        client.listByNamePrefix("/registry/posts")
+                .collectList()
+                .as(StepVerifier::create)
+                .expectNext(expectedExtensions)
+                .verifyComplete();
     }
 
     @Test
     void fetchByName() {
-        var expectedExtension =
-            new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L);
+        var expectedExtension = new ExtensionStore("/registry/posts/hello-world", "this is post".getBytes(), 1L);
 
-        when(repository.findById("/registry/posts/hello-halo"))
-            .thenReturn(Mono.just(expectedExtension));
+        when(repository.findById("/registry/posts/hello-halo")).thenReturn(Mono.just(expectedExtension));
 
         var gotExtension = client.fetchByName("/registry/posts/hello-halo").blockOptional();
         assertTrue(gotExtension.isPresent());
@@ -67,14 +65,11 @@ class ReactiveExtensionStoreClientImplTest {
 
     @Test
     void create() {
-        var expectedExtension =
-            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+        var expectedExtension = new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
-        when(repository.save(any()))
-            .thenReturn(Mono.just(expectedExtension));
+        when(repository.save(any())).thenReturn(Mono.just(expectedExtension));
 
-        var createdExtension =
-            client.create("/registry/posts/hello-halo", "hello halo".getBytes())
+        var createdExtension = client.create("/registry/posts/hello-halo", "hello halo".getBytes())
                 .block();
 
         assertEquals(expectedExtension, createdExtension);
@@ -82,13 +77,11 @@ class ReactiveExtensionStoreClientImplTest {
 
     @Test
     void update() {
-        var expectedExtension =
-            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+        var expectedExtension = new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
         when(repository.save(any())).thenReturn(Mono.just(expectedExtension));
 
-        var updatedExtension =
-            client.update("/registry/posts/hello-halo", 1L, "hello halo".getBytes())
+        var updatedExtension = client.update("/registry/posts/hello-halo", 1L, "hello halo".getBytes())
                 .block();
 
         assertEquals(expectedExtension, updatedExtension);
@@ -103,8 +96,7 @@ class ReactiveExtensionStoreClientImplTest {
 
     @Test
     void shouldDeleteSuccessfully() {
-        var expectedExtension =
-            new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
+        var expectedExtension = new ExtensionStore("/registry/posts/hello-halo", "hello halo".getBytes(), 2L);
 
         when(repository.findById(anyString())).thenReturn(Mono.just(expectedExtension));
         when(repository.delete(any())).thenReturn(Mono.empty());

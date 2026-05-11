@@ -17,5 +17,4 @@ public interface SearchService {
      * @return search result
      */
     Mono<SearchResult> search(SearchOption option);
-
 }

@@ -34,5 +34,4 @@ public interface ReactiveSettingFetcher {
      * @return all setting values, never empty
      */
     Mono<Map<String, JsonNode>> getSettingValues();
-
 }

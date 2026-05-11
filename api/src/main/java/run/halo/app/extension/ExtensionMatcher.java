@@ -4,5 +4,4 @@ package run.halo.app.extension;
 public interface ExtensionMatcher {
 
     boolean match(Extension extension);
-
 }

@@ -16,7 +16,7 @@
 
 export interface UserConnectionSpec {
     /**
-     * The unique identifier for the user\'s connection to the OAuth provider.  for example, the user\'s GitHub id.
+     * The unique identifier for the user\'s connection to the OAuth provider. for example, the user\'s GitHub id.
      */
     'providerUserId': string;
     /**

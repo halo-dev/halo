@@ -1,12 +1,6 @@
 package run.halo.app.security;
 
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.ANONYMOUS_AUTHENTICATION;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.FIRST;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.FORM_LOGIN;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.HTTP_BASIC;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.LAST;
-import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.OAUTH2_AUTHORIZATION_CODE;
+import static org.springframework.security.config.web.server.SecurityWebFiltersOrder.*;
 
 import lombok.Setter;
 import org.pf4j.ExtensionPoint;
@@ -35,36 +29,17 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        http
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(BeforeSecurityWebFilter.class),
-                FIRST
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(HttpBasicSecurityWebFilter.class),
-                HTTP_BASIC
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class),
-                FORM_LOGIN
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AuthenticationSecurityWebFilter.class),
-                AUTHENTICATION
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AnonymousAuthenticationSecurityWebFilter.class),
-                ANONYMOUS_AUTHENTICATION
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(OAuth2AuthorizationCodeSecurityWebFilter.class),
-                OAUTH2_AUTHORIZATION_CODE
-            )
-            .addFilterAt(
-                new SecurityWebFilterChainProxy(AfterSecurityWebFilter.class),
-                LAST
-            )
-        ;
+        http.addFilterAt(new SecurityWebFilterChainProxy(BeforeSecurityWebFilter.class), FIRST)
+                .addFilterAt(new SecurityWebFilterChainProxy(HttpBasicSecurityWebFilter.class), HTTP_BASIC)
+                .addFilterAt(new SecurityWebFilterChainProxy(FormLoginSecurityWebFilter.class), FORM_LOGIN)
+                .addFilterAt(new SecurityWebFilterChainProxy(AuthenticationSecurityWebFilter.class), AUTHENTICATION)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(AnonymousAuthenticationSecurityWebFilter.class),
+                        ANONYMOUS_AUTHENTICATION)
+                .addFilterAt(
+                        new SecurityWebFilterChainProxy(OAuth2AuthorizationCodeSecurityWebFilter.class),
+                        OAUTH2_AUTHORIZATION_CODE)
+                .addFilterAt(new SecurityWebFilterChainProxy(AfterSecurityWebFilter.class), LAST);
     }
 
     public class SecurityWebFilterChainProxy implements WebFilter {
@@ -81,13 +56,13 @@ public class SecurityWebFiltersConfigurer implements SecurityConfigurer {
 
         @Override
         public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-            return extensionGetter.getExtensions(this.extensionPointClass)
-                .sort(AnnotationAwareOrderComparator.INSTANCE)
-                .cast(WebFilter.class)
-                .collectList()
-                .map(filters -> filterChainDecorator.decorate(chain, filters))
-                .flatMap(decoratedChain -> decoratedChain.filter(exchange));
+            return extensionGetter
+                    .getExtensions(this.extensionPointClass)
+                    .sort(AnnotationAwareOrderComparator.INSTANCE)
+                    .cast(WebFilter.class)
+                    .collectList()
+                    .map(filters -> filterChainDecorator.decorate(chain, filters))
+                    .flatMap(decoratedChain -> decoratedChain.filter(exchange));
         }
     }
-
 }

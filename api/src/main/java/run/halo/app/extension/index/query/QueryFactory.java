@@ -1,10 +1,6 @@
 package run.halo.app.extension.index.query;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
@@ -63,9 +59,7 @@ public class QueryFactory {
     }
 
     public static Query in(String fieldName, Collection<String> values) {
-        var convertedValues = values.stream()
-            .map(v -> (Object) v)
-            .collect(Collectors.toSet());
+        var convertedValues = values.stream().map(v -> (Object) v).collect(Collectors.toSet());
         return Queries.in(fieldName, convertedValues);
     }
 
@@ -75,22 +69,19 @@ public class QueryFactory {
             return queries.iterator().next();
         }
         return queries.stream()
-            .peek(query -> {
-                if (!(query instanceof Condition)) {
-                    throw new IllegalArgumentException(
-                        "Only Condition instances are supported in AND operations");
-                }
-            })
-            .map(query -> (Condition) query)
-            .reduce(Condition::and)
-            .orElseThrow(() -> new IllegalArgumentException("No Condition found in queries"));
+                .peek(query -> {
+                    if (!(query instanceof Condition)) {
+                        throw new IllegalArgumentException("Only Condition instances are supported in AND operations");
+                    }
+                })
+                .map(query -> (Condition) query)
+                .reduce(Condition::and)
+                .orElseThrow(() -> new IllegalArgumentException("No Condition found in queries"));
     }
 
     public static And and(Query left, Query right) {
-        Assert.isInstanceOf(Condition.class, left,
-            "Only Condition instances are supported in AND operations");
-        Assert.isInstanceOf(Condition.class, right,
-            "Only Condition instances are supported in AND operations");
+        Assert.isInstanceOf(Condition.class, left, "Only Condition instances are supported in AND operations");
+        Assert.isInstanceOf(Condition.class, right, "Only Condition instances are supported in AND operations");
         return new And((Condition) left, (Condition) right);
     }
 
@@ -116,15 +107,14 @@ public class QueryFactory {
             return queries.iterator().next();
         }
         return queries.stream()
-            .peek(query -> {
-                if (!(query instanceof Condition)) {
-                    throw new IllegalArgumentException(
-                        "Only Condition instances are supported in OR operations");
-                }
-            })
-            .map(query -> (Condition) query)
-            .reduce(Condition::or)
-            .orElseThrow(() -> new IllegalArgumentException("No Condition found in queries"));
+                .peek(query -> {
+                    if (!(query instanceof Condition)) {
+                        throw new IllegalArgumentException("Only Condition instances are supported in OR operations");
+                    }
+                })
+                .map(query -> (Condition) query)
+                .reduce(Condition::or)
+                .orElseThrow(() -> new IllegalArgumentException("No Condition found in queries"));
     }
 
     public static Query or(Query left, Query right) {
@@ -148,23 +138,19 @@ public class QueryFactory {
     }
 
     public static Query not(Query query) {
-        Assert.isInstanceOf(Condition.class, query,
-            "Only Condition instances are supported in NOT operations");
+        Assert.isInstanceOf(Condition.class, query, "Only Condition instances are supported in NOT operations");
         return ((Condition) query).not();
     }
 
-    public static Query betweenLowerExclusive(String fieldName, String lowerValue,
-        String upperValue) {
+    public static Query betweenLowerExclusive(String fieldName, String lowerValue, String upperValue) {
         return Queries.between(fieldName, lowerValue, false, upperValue, true);
     }
 
-    public static Query betweenUpperExclusive(String fieldName, String lowerValue,
-        String upperValue) {
+    public static Query betweenUpperExclusive(String fieldName, String lowerValue, String upperValue) {
         return Queries.between(fieldName, lowerValue, true, upperValue, false);
     }
 
-    public static Query betweenExclusive(String fieldName, String lowerValue,
-        String upperValue) {
+    public static Query betweenExclusive(String fieldName, String lowerValue, String upperValue) {
         return Queries.between(fieldName, lowerValue, false, upperValue, false);
     }
 
@@ -183,5 +169,4 @@ public class QueryFactory {
     public static Query contains(String fieldName, String value) {
         return Queries.contains(fieldName, value);
     }
-
 }

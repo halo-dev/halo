@@ -9,15 +9,15 @@ import org.springframework.web.server.ServerWebInputException;
  *
  * @author lywq
  * @since 2025/10/30 11:47
- **/
+ */
 public class RestrictedNameException extends ServerWebInputException {
 
     public RestrictedNameException() {
         super("The name is restricted");
     }
 
-    public RestrictedNameException(String reason, @Nullable String messageDetailCode,
-        @Null Object[] messageDetailArguments) {
+    public RestrictedNameException(
+            String reason, @Nullable String messageDetailCode, @Null Object[] messageDetailArguments) {
         super(reason, null, null, messageDetailCode, messageDetailArguments);
     }
 }

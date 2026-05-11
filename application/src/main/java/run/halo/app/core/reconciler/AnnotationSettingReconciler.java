@@ -47,8 +47,6 @@ public class AnnotationSettingReconciler implements Reconciler<Reconciler.Reques
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new AnnotationSetting())
-            .build();
+        return builder.extension(new AnnotationSetting()).build();
     }
 }

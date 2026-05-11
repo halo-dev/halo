@@ -9,6 +9,4 @@ import java.util.function.Supplier;
  * @author johnniang
  * @since 2.18.0
  */
-public interface PluginsRootGetter extends Supplier<Path> {
-
-}
+public interface PluginsRootGetter extends Supplier<Path> {}

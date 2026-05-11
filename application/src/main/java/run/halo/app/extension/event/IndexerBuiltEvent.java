@@ -4,9 +4,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import run.halo.app.extension.Scheme;
 
-/**
- * IndexBuildEvent is fired when index build of a scheme is triggered and completed.
- */
+/** IndexBuildEvent is fired when index build of a scheme is triggered and completed. */
 public class IndexerBuiltEvent extends ApplicationEvent {
 
     @Getter
@@ -16,5 +14,4 @@ public class IndexerBuiltEvent extends ApplicationEvent {
         super(source);
         this.scheme = scheme;
     }
-
 }

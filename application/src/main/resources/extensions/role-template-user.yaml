@@ -12,12 +12,12 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:users:manage"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "users" ]
-    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users", "users/permissions", "users/password", "users/avatar" ]
-    verbs: [ "*" ]
+  - apiGroups: [""]
+    resources: ["users"]
+    verbs: ["create", "patch", "update", "delete", "deletecollection"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users", "users/permissions", "users/password", "users/avatar"]
+    verbs: ["*"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -31,12 +31,12 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:users:view"]
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "users" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users" ]
-    verbs: [ "get", "list" ]
+  - apiGroups: [""]
+    resources: ["users"]
+    verbs: ["get", "list"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users"]
+    verbs: ["get", "list"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -49,6 +49,6 @@ metadata:
     rbac.authorization.halo.run/module: "Users Management"
     rbac.authorization.halo.run/display-name: "User Password Change"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users/password" ]
-    verbs: [ "update" ]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["users/password"]
+    verbs: ["update"]

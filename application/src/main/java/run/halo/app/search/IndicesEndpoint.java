@@ -28,23 +28,22 @@ public class IndicesEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "IndicesV1alpha1Console";
         return SpringdocRouteBuilder.route()
-            .POST("/indices/-/rebuild", this::rebuildIndices,
-                builder -> builder.operationId("RebuildAllIndices")
-                    .tag(tag)
-                    .description("Rebuild all indices")
-            )
-            .build();
+                .POST(
+                        "/indices/-/rebuild",
+                        this::rebuildIndices,
+                        builder -> builder.operationId("RebuildAllIndices")
+                                .tag(tag)
+                                .description("Rebuild all indices"))
+                .build();
     }
 
     private Mono<ServerResponse> rebuildIndices(ServerRequest serverRequest) {
-        return Mono.fromRunnable(
-            () -> eventPublisher.publishEvent(new HaloDocumentRebuildRequestEvent(this))
-        ).then(ServerResponse.accepted().build());
+        return Mono.fromRunnable(() -> eventPublisher.publishEvent(new HaloDocumentRebuildRequestEvent(this)))
+                .then(ServerResponse.accepted().build());
     }
 
     @Override
     public GroupVersion groupVersion() {
         return GroupVersion.parseAPIVersion(API_VERSION);
     }
-
 }

@@ -8,8 +8,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
- * ExtensionClient is an interface which contains some operations on Extension instead of
- * ExtensionStore.
+ * ExtensionClient is an interface which contains some operations on Extension instead of ExtensionStore.
  *
  * @author johnniang
  */
@@ -24,8 +23,7 @@ public interface ReactiveExtensionClient {
      * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
-    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator);
+    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate, Comparator<E> comparator);
 
     /**
      * Lists Extensions by Extension type, filter, sorter and page info.
@@ -39,21 +37,19 @@ public interface ReactiveExtensionClient {
      * @return a list of Extensions.
      */
     @Deprecated
-    <E extends Extension> Mono<ListResult<E>> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size);
+    <E extends Extension> Mono<ListResult<E>> list(
+            Class<E> type, Predicate<E> predicate, Comparator<E> comparator, int page, int size);
 
     <E extends Extension> Flux<E> listAll(Class<E> type, ListOptions options, Sort sort);
 
     <E extends Extension> Flux<String> listAllNames(Class<E> type, ListOptions options, Sort sort);
 
-    <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort,
-        int topN);
+    <E extends Extension> Flux<String> listTopNames(Class<E> type, ListOptions options, Sort sort, int topN);
 
-    <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options,
-        PageRequest pageable);
+    <E extends Extension> Mono<ListResult<E>> listBy(Class<E> type, ListOptions options, PageRequest pageable);
 
-    <E extends Extension> Mono<ListResult<String>> listNamesBy(Class<E> type, ListOptions options,
-        PageRequest pageable);
+    <E extends Extension> Mono<ListResult<String>> listNamesBy(
+            Class<E> type, ListOptions options, PageRequest pageable);
 
     <E extends Extension> Mono<Long> countBy(Class<E> type, ListOptions options);
 
@@ -77,8 +73,7 @@ public interface ReactiveExtensionClient {
     /**
      * Creates an Extension.
      *
-     * @param extension is fresh Extension to be created. Please make sure the Extension name does
-     * not exist.
+     * @param extension is fresh Extension to be created. Please make sure the Extension name does not exist.
      * @param <E> is Extension type.
      */
     <E extends Extension> Mono<E> create(E extension);
@@ -86,8 +81,7 @@ public interface ReactiveExtensionClient {
     /**
      * Updates an Extension.
      *
-     * @param extension is an Extension to be updated. Please make sure the resource version is
-     * latest.
+     * @param extension is an Extension to be updated. Please make sure the resource version is latest.
      * @param <E> is Extension type.
      */
     <E extends Extension> Mono<E> update(E extension);
@@ -95,8 +89,7 @@ public interface ReactiveExtensionClient {
     /**
      * Deletes an Extension.
      *
-     * @param extension is an Extension to be deleted. Please make sure the resource version is
-     * latest.
+     * @param extension is an Extension to be deleted. Please make sure the resource version is latest.
      * @param <E> is Extension type.
      */
     <E extends Extension> Mono<E> delete(E extension);
@@ -105,5 +98,4 @@ public interface ReactiveExtensionClient {
     IndexedQueryEngine indexedQueryEngine();
 
     void watch(Watcher watcher);
-
 }

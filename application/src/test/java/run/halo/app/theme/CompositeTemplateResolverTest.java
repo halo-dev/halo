@@ -1,8 +1,6 @@
 package run.halo.app.theme;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,10 +37,7 @@ class CompositeTemplateResolverTest {
     @Test
     void shouldThrowNotFoundExceptionIfNoResolvers() {
         var resolver = new CompositeTemplateResolver(null);
-        assertThrows(
-            NotFoundException.class,
-            () -> resolver.resolveTemplate(null, null, null, null)
-        );
+        assertThrows(NotFoundException.class, () -> resolver.resolveTemplate(null, null, null, null));
     }
 
     @Test
@@ -52,21 +47,16 @@ class CompositeTemplateResolverTest {
         var resolverB = mock(ITemplateResolver.class);
         when(resolverB.resolveTemplate(null, null, null, null)).thenReturn(null);
         var resolver = new CompositeTemplateResolver(List.of(resolverA, resolverB));
-        assertThrows(
-            NotFoundException.class,
-            () -> resolver.resolveTemplate(null, null, null, null)
-        );
+        assertThrows(NotFoundException.class, () -> resolver.resolveTemplate(null, null, null, null));
     }
 
     @Test
     void shouldResolveTemplateIfResolvedByOneOfResolvers() {
         var resolverA = mock(ITemplateResolver.class);
         var resolution = mock(TemplateResolution.class);
-        when(resolverA.resolveTemplate(null, null, null, null))
-            .thenReturn(resolution);
+        when(resolverA.resolveTemplate(null, null, null, null)).thenReturn(resolution);
         var resolverB = mock(ITemplateResolver.class);
-        when(resolverB.resolveTemplate(null, null, null, null))
-            .thenReturn(null);
+        when(resolverB.resolveTemplate(null, null, null, null)).thenReturn(null);
         var resolver = new CompositeTemplateResolver(List.of(resolverA, resolverB));
         assertEquals(resolution, resolver.resolveTemplate(null, null, null, null));
     }

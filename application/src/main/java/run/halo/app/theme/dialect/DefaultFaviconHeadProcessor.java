@@ -24,16 +24,15 @@ public class DefaultFaviconHeadProcessor implements TemplateHeadProcessor {
     private final SystemConfigFetcher fetcher;
 
     @Override
-    public Mono<Void> process(ITemplateContext context, IModel model,
-        IElementModelStructureHandler structureHandler) {
+    public Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler) {
         return fetchBasicSetting()
-            .filter(basic -> StringUtils.isNotBlank(basic.getFavicon()))
-            .map(basic -> {
-                IModelFactory modelFactory = context.getModelFactory();
-                model.add(modelFactory.createText(faviconSnippet(basic.getFavicon())));
-                return model;
-            })
-            .then();
+                .filter(basic -> StringUtils.isNotBlank(basic.getFavicon()))
+                .map(basic -> {
+                    IModelFactory modelFactory = context.getModelFactory();
+                    model.add(modelFactory.createText(faviconSnippet(basic.getFavicon())));
+                    return model;
+                })
+                .then();
     }
 
     private String faviconSnippet(String favicon) {

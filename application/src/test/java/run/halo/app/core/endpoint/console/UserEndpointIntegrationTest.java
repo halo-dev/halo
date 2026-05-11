@@ -43,10 +43,10 @@ public class UserEndpointIntegrationTest {
     @BeforeEach
     void setUp() {
         var rule = new Role.PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .verbs("*")
-            .build();
+                .apiGroups("*")
+                .resources("*")
+                .verbs("*")
+                .build();
         var role = new Role();
         role.setMetadata(new Metadata());
         role.getMetadata().setName("fake-super-role");
@@ -59,39 +59,36 @@ public class UserEndpointIntegrationTest {
     class UserListTest {
         @Test
         void shouldFilterUsersWhenDisplayNameKeywordProvided() {
-            var expectUser =
-                createUser("fake-user-2", "expected display name");
-            var unexpectedUser1 =
-                createUser("fake-user-1", "first fake display name");
-            var unexpectedUser2 =
-                createUser("fake-user-3", "second fake display name");
+            var expectUser = createUser("fake-user-2", "expected display name");
+            var unexpectedUser1 = createUser("fake-user-1", "first fake display name");
+            var unexpectedUser2 = createUser("fake-user-3", "second fake display name");
 
             client.create(expectUser).block();
             client.create(unexpectedUser1).block();
             client.create(unexpectedUser2).block();
 
             when(roleService.list(anySet())).thenReturn(Flux.empty());
-            when(roleService.getRolesByUsernames(
-                List.of("fake-user-2")
-            )).thenReturn(Mono.just(Map.of("fake-user-2", Set.of("fake-super-role"))));
+            when(roleService.getRolesByUsernames(List.of("fake-user-2")))
+                    .thenReturn(Mono.just(Map.of("fake-user-2", Set.of("fake-super-role"))));
 
-            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users?keyword=Expected")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(1)
-                .jsonPath("$.items[0].user.metadata.name").isEqualTo("fake-user-2");
-
+            webClient
+                    .get()
+                    .uri("/apis/api.console.halo.run/v1alpha1/users?keyword=Expected")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(1)
+                    .jsonPath("$.items[0].user.metadata.name")
+                    .isEqualTo("fake-user-2");
         }
 
         @Test
         void shouldFilterUsersWhenUserNameKeywordProvided() {
-            var expectUser =
-                createUser("fake-user", "expected display name");
-            var unexpectedUser1 =
-                createUser("fake-user-1", "first fake display name");
-            var unexpectedUser2 =
-                createUser("fake-user-3", "second fake display name");
+            var expectUser = createUser("fake-user", "expected display name");
+            var unexpectedUser1 = createUser("fake-user-1", "first fake display name");
+            var unexpectedUser2 = createUser("fake-user-3", "second fake display name");
 
             client.create(expectUser).block();
             client.create(unexpectedUser1).block();
@@ -99,14 +96,19 @@ public class UserEndpointIntegrationTest {
 
             when(roleService.list(anySet())).thenReturn(Flux.empty());
             when(roleService.getRolesByUsernames(List.of("fake-user")))
-                .thenReturn(Mono.just(Map.of("fake-user", Set.of("fake-super-role"))));
+                    .thenReturn(Mono.just(Map.of("fake-user", Set.of("fake-super-role"))));
 
-            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users?keyword=fake-user")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items.length()").isEqualTo(1)
-                .jsonPath("$.items[0].user.metadata.name").isEqualTo("fake-user");
+            webClient
+                    .get()
+                    .uri("/apis/api.console.halo.run/v1alpha1/users?keyword=fake-user")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.items.length()")
+                    .isEqualTo(1)
+                    .jsonPath("$.items[0].user.metadata.name")
+                    .isEqualTo("fake-user");
         }
     }
 

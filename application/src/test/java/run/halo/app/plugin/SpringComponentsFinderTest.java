@@ -1,10 +1,6 @@
 package run.halo.app.plugin;
 
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,16 +36,12 @@ class SpringComponentsFinderTest {
 
     @Test
     void shouldNotInvokeReadClasspathStorages() {
-        assertThrows(UnsupportedOperationException.class,
-            () -> finder.readClasspathStorages()
-        );
+        assertThrows(UnsupportedOperationException.class, () -> finder.readClasspathStorages());
     }
 
     @Test
     void shouldNotInvokeReadPluginsStorages() {
-        assertThrows(UnsupportedOperationException.class,
-            () -> finder.readPluginsStorages()
-        );
+        assertThrows(UnsupportedOperationException.class, () -> finder.readPluginsStorages());
     }
 
     @Test

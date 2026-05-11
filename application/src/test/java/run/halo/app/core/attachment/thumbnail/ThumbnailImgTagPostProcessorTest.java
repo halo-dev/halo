@@ -46,45 +46,31 @@ class ThumbnailImgTagPostProcessorTest {
     void shouldReturnEmptyIfImgTagWithoutSrc() {
         var imgTag = modelFactory.createStandaloneElementTag("img");
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        processor.process(templateContext, imgTag).as(StepVerifier::create).verifyComplete();
     }
 
     @Test
     void shouldReturnEmptyIfImgTagWithSrcSet() {
         var imgTag = modelFactory.createStandaloneElementTag(
-            "img",
-            Map.of("src", "/halo.png",
-                "srcset", "fake-srcset"),
-            AttributeValueQuotes.DOUBLE,
-            true,
-            true);
+                "img", Map.of("src", "/halo.png", "srcset", "fake-srcset"), AttributeValueQuotes.DOUBLE, true, true);
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        processor.process(templateContext, imgTag).as(StepVerifier::create).verifyComplete();
     }
 
     @Test
     void shouldReturnEmptyIfNotImgTag() {
         var imgTag = modelFactory.createStandaloneElementTag("not-a-img");
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        processor.process(templateContext, imgTag).as(StepVerifier::create).verifyComplete();
     }
 
     @Test
     void shouldReturnEmptyIfNoThumbnailsFound() {
         var imgTag = modelFactory.createStandaloneElementTag("img", "src", "/halo.png");
 
-        when(thumbnailService.get(URI.create("/halo.png")))
-            .thenReturn(Mono.just(Map.of()));
+        when(thumbnailService.get(URI.create("/halo.png"))).thenReturn(Mono.just(Map.of()));
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        processor.process(templateContext, imgTag).as(StepVerifier::create).verifyComplete();
     }
 
     @Test
@@ -93,39 +79,37 @@ class ThumbnailImgTagPostProcessorTest {
 
         when(templateContext.getModelFactory()).thenReturn(modelFactory);
         when(thumbnailService.get(URI.create("/halo.png")))
-            .thenReturn(Mono.just(Map.of(ThumbnailSize.S, URI.create("/halo.png?width=400"))));
+                .thenReturn(Mono.just(Map.of(ThumbnailSize.S, URI.create("/halo.png?width=400"))));
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .assertNext(tag -> {
-                var srcset = tag.getAttribute("srcset");
-                assertEquals("/halo.png?width=400 400w", srcset.getValue());
-                assertTrue(tag.hasAttribute("sizes"));
-            })
-            .verifyComplete();
+        processor
+                .process(templateContext, imgTag)
+                .as(StepVerifier::create)
+                .assertNext(tag -> {
+                    var srcset = tag.getAttribute("srcset");
+                    assertEquals("/halo.png?width=400 400w", srcset.getValue());
+                    assertTrue(tag.hasAttribute("sizes"));
+                })
+                .verifyComplete();
     }
 
     @Test
     void shouldReturnTagIfImgTagWithSrcAndSizes() {
         var imgTag = modelFactory.createStandaloneElementTag(
-            "img",
-            Map.of("src", "/halo.png",
-                "sizes", "fake-sizes"),
-            AttributeValueQuotes.DOUBLE,
-            true,
-            true);
+                "img", Map.of("src", "/halo.png", "sizes", "fake-sizes"), AttributeValueQuotes.DOUBLE, true, true);
 
         when(templateContext.getModelFactory()).thenReturn(modelFactory);
         when(thumbnailService.get(URI.create("/halo.png")))
-            .thenReturn(Mono.just(Map.of(ThumbnailSize.S, URI.create("/halo.png?width=400"))));
+                .thenReturn(Mono.just(Map.of(ThumbnailSize.S, URI.create("/halo.png?width=400"))));
 
-        processor.process(templateContext, imgTag)
-            .as(StepVerifier::create)
-            .assertNext(tag -> {
-                assertEquals("/halo.png?width=400 400w", tag.getAttribute("srcset").getValue());
-                assertEquals("fake-sizes", tag.getAttribute("sizes").getValue());
-            })
-            .verifyComplete();
+        processor
+                .process(templateContext, imgTag)
+                .as(StepVerifier::create)
+                .assertNext(tag -> {
+                    assertEquals(
+                            "/halo.png?width=400 400w",
+                            tag.getAttribute("srcset").getValue());
+                    assertEquals("fake-sizes", tag.getAttribute("sizes").getValue());
+                })
+                .verifyComplete();
     }
-
 }

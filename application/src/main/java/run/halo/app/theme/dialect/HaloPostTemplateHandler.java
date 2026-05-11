@@ -29,9 +29,10 @@ public class HaloPostTemplateHandler extends AbstractTemplateHandler {
     public void setContext(ITemplateContext context) {
         super.setContext(context);
         this.postProcessors = Optional.ofNullable(getApplicationContext(context))
-            .map(appContext -> appContext.getBeanProvider(ExtensionGetter.class).getIfUnique())
-            .map(extensionGetter -> extensionGetter.getExtensionList(ElementTagPostProcessor.class))
-            .orElseGet(List::of);
+                .map(appContext ->
+                        appContext.getBeanProvider(ExtensionGetter.class).getIfUnique())
+                .map(extensionGetter -> extensionGetter.getExtensionList(ElementTagPostProcessor.class))
+                .orElseGet(List::of);
     }
 
     @Override
@@ -46,22 +47,18 @@ public class HaloPostTemplateHandler extends AbstractTemplateHandler {
         super.handleOpenElement((IOpenElementTag) processedTag);
     }
 
-
     private IProcessableElementTag handleElementTag(IProcessableElementTag processableElementTag) {
         IProcessableElementTag processedTag = processableElementTag;
         if (!CollectionUtils.isEmpty(postProcessors)) {
             var tagProcessorChain = Mono.just(processableElementTag);
             var context = getContext();
             for (ElementTagPostProcessor elementTagPostProcessor : postProcessors) {
-                tagProcessorChain = tagProcessorChain.flatMap(
-                    tag -> elementTagPostProcessor.process(
-                            SecureTemplateContextWrapper.wrap(context), tag)
-                        .defaultIfEmpty(tag)
-                );
+                tagProcessorChain = tagProcessorChain.flatMap(tag -> elementTagPostProcessor
+                        .process(SecureTemplateContextWrapper.wrap(context), tag)
+                        .defaultIfEmpty(tag));
             }
-            processedTag =
-                Objects.requireNonNull(tagProcessorChain.defaultIfEmpty(processableElementTag)
-                    .block(Duration.ofMinutes(1)));
+            processedTag = Objects.requireNonNull(
+                    tagProcessorChain.defaultIfEmpty(processableElementTag).block(Duration.ofMinutes(1)));
         }
         return processedTag;
     }

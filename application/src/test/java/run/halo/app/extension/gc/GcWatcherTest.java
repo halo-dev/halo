@@ -3,10 +3,7 @@ package run.halo.app.extension.gc;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -80,7 +77,6 @@ class GcWatcherTest {
         assertTrue(watcher.isDisposed());
         verify(run).run();
     }
-
 
     FakeExtension createExtension() {
         var fake = new FakeExtension();

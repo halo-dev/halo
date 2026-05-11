@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { SubscriptionSpec } from './subscription-spec';
 
 /**
- * <p>{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a  certain {@link Reason Reason} is triggered.</p>  <p>It holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to  subscribe to.</p>
+ * {@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a certain {@link Reason Reason} is  triggered.   <p>It holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to subscribe to.
  */
 export interface Subscription {
     'apiVersion': string;

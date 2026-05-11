@@ -21,11 +21,7 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = GROUP,
-    version = VERSION,
-    kind = KIND,
-    singular = "user",
-    plural = "users")
+@GVK(group = GROUP, version = VERSION, kind = KIND, singular = "user", plural = "users")
 public class User extends AbstractExtension {
 
     public static final String GROUP = "";
@@ -38,8 +34,7 @@ public class User extends AbstractExtension {
 
     public static final String EMAIL_TO_VERIFY = "halo.run/email-to-verify";
 
-    public static final String LAST_AVATAR_ATTACHMENT_NAME_ANNO =
-        "halo.run/last-avatar-attachment-name";
+    public static final String LAST_AVATAR_ATTACHMENT_NAME_ANNO = "halo.run/last-avatar-attachment-name";
 
     public static final String AVATAR_ATTACHMENT_NAME_ANNO = "halo.run/avatar-attachment-name";
 
@@ -80,14 +75,11 @@ public class User extends AbstractExtension {
         private Boolean disabled;
 
         private Integer loginHistoryLimit;
-
     }
 
     @Data
     public static class UserStatus {
 
         private String permalink;
-
     }
-
 }

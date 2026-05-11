@@ -33,23 +33,21 @@ public enum AuthorityUtils {
     /**
      * Converts an array of GrantedAuthority objects to a role set.
      *
-     * @return a Set of the Strings obtained from each call to
-     * GrantedAuthority.getAuthority() and filtered by prefix "ROLE_".
+     * @return a Set of the Strings obtained from each call to GrantedAuthority.getAuthority() and filtered by prefix
+     *     "ROLE_".
      */
-    public static Set<String> authoritiesToRoles(
-        Collection<? extends GrantedAuthority> authorities) {
+    public static Set<String> authoritiesToRoles(Collection<? extends GrantedAuthority> authorities) {
         return authorities.stream()
-            .map(GrantedAuthority::getAuthority)
-            .filter(authority -> StringUtils.startsWith(authority, ROLE_PREFIX))
-            .map(authority -> {
-                authority = StringUtils.removeStart(authority, ROLE_PREFIX);
-                return authority;
-            })
-            .collect(Collectors.toSet());
+                .map(GrantedAuthority::getAuthority)
+                .filter(authority -> StringUtils.startsWith(authority, ROLE_PREFIX))
+                .map(authority -> {
+                    authority = StringUtils.removeStart(authority, ROLE_PREFIX);
+                    return authority;
+                })
+                .collect(Collectors.toSet());
     }
 
     public static boolean containsSuperRole(Collection<String> roles) {
         return roles.contains(SUPER_ROLE_NAME);
     }
-
 }

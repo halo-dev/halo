@@ -9,7 +9,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.utils.ReactiveUtils;
 
 /**
- * <p>A value fetcher for plugin form configuration.</p>
+ * A value fetcher for plugin form configuration.
  *
  * @author guqing
  * @since 2.0.0
@@ -24,8 +24,7 @@ class DefaultSettingFetcher implements SettingFetcher {
 
     @Override
     public <T> Optional<T> fetch(String group, Class<T> clazz) {
-        return delegateFetcher.fetch(group, clazz)
-            .blockOptional(BLOCKING_TIMEOUT);
+        return delegateFetcher.fetch(group, clazz).blockOptional(BLOCKING_TIMEOUT);
     }
 
     @Override

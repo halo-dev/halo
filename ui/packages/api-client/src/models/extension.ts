@@ -18,7 +18,7 @@
 import type { Metadata } from './metadata';
 
 /**
- * Extension is an interface which represents an Extension. It contains setters and getters of  GroupVersionKind and Metadata.
+ * Extension is an interface which represents an Extension. It contains setters and getters of GroupVersionKind and  Metadata.
  */
 export interface Extension {
     'apiVersion': string;

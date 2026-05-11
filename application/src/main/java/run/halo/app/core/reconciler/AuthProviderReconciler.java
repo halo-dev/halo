@@ -28,27 +28,23 @@ public class AuthProviderReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(AuthProvider.class, request.name())
-            .ifPresent(this::handlePrivileged);
+        client.fetch(AuthProvider.class, request.name()).ifPresent(this::handlePrivileged);
         return Result.doNotRetry();
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        return builder
-            .extension(new AuthProvider())
-            .build();
+        return builder.extension(new AuthProvider()).build();
     }
 
     private void handlePrivileged(AuthProvider authProvider) {
         if (privileged(authProvider)) {
-            authProviderService.enable(authProvider.getMetadata().getName())
-                .block(BLOCKING_TIMEOUT);
+            authProviderService.enable(authProvider.getMetadata().getName()).block(BLOCKING_TIMEOUT);
         }
     }
 
     private boolean privileged(AuthProvider authProvider) {
-        return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
-            .get(AuthProvider.PRIVILEGED_LABEL));
+        return BooleanUtils.TRUE.equals(
+                MetadataUtil.nullSafeLabels(authProvider).get(AuthProvider.PRIVILEGED_LABEL));
     }
 }

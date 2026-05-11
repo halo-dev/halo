@@ -1,12 +1,8 @@
 package run.halo.app.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
@@ -42,10 +38,8 @@ class DefaultSettingFetcherTest {
     private ReactiveExtensionClient client;
 
     @MockitoBean
-    private final PluginContext pluginContext = PluginContext.builder()
-        .name("fake")
-        .configMapName("fake-config")
-        .build();
+    private final PluginContext pluginContext =
+            PluginContext.builder().name("fake").configMapName("fake-config").build();
 
     @Mock
     private ApplicationContext applicationContext;
@@ -62,7 +56,7 @@ class DefaultSettingFetcherTest {
 
         ConfigMap configMap = buildConfigMap();
         when(client.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
-            .thenReturn(Mono.just(configMap));
+                .thenReturn(Mono.just(configMap));
     }
 
     @Test
@@ -95,7 +89,7 @@ class DefaultSettingFetcherTest {
             }
             """);
         when(client.fetch(eq(ConfigMap.class), eq(pluginContext.getConfigMapName())))
-            .thenReturn(Mono.just(configMap));
+                .thenReturn(Mono.just(configMap));
         when(client.update(configMap)).thenReturn(Mono.just(configMap));
         reactiveSettingFetcher.reconcile(new Reconciler.Request(pluginContext.getConfigMapName()));
 
@@ -106,8 +100,7 @@ class DefaultSettingFetcherTest {
         Map<String, JsonNode> updatedValues = settingFetcher.getValues();
         verify(client, times(3)).fetch(eq(ConfigMap.class), any());
         assertThat(updatedValues).hasSize(2);
-        JSONAssert.assertEquals(configMap.getData().get("sns"),
-            JsonUtils.objectToJson(updatedValues.get("sns")), true);
+        JSONAssert.assertEquals(configMap.getData().get("sns"), JsonUtils.objectToJson(updatedValues.get("sns")), true);
 
         updatedValues = settingFetcher.getValues();
         assertThat(updatedValues).hasSize(2);
@@ -170,7 +163,11 @@ class DefaultSettingFetcherTest {
             """;
     }
 
-    record Sns(String email, String github, String instagram, String twitter,
-               Map<String, Object> user, List<Integer> nums) {
-    }
+    record Sns(
+            String email,
+            String github,
+            String instagram,
+            String twitter,
+            Map<String, Object> user,
+            List<Integer> nums) {}
 }

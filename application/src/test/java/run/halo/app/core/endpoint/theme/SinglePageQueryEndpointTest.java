@@ -45,20 +45,23 @@ class SinglePageQueryEndpointTest {
     @Test
     void getByName() {
         SinglePageVo singlePage = SinglePageVo.builder()
-            .metadata(metadata("fake-page"))
-            .spec(new SinglePage.SinglePageSpec())
-            .build();
+                .metadata(metadata("fake-page"))
+                .spec(new SinglePage.SinglePageSpec())
+                .build();
 
-        when(singlePageFinder.getByName(eq("fake-page")))
-            .thenReturn(Mono.just(singlePage));
+        when(singlePageFinder.getByName(eq("fake-page"))).thenReturn(Mono.just(singlePage));
 
-        webTestClient.get()
-            .uri("/singlepages/fake-page")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("fake-page");
+        webTestClient
+                .get()
+                .uri("/singlepages/fake-page")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.metadata.name")
+                .isEqualTo("fake-page");
 
         verify(singlePageFinder).getByName("fake-page");
     }

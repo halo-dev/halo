@@ -39,5 +39,4 @@ public interface ValueIndexSpec<E extends Extension, K extends Comparable<K>> {
      * @return the type of the key
      */
     Class<K> getKeyType();
-
 }

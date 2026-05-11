@@ -16,16 +16,12 @@ import run.halo.app.core.attachment.ThumbnailSize;
 public enum ThumbnailUtils {
     ;
 
-    private static final Set<String> SUPPORTED_IMAGE_SUFFIXES = Set.of(
-        "jpg", "jpeg", "png", "bmp", "wbmp"
-    );
+    private static final Set<String> SUPPORTED_IMAGE_SUFFIXES = Set.of("jpg", "jpeg", "png", "bmp", "wbmp");
 
-    private static final Set<MimeType> SUPPORTED_IMAGE_MIME_TYPES = Set.of(
-            "image/jpg", "image/jpeg", "image/png", "image/bmp", "image/vnd.wap.wbmp"
-        )
-        .stream()
-        .map(MediaType::parseMediaType)
-        .collect(Collectors.toSet());
+    private static final Set<MimeType> SUPPORTED_IMAGE_MIME_TYPES =
+            Set.of("image/jpg", "image/jpeg", "image/png", "image/bmp", "image/vnd.wap.wbmp").stream()
+                    .map(MediaType::parseMediaType)
+                    .collect(Collectors.toSet());
 
     /**
      * Check if the given file suffix is a supported image format for thumbnail generation.
@@ -41,8 +37,7 @@ public enum ThumbnailUtils {
     }
 
     public static boolean isSupportedImage(@Nullable MimeType mimeType) {
-        return SUPPORTED_IMAGE_MIME_TYPES.stream()
-            .anyMatch(supported -> supported.isCompatibleWith(mimeType));
+        return SUPPORTED_IMAGE_MIME_TYPES.stream().anyMatch(supported -> supported.isCompatibleWith(mimeType));
     }
 
     /**
@@ -57,11 +52,11 @@ public enum ThumbnailUtils {
             return Map.of();
         }
         return Arrays.stream(ThumbnailSize.values())
-            .collect(Collectors.toMap(t -> t, t ->
-                UriComponentsBuilder.fromUri(permalink)
-                    .queryParam("width", t.getWidth())
-                    .build(true)
-                    .toUri()
-            ));
+                .collect(Collectors.toMap(
+                        t -> t,
+                        t -> UriComponentsBuilder.fromUri(permalink)
+                                .queryParam("width", t.getWidth())
+                                .build(true)
+                                .toUri()));
     }
 }

@@ -81,3 +81,4 @@ public class MySharedEvent extends ApplicationEvent {
 > 1. 共享事件必须继承 `ApplicationEvent`。
 > 2. 共享事件必须被 `@SharedEvent` 注解标记。
 > 3. 如果想要被其他插件订阅，则需要将该事件类发布到 Maven 仓库中，供其他插件引用。
+

@@ -19,9 +19,7 @@ public class DefaultControllerManager implements ApplicationContextAware, SmartL
 
     private ApplicationContext applicationContext;
 
-    /**
-     * Map with key: reconciler class name, value: controller self.
-     */
+    /** Map with key: reconciler class name, value: controller self. */
     private final ConcurrentHashMap<String, Controller> controllers;
 
     private volatile boolean running;
@@ -38,10 +36,10 @@ public class DefaultControllerManager implements ApplicationContextAware, SmartL
         }
         this.running = true;
         // register reconcilers in system after scheme initialized
-        applicationContext.<Reconciler<Request>>getBeanProvider(
-                forClassWithGenerics(Reconciler.class, Request.class))
-            .orderedStream()
-            .forEach(this::start);
+        applicationContext
+                .<Reconciler<Request>>getBeanProvider(forClassWithGenerics(Reconciler.class, Request.class))
+                .orderedStream()
+                .forEach(this::start);
     }
 
     void start(Reconciler<Request> reconciler) {
@@ -80,7 +78,6 @@ public class DefaultControllerManager implements ApplicationContextAware, SmartL
         this.applicationContext = applicationContext;
     }
 
-
     @Override
     public boolean isRunning() {
         return running;
@@ -90,5 +87,4 @@ public class DefaultControllerManager implements ApplicationContextAware, SmartL
     public int getPhase() {
         return InitializationPhase.CONTROLLERS.getPhase();
     }
-
 }

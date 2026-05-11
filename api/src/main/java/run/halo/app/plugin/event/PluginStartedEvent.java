@@ -13,5 +13,4 @@ public class PluginStartedEvent extends ApplicationEvent {
     public PluginStartedEvent(Object source) {
         super(source);
     }
-
 }

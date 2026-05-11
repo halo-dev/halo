@@ -10,14 +10,15 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * <p>{@link Notification} is a custom extension that used to store notification information for
- * inner use, it's on-site notification.</p>
+ * {@link Notification} is a custom extension that used to store notification information for inner use, it's on-site
+ * notification.
  *
- * <p>Supports the following operations:</p>
+ * <p>Supports the following operations:
+ *
  * <ul>
- *    <li>Marked as read: {@link NotificationSpec#setUnread(boolean)}</li>
- *    <li>Get the last read time: {@link NotificationSpec#getLastReadAt()}</li>
- *    <li>Filter by recipient: {@link NotificationSpec#getRecipient()}</li>
+ *   <li>Marked as read: {@link NotificationSpec#setUnread(boolean)}
+ *   <li>Get the last read time: {@link NotificationSpec#getLastReadAt()}
+ *   <li>Filter by recipient: {@link NotificationSpec#getRecipient()}
  * </ul>
  *
  * @author guqing
@@ -27,8 +28,12 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "notification.halo.run", version = "v1alpha1", kind = "Notification", plural =
-    "notifications", singular = "notification")
+@GVK(
+        group = "notification.halo.run",
+        version = "v1alpha1",
+        kind = "Notification",
+        plural = "notifications",
+        singular = "notification")
 public class Notification extends AbstractExtension {
 
     @Schema

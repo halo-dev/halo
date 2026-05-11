@@ -11,5 +11,4 @@ public class TwoFactorAuthException extends AuthenticationException {
     public TwoFactorAuthException(String msg) {
         super(msg);
     }
-
 }

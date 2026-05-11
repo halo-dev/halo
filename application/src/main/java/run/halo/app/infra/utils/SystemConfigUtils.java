@@ -38,9 +38,8 @@ public enum SystemConfigUtils {
      * @return the merged configuration map
      * @throws JsonProcessingException if JSON processing fails
      */
-    public static Map<String, String> mergeMap(
-        Map<String, String> defaultMap, Map<String, String> overrideMap
-    ) throws JsonProcessingException {
+    public static Map<String, String> mergeMap(Map<String, String> defaultMap, Map<String, String> overrideMap)
+            throws JsonProcessingException {
         if (CollectionUtils.isEmpty(defaultMap)) {
             return overrideMap;
         }
@@ -71,22 +70,18 @@ public enum SystemConfigUtils {
      * @return the merged ConfigMap
      * @throws JsonProcessingException if JSON processing fails
      */
-    public static ConfigMap mergeConfigMap(
-        ConfigMap defaultConfigMap,
-        ConfigMap overrideConfigMap
-    ) throws JsonProcessingException {
+    public static ConfigMap mergeConfigMap(ConfigMap defaultConfigMap, ConfigMap overrideConfigMap)
+            throws JsonProcessingException {
         var mergedData = mergeMap(
-            defaultConfigMap.getData() != null ? defaultConfigMap.getData() : Map.of(),
-            overrideConfigMap.getData() != null ? overrideConfigMap.getData() : Map.of()
-        );
+                defaultConfigMap.getData() != null ? defaultConfigMap.getData() : Map.of(),
+                overrideConfigMap.getData() != null ? overrideConfigMap.getData() : Map.of());
         var merged = new ConfigMap();
         merged.setMetadata(overrideConfigMap.getMetadata());
         merged.setData(mergedData);
         return merged;
     }
 
-    private static String mergeJsonStrings(String mainJson, String updateJson)
-        throws JsonProcessingException {
+    private static String mergeJsonStrings(String mainJson, String updateJson) throws JsonProcessingException {
         var mainNode = mapper.readTree(mainJson);
         var updateNode = mapper.readTree(updateJson);
 
@@ -122,22 +117,23 @@ public enum SystemConfigUtils {
      * @return true if the checksum was updated, false otherwise
      */
     public static boolean populateChecksum(ConfigMap configMap) {
-        var toHash = Optional.ofNullable(configMap.getData())
-            .map(Objects::toString)
-            .orElse("");
-        var checksum = Hashing.sha256().hashString(toHash, StandardCharsets.UTF_8)
-            .toString();
+        var toHash =
+                Optional.ofNullable(configMap.getData()).map(Objects::toString).orElse("");
+        var checksum =
+                Hashing.sha256().hashString(toHash, StandardCharsets.UTF_8).toString();
         var metadata = configMap.getMetadata();
         var notChanged = Optional.ofNullable(metadata.getAnnotations())
-            .map(annotations -> annotations.get(Constant.CHECKSUM_CONFIG_ANNO))
-            .stream()
-            .anyMatch(existingChecksum -> Objects.equals(checksum, existingChecksum));
+                .map(annotations -> annotations.get(Constant.CHECKSUM_CONFIG_ANNO))
+                .stream()
+                .anyMatch(existingChecksum -> Objects.equals(checksum, existingChecksum));
         if (notChanged) {
             log.debug("ConfigMap '{}' has not changed.", configMap.getMetadata().getName());
             return false;
         }
-        log.debug("ConfigMap '{}' has changed, updating checksum {}.",
-            configMap.getMetadata().getName(), checksum);
+        log.debug(
+                "ConfigMap '{}' has changed, updating checksum {}.",
+                configMap.getMetadata().getName(),
+                checksum);
         if (metadata.getAnnotations() == null) {
             metadata.setAnnotations(new HashMap<>());
         }
@@ -151,15 +147,13 @@ public enum SystemConfigUtils {
      * @param configMap the ConfigMap
      */
     public static void updateDataSnapshot(ConfigMap configMap) {
-        Optional.ofNullable(configMap.getData())
-            .map(JsonUtils::objectToJson)
-            .ifPresent(dataJson -> {
-                var metadata = configMap.getMetadata();
-                if (metadata.getAnnotations() == null) {
-                    metadata.setAnnotations(new HashMap<>());
-                }
-                metadata.getAnnotations().put(DATA_SNAPSHOT_ANNO, dataJson);
-            });
+        Optional.ofNullable(configMap.getData()).map(JsonUtils::objectToJson).ifPresent(dataJson -> {
+            var metadata = configMap.getMetadata();
+            if (metadata.getAnnotations() == null) {
+                metadata.setAnnotations(new HashMap<>());
+            }
+            metadata.getAnnotations().put(DATA_SNAPSHOT_ANNO, dataJson);
+        });
     }
 
     /**
@@ -170,12 +164,8 @@ public enum SystemConfigUtils {
      */
     public static Map<String, String> getDataSnapshot(ConfigMap configMap) {
         return Optional.ofNullable(configMap.getMetadata().getAnnotations())
-            .map(annotations -> annotations.get(DATA_SNAPSHOT_ANNO))
-            .map(dataJson -> JsonUtils.jsonToObject(
-                dataJson,
-                new TypeReference<Map<String, String>>() {
-                }
-            ))
-            .orElse(Map.of());
+                .map(annotations -> annotations.get(DATA_SNAPSHOT_ANNO))
+                .map(dataJson -> JsonUtils.jsonToObject(dataJson, new TypeReference<Map<String, String>>() {}))
+                .orElse(Map.of());
     }
 }

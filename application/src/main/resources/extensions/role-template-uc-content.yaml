@@ -9,7 +9,7 @@ metadata:
     rbac.authorization.halo.run/display-name: "文章管理员"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-manage-posts"]
-rules: [ ]
+rules: []
 
 ---
 apiVersion: v1alpha1
@@ -25,7 +25,7 @@ metadata:
     rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-post-author" ]
-rules: [ ]
+rules: []
 
 ---
 apiVersion: v1alpha1
@@ -41,7 +41,7 @@ metadata:
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-post-contributor", "role-template-post-publisher", "role-template-recycle-my-post",
         "role-template-uc-attachment-manager" ]
-rules: [ ]
+rules: []
 
 ---
 apiVersion: v1alpha1
@@ -57,7 +57,7 @@ metadata:
     rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-post-contributor" ]
-rules: [ ]
+rules: []
 
 ---
 apiVersion: v1alpha1
@@ -75,12 +75,12 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       [ "uc:posts:manage" ]
 rules:
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "posts" ]
-    verbs: [ "get", "list", "create", "update", "delete" ]
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "posts/draft" ]
-    verbs: [ "update", "get" ]
+  - apiGroups: ["uc.api.content.halo.run"]
+    resources: ["posts"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  - apiGroups: ["uc.api.content.halo.run"]
+    resources: ["posts/draft"]
+    verbs: ["update", "get"]
 
 ---
 apiVersion: v1alpha1
@@ -95,9 +95,9 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       [ "uc:posts:publish" ]
 rules:
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "posts/publish", "posts/unpublish" ]
-    verbs: [ "update" ]
+  - apiGroups: ["uc.api.content.halo.run"]
+    resources: ["posts/publish", "posts/unpublish"]
+    verbs: ["update"]
 
 ---
 # TODO remove this in next major version
@@ -113,9 +113,9 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       [ "uc:posts:recycle" ]
 rules:
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "posts/recycle" ]
-    verbs: [ "delete" ]
+  - apiGroups: ["uc.api.content.halo.run"]
+    resources: ["posts/recycle"]
+    verbs: ["delete"]
 
 ---
 apiVersion: v1alpha1
@@ -128,4 +128,4 @@ metadata:
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Attachment Manager"
-rules: [ ]
+rules: []

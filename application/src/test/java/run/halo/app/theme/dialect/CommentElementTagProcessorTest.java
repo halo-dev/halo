@@ -2,9 +2,7 @@ package run.halo.app.theme.dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +48,7 @@ class CommentElementTagProcessorTest {
     private ExtensionGetter extensionGetter;
 
     @Mock
-    private ObjectProvider<ExtensionGetter>  extensionGetterProvider;
+    private ObjectProvider<ExtensionGetter> extensionGetterProvider;
 
     @Mock
     private SystemConfigFetcher environmentFetcher;
@@ -63,10 +61,8 @@ class CommentElementTagProcessorTest {
         templateEngine = new TemplateEngine();
         templateEngine.setDialects(Set.of(haloProcessorDialect, new SpringStandardDialect()));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
-        lenient().when(applicationContext.getBean(eq(ExtensionGetter.class)))
-            .thenReturn(extensionGetter);
-        when(applicationContext.getBeanProvider(ExtensionGetter.class))
-            .thenReturn(extensionGetterProvider);
+        lenient().when(applicationContext.getBean(eq(ExtensionGetter.class))).thenReturn(extensionGetter);
+        when(applicationContext.getBeanProvider(ExtensionGetter.class)).thenReturn(extensionGetterProvider);
         when(extensionGetterProvider.getIfUnique()).thenReturn(null);
     }
 
@@ -74,15 +70,12 @@ class CommentElementTagProcessorTest {
     void doProcess() {
         Context context = getContext();
 
-        when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
-            .thenReturn(environmentFetcher);
+        when(applicationContext.getBean(eq(SystemConfigFetcher.class))).thenReturn(environmentFetcher);
         var commentSetting = mock(SystemSetting.Comment.class);
-        when(environmentFetcher.fetchComment())
-            .thenReturn(Mono.just(commentSetting));
+        when(environmentFetcher.fetchComment()).thenReturn(Mono.just(commentSetting));
         when(commentSetting.getEnable()).thenReturn(true);
 
-        when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
-            .thenReturn(Flux.empty());
+        when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class))).thenReturn(Flux.empty());
         String result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""
             <!DOCTYPE html>
@@ -95,7 +88,7 @@ class CommentElementTagProcessorTest {
             """);
 
         when(extensionGetter.getEnabledExtensions(eq(CommentWidget.class)))
-            .thenReturn(Flux.just(new DefaultCommentWidget()));
+                .thenReturn(Flux.just(new DefaultCommentWidget()));
         result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""
             <!DOCTYPE html>
@@ -111,8 +104,8 @@ class CommentElementTagProcessorTest {
     static class DefaultCommentWidget implements CommentWidget {
 
         @Override
-        public void render(ITemplateContext context, IProcessableElementTag tag,
-            IElementTagStructureHandler structureHandler) {
+        public void render(
+                ITemplateContext context, IProcessableElementTag tag, IElementTagStructureHandler structureHandler) {
             structureHandler.replaceWith("<p>Comment in default widget</p>", false);
         }
     }
@@ -120,16 +113,18 @@ class CommentElementTagProcessorTest {
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
-            ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
-            new ThymeleafEvaluationContext(applicationContext, null));
+                ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME,
+                new ThymeleafEvaluationContext(applicationContext, null));
         return context;
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             if (template.equals("commentWidget")) {
                 return new StringTemplateResource(commentWidget());
             }

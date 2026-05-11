@@ -29,7 +29,8 @@ class TokenSecurityConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        var jwtDecoder = withJwkSource(signedJWT -> Flux.just(cryptoService.getJwk())).build();
+        var jwtDecoder =
+                withJwkSource(signedJWT -> Flux.just(cryptoService.getJwk())).build();
         var tokenAuthenticationManager = new TokenAuthenticationManager(client, jwtDecoder);
 
         var entryPoint = new BearerTokenServerAuthenticationEntryPoint();
@@ -40,5 +41,4 @@ class TokenSecurityConfigurer implements SecurityConfigurer {
         filter.setAuthenticationFailureHandler(failureHandler);
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
-
 }

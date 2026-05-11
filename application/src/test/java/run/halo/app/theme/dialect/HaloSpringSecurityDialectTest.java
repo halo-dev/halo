@@ -41,11 +41,9 @@ class HaloSpringSecurityDialectTest {
     @Autowired
     ObjectProvider<MethodSecurityExpressionHandler> expressionHandler;
 
-
     @BeforeEach
     void setUp() {
-        var haloSpringSecurityDialect =
-            new HaloSpringSecurityDialect(securityContextRepository, expressionHandler);
+        var haloSpringSecurityDialect = new HaloSpringSecurityDialect(securityContextRepository, expressionHandler);
         templateEngine = new SpringWebFluxTemplateEngine();
         templateEngine.addTemplateResolver(new StringTemplateResolver());
         templateEngine.addDialect(haloSpringSecurityDialect);
@@ -53,39 +51,28 @@ class HaloSpringSecurityDialectTest {
 
     static Stream<Arguments> shouldEvaluateSecAuthorizeAttr() {
         return Stream.of(
-            arguments(
-                "Evaluate sec:authorize to true when role match",
-                List.of("ROLE_ADMIN"),
-                """
+                arguments("Evaluate sec:authorize to true when role match", List.of("ROLE_ADMIN"), """
                     <p sec:authorize="hasRole('ROLE_ADMIN')">Admin</p>\
-                    """,
-                """
+                    """, """
                     <p>Admin</p>\
                     """),
-            arguments(
-                "Evaluate sec:authorize to false when role not match",
-                List.of("ROLE_USER"),
-                """
+                arguments("Evaluate sec:authorize to false when role not match", List.of("ROLE_USER"), """
                     <p sec:authorize="hasRole('ROLE_ADMIN')"></p>\
-                    """,
-                "")
-        );
+                    """, ""));
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource
-    void shouldEvaluateSecAuthorizeAttr(String name, List<String> authorities, String template,
-        String expected) {
+    void shouldEvaluateSecAuthorizeAttr(String name, List<String> authorities, String template, String expected) {
         var request = MockServerHttpRequest.get("/halo-sec-authorize").build();
         var exchange = new MockServerWebExchange.Builder(request).build();
         var webExchange = SpringWebFluxWebApplication.buildApplication(null)
-            .buildExchange(exchange, Locale.getDefault(), TEXT_HTML, UTF_8);
+                .buildExchange(exchange, Locale.getDefault(), TEXT_HTML, UTF_8);
         var context = new WebContext(webExchange);
-        var authentication = new UsernamePasswordAuthenticationToken("fake-user", "fake-credential",
-            AuthorityUtils.createAuthorityList(authorities));
+        var authentication = new UsernamePasswordAuthenticationToken(
+                "fake-user", "fake-credential", AuthorityUtils.createAuthorityList(authorities));
         var securityContext = new SecurityContextImpl(authentication);
-        context.setVariable(SpringSecurityContextUtils.SECURITY_CONTEXT_MODEL_ATTRIBUTE_NAME,
-            securityContext);
+        context.setVariable(SpringSecurityContextUtils.SECURITY_CONTEXT_MODEL_ATTRIBUTE_NAME, securityContext);
         var result = templateEngine.process(template, context);
         assertEquals(expected, result);
     }

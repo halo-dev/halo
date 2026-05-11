@@ -15,7 +15,7 @@
 
 
 /**
- * <p>The creator info of the comment.</p>  This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to comment  without logging in.
+ * The creator info of the comment. This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to  comment without logging in.
  */
 export interface CommentEmailOwner {
     /**

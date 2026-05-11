@@ -42,19 +42,17 @@ class InitializeRedirectionWebFilter implements WebFilter {
         var html = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         html.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         this.redirectMatcher = new AndServerWebExchangeMatcher(
-            pathMatchers(HttpMethod.GET, "/", "/console/**", "/uc/**", "/login", "/signup"),
-            html
-        );
+                pathMatchers(HttpMethod.GET, "/", "/console/**", "/uc/**", "/login", "/signup"), html);
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return redirectMatcher.matches(exchange)
-            .flatMap(matched -> {
-                if (!matched.isMatch()) {
-                    return chain.filter(exchange);
-                }
-                return initializationStateGetter.userInitialized()
+        return redirectMatcher.matches(exchange).flatMap(matched -> {
+            if (!matched.isMatch()) {
+                return chain.filter(exchange);
+            }
+            return initializationStateGetter
+                    .userInitialized()
                     .defaultIfEmpty(false)
                     .flatMap(initialized -> {
                         if (initialized) {
@@ -63,7 +61,7 @@ class InitializeRedirectionWebFilter implements WebFilter {
                         // Redirect to set up page if system is not initialized.
                         return redirectStrategy.sendRedirect(exchange, location);
                     });
-            });
+        });
     }
 
     public void setRedirectStrategy(ServerRedirectStrategy redirectStrategy) {

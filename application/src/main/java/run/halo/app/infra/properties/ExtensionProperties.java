@@ -11,7 +11,5 @@ public class ExtensionProperties {
     public static class Controller {
 
         private boolean disabled;
-
     }
-
 }

@@ -1,15 +1,8 @@
 package run.halo.app.core.user.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.assertArg;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.Map;
@@ -60,9 +53,7 @@ class DefaultAttachmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        var webClient = WebClient.builder()
-            .exchangeFunction(exchangeFunction)
-            .build();
+        var webClient = WebClient.builder().exchangeFunction(exchangeFunction).build();
         attachmentService.setWebClient(webClient);
     }
 
@@ -91,26 +82,17 @@ class DefaultAttachmentServiceTest {
         when(client.get(Group.class, "fake-group")).thenReturn(Mono.just(group));
         when(extensionGetter.getExtensions(AttachmentHandler.class)).thenReturn(Flux.just(handler));
         when(handler.upload(any())).thenReturn(Mono.just(createdAttachment));
-        when(client.create(any(Attachment.class)))
-            .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(client.create(any(Attachment.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
 
         var filePart = mock(FilePart.class);
-        StepVerifier.create(
-                attachmentService.upload(
-                    "fake-user",
-                    "fake-policy",
-                    "fake-group",
-                    filePart,
-                    null
-                )
-            )
-            .assertNext((Attachment attachment) -> {
-                assertEquals("fake-attachment", attachment.getMetadata().getName());
-                assertEquals("fake-user", attachment.getSpec().getOwnerName());
-                assertEquals("fake-policy", attachment.getSpec().getPolicyName());
-                assertEquals("fake-group", attachment.getSpec().getGroupName());
-            })
-            .verifyComplete();
+        StepVerifier.create(attachmentService.upload("fake-user", "fake-policy", "fake-group", filePart, null))
+                .assertNext((Attachment attachment) -> {
+                    assertEquals("fake-attachment", attachment.getMetadata().getName());
+                    assertEquals("fake-user", attachment.getSpec().getOwnerName());
+                    assertEquals("fake-policy", attachment.getSpec().getPolicyName());
+                    assertEquals("fake-group", attachment.getSpec().getGroupName());
+                })
+                .verifyComplete();
 
         verify(handler).upload(assertArg(context -> {
             assertEquals(policy, context.policy());
@@ -137,12 +119,11 @@ class DefaultAttachmentServiceTest {
         when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
         when(client.get(ConfigMap.class, "fake-configmap")).thenReturn(Mono.just(configMap));
         when(extensionGetter.getExtensions(AttachmentHandler.class)).thenReturn(Flux.just(handler));
-        when(handler.getThumbnailLinks(attachment, policy, configMap))
-            .thenReturn(Mono.just(expected));
+        when(handler.getThumbnailLinks(attachment, policy, configMap)).thenReturn(Mono.just(expected));
 
         StepVerifier.create(attachmentService.getThumbnailLinks(attachment))
-            .expectNext(expected)
-            .verifyComplete();
+                .expectNext(expected)
+                .verifyComplete();
     }
 
     @Test
@@ -153,27 +134,21 @@ class DefaultAttachmentServiceTest {
         var uploadedAttachment = new Attachment();
         var url = URI.create("https://example.com/assets/image.png").toURL();
         var mockResponse = ClientResponse.create(HttpStatus.OK)
-            .headers(h -> {
-                h.setContentType(MediaType.IMAGE_PNG);
-                h.setContentDisposition(
-                    ContentDisposition.attachment().filename("remote.png").build()
-                );
-            })
-            .body(body)
-            .build();
-        when(exchangeFunction.exchange(any(ClientRequest.class)))
-            .thenReturn(Mono.just(mockResponse));
-        when(service.upload(
-            eq("fake-policy"),
-            eq(""),
-            eq("remote.png"),
-            any(),
-            eq(MediaType.IMAGE_PNG)
-        )).thenReturn(Mono.just(uploadedAttachment));
+                .headers(h -> {
+                    h.setContentType(MediaType.IMAGE_PNG);
+                    h.setContentDisposition(ContentDisposition.attachment()
+                            .filename("remote.png")
+                            .build());
+                })
+                .body(body)
+                .build();
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(mockResponse));
+        when(service.upload(eq("fake-policy"), eq(""), eq("remote.png"), any(), eq(MediaType.IMAGE_PNG)))
+                .thenReturn(Mono.just(uploadedAttachment));
 
         StepVerifier.create(service.uploadFromUrl(url, "fake-policy", "", ""))
-            .expectNext(uploadedAttachment)
-            .verifyComplete();
+                .expectNext(uploadedAttachment)
+                .verifyComplete();
 
         verify(exchangeFunction).exchange(assertArg(r -> {
             assertEquals(url.toString(), r.url().toString());
@@ -185,14 +160,15 @@ class DefaultAttachmentServiceTest {
     void shouldRejectUploadFromUrlWhenResponseStatusIsNotSuccessful() throws Exception {
         var url = URI.create("https://example.com/file.png").toURL();
         when(exchangeFunction.exchange(any(ClientRequest.class)))
-            .thenReturn(Mono.just(ClientResponse.create(HttpStatus.BAD_GATEWAY).build()));
+                .thenReturn(
+                        Mono.just(ClientResponse.create(HttpStatus.BAD_GATEWAY).build()));
 
         StepVerifier.create(attachmentService.uploadFromUrl(url, "fake-policy", "", ""))
-            .consumeErrorWith(error -> {
-                var exception = assertInstanceOf(ServerWebInputException.class, error);
-                assertTrue(exception.getMessage().contains(HttpStatus.BAD_GATEWAY.toString()));
-            })
-            .verify();
+                .consumeErrorWith(error -> {
+                    var exception = assertInstanceOf(ServerWebInputException.class, error);
+                    assertTrue(exception.getMessage().contains(HttpStatus.BAD_GATEWAY.toString()));
+                })
+                .verify();
         verify(exchangeFunction).exchange(assertArg(r -> {
             assertEquals(url.toString(), r.url().toString());
             assertEquals(HttpMethod.GET, r.method());
@@ -208,24 +184,16 @@ class DefaultAttachmentServiceTest {
         var url = URI.create("https://example.com/assets/image.png").toURL();
 
         when(exchangeFunction.exchange(any(ClientRequest.class)))
-            .thenReturn(Mono.just(ClientResponse.create(HttpStatus.OK)
-                .headers(h -> h.setContentType(MediaType.IMAGE_JPEG))
-                .body(body)
-                .build()
-            ));
-        when(service.upload(
-            eq("fake-policy"),
-            eq(""),
-            eq("custom-name.jpg"),
-            any(),
-            eq(MediaType.IMAGE_JPEG)
-        )).thenReturn(Mono.just(uploadedAttachment));
+                .thenReturn(Mono.just(ClientResponse.create(HttpStatus.OK)
+                        .headers(h -> h.setContentType(MediaType.IMAGE_JPEG))
+                        .body(body)
+                        .build()));
+        when(service.upload(eq("fake-policy"), eq(""), eq("custom-name.jpg"), any(), eq(MediaType.IMAGE_JPEG)))
+                .thenReturn(Mono.just(uploadedAttachment));
 
-        StepVerifier.create(
-                service.uploadFromUrl(url, "fake-policy", "", "custom-name.jpg")
-            )
-            .expectNext(uploadedAttachment)
-            .verifyComplete();
+        StepVerifier.create(service.uploadFromUrl(url, "fake-policy", "", "custom-name.jpg"))
+                .expectNext(uploadedAttachment)
+                .verifyComplete();
 
         verify(exchangeFunction).exchange(assertArg(r -> {
             assertEquals(url.toString(), r.url().toString());
@@ -233,5 +201,3 @@ class DefaultAttachmentServiceTest {
         }));
     }
 }
-
-

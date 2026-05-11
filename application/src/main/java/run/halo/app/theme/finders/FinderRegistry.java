@@ -16,5 +16,4 @@ public interface FinderRegistry {
     void register(String pluginId, ApplicationContext pluginContext);
 
     void unregister(String pluginId);
-
 }

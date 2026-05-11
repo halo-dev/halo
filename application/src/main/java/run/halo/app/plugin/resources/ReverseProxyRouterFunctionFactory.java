@@ -38,9 +38,9 @@ import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.PluginConst;
 
 /**
- * <p>Plugin's reverse proxy router factory.</p>
- * <p>It creates a {@link RouterFunction} based on the ReverseProxy rule configured by
- * the plugin.</p>
+ * Plugin's reverse proxy router factory.
+ *
+ * <p>It creates a {@link RouterFunction} based on the ReverseProxy rule configured by the plugin.
  *
  * @author guqing
  * @since 2.0.0
@@ -55,21 +55,19 @@ public class ReverseProxyRouterFunctionFactory {
     private final WebProperties webProperties;
 
     /**
-     * <p>Create {@link RouterFunction} according to the {@link ReverseProxy} custom resource
-     * configuration of the plugin.</p>
-     * <p>Note that: returns {@code Null} if the plugin does not have a {@link ReverseProxy} custom
-     * resource.</p>
+     * Create {@link RouterFunction} according to the {@link ReverseProxy} custom resource configuration of the plugin.
+     *
+     * <p>Note that: returns {@code Null} if the plugin does not have a {@link ReverseProxy} custom resource.
      *
      * @param pluginName plugin name(nullable if system)
      * @return A reverse proxy RouterFunction handle(nullable)
      */
-    public @Nullable RouterFunction<ServerResponse> create(ReverseProxy reverseProxy,
-        String pluginName) {
+    public @Nullable RouterFunction<ServerResponse> create(ReverseProxy reverseProxy, String pluginName) {
         return createReverseProxyRouterFunction(reverseProxy, nullSafePluginName(pluginName));
     }
 
     private @Nullable RouterFunction<ServerResponse> createReverseProxyRouterFunction(
-        ReverseProxy reverseProxy, String pluginName) {
+            ReverseProxy reverseProxy, String pluginName) {
         Assert.notNull(reverseProxy, "The reverseProxy must not be null.");
         var rules = getReverseProxyRules(reverseProxy);
         var cacheProperties = webProperties.getResources().getCache();
@@ -79,41 +77,38 @@ public class ReverseProxyRouterFunctionFactory {
             cacheControl = CacheControl.empty();
         }
         var finalCacheControl = cacheControl;
-        return rules.stream().map(rule -> {
-            String routePath = buildRoutePath(pluginName, rule);
-            log.debug("Plugin [{}] registered reverse proxy route path [{}]", pluginName,
-                routePath);
-            return RouterFunctions.route(GET(routePath).and(accept(ALL)),
-                request -> {
-                    var resource = loadResourceByFileRule(pluginName, rule, request);
-                    if (!resource.exists()) {
-                        return Mono.error(new NoResourceFoundException(request.uri(), routePath));
-                    }
-                    if (!useLastModified) {
-                        return ServerResponse.ok()
-                            .cacheControl(finalCacheControl)
-                            .body(BodyInserters.fromResource(resource));
-                    }
-                    Instant lastModified;
-                    try {
-                        lastModified = Instant.ofEpochMilli(resource.lastModified());
-                    } catch (IOException e) {
-                        if (e instanceof FileNotFoundException) {
-                            return Mono.error(
-                                new NoResourceFoundException(request.uri(), routePath)
-                            );
+        return rules.stream()
+                .map(rule -> {
+                    String routePath = buildRoutePath(pluginName, rule);
+                    log.debug("Plugin [{}] registered reverse proxy route path [{}]", pluginName, routePath);
+                    return RouterFunctions.route(GET(routePath).and(accept(ALL)), request -> {
+                        var resource = loadResourceByFileRule(pluginName, rule, request);
+                        if (!resource.exists()) {
+                            return Mono.error(new NoResourceFoundException(request.uri(), routePath));
                         }
-                        return Mono.error(e);
-                    }
-                    return request.checkNotModified(lastModified)
-                        .switchIfEmpty(Mono.defer(
-                            () -> ServerResponse.ok()
-                                .cacheControl(finalCacheControl)
-                                .lastModified(lastModified)
-                                .body(BodyInserters.fromResource(resource)))
-                        );
-                });
-        }).reduce(RouterFunction::and).orElse(null);
+                        if (!useLastModified) {
+                            return ServerResponse.ok()
+                                    .cacheControl(finalCacheControl)
+                                    .body(BodyInserters.fromResource(resource));
+                        }
+                        Instant lastModified;
+                        try {
+                            lastModified = Instant.ofEpochMilli(resource.lastModified());
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) {
+                                return Mono.error(new NoResourceFoundException(request.uri(), routePath));
+                            }
+                            return Mono.error(e);
+                        }
+                        return request.checkNotModified(lastModified)
+                                .switchIfEmpty(Mono.defer(() -> ServerResponse.ok()
+                                        .cacheControl(finalCacheControl)
+                                        .lastModified(lastModified)
+                                        .body(BodyInserters.fromResource(resource))));
+                    });
+                })
+                .reduce(RouterFunction::and)
+                .orElse(null);
     }
 
     private String nullSafePluginName(String pluginName) {
@@ -125,28 +120,27 @@ public class ReverseProxyRouterFunctionFactory {
     }
 
     public static String buildRoutePath(String pluginId, ReverseProxyRule reverseProxyRule) {
-        return PathUtils.combinePath(PluginConst.assetsRoutePrefix(pluginId),
-            reverseProxyRule.path());
+        return PathUtils.combinePath(PluginConst.assetsRoutePrefix(pluginId), reverseProxyRule.path());
     }
 
     /**
-     * <p>File load rule: if the directory is configured but the file name is not configured, it
-     * means access through wildcards. Otherwise, if only the file name is configured, this
-     * method only returns the file pointed to by the rule.</p>
+     * File load rule: if the directory is configured but the file name is not configured, it means access through
+     * wildcards. Otherwise, if only the file name is configured, this method only returns the file pointed to by the
+     * rule.
+     *
      * <p>You should only use {@link Resource#getInputStream()} to get resource content instead of
-     * {@link Resource#getFile()},the resource is loaded from the plugin jar file using a
-     * specific plugin class loader; if you use {@link Resource#getFile()}, you cannot get the
-     * file.</p>
-     * <p>Note that a returned Resource handle does not imply an existing resource; you need to
-     * invoke {@link Resource#exists()} to check for existence</p>
+     * {@link Resource#getFile()},the resource is loaded from the plugin jar file using a specific plugin class loader;
+     * if you use {@link Resource#getFile()}, you cannot get the file.
+     *
+     * <p>Note that a returned Resource handle does not imply an existing resource; you need to invoke
+     * {@link Resource#exists()} to check for existence
      *
      * @param pluginName plugin to load file by name
      * @param rule reverse proxy rule
      * @param request client request
      * @return a Resource handle for the specified resource location by the plugin(never null);
      */
-    private Resource loadResourceByFileRule(String pluginName, ReverseProxyRule rule,
-        ServerRequest request) {
+    private Resource loadResourceByFileRule(String pluginName, ReverseProxyRule rule, ServerRequest request) {
         Assert.notNull(rule.file(), "File rule must not be null.");
         FileReverseProxyProvider file = rule.file();
         String directory = file.directory();
@@ -158,8 +152,9 @@ public class ReverseProxyRouterFunctionFactory {
             filename = configuredFilename;
         } else {
             String routePath = buildRoutePath(pluginName, rule);
-            PathContainer pathContainer = PathPatternParser.defaultInstance.parse(routePath)
-                .extractPathWithinPattern(PathContainer.parsePath(request.path()));
+            PathContainer pathContainer = PathPatternParser.defaultInstance
+                    .parse(routePath)
+                    .extractPathWithinPattern(PathContainer.parsePath(request.path()));
             filename = pathContainer.value();
         }
 
@@ -171,12 +166,10 @@ public class ReverseProxyRouterFunctionFactory {
         if (PluginConst.SYSTEM_PLUGIN_NAME.equals(pluginName)) {
             return applicationContext;
         }
-        DefaultResourceLoader resourceLoader =
-            BundleResourceUtils.getResourceLoader(pluginManager, pluginName);
+        DefaultResourceLoader resourceLoader = BundleResourceUtils.getResourceLoader(pluginManager, pluginName);
         if (resourceLoader == null) {
             throw new NotFoundException("Plugin [" + pluginName + "] not found.");
         }
         return resourceLoader;
     }
 }
-

@@ -11,5 +11,4 @@ record LabelExistsCondition(String labelKey) implements LabelCondition {
     public String toString() {
         return "EXISTS " + INDEX_NAME + "['" + labelKey + "']";
     }
-
 }

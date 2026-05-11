@@ -17,5 +17,4 @@ public class HaloDocumentAddRequestEvent extends ApplicationEvent {
     public Iterable<HaloDocument> getDocuments() {
         return documents;
     }
-
 }

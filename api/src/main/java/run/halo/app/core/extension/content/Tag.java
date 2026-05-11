@@ -19,8 +19,7 @@ import run.halo.app.extension.GroupVersionKind;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION,
-    kind = Tag.KIND, plural = "tags", singular = "tag")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Tag.KIND, plural = "tags", singular = "tag")
 @EqualsAndHashCode(callSuper = true)
 public class Tag extends AbstractExtension {
 
@@ -51,6 +50,7 @@ public class Tag extends AbstractExtension {
 
         /**
          * Color regex explanation.
+         *
          * <pre>
          * ^                 # start of the line
          * #                 # start with a number sign `#`

@@ -35,15 +35,17 @@ class DefaultSubscriberEmailResolverTest {
     void testResolve() {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(AnonymousUserConst.PRINCIPAL + "#test@example.com");
-        subscriberEmailResolver.resolve(subscriber)
-            .as(StepVerifier::create)
-            .expectNext("test@example.com")
-            .verifyComplete();
+        subscriberEmailResolver
+                .resolve(subscriber)
+                .as(StepVerifier::create)
+                .expectNext("test@example.com")
+                .verifyComplete();
 
         subscriber.setName(AnonymousUserConst.PRINCIPAL + "#");
-        subscriberEmailResolver.resolve(subscriber)
-            .as(StepVerifier::create)
-            .verifyErrorMessage("The subscriber does not have an email");
+        subscriberEmailResolver
+                .resolve(subscriber)
+                .as(StepVerifier::create)
+                .verifyErrorMessage("The subscriber does not have an email");
 
         var user = new User();
         user.setMetadata(new Metadata());
@@ -54,17 +56,16 @@ class DefaultSubscriberEmailResolverTest {
         when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(user));
 
         subscriber.setName("fake-user");
-        subscriberEmailResolver.resolve(subscriber)
-            .as(StepVerifier::create)
-            .verifyComplete();
+        subscriberEmailResolver.resolve(subscriber).as(StepVerifier::create).verifyComplete();
 
         user.getSpec().setEmailVerified(true);
         when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(user));
 
         subscriber.setName("fake-user");
-        subscriberEmailResolver.resolve(subscriber)
-            .as(StepVerifier::create)
-            .expectNext("test@halo.run")
-            .verifyComplete();
+        subscriberEmailResolver
+                .resolve(subscriber)
+                .as(StepVerifier::create)
+                .expectNext("test@halo.run")
+                .verifyComplete();
     }
 }

@@ -11,8 +11,7 @@ import org.springframework.web.server.ServerWebInputException;
  */
 public class PluginDependentsNotDisabledException extends ServerWebInputException {
 
-    public static final URI TYPE =
-        URI.create("https://www.halo.run/probs/plugin-dependents-not-disabled");
+    public static final URI TYPE = URI.create("https://www.halo.run/probs/plugin-dependents-not-disabled");
 
     /**
      * Instantiates a new Plugin dependents not disabled exception.
@@ -20,13 +19,10 @@ public class PluginDependentsNotDisabledException extends ServerWebInputExceptio
      * @param dependents dependents that are not disabled
      */
     public PluginDependentsNotDisabledException(List<String> dependents) {
-        super("Plugin dependents are not fully disabled, please disable them first.",
-            null,
-            null,
-            null,
-            new Object[] {dependents});
+        super("Plugin dependents are not fully disabled, please disable them first.", null, null, null, new Object[] {
+            dependents
+        });
         setType(TYPE);
         getBody().setProperty("dependents", dependents);
     }
-
 }

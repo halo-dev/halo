@@ -4,8 +4,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * String key wrapper for nullable string comparison. Only for backward compatibility. May remove
- * in the future.
+ * String key wrapper for nullable string comparison. Only for backward compatibility. May remove in the future.
  *
  * @author johnniang
  * @since 2.22.0

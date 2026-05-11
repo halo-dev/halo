@@ -6,7 +6,8 @@ public interface ExtensionPointDefinitionGetter {
 
     /**
      * Gets extension point definition by extension point class.
-     * <p>Retrieve by filedSelector: <code>spec.className</code></p>
+     *
+     * <p>Retrieve by filedSelector: <code>spec.className</code>
      *
      * @param className extension point class name
      */

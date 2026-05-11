@@ -11,14 +11,11 @@ import run.halo.app.extension.GroupVersionKind;
  */
 public class SchemaViolationException extends ExtensionException {
 
-    /**
-     * Validation errors.
-     */
+    /** Validation errors. */
     private final ValidationResults errors;
 
     public SchemaViolationException(GroupVersionKind gvk, ValidationResults errors) {
-        super(HttpStatus.BAD_REQUEST, "Failed to validate " + gvk, null, null,
-            new Object[] {gvk, errors});
+        super(HttpStatus.BAD_REQUEST, "Failed to validate " + gvk, null, null, new Object[] {gvk, errors});
         this.errors = errors;
     }
 

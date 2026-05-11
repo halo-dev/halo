@@ -24,12 +24,12 @@ public class AdditionalWebFilterChainProxy implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return extensionGetter.getEnabledExtensions(AdditionalWebFilter.class)
-            .sort(AnnotationAwareOrderComparator.INSTANCE)
-            .cast(WebFilter.class)
-            .collectList()
-            .map(filters -> filterChainDecorator.decorate(chain, filters))
-            .flatMap(decoratedChain -> decoratedChain.filter(exchange));
+        return extensionGetter
+                .getEnabledExtensions(AdditionalWebFilter.class)
+                .sort(AnnotationAwareOrderComparator.INSTANCE)
+                .cast(WebFilter.class)
+                .collectList()
+                .map(filters -> filterChainDecorator.decorate(chain, filters))
+                .flatMap(decoratedChain -> decoratedChain.filter(exchange));
     }
-
 }

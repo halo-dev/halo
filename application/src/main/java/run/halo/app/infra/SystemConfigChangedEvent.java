@@ -12,26 +12,17 @@ import org.springframework.context.ApplicationEvent;
  */
 public class SystemConfigChangedEvent extends ApplicationEvent {
 
-    /**
-     * Old configuration data. Unmodifiable.
-     */
+    /** Old configuration data. Unmodifiable. */
     @Getter
     private final Map<String, String> oldData;
 
-    /**
-     * New configuration data. Unmodifiable.
-     */
+    /** New configuration data. Unmodifiable. */
     @Getter
     private final Map<String, String> newData;
 
-    public SystemConfigChangedEvent(
-        Object source,
-        Map<String, String> oldData,
-        Map<String, String> newData
-    ) {
+    public SystemConfigChangedEvent(Object source, Map<String, String> oldData, Map<String, String> newData) {
         super(source);
         this.oldData = Map.copyOf(oldData);
         this.newData = Map.copyOf(newData);
     }
-
 }

@@ -31,9 +31,7 @@ public enum ThumbnailSize {
         return ThumbnailSize.M;
     }
 
-    /**
-     * Convert name to {@link ThumbnailSize}.
-     */
+    /** Convert name to {@link ThumbnailSize}. */
     public static ThumbnailSize fromName(String name) {
         for (ThumbnailSize value : values()) {
             if (value.name().equalsIgnoreCase(name)) {
@@ -54,8 +52,7 @@ public enum ThumbnailSize {
 
     public static Integer[] allowedWidths() {
         return Arrays.stream(ThumbnailSize.values())
-            .map(ThumbnailSize::getWidth)
-            .toArray(Integer[]::new);
+                .map(ThumbnailSize::getWidth)
+                .toArray(Integer[]::new);
     }
-
 }

@@ -16,9 +16,7 @@ import reactor.util.context.ContextView;
 public enum ReactiveUtils {
     ;
 
-    /**
-     * Default timeout for blocking operation.
-     */
+    /** Default timeout for blocking operation. */
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
     /**
@@ -37,8 +35,7 @@ public enum ReactiveUtils {
      * @param value the normal value or reactive value
      * @return the resolved value
      */
-    public static @Nullable Object blockReactiveValue(@Nullable Object value,
-        ContextView contextView) {
+    public static @Nullable Object blockReactiveValue(@Nullable Object value, ContextView contextView) {
         return blockReactiveValue(value, contextView, DEFAULT_TIMEOUT);
     }
 
@@ -50,8 +47,7 @@ public enum ReactiveUtils {
      * @return the resolved value
      */
     public static @Nullable Object blockReactiveValue(
-        @Nullable Object value, @Nullable ContextView contextView, Duration timeout
-    ) {
+            @Nullable Object value, @Nullable ContextView contextView, Duration timeout) {
         if (value == null) {
             return null;
         }
@@ -60,7 +56,10 @@ public enum ReactiveUtils {
         }
         Class<?> clazz = value.getClass();
         if (Mono.class.isAssignableFrom(clazz)) {
-            return ((Mono<?>) value).contextWrite(contextView).blockOptional(timeout).orElse(null);
+            return ((Mono<?>) value)
+                    .contextWrite(contextView)
+                    .blockOptional(timeout)
+                    .orElse(null);
         }
         if (Flux.class.isAssignableFrom(clazz)) {
             return ((Flux<?>) value).contextWrite(contextView).collectList().block(timeout);

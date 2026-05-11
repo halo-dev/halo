@@ -2,10 +2,7 @@ package run.halo.app.extension.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static run.halo.app.extension.FakeExtension.createFake;
 
 import org.junit.jupiter.api.Test;
@@ -13,11 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.extension.DefaultExtensionMatcher;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.FakeExtension;
-import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.extension.WatcherExtensionMatchers;
+import run.halo.app.extension.*;
 import run.halo.app.extension.controller.Reconciler.Request;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +29,8 @@ class ExtensionWatcherTest {
     ExtensionWatcher watcher;
 
     private DefaultExtensionMatcher getEmptyMatcher() {
-        return DefaultExtensionMatcher.builder(client,
-                GroupVersionKind.fromExtension(FakeExtension.class))
-            .build();
+        return DefaultExtensionMatcher.builder(client, GroupVersionKind.fromExtension(FakeExtension.class))
+                .build();
     }
 
     @Test
@@ -47,16 +39,15 @@ class ExtensionWatcherTest {
         watcher.onAdd(createFake("fake-name"));
 
         verify(matchers, times(1)).onAddMatcher();
-        verify(queue, times(1)).addImmediately(
-            argThat(request -> request.name().equals("fake-name")));
+        verify(queue, times(1)).addImmediately(argThat(request -> request.name().equals("fake-name")));
         verify(queue, times(0)).add(any());
     }
 
     @Test
     void shouldNotAddExtensionWhenAddPredicateAlwaysFalse() {
         var type = GroupVersionKind.fromAPIVersionAndKind("v1alpha1", "User");
-        when(matchers.onAddMatcher()).thenReturn(
-            DefaultExtensionMatcher.builder(client, type).build());
+        when(matchers.onAddMatcher())
+                .thenReturn(DefaultExtensionMatcher.builder(client, type).build());
         watcher.onAdd(createFake("fake-name"));
 
         verify(matchers, times(1)).onAddMatcher();
@@ -80,16 +71,15 @@ class ExtensionWatcherTest {
         watcher.onUpdate(createFake("old-fake-name"), createFake("new-fake-name"));
 
         verify(matchers, times(1)).onUpdateMatcher();
-        verify(queue, times(1)).addImmediately(
-            argThat(request -> request.name().equals("new-fake-name")));
+        verify(queue, times(1)).addImmediately(argThat(request -> request.name().equals("new-fake-name")));
         verify(queue, times(0)).add(any());
     }
 
     @Test
     void shouldUpdateExtensionWhenUpdatePredicateAlwaysFalse() {
         var type = GroupVersionKind.fromAPIVersionAndKind("v1alpha1", "User");
-        when(matchers.onUpdateMatcher()).thenReturn(
-            DefaultExtensionMatcher.builder(client, type).build());
+        when(matchers.onUpdateMatcher())
+                .thenReturn(DefaultExtensionMatcher.builder(client, type).build());
         watcher.onUpdate(createFake("old-fake-name"), createFake("new-fake-name"));
 
         verify(matchers, times(1)).onUpdateMatcher();
@@ -113,16 +103,15 @@ class ExtensionWatcherTest {
         watcher.onDelete(createFake("fake-name"));
 
         verify(matchers, times(1)).onDeleteMatcher();
-        verify(queue, times(1)).addImmediately(
-            argThat(request -> request.name().equals("fake-name")));
+        verify(queue, times(1)).addImmediately(argThat(request -> request.name().equals("fake-name")));
         verify(queue, times(0)).add(any());
     }
 
     @Test
     void shouldDeleteExtensionWhenDeletePredicateAlwaysFalse() {
         var type = GroupVersionKind.fromAPIVersionAndKind("v1alpha1", "User");
-        when(matchers.onDeleteMatcher()).thenReturn(
-            DefaultExtensionMatcher.builder(client, type).build());
+        when(matchers.onDeleteMatcher())
+                .thenReturn(DefaultExtensionMatcher.builder(client, type).build());
         watcher.onDelete(createFake("fake-name"));
 
         verify(matchers, times(1)).onDeleteMatcher();

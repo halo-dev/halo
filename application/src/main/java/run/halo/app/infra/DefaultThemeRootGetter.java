@@ -17,5 +17,4 @@ public class DefaultThemeRootGetter implements ThemeRootGetter {
     public Path get() {
         return haloProps.getWorkDir().resolve("themes");
     }
-
 }

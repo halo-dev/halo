@@ -29,15 +29,11 @@ public class RememberMeConfigurer implements SecurityConfigurer {
         var filter = new AuthenticationWebFilter(authManager);
         filter.setSecurityContextRepository(securityContextRepository);
         filter.setAuthenticationFailureHandler(
-            (exchange, exception) -> rememberMeServices.loginFail(exchange.getExchange())
-        );
+                (exchange, exception) -> rememberMeServices.loginFail(exchange.getExchange()));
         filter.setServerAuthenticationConverter(rememberMeServices::autoLogin);
-        filter.setRequiresAuthenticationMatcher(
-            exchange -> ReactiveSecurityContextHolder.getContext()
+        filter.setRequiresAuthenticationMatcher(exchange -> ReactiveSecurityContextHolder.getContext()
                 .flatMap(securityContext -> MatchResult.notMatch())
-                .switchIfEmpty(MatchResult.match())
-        );
+                .switchIfEmpty(MatchResult.match()));
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
-
 }

@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>{@link DataBuffer} stream fetcher from uri.</p>
+ * {@link DataBuffer} stream fetcher from uri.
  *
  * @author guqing
  * @since 2.6.0
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public interface ReactiveUrlDataBufferFetcher {
 
     /**
-     * <p>Fetch data buffer flux from uri.</p>
+     * Fetch data buffer flux from uri.
      *
      * @param uri uri to fetch
      * @return data buffer flux
@@ -24,7 +24,7 @@ public interface ReactiveUrlDataBufferFetcher {
     Flux<DataBuffer> fetch(URI uri);
 
     /**
-     * <p>Get head of the uri.</p>
+     * Get head of the uri.
      *
      * @param uri uri to fetch
      * @return response entity
@@ -38,5 +38,4 @@ public interface ReactiveUrlDataBufferFetcher {
      * @return response entity
      */
     Mono<ResponseEntity<Flux<DataBuffer>>> fetchResponseEntity(URI uri);
-
 }

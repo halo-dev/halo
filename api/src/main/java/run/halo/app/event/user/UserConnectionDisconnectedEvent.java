@@ -21,5 +21,4 @@ public class UserConnectionDisconnectedEvent extends ApplicationEvent {
         super(source);
         this.userConnection = userConnection;
     }
-
 }

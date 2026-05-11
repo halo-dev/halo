@@ -223,9 +223,9 @@ Content-Type: application/zip
 
 1. 解压缩备份文件。
 2. 校验备份文件的完整性。
-2. 恢复所有 ExtensionStore。
-3. 覆盖当前工作目录。
-4. 备份完成。
+3. 恢复所有 ExtensionStore。
+4. 覆盖当前工作目录。
+5. 备份完成。
 
 > 需要注意内存占用问题。
 

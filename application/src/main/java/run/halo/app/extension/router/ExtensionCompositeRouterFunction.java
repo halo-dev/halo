@@ -32,8 +32,8 @@ public class ExtensionCompositeRouterFunction implements RouterFunction<ServerRe
     @Override
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return Flux.fromIterable(getRouterFunctions())
-            .concatMap(routerFunction -> routerFunction.route(request))
-            .next();
+                .concatMap(routerFunction -> routerFunction.route(request))
+                .next();
     }
 
     @Override
@@ -57,5 +57,4 @@ public class ExtensionCompositeRouterFunction implements RouterFunction<ServerRe
     void onSchemeRemovedEvent(SchemeRemovedEvent event) {
         this.schemeRouterFuncMapper.remove(event.getScheme());
     }
-
 }

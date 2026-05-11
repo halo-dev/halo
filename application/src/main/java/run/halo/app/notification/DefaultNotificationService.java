@@ -32,32 +32,31 @@ public class DefaultNotificationService implements UserNotificationService {
     @Override
     public Mono<Notification> markAsRead(String username, String name) {
         return client.fetch(Notification.class, name)
-            .filter(notification -> isRecipient(notification, username))
-            .flatMap(notification -> {
-                notification.getSpec().setUnread(false);
-                notification.getSpec().setLastReadAt(Instant.now());
-                return client.update(notification);
-            });
+                .filter(notification -> isRecipient(notification, username))
+                .flatMap(notification -> {
+                    notification.getSpec().setUnread(false);
+                    notification.getSpec().setLastReadAt(Instant.now());
+                    return client.update(notification);
+                });
     }
 
     @Override
     public Flux<String> markSpecifiedAsRead(String username, List<String> names) {
         return Flux.fromIterable(names)
-            .flatMap(name -> markAsRead(username, name))
-            .map(notification -> notification.getMetadata().getName());
+                .flatMap(name -> markAsRead(username, name))
+                .map(notification -> notification.getMetadata().getName());
     }
 
     @Override
     public Mono<Notification> deleteByName(String username, String name) {
         return client.get(Notification.class, name)
-            .doOnNext(notification -> {
-                var recipient = notification.getSpec().getRecipient();
-                if (!username.equals(recipient)) {
-                    throw new AccessDeniedException(
-                        "You have no permission to delete this notification.");
-                }
-            })
-            .flatMap(client::delete);
+                .doOnNext(notification -> {
+                    var recipient = notification.getSpec().getRecipient();
+                    if (!username.equals(recipient)) {
+                        throw new AccessDeniedException("You have no permission to delete this notification.");
+                    }
+                })
+                .flatMap(client::delete);
     }
 
     static boolean isRecipient(Notification notification, String username) {

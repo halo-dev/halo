@@ -9692,16 +9692,16 @@
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "\u003cp\u003eWhether to hide the category from the category list.\u003c/p\u003e\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will\n not be displayed in the category list, but it can still be accessed by permalink.\u003c/p\u003e\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only\n allows to be set to true on the first level(root node) of categories.\u003c/p\u003e"
+            "description": "Whether to hide the category from the category list.\n\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will not be displayed in the\n category list, but it can still be accessed by permalink.\n\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only allows to be set to true\n on the first level(root node) of categories."
           },
           "postTemplate": {
             "maxLength": 255,
             "type": "string",
-            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e"
+            "description": "Used to specify the template for the posts associated with the category.\n\n \u003cp\u003eThe priority is not as high as that of the post.\n\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail."
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
-            "description": "\u003cp\u003eif a category is queried for related posts, the default behavior is to\n query all posts under the category including its subcategories, but if this field is\n set to true, cascade query behavior will be terminated here.\u003c/p\u003e\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and\n D and C marked this field as true, when querying posts under A category,all posts under A\n and B will be queried, but C and D will not be queried.\u003c/p\u003e"
+            "description": "if a category is queried for related posts, the default behavior is to query all posts under the category\n including its subcategories, but if this field is set to true, cascade query behavior will be terminated\n here.\n\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and D and C marked this\n field as true, when querying posts under A category,all posts under A and B will be queried, but C and D will\n not be queried."
           },
           "priority": {
             "type": "integer",
@@ -9961,7 +9961,7 @@
           "message": {
             "maxLength": 32768,
             "type": "string",
-            "description": "Human-readable message indicating details about last transition.\n This may be an empty string."
+            "description": "Human-readable message indicating details about last transition. This may be an empty string."
           },
           "reason": {
             "maxLength": 1024,
@@ -9982,10 +9982,10 @@
             "maxLength": 316,
             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
             "type": "string",
-            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316."
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase. example: Ready, Initialized. maxLength: 316."
           }
         },
-        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列."
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新 导致 equals 为 false，一直被加入队列."
       },
       "ConfigMap": {
         "required": [
@@ -10011,7 +10011,7 @@
             "$ref": "#/components/schemas/Metadata"
           }
         },
-        "description": "\u003cp\u003eConfigMap holds configuration data to consume.\u003c/p\u003e"
+        "description": "ConfigMap holds configuration data to consume."
       },
       "ConfigMapList": {
         "required": [
@@ -10405,7 +10405,7 @@
             "$ref": "#/components/schemas/ExtensionSpec"
           }
         },
-        "description": "Extension definition.\n An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure,\n enumeration, or protocol type without needing to subclass it."
+        "description": "Extension definition. An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure, enumeration, or\n protocol type without needing to subclass it."
       },
       "ExtensionDefinitionList": {
         "required": [
@@ -10488,7 +10488,7 @@
             "$ref": "#/components/schemas/ExtensionPointSpec"
           }
         },
-        "description": "Extension point definition.\n An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for the\n dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where\n additional functionality can be added through the use of plugins or extensions."
+        "description": "Extension point definition. An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for\n the dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where additional functionality can be\n added through the use of plugins or extensions."
       },
       "ExtensionPointDefinitionList": {
         "required": [
@@ -11175,7 +11175,7 @@
             "$ref": "#/components/schemas/NotificationSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Notification Notification} is a custom extension that used to store notification information for\n inner use, it\u0027s on-site notification.\u003c/p\u003e\n\n \u003cp\u003eSupports the following operations:\u003c/p\u003e\n \u003cul\u003e\n    \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\u003c/li\u003e\n    \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\u003c/li\u003e\n    \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\u003c/li\u003e\n \u003c/ul\u003e"
+        "description": "{@link Notification Notification} is a custom extension that used to store notification information for inner use, it\u0027s on-site\n notification.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
       },
       "NotificationList": {
         "required": [
@@ -11296,7 +11296,7 @@
             "$ref": "#/components/schemas/NotificationTemplateSpec"
           }
         },
-        "description": "\u003cp\u003e{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\u003c/p\u003e\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\u003c/p\u003e\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language,\n if multiple templates are matched, the best match will be selected. This is useful when you\n want to override the default template.\u003c/p\u003e"
+        "description": "{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\n\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\n\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language, if multiple templates\n are matched, the best match will be selected. This is useful when you want to override the default template."
       },
       "NotificationTemplateList": {
         "required": [
@@ -11389,7 +11389,7 @@
             "$ref": "#/components/schemas/NotifierDescriptorSpec"
           }
         },
-        "description": "\u003cp\u003e{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\u003c/p\u003e\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to\n let the user know what the notifier is and what it can do in the UI and also let the\n \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the notifier and prepare the notifier\u0027s settings.\u003c/p\u003e"
+        "description": "{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\n\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to let the user know what\n the notifier is and what it can do in the UI and also let the \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the\n notifier and prepare the notifier\u0027s settings."
       },
       "NotifierDescriptorList": {
         "required": [
@@ -11929,28 +11929,28 @@
         "properties": {
           "apiGroups": {
             "type": "array",
-            "description": "APIGroups is the name of the APIGroup that contains the resources.\n If multiple API groups are specified, any action requested against one of the enumerated\n resources in any API group will be allowed.",
+            "description": "APIGroups is the name of the APIGroup that contains the resources. If multiple API groups are specified, any\n action requested against one of the enumerated resources in any API group will be allowed.",
             "items": {
               "type": "string"
             }
           },
           "nonResourceURLs": {
             "type": "array",
-            "description": "NonResourceURLs is a set of partial urls that a user should have access to.\n *s are allowed, but only as the full, final step in the path\n If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is checked\n against the NonResourceURLs to look for a match.\n Since non-resource URLs are not namespaced, this field is only applicable for\n ClusterRoles referenced from a ClusterRoleBinding.\n Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource\n URL paths (such as \"/api\"),  but not both.",
+            "description": "NonResourceURLs is a set of partial urls that a user should have access to. *s are allowed, but only as the\n full, final step in the path If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is\n checked against the NonResourceURLs to look for a match. Since non-resource URLs are not namespaced, this\n field is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API\n resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"), but not both.",
             "items": {
               "type": "string"
             }
           },
           "resourceNames": {
             "type": "array",
-            "description": "ResourceNames is an optional white list of names that the rule applies to.  An empty set\n means that everything is allowed.",
+            "description": "ResourceNames is an optional white list of names that the rule applies to. An empty set means that everything\n is allowed.",
             "items": {
               "type": "string"
             }
           },
           "resources": {
             "type": "array",
-            "description": "Resources is a list of resources this rule applies to.  \u0027*\u0027 represents all resources in\n the specified apiGroups.\n \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified\n apiGroups.",
+            "description": "Resources is a list of resources this rule applies to. \u0027*\u0027 represents all resources in the specified\n apiGroups. \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified apiGroups.",
             "items": {
               "type": "string"
             }
@@ -11963,7 +11963,7 @@
             }
           }
         },
-        "description": "PolicyRule holds information that describes a policy rule, but does not contain information\n about whom the rule applies to or which namespace the rule applies to."
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information about whom the rule\n applies to or which namespace the rule applies to."
       },
       "PolicySpec": {
         "required": [
@@ -12106,7 +12106,7 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "\u003cp\u003ePost extension.\u003c/p\u003e"
+        "description": "Post extension."
       },
       "PostList": {
         "required": [
@@ -12338,7 +12338,7 @@
             "$ref": "#/components/schemas/ReasonSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents\n an instance of a {@link ReasonType ReasonType}.\u003c/p\u003e\n \u003cp\u003eIt can be understood as an event that triggers a notification.\u003c/p\u003e"
+        "description": "{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents an instance of a\n {@link ReasonType ReasonType}.\n\n \u003cp\u003eIt can be understood as an event that triggers a notification."
       },
       "ReasonAttributes": {
         "type": "object",
@@ -12519,7 +12519,7 @@
             "$ref": "#/components/schemas/ReasonTypeSpec"
           }
         },
-        "description": "\u003cp\u003e{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\u003c/p\u003e\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.\u003c/p\u003e"
+        "description": "{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\n\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify."
       },
       "ReasonTypeList": {
         "required": [
@@ -12726,7 +12726,7 @@
           },
           "previousTokenValue": {
             "type": "string",
-            "description": "The previous token value, stored when the token is rotated.\n Used to accept recently-rotated tokens within a grace period\n to prevent false-positive cookie theft detection during\n concurrent requests."
+            "description": "The previous token value, stored when the token is rotated. Used to accept recently-rotated tokens within a\n grace period to prevent false-positive cookie theft detection during concurrent requests."
           },
           "series": {
             "minLength": 1,
@@ -12977,7 +12977,7 @@
             }
           }
         },
-        "description": "\u003cp\u003eThe reverse proxy custom resource is used to configure a path to proxy it to a directory or\n file.\u003c/p\u003e\n \u003cp\u003eHTTP proxy may be added in the future.\u003c/p\u003e"
+        "description": "The reverse proxy custom resource is used to configure a path to proxy it to a directory or file.\n\n \u003cp\u003eHTTP proxy may be added in the future."
       },
       "ReverseProxyList": {
         "required": [
@@ -13103,7 +13103,7 @@
             }
           }
         },
-        "description": "RoleBinding references a role, but does not contain it.\n It can reference a Role in the global.\n It adds who information via Subjects."
+        "description": "RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who\n information via Subjects."
       },
       "RoleBindingList": {
         "required": [
@@ -13258,7 +13258,7 @@
               "type": "string",
               "format": "byte"
             },
-            "description": "\u003cp\u003eThe total bytes of the values in\n the Data field must be less than {@link run.halo.app.extension.Secret#MAX_SECRET_SIZE #MAX_SECRET_SIZE} bytes.\u003c/p\u003e\n \u003cp\u003e\u003ccode\u003edata\u003c/code\u003e contains the secret data. Each key must consist of alphanumeric\n characters, \u0027-\u0027, \u0027_\u0027 or \u0027.\u0027. The serialized form of the secret data is a\n base64 encoded string, representing the arbitrary (possibly non-string)\n data value here. Described in\n \u003ca href\u003d\"https://tools.ietf.org/html/rfc4648#section-4\"\u003erfc4648#section-4\u003c/a\u003e\n \u003c/p\u003e"
+            "description": "The total bytes of the values in the Data field must be less than {@link run.halo.app.extension.Secret#MAX_SECRET_SIZE #MAX_SECRET_SIZE} bytes.\n\n \u003cp\u003e\u003ccode\u003edata\u003c/code\u003e contains the secret data. Each key must consist of alphanumeric characters, \u0027-\u0027, \u0027_\u0027 or \u0027.\u0027. The\n serialized form of the secret data is a base64 encoded string, representing the arbitrary (possibly non-string)\n data value here. Described in \u003ca href\u003d\"https://tools.ietf.org/html/rfc4648#section-4\"\u003erfc4648#section-4\u003c/a\u003e"
           },
           "kind": {
             "type": "string"
@@ -13271,14 +13271,14 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "\u003ccode\u003estringData\u003c/code\u003e allows specifying non-binary secret data in string form.\n It is provided as a write-only input field for convenience.\n All keys and values are merged into the data field on write, overwriting any existing\n values.\n The stringData field is never output when reading from the API."
+            "description": "\u003ccode\u003estringData\u003c/code\u003e allows specifying non-binary secret data in string form. It is provided as a write-only input\n field for convenience. All keys and values are merged into the data field on write, overwriting any existing\n values. The stringData field is never output when reading from the API."
           },
           "type": {
             "type": "string",
-            "description": "Used to facilitate programmatic handling of secret data.\n More info:\n \u003ca href\u003d\"https://kubernetes.io/docs/concepts/configuration/secret/#secret-types\"\u003esecret-types\u003c/a\u003e"
+            "description": "Used to facilitate programmatic handling of secret data. More info: \u003ca\n href\u003d\"https://kubernetes.io/docs/concepts/configuration/secret/#secret-types\"\u003esecret-types\u003c/a\u003e"
           }
         },
-        "description": "Secret is a small piece of sensitive data which should be kept secret, such as a password,\n a token, or a key."
+        "description": "Secret is a small piece of sensitive data which should be kept secret, such as a password, a token, or a key."
       },
       "SecretList": {
         "required": [
@@ -13501,7 +13501,7 @@
             "$ref": "#/components/schemas/SinglePageStatus"
           }
         },
-        "description": "\u003cp\u003eSingle page extension.\u003c/p\u003e"
+        "description": "Single page extension."
       },
       "SinglePageList": {
         "required": [
@@ -13830,11 +13830,11 @@
         "properties": {
           "apiGroup": {
             "type": "string",
-            "description": "APIGroup holds the API group of the referenced subject.\n Defaults to \"\" for ServiceAccount subjects.\n Defaults to \"rbac.authorization.halo.run\" for User and Group subjects."
+            "description": "APIGroup holds the API group of the referenced subject. Defaults to \"\" for ServiceAccount subjects. Defaults\n to \"rbac.authorization.halo.run\" for User and Group subjects."
           },
           "kind": {
             "type": "string",
-            "description": "Kind of object being referenced. Values defined by this API group are \"User\", \"Group\",\n and \"ServiceAccount\".\n If the Authorizer does not recognize the kind value, the Authorizer should report\n an error."
+            "description": "Kind of object being referenced. Values defined by this API group are \"User\", \"Group\", and \"ServiceAccount\".\n If the Authorizer does not recognize the kind value, the Authorizer should report an error."
           },
           "name": {
             "type": "string",
@@ -13863,7 +13863,7 @@
             "$ref": "#/components/schemas/SubscriptionSpec"
           }
         },
-        "description": "\u003cp\u003e{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a\n certain {@link Reason Reason} is triggered.\u003c/p\u003e\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to\n subscribe to.\u003c/p\u003e"
+        "description": "{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a certain {@link Reason Reason} is\n triggered.\n\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to subscribe to."
       },
       "SubscriptionList": {
         "required": [
@@ -14056,7 +14056,7 @@
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
+            "description": "Color regex explanation.\n\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
           },
           "cover": {
             "type": "string"
@@ -14186,7 +14186,7 @@
             "$ref": "#/components/schemas/ThemeStatus"
           }
         },
-        "description": "\u003cp\u003eTheme extension.\u003c/p\u003e"
+        "description": "Theme extension."
       },
       "ThemeList": {
         "required": [
@@ -14446,7 +14446,7 @@
         "properties": {
           "providerUserId": {
             "type": "string",
-            "description": "The unique identifier for the user\u0027s connection to the OAuth provider.\n for example, the user\u0027s GitHub id."
+            "description": "The unique identifier for the user\u0027s connection to the OAuth provider. for example, the user\u0027s GitHub id."
           },
           "registrationId": {
             "type": "string",

@@ -5,7 +5,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.converter.Converter;
 
 public enum Operator implements Converter<String, SelectorCriteria> {
-
     Equals("=", 3) {
         @Override
         public @Nullable SelectorCriteria convert(@Nullable String selector) {
@@ -25,11 +24,11 @@ public enum Operator implements Converter<String, SelectorCriteria> {
         public SelectorCriteria convert(String selector) {
             if (preFlightCheck(selector, 5)) {
                 var idx = selector.indexOf(getOperator());
-                if (idx > 0 && (idx + getOperator().length()) < selector.length() - 2
-                    && selector.charAt(selector.length() - 1) == ')') {
+                if (idx > 0
+                        && (idx + getOperator().length()) < selector.length() - 2
+                        && selector.charAt(selector.length() - 1) == ')') {
                     var key = selector.substring(0, idx);
-                    var valuesString =
-                        selector.substring(idx + getOperator().length(), selector.length() - 1);
+                    var valuesString = selector.substring(idx + getOperator().length(), selector.length() - 1);
                     String[] values = valuesString.split(",");
                     return new SelectorCriteria(key, this, Set.of(values));
                 }
@@ -75,9 +74,7 @@ public enum Operator implements Converter<String, SelectorCriteria> {
     };
     private final String operator;
 
-    /**
-     * Parse order.
-     */
+    /** Parse order. */
     private final int order;
 
     Operator(String operator, int order) {
@@ -96,5 +93,4 @@ public enum Operator implements Converter<String, SelectorCriteria> {
     protected boolean preFlightCheck(String selector, int minLength) {
         return selector != null && selector.length() >= minLength;
     }
-
 }

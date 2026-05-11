@@ -1,18 +1,12 @@
 package run.halo.app.core.extension;
 
-import static run.halo.app.core.extension.RoleBinding.GROUP;
-import static run.halo.app.core.extension.RoleBinding.KIND;
-import static run.halo.app.core.extension.RoleBinding.VERSION;
+import static run.halo.app.core.extension.RoleBinding.*;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.util.StringUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionOperator;
@@ -20,9 +14,8 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
 
 /**
- * RoleBinding references a role, but does not contain it.
- * It can reference a Role in the global.
- * It adds who information via Subjects.
+ * RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who
+ * information via Subjects.
  *
  * @author guqing
  * @since 2.0.0
@@ -30,11 +23,7 @@ import run.halo.app.extension.Metadata;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = GROUP,
-    version = VERSION,
-    kind = KIND,
-    plural = "rolebindings",
-    singular = "rolebinding")
+@GVK(group = GROUP, version = VERSION, kind = KIND, plural = "rolebindings", singular = "rolebinding")
 public class RoleBinding extends AbstractExtension {
 
     public static final String GROUP = "";
@@ -43,15 +32,12 @@ public class RoleBinding extends AbstractExtension {
 
     public static final String KIND = "RoleBinding";
 
-    /**
-     * Subjects holds references to the objects the role applies to.
-     */
+    /** Subjects holds references to the objects the role applies to. */
     List<Subject> subjects;
 
     /**
-     * RoleRef can reference a Role in the current namespace or a ClusterRole in the global
-     * namespace.
-     * If the RoleRef cannot be resolved, the Authorizer must return an error.
+     * RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace. If the RoleRef
+     * cannot be resolved, the Authorizer must return an error.
      */
     RoleRef roleRef;
 
@@ -64,19 +50,13 @@ public class RoleBinding extends AbstractExtension {
     @Data
     public static class RoleRef {
 
-        /**
-         * Kind is the type of resource being referenced.
-         */
+        /** Kind is the type of resource being referenced. */
         String kind;
 
-        /**
-         * Name is the name of resource being referenced.
-         */
+        /** Name is the name of resource being referenced. */
         String name;
 
-        /**
-         * APIGroup is the group for the resource being referenced.
-         */
+        /** APIGroup is the group for the resource being referenced. */
         String apiGroup;
     }
 
@@ -89,35 +69,30 @@ public class RoleBinding extends AbstractExtension {
     @AllArgsConstructor
     public static class Subject {
         /**
-         * Kind of object being referenced. Values defined by this API group are "User", "Group",
-         * and "ServiceAccount".
-         * If the Authorizer does not recognize the kind value, the Authorizer should report
-         * an error.
+         * Kind of object being referenced. Values defined by this API group are "User", "Group", and "ServiceAccount".
+         * If the Authorizer does not recognize the kind value, the Authorizer should report an error.
          */
         String kind;
 
-        /**
-         * Name of the object being referenced.
-         */
+        /** Name of the object being referenced. */
         String name;
 
         /**
-         * APIGroup holds the API group of the referenced subject.
-         * Defaults to "" for ServiceAccount subjects.
-         * Defaults to "rbac.authorization.halo.run" for User and Group subjects.
+         * APIGroup holds the API group of the referenced subject. Defaults to "" for ServiceAccount subjects. Defaults
+         * to "rbac.authorization.halo.run" for User and Group subjects.
          */
         String apiGroup;
 
         public static Predicate<Subject> isUser(String username) {
             return subject -> User.KIND.equals(subject.getKind())
-                && User.GROUP.equals(subject.getApiGroup())
-                && username.equals(subject.getName());
+                    && User.GROUP.equals(subject.getApiGroup())
+                    && username.equals(subject.getName());
         }
 
         public static Predicate<Subject> containsUser(Set<String> usernames) {
             return subject -> User.KIND.equals(subject.getKind())
-                && User.GROUP.equals(subject.apiGroup)
-                && usernames.contains(subject.getName());
+                    && User.GROUP.equals(subject.apiGroup)
+                    && usernames.contains(subject.getName());
         }
 
         @Override
@@ -156,14 +131,12 @@ public class RoleBinding extends AbstractExtension {
     }
 
     public static Predicate<RoleBinding> containsUser(String username) {
-        return ExtensionOperator.<RoleBinding>isNotDeleted().and(
-            binding -> binding.getSubjects().stream()
-                .anyMatch(Subject.isUser(username)));
+        return ExtensionOperator.<RoleBinding>isNotDeleted()
+                .and(binding -> binding.getSubjects().stream().anyMatch(Subject.isUser(username)));
     }
 
     public static Predicate<RoleBinding> containsUser(Set<String> usernames) {
         return ExtensionOperator.<RoleBinding>isNotDeleted()
-            .and(binding -> binding.getSubjects().stream()
-                .anyMatch(Subject.containsUser(usernames)));
+                .and(binding -> binding.getSubjects().stream().anyMatch(Subject.containsUser(usernames)));
     }
 }

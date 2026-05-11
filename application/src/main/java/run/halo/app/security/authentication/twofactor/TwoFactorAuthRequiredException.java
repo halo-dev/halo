@@ -13,5 +13,4 @@ public class TwoFactorAuthRequiredException extends ResponseStatusException {
         setType(type);
         getBody().setProperty("redirectURI", redirectURI);
     }
-
 }

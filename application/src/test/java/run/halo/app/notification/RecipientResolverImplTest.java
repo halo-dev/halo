@@ -58,13 +58,13 @@ class RecipientResolverImplTest {
         reasonAttributes.put("owner", "guqing");
         reason.getSpec().setAttributes(reasonAttributes);
 
-        when(subscriptionService.listByPerPage(anyString()))
-            .thenReturn(Flux.just(subscription1, subscription2));
+        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription1, subscription2));
 
-        recipientResolver.resolve(reason)
-            .as(StepVerifier::create)
-            .expectNext(new Subscriber(UserIdentity.of("guqing"), "guqing-subscription"))
-            .verifyComplete();
+        recipientResolver
+                .resolve(reason)
+                .as(StepVerifier::create)
+                .expectNext(new Subscriber(UserIdentity.of("guqing"), "guqing-subscription"))
+                .verifyComplete();
 
         verify(subscriptionService).listByPerPage(anyString());
     }
@@ -75,8 +75,7 @@ class RecipientResolverImplTest {
         subscriber.setName("test");
         Subscription subscription = createSubscription(subscriber);
 
-        when(subscriptionService.listByPerPage(anyString()))
-            .thenReturn(Flux.just(subscription));
+        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -86,10 +85,11 @@ class RecipientResolverImplTest {
         reason.getSpec().getSubject().setKind("Post");
         reason.getSpec().getSubject().setName("fake-post");
 
-        recipientResolver.resolve(reason)
-            .as(StepVerifier::create)
-            .expectNext(new Subscriber(UserIdentity.of("test"), "fake-subscription"))
-            .verifyComplete();
+        recipientResolver
+                .resolve(reason)
+                .as(StepVerifier::create)
+                .expectNext(new Subscriber(UserIdentity.of("test"), "fake-subscription"))
+                .verifyComplete();
 
         verify(subscriptionService).listByPerPage(anyString());
     }
@@ -108,8 +108,7 @@ class RecipientResolverImplTest {
         subscription2.getSpec().getReason().setSubject(null);
         subscription2.getSpec().getReason().setExpression("props.owner == 'guqing'");
 
-        when(subscriptionService.listByPerPage(anyString()))
-            .thenReturn(Flux.just(subscription1, subscription2));
+        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription1, subscription2));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -122,10 +121,11 @@ class RecipientResolverImplTest {
         reasonAttributes.put("owner", "guqing");
         reason.getSpec().setAttributes(reasonAttributes);
 
-        recipientResolver.resolve(reason)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete();
+        recipientResolver
+                .resolve(reason)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .verifyComplete();
 
         verify(subscriptionService).listByPerPage(anyString());
     }

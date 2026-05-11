@@ -16,14 +16,14 @@ class CsrfSecurityTest {
 
     @Test
     void shouldNotCheckCsrfForPatAuthentication() {
-        webClient.post()
-            .uri("/fake")
-            .headers(headers -> headers.setBearerAuth("pat_invalid"))
-            .exchange()
-            .expectStatus()
-            .isUnauthorized()
-            .expectHeader()
-            .exists(HttpHeaders.WWW_AUTHENTICATE);
+        webClient
+                .post()
+                .uri("/fake")
+                .headers(headers -> headers.setBearerAuth("pat_invalid"))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized()
+                .expectHeader()
+                .exists(HttpHeaders.WWW_AUTHENTICATE);
     }
-
 }

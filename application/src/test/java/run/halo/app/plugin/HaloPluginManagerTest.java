@@ -58,6 +58,4 @@ class HaloPluginManagerTest {
         var dependents = pluginManager.getDependents("fake-plugin");
         assertTrue(dependents.isEmpty());
     }
-
-
 }

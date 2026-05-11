@@ -11,5 +11,4 @@ public interface PluginApplicationContextFactory {
      * @return refresh application context for the plugin.
      */
     ApplicationContext create(String pluginId);
-
 }

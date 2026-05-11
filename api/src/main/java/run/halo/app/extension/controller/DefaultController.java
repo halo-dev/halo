@@ -43,26 +43,29 @@ public class DefaultController<R> implements Controller {
 
     private final AtomicLong workerCounter;
 
-    public DefaultController(String name,
-        Reconciler<R> reconciler,
-        RequestQueue<R> queue,
-        Synchronizer<R> synchronizer,
-        Supplier<Instant> nowSupplier,
-        Duration minDelay,
-        Duration maxDelay,
-        ExecutorService executor, int workerCount) {
-        this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
-            (Executor) executor, workerCount);
+    public DefaultController(
+            String name,
+            Reconciler<R> reconciler,
+            RequestQueue<R> queue,
+            Synchronizer<R> synchronizer,
+            Supplier<Instant> nowSupplier,
+            Duration minDelay,
+            Duration maxDelay,
+            ExecutorService executor,
+            int workerCount) {
+        this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay, (Executor) executor, workerCount);
     }
 
-    public DefaultController(String name,
-        Reconciler<R> reconciler,
-        RequestQueue<R> queue,
-        Synchronizer<R> synchronizer,
-        Supplier<Instant> nowSupplier,
-        Duration minDelay,
-        Duration maxDelay,
-        Executor executor, int workerCount) {
+    public DefaultController(
+            String name,
+            Reconciler<R> reconciler,
+            RequestQueue<R> queue,
+            Synchronizer<R> synchronizer,
+            Supplier<Instant> nowSupplier,
+            Duration minDelay,
+            Duration maxDelay,
+            Executor executor,
+            int workerCount) {
         Assert.isTrue(workerCount > 0, "Worker count must not be less than 1");
         this.name = name;
         this.reconciler = reconciler;
@@ -76,43 +79,44 @@ public class DefaultController<R> implements Controller {
         this.workerCounter = new AtomicLong();
     }
 
-    public DefaultController(String name,
-        Reconciler<R> reconciler,
-        RequestQueue<R> queue,
-        Synchronizer<R> synchronizer,
-        Duration minDelay,
-        Duration maxDelay) {
+    public DefaultController(
+            String name,
+            Reconciler<R> reconciler,
+            RequestQueue<R> queue,
+            Synchronizer<R> synchronizer,
+            Duration minDelay,
+            Duration maxDelay) {
         this(name, reconciler, queue, synchronizer, Instant::now, minDelay, maxDelay, 1);
     }
 
-    public DefaultController(String name,
-        Reconciler<R> reconciler,
-        RequestQueue<R> queue,
-        Synchronizer<R> synchronizer,
-        Duration minDelay,
-        Duration maxDelay, int workerCount) {
+    public DefaultController(
+            String name,
+            Reconciler<R> reconciler,
+            RequestQueue<R> queue,
+            Synchronizer<R> synchronizer,
+            Duration minDelay,
+            Duration maxDelay,
+            int workerCount) {
         this(name, reconciler, queue, synchronizer, Instant::now, minDelay, maxDelay, workerCount);
     }
 
-    public DefaultController(String name,
-        Reconciler<R> reconciler,
-        RequestQueue<R> queue,
-        Synchronizer<R> synchronizer,
-        Supplier<Instant> nowSupplier,
-        Duration minDelay,
-        Duration maxDelay, int workerCount) {
-        this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
-            executor(name), workerCount);
+    public DefaultController(
+            String name,
+            Reconciler<R> reconciler,
+            RequestQueue<R> queue,
+            Synchronizer<R> synchronizer,
+            Supplier<Instant> nowSupplier,
+            Duration minDelay,
+            Duration maxDelay,
+            int workerCount) {
+        this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay, executor(name), workerCount);
     }
 
     private static Executor executor(String name) {
         return Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
-            .name(name, 1)
-            .uncaughtExceptionHandler(
-                (t, e) -> log.error("Uncaught exception in thread: {}", t.getName(), e)
-            )
-            .factory()
-        );
+                .name(name, 1)
+                .uncaughtExceptionHandler((t, e) -> log.error("Uncaught exception in thread: {}", t.getName(), e))
+                .factory());
     }
 
     @Override
@@ -135,9 +139,7 @@ public class DefaultController<R> implements Controller {
             executor.execute(synchronizer::start);
         }
         log.info("Starting controller {}", name);
-        IntStream.range(0, getWorkerCount())
-            .mapToObj(i -> new Worker())
-            .forEach(executor::execute);
+        IntStream.range(0, getWorkerCount()).mapToObj(i -> new Worker()).forEach(executor::execute);
     }
 
     /**
@@ -150,8 +152,7 @@ public class DefaultController<R> implements Controller {
         private final String name;
 
         Worker() {
-            this.name =
-                DefaultController.this.getName() + "-worker-" + workerCounter.incrementAndGet();
+            this.name = DefaultController.this.getName() + "-worker-" + workerCounter.incrementAndGet();
         }
 
         public String getName() {
@@ -166,28 +167,30 @@ public class DefaultController<R> implements Controller {
                     var entry = queue.take();
                     Reconciler.Result result;
                     try {
-                        log.debug("{} >>> Reconciling request {} at {}", this.name,
-                            entry.getEntry(),
-                            nowSupplier.get());
+                        log.debug(
+                                "{} >>> Reconciling request {} at {}", this.name, entry.getEntry(), nowSupplier.get());
                         var watch = new StopWatch(this.name + ":reconcile: " + entry.getEntry());
                         watch.start("reconciliation");
                         result = reconciler.reconcile(entry.getEntry());
                         watch.stop();
-                        log.debug("{} >>> Reconciled request: {} with result: {}, usage: {}",
-                            this.name, entry.getEntry(), result, watch.getTotalTimeMillis());
+                        log.debug(
+                                "{} >>> Reconciled request: {} with result: {}, usage: {}",
+                                this.name,
+                                entry.getEntry(),
+                                result,
+                                watch.getTotalTimeMillis());
                     } catch (Throwable t) {
                         result = new Reconciler.Result(true, null);
                         if (t instanceof OptimisticLockingFailureException) {
-                            log.warn("Optimistic locking failure when reconciling request: {}/{}",
-                                this.name, entry.getEntry());
+                            log.warn(
+                                    "Optimistic locking failure when reconciling request: {}/{}",
+                                    this.name,
+                                    entry.getEntry());
                         } else if (t instanceof RequeueException re) {
-                            log.warn("{}: Requeue {} due to {}",
-                                this.name, entry.getEntry(), re.getMessage());
+                            log.warn("{}: Requeue {} due to {}", this.name, entry.getEntry(), re.getMessage());
                             result = re.getResult();
                         } else {
-                            log.error("Reconciler in " + this.name
-                                    + " aborted with an error, re-enqueuing...",
-                                t);
+                            log.error("Reconciler in " + this.name + " aborted with an error, re-enqueuing...", t);
                         }
                     } finally {
                         queue.done(entry.getEntry());
@@ -202,9 +205,9 @@ public class DefaultController<R> implements Controller {
                     if (retryAfter == null) {
                         retryAfter = entry.getRetryAfter();
                         if (retryAfter == null
-                            || retryAfter.isNegative()
-                            || retryAfter.isZero()
-                            || retryAfter.compareTo(minDelay) < 0) {
+                                || retryAfter.isNegative()
+                                || retryAfter.isZero()
+                                || retryAfter.compareTo(minDelay) < 0) {
                             // set min retry after
                             retryAfter = minDelay;
                         } else {
@@ -219,8 +222,7 @@ public class DefaultController<R> implements Controller {
                             retryAfter = maxDelay;
                         }
                     }
-                    queue.add(
-                        new DelayedEntry<>(entry.getEntry(), retryAfter, nowSupplier));
+                    queue.add(new DelayedEntry<>(entry.getEntry(), retryAfter, nowSupplier));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     log.info("Controller worker {} interrupted", name);

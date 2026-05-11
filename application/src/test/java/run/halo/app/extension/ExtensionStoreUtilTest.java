@@ -14,16 +14,18 @@ class ExtensionStoreUtilTest {
 
     @BeforeEach
     void setUp() {
-        scheme = new Scheme(FakeExtension.class,
-            new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"),
-            "fakes",
-            "fake",
-            new ObjectNode(null));
-        grouplessScheme = new Scheme(FakeExtension.class,
-            new GroupVersionKind("", "v1alpha1", "Fake"),
-            "fakes",
-            "fake",
-            new ObjectNode(null));
+        scheme = new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"),
+                "fakes",
+                "fake",
+                new ObjectNode(null));
+        grouplessScheme = new Scheme(
+                FakeExtension.class,
+                new GroupVersionKind("", "v1alpha1", "Fake"),
+                "fakes",
+                "fake",
+                new ObjectNode(null));
     }
 
     @Test
@@ -43,5 +45,4 @@ class ExtensionStoreUtilTest {
         storeName = ExtensionStoreUtil.buildStoreName(grouplessScheme, "fake-name");
         assertEquals("/registry/fakes/fake-name", storeName);
     }
-
 }

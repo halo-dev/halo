@@ -33,12 +33,7 @@ import run.halo.app.core.endpoint.WebSocketEndpoint;
 import run.halo.app.core.endpoint.WebSocketEndpointManager;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
-import run.halo.app.plugin.event.HaloPluginStartedEvent;
-import run.halo.app.plugin.event.HaloPluginStoppedEvent;
-import run.halo.app.plugin.event.SpringPluginStartedEvent;
-import run.halo.app.plugin.event.SpringPluginStoppedEvent;
-import run.halo.app.plugin.event.SpringPluginStoppingEvent;
+import run.halo.app.plugin.event.*;
 import run.halo.app.search.SearchService;
 import run.halo.app.theme.DefaultTemplateNameResolver;
 import run.halo.app.theme.ViewNameResolver;
@@ -54,8 +49,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
     }
 
     /**
-     * Create and refresh application context. Make sure the plugin has already loaded
-     * before.
+     * Create and refresh application context. Make sure the plugin has already loaded before.
      *
      * @param pluginId plugin id
      * @return refresh application context for the plugin.
@@ -69,7 +63,6 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
 
         var pluginWrapper = pluginManager.getPlugin(pluginId);
         var classLoader = pluginWrapper.getPluginClassLoader();
-
 
         /*
          * Manually creating a BeanFactory and setting the plugin's ClassLoader is necessary
@@ -101,8 +94,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         sw.start("LoadPropertySources");
         var mutablePropertySources = context.getEnvironment().getPropertySources();
 
-        resolvePropertySources(pluginId, resourceLoader)
-            .forEach(mutablePropertySources::addLast);
+        resolvePropertySources(pluginId, resourceLoader).forEach(mutablePropertySources::addLast);
         sw.stop();
 
         sw.start("RegisterBeans");
@@ -114,70 +106,59 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         }
 
         var rootContext = pluginManager.getRootContext();
-        rootContext.getBeanProvider(ViewNameResolver.class)
-            .ifAvailable(viewNameResolver -> {
-                var templateNameResolver =
-                    new DefaultTemplateNameResolver(viewNameResolver, context);
-                beanFactory.registerSingleton("templateNameResolver", templateNameResolver);
-            });
+        rootContext.getBeanProvider(ViewNameResolver.class).ifAvailable(viewNameResolver -> {
+            var templateNameResolver = new DefaultTemplateNameResolver(viewNameResolver, context);
+            beanFactory.registerSingleton("templateNameResolver", templateNameResolver);
+        });
 
-        rootContext.getBeanProvider(ReactiveExtensionClient.class)
-            .ifUnique(client -> {
-                context.registerBean("reactiveSettingFetcher", DefaultReactiveSettingFetcher.class);
-                context.registerBean("settingFetcher", DefaultSettingFetcher.class);
-            });
+        rootContext.getBeanProvider(ReactiveExtensionClient.class).ifUnique(client -> {
+            context.registerBean("reactiveSettingFetcher", DefaultReactiveSettingFetcher.class);
+            context.registerBean("settingFetcher", DefaultSettingFetcher.class);
+        });
 
-        rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class)
-            .ifAvailable(handlerMapping -> {
-                var handlerMappingManager =
-                    new PluginHandlerMappingManager(pluginId, handlerMapping);
-                beanFactory.registerSingleton("pluginHandlerMappingManager", handlerMappingManager);
-            });
+        rootContext.getBeanProvider(PluginRequestMappingHandlerMapping.class).ifAvailable(handlerMapping -> {
+            var handlerMappingManager = new PluginHandlerMappingManager(pluginId, handlerMapping);
+            beanFactory.registerSingleton("pluginHandlerMappingManager", handlerMappingManager);
+        });
 
         context.registerBean(PluginControllerManager.class);
-        beanFactory.registerSingleton("springPluginStoppedEventAdapter",
-            new SpringPluginStoppedEventAdapter(pluginId));
+        beanFactory.registerSingleton("springPluginStoppedEventAdapter", new SpringPluginStoppedEventAdapter(pluginId));
         beanFactory.registerSingleton("haloPluginEventBridge", new HaloPluginEventBridge());
 
-        rootContext.getBeanProvider(FinderRegistry.class)
-            .ifAvailable(finderRegistry -> {
-                var finderManager = new FinderManager(pluginId, finderRegistry);
-                beanFactory.registerSingleton("finderManager", finderManager);
-            });
+        rootContext.getBeanProvider(FinderRegistry.class).ifAvailable(finderRegistry -> {
+            var finderManager = new FinderManager(pluginId, finderRegistry);
+            beanFactory.registerSingleton("finderManager", finderManager);
+        });
 
-        rootContext.getBeanProvider(WebSocketEndpointManager.class)
-            .ifUnique(manager -> beanFactory.registerSingleton("pluginWebSocketEndpointManager",
-                new PluginWebSocketEndpointManager(manager)));
+        rootContext
+                .getBeanProvider(WebSocketEndpointManager.class)
+                .ifUnique(manager -> beanFactory.registerSingleton(
+                        "pluginWebSocketEndpointManager", new PluginWebSocketEndpointManager(manager)));
 
-        rootContext.getBeanProvider(PluginRouterFunctionRegistry.class)
-            .ifUnique(registry -> {
-                var pluginRouterFunctionManager = new PluginRouterFunctionManager(registry);
-                beanFactory.registerSingleton(
-                    "pluginRouterFunctionManager",
-                    pluginRouterFunctionManager
-                );
-            });
+        rootContext.getBeanProvider(PluginRouterFunctionRegistry.class).ifUnique(registry -> {
+            var pluginRouterFunctionManager = new PluginRouterFunctionManager(registry);
+            beanFactory.registerSingleton("pluginRouterFunctionManager", pluginRouterFunctionManager);
+        });
 
-        rootContext.getBeanProvider(SearchService.class)
-            .ifUnique(searchService ->
-                beanFactory.registerSingleton("searchService", searchService)
-            );
+        rootContext
+                .getBeanProvider(SearchService.class)
+                .ifUnique(searchService -> beanFactory.registerSingleton("searchService", searchService));
 
         sw.stop();
 
         sw.start("LoadComponents");
         var classNames = pluginManager.getExtensionClassNames(pluginId);
         classNames.stream()
-            .map(className -> {
-                try {
-                    return classLoader.loadClass(className);
-                } catch (ClassNotFoundException e) {
-                    throw new PluginRuntimeException(String.format("""
+                .map(className -> {
+                    try {
+                        return classLoader.loadClass(className);
+                    } catch (ClassNotFoundException e) {
+                        throw new PluginRuntimeException(String.format("""
                         Failed to load class %s for plugin %s.\
                         """, className, pluginId), e);
-                }
-            })
-            .forEach(clazzName -> context.registerBean(clazzName));
+                    }
+                })
+                .forEach(clazzName -> context.registerBean(clazzName));
         sw.stop();
         log.debug("Created application context for plugin {}", pluginId);
 
@@ -224,7 +205,6 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         public void onApplicationEvent(ContextRefreshedEvent event) {
             this.finderRegistry.register(this.pluginId, event.getApplicationContext());
         }
-
     }
 
     private static class PluginWebSocketEndpointManager {
@@ -241,8 +221,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         public void onApplicationEvent(ContextRefreshedEvent event) {
             var context = event.getApplicationContext();
             this.endpoints = context.getBeanProvider(WebSocketEndpoint.class)
-                .orderedStream()
-                .toList();
+                    .orderedStream()
+                    .toList();
             manager.register(this.endpoints);
         }
 
@@ -272,24 +252,21 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         @EventListener
         public void onApplicationEvent(ContextRefreshedEvent event) {
             var routerFunctions = event.getApplicationContext()
-                .<RouterFunction<ServerResponse>>getBeanProvider(
-                    ResolvableType.forClassWithGenerics(RouterFunction.class, ServerResponse.class)
-                )
-                .orderedStream()
-                .toList();
+                    .<RouterFunction<ServerResponse>>getBeanProvider(
+                            ResolvableType.forClassWithGenerics(RouterFunction.class, ServerResponse.class))
+                    .orderedStream()
+                    .toList();
             routerFunctionRegistry.register(routerFunctions);
             this.routerFunctions = routerFunctions;
         }
     }
-
 
     private static class PluginHandlerMappingManager {
         private final String pluginId;
 
         private final PluginRequestMappingHandlerMapping handlerMapping;
 
-        private PluginHandlerMappingManager(String pluginId,
-            PluginRequestMappingHandlerMapping handlerMapping) {
+        private PluginHandlerMappingManager(String pluginId, PluginRequestMappingHandlerMapping handlerMapping) {
             this.pluginId = pluginId;
             this.handlerMapping = handlerMapping;
         }
@@ -298,10 +275,8 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         public void onApplicationEvent(ContextRefreshedEvent event) {
             var context = event.getApplicationContext();
             context.getBeansWithAnnotation(Controller.class)
-                .values()
-                .forEach(controller ->
-                    handlerMapping.registerHandlerMethods(this.pluginId, controller)
-                );
+                    .values()
+                    .forEach(controller -> handlerMapping.registerHandlerMethods(this.pluginId, controller));
         }
 
         @EventListener
@@ -310,8 +285,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         }
     }
 
-    private class SpringPluginStoppedEventAdapter
-        implements ApplicationListener<ContextClosedEvent> {
+    private class SpringPluginStoppedEventAdapter implements ApplicationListener<ContextClosedEvent> {
 
         private final String pluginId;
 
@@ -323,8 +297,7 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         public void onApplicationEvent(ContextClosedEvent event) {
             var plugin = pluginManager.getPlugin(pluginId).getPlugin();
             if (plugin instanceof SpringPlugin springPlugin) {
-                event.getApplicationContext()
-                    .publishEvent(new SpringPluginStoppedEvent(this, springPlugin));
+                event.getApplicationContext().publishEvent(new SpringPluginStoppedEvent(this, springPlugin));
             }
         }
     }
@@ -336,33 +309,29 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
             var pluginContext = event.getSpringPlugin().getPluginContext();
             var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
 
-            pluginManager.getRootContext()
-                .publishEvent(new HaloPluginStartedEvent(this, pluginWrapper));
+            pluginManager.getRootContext().publishEvent(new HaloPluginStartedEvent(this, pluginWrapper));
         }
 
         @EventListener
         public void onApplicationEvent(SpringPluginStoppingEvent event) {
             var pluginContext = event.getSpringPlugin().getPluginContext();
             var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
-            pluginManager.getRootContext()
-                .publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
+            pluginManager.getRootContext().publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
         }
 
         @EventListener
         public void onApplicationEvent(SpringPluginStoppedEvent event) {
             var pluginContext = event.getSpringPlugin().getPluginContext();
             var pluginWrapper = pluginManager.getPlugin(pluginContext.getName());
-            pluginManager.getRootContext()
-                .publishEvent(new HaloPluginStoppedEvent(this, pluginWrapper));
+            pluginManager.getRootContext().publishEvent(new HaloPluginStoppedEvent(this, pluginWrapper));
         }
-
     }
 
-    private List<PropertySource<?>> resolvePropertySources(String pluginId,
-        ResourceLoader resourceLoader) {
-        var haloProperties = pluginManager.getRootContext()
-            .getBeanProvider(HaloProperties.class)
-            .getIfAvailable();
+    private List<PropertySource<?>> resolvePropertySources(String pluginId, ResourceLoader resourceLoader) {
+        var haloProperties = pluginManager
+                .getRootContext()
+                .getBeanProvider(HaloProperties.class)
+                .getIfAvailable();
         if (haloProperties == null) {
             return List.of();
         }
@@ -371,33 +340,25 @@ public class DefaultPluginApplicationContextFactory implements PluginApplication
         var propertySources = new ArrayList<PropertySource<?>>();
         var configsPath = haloProperties.getWorkDir().resolve("plugins").resolve("configs");
         // resolve user defined config
-        Stream.of(
-                configsPath.resolve(pluginId + ".yaml"),
-                configsPath.resolve(pluginId + ".yml")
-            )
-            .map(path -> resourceLoader.getResource(path.toUri().toString()))
-            .forEach(resource -> {
-                var sources =
-                    loadPropertySources("user-defined-config", resource, propertySourceLoader);
-                propertySources.addAll(sources);
-            });
+        Stream.of(configsPath.resolve(pluginId + ".yaml"), configsPath.resolve(pluginId + ".yml"))
+                .map(path -> resourceLoader.getResource(path.toUri().toString()))
+                .forEach(resource -> {
+                    var sources = loadPropertySources("user-defined-config", resource, propertySourceLoader);
+                    propertySources.addAll(sources);
+                });
 
         // resolve default config
-        Stream.of(
-                CLASSPATH_URL_PREFIX + "/config.yaml",
-                CLASSPATH_URL_PREFIX + "/config.yml"
-            )
-            .map(resourceLoader::getResource)
-            .forEach(resource -> {
-                var sources = loadPropertySources("default-config", resource, propertySourceLoader);
-                propertySources.addAll(sources);
-            });
+        Stream.of(CLASSPATH_URL_PREFIX + "/config.yaml", CLASSPATH_URL_PREFIX + "/config.yml")
+                .map(resourceLoader::getResource)
+                .forEach(resource -> {
+                    var sources = loadPropertySources("default-config", resource, propertySourceLoader);
+                    propertySources.addAll(sources);
+                });
         return propertySources;
     }
 
-    private List<PropertySource<?>> loadPropertySources(String propertySourceName,
-        Resource resource,
-        PropertySourceLoader propertySourceLoader) {
+    private List<PropertySource<?>> loadPropertySources(
+            String propertySourceName, Resource resource, PropertySourceLoader propertySourceLoader) {
         if (log.isDebugEnabled()) {
             log.debug("Loading property sources from {}", resource);
         }

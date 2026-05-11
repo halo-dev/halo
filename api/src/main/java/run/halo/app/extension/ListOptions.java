@@ -43,9 +43,9 @@ public class ListOptions {
         var labelSelector = getLabelSelector();
         if (labelSelector != null) {
             var labelCondition = labelSelector.getConditions().stream()
-                .map(Function.<Condition>identity())
-                .reduce(Condition::and)
-                .orElse(null);
+                    .map(Function.<Condition>identity())
+                    .reduce(Condition::and)
+                    .orElse(null);
             if (labelCondition != null) {
                 if (condition == null) {
                     condition = labelCondition;
@@ -71,25 +71,20 @@ public class ListOptions {
         @SuppressWarnings("removal")
         private @Nullable Query query;
 
-        public ListOptionsBuilder() {
-        }
+        public ListOptionsBuilder() {}
 
-        /**
-         * Create a new list options builder with the given list options.
-         */
+        /** Create a new list options builder with the given list options. */
         public ListOptionsBuilder(ListOptions listOptions) {
             if (listOptions.getLabelSelector() != null) {
-                this.labelSelectorBuilder = new LabelSelectorBuilder(
-                    listOptions.getLabelSelector().getConditions(), this);
+                this.labelSelectorBuilder =
+                        new LabelSelectorBuilder(listOptions.getLabelSelector().getConditions(), this);
             }
             if (listOptions.getFieldSelector() != null) {
                 this.query = listOptions.getFieldSelector().query();
             }
         }
 
-        /**
-         * Create a new label selector builder.
-         */
+        /** Create a new label selector builder. */
         public LabelSelectorBuilder labelSelector() {
             if (labelSelectorBuilder == null) {
                 labelSelectorBuilder = new LabelSelectorBuilder(this);
@@ -102,9 +97,7 @@ public class ListOptions {
             return this;
         }
 
-        /**
-         * And the given query to the current query.
-         */
+        /** And the given query to the current query. */
         public ListOptionsBuilder andQuery(Query query) {
             if (!(query instanceof Condition condition)) {
                 throw new IllegalArgumentException("Given query must be an instance of Condition");
@@ -113,18 +106,14 @@ public class ListOptions {
                 this.query = condition;
             } else {
                 if (!(this.query instanceof Condition currentCondition)) {
-                    throw new IllegalArgumentException(
-                        "Current query must be an instance of Condition"
-                    );
+                    throw new IllegalArgumentException("Current query must be an instance of Condition");
                 }
                 this.query = currentCondition.and(condition);
             }
             return this;
         }
 
-        /**
-         * Or the given query to the current query.
-         */
+        /** Or the given query to the current query. */
         public ListOptionsBuilder orQuery(Query query) {
             if (!(query instanceof Condition condition)) {
                 throw new IllegalArgumentException("Given query must be an instance of Condition");
@@ -133,18 +122,14 @@ public class ListOptions {
                 this.query = condition;
             } else {
                 if (!(this.query instanceof Condition currentCondition)) {
-                    throw new IllegalArgumentException(
-                        "Current query must be an instance of Condition"
-                    );
+                    throw new IllegalArgumentException("Current query must be an instance of Condition");
                 }
                 this.query = currentCondition.or(condition);
             }
             return this;
         }
 
-        /**
-         * Build the list options.
-         */
+        /** Build the list options. */
         public ListOptions build() {
             var listOptions = new ListOptions();
             if (labelSelectorBuilder != null) {
@@ -157,12 +142,10 @@ public class ListOptions {
         }
     }
 
-    public static class LabelSelectorBuilder
-        extends LabelSelector.LabelSelectorBuilder<LabelSelectorBuilder> {
+    public static class LabelSelectorBuilder extends LabelSelector.LabelSelectorBuilder<LabelSelectorBuilder> {
         private final ListOptionsBuilder listOptionsBuilder;
 
-        public LabelSelectorBuilder(List<LabelCondition> conditions,
-            ListOptionsBuilder listOptionsBuilder) {
+        public LabelSelectorBuilder(List<LabelCondition> conditions, ListOptionsBuilder listOptionsBuilder) {
             super(conditions);
             this.listOptionsBuilder = listOptionsBuilder;
         }

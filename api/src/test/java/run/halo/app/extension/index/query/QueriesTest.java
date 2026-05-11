@@ -9,19 +9,13 @@ class QueriesTest {
 
     @Test
     void shouldBuildAndConditionStaticMethod() {
-        var condition = Queries.and(
-            Queries.equal("status", "active"),
-            Queries.greaterThan("age", 18)
-        );
+        var condition = Queries.and(Queries.equal("status", "active"), Queries.greaterThan("age", 18));
         assertEquals("(status = active AND age > 18)", condition.toString());
     }
 
     @Test
     void shouldBuildOrConditionStaticMethod() {
-        var condition = Queries.or(
-            Queries.lessThan("price", 50, false),
-            Queries.equal("category", "Books")
-        );
+        var condition = Queries.or(Queries.lessThan("price", 50, false), Queries.equal("category", "Books"));
         assertEquals("(price < 50 OR category = Books)", condition.toString());
     }
 
@@ -150,18 +144,15 @@ class QueriesTest {
 
     @Test
     void shouldBuildAndCondition() {
-        var condition = Queries.equal("status", "active")
-            .and(Queries.greaterThan("age", 18));
+        var condition = Queries.equal("status", "active").and(Queries.greaterThan("age", 18));
         assertEquals("(status = active AND age > 18)", condition.toString());
     }
 
     @Test
     void shouldBuildOrCondition() {
-        var condition = Queries.lessThan("price", 50, false)
-            .or(Queries.equal("category", "Books"));
+        var condition = Queries.lessThan("price", 50, false).or(Queries.equal("category", "Books"));
         assertEquals("(price < 50 OR category = Books)", condition.toString());
     }
-
 
     @Test
     void shouldBuildNotCondition() {
@@ -208,22 +199,19 @@ class QueriesTest {
     @Test
     void shouldBuildChainedConditions() {
         var condition = Queries.equal("name", "Bob")
-            .and(Queries.greaterThan("age", 25))
-            .or(Queries.in("status", "active", "pending"));
-        assertEquals(
-            "((name = Bob AND age > 25) OR status IN (active, pending))", condition.toString()
-        );
+                .and(Queries.greaterThan("age", 25))
+                .or(Queries.in("status", "active", "pending"));
+        assertEquals("((name = Bob AND age > 25) OR status IN (active, pending))", condition.toString());
     }
 
     @Test
     void shouldBuildComplexCondition() {
         var condition = Queries.between("salary", 50000, true, 100000, false)
-            .and(Queries.equal("department", "Engineering").not())
-            .or(Queries.in("role", "Manager", "Director"));
+                .and(Queries.equal("department", "Engineering").not())
+                .or(Queries.in("role", "Manager", "Director"));
         assertEquals("""
             ((salary BETWEEN [50000, 100000) AND department != Engineering) OR role IN (Manager,\
              Director))\
-            """, condition.toString()
-        );
+            """, condition.toString());
     }
 }

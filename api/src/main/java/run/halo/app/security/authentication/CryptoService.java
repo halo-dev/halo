@@ -33,5 +33,4 @@ public interface CryptoService {
      * @return JSON Web Keys
      */
     JWK getJwk();
-
 }

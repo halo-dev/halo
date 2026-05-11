@@ -68,12 +68,10 @@ class PostFinderImplIntegrationTest {
             <span th:text="${postFinder.list({})}"></span>
             """));
 
-        when(postPublicQueryService.list(any(), any()))
-            .thenReturn(Mono.just(ListResult.emptyResult()));
+        when(postPublicQueryService.list(any(), any())).thenReturn(Mono.just(ListResult.emptyResult()));
 
         var result = templateEngine.process("post", context);
-        assertThat(result).isEqualToIgnoringWhitespace(
-            "<span>ListResult(page=0, size=0, total=0, items=[])</span>");
+        assertThat(result).isEqualToIgnoringWhitespace("<span>ListResult(page=0, size=0, total=0, items=[])</span>");
 
         when(templateResourceComputer.compute(eq("post"))).thenReturn(new StringTemplateResource("""
             <span
@@ -95,9 +93,11 @@ class PostFinderImplIntegrationTest {
         }
 
         @Override
-        protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration,
-            String ownerTemplate, String template,
-            Map<String, Object> templateResolutionAttributes) {
+        protected ITemplateResource computeTemplateResource(
+                IEngineConfiguration configuration,
+                String ownerTemplate,
+                String template,
+                Map<String, Object> templateResolutionAttributes) {
             return templateResourceComputer.compute(template);
         }
     }

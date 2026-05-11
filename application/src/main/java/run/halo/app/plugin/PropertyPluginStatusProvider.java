@@ -7,10 +7,9 @@ import org.pf4j.PluginStatusProvider;
 import org.thymeleaf.util.ArrayUtils;
 
 /**
- * An implementation for PluginStatusProvider. The enabled plugins are read
- * from {@code halo.plugin.enabled-plugins} properties in <code>application.yaml</code>
- * and the disabled plugins are read from {@code halo.plugin.disabled-plugins}
- * in <code>application.yaml</code>.
+ * An implementation for PluginStatusProvider. The enabled plugins are read from {@code halo.plugin.enabled-plugins}
+ * properties in <code>application.yaml</code> and the disabled plugins are read from
+ * {@code halo.plugin.disabled-plugins} in <code>application.yaml</code>.
  *
  * @author guqing
  * @since 2.0.0
@@ -22,14 +21,16 @@ public class PropertyPluginStatusProvider implements PluginStatusProvider {
 
     public PropertyPluginStatusProvider(PluginProperties pluginProperties) {
         this.enabledPlugins = pluginProperties.getEnabledPlugins() != null
-            ? Arrays.asList(pluginProperties.getEnabledPlugins()) : new ArrayList<>();
+                ? Arrays.asList(pluginProperties.getEnabledPlugins())
+                : new ArrayList<>();
         this.disabledPlugins = pluginProperties.getDisabledPlugins() != null
-            ? Arrays.asList(pluginProperties.getDisabledPlugins()) : new ArrayList<>();
+                ? Arrays.asList(pluginProperties.getDisabledPlugins())
+                : new ArrayList<>();
     }
 
     public static boolean isPropertySet(PluginProperties pluginProperties) {
         return !ArrayUtils.isEmpty(pluginProperties.getEnabledPlugins())
-            && !ArrayUtils.isEmpty(pluginProperties.getDisabledPlugins());
+                && !ArrayUtils.isEmpty(pluginProperties.getDisabledPlugins());
     }
 
     @Override

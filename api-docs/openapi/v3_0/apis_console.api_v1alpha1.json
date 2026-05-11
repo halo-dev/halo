@@ -3733,16 +3733,16 @@
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "\u003cp\u003eWhether to hide the category from the category list.\u003c/p\u003e\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will\n not be displayed in the category list, but it can still be accessed by permalink.\u003c/p\u003e\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only\n allows to be set to true on the first level(root node) of categories.\u003c/p\u003e"
+            "description": "Whether to hide the category from the category list.\n\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will not be displayed in the\n category list, but it can still be accessed by permalink.\n\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only allows to be set to true\n on the first level(root node) of categories."
           },
           "postTemplate": {
             "maxLength": 255,
             "type": "string",
-            "description": "\u003cp\u003eUsed to specify the template for the posts associated with the category.\u003c/p\u003e\n \u003cp\u003eThe priority is not as high as that of the post.\u003c/p\u003e\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail.\u003c/p\u003e"
+            "description": "Used to specify the template for the posts associated with the category.\n\n \u003cp\u003eThe priority is not as high as that of the post.\n\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail."
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
-            "description": "\u003cp\u003eif a category is queried for related posts, the default behavior is to\n query all posts under the category including its subcategories, but if this field is\n set to true, cascade query behavior will be terminated here.\u003c/p\u003e\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and\n D and C marked this field as true, when querying posts under A category,all posts under A\n and B will be queried, but C and D will not be queried.\u003c/p\u003e"
+            "description": "if a category is queried for related posts, the default behavior is to query all posts under the category\n including its subcategories, but if this field is set to true, cascade query behavior will be terminated\n here.\n\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and D and C marked this\n field as true, when querying posts under A category,all posts under A and B will be queried, but C and D will\n not be queried."
           },
           "priority": {
             "type": "integer",
@@ -3854,7 +3854,7 @@
             "description": "website for comment owner"
           }
         },
-        "description": "\u003cp\u003eThe creator info of the comment.\u003c/p\u003e\n This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to comment\n without logging in."
+        "description": "The creator info of the comment. This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to\n comment without logging in."
       },
       "CommentOwner": {
         "required": [
@@ -4039,7 +4039,7 @@
           "message": {
             "maxLength": 32768,
             "type": "string",
-            "description": "Human-readable message indicating details about last transition.\n This may be an empty string."
+            "description": "Human-readable message indicating details about last transition. This may be an empty string."
           },
           "reason": {
             "maxLength": 1024,
@@ -4060,10 +4060,10 @@
             "maxLength": 316,
             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
             "type": "string",
-            "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n example: Ready, Initialized.\n maxLength: 316."
+            "description": "type of condition in CamelCase or in foo.example.com/CamelCase. example: Ready, Initialized. maxLength: 316."
           }
         },
-        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新\n 导致 equals 为 false，一直被加入队列."
+        "description": "EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新 导致 equals 为 false，一直被加入队列."
       },
       "ConfigMap": {
         "required": [
@@ -4089,7 +4089,7 @@
             "$ref": "#/components/schemas/Metadata"
           }
         },
-        "description": "\u003cp\u003eConfigMap holds configuration data to consume.\u003c/p\u003e"
+        "description": "ConfigMap holds configuration data to consume."
       },
       "ConfigMapRef": {
         "required": [
@@ -4395,7 +4395,7 @@
             "$ref": "#/components/schemas/Metadata"
           }
         },
-        "description": "Extension is an interface which represents an Extension. It contains setters and getters of\n GroupVersionKind and Metadata."
+        "description": "Extension is an interface which represents an Extension. It contains setters and getters of GroupVersionKind and\n Metadata."
       },
       "GrantRequest": {
         "type": "object",
@@ -5316,28 +5316,28 @@
         "properties": {
           "apiGroups": {
             "type": "array",
-            "description": "APIGroups is the name of the APIGroup that contains the resources.\n If multiple API groups are specified, any action requested against one of the enumerated\n resources in any API group will be allowed.",
+            "description": "APIGroups is the name of the APIGroup that contains the resources. If multiple API groups are specified, any\n action requested against one of the enumerated resources in any API group will be allowed.",
             "items": {
               "type": "string"
             }
           },
           "nonResourceURLs": {
             "type": "array",
-            "description": "NonResourceURLs is a set of partial urls that a user should have access to.\n *s are allowed, but only as the full, final step in the path\n If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is checked\n against the NonResourceURLs to look for a match.\n Since non-resource URLs are not namespaced, this field is only applicable for\n ClusterRoles referenced from a ClusterRoleBinding.\n Rules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource\n URL paths (such as \"/api\"),  but not both.",
+            "description": "NonResourceURLs is a set of partial urls that a user should have access to. *s are allowed, but only as the\n full, final step in the path If an action is not a resource API request, then the URL is split on \u0027/\u0027 and is\n checked against the NonResourceURLs to look for a match. Since non-resource URLs are not namespaced, this\n field is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API\n resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"), but not both.",
             "items": {
               "type": "string"
             }
           },
           "resourceNames": {
             "type": "array",
-            "description": "ResourceNames is an optional white list of names that the rule applies to.  An empty set\n means that everything is allowed.",
+            "description": "ResourceNames is an optional white list of names that the rule applies to. An empty set means that everything\n is allowed.",
             "items": {
               "type": "string"
             }
           },
           "resources": {
             "type": "array",
-            "description": "Resources is a list of resources this rule applies to.  \u0027*\u0027 represents all resources in\n the specified apiGroups.\n \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified\n apiGroups.",
+            "description": "Resources is a list of resources this rule applies to. \u0027*\u0027 represents all resources in the specified\n apiGroups. \u0027*\u0026#47;foo\u0027 represents the subresource \u0027foo\u0027 for all resources in the specified apiGroups.",
             "items": {
               "type": "string"
             }
@@ -5350,7 +5350,7 @@
             }
           }
         },
-        "description": "PolicyRule holds information that describes a policy rule, but does not contain information\n about whom the rule applies to or which namespace the rule applies to."
+        "description": "PolicyRule holds information that describes a policy rule, but does not contain information about whom the rule\n applies to or which namespace the rule applies to."
       },
       "Post": {
         "required": [
@@ -5377,7 +5377,7 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "\u003cp\u003ePost extension.\u003c/p\u003e"
+        "description": "Post extension."
       },
       "PostRequest": {
         "required": [
@@ -5930,7 +5930,7 @@
             "$ref": "#/components/schemas/SinglePageStatus"
           }
         },
-        "description": "\u003cp\u003eSingle page extension.\u003c/p\u003e"
+        "description": "Single page extension."
       },
       "SinglePageRequest": {
         "required": [
@@ -6204,7 +6204,7 @@
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Color regex explanation.\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
+            "description": "Color regex explanation.\n\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
           },
           "cover": {
             "type": "string"
@@ -6316,7 +6316,7 @@
             "$ref": "#/components/schemas/ThemeStatus"
           }
         },
-        "description": "\u003cp\u003eTheme extension.\u003c/p\u003e"
+        "description": "Theme extension."
       },
       "ThemeInstallRequest": {
         "type": "object"
@@ -6493,14 +6493,14 @@
           },
           "filename": {
             "type": "string",
-            "description": "The filename to use when uploading from url. If not provided, the filename will be\n extracted from the url."
+            "description": "The filename to use when uploading from url. If not provided, the filename will be extracted from the url."
           },
           "url": {
             "type": "string",
             "description": "The url to upload from. If not provided, the file will be used."
           }
         },
-        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided,\n the file will be used."
+        "description": "Upload form from console. The file and url are mutually exclusive. If both are provided, the file will be used."
       },
       "UploadFromUrlRequest": {
         "required": [

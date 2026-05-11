@@ -20,11 +20,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.reactive.function.server.EntityResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.FakeExtension;
-import run.halo.app.extension.ListOptions;
-import run.halo.app.extension.ListResult;
-import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Scheme;
+import run.halo.app.extension.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionListHandlerTest {
@@ -44,26 +40,25 @@ class ExtensionListHandlerTest {
     void shouldHandleCorrectly() {
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var listHandler = new ExtensionListHandler(scheme, client);
-        var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/fake")
-            .queryParam("sort", "metadata.name,desc"));
+        var exchange =
+                MockServerWebExchange.from(MockServerHttpRequest.get("/fake").queryParam("sort", "metadata.name,desc"));
         var serverRequest = MockServerRequest.builder().exchange(exchange).build();
         final var fake01 = FakeExtension.createFake("fake01");
         final var fake02 = FakeExtension.createFake("fake02");
         var fakeListResult = new ListResult<>(0, 0, 2, List.of(fake01, fake02));
         when(client.listBy(same(FakeExtension.class), any(ListOptions.class), any()))
-            .thenReturn(Mono.just(fakeListResult));
+                .thenReturn(Mono.just(fakeListResult));
 
         var responseMono = listHandler.handle(serverRequest);
 
         StepVerifier.create(responseMono)
-            .consumeNextWith(response -> {
-                assertEquals(HttpStatus.OK, response.statusCode());
-                assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
-                assertTrue(response instanceof EntityResponse<?>);
-                assertEquals(fakeListResult, ((EntityResponse<?>) response).entity());
-            })
-            .verifyComplete();
+                .consumeNextWith(response -> {
+                    assertEquals(HttpStatus.OK, response.statusCode());
+                    assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
+                    assertTrue(response instanceof EntityResponse<?>);
+                    assertEquals(fakeListResult, ((EntityResponse<?>) response).entity());
+                })
+                .verifyComplete();
         verify(client).listBy(same(FakeExtension.class), any(ListOptions.class), any());
     }
-
 }

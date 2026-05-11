@@ -8,5 +8,4 @@ public class PostPublishedEvent extends PostEvent {
     public PostPublishedEvent(Object source, String postName) {
         super(source, postName);
     }
-
 }

@@ -5,11 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,16 +38,17 @@ class ReasonNotificationTemplateSelectorImplTest {
     @Test
     void select() {
         when(client.listAll(eq(NotificationTemplate.class), any(), any(Sort.class)))
-            .thenReturn(Flux.fromIterable(templates()));
+                .thenReturn(Flux.fromIterable(templates()));
         // language priority: zh_CN -> zh -> default
         // if language is same, then compare creationTimestamp to get the latest one
-        templateSelector.select("new-comment-on-post", Locale.SIMPLIFIED_CHINESE)
-            .as(StepVerifier::create)
-            .consumeNextWith(template -> {
-                assertThat(template.getMetadata().getName()).isEqualTo("template-2");
-                assertThat(template.getSpec().getTemplate().getTitle()).isEqualTo("B");
-            })
-            .verifyComplete();
+        templateSelector
+                .select("new-comment-on-post", Locale.SIMPLIFIED_CHINESE)
+                .as(StepVerifier::create)
+                .consumeNextWith(template -> {
+                    assertThat(template.getMetadata().getName()).isEqualTo("template-2");
+                    assertThat(template.getSpec().getTemplate().getTitle()).isEqualTo("B");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -61,18 +58,15 @@ class ReasonNotificationTemplateSelectorImplTest {
         map.put("zh", Optional.of(createNotificationTemplate("zh-template")));
         map.put("default", Optional.of(createNotificationTemplate("default-template")));
 
-        var sc = ReasonNotificationTemplateSelectorImpl
-            .lookupTemplateByLocale(Locale.SIMPLIFIED_CHINESE, map);
+        var sc = ReasonNotificationTemplateSelectorImpl.lookupTemplateByLocale(Locale.SIMPLIFIED_CHINESE, map);
         assertThat(sc).isNotNull();
         assertThat(sc.getMetadata().getName()).isEqualTo("zh_CN-template");
 
-        var c = ReasonNotificationTemplateSelectorImpl
-            .lookupTemplateByLocale(Locale.CHINESE, map);
+        var c = ReasonNotificationTemplateSelectorImpl.lookupTemplateByLocale(Locale.CHINESE, map);
         assertThat(c).isNotNull();
         assertThat(c.getMetadata().getName()).isEqualTo("zh-template");
 
-        var e = ReasonNotificationTemplateSelectorImpl
-            .lookupTemplateByLocale(Locale.ENGLISH, map);
+        var e = ReasonNotificationTemplateSelectorImpl.lookupTemplateByLocale(Locale.ENGLISH, map);
         assertThat(e).isNotNull();
         assertThat(e.getMetadata().getName()).isEqualTo("default-template");
     }
@@ -81,10 +75,12 @@ class ReasonNotificationTemplateSelectorImplTest {
     void matchReasonTypeTest() {
         var template = createNotificationTemplate("fake-template");
         assertThat(ReasonNotificationTemplateSelectorImpl.matchReasonType("new-comment-on-post")
-            .test(template)).isTrue();
+                        .test(template))
+                .isTrue();
 
         assertThat(ReasonNotificationTemplateSelectorImpl.matchReasonType("fake-reason-type")
-            .test(template)).isFalse();
+                        .test(template))
+                .isFalse();
     }
 
     @Test
@@ -97,7 +93,6 @@ class ReasonNotificationTemplateSelectorImplTest {
         template.getSpec().getReasonSelector().setReasonType("new-comment-on-post");
         assertThat(languageKeyFunc.apply(template)).isEqualTo("default");
     }
-
 
     private static NotificationTemplate createNotificationTemplate(String name) {
         var template = new NotificationTemplate();
@@ -130,8 +125,7 @@ class ReasonNotificationTemplateSelectorImplTest {
                             }
                         }
                     }
-                    """,
-                """
+                    """, """
                     {
                         "apiVersion": "notification.halo.run/v1alpha1",
                         "kind": "NotificationTemplate",
@@ -150,8 +144,7 @@ class ReasonNotificationTemplateSelectorImplTest {
                             }
                         }
                     }
-                    """,
-                """
+                    """, """
                     {
                         "apiVersion": "notification.halo.run/v1alpha1",
                         "kind": "NotificationTemplate",
@@ -171,7 +164,7 @@ class ReasonNotificationTemplateSelectorImplTest {
                         }
                     }
                     """)
-            .map(json -> JsonUtils.jsonToObject(json, NotificationTemplate.class))
-            .toList();
+                .map(json -> JsonUtils.jsonToObject(json, NotificationTemplate.class))
+                .toList();
     }
 }

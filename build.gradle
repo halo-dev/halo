@@ -1,0 +1,53 @@
+plugins {
+    alias(libs.plugins.spotless)
+}
+
+repositories {
+    mavenCentral()
+}
+
+def excludePatterns = [
+    '**/build/**',
+    'gradle/**',
+    '.gradle/**',
+    'config/**',
+    'ui/**',
+    '**/.idea/**',
+    '**/.vscode/**',
+    '.claude/**',
+    '.codex/**',
+    '.github/skills/**',
+    '.github/prompts/**',
+    '**/.git/**',
+    '**/bin/**',
+    '**/out/**',
+    'api-docs/**',
+    'openspec/**',
+    'application/src/main/resources/config/uap/**'
+]
+
+spotless {
+    format 'misc', {
+        target fileTree(layout.projectDirectory) {
+            include '**/*.xml', '**/*.properties', '**/*.gitignore', '**/*.editorconfig'
+            exclude excludePatterns
+        }
+        trimTrailingWhitespace()
+        leadingTabsToSpaces()
+        endWithNewline()
+    }
+    json {
+        target fileTree(layout.projectDirectory) {
+            include '**/*.json'
+            exclude excludePatterns
+        }
+        gson().sortByKeys()
+    }
+    flexmark {
+        target fileTree(layout.projectDirectory) {
+            include '**/*.md'
+            exclude excludePatterns
+        }
+        flexmark()
+    }
+}

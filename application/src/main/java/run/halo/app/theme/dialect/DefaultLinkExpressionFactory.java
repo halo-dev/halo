@@ -40,8 +40,8 @@ public class DefaultLinkExpressionFactory implements IExpressionObjectFactory {
         private final IExpressionContext context;
 
         /**
-         * Construct an expression object that provides a set of methods to handle link in
-         * Javascript or HTML through {@link IExpressionContext}.
+         * Construct an expression object that provides a set of methods to handle link in Javascript or HTML through
+         * {@link IExpressionContext}.
          *
          * @param context expression context
          */
@@ -50,8 +50,8 @@ public class DefaultLinkExpressionFactory implements IExpressionObjectFactory {
             this.context = context;
             Set<ILinkBuilder> linkBuilders = context.getConfiguration().getLinkBuilders();
             linkBuilder = linkBuilders.stream()
-                .findFirst()
-                .orElseThrow(() -> new TemplateProcessingException("Link builder not found"));
+                    .findFirst()
+                    .orElseThrow(() -> new TemplateProcessingException("Link builder not found"));
         }
 
         public String assets(String path) {

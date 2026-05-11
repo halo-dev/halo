@@ -22,5 +22,4 @@ import org.springframework.security.test.context.support.WithSecurityContext;
     String[] roles() default {};
 
     String[] targetRoles() default {};
-
 }

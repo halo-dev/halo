@@ -30,58 +30,60 @@ class ReactiveQueryPostPredicateResolverTest {
 
     @Test
     void getPredicateWithoutAuth() {
-        postPredicateResolver.getPredicate()
-            .as(StepVerifier::create)
-            .consumeNextWith(predicate -> {
-                Post post = new Post();
-                post.setMetadata(new Metadata());
-                post.getMetadata().setName("fake-post");
+        postPredicateResolver
+                .getPredicate()
+                .as(StepVerifier::create)
+                .consumeNextWith(predicate -> {
+                    Post post = new Post();
+                    post.setMetadata(new Metadata());
+                    post.getMetadata().setName("fake-post");
 
-                post.setSpec(new Post.PostSpec());
-                post.getSpec().setDeleted(false);
-                post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "true"));
-                post.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
-                assertThat(predicate.test(post)).isFalse();
+                    post.setSpec(new Post.PostSpec());
+                    post.getSpec().setDeleted(false);
+                    post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "true"));
+                    post.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
+                    assertThat(predicate.test(post)).isFalse();
 
-                post.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
-                assertThat(predicate.test(post)).isTrue();
+                    post.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
+                    assertThat(predicate.test(post)).isTrue();
 
-                post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "false"));
-                assertThat(predicate.test(post)).isFalse();
-            })
-            .verifyComplete();
+                    post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "false"));
+                    assertThat(predicate.test(post)).isFalse();
+                })
+                .verifyComplete();
     }
 
     @Test
     @WithMockUser(username = "halo")
     void getPredicateWithAuth() {
-        postPredicateResolver.getPredicate()
-            .as(StepVerifier::create)
-            .consumeNextWith(predicate -> {
-                Post post = new Post();
-                post.setMetadata(new Metadata());
-                post.getMetadata().setName("fake-post");
+        postPredicateResolver
+                .getPredicate()
+                .as(StepVerifier::create)
+                .consumeNextWith(predicate -> {
+                    Post post = new Post();
+                    post.setMetadata(new Metadata());
+                    post.getMetadata().setName("fake-post");
 
-                post.setSpec(new Post.PostSpec());
-                post.getSpec().setDeleted(false);
-                post.getSpec().setOwner("halo");
-                post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "true"));
-                post.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
-                assertThat(predicate.test(post)).isTrue();
+                    post.setSpec(new Post.PostSpec());
+                    post.getSpec().setDeleted(false);
+                    post.getSpec().setOwner("halo");
+                    post.getMetadata().setLabels(Map.of(Post.PUBLISHED_LABEL, "true"));
+                    post.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
+                    assertThat(predicate.test(post)).isTrue();
 
-                post.getSpec().setOwner("guqing");
-                assertThat(predicate.test(post)).isFalse();
+                    post.getSpec().setOwner("guqing");
+                    assertThat(predicate.test(post)).isFalse();
 
-                post.getSpec().setOwner("halo");
-                post.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
-                assertThat(predicate.test(post)).isTrue();
+                    post.getSpec().setOwner("halo");
+                    post.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
+                    assertThat(predicate.test(post)).isTrue();
 
-                post.getSpec().setDeleted(true);
-                assertThat(predicate.test(post)).isFalse();
+                    post.getSpec().setDeleted(true);
+                    assertThat(predicate.test(post)).isFalse();
 
-                post.getSpec().setVisible(Post.VisibleEnum.INTERNAL);
-                assertThat(predicate.test(post)).isFalse();
-            })
-            .verifyComplete();
+                    post.getSpec().setVisible(Post.VisibleEnum.INTERNAL);
+                    assertThat(predicate.test(post)).isFalse();
+                })
+                .verifyComplete();
     }
 }
