@@ -22,6 +22,7 @@ def excludePatterns = [
     '**/bin/**',
     '**/out/**',
     'api-docs/**',
+    'openspec/**',
     'application/src/main/resources/config/uap/**'
 ]
 
