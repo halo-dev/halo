@@ -50,6 +50,7 @@ import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
+import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.EmailVerificationFailed;
@@ -274,6 +275,15 @@ public class UserServiceImpl implements UserService {
                 .filter(setting -> StringUtils.hasText(setting.getDefaultRole()))
                 .switchIfEmpty(Mono.error(
                         () -> new ServerWebInputException("The default role is not configured by the administrator.")))
+                .filter(setting -> {
+                    var pages = setting.getRequiredAgreementPages();
+                    if (CollectionUtils.isEmpty(pages)) {
+                        return true;
+                    }
+                    return Boolean.TRUE.equals(signUpData.getAgreedToTerms());
+                })
+                .switchIfEmpty(Mono.error(() -> new AgreementNotAcceptedException(
+                        "Agreement not accepted.", "problemDetail.user.signup.agreement-not-accepted", null)))
                 .flatMap(setting -> {
                     var email = Optional.ofNullable(signUpData.getEmail())
                             .map(String::toLowerCase)

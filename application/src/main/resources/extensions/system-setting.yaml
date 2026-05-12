@@ -146,6 +146,12 @@ spec:
           validation: "required"
           if: "$get(allowRegistration).value === true"
           help: 用户注册之后默认为用户分配的角色
+        - $formkit: singlePageSelect
+          name: requiredAgreementPages
+          label: "注册时所需协议"
+          multiple: true
+          if: "$get(allowRegistration).value === true"
+          help: 选择注册时需要用户同意的协议页面
         - $formkit: attachmentPolicySelect
           name: avatarPolicy
           label: "头像存储位置"
