@@ -10,7 +10,7 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import { onMounted, ref, toRaw } from "vue";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
@@ -18,8 +18,20 @@ import {
 import AttachmentPoliciesListItem from "./AttachmentPoliciesListItem.vue";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 
+const props = withDefaults(
+  defineProps<{
+    selectMode?: boolean;
+    selectedName?: string;
+  }>(),
+  {
+    selectMode: false,
+    selectedName: undefined,
+  }
+);
+
 const emit = defineEmits<{
   (event: "close"): void;
+  (event: "select", policyName: string): void;
 }>();
 
 const {
@@ -45,6 +57,17 @@ const onCreationModalClose = () => {
   selectedTemplateName.value = undefined;
   creationModalVisible.value = false;
 };
+
+const currentSelectedName = ref();
+
+onMounted(() => {
+  currentSelectedName.value = toRaw(props.selectedName);
+});
+
+function handleConfirm() {
+  emit("select", currentSelectedName.value);
+  modal.value?.close();
+}
 </script>
 <template>
   <VModal
@@ -54,6 +77,7 @@ const onCreationModalClose = () => {
     :body-class="['!p-0']"
     :layer-closable="true"
     :centered="false"
+    :mount-to-body="true"
     @close="emit('close')"
   >
     <template #actions>
@@ -107,12 +131,26 @@ const onCreationModalClose = () => {
         v-for="policy in policies"
         :key="policy.metadata.name"
         :policy="policy"
-      />
+        class="cursor-pointer"
+      >
+        <template v-if="selectMode" #checkbox>
+          <input
+            v-model="currentSelectedName"
+            :value="policy.metadata.name"
+            type="radio"
+          />
+        </template>
+      </AttachmentPoliciesListItem>
     </VEntityContainer>
     <template #footer>
-      <VButton @click="modal?.close()">
-        {{ $t("core.common.buttons.close_and_shortcut") }}
-      </VButton>
+      <VSpace>
+        <VButton v-if="selectMode" type="secondary" @click="handleConfirm">
+          {{ $t("core.common.buttons.confirm") }}
+        </VButton>
+        <VButton @click="modal?.close()">
+          {{ $t("core.common.buttons.close_and_shortcut") }}
+        </VButton>
+      </VSpace>
     </template>
   </VModal>
 

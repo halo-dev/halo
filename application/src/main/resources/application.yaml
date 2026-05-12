@@ -51,6 +51,11 @@ halo:
       - name: email
         href: /password-reset/email
         icon: /images/password-reset-methods/email.svg
+  notification:
+    auto-cleanup:
+      enabled: false          # Set to true to enable automatic notification cleanup
+      retention-days: 30      # Delete notifications older than this many days (0 = disabled)
+      cleanup-cron: "0 0 3 * * ?"  # Cron expression: default is daily at 3:00 AM
 
 springdoc:
   api-docs:
