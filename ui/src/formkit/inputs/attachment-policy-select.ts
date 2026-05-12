@@ -1,12 +1,38 @@
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import type { FormKitInputs } from "@formkit/inputs";
 import {
+  createSection,
+  help,
+  icon,
+  inner,
+  label,
+  message,
+  messages,
+  outer,
+  prefix,
+  suffix,
+  wrapper,
+} from "@formkit/inputs";
+import {
   coreApiClient,
   paginate,
   type Policy,
   type PolicyV1alpha1ApiListPolicyRequest,
 } from "@halo-dev/api-client";
+import { defineAsyncComponent } from "vue";
 import { select } from "./select";
+import { SelectSection } from "./select/sections";
+
+const PolicySettingsButton = defineAsyncComponent(
+  () => import("./PolicySettingsButton.vue")
+);
+
+const PolicySettingsSuffix = createSection("PolicySettingsSuffix", () => ({
+  $cmp: "PolicySettingsButton",
+  props: {
+    context: "$node.context",
+  },
+}));
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
@@ -30,8 +56,27 @@ function optionsHandler(node: FormKitNode) {
 
 export const attachmentPolicySelect: FormKitTypeDefinition = {
   ...select,
+  schema: outer(
+    wrapper(
+      label("$label"),
+      inner(
+        icon("prefix"),
+        prefix(),
+        SelectSection(),
+        suffix(),
+        PolicySettingsSuffix()
+      )
+    ),
+    help("$help"),
+    messages(message("$message.value"))
+  ),
   forceTypeProp: "select",
   features: [optionsHandler],
+  library: {
+    ...select.library,
+    PolicySettingsButton,
+  },
+  schemaMemoKey: "custom-attachment-policy-select",
 };
 
 declare module "@formkit/inputs" {
