@@ -227,6 +227,108 @@ spec:
     kind: SinglePage
     name: 373a5f79-f44f-441a-9df1-85a4f553ece8
 ---
+# Terms of Service page content
+apiVersion: content.halo.run/v1alpha1
+kind: Snapshot
+metadata:
+  name: user-agreement-snapshot
+  annotations:
+    content.halo.run/keep-raw: "true"
+spec:
+  subjectRef:
+    group: content.halo.run
+    version: v1alpha1
+    kind: SinglePage
+    name: user-agreement
+  rawType: HTML
+  rawPatch: <h2><strong>用户协议</strong></h2><p>请在此处添加你的用户协议内容。你可以在后台的 <code>页面</code> -> <code>自定义页面</code> 中找到并编辑此页面。</p><blockquote><p>这是一篇自动生成的页面，请在发布网站前替换为实际内容。</p></blockquote>
+  contentPatch: <h2><strong>用户协议</strong></h2><p>请在此处添加你的用户协议内容。你可以在后台的 <code>页面</code> -> <code>自定义页面</code> 中找到并编辑此页面。</p><blockquote><p>这是一篇自动生成的页面，请在发布网站前替换为实际内容。</p></blockquote>
+  lastModifyTime: "${timestamp}"
+  owner: "${username}"
+  contributors:
+    - "${username}"
+
+---
+# Terms of Service page
+apiVersion: content.halo.run/v1alpha1
+kind: SinglePage
+metadata:
+  name: user-agreement
+spec:
+  title: 用户协议
+  slug: user-agreement
+  template: ""
+  cover: ""
+  owner: "${username}"
+  deleted: false
+  publish: true
+  baseSnapshot: user-agreement-snapshot
+  headSnapshot: user-agreement-snapshot
+  releaseSnapshot: user-agreement-snapshot
+  pinned: false
+  allowComment: false
+  visible: PUBLIC
+  version: 1
+  priority: 0
+  excerpt:
+    autoGenerate: false
+    raw: 请在此处添加你的用户协议内容。你可以在后台的 页面 -> 自定义页面 中找到并编辑此页面。
+  htmlMetas: []
+status:
+  permalink: "/user-agreement"
+
+---
+# Privacy Policy page content
+apiVersion: content.halo.run/v1alpha1
+kind: Snapshot
+metadata:
+  name: privacy-policy-snapshot
+  annotations:
+    content.halo.run/keep-raw: "true"
+spec:
+  subjectRef:
+    group: content.halo.run
+    version: v1alpha1
+    kind: SinglePage
+    name: privacy-policy
+  rawType: HTML
+  rawPatch: <h2><strong>隐私政策</strong></h2><p>请在此处添加你的隐私政策内容。你可以在后台的 <code>页面</code> -> <code>自定义页面</code> 中找到并编辑此页面。</p><blockquote><p>这是一篇自动生成的页面，请在发布网站前替换为实际内容。</p></blockquote>
+  contentPatch: <h2><strong>隐私政策</strong></h2><p>请在此处添加你的隐私政策内容。你可以在后台的 <code>页面</code> -> <code>自定义页面</code> 中找到并编辑此页面。</p><blockquote><p>这是一篇自动生成的页面，请在发布网站前替换为实际内容。</p></blockquote>
+  lastModifyTime: "${timestamp}"
+  owner: "${username}"
+  contributors:
+    - "${username}"
+
+---
+# Privacy Policy page
+apiVersion: content.halo.run/v1alpha1
+kind: SinglePage
+metadata:
+  name: privacy-policy
+spec:
+  title: 隐私政策
+  slug: privacy-policy
+  template: ""
+  cover: ""
+  owner: "${username}"
+  deleted: false
+  publish: true
+  baseSnapshot: privacy-policy-snapshot
+  headSnapshot: privacy-policy-snapshot
+  releaseSnapshot: privacy-policy-snapshot
+  pinned: false
+  allowComment: false
+  visible: PUBLIC
+  version: 1
+  priority: 0
+  excerpt:
+    autoGenerate: false
+    raw: 请在此处添加你的隐私政策内容。你可以在后台的 页面 -> 自定义页面 中找到并编辑此页面。
+  htmlMetas: []
+status:
+  permalink: "/privacy-policy"
+
+---
 apiVersion: v1alpha1
 kind: Menu
 metadata:
