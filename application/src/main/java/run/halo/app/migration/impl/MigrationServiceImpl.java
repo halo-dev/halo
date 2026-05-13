@@ -49,6 +49,7 @@ import run.halo.app.extension.Scheme;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
+import run.halo.app.infra.exception.BackupMalformedException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -242,7 +243,11 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     private Mono<Void> restoreExtensions(Path backupRoot) {
         var extensionsPath = backupRoot.resolve("extensions.data");
         if (Files.notExists(extensionsPath)) {
-            return Mono.error(new ServerWebInputException("Extensions data file not found."));
+            return Mono.error(new BackupMalformedException(
+                    "Extensions data file not found.",
+                    null,
+                    "problemDetail.migration.backup.extensionsNotFound",
+                    null));
         }
         var reader = objectMapper.readerFor(ExtensionStore.class);
         var total = new AtomicInteger(0);
@@ -272,7 +277,14 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
     }
 
     private Mono<Void> unpackBackup(Publisher<DataBuffer> content, Path target) {
-        return unzip(content, target, scheduler);
+        return unzip(content, target, scheduler)
+                .onErrorMap(
+                        IOException.class,
+                        e -> new BackupMalformedException(
+                                "The backup file is malformed, corrupted, or incompatible with the current Halo version.",
+                                e,
+                                "problemDetail.migration.backup.malformed",
+                                null));
     }
 
     private Mono<Void> packageBackup(Path baseDir, Backup backup) {
