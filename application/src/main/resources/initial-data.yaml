@@ -179,37 +179,32 @@ spec:
   children: []
   priority: 0
 ---
-# 关联到文章作为菜单
+# 文章归档
 apiVersion: v1alpha1
 kind: MenuItem
 metadata:
   name: c4c814d1-0c2c-456b-8c96-4864965fee94
 spec:
-  displayName: "Hello Halo"
-  href: "/archives/hello-halo"
+  displayName: "文章"
+  href: "/archives"
   children: []
   priority: 1
-  targetRef:
-    group: content.halo.run
-    version: v1alpha1
-    kind: Post
-    name: 5152aea5-c2e8-4717-8bba-2263d46e19d5
 ---
-# 关联到标签作为菜单
+# 关联到分类作为菜单
 apiVersion: v1alpha1
 kind: MenuItem
 metadata:
   name: 35869bd3-33b5-448b-91ee-cf6517a59644
 spec:
-  displayName: "Halo"
-  href: "/tags/halo"
+  displayName: "默认分类"
+  href: "/categories/default"
   children: []
   priority: 2
   targetRef:
     group: content.halo.run
     version: v1alpha1
-    kind: Tag
-    name: c33ceabb-d8f1-4711-8991-bb8f5c92ad7c
+    kind: Category
+    name: 76514a40-6ef1-4ed9-b58a-e26945bde3ca
 ---
 # 关联到自定义页面作为菜单
 apiVersion: v1alpha1
