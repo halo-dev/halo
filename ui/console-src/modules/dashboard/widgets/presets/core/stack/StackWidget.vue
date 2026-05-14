@@ -34,7 +34,7 @@ function handleNavigate(direction: -1 | 1) {
 }
 
 // auto play
-const autoPlayInterval = ref<NodeJS.Timeout | null>(null);
+const autoPlayInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 function startAutoPlay() {
   if (!props.config.auto_play || configVisible.value) {

@@ -21,7 +21,7 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",

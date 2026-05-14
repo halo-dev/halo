@@ -48,7 +48,7 @@
     "test:unit:ui": "vp test --watch --ui",
     "test:unit:watch": "vp test --watch",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "floating-vue": "^5.2.2"

@@ -32,7 +32,7 @@
   "scripts": {
     "build": "vp build",
     "dev": "vp build --watch --mode development",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "vp run build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
