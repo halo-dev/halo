@@ -6,19 +6,17 @@
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
     "dev": "vp dev --host",
-    "build": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp build",
-    "build:packages": "pnpm -r run build",
-    "api-client:gen": "pnpm -C packages/api-client gen",
-    "test:unit": "vp test --run && pnpm run test:unit:packages",
+    "build": "vp build",
+    "build:packages": "vp run --filter @halo-dev/* build",
+    "api-client:gen": "vp run --filter @halo-dev/api-client gen",
+    "test:unit": "vp test --run && vp run --parallel --filter @halo-dev/* test:unit",
     "test:unit:watch": "vp test --watch",
     "test:unit:ui": "vp test --watch --ui",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp run --parallel --filter @halo-dev/* typecheck",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
-    "typecheck:packages": "pnpm --parallel -r run typecheck",
-    "test:unit:packages": "pnpm --parallel -r run test:unit",
-    "publish:packages": "pnpm -r publish --access public --no-git-checks"
+    "publish:packages": "npm publish -ws --access public"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.6.0",

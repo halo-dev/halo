@@ -8,7 +8,7 @@ import type {
   Plugin,
   Theme,
 } from "@halo-dev/api-client";
-import type { AnyExtension } from "@halo-dev/richtext-editor";
+import type { AnyExtension } from "@tiptap/core";
 import type { Component, Ref } from "vue";
 import type { RouteRecordName, RouteRecordRaw } from "vue-router";
 import type { AttachmentSelectProvider } from "./attachment-selector";
