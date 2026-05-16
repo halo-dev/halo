@@ -67,7 +67,7 @@
     "@vueuse/integrations": "^12.8.2",
     "@vueuse/router": "^12.8.2",
     "@vueuse/shared": "^12.8.2",
-    "axios": "^1.12.2",
+    "axios": "^1.16.1",
     "codemirror": "^6.0.2",
     "colorjs.io": "^0.4.3",
     "core-js": "^3.43.0",
@@ -161,7 +161,7 @@
     "vue-tsc": "^3.2.4"
   },
   "resolutions": {
-    "axios": "^1.12.2"
+    "axios": "^1.16.1"
   },
   "lint-staged": {
     "**/*": "vp fmt --no-error-on-unmatched-pattern",

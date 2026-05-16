@@ -53,7 +53,7 @@
     "rimraf": "^5.0.10"
   },
   "peerDependencies": {
-    "axios": "^1.12.*"
+    "axios": "^1.16.0"
   },
   "inlinedDependencies": {
     "call-bind-apply-helpers": "1.0.2",
