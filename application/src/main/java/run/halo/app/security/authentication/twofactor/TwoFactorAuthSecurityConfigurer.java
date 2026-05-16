@@ -2,6 +2,7 @@ package run.halo.app.security.authentication.twofactor;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -29,15 +30,19 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerRequestCache serverRequestCache;
 
+    private final RateLimiterRegistry rateLimiterRegistry;
+
     public TwoFactorAuthSecurityConfigurer(
             ServerSecurityContextRepository securityContextRepository,
             TotpAuthService totpAuthService,
             LoginHandlerEnhancer loginHandlerEnhancer,
-            ServerRequestCache serverRequestCache) {
+            ServerRequestCache serverRequestCache,
+            RateLimiterRegistry rateLimiterRegistry) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
         this.serverRequestCache = serverRequestCache;
+        this.rateLimiterRegistry = rateLimiterRegistry;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
         var filter = new AuthenticationWebFilter(authManager);
         filter.setRequiresAuthenticationMatcher(pathMatchers(HttpMethod.POST, "/challenges/two-factor/totp"));
         filter.setSecurityContextRepository(securityContextRepository);
-        filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
+        filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter(rateLimiterRegistry));
         filter.setAuthenticationSuccessHandler(
                 new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache));
         filter.setAuthenticationFailureHandler(
