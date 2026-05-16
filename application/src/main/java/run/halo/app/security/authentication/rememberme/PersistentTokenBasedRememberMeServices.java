@@ -30,19 +30,21 @@ import run.halo.app.security.device.DeviceService;
 /**
  * {@link RememberMeServices} implementation based on Barry Jaspan's <a href=
  * "https://web.archive.org/web/20180819014446/http://jaspan
- * .com/improved_persistent_login_cookie_best_practice">Improved Persistent Login Cookie Best Practice</a>.
- *
- * <p>There is a slight modification to the described approach, in that the username is not stored as part of the cookie
- * but obtained from the persistent store via an implementation of {@link PersistentTokenRepository}. The latter should
- * place a unique constraint on the series identifier, so that it is impossible for the same identifier to be allocated
- * to two different users.
- *
- * <p>User management such as changing passwords, removing users and setting user status should be combined with
- * maintenance of the user's persistent tokens.
- *
- * <p>Note that while this class will use the date a token was created to check whether a presented cookie is older than
- * the configured <tt>tokenValiditySeconds</tt> property and deny authentication in this case, it will not delete these
- * tokens from storage. A suitable batch process should be run periodically to remove expired tokens from the database.
+ * .com/improved_persistent_login_cookie_best_practice">Improved
+ * Persistent Login Cookie Best Practice</a>.</p>
+ * <p>There is a slight modification to the described approach, in that the username is not
+ * stored as part of the cookie but obtained from the persistent store via an
+ * implementation of {@link PersistentTokenRepository}. The latter should place a unique
+ * constraint on the series identifier, so that it is impossible for the same identifier
+ * to be allocated to two different users.</p>
+ * <p>User management such as changing passwords, removing users and setting user status
+ * should be combined with maintenance of the user's persistent tokens.</p>
+ * <p>
+ * When a presented cookie is older than the configured <tt>tokenValiditySeconds</tt>
+ * property, authentication will be denied and the expired token will be removed from
+ * storage immediately. A suitable batch process may also be run periodically to remove
+ * any remaining expired tokens from the database.
+ * </p>
  *
  * @author guqing
  * @see <a
@@ -123,32 +125,35 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                 token.getSpec().getUsername(),
                                 token.getSpec().getSeries());
                     }
-                    if (isTokenExpired(token)) {
-                        return Mono.error(new InvalidCookieException("Remember-me login has expired"));
-                    }
-                    return Mono.empty();
-                })
-                .flatMap(token -> {
-                    if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
-                        return Mono.just(token);
-                    }
-                    log.debug(
-                            "Token value will be rotated for series '{}'",
-                            token.getSpec().getSeries());
-                    token.getSpec().setPreviousTokenValue(presentedToken);
-                    token.getSpec().setTokenValue(generateTokenData());
-                    token.getSpec().setLastUsed(clock.instant());
-                    return tokenRepository
-                            .updateToken(token)
-                            .doOnNext(updated -> {
-                                log.debug(
-                                        "Remember me token {} rotated successfully",
-                                        updated.getSpec().getSeries());
-                                addCookie(updated, exchange);
-                            })
-                            .onErrorReturn(OptimisticLockingFailureException.class, token);
-                })
-                .flatMap(t -> getUserDetailsService().findByUsername(t.getSpec().getUsername()));
+                    log.debug("Token mismatch but within grace period for user '{}', series '{}'",
+                        token.getSpec().getUsername(), token.getSpec().getSeries()
+                    );
+                }
+                if (isTokenExpired(token)) {
+                    return this.tokenRepository.removeUserTokens(token.getSpec().getUsername())
+                        .then(Mono.error(
+                            new InvalidCookieException("Remember-me login has expired")));
+                }
+                return Mono.empty();
+            })
+            .flatMap(token -> {
+                if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
+                    return Mono.just(token);
+                }
+                log.debug("Token value will be rotated for series '{}'",
+                    token.getSpec().getSeries());
+                token.getSpec().setPreviousTokenValue(presentedToken);
+                token.getSpec().setTokenValue(generateTokenData());
+                token.getSpec().setLastUsed(clock.instant());
+                return tokenRepository.updateToken(token)
+                    .doOnNext(updated -> {
+                        log.debug("Remember me token {} rotated successfully",
+                            updated.getSpec().getSeries());
+                        addCookie(updated, exchange);
+                    })
+                    .onErrorReturn(OptimisticLockingFailureException.class, token);
+            })
+            .flatMap(t -> getUserDetailsService().findByUsername(t.getSpec().getUsername()));
     }
 
     private Mono<Void> validateDevice(ServerWebExchange exchange, RememberMeToken token) {
