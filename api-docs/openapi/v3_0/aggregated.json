@@ -5498,6 +5498,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Scope of navigation. Use \u0027category\u0027 to limit navigation to the post\u0027s primary category. Defaults to global scope.",
+            "in": "query",
+            "name": "scope",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

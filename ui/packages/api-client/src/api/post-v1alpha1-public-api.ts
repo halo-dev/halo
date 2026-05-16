@@ -76,10 +76,11 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
         /**
          * Gets a post navigation by name.
          * @param {string} name Post name
+         * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryPostNavigationByName: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        queryPostNavigationByName: async (name: string, scope?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('queryPostNavigationByName', 'name', name)
             const localVarPath = `/apis/api.content.halo.run/v1alpha1/posts/{name}/navigation`
@@ -102,6 +103,10 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (scope !== undefined) {
+                localVarQueryParameter['scope'] = scope;
+            }
 
 
     
@@ -200,11 +205,12 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
         /**
          * Gets a post navigation by name.
          * @param {string} name Post name
+         * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryPostNavigationByName(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NavigationPostVo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostNavigationByName(name, options);
+        async queryPostNavigationByName(name: string, scope?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NavigationPostVo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.queryPostNavigationByName(name, scope, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1PublicApi.queryPostNavigationByName']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -250,7 +256,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         queryPostNavigationByName(requestParameters: PostV1alpha1PublicApiQueryPostNavigationByNameRequest, options?: RawAxiosRequestConfig): AxiosPromise<NavigationPostVo> {
-            return localVarFp.queryPostNavigationByName(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.queryPostNavigationByName(requestParameters.name, requestParameters.scope, options).then((request) => request(axios, basePath));
         },
         /**
          * Lists posts.
@@ -282,6 +288,11 @@ export interface PostV1alpha1PublicApiQueryPostNavigationByNameRequest {
      * Post name
      */
     readonly name: string
+
+    /**
+     * Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
+     */
+    readonly scope?: string
 }
 
 /**
@@ -335,7 +346,7 @@ export class PostV1alpha1PublicApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public queryPostNavigationByName(requestParameters: PostV1alpha1PublicApiQueryPostNavigationByNameRequest, options?: RawAxiosRequestConfig) {
-        return PostV1alpha1PublicApiFp(this.configuration).queryPostNavigationByName(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return PostV1alpha1PublicApiFp(this.configuration).queryPostNavigationByName(requestParameters.name, requestParameters.scope, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
