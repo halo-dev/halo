@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -229,6 +230,52 @@ class PostFinderImplTest {
             result = query.toPageRequest();
             assertThat(result.getSort())
                     .isEqualTo(Sort.by(Sort.Order.desc("spec.publishTime")).and(PostFinderImpl.defaultSort()));
+        }
+    }
+
+    @Nested
+    class CursorByCategoryTest {
+
+        @Test
+        void withCategories_shouldFilterByPrimaryCategory() {
+            var currentPost = post(1);
+            currentPost.getSpec().setCategories(List.of("java", "tutorial"));
+            currentPost.getSpec().setPublishTime(Instant.parse("2023-06-15T00:00:00Z"));
+
+            when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(currentPost));
+
+            var listOptions = ListOptions.builder().build();
+            when(postPredicateResolver.getListOptions()).thenReturn(Mono.just(listOptions));
+
+            when(client.listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class)))
+                    .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
+
+            postFinder.cursorByCategory("post-1").block();
+
+            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+            verify(client, times(2)).listBy(eq(Post.class), listOptionsCaptor.capture(), any(PageRequest.class));
+
+            var capturedOptions = listOptionsCaptor.getAllValues();
+            for (var options : capturedOptions) {
+                assertThat(options.toCondition().toString()).contains("spec.categories = java");
+            }
+        }
+
+        @Test
+        void withoutCategories_shouldReturnEmptyNavigation() {
+            var currentPost = post(1);
+            currentPost.getSpec().setCategories(null);
+            currentPost.getSpec().setPublishTime(Instant.parse("2023-06-15T00:00:00Z"));
+
+            when(client.fetch(Post.class, "post-1")).thenReturn(Mono.just(currentPost));
+
+            var result = postFinder.cursorByCategory("post-1").block();
+            assertThat(result).isNotNull();
+            assertThat(result.hasPrevious()).isFalse();
+            assertThat(result.hasNext()).isFalse();
+
+            verify(client, never()).listBy(eq(Post.class), any(ListOptions.class), any(PageRequest.class));
+            verify(postPredicateResolver, never()).getListOptions();
         }
     }
 }

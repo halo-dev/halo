@@ -71,13 +71,22 @@ public class PostQueryEndpoint implements CustomEndpoint {
                                         .name("name")
                                         .description("Post name")
                                         .required(true))
+                                .parameter(parameterBuilder()
+                                        .in(ParameterIn.QUERY)
+                                        .name("scope")
+                                        .description("Scope of navigation. Use 'category' to "
+                                                + "limit navigation to the post's primary category."
+                                                + " Defaults to global scope.")
+                                        .required(false))
                                 .response(responseBuilder().implementation(NavigationPostVo.class)))
                 .build();
     }
 
     private Mono<ServerResponse> getPostNavigationByName(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return postFinder.cursor(name).flatMap(result -> ServerResponse.ok().bodyValue(result));
+        var scope = request.queryParam("scope").orElse("");
+        var navigationMono = "category".equals(scope) ? postFinder.cursorByCategory(name) : postFinder.cursor(name);
+        return navigationMono.flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
     private Mono<ServerResponse> getPostByName(ServerRequest request) {
