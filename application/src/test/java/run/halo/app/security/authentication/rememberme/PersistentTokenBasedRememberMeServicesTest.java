@@ -261,12 +261,15 @@ class PersistentTokenBasedRememberMeServicesTest {
         void shouldFallbackToExistingTokenWhenRotationFailsWithOptimisticLock() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var storedToken = createTestToken("test-series", "test-token", "test-user", NOW);
+            var updatedToken = createTestToken("test-series", "new-token", "test-user", NOW);
             var device = createTestDevice("test-series");
             var userDetails = User.withUsername("test-user")
                     .password("password")
                     .roles("USER")
                     .build();
-            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
+            when(tokenRepository.getTokenForSeries(eq("test-series")))
+                    .thenReturn(Mono.just(storedToken))
+                    .thenReturn(Mono.just(updatedToken));
             when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
             when(tokenRepository.updateToken(any(RememberMeToken.class)))
                     .thenReturn(Mono.error(new OptimisticLockingFailureException("concurrent update")));
@@ -279,8 +282,8 @@ class PersistentTokenBasedRememberMeServicesTest {
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
             verify(tokenRepository).updateToken(any(RememberMeToken.class));
-            // Cookie should NOT be set because rotation failed
-            verify(rememberMeCookieResolver, never()).setRememberMeCookie(any(), any());
+            verify(tokenRepository, times(2)).getTokenForSeries(eq("test-series"));
+            verify(rememberMeCookieResolver).setRememberMeCookie(eq(exchange), any());
         }
     }
 
