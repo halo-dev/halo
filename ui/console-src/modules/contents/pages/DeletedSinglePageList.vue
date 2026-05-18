@@ -252,19 +252,17 @@ watch(
                 </VButton>
               </VSpace>
             </div>
-            <VSpace spacing="lg" class="flex-wrap">
-              <div class="flex flex-row gap-2">
-                <div
-                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                  @click="refetch()"
-                >
-                  <IconRefreshLine
-                    :class="{ 'animate-spin text-gray-900': isFetching }"
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </div>
-              </div>
-            </VSpace>
+            <button
+              v-tooltip="$t('core.common.buttons.refresh')"
+              type="button"
+              class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+              @click="refetch()"
+            >
+              <IconRefreshLine
+                :class="{ 'animate-spin text-gray-900': isFetching }"
+                class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+              />
+            </button>
           </div>
         </div>
       </template>
