@@ -9,7 +9,11 @@ data:
       "mustVerifyEmailOnRegistration": false,
       "defaultRole": "guest",
       "avatarPolicy": "default-policy",
-      "ucAttachmentPolicy": "default-policy"
+      "ucAttachmentPolicy": "default-policy",
+      "requiredAgreementPages": [
+        "user-agreement",
+        "privacy-policy"
+      ]
     }
   attachment: |
     {

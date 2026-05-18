@@ -184,6 +184,9 @@ tasks.named('forkedSpringBootRun') {
 }
 
 tasks.named('generateOpenApiDocs') {
+    notCompatibleWithConfigurationCache(
+        'Task generates OpenAPI docs from a running server and is not compatible with configuration cache'
+    )
     outputs.upToDateWhen {
         false
     }

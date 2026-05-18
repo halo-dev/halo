@@ -32,11 +32,11 @@
     "build": "vp pack",
     "dev": "vp pack --watch",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --composite false",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
-    "@halo-dev/richtext-editor": "workspace:*",
+    "@tiptap/core": "^3.22.2",
     "mitt": "^3.0.1"
   },
   "devDependencies": {

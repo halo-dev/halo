@@ -37,6 +37,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.BackupRootGetter;
+import run.halo.app.infra.exception.BackupMalformedException;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -154,6 +155,86 @@ class MigrationServiceImplTest {
         // make sure the workdir is recovered.
         var fakeFile = workdir.resolve("fake-file");
         assertEquals("halo", Files.readString(fakeFile));
+    }
+
+    @Test
+    void restoreWithMalformedZipFileTest() throws IOException {
+        var malformedZip = tempDir.resolve("malformed.zip");
+        // Create a zip-like file that triggers ZipException during parsing
+        byte[] malformedData = {
+            (byte) 0x50,
+            (byte) 0x4B,
+            (byte) 0x03,
+            (byte) 0x04,
+            0x14,
+            0x00,
+            0x08,
+            0x00, // data descriptor flag set
+            0x00,
+            0x00, // stored (not DEFLATED)
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x04,
+            0x00,
+            0x00,
+            0x00,
+            0x74,
+            0x65,
+            0x73,
+            0x74
+        };
+        Files.write(malformedZip, malformedData, StandardOpenOption.CREATE_NEW);
+
+        var content = DataBufferUtils.read(
+                malformedZip, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content))
+                .expectErrorSatisfies(e -> {
+                    assertInstanceOf(BackupMalformedException.class, e);
+                    var ex = (BackupMalformedException) e;
+                    assertEquals("problemDetail.migration.backup.malformed", ex.getDetailMessageCode());
+                })
+                .verify();
+    }
+
+    @Test
+    void restoreWithMissingExtensionsDataTest() throws IOException {
+        var backupRoot = tempDir.resolve("empty-backup");
+        Files.createDirectory(backupRoot);
+        var workdir = tempDir.resolve("workdir-for-restoration");
+        Files.createDirectory(workdir);
+
+        var backupFile = tempDir.resolve("empty-backup.zip");
+        FileUtils.zip(backupRoot, backupFile);
+
+        when(repository.deleteAll()).thenReturn(Mono.empty());
+
+        var tx = mock(ReactiveTransaction.class);
+        when(txManager.getReactiveTransaction(any())).thenReturn(Mono.just(tx));
+        when(txManager.rollback(tx)).thenReturn(Mono.empty());
+
+        var content = DataBufferUtils.read(
+                backupFile, DefaultDataBufferFactory.sharedInstance, 2048, StandardOpenOption.READ);
+        StepVerifier.create(migrationService.restore(content))
+                .expectErrorSatisfies(e -> {
+                    assertInstanceOf(BackupMalformedException.class, e);
+                    var ex = (BackupMalformedException) e;
+                    assertEquals("problemDetail.migration.backup.extensionsNotFound", ex.getDetailMessageCode());
+                })
+                .verify();
     }
 
     @Test

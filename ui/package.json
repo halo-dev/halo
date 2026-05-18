@@ -6,19 +6,17 @@
   "scripts": {
     "prepare": "cd .. && husky ui/.husky",
     "dev": "vp dev --host",
-    "build": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp build",
-    "build:packages": "pnpm -r run build",
-    "api-client:gen": "pnpm -C packages/api-client gen",
-    "test:unit": "vp test --run && pnpm run test:unit:packages",
+    "build": "vp build",
+    "build:packages": "vp run --filter @halo-dev/* build",
+    "api-client:gen": "vp run --filter @halo-dev/api-client gen",
+    "test:unit": "vp test --run && vp run --parallel --filter @halo-dev/* test:unit",
     "test:unit:watch": "vp test --watch",
     "test:unit:ui": "vp test --watch --ui",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp run --parallel --filter @halo-dev/* typecheck",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
-    "typecheck:packages": "pnpm --parallel -r run typecheck",
-    "test:unit:packages": "pnpm --parallel -r run test:unit",
-    "publish:packages": "pnpm -r publish --access public --no-git-checks"
+    "publish:packages": "npm publish -ws --access public"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.6.0",
@@ -69,13 +67,13 @@
     "@vueuse/integrations": "^12.8.2",
     "@vueuse/router": "^12.8.2",
     "@vueuse/shared": "^12.8.2",
-    "axios": "^1.12.2",
+    "axios": "^1.16.1",
     "codemirror": "^6.0.2",
     "colorjs.io": "^0.4.3",
     "core-js": "^3.43.0",
     "cropperjs": "^1.5.13",
     "crypto-js": "^4.2.0",
-    "dompurify": "^3.2.2",
+    "dompurify": "^3.4.3",
     "emoji-mart": "^5.6.0",
     "es-toolkit": "^1.41.0",
     "fuse.js": "^7.1.0",
@@ -89,7 +87,7 @@
     "pinia": "^3.0.4",
     "pretty-bytes": "^6.0.0",
     "qrcode": "^1.5.3",
-    "sanitize-html": "^2.17.0",
+    "sanitize-html": "^2.17.4",
     "short-unique-id": "^5.0.2",
     "transliteration": "^2.3.5",
     "ua-parser-js": "^1.0.38",
@@ -163,7 +161,7 @@
     "vue-tsc": "^3.2.4"
   },
   "resolutions": {
-    "axios": "^1.12.2"
+    "axios": "^1.16.1"
   },
   "lint-staged": {
     "**/*": "vp fmt --no-error-on-unmatched-pattern",
