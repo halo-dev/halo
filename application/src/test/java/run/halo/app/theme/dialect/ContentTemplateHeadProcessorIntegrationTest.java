@@ -159,6 +159,32 @@ class ContentTemplateHeadProcessorIntegrationTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    void shouldKeepThemeColorMetasWithDifferentMedia() {
+        SystemSetting.CodeInjection codeInjection = new SystemSetting.CodeInjection();
+        codeInjection.setGlobalHead(null);
+        codeInjection.setContentHead(null);
+        when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP), eq(SystemSetting.CodeInjection.class)))
+                .thenReturn(Mono.just(codeInjection));
+
+        String result = templateEngine.process("themeColor", getContext());
+
+        var actual = Jsoup.parse(result);
+        var themeColorMetas = actual.select("meta[name=theme-color]");
+        assertThat(themeColorMetas).hasSize(2);
+        assertThat(themeColorMetas.get(0).attr("content")).isEqualTo("cyan");
+        assertThat(themeColorMetas.get(0).attr("media")).isEqualTo("(prefers-color-scheme: light)");
+        assertThat(themeColorMetas.get(1).attr("content")).isEqualTo("black");
+        assertThat(themeColorMetas.get(1).attr("media")).isEqualTo("(prefers-color-scheme: dark)");
+        assertThat(actual.select("meta[name=robots]")).hasSize(2);
+        assertThat(actual.select("meta[name=custom-meta]")).singleElement().satisfies(meta -> {
+            assertThat(meta.attr("content")).isEqualTo("new custom");
+        });
+        assertThat(actual.select("meta[name=description]")).singleElement().satisfies(meta -> {
+            assertThat(meta.attr("content")).isEqualTo("new description");
+        });
+    }
+
     Map<String, String> mutableMetaMap(String nameValue, String contentValue) {
         Map<String, String> map = new HashMap<>();
         map.put("name", nameValue);
@@ -184,6 +210,9 @@ class ContentTemplateHeadProcessorIntegrationTest {
             if (template.equals("post")) {
                 return new StringTemplateResource(postTemplate());
             }
+            if (template.equals("themeColor")) {
+                return new StringTemplateResource(themeColorTemplate());
+            }
             return null;
         }
 
@@ -194,6 +223,30 @@ class ContentTemplateHeadProcessorIntegrationTest {
                   <head>
                     <meta charset="UTF-8" />
                     <title>Post detail</title>
+                  </head>
+                  <body>
+                    this is body
+                  </body>
+                </html>
+                """;
+        }
+
+        private String themeColorTemplate() {
+            return """
+                <!DOCTYPE html>
+                <html lang="en" xmlns:th="http://www.thymeleaf.org">
+                  <head>
+                    <meta charset="UTF-8" />
+                    <title>Theme color</title>
+                    <meta name="theme-color" th:if="true" content="cyan" media="(prefers-color-scheme: light)">
+                    <meta name="theme-color" th:if="true" content="black" media="(prefers-color-scheme: dark)">
+                    <meta name="theme-color" th:if="false" content="blue" media="(prefers-color-scheme: dark)">
+                    <meta name="robots" content="noindex">
+                    <meta name="robots" content="nofollow">
+                    <meta name="custom-meta" content="old custom">
+                    <meta name="custom-meta" content="new custom">
+                    <meta name="description" content="old description">
+                    <meta name="description" content="new description">
                   </head>
                   <body>
                     this is body
