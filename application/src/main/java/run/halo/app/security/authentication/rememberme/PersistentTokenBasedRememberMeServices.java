@@ -146,7 +146,12 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                         updated.getSpec().getSeries());
                                 addCookie(updated, exchange);
                             })
-                            .onErrorReturn(OptimisticLockingFailureException.class, token);
+                            .onErrorResume(
+                                    OptimisticLockingFailureException.class,
+                                    e -> tokenRepository
+                                            .getTokenForSeries(presentedSeries)
+                                            .doOnNext(fresh -> addCookie(fresh, exchange))
+                                            .defaultIfEmpty(token));
                 })
                 .flatMap(t -> getUserDetailsService().findByUsername(t.getSpec().getUsername()));
     }
