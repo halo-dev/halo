@@ -50,19 +50,20 @@ class BundleResourceUtilsTest {
     }
 
     @Test
-    void getJsBundleResource() {
-        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+    void getSelectedBundleResource() {
+        Resource jsBundleResource =
+                BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "main.js");
         assertThat(jsBundleResource).isNotNull();
         assertThat(jsBundleResource.exists()).isTrue();
 
-        jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "test.js");
+        jsBundleResource = BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "test.js");
         assertThat(jsBundleResource).isNull();
 
-        jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "nothing-plugin", "main.js");
+        jsBundleResource = BundleResourceUtils.getSelectedBundleResource(pluginManager, "nothing-plugin", "main.js");
         assertThat(jsBundleResource).isNull();
 
         assertThatThrownBy(() -> {
-                    BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "../test/main.js");
+                    BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "../test/main.js");
                 })
                 .isInstanceOf(AccessDeniedException.class);
     }
@@ -74,7 +75,8 @@ class BundleResourceUtilsTest {
         assertThat(BundleResourceUtils.selectBundleLocation(pluginManager, "fake-plugin"))
                 .isEqualTo(BundleResourceUtils.UI_BUNDLE_LOCATION);
 
-        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+        Resource jsBundleResource =
+                BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "main.js");
         assertThat(jsBundleResource).isNotNull();
         assertThat(jsBundleResource.getURL().toString()).isEqualTo("file://ui/main.js");
     }
@@ -83,10 +85,12 @@ class BundleResourceUtilsTest {
     void shouldSkipConsoleWhenUiLocationIsSelected() throws IOException {
         lenient().when(pluginClassLoader.getResource(eq("ui/style.css"))).thenReturn(new URL("file://ui/style.css"));
 
-        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+        Resource jsBundleResource =
+                BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "main.js");
         assertThat(jsBundleResource).isNull();
 
-        Resource cssBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "style.css");
+        Resource cssBundleResource =
+                BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "style.css");
         assertThat(cssBundleResource).isNotNull();
         assertThat(cssBundleResource.getURL().toString()).isEqualTo("file://ui/style.css");
     }
