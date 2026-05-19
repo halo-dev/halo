@@ -17,14 +17,16 @@ import run.halo.app.infra.utils.PathUtils;
  * @since 2.0.0
  */
 public abstract class BundleResourceUtils {
-    private static final String CONSOLE_BUNDLE_LOCATION = "console";
+    public static final String UI_BUNDLE_LOCATION = "ui";
+    public static final String CONSOLE_BUNDLE_LOCATION = "console";
     public static final String JS_BUNDLE = "main.js";
     public static final String CSS_BUNDLE = "style.css";
+    private static final String[] BUNDLE_LOCATIONS = {UI_BUNDLE_LOCATION, CONSOLE_BUNDLE_LOCATION};
 
     /**
-     * Gets js bundle resource by plugin name in console location.
+     * Gets bundle resource by plugin name in the selected location.
      *
-     * @return js bundle resource if exists, otherwise null
+     * @return bundle resource if exists, otherwise null
      */
     public static @Nullable Resource getJsBundleResource(
             PluginManager pluginManager, String pluginName, String bundleName) {
@@ -35,11 +37,66 @@ public abstract class BundleResourceUtils {
         if (resourceLoader == null) {
             return null;
         }
-        String path = PathUtils.combinePath(CONSOLE_BUNDLE_LOCATION, bundleName);
+        var bundleLocation = selectBundleLocation(resourceLoader);
+        if (bundleLocation == null) {
+            return null;
+        }
+        return getBundleResource(resourceLoader, bundleLocation, bundleName);
+    }
+
+    public static @Nullable Resource getBundleResource(
+            PluginManager pluginManager, String pluginName, String bundleLocation, String bundleName) {
+        Assert.hasText(pluginName, "The pluginName must not be blank");
+        Assert.hasText(bundleLocation, "Bundle location must not be blank");
+        Assert.hasText(bundleName, "Bundle name must not be blank");
+
+        DefaultResourceLoader resourceLoader = getResourceLoader(pluginManager, pluginName);
+        if (resourceLoader == null) {
+            return null;
+        }
+        return getBundleResource(resourceLoader, bundleLocation, bundleName);
+    }
+
+    public static @Nullable String selectBundleLocation(PluginManager pluginManager, String pluginName) {
+        Assert.hasText(pluginName, "The pluginName must not be blank");
+
+        DefaultResourceLoader resourceLoader = getResourceLoader(pluginManager, pluginName);
+        if (resourceLoader == null) {
+            return null;
+        }
+        return selectBundleLocation(resourceLoader);
+    }
+
+    public static @Nullable String selectBundleLocation(DefaultResourceLoader resourceLoader) {
+        Assert.notNull(resourceLoader, "Resource loader must not be null");
+        for (String location : BUNDLE_LOCATIONS) {
+            var jsBundle = getBundleResource(resourceLoader, location, JS_BUNDLE);
+            var cssBundle = getBundleResource(resourceLoader, location, CSS_BUNDLE);
+            if (jsBundle != null || cssBundle != null) {
+                return location;
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable Resource getBundleResource(
+            DefaultResourceLoader resourceLoader, String bundleLocation, String bundleName) {
+        Assert.notNull(resourceLoader, "Resource loader must not be null");
+        assertSupportedBundleLocation(bundleLocation);
+        String path = PathUtils.combinePath(bundleLocation, bundleName);
         String simplifyPath = StringUtils.cleanPath(path);
-        FileUtils.checkDirectoryTraversal("/" + CONSOLE_BUNDLE_LOCATION, simplifyPath);
+        FileUtils.checkDirectoryTraversal("/" + bundleLocation, simplifyPath);
         Resource resource = resourceLoader.getResource(simplifyPath);
         return resource.exists() ? resource : null;
+    }
+
+    private static void assertSupportedBundleLocation(String bundleLocation) {
+        for (String supportedLocation : BUNDLE_LOCATIONS) {
+            if (supportedLocation.equals(bundleLocation)) {
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported bundle location: " + bundleLocation);
     }
 
     public static @Nullable DefaultResourceLoader getResourceLoader(PluginManager pluginManager, String pluginName) {

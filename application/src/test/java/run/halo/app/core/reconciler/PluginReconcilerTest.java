@@ -284,7 +284,7 @@ class PluginReconcilerTest {
                     .thenReturn(null)
                     // get setting extension
                     .thenReturn(mockPluginWrapperForSetting())
-                    .thenReturn(mockPluginWrapperForStaticResources())
+                    .thenReturn(mockPluginWrapperForStaticResources("ui"))
                     // before starting
                     .thenReturn(mockPluginWrapper(PluginState.STARTED))
                     // sync plugin state
@@ -304,10 +304,10 @@ class PluginReconcilerTest {
                     "/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
                     fakePlugin.getStatus().getLogo());
             assertEquals(
-                    "/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                    "/plugins/fake-plugin/assets/ui/main.js?version=1.2.3",
                     fakePlugin.getStatus().getEntry());
             assertEquals(
-                    "/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                    "/plugins/fake-plugin/assets/ui/style.css?version=1.2.3",
                     fakePlugin.getStatus().getStylesheet());
             assertEquals(Plugin.Phase.STARTED, fakePlugin.getStatus().getPhase());
             assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
@@ -401,11 +401,17 @@ class PluginReconcilerTest {
         }
 
         PluginWrapper mockPluginWrapperForStaticResources() {
+            return mockPluginWrapperForStaticResources("console");
+        }
+
+        PluginWrapper mockPluginWrapperForStaticResources(String location) {
             // check
             var pluginWrapper = mock(PluginWrapper.class);
             var pluginClassLoader = mock(ClassLoader.class);
-            when(pluginClassLoader.getResource("console/main.js")).thenReturn(mock(URL.class));
-            when(pluginClassLoader.getResource("console/style.css")).thenReturn(mock(URL.class));
+            lenient().when(pluginClassLoader.getResource(location + "/main.js")).thenReturn(mock(URL.class));
+            lenient()
+                    .when(pluginClassLoader.getResource(location + "/style.css"))
+                    .thenReturn(mock(URL.class));
             when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
             lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;
