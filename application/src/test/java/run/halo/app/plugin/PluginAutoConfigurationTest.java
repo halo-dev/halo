@@ -1,8 +1,8 @@
 package run.halo.app.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,8 +36,8 @@ class PluginAutoConfigurationTest {
         var pluginWrapper = mock(PluginWrapper.class);
         var pluginRoot = ResourceUtils.getURL("classpath:plugin/plugin-for-ui-assets/");
         var classLoader = new URLClassLoader(new URL[] {pluginRoot});
-        when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
-        when(pluginManager.getPlugin("fake-plugin")).thenReturn(pluginWrapper);
+        lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
+        lenient().when(pluginManager.getPlugin("fake-plugin")).thenReturn(pluginWrapper);
     }
 
     @Test
@@ -62,5 +62,34 @@ class PluginAutoConfigurationTest {
                 .isOk()
                 .expectBody(String.class)
                 .value(body -> assertThat(body).contains("console.log(\"console\");"));
+    }
+
+    @Test
+    void shouldUseExactAssetRouteLocation() {
+        webClient
+                .get()
+                .uri("/plugins/fake-plugin/assets/ui/console-only.js")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+
+        webClient
+                .get()
+                .uri("/plugins/fake-plugin/assets/console/console-only.js")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("console.log(\"console-only\");"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenPluginIsMissing() {
+        webClient
+                .get()
+                .uri("/plugins/missing-plugin/assets/ui/main.js")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 }

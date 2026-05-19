@@ -68,6 +68,17 @@ class BundleResourceUtilsTest {
                 .isInstanceOf(AccessDeniedException.class);
     }
 
+    @SuppressWarnings("deprecation")
+    @Test
+    void getJsBundleResourceShouldDelegateToSelectedBundleResource() throws IOException {
+        lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));
+
+        Resource jsBundleResource = BundleResourceUtils.getJsBundleResource(pluginManager, "fake-plugin", "main.js");
+
+        assertThat(jsBundleResource).isNotNull();
+        assertThat(jsBundleResource.getURL().toString()).isEqualTo("file://ui/main.js");
+    }
+
     @Test
     void shouldPreferUiBundleLocation() throws IOException {
         lenient().when(pluginClassLoader.getResource(eq("ui/main.js"))).thenReturn(new URL("file://ui/main.js"));
@@ -108,5 +119,13 @@ class BundleResourceUtilsTest {
                 pluginManager, "fake-plugin", BundleResourceUtils.CONSOLE_BUNDLE_LOCATION, "main.js");
         assertThat(consoleBundleResource).isNotNull();
         assertThat(consoleBundleResource.getURL().toString()).isEqualTo("file://console/main.js");
+    }
+
+    @Test
+    void shouldRejectUnsupportedBundleLocation() {
+        assertThatThrownBy(
+                        () -> BundleResourceUtils.getBundleResource(pluginManager, "fake-plugin", "admin", "main.js"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unsupported bundle location: admin");
     }
 }
