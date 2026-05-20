@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -31,6 +30,8 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Device;
 import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.properties.SecurityProperties;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.device.DeviceService;
 
@@ -60,13 +61,28 @@ class PersistentTokenBasedRememberMeServicesTest {
     @Mock
     private LoginParameterRequestCache parameterRequestCache;
 
-    @InjectMocks
+    @Mock
+    private HaloProperties haloProperties;
+
+    private final SecurityProperties securityProperties = new SecurityProperties();
+
     private PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
 
     private static final Instant NOW = Instant.parse("2024-01-01T00:00:00Z");
 
     @BeforeEach
     void setUp() {
+        // Set cooldown to zero BEFORE construction so the constructor sees it
+        securityProperties.getRememberMe().setRotationCooldown(Duration.ZERO);
+        lenient().when(haloProperties.getSecurity()).thenReturn(securityProperties);
+        persistentTokenBasedRememberMeServices = new PersistentTokenBasedRememberMeServices(
+                cookieSignatureKeyResolver,
+                userDetailsService,
+                rememberMeCookieResolver,
+                tokenRepository,
+                parameterRequestCache,
+                deviceService,
+                haloProperties);
         persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
         lenient().when(rememberMeCookieResolver.getCookieMaxAge()).thenReturn(Duration.ofDays(14));
     }
@@ -255,6 +271,80 @@ class PersistentTokenBasedRememberMeServicesTest {
             verify(tokenRepository).updateToken(any(RememberMeToken.class));
             // Cookie should be set with new token values
             verify(rememberMeCookieResolver).setRememberMeCookie(eq(exchange), any());
+        }
+
+        @Test
+        void shouldSkipRotationWhenWithinCooldown() {
+            // Override to 5-minute cooldown for this test
+            securityProperties.getRememberMe().setRotationCooldown(Duration.ofMinutes(5));
+            persistentTokenBasedRememberMeServices = new PersistentTokenBasedRememberMeServices(
+                    cookieSignatureKeyResolver,
+                    userDetailsService,
+                    rememberMeCookieResolver,
+                    tokenRepository,
+                    parameterRequestCache,
+                    deviceService,
+                    haloProperties);
+            persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
+
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            // Token was just rotated (lastUsed = NOW), clock is also NOW
+            var storedToken = createTestToken("test-series", "test-token", "test-user", NOW);
+            var device = createTestDevice("test-series");
+            var userDetails = User.withUsername("test-user")
+                    .password("password")
+                    .roles("USER")
+                    .build();
+            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(userDetailsService.findByUsername(eq("test-user"))).thenReturn(Mono.just(userDetails));
+
+            var result = persistentTokenBasedRememberMeServices
+                    .processAutoLoginCookie(new String[] {"test-series", "test-token"}, exchange)
+                    .block();
+
+            assertThat(result).isNotNull();
+            assertThat(result.getUsername()).isEqualTo("test-user");
+            // Rotation should be skipped — token was rotated at NOW, within 5-min cooldown
+            verify(tokenRepository, never()).updateToken(any());
+        }
+
+        @Test
+        void shouldRotateWhenOutsideCooldown() {
+            // Override to 5-minute cooldown for this test
+            securityProperties.getRememberMe().setRotationCooldown(Duration.ofMinutes(5));
+            persistentTokenBasedRememberMeServices = new PersistentTokenBasedRememberMeServices(
+                    cookieSignatureKeyResolver,
+                    userDetailsService,
+                    rememberMeCookieResolver,
+                    tokenRepository,
+                    parameterRequestCache,
+                    deviceService,
+                    haloProperties);
+            persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
+
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            // Token last rotated 6 minutes ago
+            var lastUsed = NOW.minus(Duration.ofMinutes(6));
+            var storedToken = createTestToken("test-series", "test-token", "test-user", lastUsed);
+            var device = createTestDevice("test-series");
+            var userDetails = User.withUsername("test-user")
+                    .password("password")
+                    .roles("USER")
+                    .build();
+            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(tokenRepository.updateToken(any(RememberMeToken.class)))
+                    .thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+            when(userDetailsService.findByUsername(eq("test-user"))).thenReturn(Mono.just(userDetails));
+
+            var result = persistentTokenBasedRememberMeServices
+                    .processAutoLoginCookie(new String[] {"test-series", "test-token"}, exchange)
+                    .block();
+
+            assertThat(result).isNotNull();
+            // Rotation should happen — token last rotated 6 min ago, cooldown is 5 min
+            verify(tokenRepository).updateToken(any(RememberMeToken.class));
         }
 
         @Test
