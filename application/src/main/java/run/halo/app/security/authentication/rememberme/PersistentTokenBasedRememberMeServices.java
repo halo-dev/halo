@@ -168,13 +168,10 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                     token.getSpec().setLastUsed(clock.instant());
                     return tokenRepository
                             .updateToken(token)
-                            .doOnNext(updated -> {
-                                log.info(
-                                        "Remember-me token rotated successfully for user '{}', series '{}'",
-                                        updated.getSpec().getUsername(),
-                                        updated.getSpec().getSeries());
-                                addCookie(updated, exchange);
-                            })
+                            .doOnNext(updated -> log.info(
+                                    "Remember-me token rotated successfully for user '{}', series '{}'",
+                                    updated.getSpec().getUsername(),
+                                    updated.getSpec().getSeries()))
                             .onErrorResume(OptimisticLockingFailureException.class, e -> {
                                 log.info(
                                         "Optimistic locking failure during token rotation "
@@ -184,10 +181,10 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                         token.getSpec().getSeries());
                                 return tokenRepository
                                         .getTokenForSeries(presentedSeries)
-                                        .doOnNext(fresh -> addCookie(fresh, exchange))
                                         .defaultIfEmpty(token);
                             });
                 })
+                .doOnNext(token -> addCookie(token, exchange))
                 .flatMap(t -> getUserDetailsService().findByUsername(t.getSpec().getUsername()));
     }
 
