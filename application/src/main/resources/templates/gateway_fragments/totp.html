@@ -1,33 +1,33 @@
 <form
-        th:fragment="form"
-        class="halo-form"
-        th:action="@{/challenges/two-factor/totp}"
-        name="two-factor-form"
-        id="two-factor-form"
-        method="post"
+  th:fragment="form"
+  class="halo-form"
+  th:action="@{/challenges/two-factor/totp}"
+  name="two-factor-form"
+  id="two-factor-form"
+  method="post"
 >
-    <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
-        <strong th:text="#{form.messages.invalidError}"></strong>
+  <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
+    <strong th:text="#{form.messages.invalidError}"></strong>
+  </div>
+  <div class="form-item">
+    <label for="code" th:text="#{form.code.label}"></label>
+    <div class="form-input">
+      <input
+        type="text"
+        inputmode="numeric"
+        id="code"
+        name="code"
+        autocomplete="one-time-code"
+        pattern="\d{6}"
+        autofocus
+        required
+      />
     </div>
-    <div class="form-item">
-        <label for="code" th:text="#{form.code.label}"></label>
-        <div class="form-input">
-            <input
-                    type="text"
-                    inputmode="numeric"
-                    id="code"
-                    name="code"
-                    autocomplete="one-time-code"
-                    pattern="\d{6}"
-                    autofocus
-                    required
-            />
-        </div>
-    </div>
-    <div class="form-item">
-        <button type="submit" th:text="#{form.submit}"></button>
-    </div>
-    <div class="form-item">
-        <a th:href="@{/logout}" class="cancel-link" th:text="#{form.cancel}"></a>
-    </div>
+  </div>
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+  <div class="form-item">
+    <a th:href="@{/logout}" class="cancel-link" th:text="#{form.cancel}"></a>
+  </div>
 </form>
