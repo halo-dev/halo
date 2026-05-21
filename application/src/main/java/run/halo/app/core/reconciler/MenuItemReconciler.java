@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.event.menu.MenuItemReconciledEvent;
 import run.halo.app.event.post.*;
 import run.halo.app.extension.*;
 import run.halo.app.extension.controller.Controller;
@@ -32,9 +34,13 @@ class MenuItemReconciler implements Reconciler<Request> {
 
     private final ReactiveExtensionClient reactiveClient;
 
-    public MenuItemReconciler(ExtensionClient client, ReactiveExtensionClient reactiveClient) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public MenuItemReconciler(
+            ExtensionClient client, ReactiveExtensionClient reactiveClient, ApplicationEventPublisher eventPublisher) {
         this.client = client;
         this.reactiveClient = reactiveClient;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -72,6 +78,8 @@ class MenuItemReconciler implements Reconciler<Request> {
                 status.setDisplayName(spec.getDisplayName());
             }
             client.update(menuItem);
+            eventPublisher.publishEvent(
+                    new MenuItemReconciledEvent(this, menuItem.getMetadata().getName()));
         });
         return Result.doNotRetry();
     }

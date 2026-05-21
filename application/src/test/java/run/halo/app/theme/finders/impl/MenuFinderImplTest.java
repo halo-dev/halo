@@ -3,23 +3,29 @@ package run.halo.app.theme.finders.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
+import run.halo.app.event.menu.MenuItemReconciledEvent;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -34,8 +40,18 @@ class MenuFinderImplTest {
     @Mock
     private ReactiveExtensionClient client;
 
-    @InjectMocks
+    @Mock
+    private SystemConfigFetcher environmentFetcher;
+
     private MenuFinderImpl menuFinder;
+
+    private MenuTreeCache menuTreeCache;
+
+    @BeforeEach
+    void setUp() {
+        menuTreeCache = new MenuTreeCache(client, new ConcurrentMapCacheManager());
+        menuFinder = new MenuFinderImpl(menuTreeCache, environmentFetcher);
+    }
 
     @Test
     void listAsTree() {
@@ -56,6 +72,66 @@ class MenuFinderImplTest {
             └── F
                 └── H
             """);
+    }
+
+    @Test
+    void shouldCacheListAsTree() {
+        Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
+        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null))).thenReturn(Flux.fromIterable(tuple.getT1()));
+        Mockito.when(client.list(eq(MenuItem.class), eq(null), any())).thenReturn(Flux.fromIterable(tuple.getT2()));
+
+        menuFinder.listAsTree().collectList().block();
+        menuFinder.listAsTree().collectList().block();
+
+        verify(client, times(1)).list(eq(Menu.class), eq(null), eq(null));
+        verify(client, times(1)).list(eq(MenuItem.class), eq(null), any());
+    }
+
+    @Test
+    void shouldReloadListAsTreeAfterEviction() {
+        Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
+        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null))).thenReturn(Flux.fromIterable(tuple.getT1()));
+        Mockito.when(client.list(eq(MenuItem.class), eq(null), any())).thenReturn(Flux.fromIterable(tuple.getT2()));
+
+        menuFinder.listAsTree().collectList().block();
+        menuTreeCache.onUpdate(new Menu(), new Menu());
+        menuFinder.listAsTree().collectList().block();
+
+        verify(client, times(2)).list(eq(Menu.class), eq(null), eq(null));
+        verify(client, times(2)).list(eq(MenuItem.class), eq(null), any());
+    }
+
+    @Test
+    void shouldNotEvictWhenOnlyMenuItemMetadataAnnotationChanges() {
+        Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
+        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null))).thenReturn(Flux.fromIterable(tuple.getT1()));
+        Mockito.when(client.list(eq(MenuItem.class), eq(null), any())).thenReturn(Flux.fromIterable(tuple.getT2()));
+
+        var oldMenuItem = menuItem("E", of("A", "C"));
+        var newMenuItem = menuItem("E", of("A", "C"));
+        newMenuItem.getMetadata().setAnnotations(new HashMap<>());
+        newMenuItem.getMetadata().getAnnotations().put(MenuItem.REQUEST_TO_UPDATE_ANNO, "now");
+
+        menuFinder.listAsTree().collectList().block();
+        menuTreeCache.onUpdate(oldMenuItem, newMenuItem);
+        menuFinder.listAsTree().collectList().block();
+
+        verify(client, times(1)).list(eq(Menu.class), eq(null), eq(null));
+        verify(client, times(1)).list(eq(MenuItem.class), eq(null), any());
+    }
+
+    @Test
+    void shouldReloadListAsTreeAfterMenuItemReconciled() {
+        Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
+        Mockito.when(client.list(eq(Menu.class), eq(null), eq(null))).thenReturn(Flux.fromIterable(tuple.getT1()));
+        Mockito.when(client.list(eq(MenuItem.class), eq(null), any())).thenReturn(Flux.fromIterable(tuple.getT2()));
+
+        menuFinder.listAsTree().collectList().block();
+        menuTreeCache.onMenuItemReconciled(new MenuItemReconciledEvent(this, "E"));
+        menuFinder.listAsTree().collectList().block();
+
+        verify(client, times(2)).list(eq(Menu.class), eq(null), eq(null));
+        verify(client, times(2)).list(eq(MenuItem.class), eq(null), any());
     }
 
     /** Visualize a tree. */

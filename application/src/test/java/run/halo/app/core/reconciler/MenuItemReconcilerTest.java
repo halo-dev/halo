@@ -8,12 +8,16 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,6 +28,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.event.menu.MenuItemReconciledEvent;
 import run.halo.app.event.post.*;
 import run.halo.app.extension.*;
 import run.halo.app.extension.controller.Reconciler.Request;
@@ -36,6 +41,9 @@ class MenuItemReconcilerTest {
 
     @Mock
     ReactiveExtensionClient reactiveClient;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     MenuItemReconciler reconciler;
@@ -80,6 +88,7 @@ class MenuItemReconcilerTest {
             assertEquals("fake://permalink", menuItem.getStatus().getHref());
             assertEquals("Fake Category", menuItem.getStatus().getDisplayName());
             verify(client).update(menuItem);
+            assertMenuItemReconciledEventPublished("fake-name");
         }
 
         @Test
@@ -134,6 +143,7 @@ class MenuItemReconcilerTest {
             assertEquals("fake://permalink", menuItem.getStatus().getHref());
             assertEquals("fake-title", menuItem.getStatus().getDisplayName());
             verify(client).update(menuItem);
+            assertMenuItemReconciledEventPublished("fake-name");
         }
 
         @Test
@@ -207,6 +217,7 @@ class MenuItemReconcilerTest {
             assertEquals("fake://permalink", menuItem.getStatus().getHref());
             assertEquals("Fake Post", menuItem.getStatus().getDisplayName());
             verify(client).update(menuItem);
+            assertMenuItemReconciledEventPublished("fake-name");
         }
 
         @Test
@@ -281,6 +292,7 @@ class MenuItemReconcilerTest {
             assertEquals("fake://permalink", menuItem.getStatus().getHref());
             assertEquals("Fake Tag", menuItem.getStatus().getDisplayName());
             verify(client).update(menuItem);
+            assertMenuItemReconciledEventPublished("fake-name");
         }
 
         @Test
@@ -422,5 +434,12 @@ class MenuItemReconcilerTest {
         }
         menuItem.setSpec(spec);
         return menuItem;
+    }
+
+    void assertMenuItemReconciledEventPublished(String menuItemName) {
+        var eventCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        var event = Assertions.assertInstanceOf(MenuItemReconciledEvent.class, eventCaptor.getValue());
+        assertEquals(menuItemName, event.getMenuItemName());
     }
 }
