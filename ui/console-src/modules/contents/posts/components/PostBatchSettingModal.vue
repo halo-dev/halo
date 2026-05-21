@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { chunk } from "es-toolkit";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { usePostAuthorOptions } from "../composables/use-post-author-options";
 
 type ArrayPatchOp = "add" | "replace" | "removeAll";
 
@@ -47,6 +48,7 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+const { authorOptions } = usePostAuthorOptions();
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["batch-update-posts"],
@@ -267,9 +269,11 @@ function onSubmit(data: FormData) {
         ></FormKit>
         <FormKit
           v-if="value?.enabled"
+          :options="authorOptions"
           :label="$t('core.post.batch_setting_modal.fields.owner_value')"
           name="value"
-          type="userSelect"
+          :placeholder="$t('core.post.batch_setting_modal.fields.owner_value')"
+          type="select"
         ></FormKit>
       </FormKit>
       <FormKit

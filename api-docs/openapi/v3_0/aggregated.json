@@ -4793,6 +4793,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Effective role name",
+            "in": "query",
+            "name": "effectiveRole",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

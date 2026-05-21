@@ -15,6 +15,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,8 +40,10 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.user.service.EffectiveRoleResolver;
 import run.halo.app.core.user.service.RoleService;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.PageRequest;
@@ -56,6 +60,9 @@ class UserEndpointTest {
 
     @Mock
     RoleService roleService;
+
+    @Mock
+    EffectiveRoleResolver effectiveRoleResolver;
 
     @Mock
     AttachmentService attachmentService;
@@ -145,6 +152,53 @@ class UserEndpointTest {
             when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             webClient.get().uri("/users?role=guest").exchange().expectStatus().isOk();
+            verify(effectiveRoleResolver, never()).resolveRolesContaining(anyString());
+        }
+
+        @Test
+        void shouldFilterUsersWhenEffectiveRoleProvided() {
+            var users = List.of(createUser("fake-author"));
+            var expectResult = new ListResult<>(users);
+            when(effectiveRoleResolver.resolveRolesContaining("role-template-post-contributor"))
+                    .thenReturn(Mono.just(new LinkedHashSet<>(List.of("post-author", "super-role"))));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class))).thenReturn(Mono.just(expectResult));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient
+                    .get()
+                    .uri("/users?effectiveRole=role-template-post-contributor")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+            verify(client).listBy(same(User.class), listOptionsCaptor.capture(), any(PageRequest.class));
+            assertEquals(
+                    "(EMPTY AND roles IN (post-author, super-role))",
+                    listOptionsCaptor.getValue().toString());
+        }
+
+        @Test
+        void shouldReturnNoUsersWhenEffectiveRoleHasNoMatchingRoles() {
+            when(effectiveRoleResolver.resolveRolesContaining("missing-role")).thenReturn(Mono.just(Set.of()));
+            when(client.listBy(same(User.class), any(), any(PageRequest.class)))
+                    .thenReturn(Mono.just(ListResult.emptyResult()));
+            when(roleService.getRolesByUsernames(any())).thenReturn(Mono.just(Map.of()));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
+
+            webClient
+                    .get()
+                    .uri("/users?effectiveRole=missing-role")
+                    .exchange()
+                    .expectStatus()
+                    .isOk();
+
+            var listOptionsCaptor = ArgumentCaptor.forClass(ListOptions.class);
+            verify(client).listBy(same(User.class), listOptionsCaptor.capture(), any(PageRequest.class));
+            assertEquals(
+                    "(EMPTY AND NONE metadata.name)",
+                    listOptionsCaptor.getValue().toString());
         }
 
         @Test

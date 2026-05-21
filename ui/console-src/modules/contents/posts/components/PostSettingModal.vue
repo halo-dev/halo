@@ -17,6 +17,7 @@ import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { postLabels } from "@/constants/labels";
+import { usePostAuthorOptions } from "../composables/use-post-author-options";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
 
 const props = withDefaults(
@@ -307,6 +308,15 @@ const showCancelPublishButton = computed(() => {
 
   return published === "true" || schedulingPublish === "true";
 });
+
+const canViewUsers = computed(() => {
+  return utils.permission.has(["system:users:view"]);
+});
+
+const { authorOptions } = usePostAuthorOptions({
+  currentOwner: computed(() => formState.value.spec.owner),
+  enabled: canViewUsers,
+});
 </script>
 <template>
   <VModal
@@ -432,10 +442,12 @@ const showCancelPublishButton = computed(() => {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
-              v-if="utils.permission.has(['system:users:view'])"
+              v-if="canViewUsers"
               v-model="formState.spec.owner"
+              :options="authorOptions"
               :label="$t('core.post.settings.fields.owner.label')"
-              type="userSelect"
+              :placeholder="$t('core.post.settings.fields.owner.label')"
+              type="select"
             ></FormKit>
             <FormKit
               v-model="formState.spec.allowComment"
