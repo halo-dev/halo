@@ -2,7 +2,6 @@ package run.halo.app.security.authentication.rememberme;
 
 import java.security.SecureRandom;
 import java.time.Clock;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
@@ -60,12 +59,6 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     public static final int DEFAULT_TOKEN_LENGTH = 16;
 
-    /**
-     * Grace period during which the previous token value is still accepted after rotation. This prevents false-positive
-     * cookie theft detection when concurrent requests race on token rotation.
-     */
-    private static final Duration TOKEN_GRACE_PERIOD = Duration.ofSeconds(10);
-
     private final SecureRandom random;
 
     private final int seriesLength = DEFAULT_SERIES_LENGTH;
@@ -107,7 +100,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 .delayUntil(token -> validateDevice(exchange, token))
                 .delayUntil(token -> {
                     if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
-                        if (isTokenStolen(token, presentedToken)) {
+                        if (!isPreviousToken(token, presentedToken)) {
                             log.error(
                                     "Possible cookie theft detected for user '{}', series '{}'",
                                     token.getSpec().getUsername(),
@@ -119,7 +112,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                 Implies previous cookie theft attack.""")));
                         }
                         log.debug(
-                                "Token mismatch but within grace period for user '{}', series '{}'",
+                                "Previous remember-me token accepted for user '{}', series '{}'",
                                 token.getSpec().getUsername(),
                                 token.getSpec().getSeries());
                     }
@@ -130,6 +123,7 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 })
                 .flatMap(token -> {
                     if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
+                        addCookie(token, exchange);
                         return Mono.just(token);
                     }
                     log.debug(
@@ -168,12 +162,8 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 .then();
     }
 
-    private boolean isTokenStolen(RememberMeToken token, String presentedToken) {
-        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
-                .orElseGet(() -> token.getMetadata().getCreationTimestamp());
-        var now = clock.instant();
-        return now.isAfter(lastUsed.plus(TOKEN_GRACE_PERIOD))
-                || !Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue());
+    private boolean isPreviousToken(RememberMeToken token, String presentedToken) {
+        return Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue());
     }
 
     private boolean isTokenExpired(RememberMeToken token) {

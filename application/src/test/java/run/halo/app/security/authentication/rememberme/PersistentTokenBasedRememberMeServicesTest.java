@@ -151,7 +151,7 @@ class PersistentTokenBasedRememberMeServicesTest {
         }
 
         @Test
-        void shouldDetectCookieTheftWhenOutsideGracePeriod() {
+        void shouldDetectCookieTheftWhenTokenDoesNotMatchCurrentOrPreviousToken() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var lastUsed = NOW.minusSeconds(11);
             var storedToken = createTestToken("test-series", "correct-token", "test-user", lastUsed);
@@ -190,9 +190,9 @@ class PersistentTokenBasedRememberMeServicesTest {
         }
 
         @Test
-        void shouldAcceptTokenWithinGracePeriod() {
+        void shouldAcceptPreviousTokenAndRefreshCookie() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
-            var storedToken = createTestToken("test-series", "rotated-token", "test-user", NOW);
+            var storedToken = createTestToken("test-series", "rotated-token", "test-user", NOW.minusSeconds(60));
             storedToken.getSpec().setPreviousTokenValue("old-token");
             var device = createTestDevice("test-series");
             var userDetails = User.withUsername("test-user")
@@ -209,8 +209,9 @@ class PersistentTokenBasedRememberMeServicesTest {
 
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
-            // Token should not be rotated when values don't match (grace period path)
+            // Token should not be rotated when the previous token is accepted.
             verify(tokenRepository, never()).updateToken(any());
+            verify(rememberMeCookieResolver).setRememberMeCookie(eq(exchange), any());
         }
 
         @Test
