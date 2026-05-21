@@ -219,10 +219,13 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     private boolean isTokenStolen(RememberMeToken token, String presentedToken) {
         // If the presented token matches the previous token value, the request is from a device
-        // that missed the last rotation (e.g., response lost, connection closed). This is not
-        // theft — accept the old token regardless of how much time has passed since last rotation.
+        // that missed the last rotation (e.g., response lost, connection closed). Accept it
+        // within the rotation cooldown window — beyond that, a legitimate device should have
+        // retried and received the updated cookie by now.
         if (Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue())) {
-            return false;
+            var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
+                    .orElseGet(() -> token.getMetadata().getCreationTimestamp());
+            return clock.instant().isAfter(lastUsed.plus(rotationCooldown));
         }
         // Presented token matches neither current nor previous — treat as stolen regardless
         // of grace period. A legitimate device would have either the current token or the

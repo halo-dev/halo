@@ -230,11 +230,23 @@ class PersistentTokenBasedRememberMeServicesTest {
         }
 
         @Test
-        void shouldAcceptPreviousTokenOutsideGracePeriod() {
+        void shouldAcceptPreviousTokenWithinCooldown() {
             // Reproduces: session expired → auto-login rotates token → response lost →
-            // browser retries with old token after >10s → old token matches
-            // previousTokenValue → should NOT be considered theft
+            // browser retries with old token within cooldown → should NOT be theft.
+            // Override to 5-minute cooldown for this test
+            securityProperties.getRememberMe().setRotationCooldown(Duration.ofMinutes(5));
+            persistentTokenBasedRememberMeServices = new PersistentTokenBasedRememberMeServices(
+                    cookieSignatureKeyResolver,
+                    userDetailsService,
+                    rememberMeCookieResolver,
+                    tokenRepository,
+                    parameterRequestCache,
+                    deviceService,
+                    haloProperties);
+            persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
+
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            // Token rotated 30 seconds ago — within 5-minute cooldown
             var lastUsed = NOW.minusSeconds(30);
             var storedToken = createTestToken("test-series", "rotated-token", "test-user", lastUsed);
             storedToken.getSpec().setPreviousTokenValue("old-token");
@@ -253,10 +265,44 @@ class PersistentTokenBasedRememberMeServicesTest {
 
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo("test-user");
-            // Should NOT be treated as theft — presentedToken matches previousTokenValue
+            // Should NOT be treated as theft — within cooldown
             verify(tokenRepository, never()).removeUserTokens(any());
             // Should NOT rotate when token doesn't match current value
             verify(tokenRepository, never()).updateToken(any());
+        }
+
+        @Test
+        void shouldDetectCookieTheftWhenPreviousTokenOutsideCooldown() {
+            // Previous token value presented AFTER cooldown expires → treat as theft.
+            // Override to 5-minute cooldown for this test
+            securityProperties.getRememberMe().setRotationCooldown(Duration.ofMinutes(5));
+            persistentTokenBasedRememberMeServices = new PersistentTokenBasedRememberMeServices(
+                    cookieSignatureKeyResolver,
+                    userDetailsService,
+                    rememberMeCookieResolver,
+                    tokenRepository,
+                    parameterRequestCache,
+                    deviceService,
+                    haloProperties);
+            persistentTokenBasedRememberMeServices.setClock(Clock.fixed(NOW, ZoneId.of("UTC")));
+
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            // Token rotated 6 minutes ago — outside 5-minute cooldown
+            var lastUsed = NOW.minus(Duration.ofMinutes(6));
+            var storedToken = createTestToken("test-series", "rotated-token", "test-user", lastUsed);
+            storedToken.getSpec().setPreviousTokenValue("old-token");
+            var device = createTestDevice("test-series");
+            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(tokenRepository.removeUserTokens(eq("test-user"))).thenReturn(Mono.empty());
+
+            assertThatThrownBy(() -> persistentTokenBasedRememberMeServices
+                            .processAutoLoginCookie(new String[] {"test-series", "old-token"}, exchange)
+                            .block())
+                    .isInstanceOf(CookieTheftException.class)
+                    .hasMessageContaining("Invalid remember-me token (Series/token) mismatch");
+
+            verify(tokenRepository).removeUserTokens(eq("test-user"));
         }
 
         @Test
