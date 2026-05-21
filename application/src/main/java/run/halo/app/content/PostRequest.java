@@ -7,14 +7,18 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Ref;
 
 /**
- * Post and content data for creating and updating post.
+ * Post metadata/spec and content data for creating or updating a post from the console editor.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Post editor payload containing the post extension and its editable content.")
 public record PostRequest(
-        @Schema(requiredMode = REQUIRED) Post post,
-        @Schema(requiredMode = REQUIRED) ContentUpdateParam content) {
+        @Schema(description = "Post extension to create or update.", requiredMode = REQUIRED)
+        Post post,
+
+        @Schema(description = "Editable content associated with the post.", requiredMode = REQUIRED)
+        ContentUpdateParam content) {
 
     public ContentRequest contentRequest() {
         Ref subjectRef = Ref.of(post);

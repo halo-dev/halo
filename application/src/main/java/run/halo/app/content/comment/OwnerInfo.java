@@ -1,28 +1,35 @@
 package run.halo.app.content.comment;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 
 /**
- * Comment owner info.
+ * Resolved comment owner summary for display.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Resolved owner summary for a comment or reply.")
 @Value
 @Builder
 public class OwnerInfo {
 
+    @Schema(description = "Owner kind, such as User or email.")
     String kind;
 
+    @Schema(description = "Owner name. For Halo users, this is the user metadata name.")
     String name;
 
+    @Schema(description = "Owner display name.")
     String displayName;
 
+    @Schema(description = "Owner avatar URL.")
     String avatar;
 
+    @Schema(description = "Owner email address when available.")
     String email;
 
     /**

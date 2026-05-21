@@ -15,6 +15,8 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
 /**
+ * Snapshot extension that stores a version of post or single page content.
+ *
  * @author guqing
  * @see <a href="https://github.com/halo-dev/halo/issues/2322">issue#2322</a>
  * @since 2.0.0
@@ -30,34 +32,70 @@ import run.halo.app.extension.Ref;
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";
+
+    /** Annotation key that marks a snapshot as a base snapshot storing full raw and rendered content. */
     public static final String KEEP_RAW_ANNO = "content.halo.run/keep-raw";
+
+    /** Annotation key used to store the patched rendered content when a snapshot is restored for reading. */
     public static final String PATCHED_CONTENT_ANNO = "content.halo.run/patched-content";
+
+    /** Annotation key used to store the patched raw content when a snapshot is restored for reading. */
     public static final String PATCHED_RAW_ANNO = "content.halo.run/patched-raw";
 
-    @Schema(requiredMode = REQUIRED)
+    /** Desired state of the snapshot, including the subject, content patches, and authorship information. */
+    @Schema(
+            requiredMode = REQUIRED,
+            description = "Desired state of the snapshot, including the subject, content patches, and authorship "
+                    + "information.")
     private SnapShotSpec spec;
 
     @Data
+    @Schema(description = "Content snapshot payload and metadata.")
     public static class SnapShotSpec {
 
-        @Schema(requiredMode = REQUIRED)
+        /** Reference to the content extension that owns this snapshot, such as a Post or SinglePage. */
+        @Schema(
+                requiredMode = REQUIRED,
+                description = "Reference to the content extension that owns this snapshot, such as a Post or "
+                        + "SinglePage.")
         private Ref subjectRef;
 
         /** such as: markdown | html | json | asciidoc | latex. */
-        @Schema(requiredMode = REQUIRED, minLength = 1, maxLength = 50)
+        @Schema(
+                requiredMode = REQUIRED,
+                minLength = 1,
+                maxLength = 50,
+                description = "Type of the raw source content, such as markdown, html, json, asciidoc, or latex.")
         private String rawType;
 
+        /** Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot. */
+        @Schema(
+                description = "Raw source content for a base snapshot, or a JSON Patch from the base raw content for "
+                        + "a derived snapshot.")
         private String rawPatch;
 
+        /**
+         * Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot.
+         */
+        @Schema(
+                description = "Rendered content for a base snapshot, or a JSON Patch from the base rendered content "
+                        + "for a derived snapshot.")
         private String contentPatch;
 
+        /** Parent snapshot name in the snapshot revision chain. */
+        @Schema(description = "Parent snapshot name in the snapshot revision chain.")
         private String parentSnapshotName;
 
+        /** Last time the snapshot content was modified. */
+        @Schema(description = "Last time the snapshot content was modified.")
         private Instant lastModifyTime;
 
-        @Schema(requiredMode = REQUIRED, minLength = 1)
+        /** Username of the snapshot owner. */
+        @Schema(requiredMode = REQUIRED, minLength = 1, description = "Username of the snapshot owner.")
         private String owner;
 
+        /** Usernames that contributed to this snapshot. */
+        @Schema(description = "Usernames that contributed to this snapshot.")
         private Set<String> contributors;
     }
 

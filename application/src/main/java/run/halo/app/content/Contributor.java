@@ -1,16 +1,23 @@
 package run.halo.app.content;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * Contributor from user.
+ * User summary used when displaying content authorship.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "User summary for a content owner or contributor.")
 @Data
 public class Contributor {
+    @Schema(description = "User display name.")
     private String displayName;
+
+    @Schema(description = "User avatar URL.")
     private String avatar;
+
+    @Schema(description = "User metadata name.")
     private String name;
 }

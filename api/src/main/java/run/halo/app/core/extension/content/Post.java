@@ -3,6 +3,7 @@ package run.halo.app.core.extension.content;
 import static java.lang.Boolean.parseBoolean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.Instant;
@@ -62,11 +63,16 @@ public class Post extends AbstractExtension {
     public static final String ARCHIVE_MONTH_LABEL = "content.halo.run/archive-month";
     public static final String ARCHIVE_DAY_LABEL = "content.halo.run/archive-day";
 
-    @Schema(requiredMode = RequiredMode.REQUIRED)
+    /** Desired state of the post, including content snapshots, publishing options, taxonomy, and theme hints. */
+    @Schema(
+            requiredMode = RequiredMode.REQUIRED,
+            description = "Desired state of the post, including content snapshots, publishing options, taxonomy, and "
+                    + "theme hints.")
     @Nullable
     private PostSpec spec;
 
-    @Schema
+    /** Observed state of the post, populated by reconcilers and other internal controllers. */
+    @Schema(description = "Observed state of the post, populated by reconcilers and other internal controllers.")
     @Nullable
     private PostStatus status;
 
@@ -103,78 +109,148 @@ public class Post extends AbstractExtension {
     }
 
     @Data
+    @Schema(description = "Desired content, publication, taxonomy, and rendering configuration of a post.")
     public static class PostSpec {
-        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
+        /** Display title of the post. */
+        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1, description = "Display title of the post.")
         private String title;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
+        /** URL slug used to build the post permalink. */
+        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1, description = "URL slug of the post.")
         private String slug;
 
-        /** 文章引用到的已发布的内容，用于主题端显示. */
+        /** Snapshot name selected as the released version for theme-side rendering after publishing. */
+        @Schema(
+                description =
+                        "Snapshot name selected as the released version for theme-side rendering after publishing.")
         private String releaseSnapshot;
 
+        /** Snapshot name of the latest draft content. */
+        @Schema(description = "Snapshot name of the latest draft content.")
         private String headSnapshot;
 
+        /** Base snapshot name used to apply snapshot patches. */
+        @Schema(description = "Base snapshot name used to apply snapshot patches.")
         private String baseSnapshot;
 
+        /** Username of the post owner. */
+        @Schema(description = "Username of the post owner.")
         private String owner;
 
+        /** Theme template used to render this post. */
+        @Schema(description = "Theme template used to render this post.")
         private String template;
 
+        /** Cover image URL or attachment URI of the post. */
+        @Schema(description = "Cover image URL or attachment URI of the post.")
         private String cover;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
+        /** Whether the post is logically deleted and should be treated as recycled. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "false",
+                description = "Whether the post is logically deleted and should be treated as recycled.")
         private Boolean deleted;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
+        /** Desired publish state; false keeps or moves the post to draft. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "false",
+                description = "Desired publish state. False keeps or moves the post to draft.")
         private Boolean publish;
 
+        /** Time when the post was published or is scheduled to be published. */
+        @Schema(description = "Time when the post was published or is scheduled to be published.")
         private Instant publishTime;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
+        /** Whether the post should be pinned ahead of normal post ordering. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "false",
+                description = "Whether the post should be pinned ahead of normal post ordering.")
         private Boolean pinned;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
+        /** Whether new comments are allowed for this post. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "true",
+                description = "Whether new comments are allowed for this post.")
         private Boolean allowComment;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED)
+        /** Visibility of the post in theme-side queries; only PUBLIC content is returned to anonymous visitors. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                description = "Visibility of the post in theme-side queries. Only PUBLIC content is returned to "
+                        + "anonymous visitors.")
         private VisibleEnum visible;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "0")
+        /** Sorting priority; larger values are ordered ahead by consumers that sort by priority. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "0",
+                description = "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.")
         private Integer priority;
 
-        @Schema(requiredMode = RequiredMode.REQUIRED)
+        /** Excerpt configuration for the post. */
+        @Schema(requiredMode = RequiredMode.REQUIRED, description = "Excerpt configuration for the post.")
         private Excerpt excerpt;
 
+        /** Category extension names associated with the post. */
+        @Schema(description = "Category extension names associated with the post.")
         private List<String> categories;
 
+        /** Tag extension names associated with the post. */
+        @Schema(description = "Tag extension names associated with the post.")
         private List<String> tags;
 
+        /** HTML meta tag attribute maps injected into the post template head. */
+        @Schema(description = "HTML meta tag attribute maps injected into the post template head.")
         private List<Map<String, String>> htmlMetas;
     }
 
     @Data
+    @Schema(description = "Observed state of a content item.")
     public static class PostStatus {
+        /** Current publishing phase of the content item. */
+        @Schema(
+                description = "Current publishing phase of the content item, such as DRAFT, PENDING_APPROVAL, "
+                        + "PUBLISHED, or FAILED.")
         private String phase;
 
-        @Schema
+        /** Latest reconciliation conditions for the content item. */
+        @ArraySchema(arraySchema = @Schema(description = "Latest reconciliation conditions for the content item."))
         private ConditionList conditions;
 
+        /** Absolute permalink calculated from the content permalink policy. */
+        @Schema(description = "Absolute permalink calculated from the content permalink policy.")
         private String permalink;
 
+        /** Excerpt text resolved from the content excerpt configuration. */
+        @Schema(description = "Excerpt text resolved from the content excerpt configuration.")
         private String excerpt;
 
+        /** Whether the latest draft snapshot differs from the released snapshot. */
+        @Schema(description = "Whether the latest draft snapshot differs from the released snapshot.")
         private Boolean inProgress;
 
+        /** Total number of comments associated with the content item. */
+        @Schema(description = "Total number of comments associated with the content item.")
         private Integer commentsCount;
 
+        /** Usernames that contributed to the content snapshots. */
+        @Schema(description = "Usernames that contributed to the content snapshots.")
         private List<String> contributors;
 
-        /** see {@link Category.CategorySpec#isHideFromList()}. */
+        /** Mirrors {@link Category.CategorySpec#isHideFromList()} for any associated category. */
+        @Schema(description = "Whether any associated category hides the content item from theme-side lists.")
         private Boolean hideFromList;
 
+        /** Last modification time of the released snapshot. */
+        @Schema(description = "Last modification time of the released snapshot.")
         private Instant lastModifyTime;
 
+        /** Metadata version observed by the last successful reconciliation. */
+        @Schema(description = "Metadata version observed by the last successful reconciliation.")
         private Long observedVersion;
 
         @JsonIgnore
@@ -187,14 +263,22 @@ public class Post extends AbstractExtension {
     }
 
     @Data
+    @Schema(description = "Excerpt generation configuration.")
     public static class Excerpt {
 
-        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
+        /** Whether Halo should generate the excerpt from the released content automatically. */
+        @Schema(
+                requiredMode = RequiredMode.REQUIRED,
+                defaultValue = "true",
+                description = "Whether Halo should generate the excerpt from the released content automatically.")
         private Boolean autoGenerate;
 
+        /** Manual excerpt text used when auto generation is disabled. */
+        @Schema(description = "Manual excerpt text used when auto generation is disabled.")
         private String raw;
     }
 
+    /** Publishing phase calculated for a post. */
     public enum PostPhase {
         DRAFT,
         PENDING_APPROVAL,
@@ -217,9 +301,13 @@ public class Post extends AbstractExtension {
         }
     }
 
+    /** Visibility options used by theme-side content queries. */
     public enum VisibleEnum {
+        /** Eligible for public theme-side listings and routing. */
         PUBLIC,
+        /** Non-public visibility value for internal or caller-specific access rules. */
         INTERNAL,
+        /** Non-public visibility value intended for owner-only content. */
         PRIVATE;
 
         /**

@@ -29,7 +29,7 @@ public class ReplyQuery extends SortableRequest {
         super(exchange);
     }
 
-    @Schema(description = "Replies filtered by commentName.")
+    @Schema(description = "Metadata name of the comment whose replies should be listed.")
     public String getCommentName() {
         String commentName = queryParams.getFirst("commentName");
         if (StringUtils.isBlank(commentName)) {
@@ -56,7 +56,7 @@ public class ReplyQuery extends SortableRequest {
         builder.parameter(parameterBuilder()
                 .in(ParameterIn.QUERY)
                 .name("commentName")
-                .description("Replies filtered by commentName.")
+                .description("Metadata name of the comment whose replies should be listed.")
                 .implementation(String.class)
                 .required(true));
     }

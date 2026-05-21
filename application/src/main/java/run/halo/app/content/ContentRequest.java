@@ -12,17 +12,33 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 
 /**
+ * Internal content request used by content services to create or update snapshots.
+ *
  * @author guqing
  * @since 2.0.0
  */
 @Builder
+@Schema(description = "Snapshot content request used when Halo creates or updates content snapshots.")
 public record ContentRequest(
-        @Schema(requiredMode = REQUIRED) Ref subjectRef,
+        @Schema(description = "Reference to the post or single page that owns the content.", requiredMode = REQUIRED)
+        Ref subjectRef,
+
+        @Schema(description = "Current head snapshot name used as the update target.")
         String headSnapshotName,
-        @Schema(requiredMode = NOT_REQUIRED) Long version,
-        @Schema(requiredMode = REQUIRED) String raw,
-        @Schema(requiredMode = REQUIRED) String content,
-        @Schema(requiredMode = REQUIRED) String rawType) {
+
+        @Schema(description = "Expected metadata version of the current head snapshot.", requiredMode = NOT_REQUIRED)
+        Long version,
+
+        @Schema(description = "Source text stored by the editor.", requiredMode = REQUIRED)
+        String raw,
+
+        @Schema(description = "Rendered HTML or normalized content derived from raw.", requiredMode = REQUIRED)
+        String content,
+
+        @Schema(
+                description = "Editor/source format of the raw content, for example HTML or Markdown.",
+                requiredMode = REQUIRED)
+        String rawType) {
 
     public Snapshot toSnapshot() {
         final Snapshot snapshot = new Snapshot();

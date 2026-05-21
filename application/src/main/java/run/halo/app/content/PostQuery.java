@@ -93,19 +93,21 @@ public class PostQuery extends SortableRequest {
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("publishPhase")
-                        .description("Posts filtered by publish phase.")
+                        .description("Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, "
+                                + "PENDING_APPROVAL, PUBLISHED, or FAILED.")
                         .implementation(Post.PostPhase.class)
                         .required(false))
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("keyword")
-                        .description("Posts filtered by keyword.")
+                        .description("Keyword used to match post title, slug, or excerpt.")
                         .implementation(String.class)
                         .required(false))
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("categoryWithChildren")
-                        .description("Posts filtered by category including sub-categories.")
+                        .description("Category metadata name used to include posts in that category and its child "
+                                + "categories.")
                         .implementation(String.class)
                         .required(false));
     }

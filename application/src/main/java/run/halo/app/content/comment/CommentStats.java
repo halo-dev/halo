@@ -1,18 +1,21 @@
 package run.halo.app.content.comment;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 
 /**
- * comment stats value object.
+ * Aggregated counters for a comment or reply.
  *
  * @author LIlGG
  * @since 2.0.0
  */
+@Schema(description = "Aggregated counters for a comment or reply.")
 @Value
 @Builder
 public class CommentStats {
 
+    @Schema(description = "Total upvote count.")
     Integer upvote;
 
     public static CommentStats empty() {

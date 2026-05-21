@@ -11,30 +11,31 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 
 /**
- * An aggregate object of {@link Post} and {@link Category} and {@link Tag} and more for post list.
+ * Aggregate object returned by the console post list API.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Post list item with resolved categories, tags, contributors, owner, and counters.")
 @Data
 @Accessors(chain = true)
 public class ListedPost {
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Post extension data.", requiredMode = REQUIRED)
     private Post post;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved categories referenced by the post spec.", requiredMode = REQUIRED)
     private List<Category> categories;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved tags referenced by the post spec.", requiredMode = REQUIRED)
     private List<Tag> tags;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Users that have contributed to the post content snapshots.", requiredMode = REQUIRED)
     private List<Contributor> contributors;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved owner of the post.", requiredMode = REQUIRED)
     private Contributor owner;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Aggregated visit, upvote, and comment counters for the post.", requiredMode = REQUIRED)
     private Stats stats;
 }

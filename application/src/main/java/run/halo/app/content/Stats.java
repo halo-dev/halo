@@ -1,23 +1,29 @@
 package run.halo.app.content;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
 /**
- * Stats value object.
+ * Aggregated counters for content resources.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Aggregated visit, upvote, and comment counters for a content resource.")
 @Data
 public class Stats {
 
+    @Schema(description = "Total visit count.")
     private Integer visit;
 
+    @Schema(description = "Total upvote count.")
     private Integer upvote;
 
+    @Schema(description = "Total comment count, including comments that may not be approved.")
     private Integer totalComment;
 
+    @Schema(description = "Total approved comment count.")
     private Integer approvedComment;
 
     public Stats() {}

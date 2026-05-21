@@ -11,6 +11,8 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
+ * Reply extension that belongs to a top-level {@link Comment}.
+ *
  * @author guqing
  * @see <a href="https://github.com/halo-dev/halo/issues/2322">issue#2322</a>
  * @since 2.0.0
@@ -25,25 +27,36 @@ public class Reply extends AbstractExtension {
 
     public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
 
-    @Schema(requiredMode = REQUIRED)
+    /** Desired state of the reply, including the parent comment, optional quoted reply, owner, and body. */
+    @Schema(
+            requiredMode = REQUIRED,
+            description = "Desired state of the reply, including the parent comment, optional quoted reply, owner, and "
+                    + "body.")
     private ReplySpec spec;
 
-    @Schema(requiredMode = REQUIRED)
+    /** Observed state of the reply. */
+    @Schema(requiredMode = REQUIRED, description = "Observed state of the reply.")
     private Status status = new Status();
 
     @Data
     @EqualsAndHashCode(callSuper = true)
+    @Schema(description = "Desired state of a reply.")
     public static class ReplySpec extends Comment.BaseCommentSpec {
 
-        @Schema(requiredMode = REQUIRED, minLength = 1)
+        /** Metadata name of the parent comment. */
+        @Schema(requiredMode = REQUIRED, minLength = 1, description = "Metadata name of the parent comment.")
         private String commentName;
 
+        /** Metadata name of the reply being quoted, when this reply is addressed to another reply. */
+        @Schema(description = "Metadata name of the reply being quoted, when this reply is addressed to another reply.")
         private String quoteReply;
     }
 
     @Data
-    @Schema(name = "ReplyStatus")
+    @Schema(name = "ReplyStatus", description = "Observed state of a reply.")
     public static class Status {
+        /** Metadata version observed by the last successful reconciliation. */
+        @Schema(description = "Metadata version observed by the last successful reconciliation.")
         private Long observedVersion;
     }
 

@@ -8,21 +8,22 @@ import lombok.Data;
 import run.halo.app.core.extension.content.Reply;
 
 /**
- * Listed reply for {@link Reply}.
+ * Reply list item returned by the console reply API.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Reply list item with resolved owner and counters.")
 @Data
 @Builder
 public class ListedReply {
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Reply extension data.", requiredMode = REQUIRED)
     private Reply reply;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved owner information for display.", requiredMode = REQUIRED)
     private OwnerInfo owner;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Aggregated counters for the reply.", requiredMode = REQUIRED)
     private CommentStats stats;
 }
