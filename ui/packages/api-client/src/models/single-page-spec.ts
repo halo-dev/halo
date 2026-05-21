@@ -17,26 +17,74 @@
 // @ts-ignore
 import type { Excerpt } from './excerpt';
 
+/**
+ * Desired content, publication, and rendering configuration of a single page.
+ */
 export interface SinglePageSpec {
+    /**
+     * Whether new comments are allowed for this single page.
+     */
     'allowComment': boolean;
+    /**
+     * Base snapshot name used to apply snapshot patches.
+     */
     'baseSnapshot'?: string;
+    /**
+     * Cover image URL or attachment URI of the single page.
+     */
     'cover'?: string;
+    /**
+     * Whether the single page is logically deleted and should be treated as recycled.
+     */
     'deleted': boolean;
     'excerpt': Excerpt;
+    /**
+     * Snapshot name of the latest draft content.
+     */
     'headSnapshot'?: string;
+    /**
+     * HTML meta tag attribute maps injected into the single page template head.
+     */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
+    /**
+     * Username of the single page owner.
+     */
     'owner'?: string;
+    /**
+     * Whether the single page should be pinned ahead of normal page ordering.
+     */
     'pinned': boolean;
+    /**
+     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     */
     'priority': number;
+    /**
+     * Desired publish state. False keeps or moves the single page to draft.
+     */
     'publish': boolean;
+    /**
+     * Time when the single page was published or is scheduled to be published.
+     */
     'publishTime'?: string;
     /**
-     * 引用到的已发布的内容，用于主题端显示.
+     * Snapshot name selected as the released version for theme-side rendering after publishing.
      */
     'releaseSnapshot'?: string;
+    /**
+     * URL slug of the single page.
+     */
     'slug': string;
+    /**
+     * Theme template used to render this single page.
+     */
     'template'?: string;
+    /**
+     * Display title of the single page.
+     */
     'title': string;
+    /**
+     * Visibility of the single page in theme-side queries. Only PUBLIC content is returned to anonymous visitors.
+     */
     'visible': SinglePageSpecVisibleEnum;
 }
 

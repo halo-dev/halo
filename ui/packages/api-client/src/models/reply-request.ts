@@ -18,14 +18,29 @@
 import type { CommentEmailOwner } from './comment-email-owner';
 
 /**
- * A request parameter object for {@link Reply Reply}.
+ * Reply creation payload for console comment APIs.
  */
 export interface ReplyRequest {
+    /**
+     * Whether to subscribe the owner to notifications for future replies.
+     */
     'allowNotification'?: boolean;
+    /**
+     * Rendered HTML content for the reply. Unsafe HTML is rejected.
+     */
     'content': string;
+    /**
+     * Whether the reply should be hidden from normal display.
+     */
     'hidden'?: boolean;
     'owner'?: CommentEmailOwner;
+    /**
+     * Metadata name of the reply being quoted, if this reply quotes another reply.
+     */
     'quoteReply'?: string;
+    /**
+     * Original reply text submitted by the editor.
+     */
     'raw': string;
 }
 

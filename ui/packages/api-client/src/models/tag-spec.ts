@@ -14,14 +14,29 @@
 
 
 
+/**
+ * Desired display and rendering configuration of a tag.
+ */
 export interface TagSpec {
     /**
-     * Color regex explanation.   <pre>  ^                 # start of the line  #                 # start with a number sign `#`  (                 # start of (group 1)    [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6    |               # or    [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3  )                 # end of (group 1)  $                 # end of the line  </pre>
+     * Display color of the tag in 3- or 6-digit hex notation.
      */
     'color'?: string;
+    /**
+     * Cover image URL or attachment URI of the tag.
+     */
     'cover'?: string;
+    /**
+     * Human-readable description of the tag.
+     */
     'description'?: string;
+    /**
+     * Display name of the tag.
+     */
     'displayName': string;
+    /**
+     * URL slug of the tag.
+     */
     'slug': string;
 }
 

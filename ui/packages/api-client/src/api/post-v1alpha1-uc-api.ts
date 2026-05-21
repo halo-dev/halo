@@ -33,12 +33,14 @@ import type { Snapshot } from '../models';
 export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create my post. If you want to create a post with content, please set  annotation: \"content.halo.run/content-json\" into annotations and refer  to Content for corresponding data type. 
-         * @param {Post} [post] 
+         * Create a draft post for the current user. To create it with initial content, put JSON-serialized Content into metadata.annotations[\'content.halo.run/content-json\'].
+         * @param {Post} post Post extension to create. The server assigns spec.owner from the current user and consumes the content-json annotation as initial content when present.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyPost: async (post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createMyPost: async (post: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'post' is not null or undefined
+            assertParamExists('createMyPost', 'post', post)
             const localVarPath = `/apis/uc.api.content.halo.run/v1alpha1/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -74,8 +76,8 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Get post that belongs to the current user.
-         * @param {string} name Post name
+         * Get a post owned by the current user by metadata name.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -115,9 +117,9 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Get my post draft.
-         * @param {string} name Post name
-         * @param {boolean} [patched] Should include patched content and raw or not.
+         * Get the editable draft snapshot of a post owned by the current user.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {boolean} [patched] Whether to return the head snapshot patched against the base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -161,15 +163,15 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * List posts owned by the current user.
+         * List posts owned by the current user with pagination, sorting, keyword, publish phase, and category filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {ListMyPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
-         * @param {string} [keyword] Posts filtered by keyword.
-         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
+         * @param {ListMyPostsPublishPhaseEnum} [publishPhase] Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {string} [keyword] Keyword used to match post title, slug, or excerpt.
+         * @param {string} [categoryWithChildren] Category metadata name used to include posts in that category and its child categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -238,8 +240,8 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Publish my post.
-         * @param {string} name Post name
+         * Publish a post owned by the current user from its current head snapshot.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -279,8 +281,8 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Move my post to recycle bin.
-         * @param {string} name Post name
+         * Move a post owned by the current user to the recycle bin.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -320,8 +322,8 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Unpublish my post.
-         * @param {string} name Post name
+         * Unpublish a post owned by the current user so it is no longer served as published content.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -361,15 +363,17 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Update my post.
-         * @param {string} name Post name
-         * @param {Post} [post] 
+         * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {Post} post Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateMyPost: async (name: string, post?: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateMyPost: async (name: string, post: Post, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('updateMyPost', 'name', name)
+            // verify required parameter 'post' is not null or undefined
+            assertParamExists('updateMyPost', 'post', post)
             const localVarPath = `/apis/uc.api.content.halo.run/v1alpha1/posts/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -406,15 +410,17 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Update draft of my post. Please make sure set annotation: \"content.halo.run/content-json\" into annotations and refer to Content for corresponding data type. 
-         * @param {string} name Post name
-         * @param {Snapshot} [snapshot] 
+         * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {Snapshot} snapshot Snapshot payload carrying JSON-serialized Content in metadata.annotations[\&#39;content.halo.run/content-json\&#39;].
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateMyPostDraft: async (name: string, snapshot?: Snapshot, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateMyPostDraft: async (name: string, snapshot: Snapshot, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('updateMyPostDraft', 'name', name)
+            // verify required parameter 'snapshot' is not null or undefined
+            assertParamExists('updateMyPostDraft', 'snapshot', snapshot)
             const localVarPath = `/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/draft`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -460,20 +466,20 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1UcApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create my post. If you want to create a post with content, please set  annotation: \"content.halo.run/content-json\" into annotations and refer  to Content for corresponding data type. 
-         * @param {Post} [post] 
+         * Create a draft post for the current user. To create it with initial content, put JSON-serialized Content into metadata.annotations[\'content.halo.run/content-json\'].
+         * @param {Post} post Post extension to create. The server assigns spec.owner from the current user and consumes the content-json annotation as initial content when present.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyPost(post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+        async createMyPost(post: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyPost(post, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1UcApi.createMyPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get post that belongs to the current user.
-         * @param {string} name Post name
+         * Get a post owned by the current user by metadata name.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -484,9 +490,9 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get my post draft.
-         * @param {string} name Post name
-         * @param {boolean} [patched] Should include patched content and raw or not.
+         * Get the editable draft snapshot of a post owned by the current user.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {boolean} [patched] Whether to return the head snapshot patched against the base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -497,15 +503,15 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List posts owned by the current user.
+         * List posts owned by the current user with pagination, sorting, keyword, publish phase, and category filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {ListMyPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
-         * @param {string} [keyword] Posts filtered by keyword.
-         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
+         * @param {ListMyPostsPublishPhaseEnum} [publishPhase] Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {string} [keyword] Keyword used to match post title, slug, or excerpt.
+         * @param {string} [categoryWithChildren] Category metadata name used to include posts in that category and its child categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -516,8 +522,8 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Publish my post.
-         * @param {string} name Post name
+         * Publish a post owned by the current user from its current head snapshot.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -528,8 +534,8 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Move my post to recycle bin.
-         * @param {string} name Post name
+         * Move a post owned by the current user to the recycle bin.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -540,8 +546,8 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Unpublish my post.
-         * @param {string} name Post name
+         * Unpublish a post owned by the current user so it is no longer served as published content.
+         * @param {string} name Metadata name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -552,26 +558,26 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update my post.
-         * @param {string} name Post name
-         * @param {Post} [post] 
+         * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {Post} post Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateMyPost(name: string, post?: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+        async updateMyPost(name: string, post: Post, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateMyPost(name, post, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1UcApi.updateMyPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update draft of my post. Please make sure set annotation: \"content.halo.run/content-json\" into annotations and refer to Content for corresponding data type. 
-         * @param {string} name Post name
-         * @param {Snapshot} [snapshot] 
+         * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
+         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {Snapshot} snapshot Snapshot payload carrying JSON-serialized Content in metadata.annotations[\&#39;content.halo.run/content-json\&#39;].
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateMyPostDraft(name: string, snapshot?: Snapshot, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Snapshot>> {
+        async updateMyPostDraft(name: string, snapshot: Snapshot, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Snapshot>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateMyPostDraft(name, snapshot, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PostV1alpha1UcApi.updateMyPostDraft']?.[localVarOperationServerIndex]?.url;
@@ -587,16 +593,16 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
     const localVarFp = PostV1alpha1UcApiFp(configuration)
     return {
         /**
-         * Create my post. If you want to create a post with content, please set  annotation: \"content.halo.run/content-json\" into annotations and refer  to Content for corresponding data type. 
+         * Create a draft post for the current user. To create it with initial content, put JSON-serialized Content into metadata.annotations[\'content.halo.run/content-json\'].
          * @param {PostV1alpha1UcApiCreateMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyPost(requestParameters: PostV1alpha1UcApiCreateMyPostRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+        createMyPost(requestParameters: PostV1alpha1UcApiCreateMyPostRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
             return localVarFp.createMyPost(requestParameters.post, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get post that belongs to the current user.
+         * Get a post owned by the current user by metadata name.
          * @param {PostV1alpha1UcApiGetMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -605,7 +611,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.getMyPost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get my post draft.
+         * Get the editable draft snapshot of a post owned by the current user.
          * @param {PostV1alpha1UcApiGetMyPostDraftRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -614,7 +620,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.getMyPostDraft(requestParameters.name, requestParameters.patched, options).then((request) => request(axios, basePath));
         },
         /**
-         * List posts owned by the current user.
+         * List posts owned by the current user with pagination, sorting, keyword, publish phase, and category filters.
          * @param {PostV1alpha1UcApiListMyPostsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -623,7 +629,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.listMyPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(axios, basePath));
         },
         /**
-         * Publish my post.
+         * Publish a post owned by the current user from its current head snapshot.
          * @param {PostV1alpha1UcApiPublishMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -632,7 +638,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.publishMyPost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Move my post to recycle bin.
+         * Move a post owned by the current user to the recycle bin.
          * @param {PostV1alpha1UcApiRecycleMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -641,7 +647,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.recycleMyPost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Unpublish my post.
+         * Unpublish a post owned by the current user so it is no longer served as published content.
          * @param {PostV1alpha1UcApiUnpublishMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -650,7 +656,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.unpublishMyPost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update my post.
+         * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
          * @param {PostV1alpha1UcApiUpdateMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -659,7 +665,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.updateMyPost(requestParameters.name, requestParameters.post, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update draft of my post. Please make sure set annotation: \"content.halo.run/content-json\" into annotations and refer to Content for corresponding data type. 
+         * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
          * @param {PostV1alpha1UcApiUpdateMyPostDraftRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -674,7 +680,10 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
  * Request parameters for createMyPost operation in PostV1alpha1UcApi.
  */
 export interface PostV1alpha1UcApiCreateMyPostRequest {
-    readonly post?: Post
+    /**
+     * Post extension to create. The server assigns spec.owner from the current user and consumes the content-json annotation as initial content when present.
+     */
+    readonly post: Post
 }
 
 /**
@@ -682,7 +691,7 @@ export interface PostV1alpha1UcApiCreateMyPostRequest {
  */
 export interface PostV1alpha1UcApiGetMyPostRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -692,12 +701,12 @@ export interface PostV1alpha1UcApiGetMyPostRequest {
  */
 export interface PostV1alpha1UcApiGetMyPostDraftRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 
     /**
-     * Should include patched content and raw or not.
+     * Whether to return the head snapshot patched against the base snapshot. Defaults to false.
      */
     readonly patched?: boolean
 }
@@ -732,17 +741,17 @@ export interface PostV1alpha1UcApiListMyPostsRequest {
     readonly sort?: Array<string>
 
     /**
-     * Posts filtered by publish phase.
+     * Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
      */
     readonly publishPhase?: ListMyPostsPublishPhaseEnum
 
     /**
-     * Posts filtered by keyword.
+     * Keyword used to match post title, slug, or excerpt.
      */
     readonly keyword?: string
 
     /**
-     * Posts filtered by category including sub-categories.
+     * Category metadata name used to include posts in that category and its child categories.
      */
     readonly categoryWithChildren?: string
 }
@@ -752,7 +761,7 @@ export interface PostV1alpha1UcApiListMyPostsRequest {
  */
 export interface PostV1alpha1UcApiPublishMyPostRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -762,7 +771,7 @@ export interface PostV1alpha1UcApiPublishMyPostRequest {
  */
 export interface PostV1alpha1UcApiRecycleMyPostRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -772,7 +781,7 @@ export interface PostV1alpha1UcApiRecycleMyPostRequest {
  */
 export interface PostV1alpha1UcApiUnpublishMyPostRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -782,11 +791,14 @@ export interface PostV1alpha1UcApiUnpublishMyPostRequest {
  */
 export interface PostV1alpha1UcApiUpdateMyPostRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 
-    readonly post?: Post
+    /**
+     * Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.
+     */
+    readonly post: Post
 }
 
 /**
@@ -794,11 +806,14 @@ export interface PostV1alpha1UcApiUpdateMyPostRequest {
  */
 export interface PostV1alpha1UcApiUpdateMyPostDraftRequest {
     /**
-     * Post name
+     * Metadata name of a post owned by the current user.
      */
     readonly name: string
 
-    readonly snapshot?: Snapshot
+    /**
+     * Snapshot payload carrying JSON-serialized Content in metadata.annotations[\&#39;content.halo.run/content-json\&#39;].
+     */
+    readonly snapshot: Snapshot
 }
 
 /**
@@ -806,17 +821,17 @@ export interface PostV1alpha1UcApiUpdateMyPostDraftRequest {
  */
 export class PostV1alpha1UcApi extends BaseAPI {
     /**
-     * Create my post. If you want to create a post with content, please set  annotation: \"content.halo.run/content-json\" into annotations and refer  to Content for corresponding data type. 
+     * Create a draft post for the current user. To create it with initial content, put JSON-serialized Content into metadata.annotations[\'content.halo.run/content-json\'].
      * @param {PostV1alpha1UcApiCreateMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public createMyPost(requestParameters: PostV1alpha1UcApiCreateMyPostRequest = {}, options?: RawAxiosRequestConfig) {
+    public createMyPost(requestParameters: PostV1alpha1UcApiCreateMyPostRequest, options?: RawAxiosRequestConfig) {
         return PostV1alpha1UcApiFp(this.configuration).createMyPost(requestParameters.post, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Get post that belongs to the current user.
+     * Get a post owned by the current user by metadata name.
      * @param {PostV1alpha1UcApiGetMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -826,7 +841,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Get my post draft.
+     * Get the editable draft snapshot of a post owned by the current user.
      * @param {PostV1alpha1UcApiGetMyPostDraftRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -836,7 +851,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * List posts owned by the current user.
+     * List posts owned by the current user with pagination, sorting, keyword, publish phase, and category filters.
      * @param {PostV1alpha1UcApiListMyPostsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -846,7 +861,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Publish my post.
+     * Publish a post owned by the current user from its current head snapshot.
      * @param {PostV1alpha1UcApiPublishMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -856,7 +871,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Move my post to recycle bin.
+     * Move a post owned by the current user to the recycle bin.
      * @param {PostV1alpha1UcApiRecycleMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -866,7 +881,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Unpublish my post.
+     * Unpublish a post owned by the current user so it is no longer served as published content.
      * @param {PostV1alpha1UcApiUnpublishMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -876,7 +891,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Update my post.
+     * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
      * @param {PostV1alpha1UcApiUpdateMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -886,7 +901,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Update draft of my post. Please make sure set annotation: \"content.halo.run/content-json\" into annotations and refer to Content for corresponding data type. 
+     * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
      * @param {PostV1alpha1UcApiUpdateMyPostDraftRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Content update payload for post and single page editors.
+ */
 export interface ContentUpdateParam {
+    /**
+     * Rendered HTML or normalized content derived from raw.
+     */
     'content': string;
+    /**
+     * Source text stored by the editor.
+     */
     'raw': string;
+    /**
+     * Editor/source format of the raw content, for example HTML or Markdown.
+     */
     'rawType': string;
+    /**
+     * Expected metadata version of the current head snapshot. If it conflicts with the latest snapshot version, Halo creates a new head snapshot instead of overwriting it.
+     */
     'version'?: number;
 }
 

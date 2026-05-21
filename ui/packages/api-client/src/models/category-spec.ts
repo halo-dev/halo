@@ -14,25 +14,49 @@
 
 
 
+/**
+ * Desired display, hierarchy, and rendering configuration of a category.
+ */
 export interface CategorySpec {
+    /**
+     * Child category extension names.
+     */
     'children'?: Array<string>;
+    /**
+     * Cover image URL or attachment URI of the category.
+     */
     'cover'?: string;
+    /**
+     * Human-readable description of the category.
+     */
     'description'?: string;
+    /**
+     * Display name of the category.
+     */
     'displayName': string;
     /**
-     * Whether to hide the category from the category list.   <p>When set to true, the category including its subcategories and related posts will not be displayed in the  category list, but it can still be accessed by permalink.   <p>Limitation: It only takes effect on the theme-side categorized list and it only allows to be set to true  on the first level(root node) of categories.
+     * Whether this category tree and its posts should be hidden from theme-side lists.
      */
     'hideFromList'?: boolean;
     /**
-     * Used to specify the template for the posts associated with the category.   <p>The priority is not as high as that of the post.   <p>If the post also specifies a template, the post\'s template will prevail.
+     * Theme template used to render posts associated with this category when the post does not specify its own template.
      */
     'postTemplate'?: string;
     /**
-     * if a category is queried for related posts, the default behavior is to query all posts under the category  including its subcategories, but if this field is set to true, cascade query behavior will be terminated  here.   <p>For example, if a category has subcategories A and B, and A has subcategories C and D and C marked this  field as true, when querying posts under A category,all posts under A and B will be queried, but C and D will  not be queried.
+     * Whether ancestor category post queries should stop cascading into this category\'s children.
      */
     'preventParentPostCascadeQuery'?: boolean;
+    /**
+     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     */
     'priority': number;
+    /**
+     * URL slug of the category.
+     */
     'slug': string;
+    /**
+     * Theme template used to render the category archive page.
+     */
     'template'?: string;
 }
 

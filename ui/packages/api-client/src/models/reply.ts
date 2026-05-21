@@ -23,6 +23,9 @@ import type { ReplySpec } from './reply-spec';
 // @ts-ignore
 import type { ReplyStatus } from './reply-status';
 
+/**
+ * Reply extension that belongs to a top-level {@link Comment Comment}.
+ */
 export interface Reply {
     'apiVersion': string;
     'kind': string;

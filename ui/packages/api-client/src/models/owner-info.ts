@@ -15,13 +15,28 @@
 
 
 /**
- * Comment owner info.
+ * Resolved owner summary for a comment or reply.
  */
 export interface OwnerInfo {
+    /**
+     * Owner avatar URL.
+     */
     'avatar'?: string;
+    /**
+     * Owner display name.
+     */
     'displayName'?: string;
+    /**
+     * Owner email address when available.
+     */
     'email'?: string;
+    /**
+     * Owner kind, such as User or email.
+     */
     'kind'?: string;
+    /**
+     * Owner name. For Halo users, this is the user metadata name.
+     */
     'name'?: string;
 }
 

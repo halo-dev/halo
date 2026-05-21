@@ -14,12 +14,33 @@
 
 
 
+/**
+ * Observed state of a comment.
+ */
 export interface CommentStatus {
+    /**
+     * Whether unreadReplyCount is greater than zero.
+     */
     'hasNewReply'?: boolean;
+    /**
+     * Creation time of the latest reply under this comment.
+     */
     'lastReplyTime'?: string;
+    /**
+     * Metadata version observed by the last successful reconciliation.
+     */
     'observedVersion'?: number;
+    /**
+     * Total number of replies under this comment.
+     */
     'replyCount'?: number;
+    /**
+     * Number of replies created after spec.lastReadTime.
+     */
     'unreadReplyCount'?: number;
+    /**
+     * Total number of approved and non-hidden replies under this comment.
+     */
     'visibleReplyCount'?: number;
 }
 

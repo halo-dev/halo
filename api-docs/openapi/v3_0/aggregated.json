@@ -2398,7 +2398,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/comments": {
       "get": {
-        "description": "List comments.",
+        "description": "List comments with pagination, sorting, keyword, and commenter filters.",
         "operationId": "ListComments",
         "parameters": [
           {
@@ -2453,7 +2453,7 @@
             }
           },
           {
-            "description": "Comments filtered by keyword.",
+            "description": "Keyword used to match the raw comment text.",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -2461,7 +2461,7 @@
             }
           },
           {
-            "description": "Commenter kind.",
+            "description": "Kind of the commenter identity. Defaults to User when ownerName is provided.",
             "in": "query",
             "name": "ownerKind",
             "schema": {
@@ -2469,7 +2469,7 @@
             }
           },
           {
-            "description": "Commenter name.",
+            "description": "Name of the commenter identity to filter by.",
             "in": "query",
             "name": "ownerName",
             "schema": {
@@ -2494,7 +2494,7 @@
         ]
       },
       "post": {
-        "description": "Create a comment.",
+        "description": "Create a comment for a subject. Console-created comments are created through the comment service with request IP and user agent captured.",
         "operationId": "CreateComment",
         "requestBody": {
           "content": {
@@ -2525,10 +2525,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/comments/{name}/reply": {
       "post": {
-        "description": "Create a reply.",
+        "description": "Create an approved reply under an existing comment.",
         "operationId": "CreateReply",
         "parameters": [
           {
+            "description": "Metadata name of the comment to reply to.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3105,7 +3106,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts": {
       "get": {
-        "description": "List posts.",
+        "description": "List posts with pagination, sorting, keyword, publish phase, and category filters.",
         "operationId": "ListPosts",
         "parameters": [
           {
@@ -3160,7 +3161,7 @@
             }
           },
           {
-            "description": "Posts filtered by publish phase.",
+            "description": "Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.",
             "in": "query",
             "name": "publishPhase",
             "schema": {
@@ -3174,7 +3175,7 @@
             }
           },
           {
-            "description": "Posts filtered by keyword.",
+            "description": "Keyword used to match post title, slug, or excerpt.",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -3182,7 +3183,7 @@
             }
           },
           {
-            "description": "Posts filtered by category including sub-categories.",
+            "description": "Category metadata name used to include posts in that category and its child categories.",
             "in": "query",
             "name": "categoryWithChildren",
             "schema": {
@@ -3207,7 +3208,7 @@
         ]
       },
       "post": {
-        "description": "Draft a post.",
+        "description": "Create a draft post together with its initial content.",
         "operationId": "DraftPost",
         "requestBody": {
           "content": {
@@ -3238,10 +3239,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}": {
       "put": {
-        "description": "Update a post.",
+        "description": "Update post metadata, spec, and content in one request.",
         "operationId": "UpdateDraftPost",
         "parameters": [
           {
+            "description": "Metadata name of the post to update.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3279,10 +3281,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/content": {
       "delete": {
-        "description": "Delete a content for post.",
+        "description": "Delete a content snapshot from a post and return the deleted content.",
         "operationId": "deletePostContent",
         "parameters": [
           {
+            "description": "Metadata name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3291,6 +3294,7 @@
             }
           },
           {
+            "description": "Name of the content snapshot to delete.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -3316,10 +3320,11 @@
         ]
       },
       "get": {
-        "description": "Fetch content of post.",
+        "description": "Fetch a post content snapshot reconstructed from its base snapshot.",
         "operationId": "fetchPostContent",
         "parameters": [
           {
+            "description": "Metadata name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3328,6 +3333,7 @@
             }
           },
           {
+            "description": "Name of the content snapshot to fetch.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -3353,10 +3359,11 @@
         ]
       },
       "put": {
-        "description": "Update a post\u0027s content.",
+        "description": "Update only the content of an existing post.",
         "operationId": "UpdatePostContent",
         "parameters": [
           {
+            "description": "Metadata name of the post whose content will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3394,10 +3401,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/head-content": {
       "get": {
-        "description": "Fetch head content of post.",
+        "description": "Fetch the editable head content of a post.",
         "operationId": "fetchPostHeadContent",
         "parameters": [
           {
+            "description": "Metadata name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3425,10 +3433,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/publish": {
       "put": {
-        "description": "Publish a post.",
+        "description": "Publish a post. By default, the request waits until the release snapshot is available.",
         "operationId": "PublishPost",
         "parameters": [
           {
+            "description": "Metadata name of the post to publish.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3437,7 +3446,7 @@
             }
           },
           {
-            "description": "Head snapshot name of content.",
+            "description": "Snapshot name to publish. Defaults to the current base snapshot when no head snapshot exists.",
             "in": "query",
             "name": "headSnapshot",
             "schema": {
@@ -3445,6 +3454,7 @@
             }
           },
           {
+            "description": "Whether to return immediately after marking the post for publishing.",
             "in": "query",
             "name": "async",
             "schema": {
@@ -3471,10 +3481,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/recycle": {
       "put": {
-        "description": "Recycle a post.",
+        "description": "Move a post to the recycle bin by marking it as deleted.",
         "operationId": "RecyclePost",
         "parameters": [
           {
+            "description": "Metadata name of the post to recycle.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3491,10 +3502,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/release-content": {
       "get": {
-        "description": "Fetch release content of post.",
+        "description": "Fetch the released content currently served for a published post.",
         "operationId": "fetchPostReleaseContent",
         "parameters": [
           {
+            "description": "Metadata name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3522,10 +3534,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/revert-content": {
       "put": {
-        "description": "Revert to specified snapshot for post content.",
+        "description": "Restore the post content from a specified snapshot.",
         "operationId": "revertToSpecifiedSnapshotForPost",
         "parameters": [
           {
+            "description": "Metadata name of the post whose content will be restored.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3563,10 +3576,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/snapshot": {
       "get": {
-        "description": "List all snapshots for post content.",
+        "description": "List content snapshots for a post.",
         "operationId": "listPostSnapshots",
         "parameters": [
           {
+            "description": "Metadata name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3597,10 +3611,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/posts/{name}/unpublish": {
       "put": {
-        "description": "UnPublish a post.",
+        "description": "Unpublish a post so it is no longer served as published content.",
         "operationId": "UnpublishPost",
         "parameters": [
           {
+            "description": "Metadata name of the post to unpublish.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3628,7 +3643,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/replies": {
       "get": {
-        "description": "List replies.",
+        "description": "List replies for a comment with pagination, sorting, labels, and field selectors.",
         "operationId": "ListReplies",
         "parameters": [
           {
@@ -3683,7 +3698,7 @@
             }
           },
           {
-            "description": "Replies filtered by commentName.",
+            "description": "Metadata name of the comment whose replies should be listed.",
             "in": "query",
             "name": "commentName",
             "required": true,
@@ -3711,7 +3726,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages": {
       "get": {
-        "description": "List single pages.",
+        "description": "List single pages with pagination, sorting, keyword, publish phase, visibility, and contributor filters.",
         "operationId": "ListSinglePages",
         "parameters": [
           {
@@ -3766,7 +3781,7 @@
             }
           },
           {
-            "description": "SinglePages filtered by contributor.",
+            "description": "Contributor user names used to filter single pages. A page matches when any listed contributor appears in status.contributors.",
             "in": "query",
             "name": "contributor",
             "schema": {
@@ -3777,7 +3792,7 @@
             }
           },
           {
-            "description": "SinglePages filtered by publish phase.",
+            "description": "Filter single pages by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.",
             "in": "query",
             "name": "publishPhase",
             "schema": {
@@ -3791,7 +3806,7 @@
             }
           },
           {
-            "description": "SinglePages filtered by visibility.",
+            "description": "Filter single pages by visibility, such as PUBLIC, INTERNAL, or PRIVATE.",
             "in": "query",
             "name": "visible",
             "schema": {
@@ -3804,7 +3819,7 @@
             }
           },
           {
-            "description": "SinglePages filtered by keyword.",
+            "description": "Keyword used to match single page title, slug, or excerpt.",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -3829,7 +3844,7 @@
         ]
       },
       "post": {
-        "description": "Draft a single page.",
+        "description": "Create a draft single page together with its initial content.",
         "operationId": "DraftSinglePage",
         "requestBody": {
           "content": {
@@ -3860,10 +3875,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}": {
       "put": {
-        "description": "Update a single page.",
+        "description": "Update single page metadata, spec, and content in one request.",
         "operationId": "UpdateDraftSinglePage",
         "parameters": [
           {
+            "description": "Metadata name of the single page to update.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3901,10 +3917,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content": {
       "delete": {
-        "description": "Delete a content for post.",
+        "description": "Delete a content snapshot from a single page and return the deleted content.",
         "operationId": "deleteSinglePageContent",
         "parameters": [
           {
+            "description": "Metadata name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3913,6 +3930,7 @@
             }
           },
           {
+            "description": "Name of the content snapshot to delete.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -3938,10 +3956,11 @@
         ]
       },
       "get": {
-        "description": "Fetch content of single page.",
+        "description": "Fetch a single page content snapshot reconstructed from its base snapshot.",
         "operationId": "fetchSinglePageContent",
         "parameters": [
           {
+            "description": "Metadata name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3950,6 +3969,7 @@
             }
           },
           {
+            "description": "Name of the content snapshot to fetch.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -3975,10 +3995,11 @@
         ]
       },
       "put": {
-        "description": "Update a single page\u0027s content.",
+        "description": "Update only the content of an existing single page.",
         "operationId": "UpdateSinglePageContent",
         "parameters": [
           {
+            "description": "Metadata name of the single page whose content will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -4002,7 +4023,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Post"
+                  "$ref": "#/components/schemas/SinglePage"
                 }
               }
             },
@@ -4016,10 +4037,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/head-content": {
       "get": {
-        "description": "Fetch head content of single page.",
+        "description": "Fetch the editable head content of a single page.",
         "operationId": "fetchSinglePageHeadContent",
         "parameters": [
           {
+            "description": "Metadata name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -4047,15 +4069,24 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/publish": {
       "put": {
-        "description": "Publish a single page.",
+        "description": "Publish a single page. By default, the request waits until the release snapshot is available.",
         "operationId": "PublishSinglePage",
         "parameters": [
           {
+            "description": "Metadata name of the single page to publish.",
             "in": "path",
             "name": "name",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "Whether to return immediately after marking the single page for publishing.",
+            "in": "query",
+            "name": "async",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -4078,10 +4109,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/release-content": {
       "get": {
-        "description": "Fetch release content of single page.",
+        "description": "Fetch the released content currently served for a published single page.",
         "operationId": "fetchSinglePageReleaseContent",
         "parameters": [
           {
+            "description": "Metadata name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -4109,10 +4141,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/revert-content": {
       "put": {
-        "description": "Revert to specified snapshot for single page content.",
+        "description": "Restore the single page content from a specified snapshot.",
         "operationId": "revertToSpecifiedSnapshotForSinglePage",
         "parameters": [
           {
+            "description": "Metadata name of the single page whose content will be restored.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -4136,7 +4169,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Post"
+                  "$ref": "#/components/schemas/SinglePage"
                 }
               }
             },
@@ -4150,10 +4183,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/singlepages/{name}/snapshot": {
       "get": {
-        "description": "List all snapshots for single page content.",
+        "description": "List content snapshots for a single page.",
         "operationId": "listSinglePageSnapshots",
         "parameters": [
           {
+            "description": "Metadata name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -4205,7 +4239,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/tags": {
       "get": {
-        "description": "List Post Tags.",
+        "description": "List post tags with pagination, sorting, and keyword filtering.",
         "operationId": "ListPostTags",
         "parameters": [
           {
@@ -4260,7 +4294,7 @@
             }
           },
           {
-            "description": "Post tags filtered by keyword.",
+            "description": "Keyword used to match the tag display name or slug.",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -13985,7 +14019,7 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts": {
       "get": {
-        "description": "List posts owned by the current user.",
+        "description": "List posts owned by the current user with pagination, sorting, keyword, publish phase, and category filters.",
         "operationId": "ListMyPosts",
         "parameters": [
           {
@@ -14040,7 +14074,7 @@
             }
           },
           {
-            "description": "Posts filtered by publish phase.",
+            "description": "Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.",
             "in": "query",
             "name": "publishPhase",
             "schema": {
@@ -14054,7 +14088,7 @@
             }
           },
           {
-            "description": "Posts filtered by keyword.",
+            "description": "Keyword used to match post title, slug, or excerpt.",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -14062,7 +14096,7 @@
             }
           },
           {
-            "description": "Posts filtered by category including sub-categories.",
+            "description": "Category metadata name used to include posts in that category and its child categories.",
             "in": "query",
             "name": "categoryWithChildren",
             "schema": {
@@ -14087,7 +14121,7 @@
         ]
       },
       "post": {
-        "description": "Create my post. If you want to create a post with content, please set\n annotation: \"content.halo.run/content-json\" into annotations and refer\n to Content for corresponding data type.\n",
+        "description": "Create a draft post for the current user. To create it with initial content, put JSON-serialized Content into metadata.annotations[\u0027content.halo.run/content-json\u0027].",
         "operationId": "CreateMyPost",
         "requestBody": {
           "content": {
@@ -14096,7 +14130,9 @@
                 "$ref": "#/components/schemas/Post"
               }
             }
-          }
+          },
+          "description": "Post extension to create. The server assigns spec.owner from the current user and consumes the content-json annotation as initial content when present.",
+          "required": true
         },
         "responses": {
           "default": {
@@ -14117,11 +14153,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}": {
       "get": {
-        "description": "Get post that belongs to the current user.",
+        "description": "Get a post owned by the current user by metadata name.",
         "operationId": "GetMyPost",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14147,11 +14183,11 @@
         ]
       },
       "put": {
-        "description": "Update my post.",
+        "description": "Update post metadata and editable spec fields for the current user. Content is not updated by this operation.",
         "operationId": "UpdateMyPost",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14167,7 +14203,9 @@
                 "$ref": "#/components/schemas/Post"
               }
             }
-          }
+          },
+          "description": "Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.",
+          "required": true
         },
         "responses": {
           "default": {
@@ -14188,11 +14226,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/draft": {
       "get": {
-        "description": "Get my post draft.",
+        "description": "Get the editable draft snapshot of a post owned by the current user.",
         "operationId": "GetMyPostDraft",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14201,7 +14239,7 @@
             }
           },
           {
-            "description": "Should include patched content and raw or not.",
+            "description": "Whether to return the head snapshot patched against the base snapshot. Defaults to false.",
             "in": "query",
             "name": "patched",
             "schema": {
@@ -14226,11 +14264,11 @@
         ]
       },
       "put": {
-        "description": "Update draft of my post. Please make sure set annotation:\n\"content.halo.run/content-json\" into annotations and refer to\nContent for corresponding data type.\n",
+        "description": "Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.",
         "operationId": "UpdateMyPostDraft",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14246,7 +14284,9 @@
                 "$ref": "#/components/schemas/Snapshot"
               }
             }
-          }
+          },
+          "description": "Snapshot payload carrying JSON-serialized Content in metadata.annotations[\u0027content.halo.run/content-json\u0027].",
+          "required": true
         },
         "responses": {
           "default": {
@@ -14267,11 +14307,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/publish": {
       "put": {
-        "description": "Publish my post.",
+        "description": "Publish a post owned by the current user from its current head snapshot.",
         "operationId": "PublishMyPost",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14299,11 +14339,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/recycle": {
       "delete": {
-        "description": "Move my post to recycle bin.",
+        "description": "Move a post owned by the current user to the recycle bin.",
         "operationId": "RecycleMyPost",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14331,11 +14371,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}/unpublish": {
       "put": {
-        "description": "Unpublish my post.",
+        "description": "Unpublish a post owned by the current user so it is no longer served as published content.",
         "operationId": "UnpublishMyPost",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Metadata name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14363,11 +14403,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/snapshots/{name}": {
       "get": {
-        "description": "Get snapshot for one post.",
+        "description": "Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.",
         "operationId": "GetSnapshotForPost",
         "parameters": [
           {
-            "description": "Snapshot name.",
+            "description": "Metadata name of the snapshot to fetch.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -14376,7 +14416,7 @@
             }
           },
           {
-            "description": "Post name.",
+            "description": "Metadata name of the post that owns the snapshot. The post must belong to the current user.",
             "in": "query",
             "name": "postName",
             "required": true,
@@ -14385,7 +14425,7 @@
             }
           },
           {
-            "description": "Should include patched content and raw or not.",
+            "description": "Whether to return the snapshot patched against the post base snapshot. Defaults to false.",
             "in": "query",
             "name": "patched",
             "schema": {
@@ -15709,7 +15749,8 @@
           "status": {
             "$ref": "#/components/schemas/CategoryStatus"
           }
-        }
+        },
+        "description": "Category extension for grouping posts and building category archives."
       },
       "CategoryList": {
         "required": [
@@ -15780,65 +15821,76 @@
         "properties": {
           "children": {
             "type": "array",
+            "description": "Child category extension names.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Child category extension names."
             }
           },
           "cover": {
-            "type": "string"
+            "type": "string",
+            "description": "Cover image URL or attachment URI of the category."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the category."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the category."
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "Whether to hide the category from the category list.\n\n \u003cp\u003eWhen set to true, the category including its subcategories and related posts will not be displayed in the\n category list, but it can still be accessed by permalink.\n\n \u003cp\u003eLimitation: It only takes effect on the theme-side categorized list and it only allows to be set to true\n on the first level(root node) of categories."
+            "description": "Whether this category tree and its posts should be hidden from theme-side lists."
           },
           "postTemplate": {
             "maxLength": 255,
             "type": "string",
-            "description": "Used to specify the template for the posts associated with the category.\n\n \u003cp\u003eThe priority is not as high as that of the post.\n\n \u003cp\u003eIf the post also specifies a template, the post\u0027s template will prevail."
+            "description": "Theme template used to render posts associated with this category when the post does not specify its own template."
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
-            "description": "if a category is queried for related posts, the default behavior is to query all posts under the category\n including its subcategories, but if this field is set to true, cascade query behavior will be terminated\n here.\n\n \u003cp\u003eFor example, if a category has subcategories A and B, and A has subcategories C and D and C marked this\n field as true, when querying posts under A category,all posts under A and B will be queried, but C and D will\n not be queried."
+            "description": "Whether ancestor category post queries should stop cascading into this category\u0027s children."
           },
           "priority": {
             "type": "integer",
+            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
             "format": "int32",
             "default": 0
           },
           "slug": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "URL slug of the category."
           },
           "template": {
             "maxLength": 255,
-            "type": "string"
+            "type": "string",
+            "description": "Theme template used to render the category archive page."
           }
-        }
+        },
+        "description": "Desired display, hierarchy, and rendering configuration of a category."
       },
       "CategoryStatus": {
         "type": "object",
         "properties": {
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Absolute permalink calculated from the category permalink policy."
           },
           "postCount": {
             "type": "integer",
-            "description": "包括当前和其下所有层级的文章数量 (depth\u003dmax).",
+            "description": "Total number of posts in this category and all descendant categories.",
             "format": "int32"
           },
           "visiblePostCount": {
             "type": "integer",
-            "description": "包括当前和其下所有层级的已发布且公开的文章数量 (depth\u003dmax).",
+            "description": "Total number of published and public posts in this category and all descendant categories.",
             "format": "int32"
           }
-        }
+        },
+        "description": "Observed state of a category."
       },
       "CategoryVo": {
         "required": [
@@ -15976,29 +16028,33 @@
           "status": {
             "$ref": "#/components/schemas/CommentStatus"
           }
-        }
+        },
+        "description": "Comment extension for a post, single page, or another commentable subject."
       },
       "CommentEmailOwner": {
+        "required": [
+          "displayName"
+        ],
         "type": "object",
         "properties": {
           "avatar": {
             "type": "string",
-            "description": "avatar for comment owner"
+            "description": "Avatar URL of the guest commenter."
           },
           "displayName": {
             "type": "string",
-            "description": "display name for comment owner"
+            "description": "Display name of the guest commenter."
           },
           "email": {
             "type": "string",
-            "description": "email for comment owner"
+            "description": "Email address of the guest commenter. It is used as the owner name when present."
           },
           "website": {
             "type": "string",
-            "description": "website for comment owner"
+            "description": "Website URL of the guest commenter."
           }
         },
-        "description": "The creator info of the comment. This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to\n comment without logging in."
+        "description": "Guest/email owner information used when a comment is not owned by a Halo user."
       },
       "CommentList": {
         "required": [
@@ -16069,21 +16125,27 @@
           "annotations": {
             "type": "object",
             "additionalProperties": {
-              "type": "string"
-            }
+              "type": "string",
+              "description": "Additional owner metadata, such as avatar, website, or email hash."
+            },
+            "description": "Additional owner metadata, such as avatar, website, or email hash."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the owner."
           },
           "kind": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Owner identity kind. Built-in values are User and Email."
           },
           "name": {
             "maxLength": 64,
-            "type": "string"
+            "type": "string",
+            "description": "Owner identifier, such as a username for User owners or an email address for Email owners."
           }
-        }
+        },
+        "description": "Identity of a comment or reply owner."
       },
       "CommentRequest": {
         "required": [
@@ -16095,14 +16157,17 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
+            "description": "Whether to subscribe the owner to notifications for future replies.",
             "default": false
           },
           "content": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Rendered HTML content for the comment. Unsafe HTML is rejected."
           },
           "hidden": {
             "type": "boolean",
+            "description": "Whether the comment should be hidden from normal display.",
             "default": false
           },
           "owner": {
@@ -16110,13 +16175,14 @@
           },
           "raw": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Original comment text submitted by the editor."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
           }
         },
-        "description": "Request parameter object for {@link Comment Comment}."
+        "description": "Comment creation payload for console comment APIs."
       },
       "CommentSpec": {
         "required": [
@@ -16134,34 +16200,41 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
+            "description": "Whether notification subscriptions should be created for this comment or reply.",
             "default": true
           },
           "approved": {
             "type": "boolean",
+            "description": "Whether the comment has passed moderation and may be visible.",
             "default": false
           },
           "approvedTime": {
             "type": "string",
+            "description": "Time when the comment was approved.",
             "format": "date-time"
           },
           "content": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "HTML content that is rendered on the theme side."
           },
           "creationTime": {
             "type": "string",
-            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
+            "description": "User-defined creation time. Defaults to metadata.creationTimestamp when omitted.",
             "format": "date-time"
           },
           "hidden": {
             "type": "boolean",
+            "description": "Whether the comment should be hidden from theme-side public output.",
             "default": false
           },
           "ipAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "IP address recorded when the comment was submitted."
           },
           "lastReadTime": {
             "type": "string",
+            "description": "Latest time the comment owner has read replies for this comment.",
             "format": "date-time"
           },
           "owner": {
@@ -16169,34 +16242,40 @@
           },
           "priority": {
             "type": "integer",
+            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
             "format": "int32",
             "default": 0
           },
           "raw": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Raw comment body submitted by the owner before HTML sanitization or rendering."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
           },
           "top": {
             "type": "boolean",
+            "description": "Whether the comment is pinned above normal comment ordering.",
             "default": false
           },
           "userAgent": {
-            "type": "string"
+            "type": "string",
+            "description": "Browser user agent recorded when the comment was submitted."
           }
-        }
+        },
+        "description": "Desired state of a top-level comment."
       },
       "CommentStats": {
         "type": "object",
         "properties": {
           "upvote": {
             "type": "integer",
+            "description": "Total upvote count.",
             "format": "int32"
           }
         },
-        "description": "comment stats value object."
+        "description": "Aggregated counters for a comment or reply."
       },
       "CommentStatsVo": {
         "type": "object",
@@ -16212,29 +16291,36 @@
         "type": "object",
         "properties": {
           "hasNewReply": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether unreadReplyCount is greater than zero."
           },
           "lastReplyTime": {
             "type": "string",
+            "description": "Creation time of the latest reply under this comment.",
             "format": "date-time"
           },
           "observedVersion": {
             "type": "integer",
+            "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           },
           "replyCount": {
             "type": "integer",
+            "description": "Total number of replies under this comment.",
             "format": "int32"
           },
           "unreadReplyCount": {
             "type": "integer",
+            "description": "Number of replies created after spec.lastReadTime.",
             "format": "int32"
           },
           "visibleReplyCount": {
             "type": "integer",
+            "description": "Total number of approved and non-hidden replies under this comment.",
             "format": "int32"
           }
-        }
+        },
+        "description": "Observed state of a comment."
       },
       "CommentVo": {
         "required": [
@@ -16559,15 +16645,19 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": "string"
+            "type": "string",
+            "description": "Rendered HTML or normalized content derived from raw."
           },
           "raw": {
-            "type": "string"
+            "type": "string",
+            "description": "Source text stored by the editor."
           },
           "rawType": {
-            "type": "string"
+            "type": "string",
+            "description": "Editor/source format of the raw content, for example HTML or Markdown."
           }
-        }
+        },
+        "description": "Full content payload reconstructed from a content snapshot."
       },
       "ContentUpdateParam": {
         "required": [
@@ -16578,19 +16668,24 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": "string"
+            "type": "string",
+            "description": "Rendered HTML or normalized content derived from raw."
           },
           "raw": {
-            "type": "string"
+            "type": "string",
+            "description": "Source text stored by the editor."
           },
           "rawType": {
-            "type": "string"
+            "type": "string",
+            "description": "Editor/source format of the raw content, for example HTML or Markdown."
           },
           "version": {
             "type": "integer",
+            "description": "Expected metadata version of the current head snapshot. If it conflicts with the latest snapshot version, Halo creates a new head snapshot instead of overwriting it.",
             "format": "int64"
           }
-        }
+        },
+        "description": "Content update payload for post and single page editors."
       },
       "ContentVo": {
         "type": "object",
@@ -16608,33 +16703,41 @@
         "type": "object",
         "properties": {
           "content": {
-            "type": "string"
+            "type": "string",
+            "description": "Rendered HTML or normalized content derived from raw."
           },
           "raw": {
-            "type": "string"
+            "type": "string",
+            "description": "Source text stored by the editor."
           },
           "rawType": {
-            "type": "string"
+            "type": "string",
+            "description": "Editor/source format of the raw content, for example HTML or Markdown."
           },
           "snapshotName": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the snapshot used to build this content."
           }
-        }
+        },
+        "description": "Full content reconstructed from a content snapshot and its base snapshot."
       },
       "Contributor": {
         "type": "object",
         "properties": {
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "User avatar URL."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "User display name."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "User metadata name."
           }
         },
-        "description": "Contributor from user."
+        "description": "User summary for a content owner or contributor."
       },
       "ContributorVo": {
         "required": [
@@ -17115,12 +17218,15 @@
         "properties": {
           "autoGenerate": {
             "type": "boolean",
+            "description": "Whether Halo should generate the excerpt from the released content automatically.",
             "default": true
           },
           "raw": {
-            "type": "string"
+            "type": "string",
+            "description": "Manual excerpt text used when auto generation is disabled."
           }
-        }
+        },
+        "description": "Excerpt generation configuration."
       },
       "Extension": {
         "required": [
@@ -17877,7 +17983,7 @@
             "$ref": "#/components/schemas/Extension"
           }
         },
-        "description": "A chunk of items."
+        "description": "Comment list item with resolved owner, subject, and counters."
       },
       "ListedCommentList": {
         "required": [
@@ -17951,12 +18057,14 @@
         "properties": {
           "categories": {
             "type": "array",
+            "description": "Resolved categories referenced by the post spec.",
             "items": {
               "$ref": "#/components/schemas/Category"
             }
           },
           "contributors": {
             "type": "array",
+            "description": "Users that have contributed to the post content snapshots.",
             "items": {
               "$ref": "#/components/schemas/Contributor"
             }
@@ -17972,12 +18080,13 @@
           },
           "tags": {
             "type": "array",
+            "description": "Resolved tags referenced by the post spec.",
             "items": {
               "$ref": "#/components/schemas/Tag"
             }
           }
         },
-        "description": "A chunk of items."
+        "description": "Post list item with resolved categories, tags, contributors, owner, and counters."
       },
       "ListedPostList": {
         "required": [
@@ -18157,7 +18266,7 @@
             "$ref": "#/components/schemas/CommentStats"
           }
         },
-        "description": "A chunk of items."
+        "description": "Reply list item with resolved owner and counters."
       },
       "ListedReplyList": {
         "required": [
@@ -18229,6 +18338,7 @@
         "properties": {
           "contributors": {
             "type": "array",
+            "description": "Users that have contributed to the single page content snapshots.",
             "items": {
               "$ref": "#/components/schemas/Contributor"
             }
@@ -18243,7 +18353,7 @@
             "$ref": "#/components/schemas/Stats"
           }
         },
-        "description": "A chunk of items."
+        "description": "Single page list item with resolved contributors, owner, and counters."
       },
       "ListedSinglePageList": {
         "required": [
@@ -18406,7 +18516,8 @@
           "spec": {
             "$ref": "#/components/schemas/ListedSnapshotSpec"
           }
-        }
+        },
+        "description": "Content snapshot list item with metadata and display-oriented snapshot fields."
       },
       "ListedSnapshotSpec": {
         "required": [
@@ -18416,12 +18527,15 @@
         "properties": {
           "modifyTime": {
             "type": "string",
+            "description": "Last modification time of the snapshot content.",
             "format": "date-time"
           },
           "owner": {
-            "type": "string"
+            "type": "string",
+            "description": "User name of the snapshot owner."
           }
-        }
+        },
+        "description": "Display fields for a content snapshot list item."
       },
       "ListedUser": {
         "required": [
@@ -19199,22 +19313,27 @@
         "type": "object",
         "properties": {
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "Owner avatar URL."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Owner display name."
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Owner email address when available."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "Owner kind, such as User or email."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Owner name. For Halo users, this is the user metadata name."
           }
         },
-        "description": "Comment owner info."
+        "description": "Resolved owner summary for a comment or reply."
       },
       "PasswordRequest": {
         "required": [
@@ -19974,7 +20093,7 @@
             "$ref": "#/components/schemas/Post"
           }
         },
-        "description": "Post and content data for creating and updating post."
+        "description": "Post editor payload containing the post extension and its editable content."
       },
       "PostSpec": {
         "required": [
@@ -19992,95 +20111,118 @@
         "properties": {
           "allowComment": {
             "type": "boolean",
+            "description": "Whether new comments are allowed for this post.",
             "default": true
           },
           "baseSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Base snapshot name used to apply snapshot patches."
           },
           "categories": {
             "type": "array",
+            "description": "Category extension names associated with the post.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Category extension names associated with the post."
             }
           },
           "cover": {
-            "type": "string"
+            "type": "string",
+            "description": "Cover image URL or attachment URI of the post."
           },
           "deleted": {
             "type": "boolean",
+            "description": "Whether the post is logically deleted and should be treated as recycled.",
             "default": false
           },
           "excerpt": {
             "$ref": "#/components/schemas/Excerpt"
           },
           "headSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Snapshot name of the latest draft content."
           },
           "htmlMetas": {
             "type": "array",
+            "description": "HTML meta tag attribute maps injected into the post template head.",
             "items": {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "description": "HTML meta tag attribute maps injected into the post template head."
+              },
+              "description": "HTML meta tag attribute maps injected into the post template head."
             }
           },
           "owner": {
-            "type": "string"
+            "type": "string",
+            "description": "Username of the post owner."
           },
           "pinned": {
             "type": "boolean",
+            "description": "Whether the post should be pinned ahead of normal post ordering.",
             "default": false
           },
           "priority": {
             "type": "integer",
+            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
             "format": "int32",
             "default": 0
           },
           "publish": {
             "type": "boolean",
+            "description": "Desired publish state. False keeps or moves the post to draft.",
             "default": false
           },
           "publishTime": {
             "type": "string",
+            "description": "Time when the post was published or is scheduled to be published.",
             "format": "date-time"
           },
           "releaseSnapshot": {
             "type": "string",
-            "description": "文章引用到的已发布的内容，用于主题端显示."
+            "description": "Snapshot name selected as the released version for theme-side rendering after publishing."
           },
           "slug": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "URL slug of the post."
           },
           "tags": {
             "type": "array",
+            "description": "Tag extension names associated with the post.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Tag extension names associated with the post."
             }
           },
           "template": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme template used to render this post."
           },
           "title": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display title of the post."
           },
           "visible": {
             "type": "string",
+            "description": "Visibility of the post in theme-side queries. Only PUBLIC content is returned to anonymous visitors.",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
             ]
           }
-        }
+        },
+        "description": "Desired content, publication, taxonomy, and rendering configuration of a post."
       },
       "PostStatus": {
         "type": "object",
         "properties": {
           "commentsCount": {
             "type": "integer",
+            "description": "Total number of comments associated with the content item.",
             "format": "int32"
           },
           "conditions": {
@@ -20090,41 +20232,51 @@
                 "type": "boolean"
               }
             },
+            "description": "Latest reconciliation conditions for the content item.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
             "type": "array",
+            "description": "Usernames that contributed to the content snapshots.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Usernames that contributed to the content snapshots."
             }
           },
           "excerpt": {
-            "type": "string"
+            "type": "string",
+            "description": "Excerpt text resolved from the content excerpt configuration."
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}."
+            "description": "Whether any associated category hides the content item from theme-side lists."
           },
           "inProgress": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the latest draft snapshot differs from the released snapshot."
           },
           "lastModifyTime": {
             "type": "string",
+            "description": "Last modification time of the released snapshot.",
             "format": "date-time"
           },
           "observedVersion": {
             "type": "integer",
+            "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           },
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Absolute permalink calculated from the content permalink policy."
           },
           "phase": {
-            "type": "string"
+            "type": "string",
+            "description": "Current publishing phase of the content item, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
-        }
+        },
+        "description": "Observed state of a content item."
       },
       "PostVo": {
         "required": [
@@ -20742,7 +20894,8 @@
           "status": {
             "$ref": "#/components/schemas/ReplyStatus"
           }
-        }
+        },
+        "description": "Reply extension that belongs to a top-level {@link Comment Comment}."
       },
       "ReplyList": {
         "required": [
@@ -20812,28 +20965,33 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
+            "description": "Whether to subscribe the owner to notifications for future replies.",
             "default": false
           },
           "content": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Rendered HTML content for the reply. Unsafe HTML is rejected."
           },
           "hidden": {
             "type": "boolean",
+            "description": "Whether the reply should be hidden from normal display.",
             "default": false
           },
           "owner": {
             "$ref": "#/components/schemas/CommentEmailOwner"
           },
           "quoteReply": {
-            "type": "string"
+            "type": "string",
+            "description": "Metadata name of the reply being quoted, if this reply quotes another reply."
           },
           "raw": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Original reply text submitted by the editor."
           }
         },
-        "description": "A request parameter object for {@link Reply Reply}."
+        "description": "Reply creation payload for console comment APIs."
       },
       "ReplySpec": {
         "required": [
@@ -20851,68 +21009,83 @@
         "properties": {
           "allowNotification": {
             "type": "boolean",
+            "description": "Whether notification subscriptions should be created for this comment or reply.",
             "default": true
           },
           "approved": {
             "type": "boolean",
+            "description": "Whether the comment has passed moderation and may be visible.",
             "default": false
           },
           "approvedTime": {
             "type": "string",
+            "description": "Time when the comment was approved.",
             "format": "date-time"
           },
           "commentName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Metadata name of the parent comment."
           },
           "content": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "HTML content that is rendered on the theme side."
           },
           "creationTime": {
             "type": "string",
-            "description": "The user-defined creation time default is \u003ccode\u003emetadata.creationTimestamp\u003c/code\u003e.",
+            "description": "User-defined creation time. Defaults to metadata.creationTimestamp when omitted.",
             "format": "date-time"
           },
           "hidden": {
             "type": "boolean",
+            "description": "Whether the comment should be hidden from theme-side public output.",
             "default": false
           },
           "ipAddress": {
-            "type": "string"
+            "type": "string",
+            "description": "IP address recorded when the comment was submitted."
           },
           "owner": {
             "$ref": "#/components/schemas/CommentOwner"
           },
           "priority": {
             "type": "integer",
+            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
             "format": "int32",
             "default": 0
           },
           "quoteReply": {
-            "type": "string"
+            "type": "string",
+            "description": "Metadata name of the reply being quoted, when this reply is addressed to another reply."
           },
           "raw": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Raw comment body submitted by the owner before HTML sanitization or rendering."
           },
           "top": {
             "type": "boolean",
+            "description": "Whether the comment is pinned above normal comment ordering.",
             "default": false
           },
           "userAgent": {
-            "type": "string"
+            "type": "string",
+            "description": "Browser user agent recorded when the comment was submitted."
           }
-        }
+        },
+        "description": "Desired state of a reply."
       },
       "ReplyStatus": {
         "type": "object",
         "properties": {
           "observedVersion": {
             "type": "integer",
+            "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           }
-        }
+        },
+        "description": "Observed state of a reply."
       },
       "ReplyVo": {
         "required": [
@@ -21122,9 +21295,11 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Name of the snapshot that should become the post\u0027s head content."
           }
-        }
+        },
+        "description": "Request body for restoring post content from a snapshot."
       },
       "RevertSnapshotForSingleParam": {
         "required": [
@@ -21134,9 +21309,11 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Name of the snapshot that should become the single page\u0027s head content."
           }
-        }
+        },
+        "description": "Request body for restoring single page content from a snapshot."
       },
       "Role": {
         "required": [
@@ -21806,7 +21983,7 @@
             "$ref": "#/components/schemas/SinglePage"
           }
         },
-        "description": "A request parameter for {@link SinglePage SinglePage}."
+        "description": "Single page editor payload containing the page extension and its editable content."
       },
       "SinglePageSpec": {
         "required": [
@@ -21824,83 +22001,102 @@
         "properties": {
           "allowComment": {
             "type": "boolean",
+            "description": "Whether new comments are allowed for this single page.",
             "default": true
           },
           "baseSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Base snapshot name used to apply snapshot patches."
           },
           "cover": {
-            "type": "string"
+            "type": "string",
+            "description": "Cover image URL or attachment URI of the single page."
           },
           "deleted": {
             "type": "boolean",
+            "description": "Whether the single page is logically deleted and should be treated as recycled.",
             "default": false
           },
           "excerpt": {
             "$ref": "#/components/schemas/Excerpt"
           },
           "headSnapshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Snapshot name of the latest draft content."
           },
           "htmlMetas": {
             "type": "array",
+            "description": "HTML meta tag attribute maps injected into the single page template head.",
             "items": {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "description": "HTML meta tag attribute maps injected into the single page template head."
+              },
+              "description": "HTML meta tag attribute maps injected into the single page template head."
             }
           },
           "owner": {
-            "type": "string"
+            "type": "string",
+            "description": "Username of the single page owner."
           },
           "pinned": {
             "type": "boolean",
+            "description": "Whether the single page should be pinned ahead of normal page ordering.",
             "default": false
           },
           "priority": {
             "type": "integer",
+            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
             "format": "int32",
             "default": 0
           },
           "publish": {
             "type": "boolean",
+            "description": "Desired publish state. False keeps or moves the single page to draft.",
             "default": false
           },
           "publishTime": {
             "type": "string",
+            "description": "Time when the single page was published or is scheduled to be published.",
             "format": "date-time"
           },
           "releaseSnapshot": {
             "type": "string",
-            "description": "引用到的已发布的内容，用于主题端显示."
+            "description": "Snapshot name selected as the released version for theme-side rendering after publishing."
           },
           "slug": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "URL slug of the single page."
           },
           "template": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme template used to render this single page."
           },
           "title": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display title of the single page."
           },
           "visible": {
             "type": "string",
+            "description": "Visibility of the single page in theme-side queries. Only PUBLIC content is returned to anonymous visitors.",
             "enum": [
               "PUBLIC",
               "INTERNAL",
               "PRIVATE"
             ]
           }
-        }
+        },
+        "description": "Desired content, publication, and rendering configuration of a single page."
       },
       "SinglePageStatus": {
         "type": "object",
         "properties": {
           "commentsCount": {
             "type": "integer",
+            "description": "Total number of comments associated with the content item.",
             "format": "int32"
           },
           "conditions": {
@@ -21910,41 +22106,51 @@
                 "type": "boolean"
               }
             },
+            "description": "Latest reconciliation conditions for the content item.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
             "type": "array",
+            "description": "Usernames that contributed to the content snapshots.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Usernames that contributed to the content snapshots."
             }
           },
           "excerpt": {
-            "type": "string"
+            "type": "string",
+            "description": "Excerpt text resolved from the content excerpt configuration."
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}."
+            "description": "Whether any associated category hides the content item from theme-side lists."
           },
           "inProgress": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the latest draft snapshot differs from the released snapshot."
           },
           "lastModifyTime": {
             "type": "string",
+            "description": "Last modification time of the released snapshot.",
             "format": "date-time"
           },
           "observedVersion": {
             "type": "integer",
+            "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           },
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Absolute permalink calculated from the content permalink policy."
           },
           "phase": {
-            "type": "string"
+            "type": "string",
+            "description": "Current publishing phase of the content item, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
-        }
+        },
+        "description": "Observed state of a single page."
       },
       "SinglePageVo": {
         "required": [
@@ -22014,39 +22220,47 @@
         "type": "object",
         "properties": {
           "contentPatch": {
-            "type": "string"
+            "type": "string",
+            "description": "Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot."
           },
           "contributors": {
             "uniqueItems": true,
             "type": "array",
+            "description": "Usernames that contributed to this snapshot.",
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Usernames that contributed to this snapshot."
             }
           },
           "lastModifyTime": {
             "type": "string",
+            "description": "Last time the snapshot content was modified.",
             "format": "date-time"
           },
           "owner": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Username of the snapshot owner."
           },
           "parentSnapshotName": {
-            "type": "string"
+            "type": "string",
+            "description": "Parent snapshot name in the snapshot revision chain."
           },
           "rawPatch": {
-            "type": "string"
+            "type": "string",
+            "description": "Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot."
           },
           "rawType": {
             "maxLength": 50,
             "minLength": 1,
             "type": "string",
-            "description": "such as: markdown | html | json | asciidoc | latex."
+            "description": "Type of the raw source content, such as markdown, html, json, asciidoc, or latex."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
           }
-        }
+        },
+        "description": "Content snapshot payload and metadata."
       },
       "Snapshot": {
         "required": [
@@ -22069,7 +22283,8 @@
           "spec": {
             "$ref": "#/components/schemas/SnapShotSpec"
           }
-        }
+        },
+        "description": "Snapshot extension that stores a version of post or single page content."
       },
       "SnapshotList": {
         "required": [
@@ -22135,22 +22350,26 @@
         "properties": {
           "approvedComment": {
             "type": "integer",
+            "description": "Total approved comment count.",
             "format": "int32"
           },
           "totalComment": {
             "type": "integer",
+            "description": "Total comment count, including comments that may not be approved.",
             "format": "int32"
           },
           "upvote": {
             "type": "integer",
+            "description": "Total upvote count.",
             "format": "int32"
           },
           "visit": {
             "type": "integer",
+            "description": "Total visit count.",
             "format": "int32"
           }
         },
-        "description": "Stats value object."
+        "description": "Aggregated visit, upvote, and comment counters for a content resource."
       },
       "StatsVo": {
         "type": "object",
@@ -22330,7 +22549,8 @@
           "status": {
             "$ref": "#/components/schemas/TagStatus"
           }
-        }
+        },
+        "description": "Tag extension for grouping posts by free-form labels."
       },
       "TagList": {
         "required": [
@@ -22401,43 +22621,53 @@
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Color regex explanation.\n\n \u003cpre\u003e\n ^                 # start of the line\n #                 # start with a number sign `#`\n (                 # start of (group 1)\n   [a-fA-F0-9]{6}  # support z-f, A-F and 0-9, with a length of 6\n   |               # or\n   [a-fA-F0-9]{3}  # support z-f, A-F and 0-9, with a length of 3\n )                 # end of (group 1)\n $                 # end of the line\n \u003c/pre\u003e"
+            "description": "Display color of the tag in 3- or 6-digit hex notation."
           },
           "cover": {
-            "type": "string"
+            "type": "string",
+            "description": "Cover image URL or attachment URI of the tag."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the tag."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the tag."
           },
           "slug": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "URL slug of the tag."
           }
-        }
+        },
+        "description": "Desired display and rendering configuration of a tag."
       },
       "TagStatus": {
         "type": "object",
         "properties": {
           "observedVersion": {
             "type": "integer",
+            "description": "Metadata version observed by the last successful reconciliation.",
             "format": "int64"
           },
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Absolute permalink calculated from the tag permalink policy."
           },
           "postCount": {
             "type": "integer",
+            "description": "Total number of posts associated with the tag.",
             "format": "int32"
           },
           "visiblePostCount": {
             "type": "integer",
+            "description": "Total number of published and public posts associated with the tag.",
             "format": "int32"
           }
-        }
+        },
+        "description": "Observed state of a tag."
       },
       "TagVo": {
         "required": [

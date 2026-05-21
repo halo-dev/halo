@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Excerpt generation configuration.
+ */
 export interface Excerpt {
+    /**
+     * Whether Halo should generate the excerpt from the released content automatically.
+     */
     'autoGenerate': boolean;
+    /**
+     * Manual excerpt text used when auto generation is disabled.
+     */
     'raw'?: string;
 }
 

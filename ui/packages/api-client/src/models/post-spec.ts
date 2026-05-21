@@ -17,28 +17,82 @@
 // @ts-ignore
 import type { Excerpt } from './excerpt';
 
+/**
+ * Desired content, publication, taxonomy, and rendering configuration of a post.
+ */
 export interface PostSpec {
+    /**
+     * Whether new comments are allowed for this post.
+     */
     'allowComment': boolean;
+    /**
+     * Base snapshot name used to apply snapshot patches.
+     */
     'baseSnapshot'?: string;
+    /**
+     * Category extension names associated with the post.
+     */
     'categories'?: Array<string>;
+    /**
+     * Cover image URL or attachment URI of the post.
+     */
     'cover'?: string;
+    /**
+     * Whether the post is logically deleted and should be treated as recycled.
+     */
     'deleted': boolean;
     'excerpt': Excerpt;
+    /**
+     * Snapshot name of the latest draft content.
+     */
     'headSnapshot'?: string;
+    /**
+     * HTML meta tag attribute maps injected into the post template head.
+     */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
+    /**
+     * Username of the post owner.
+     */
     'owner'?: string;
+    /**
+     * Whether the post should be pinned ahead of normal post ordering.
+     */
     'pinned': boolean;
+    /**
+     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     */
     'priority': number;
+    /**
+     * Desired publish state. False keeps or moves the post to draft.
+     */
     'publish': boolean;
+    /**
+     * Time when the post was published or is scheduled to be published.
+     */
     'publishTime'?: string;
     /**
-     * 文章引用到的已发布的内容，用于主题端显示.
+     * Snapshot name selected as the released version for theme-side rendering after publishing.
      */
     'releaseSnapshot'?: string;
+    /**
+     * URL slug of the post.
+     */
     'slug': string;
+    /**
+     * Tag extension names associated with the post.
+     */
     'tags'?: Array<string>;
+    /**
+     * Theme template used to render this post.
+     */
     'template'?: string;
+    /**
+     * Display title of the post.
+     */
     'title': string;
+    /**
+     * Visibility of the post in theme-side queries. Only PUBLIC content is returned to anonymous visitors.
+     */
     'visible': PostSpecVisibleEnum;
 }
 

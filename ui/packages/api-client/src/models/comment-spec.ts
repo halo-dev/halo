@@ -20,23 +20,59 @@ import type { CommentOwner } from './comment-owner';
 // @ts-ignore
 import type { Ref } from './ref';
 
+/**
+ * Desired state of a top-level comment.
+ */
 export interface CommentSpec {
+    /**
+     * Whether notification subscriptions should be created for this comment or reply.
+     */
     'allowNotification': boolean;
+    /**
+     * Whether the comment has passed moderation and may be visible.
+     */
     'approved': boolean;
+    /**
+     * Time when the comment was approved.
+     */
     'approvedTime'?: string;
+    /**
+     * HTML content that is rendered on the theme side.
+     */
     'content': string;
     /**
-     * The user-defined creation time default is <code>metadata.creationTimestamp</code>.
+     * User-defined creation time. Defaults to metadata.creationTimestamp when omitted.
      */
     'creationTime'?: string;
+    /**
+     * Whether the comment should be hidden from theme-side public output.
+     */
     'hidden': boolean;
+    /**
+     * IP address recorded when the comment was submitted.
+     */
     'ipAddress'?: string;
+    /**
+     * Latest time the comment owner has read replies for this comment.
+     */
     'lastReadTime'?: string;
     'owner': CommentOwner;
+    /**
+     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     */
     'priority': number;
+    /**
+     * Raw comment body submitted by the owner before HTML sanitization or rendering.
+     */
     'raw': string;
     'subjectRef': Ref;
+    /**
+     * Whether the comment is pinned above normal comment ordering.
+     */
     'top': boolean;
+    /**
+     * Browser user agent recorded when the comment was submitted.
+     */
     'userAgent'?: string;
 }
 

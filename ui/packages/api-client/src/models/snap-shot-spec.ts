@@ -17,15 +17,36 @@
 // @ts-ignore
 import type { Ref } from './ref';
 
+/**
+ * Content snapshot payload and metadata.
+ */
 export interface SnapShotSpec {
+    /**
+     * Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot.
+     */
     'contentPatch'?: string;
+    /**
+     * Usernames that contributed to this snapshot.
+     */
     'contributors'?: Array<string>;
+    /**
+     * Last time the snapshot content was modified.
+     */
     'lastModifyTime'?: string;
+    /**
+     * Username of the snapshot owner.
+     */
     'owner': string;
+    /**
+     * Parent snapshot name in the snapshot revision chain.
+     */
     'parentSnapshotName'?: string;
+    /**
+     * Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot.
+     */
     'rawPatch'?: string;
     /**
-     * such as: markdown | html | json | asciidoc | latex.
+     * Type of the raw source content, such as markdown, html, json, asciidoc, or latex.
      */
     'rawType': string;
     'subjectRef': Ref;

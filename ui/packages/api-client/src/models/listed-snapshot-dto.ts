@@ -20,6 +20,9 @@ import type { ListedSnapshotSpec } from './listed-snapshot-spec';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Content snapshot list item with metadata and display-oriented snapshot fields.
+ */
 export interface ListedSnapshotDto {
     'metadata': Metadata;
     'spec': ListedSnapshotSpec;

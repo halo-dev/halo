@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Full content reconstructed from a content snapshot and its base snapshot.
+ */
 export interface ContentWrapper {
+    /**
+     * Rendered HTML or normalized content derived from raw.
+     */
     'content'?: string;
+    /**
+     * Source text stored by the editor.
+     */
     'raw'?: string;
+    /**
+     * Editor/source format of the raw content, for example HTML or Markdown.
+     */
     'rawType'?: string;
+    /**
+     * Name of the snapshot used to build this content.
+     */
     'snapshotName'?: string;
 }
 

@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Identity of a comment or reply owner.
+ */
 export interface CommentOwner {
+    /**
+     * Additional owner metadata, such as avatar, website, or email hash.
+     */
     'annotations'?: { [key: string]: string; };
+    /**
+     * Display name shown for the owner.
+     */
     'displayName'?: string;
+    /**
+     * Owner identity kind. Built-in values are User and Email.
+     */
     'kind': string;
+    /**
+     * Owner identifier, such as a username for User owners or an email address for Email owners.
+     */
     'name': string;
 }
 

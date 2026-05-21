@@ -23,6 +23,9 @@ import type { TagSpec } from './tag-spec';
 // @ts-ignore
 import type { TagStatus } from './tag-status';
 
+/**
+ * Tag extension for grouping posts by free-form labels.
+ */
 export interface Tag {
     'apiVersion': string;
     'kind': string;

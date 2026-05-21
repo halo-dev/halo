@@ -15,12 +15,24 @@
 
 
 /**
- * Stats value object.
+ * Aggregated visit, upvote, and comment counters for a content resource.
  */
 export interface Stats {
+    /**
+     * Total approved comment count.
+     */
     'approvedComment'?: number;
+    /**
+     * Total comment count, including comments that may not be approved.
+     */
     'totalComment'?: number;
+    /**
+     * Total upvote count.
+     */
     'upvote'?: number;
+    /**
+     * Total visit count.
+     */
     'visit'?: number;
 }
 

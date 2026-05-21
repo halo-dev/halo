@@ -14,14 +14,20 @@
 
 
 
+/**
+ * Observed state of a category.
+ */
 export interface CategoryStatus {
+    /**
+     * Absolute permalink calculated from the category permalink policy.
+     */
     'permalink'?: string;
     /**
-     * 包括当前和其下所有层级的文章数量 (depth=max).
+     * Total number of posts in this category and all descendant categories.
      */
     'postCount'?: number;
     /**
-     * 包括当前和其下所有层级的已发布且公开的文章数量 (depth=max).
+     * Total number of published and public posts in this category and all descendant categories.
      */
     'visiblePostCount'?: number;
 }
