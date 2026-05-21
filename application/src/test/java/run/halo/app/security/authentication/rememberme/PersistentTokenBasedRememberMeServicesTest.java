@@ -230,6 +230,36 @@ class PersistentTokenBasedRememberMeServicesTest {
         }
 
         @Test
+        void shouldAcceptPreviousTokenOutsideGracePeriod() {
+            // Reproduces: session expired → auto-login rotates token → response lost →
+            // browser retries with old token after >10s → old token matches
+            // previousTokenValue → should NOT be considered theft
+            var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+            var lastUsed = NOW.minusSeconds(30);
+            var storedToken = createTestToken("test-series", "rotated-token", "test-user", lastUsed);
+            storedToken.getSpec().setPreviousTokenValue("old-token");
+            var device = createTestDevice("test-series");
+            var userDetails = User.withUsername("test-user")
+                    .password("password")
+                    .roles("USER")
+                    .build();
+            when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
+            when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(userDetailsService.findByUsername(eq("test-user"))).thenReturn(Mono.just(userDetails));
+
+            var result = persistentTokenBasedRememberMeServices
+                    .processAutoLoginCookie(new String[] {"test-series", "old-token"}, exchange)
+                    .block();
+
+            assertThat(result).isNotNull();
+            assertThat(result.getUsername()).isEqualTo("test-user");
+            // Should NOT be treated as theft — presentedToken matches previousTokenValue
+            verify(tokenRepository, never()).removeUserTokens(any());
+            // Should NOT rotate when token doesn't match current value
+            verify(tokenRepository, never()).updateToken(any());
+        }
+
+        @Test
         void shouldThrowExceptionWhenTokenExpired() {
             var exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
             var lastUsed = NOW.minusSeconds(100);

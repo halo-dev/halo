@@ -61,12 +61,6 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     public static final int DEFAULT_TOKEN_LENGTH = 16;
 
-    /**
-     * Grace period during which the previous token value is still accepted after rotation. This prevents false-positive
-     * cookie theft detection when concurrent requests race on token rotation.
-     */
-    private static final Duration TOKEN_GRACE_PERIOD = Duration.ofSeconds(10);
-
     private final SecureRandom random;
 
     private final int seriesLength = DEFAULT_SERIES_LENGTH;
@@ -224,11 +218,16 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
     }
 
     private boolean isTokenStolen(RememberMeToken token, String presentedToken) {
-        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
-                .orElseGet(() -> token.getMetadata().getCreationTimestamp());
-        var now = clock.instant();
-        return now.isAfter(lastUsed.plus(TOKEN_GRACE_PERIOD))
-                || !Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue());
+        // If the presented token matches the previous token value, the request is from a device
+        // that missed the last rotation (e.g., response lost, connection closed). This is not
+        // theft — accept the old token regardless of how much time has passed since last rotation.
+        if (Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue())) {
+            return false;
+        }
+        // Presented token matches neither current nor previous — treat as stolen regardless
+        // of grace period. A legitimate device would have either the current token or the
+        // previous token value from the most recent rotation.
+        return true;
     }
 
     private boolean isTokenExpired(RememberMeToken token) {
