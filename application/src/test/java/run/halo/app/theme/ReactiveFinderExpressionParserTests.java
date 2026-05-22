@@ -3,13 +3,18 @@ package run.halo.app.theme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +22,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.MediaType;
 import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.messageresolver.StandardMessageResolver;
 import org.thymeleaf.spring6.dialect.SpringStandardDialect;
 import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator;
@@ -28,11 +37,13 @@ import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
+import run.halo.app.theme.engine.HaloTemplateEngine;
 
 /**
  * Tests expression parser for reactive return value.
@@ -68,8 +79,10 @@ public class ReactiveFinderExpressionParserTests {
         lenient()
                 .when(applicationContext.getBean(eq(SystemConfigFetcher.class)))
                 .thenReturn(environmentFetcher);
-        when(applicationContext.getBeanProvider(ExtensionGetter.class)).thenReturn(extensionGetterProvider);
-        when(extensionGetterProvider.getIfUnique()).thenReturn(null);
+        lenient()
+                .when(applicationContext.getBeanProvider(ExtensionGetter.class))
+                .thenReturn(extensionGetterProvider);
+        lenient().when(extensionGetterProvider.getIfUnique()).thenReturn(null);
         lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
@@ -96,6 +109,73 @@ public class ReactiveFinderExpressionParserTests {
                 var arrayNodeMono = "bar";
             </script>
             """);
+    }
+
+    @Test
+    void finderCallsArePrefetchedBeforeRendering() {
+        var engine = new HaloTemplateEngine(new StandardMessageResolver());
+        engine.setDialects(Set.of(new HaloProcessorDialect(), new SpringStandardDialect() {
+            @Override
+            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                return new ReactiveSpelVariableExpressionEvaluator();
+            }
+        }));
+        engine.addTemplateResolver(new TestTemplateResolver());
+
+        var finder = new TestConcurrentFinderImpl();
+        Context context = getContext();
+        var finderPrefetchContext = new FinderPrefetchContext();
+        var contextView = reactor.util.context.Context.of(FinderPrefetchContext.CONTEXT_KEY, finderPrefetchContext);
+        context.setVariable(HaloViewResolver.HaloView.CONTEXT_VIEW_KEY, contextView);
+        assertThat(FinderPrefetchContext.from(context, HaloViewResolver.HaloView.CONTEXT_VIEW_KEY))
+                .containsSame(finderPrefetchContext);
+        var finderProxy = FinderPrefetchProxyFactory.create("target", finder, finderPrefetchContext, contextView);
+        assertThat(Proxy.isProxyClass(finderProxy.getClass())).isTrue();
+        context.setVariable("target", finderProxy);
+
+        var publisher = engine.processStream(
+                "prefetch",
+                Set.of(),
+                context,
+                new DefaultDataBufferFactory(),
+                MediaType.TEXT_HTML,
+                StandardCharsets.UTF_8,
+                Integer.MAX_VALUE);
+        var result = Flux.from(publisher)
+                .map(buffer -> {
+                    try {
+                        return buffer.toString(StandardCharsets.UTF_8);
+                    } finally {
+                        DataBufferUtils.release(buffer);
+                    }
+                })
+                .collectList()
+                .map(items -> String.join("", items))
+                .block(Duration.ofSeconds(5));
+
+        assertThat(result).isEqualTo("""
+            <p>one</p>
+            <p>two</p>
+            """);
+        assertThat(finder.subscriptions).hasValue(2);
+    }
+
+    @Test
+    void finderProxyRecordsCallsDuringDiscovery() {
+        var finder = new TestConcurrentFinderImpl();
+        var finderPrefetchContext = new FinderPrefetchContext();
+        var contextView = reactor.util.context.Context.of(FinderPrefetchContext.CONTEXT_KEY, finderPrefetchContext);
+        var finderProxy = (TestConcurrentFinder)
+                FinderPrefetchProxyFactory.create("target", finder, finderPrefetchContext, contextView);
+
+        finderPrefetchContext.startDiscovery();
+        finderProxy.first().contextWrite(contextView).blockOptional(Duration.ofSeconds(1));
+        finderProxy.second().contextWrite(contextView).blockOptional(Duration.ofSeconds(1));
+        assertThat(finder.subscriptions).hasValue(0);
+
+        finderPrefetchContext.awaitPrefetchedValues().block(Duration.ofSeconds(5));
+
+        assertThat(finder.subscriptions).hasValue(2);
     }
 
     static class TestReactiveFinder {
@@ -130,6 +210,47 @@ public class ReactiveFinderExpressionParserTests {
 
     record TestUser(String name) {}
 
+    interface TestConcurrentFinder {
+        Mono<String> first();
+
+        Mono<String> second();
+    }
+
+    static class TestConcurrentFinderImpl implements TestConcurrentFinder {
+        private final AtomicInteger subscriptions = new AtomicInteger();
+        private final CountDownLatch bothSubscribed = new CountDownLatch(1);
+
+        @Override
+        public Mono<String> first() {
+            return waitForBothSubscriptions("one");
+        }
+
+        @Override
+        public Mono<String> second() {
+            return waitForBothSubscriptions("two");
+        }
+
+        private Mono<String> waitForBothSubscriptions(String value) {
+            return Mono.<String>create(sink -> {
+                if (subscriptions.incrementAndGet() == 2) {
+                    bothSubscribed.countDown();
+                }
+                Schedulers.boundedElastic().schedule(() -> {
+                    try {
+                        if (bothSubscribed.await(2, TimeUnit.SECONDS)) {
+                            sink.success(value);
+                        } else {
+                            sink.error(new AssertionError("Finder calls were not subscribed concurrently"));
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        sink.error(e);
+                    }
+                });
+            });
+        }
+    }
+
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
@@ -145,6 +266,12 @@ public class ReactiveFinderExpressionParserTests {
                 String ownerTemplate,
                 String template,
                 Map<String, Object> templateResolutionAttributes) {
+            if ("prefetch".equals(template)) {
+                return new StringTemplateResource("""
+                    <p th:text="${target.first()}"></p>
+                    <p th:text="${target.second()}"></p>
+                    """);
+            }
             return new StringTemplateResource("""
                 <p th:text="${genericMap.key}"></p>
                 <p th:text="${target.users[1].name}"></p>

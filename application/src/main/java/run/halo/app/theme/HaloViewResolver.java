@@ -39,7 +39,10 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
     protected Mono<View> loadView(String viewName, Locale locale) {
         return super.loadView(viewName, locale).cast(HaloView.class).map(view -> {
             // populate finders to view static variables
-            finderRegistry.getFinders().forEach(view::addStaticVariable);
+            finderRegistry
+                    .getFinders()
+                    .forEach((name, finder) ->
+                            view.addStaticVariable(name, FinderPrefetchProxyFactory.create(name, finder)));
             return view;
         });
     }
@@ -73,6 +76,9 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
         @Autowired
         private ThemeResolver themeResolver;
 
+        @Autowired
+        private FinderRegistry finderRegistry;
+
         @Override
         public Mono<Void> render(Map<String, ?> model, MediaType contentType, ServerWebExchange exchange) {
             return themeResolver.getTheme(exchange).flatMap(theme -> {
@@ -80,7 +86,9 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
                 var noCache = (Boolean) exchange.getAttributes().getOrDefault(ModelConst.NO_CACHE, false);
                 exchange.getAttributes().put(ModelConst.POWERED_BY_HALO_TEMPLATE_ENGINE, !noCache);
+                var finderPrefetchContext = new FinderPrefetchContext();
                 return super.render(model, contentType, exchange)
+                        .contextWrite(context -> context.put(FinderPrefetchContext.CONTEXT_KEY, finderPrefetchContext))
                         .onErrorMap(TemplateProcessingException.class::isInstance, tee -> {
                             if (tee instanceof TemplateInputException) {
                                 // map the error response exception while fragment not found
@@ -113,7 +121,18 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver implements I
                         modelMapList.forEach(result::putAll);
                         return result;
                     })
-                    .doOnNext(attributes -> attributes.put(CONTEXT_VIEW_KEY, contextView)));
+                    .doOnNext(attributes -> {
+                        attributes.put(CONTEXT_VIEW_KEY, contextView);
+                        var prefetchContext = contextView.getOrDefault(FinderPrefetchContext.CONTEXT_KEY, null);
+                        if (prefetchContext instanceof FinderPrefetchContext finderPrefetchContext) {
+                            finderRegistry
+                                    .getFinders()
+                                    .forEach((name, finder) -> attributes.put(
+                                            name,
+                                            FinderPrefetchProxyFactory.create(
+                                                    name, finder, finderPrefetchContext, contextView)));
+                        }
+                    }));
         }
 
         private Mono<Map<String, Object>> getContextBasedStaticVariables(ServerWebExchange exchange) {

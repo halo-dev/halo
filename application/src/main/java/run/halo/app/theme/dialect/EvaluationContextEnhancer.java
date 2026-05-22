@@ -49,8 +49,10 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
         var evluationContextObject =
                 context.getVariable(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME);
         if (evluationContextObject instanceof ThymeleafEvaluationContext evaluationContext) {
-            evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
-            ReactiveReflectivePropertyAccessor.wrap(evaluationContext);
+            if (!evaluationContext.getPropertyAccessors().contains(JSON_PROPERTY_ACCESSOR)) {
+                evaluationContext.addPropertyAccessor(JSON_PROPERTY_ACCESSOR);
+            }
+            ReactiveReflectivePropertyAccessor.wrap(evaluationContext, context);
             ReactiveMethodResolver.wrap(evaluationContext, context);
         }
     }
@@ -67,9 +69,12 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
      */
     private static class ReactiveReflectivePropertyAccessor extends ReflectivePropertyAccessor {
         private final ReflectivePropertyAccessor delegate;
+        private final ITemplateContext templateContext;
 
-        private ReactiveReflectivePropertyAccessor(ReflectivePropertyAccessor delegate) {
+        private ReactiveReflectivePropertyAccessor(
+                ReflectivePropertyAccessor delegate, ITemplateContext templateContext) {
             this.delegate = delegate;
+            this.templateContext = templateContext;
         }
 
         @Override
@@ -93,7 +98,13 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
                             && Objects.nonNull(tv.getTypeDescriptor())
                             && ReactiveUtils.isReactiveType(
                                     tv.getTypeDescriptor().getType()))
-                    .map(tv -> new TypedValue(ReactiveUtils.blockReactiveValue(tv.getValue())))
+                    .map(tv -> {
+                        var contextView =
+                                (ContextView) Optional.ofNullable(templateContext.getVariable(CONTEXT_VIEW_KEY))
+                                        .filter(ContextView.class::isInstance)
+                                        .orElse(null);
+                        return new TypedValue(ReactiveUtils.blockReactiveValue(tv.getValue(), contextView));
+                    })
                     .orElse(typedValue);
         }
 
@@ -125,11 +136,14 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
             return this;
         }
 
-        static void wrap(ThymeleafEvaluationContext evaluationContext) {
+        static void wrap(ThymeleafEvaluationContext evaluationContext, ITemplateContext context) {
             var wrappedPropertyAccessors = evaluationContext.getPropertyAccessors().stream()
                     .map(propertyAccessor -> {
+                        if (propertyAccessor instanceof ReactiveReflectivePropertyAccessor reactiveAccessor) {
+                            return new ReactiveReflectivePropertyAccessor(reactiveAccessor.delegate, context);
+                        }
                         if (propertyAccessor instanceof ReflectivePropertyAccessor reflectiveAccessor) {
-                            return new ReactiveReflectivePropertyAccessor(reflectiveAccessor);
+                            return new ReactiveReflectivePropertyAccessor(reflectiveAccessor, context);
                         }
                         return propertyAccessor;
                     })
@@ -171,7 +185,12 @@ public class EvaluationContextEnhancer extends AbstractTemplateBoundariesProcess
 
         static void wrap(ThymeleafEvaluationContext evaluationContext, ITemplateContext context) {
             var wrappedMethodResolvers = evaluationContext.getMethodResolvers().stream()
-                    .<MethodResolver>map(methodResolver -> new ReactiveMethodResolver(methodResolver, context))
+                    .<MethodResolver>map(methodResolver -> {
+                        if (methodResolver instanceof ReactiveMethodResolver reactiveMethodResolver) {
+                            return new ReactiveMethodResolver(reactiveMethodResolver.delegate, context);
+                        }
+                        return new ReactiveMethodResolver(methodResolver, context);
+                    })
                     // make the list mutable
                     .collect(Collectors.toCollection(ArrayList::new));
             evaluationContext.setMethodResolvers(wrappedMethodResolvers);
