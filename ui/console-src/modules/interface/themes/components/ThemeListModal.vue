@@ -2,12 +2,10 @@
 import type { Theme } from "@halo-dev/api-client";
 import { VButton, VLoading, VModal, VTabbar } from "@halo-dev/components";
 import { utils, type ThemeListTab } from "@halo-dev/ui-shared";
-import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   defineAsyncComponent,
   inject,
-  nextTick,
   onMounted,
   provide,
   ref,
@@ -85,17 +83,6 @@ provide<Ref<string>>("activeTabId", activeTabId);
 const modalTitle = computed(() => {
   const tab = tabs.value.find((tab) => tab.id === activeTabId.value);
   return tab?.label;
-});
-
-// handle remote wordpress url from route
-const remoteDownloadUrl = useRouteQuery<string>("remote-download-url");
-
-onMounted(() => {
-  if (remoteDownloadUrl.value) {
-    nextTick(() => {
-      activeTabId.value = "remote-download";
-    });
-  }
 });
 
 const { pluginModules } = usePluginModuleStore();
