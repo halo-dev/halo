@@ -2,11 +2,9 @@
 import type { Plugin } from "@halo-dev/api-client";
 import { VButton, VLoading, VModal, VTabbar } from "@halo-dev/components";
 import { utils, type PluginInstallationTab } from "@halo-dev/ui-shared";
-import { useRouteQuery } from "@vueuse/router";
 import {
   computed,
   defineAsyncComponent,
-  nextTick,
   onMounted,
   provide,
   ref,
@@ -66,19 +64,6 @@ const modalTitle = computed(() => {
         display_name: props.pluginToUpgrade.spec.displayName,
       })
     : t("core.plugin.upload_modal.titles.install");
-});
-
-// handle remote download url from route
-const routeRemoteDownloadUrl = useRouteQuery<string | null>(
-  "remote-download-url"
-);
-
-onMounted(() => {
-  if (routeRemoteDownloadUrl.value) {
-    nextTick(() => {
-      activeTabId.value = "remote";
-    });
-  }
 });
 
 const { pluginModules } = usePluginModuleStore();
