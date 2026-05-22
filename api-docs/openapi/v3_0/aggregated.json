@@ -22742,6 +22742,10 @@
               "$ref": "#/components/schemas/Condition"
             }
           },
+          "inDevelopment": {
+            "type": "boolean",
+            "description": "Whether the theme appears to be a local development workspace."
+          },
           "location": {
             "type": "string"
           },
