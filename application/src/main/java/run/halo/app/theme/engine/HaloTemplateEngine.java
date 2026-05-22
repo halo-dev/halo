@@ -108,6 +108,8 @@ public class HaloTemplateEngine extends SpringWebFluxTemplateEngine {
                     .onErrorResume(e -> Mono.empty())
                     .then(Mono.defer(
                             () -> finderPrefetchContext.awaitPrefetchedValues().onErrorResume(e -> Mono.empty())))
+                    // Prefetch may complete on R2DBC/Reactor non-blocking threads, but rendering can block.
+                    .publishOn(Schedulers.boundedElastic())
                     .then(Mono.fromRunnable(finderPrefetchContext::startRender))
                     .thenMany(Flux.defer(() -> Flux.from(super.processStream(
                             template,

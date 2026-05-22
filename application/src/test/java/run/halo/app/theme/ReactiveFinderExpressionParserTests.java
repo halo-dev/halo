@@ -161,6 +161,52 @@ public class ReactiveFinderExpressionParserTests {
     }
 
     @Test
+    void finalRenderAfterAsyncPrefetchRunsOnBlockingScheduler() {
+        var engine = new HaloTemplateEngine(new StandardMessageResolver());
+        engine.setDialects(Set.of(new HaloProcessorDialect(), new SpringStandardDialect() {
+            @Override
+            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                return new ReactiveSpelVariableExpressionEvaluator();
+            }
+        }));
+        engine.addTemplateResolver(new TestTemplateResolver());
+
+        Context context = getContext();
+        var finderPrefetchContext = new FinderPrefetchContext();
+        var contextView = reactor.util.context.Context.of(FinderPrefetchContext.CONTEXT_KEY, finderPrefetchContext);
+        context.setVariable(HaloViewResolver.HaloView.CONTEXT_VIEW_KEY, contextView);
+        context.setVariable(
+                "target",
+                FinderPrefetchProxyFactory.create(
+                        "target", new NonBlockingCompletionFinder(), finderPrefetchContext, contextView));
+
+        var publisher = engine.processStream(
+                "prefetch",
+                Set.of(),
+                context,
+                new DefaultDataBufferFactory(),
+                MediaType.TEXT_HTML,
+                StandardCharsets.UTF_8,
+                Integer.MAX_VALUE);
+        var result = Flux.from(publisher)
+                .map(buffer -> {
+                    try {
+                        return buffer.toString(StandardCharsets.UTF_8);
+                    } finally {
+                        DataBufferUtils.release(buffer);
+                    }
+                })
+                .collectList()
+                .map(items -> String.join("", items))
+                .block(Duration.ofSeconds(5));
+
+        assertThat(result).isEqualTo("""
+            <p>one</p>
+            <p>two</p>
+            """);
+    }
+
+    @Test
     void finderProxyRecordsCallsDuringDiscovery() {
         var finder = new TestConcurrentFinderImpl();
         var finderPrefetchContext = new FinderPrefetchContext();
@@ -248,6 +294,18 @@ public class ReactiveFinderExpressionParserTests {
                     }
                 });
             });
+        }
+    }
+
+    static class NonBlockingCompletionFinder implements TestConcurrentFinder {
+        @Override
+        public Mono<String> first() {
+            return Mono.delay(Duration.ofMillis(10)).thenReturn("one");
+        }
+
+        @Override
+        public Mono<String> second() {
+            return Mono.delay(Duration.ofMillis(10)).thenReturn("two");
         }
     }
 
