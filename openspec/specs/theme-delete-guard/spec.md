@@ -1,61 +1,49 @@
 ## Purpose
 
-Protect locally developed themes from accidental deletion in Console theme management while still allowing an explicit
-forced uninstall when the user confirms the risk.
+Surface whether an installed theme appears to be a local development workspace so Console and integration clients can
+warn before destructive operations such as uninstall or upgrade.
 
 ## Requirements
 
-### Requirement: Console theme deletion is guarded for possible development themes
+### Requirement: Theme development workspace status is reconciled
 
-The system SHALL provide a Console theme deletion API that refuses to delete a Theme when the corresponding theme
-directory appears to contain local development files, unless the request explicitly forces deletion.
+The system SHALL expose whether an installed Theme appears to be a local development workspace in `status.inDevelopment`.
 
-#### Scenario: Delete request is rejected for a possible development theme
+#### Scenario: Theme is marked as in development when local development indicators exist
 
-- **WHEN** a Console client requests to delete a Theme without `force=true`
-- **AND** the theme directory contains at least one development indicator such as `.git`, `package.json`,
+- **WHEN** the Theme reconciler reconciles an installed Theme
+- **AND** the corresponding theme directory contains at least one development indicator such as `.git`, `package.json`,
   `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`, or `node_modules`
-- **THEN** the system MUST NOT delete the Theme resource
-- **AND** the system MUST respond with HTTP `409 Conflict`
+- **THEN** the reconciled Theme status SHALL set `inDevelopment` to `true`
 
-#### Scenario: Delete request proceeds for a possible development theme when forced
+#### Scenario: Theme is marked as not in development when local development indicators do not exist
 
-- **WHEN** a Console client requests to delete a Theme with `force=true`
-- **AND** the theme directory contains at least one development indicator
-- **THEN** the system SHALL delete the Theme resource
-- **AND** existing Theme reconciler cleanup SHALL remain responsible for deleting associated files and resources
+- **WHEN** the Theme reconciler reconciles an installed Theme
+- **AND** the corresponding theme directory does not contain development indicators
+- **THEN** the reconciled Theme status SHALL set `inDevelopment` to `false`
 
-#### Scenario: Delete request proceeds for an ordinary theme
+### Requirement: Console asks for a second confirmation before uninstalling a development workspace theme
 
-- **WHEN** a Console client requests to delete a Theme without `force=true`
-- **AND** the theme directory does not contain development indicators
-- **THEN** the system SHALL delete the Theme resource
-- **AND** existing Theme reconciler cleanup SHALL remain responsible for deleting associated files and resources
+The Console SHALL use `status.inDevelopment` to decide whether to show a second, stronger warning before uninstalling a
+Theme.
 
-### Requirement: Console handles guarded deletion with a forced confirmation flow
+#### Scenario: Console asks for development confirmation after ordinary uninstall confirmation
 
-The Console SHALL call the guarded Console theme deletion API for theme uninstall operations and SHALL ask for explicit
-confirmation before retrying a guarded deletion with force.
+- **WHEN** a user starts a Theme uninstall in the Console
+- **AND** the Theme status has `inDevelopment` set to `true`
+- **AND** the user confirms the ordinary irreversible-operation warning
+- **THEN** the Console SHALL show a second warning that the Theme may be under local development
+- **AND** the second warning SHALL explain that uninstalling will delete the theme directory and may lose local changes
+- **AND** the Console SHALL only call the existing Theme delete API after the user confirms the second warning
 
-#### Scenario: Console retries with force after guarded deletion is rejected
+#### Scenario: Console keeps the ordinary uninstall warning for packaged themes
 
-- **WHEN** a user confirms a theme uninstall in the Console
-- **AND** the guarded delete API responds with HTTP `409 Conflict`
-- **THEN** the Console SHALL show a second warning that the theme may be under local development
-- **AND** the warning SHALL explain that forced uninstall will delete the theme directory and may lose local changes
-- **AND** if the user confirms the second warning, the Console SHALL retry the delete request with `force=true`
+- **WHEN** a user starts a Theme uninstall in the Console
+- **AND** the Theme status does not have `inDevelopment` set to `true`
+- **THEN** the Console SHALL keep the ordinary irreversible-operation confirmation
 
-#### Scenario: Console does not delete configuration when guarded deletion is cancelled
+#### Scenario: Console deletes configuration only after successful Theme deletion
 
-- **WHEN** a user starts "uninstall and delete config" for a possible development theme
-- **AND** the guarded delete API responds with HTTP `409 Conflict`
-- **AND** the user cancels the forced deletion confirmation
-- **THEN** the Console MUST NOT delete the Theme resource
-- **AND** the Console MUST NOT delete the theme Setting or ConfigMap
-
-#### Scenario: Console deletes configuration after successful forced deletion
-
-- **WHEN** a user starts "uninstall and delete config" for a possible development theme
-- **AND** the user confirms forced deletion
-- **AND** the forced delete request succeeds
+- **WHEN** a user starts "uninstall and delete config" for any Theme
+- **AND** the Theme delete request succeeds
 - **THEN** the Console SHALL delete the corresponding theme Setting and ConfigMap when they exist

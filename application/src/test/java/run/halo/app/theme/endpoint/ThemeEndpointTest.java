@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -248,64 +247,6 @@ class ThemeEndpointTest {
                 .isOk();
     }
 
-    @Test
-    void shouldRejectDeleteWhenThemeHasDevelopmentIndicators() throws IOException {
-        var theme = themeWithName("dev-theme");
-        Files.createDirectories(tmpHaloWorkDir.resolve("dev-theme").resolve(".git"));
-        when(client.fetch(eq(Theme.class), eq("dev-theme"))).thenReturn(Mono.just(theme));
-
-        webTestClient
-                .delete()
-                .uri("/themes/dev-theme")
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409);
-
-        verify(client).fetch(eq(Theme.class), eq("dev-theme"));
-        verify(client, never()).delete(theme);
-    }
-
-    @Test
-    void shouldDeletePossibleDevelopmentThemeWhenForced() throws IOException {
-        var theme = themeWithName("dev-theme");
-        Files.createDirectories(tmpHaloWorkDir.resolve("dev-theme"));
-        Files.writeString(tmpHaloWorkDir.resolve("dev-theme").resolve("package.json"), "{}");
-        when(client.fetch(eq(Theme.class), eq("dev-theme"))).thenReturn(Mono.just(theme));
-        when(client.delete(theme)).thenReturn(Mono.just(theme));
-
-        webTestClient
-                .delete()
-                .uri("/themes/dev-theme?force=true")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(Theme.class)
-                .isEqualTo(theme);
-
-        verify(client).fetch(eq(Theme.class), eq("dev-theme"));
-        verify(client).delete(theme);
-    }
-
-    @Test
-    void shouldDeleteOrdinaryThemeWithoutForce() throws IOException {
-        var theme = themeWithName("ordinary-theme");
-        Files.createDirectories(tmpHaloWorkDir.resolve("ordinary-theme"));
-        when(client.fetch(eq(Theme.class), eq("ordinary-theme"))).thenReturn(Mono.just(theme));
-        when(client.delete(theme)).thenReturn(Mono.just(theme));
-
-        webTestClient
-                .delete()
-                .uri("/themes/ordinary-theme")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(Theme.class)
-                .isEqualTo(theme);
-
-        verify(client).fetch(eq(Theme.class), eq("ordinary-theme"));
-        verify(client).delete(theme);
-    }
-
     @Nested
     class UpdateThemeConfigTest {
 
@@ -388,14 +329,5 @@ class ThemeEndpointTest {
 
         verify(settingConfigService).fetchConfig(eq("fake-config"));
         verify(client).fetch(eq(Theme.class), eq("fake"));
-    }
-
-    private Theme themeWithName(String name) {
-        var theme = new Theme();
-        var metadata = new Metadata();
-        metadata.setName(name);
-        metadata.setVersion(1L);
-        theme.setMetadata(metadata);
-        return theme;
     }
 }

@@ -2306,45 +2306,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/themes/{name}": {
-      "delete": {
-        "description": "Delete a theme from Console.",
-        "operationId": "DeleteThemeFromConsole",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Whether to force deletion when the theme may be under development.",
-            "in": "query",
-            "name": "force",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Theme"
-                }
-              }
-            },
-            "description": "default response"
-          }
-        },
-        "tags": [
-          "ThemeV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/activation": {
       "put": {
         "description": "Activate a theme by name.",
@@ -6484,6 +6445,10 @@
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
+          },
+          "inDevelopment": {
+            "type": "boolean",
+            "description": "Whether the theme appears to be a local development workspace."
           },
           "location": {
             "type": "string"

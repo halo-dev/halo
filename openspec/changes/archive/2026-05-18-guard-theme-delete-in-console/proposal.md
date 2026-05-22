@@ -4,18 +4,20 @@ Theme uninstall from the Console currently calls the generic Theme delete API. T
 `$workDir/themes/<themeName>` recursively, so an administrator can accidentally delete a theme directory that is also
 being used for local theme development.
 
-Halo should guard this Console workflow before the Theme resource is deleted, while still allowing an explicit forced
-delete when the administrator confirms the risk.
+The same signal is also useful outside Console uninstall. For example, an app marketplace client can warn before
+upgrading an already-published theme that is currently being developed locally, because the upgrade flow overwrites the
+theme directory.
+
+Halo should reconcile this local-development heuristic into Theme status so all clients can make protective UX
+decisions without introducing a new delete API.
 
 ## What Changes
 
-- Add a Console-specific theme delete API that accepts a `force` query parameter.
-- Before deleting a Theme through this Console API, inspect the theme directory for local development indicators such as
-  `.git`, `package.json`, lockfiles, or `node_modules`.
-- When development indicators are found and `force` is not true, reject the delete request instead of deleting the
-  Theme resource.
-- Let the Console theme uninstall UI call the new Console API and, when the guard rejects the first request, show a
-  stronger confirmation dialog before retrying with `force=true`.
+- Add `status.inDevelopment` to Theme status.
+- Let `ThemeReconciler` inspect the theme directory for local development indicators such as `.git`, `package.json`,
+  lockfiles, or `node_modules`, and keep `status.inDevelopment` up to date.
+- Let the Console theme uninstall UI keep calling the existing Theme delete API, but require a second, stronger
+  confirmation when `status.inDevelopment` is true.
 - Keep the existing Theme reconciler cleanup behavior unchanged; it remains responsible for deleting theme files after a
   Theme resource is actually deleted.
 
@@ -23,7 +25,8 @@ delete when the administrator confirms the risk.
 
 ### New Capabilities
 
-- `theme-delete-guard`: Console theme deletion guard for possible local development theme directories and forced retry.
+- `theme-delete-guard`: Theme development-workspace status and Console uninstall warning for possible local development
+  theme directories.
 
 ### Modified Capabilities
 
@@ -31,12 +34,13 @@ delete when the administrator confirms the risk.
 
 ## Impact
 
-- `application/src/main/java/run/halo/app/theme/endpoint/ThemeEndpoint.java` — add Console delete route and development
-  theme detection before deletion.
-- `application/src/test/java/run/halo/app/theme/endpoint/ThemeEndpointTest.java` — cover guarded delete, forced delete,
-  and ordinary delete behavior.
-- `ui/console-src/modules/interface/themes/components/operation/UninstallOperationItem.vue` — switch theme uninstall to
-  the new Console API and add the forced confirmation flow.
+- `api/src/main/java/run/halo/app/core/extension/Theme.java` — expose `status.inDevelopment`.
+- `application/src/main/java/run/halo/app/core/reconciler/ThemeReconciler.java` — reconcile development-workspace
+  status from the theme directory.
+- `application/src/test/java/run/halo/app/core/reconciler/ThemeReconcilerTest.java` — cover development-workspace
+  status updates.
+- `ui/console-src/modules/interface/themes/components/operation/UninstallOperationItem.vue` — show a second stronger
+  warning before uninstalling a theme whose status says it may be under local development.
 - `ui/src/locales/*.json` — add i18n strings for the possible development theme warning.
-- OpenAPI-generated UI API client — regenerate after adding the Console API.
+- OpenAPI-generated UI API client — regenerate after adding the Theme status field.
 - No database migration or new dependency is required.

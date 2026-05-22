@@ -12,7 +12,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -23,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -33,10 +31,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
@@ -67,9 +63,6 @@ import tools.jackson.databind.node.ObjectNode;
 @Component
 @AllArgsConstructor
 public class ThemeEndpoint implements CustomEndpoint {
-
-    private static final List<String> DEVELOPMENT_INDICATORS =
-            List.of(".git", "package.json", "pnpm-lock.yaml", "yarn.lock", "package-lock.json", "node_modules");
 
     private final ReactiveExtensionClient client;
 
@@ -213,25 +206,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                                         .required(true)
                                         .implementation(String.class))
                                 .response(responseBuilder().responseCode(String.valueOf(NO_CONTENT.value()))))
-                .DELETE(
-                        "/themes/{name}",
-                        this::deleteTheme,
-                        builder -> builder.operationId("DeleteThemeFromConsole")
-                                .description("Delete a theme from Console.")
-                                .tag(tag)
-                                .parameter(parameterBuilder()
-                                        .name("name")
-                                        .in(ParameterIn.PATH)
-                                        .required(true)
-                                        .implementation(String.class))
-                                .parameter(parameterBuilder()
-                                        .name("force")
-                                        .description(
-                                                "Whether to force deletion when the theme may be under development.")
-                                        .in(ParameterIn.QUERY)
-                                        .required(false)
-                                        .implementation(Boolean.class))
-                                .response(responseBuilder().implementation(Theme.class)))
                 .GET("themes", this::listThemes, builder -> {
                     builder.operationId("ListThemes")
                             .description("List themes.")
@@ -271,36 +245,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                                         .implementation(String.class))
                                 .response(responseBuilder().implementation(Object.class)))
                 .build();
-    }
-
-    private Mono<ServerResponse> deleteTheme(ServerRequest request) {
-        var name = request.pathVariable("name");
-        var force = Boolean.parseBoolean(request.queryParam("force").orElse("false"));
-        return client.fetch(Theme.class, name)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("Theme not found.")))
-                .flatMap(theme -> rejectPossibleDevelopmentTheme(name, force).thenReturn(theme))
-                .flatMap(client::delete)
-                .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
-    }
-
-    private Mono<Void> rejectPossibleDevelopmentTheme(String name, boolean force) {
-        if (force) {
-            return Mono.empty();
-        }
-        return hasDevelopmentIndicators(name)
-                .filter(Boolean::booleanValue)
-                .flatMap(ignored -> Mono.error(
-                        new ResponseStatusException(HttpStatus.CONFLICT, "The theme may be under local development.")))
-                .then();
-    }
-
-    private Mono<Boolean> hasDevelopmentIndicators(String name) {
-        return Mono.fromCallable(() -> {
-                    var themePath = themeRoot.get().resolve(name);
-                    return DEVELOPMENT_INDICATORS.stream()
-                            .anyMatch(indicator -> Files.exists(themePath.resolve(indicator)));
-                })
-                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Mono<ServerResponse> fetchThemeJsonConfig(ServerRequest request) {

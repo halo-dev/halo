@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import type { Theme } from "@halo-dev/api-client";
-import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
+import { coreApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VDropdown, VDropdownItem } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { AxiosError } from "axios";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -15,10 +14,6 @@ const props = withDefaults(
   }>(),
   {}
 );
-
-const isPossibleDevelopmentThemeConflict = (error: unknown) => {
-  return (error as AxiosError).response?.status === 409;
-};
 
 const deleteThemeExtensions = async () => {
   const { settingName, configMapName } = props.theme.spec;
@@ -46,12 +41,11 @@ const deleteThemeExtensions = async () => {
   }
 };
 
-const uninstallTheme = async (deleteExtensions?: boolean, force?: boolean) => {
+const uninstallTheme = async (deleteExtensions?: boolean) => {
   try {
-    await consoleApiClient.theme.theme.deleteThemeFromConsole(
+    await coreApiClient.theme.theme.deleteTheme(
       {
         name: props.theme.metadata.name,
-        force,
       },
       {
         mute: true,
@@ -68,34 +62,12 @@ const uninstallTheme = async (deleteExtensions?: boolean, force?: boolean) => {
   }
 };
 
-const confirmForceUninstall = (deleteExtensions?: boolean) => {
+const confirmDevelopmentThemeUninstall = (deleteExtensions?: boolean) => {
   Dialog.warning({
     title: t("core.theme.operations.uninstall.possible_development_title"),
     description: t(
       "core.theme.operations.uninstall.possible_development_description"
     ),
-    confirmText: t("core.theme.operations.uninstall.force_confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    confirmType: "danger",
-    onConfirm: async () => {
-      try {
-        await uninstallTheme(deleteExtensions, true);
-      } catch (e) {
-        Toast.error(t("core.common.toast.operation_failed"));
-        console.error("Failed to force uninstall theme", e);
-      }
-    },
-  });
-};
-
-const handleUninstall = async (deleteExtensions?: boolean) => {
-  Dialog.warning({
-    title: `${
-      deleteExtensions
-        ? t("core.theme.operations.uninstall_and_delete_config.title")
-        : t("core.theme.operations.uninstall.title")
-    }`,
-    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     confirmType: "danger",
@@ -103,11 +75,33 @@ const handleUninstall = async (deleteExtensions?: boolean) => {
       try {
         await uninstallTheme(deleteExtensions);
       } catch (e) {
-        if (isPossibleDevelopmentThemeConflict(e)) {
-          confirmForceUninstall(deleteExtensions);
-          return;
-        }
+        Toast.error(t("core.common.toast.operation_failed"));
+        console.error("Failed to uninstall development theme", e);
+      }
+    },
+  });
+};
 
+const handleUninstall = async (deleteExtensions?: boolean) => {
+  const isDevelopmentTheme = props.theme.status?.inDevelopment === true;
+
+  Dialog.warning({
+    title: deleteExtensions
+      ? t("core.theme.operations.uninstall_and_delete_config.title")
+      : t("core.theme.operations.uninstall.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
+    onConfirm: async () => {
+      if (isDevelopmentTheme) {
+        confirmDevelopmentThemeUninstall(deleteExtensions);
+        return;
+      }
+
+      try {
+        await uninstallTheme(deleteExtensions);
+      } catch (e) {
         Toast.error(t("core.common.toast.operation_failed"));
         console.error("Failed to uninstall theme", e);
       }

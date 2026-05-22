@@ -80,52 +80,6 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Delete a theme from Console.
-         * @param {string} name 
-         * @param {boolean} [force] Whether to force deletion when the theme may be under development.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteThemeFromConsole: async (name: string, force?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'name' is not null or undefined
-            assertParamExists('deleteThemeFromConsole', 'name', name)
-            const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (force !== undefined) {
-                localVarQueryParameter['force'] = force;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Fetch the activated theme.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -677,19 +631,6 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Delete a theme from Console.
-         * @param {string} name 
-         * @param {boolean} [force] Whether to force deletion when the theme may be under development.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteThemeFromConsole(name: string, force?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteThemeFromConsole(name, force, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ThemeV1alpha1ConsoleApi.deleteThemeFromConsole']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * Fetch the activated theme.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -857,15 +798,6 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
             return localVarFp.activateTheme(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete a theme from Console.
-         * @param {ThemeV1alpha1ConsoleApiDeleteThemeFromConsoleRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteThemeFromConsole(requestParameters: ThemeV1alpha1ConsoleApiDeleteThemeFromConsoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
-            return localVarFp.deleteThemeFromConsole(requestParameters.name, requestParameters.force, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Fetch the activated theme.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -982,18 +914,6 @@ export interface ThemeV1alpha1ConsoleApiActivateThemeRequest {
 }
 
 /**
- * Request parameters for deleteThemeFromConsole operation in ThemeV1alpha1ConsoleApi.
- */
-export interface ThemeV1alpha1ConsoleApiDeleteThemeFromConsoleRequest {
-    readonly name: string
-
-    /**
-     * Whether to force deletion when the theme may be under development.
-     */
-    readonly force?: boolean
-}
-
-/**
  * Request parameters for fetchThemeJsonConfig operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest {
@@ -1104,16 +1024,6 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      */
     public activateTheme(requestParameters: ThemeV1alpha1ConsoleApiActivateThemeRequest, options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).activateTheme(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Delete a theme from Console.
-     * @param {ThemeV1alpha1ConsoleApiDeleteThemeFromConsoleRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public deleteThemeFromConsole(requestParameters: ThemeV1alpha1ConsoleApiDeleteThemeFromConsoleRequest, options?: RawAxiosRequestConfig) {
-        return ThemeV1alpha1ConsoleApiFp(this.configuration).deleteThemeFromConsole(requestParameters.name, requestParameters.force, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
