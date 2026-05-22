@@ -79,6 +79,9 @@ public class Theme extends AbstractExtension {
         private ThemePhase phase;
         private ConditionList conditions;
         private String location;
+
+        @Schema(description = "Whether the theme appears to be a local development workspace.")
+        private Boolean inDevelopment;
     }
 
     /**

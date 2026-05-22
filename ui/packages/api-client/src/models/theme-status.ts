@@ -19,6 +19,10 @@ import type { Condition } from './condition';
 
 export interface ThemeStatus {
     'conditions'?: Array<Condition>;
+    /**
+     * Whether the theme appears to be a local development workspace.
+     */
+    'inDevelopment'?: boolean;
     'location'?: string;
     'phase'?: ThemeStatusPhaseEnum;
 }
