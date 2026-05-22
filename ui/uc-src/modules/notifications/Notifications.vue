@@ -23,7 +23,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { chunk } from "es-toolkit";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
@@ -73,6 +73,136 @@ const selectedNotification = computed(() => {
   );
 });
 
+// ---- Batch selection state ----
+const isSelectMode = ref(false);
+const selectedNames = ref<Set<string>>(new Set<string>());
+const lastSelectedIndex = ref<number>(-1);
+
+const isAllSelected = computed(
+  () =>
+    !!notifications.value?.length &&
+    selectedNames.value.size === notifications.value.length
+);
+
+// Exit select mode and clear selections when switching tabs.
+watch(activeTab, () => {
+  isSelectMode.value = false;
+  selectedNames.value.clear();
+  lastSelectedIndex.value = -1;
+});
+
+// Auto-exit select mode when the list becomes empty (e.g. after deleting all).
+watch(notifications, (newVal) => {
+  if (isSelectMode.value && newVal !== undefined && newVal.length === 0) {
+    isSelectMode.value = false;
+    selectedNames.value.clear();
+    lastSelectedIndex.value = -1;
+  }
+});
+
+function toggleSelectMode() {
+  isSelectMode.value = !isSelectMode.value;
+  if (!isSelectMode.value) {
+    selectedNames.value.clear();
+    lastSelectedIndex.value = -1;
+  }
+}
+
+/**
+ * Unified click handler for notification list items.
+ *
+ * Normal mode: open the notification in the detail pane.
+ * Select mode:
+ *   - Shift+click  -> range-select from the last clicked item to the current one
+ *   - Ctrl/Cmd+click -> toggle the current item without resetting the anchor
+ *   - plain click  -> toggle the current item and update the anchor
+ */
+function handleItemClick(
+  notification: Notification,
+  index: number,
+  event: MouseEvent
+) {
+  if (!isSelectMode.value) {
+    selectedNotificationName.value = notification.metadata.name;
+    return;
+  }
+
+  const name = notification.metadata.name;
+
+  if (event.shiftKey && lastSelectedIndex.value !== -1) {
+    const start = Math.min(lastSelectedIndex.value, index);
+    const end = Math.max(lastSelectedIndex.value, index);
+    // Shift+click always selects the range (deselection uses Ctrl+click).
+    notifications.value?.slice(start, end + 1).forEach((n) => {
+      selectedNames.value.add(n.metadata.name);
+    });
+    lastSelectedIndex.value = index;
+  } else if (event.ctrlKey || event.metaKey) {
+    // Toggle without changing the anchor (mirrors OS file-manager behaviour).
+    if (selectedNames.value.has(name)) {
+      selectedNames.value.delete(name);
+    } else {
+      selectedNames.value.add(name);
+    }
+  } else {
+    if (selectedNames.value.has(name)) {
+      selectedNames.value.delete(name);
+    } else {
+      selectedNames.value.add(name);
+    }
+    lastSelectedIndex.value = index;
+  }
+}
+
+function handleSelectAll() {
+  if (isAllSelected.value) {
+    selectedNames.value.clear();
+  } else {
+    notifications.value?.forEach((n) =>
+      selectedNames.value.add(n.metadata.name)
+    );
+  }
+}
+
+function handleDeleteSelected() {
+  if (selectedNames.value.size === 0) return;
+
+  Dialog.warning({
+    title: t("core.uc_notification.operations.delete_selected.title"),
+    description: t(
+      "core.uc_notification.operations.delete_selected.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    confirmType: "danger",
+    onConfirm: async () => {
+      if (!currentUser) {
+        throw new Error("Current user is not found");
+      }
+
+      const namesToDelete = Array.from(selectedNames.value);
+      const notificationChunks = chunk(namesToDelete, 5);
+
+      for (const chunkItem of notificationChunks) {
+        await Promise.all(
+          chunkItem.map((name) =>
+            ucApiClient.notification.notification.deleteSpecifiedNotification({
+              username: currentUser.user.metadata.name,
+              name,
+            })
+          )
+        );
+      }
+
+      selectedNames.value.clear();
+      lastSelectedIndex.value = -1;
+      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
+      Toast.success(t("core.common.toast.delete_success"));
+    },
+  });
+}
+// ---- End batch selection ----
+
 function handleDeleteNotifications() {
   Dialog.warning({
     title: t("core.uc_notification.operations.delete_all.title"),
@@ -91,9 +221,9 @@ function handleDeleteNotifications() {
 
       const notificationChunks = chunk(notifications.value, 5);
 
-      for (const chunk of notificationChunks) {
+      for (const chunkItem of notificationChunks) {
         await Promise.all(
-          chunk.map((notification) =>
+          chunkItem.map((notification) =>
             ucApiClient.notification.notification.deleteSpecifiedNotification({
               username: currentUser.user.metadata.name,
               name: notification.metadata.name,
@@ -173,25 +303,63 @@ function handleMarkAllAsRead() {
             <div
               class="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2"
             >
-              <button
-                v-if="activeTab === 'unread'"
-                class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                :disabled="!notifications?.length"
-                @click="handleMarkAllAsRead"
-              >
-                <IconCheckboxCircle
-                  class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                />
-              </button>
-              <button
-                class="group flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                :disabled="!notifications?.length"
-                @click="handleDeleteNotifications"
-              >
-                <IconDeleteBin
-                  class="h-4 w-4 text-gray-600 group-hover:text-red-600"
-                />
-              </button>
+              <!-- Normal mode actions -->
+              <template v-if="!isSelectMode">
+                <button
+                  v-if="activeTab === 'unread'"
+                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="!notifications?.length"
+                  @click="handleMarkAllAsRead"
+                >
+                  <IconCheckboxCircle
+                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                  />
+                </button>
+                <button
+                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="!notifications?.length"
+                  @click="toggleSelectMode"
+                >
+                  {{ $t("core.uc_notification.operations.select_mode.button") }}
+                </button>
+                <button
+                  class="group flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="!notifications?.length"
+                  @click="handleDeleteNotifications"
+                >
+                  <IconDeleteBin
+                    class="h-4 w-4 text-gray-600 group-hover:text-red-600"
+                  />
+                </button>
+              </template>
+
+              <!-- Select mode actions -->
+              <template v-else>
+                <button
+                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200"
+                  @click="handleSelectAll"
+                >
+                  {{ $t("core.uc_notification.operations.select_all.button") }}
+                </button>
+                <button
+                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="selectedNames.size === 0"
+                  @click="handleDeleteSelected"
+                >
+                  {{
+                    $t(
+                      "core.uc_notification.operations.delete_selected.button",
+                      { count: selectedNames.size }
+                    )
+                  }}
+                </button>
+                <button
+                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200"
+                  @click="toggleSelectMode"
+                >
+                  {{ $t("core.common.buttons.close") }}
+                </button>
+              </template>
             </div>
           </div>
           <OverlayScrollbarsComponent
@@ -222,15 +390,18 @@ function handleMarkAllAsRead() {
                 role="list"
               >
                 <li
-                  v-for="notification in notifications"
+                  v-for="(notification, index) in notifications"
                   :key="notification.metadata.name"
-                  @click="selectedNotificationName = notification.metadata.name"
+                  @click="handleItemClick(notification, index, $event)"
                 >
                   <NotificationListItem
                     :notification="notification"
                     :is-selected="
+                      !isSelectMode &&
                       selectedNotificationName === notification.metadata.name
                     "
+                    :is-select-mode="isSelectMode"
+                    :is-checked="selectedNames.has(notification.metadata.name)"
                   />
                 </li>
               </ul>
