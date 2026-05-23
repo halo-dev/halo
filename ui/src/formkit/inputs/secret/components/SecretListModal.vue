@@ -14,6 +14,7 @@ import SecretListItem from "./SecretListItem.vue";
 
 const props = defineProps<{
   selectedSecretName: string;
+  descriptionPreset?: string;
   requiredKeys?: RequiredKey[];
 }>();
 
@@ -88,6 +89,7 @@ function handleSelect() {
 
   <SecretCreationModal
     v-if="creationModalVisible"
+    :description-preset="descriptionPreset"
     :required-keys="requiredKeys"
     @close="creationModalVisible = false"
   />
