@@ -297,8 +297,8 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         }
 
         /**
-         * Sort property and direction of the list result, like field,asc or field,desc.
-         * Supported fields: creationTimestamp.
+         * Sort property and direction of the list result, like field,asc or field,desc. Supported fields:
+         * creationTimestamp.
          */
         @ArraySchema(
                 uniqueItems = true,
