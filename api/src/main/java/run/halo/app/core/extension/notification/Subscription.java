@@ -11,8 +11,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * {@link Subscription} is a custom extension that defines a subscriber to be notified when a certain {@link Reason} is
- * triggered.
+ * Subscription extension that records which subscriber should be notified when a matching reason is triggered.
  *
  * <p>It holds a {@link Subscriber} to the user to be notified, a {@link InterestReason} to subscribe to.
  *
@@ -29,36 +28,43 @@ import run.halo.app.extension.GVK;
         singular = "subscription")
 public class Subscription extends AbstractExtension {
 
+    /** Desired subscriber, unsubscribe token, interest expression, and disabled state. */
     @Schema
     private Spec spec;
 
+    /** Desired notification subscription settings. */
     @Data
     @Schema(name = "SubscriptionSpec")
     public static class Spec {
-        @Schema(requiredMode = REQUIRED, description = "The subscriber to be notified")
+        /** Subscriber that receives matching notifications. */
+        @Schema(requiredMode = REQUIRED)
         private Subscriber subscriber;
 
-        @Schema(requiredMode = REQUIRED, description = "The token to unsubscribe")
+        /** Token used to unsubscribe without authenticating as the subscriber. */
+        @Schema(requiredMode = REQUIRED)
         private String unsubscribeToken;
 
-        @Schema(requiredMode = REQUIRED, description = "The reason to be interested in")
+        /** Reason and optional subject or expression this subscription is interested in. */
+        @Schema(requiredMode = REQUIRED)
         private InterestReason reason;
 
-        @Schema(
-                description =
-                        "Perhaps users need to unsubscribe and " + "interact without receiving notifications again")
+        /** Whether the subscription has been disabled, usually after the subscriber unsubscribes. */
         private boolean disabled;
     }
 
+    /** Reason selector that decides which notifications match this subscription. */
     @Data
     public static class InterestReason {
-        @Schema(requiredMode = REQUIRED, description = "The name of the reason definition to be " + "interested in")
+        /** ReasonType metadata.name this subscription is interested in. */
+        @Schema(requiredMode = REQUIRED)
         private String reasonType;
 
-        @Schema(requiredMode = REQUIRED, description = "The subject name of reason type to be" + " interested in")
+        /** Subject this subscription is interested in. */
+        @Schema(requiredMode = REQUIRED)
         private ReasonSubject subject;
 
-        @Schema(requiredMode = NOT_REQUIRED, description = "The expression to be interested in")
+        /** Optional expression used to match reasons more flexibly than subject matching. */
+        @Schema(requiredMode = NOT_REQUIRED)
         private String expression;
 
         /**
@@ -95,6 +101,7 @@ public class Subscription extends AbstractExtension {
         }
     }
 
+    /** Subject selector used by a subscription interest reason. */
     @Data
     @Builder
     @AllArgsConstructor
@@ -102,15 +109,15 @@ public class Subscription extends AbstractExtension {
     @Schema(name = "InterestReasonSubject")
     public static class ReasonSubject {
 
-        @Schema(
-                requiredMode = NOT_REQUIRED,
-                description = "if name is not specified, it presents "
-                        + "all subjects of the specified reason type and custom resources")
+        /** Subject metadata.name. If omitted, all subjects of the selected kind and API version are matched. */
+        @Schema(requiredMode = NOT_REQUIRED)
         private String name;
 
+        /** Subject API version. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String apiVersion;
 
+        /** Subject kind. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String kind;
 
@@ -120,9 +127,11 @@ public class Subscription extends AbstractExtension {
         }
     }
 
+    /** Subscriber that receives notifications. */
     @Data
     @Schema(name = "SubscriptionSubscriber")
     public static class Subscriber {
+        /** User metadata.name of the subscriber. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
 

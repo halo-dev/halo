@@ -35,9 +35,9 @@ public class Reply extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
+    /** Desired state of a reply. */
     @Data
     @EqualsAndHashCode(callSuper = true)
-    @Schema(description = "Desired state of a reply.")
     public static class ReplySpec extends Comment.BaseCommentSpec {
 
         /** Parent Comment metadata.name. */
@@ -48,8 +48,9 @@ public class Reply extends AbstractExtension {
         private String quoteReply;
     }
 
+    /** Observed state of a reply. */
     @Data
-    @Schema(name = "ReplyStatus", description = "Observed state of a reply.")
+    @Schema(name = "ReplyStatus")
     public static class Status {
         /** Metadata version observed by the last successful reconciliation. */
         private Long observedVersion;

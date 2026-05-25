@@ -20,7 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.ConditionList;
 
 /**
- * Post extension.
+ * Post extension that stores article metadata, publication settings, taxonomy, and derived status.
  *
  * @author guqing
  * @see <a href="https://github.com/halo-dev/halo/issues/2322">issue#2322</a>
@@ -103,8 +103,8 @@ public class Post extends AbstractExtension {
         return spec.getVisible() == null || VisibleEnum.PUBLIC.equals(spec.getVisible());
     }
 
+    /** Desired post content, publication, taxonomy, and rendering configuration. */
     @Data
-    @Schema(description = "Desired content, publication, taxonomy, and rendering configuration of a post.")
     public static class PostSpec {
         /** Display title of the post. */
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
@@ -173,8 +173,8 @@ public class Post extends AbstractExtension {
         private List<Map<String, String>> htmlMetas;
     }
 
+    /** Observed post state derived by content reconcilers. */
     @Data
-    @Schema(description = "Observed state of a content item.")
     public static class PostStatus {
         /** Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED. */
         private String phase;
@@ -215,8 +215,8 @@ public class Post extends AbstractExtension {
         }
     }
 
+    /** Excerpt generation configuration for a post or single page. */
     @Data
-    @Schema(description = "Excerpt generation configuration.")
     public static class Excerpt {
 
         /** Whether Halo should generate the excerpt from the released content automatically. */

@@ -23,7 +23,7 @@ import run.halo.app.extension.GroupVersionKind;
  * @since 2.0.0
  */
 @Data
-@Schema(description = "Category extension for grouping posts and building category archives.")
+@Schema(name = "Category")
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "categories", singular = "category")
 @EqualsAndHashCode(callSuper = true)
@@ -48,8 +48,8 @@ public class Category extends AbstractExtension {
         return getMetadata().getDeletionTimestamp() != null;
     }
 
+    /** Desired category display, hierarchy, and rendering configuration. */
     @Data
-    @Schema(description = "Desired display, hierarchy, and rendering configuration of a category.")
     public static class CategorySpec {
 
         /** Display name of the category. */
@@ -102,8 +102,8 @@ public class Category extends AbstractExtension {
         return this.status;
     }
 
+    /** Observed category state derived by content reconcilers. */
     @Data
-    @Schema(description = "Observed state of a category.")
     public static class CategoryStatus {
 
         /** Absolute permalink calculated from the category permalink policy. */

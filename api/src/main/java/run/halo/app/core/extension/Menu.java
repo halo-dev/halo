@@ -11,26 +11,28 @@ import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
+/** Menu extension that groups ordered menu items for theme navigation. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @GVK(group = "", version = "v1alpha1", kind = "Menu", plural = "menus", singular = "menu")
 public class Menu extends AbstractExtension {
 
-    @Schema(description = "The spec of menu.", requiredMode = REQUIRED)
+    /** Desired menu metadata and ordered item references. */
+    @Schema(requiredMode = REQUIRED)
     private Spec spec;
 
+    /** Desired menu configuration. */
     @Data
     @Schema(name = "MenuSpec")
     public static class Spec {
 
-        @Schema(description = "The display name of the menu.", requiredMode = REQUIRED)
+        /** Display name shown for the menu. */
+        @Schema(requiredMode = REQUIRED)
         private String displayName;
 
-        @ArraySchema(
-                uniqueItems = true,
-                arraySchema = @Schema(description = "Menu items of this menu."),
-                schema = @Schema(description = "Name of menu item."))
+        /** Ordered MenuItem metadata.name values included in this menu. */
+        @ArraySchema(uniqueItems = true)
         private LinkedHashSet<String> menuItems;
     }
 }

@@ -14,8 +14,7 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
 
 /**
- * RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who
- * information via Subjects.
+ * RoleBinding extension that grants a Role to one or more subjects.
  *
  * @author guqing
  * @since 2.0.0
@@ -32,12 +31,12 @@ public class RoleBinding extends AbstractExtension {
 
     public static final String KIND = "RoleBinding";
 
-    /** Subjects holds references to the objects the role applies to. */
+    /** Subjects that receive the permissions from roleRef. */
     List<Subject> subjects;
 
     /**
-     * RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace. If the RoleRef
-     * cannot be resolved, the Authorizer must return an error.
+     * Reference to the Role whose policy rules are granted to the subjects. If the RoleRef cannot be resolved, the
+     * Authorizer must return an error.
      */
     RoleRef roleRef;
 
@@ -50,17 +49,19 @@ public class RoleBinding extends AbstractExtension {
     @Data
     public static class RoleRef {
 
-        /** Kind is the type of resource being referenced. */
+        /** Kind of the role resource being referenced. */
         String kind;
 
-        /** Name is the name of resource being referenced. */
+        /** Metadata name of the role resource being referenced. */
         String name;
 
-        /** APIGroup is the group for the resource being referenced. */
+        /** API group of the role resource being referenced. */
         String apiGroup;
     }
 
     /**
+     * Subject that receives permissions from a RoleBinding.
+     *
      * @author guqing
      * @since 2.0.0
      */

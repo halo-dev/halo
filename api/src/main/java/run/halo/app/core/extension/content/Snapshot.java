@@ -46,8 +46,8 @@ public class Snapshot extends AbstractExtension {
     @Schema(requiredMode = REQUIRED)
     private SnapShotSpec spec;
 
+    /** Content snapshot payload and metadata. */
     @Data
-    @Schema(description = "Content snapshot payload and metadata.")
     public static class SnapShotSpec {
 
         /** Reference to the content extension that owns this snapshot, such as a Post or SinglePage. */

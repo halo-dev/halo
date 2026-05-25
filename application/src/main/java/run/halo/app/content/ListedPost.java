@@ -24,10 +24,12 @@ public class ListedPost {
     @Schema(description = "Post extension data.", requiredMode = REQUIRED)
     private Post post;
 
-    @Schema(description = "Resolved categories referenced by the post spec.", requiredMode = REQUIRED)
+    /** Resolved categories referenced by the post spec. */
+    @Schema(requiredMode = REQUIRED)
     private List<Category> categories;
 
-    @Schema(description = "Resolved tags referenced by the post spec.", requiredMode = REQUIRED)
+    /** Resolved tags referenced by the post spec. */
+    @Schema(requiredMode = REQUIRED)
     private List<Tag> tags;
 
     @Schema(description = "Users that have contributed to the post content snapshots.", requiredMode = REQUIRED)
