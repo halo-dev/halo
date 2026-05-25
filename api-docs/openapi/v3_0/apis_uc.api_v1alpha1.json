@@ -1534,7 +1534,8 @@
           "spec": {
             "$ref": "#/components/schemas/AnnotationSettingSpec"
           }
-        }
+        },
+        "description": "Annotation setting extension that defines dynamic annotation forms for a target extension kind."
       },
       "AnnotationSettingSpec": {
         "required": [
@@ -1546,6 +1547,7 @@
           "formSchema": {
             "minLength": 1,
             "type": "array",
+            "description": "FormKit-compatible schema used to render annotation fields.",
             "items": {
               "minLength": 1,
               "type": "object"
@@ -1554,7 +1556,8 @@
           "targetRef": {
             "$ref": "#/components/schemas/GroupKind"
           }
-        }
+        },
+        "description": "Desired annotation form configuration for a target resource kind."
       },
       "Attachment": {
         "required": [
@@ -1580,7 +1583,8 @@
           "status": {
             "$ref": "#/components/schemas/AttachmentStatus"
           }
-        }
+        },
+        "description": "Attachment extension that describes an uploaded file and its resolved access URLs."
       },
       "AttachmentList": {
         "required": [
@@ -1646,55 +1650,57 @@
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "Display name of attachment"
+            "description": "Display name shown for the attachment."
           },
           "groupName": {
             "type": "string",
-            "description": "Group name"
+            "description": "Attachment group metadata.name this attachment belongs to."
           },
           "mediaType": {
             "type": "string",
-            "description": "Media type of attachment"
+            "description": "Media type detected or supplied for the attachment, such as image/png."
           },
           "ownerName": {
             "type": "string",
-            "description": "Name of User who uploads the attachment"
+            "description": "User metadata.name of the uploader."
           },
           "policyName": {
             "type": "string",
-            "description": "Policy name"
+            "description": "Storage policy metadata.name used to store this attachment."
           },
           "size": {
             "minimum": 0,
             "type": "integer",
-            "description": "Size of attachment. Unit is Byte",
+            "description": "Size of the attachment in bytes.",
             "format": "int64"
           },
           "tags": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Tags of attachment",
+            "description": "Free-form tags assigned to the attachment.",
             "items": {
-              "type": "string",
-              "description": "Tag name"
+              "type": "string"
             }
           }
-        }
+        },
+        "description": "Desired attachment metadata and storage placement."
       },
       "AttachmentStatus": {
         "type": "object",
         "properties": {
           "permalink": {
             "type": "string",
-            "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+            "description": "Public permalink for the attachment. Local storage usually exposes a public URL, while object storage may\n expose the object URL."
           },
           "thumbnails": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Generated thumbnail URLs keyed by thumbnail size name."
           }
-        }
+        },
+        "description": "Observed attachment access state."
       },
       "Category": {
         "required": [
@@ -1781,7 +1787,7 @@
             "description": "Theme template used to render the category archive page."
           }
         },
-        "description": "Desired display, hierarchy, and rendering configuration of a category."
+        "description": "Desired category display, hierarchy, and rendering configuration."
       },
       "CategoryStatus": {
         "type": "object",
@@ -1801,7 +1807,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a category."
+        "description": "Observed category state derived by content reconcilers."
       },
       "Condition": {
         "required": [
@@ -1916,7 +1922,8 @@
           "status": {
             "$ref": "#/components/schemas/DeviceStatus"
           }
-        }
+        },
+        "description": "Device extension that records an authenticated browser session for account security visibility."
       },
       "DeviceSpec": {
         "required": [
@@ -1928,43 +1935,54 @@
         "properties": {
           "ipAddress": {
             "maxLength": 129,
-            "type": "string"
+            "type": "string",
+            "description": "Client IP address observed for the session."
           },
           "lastAccessedTime": {
             "type": "string",
+            "description": "Last time this session accessed Halo.",
             "format": "date-time"
           },
           "lastAuthenticatedTime": {
             "type": "string",
+            "description": "Last time the user authenticated for this session.",
             "format": "date-time"
           },
           "principalName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Principal name of the authenticated user."
           },
           "rememberMeSeriesId": {
-            "type": "string"
+            "type": "string",
+            "description": "Remember-me series id associated with the session, if any."
           },
           "sessionId": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Web session identifier associated with the device."
           },
           "userAgent": {
             "maxLength": 500,
-            "type": "string"
+            "type": "string",
+            "description": "Client user-agent header captured for the session."
           }
-        }
+        },
+        "description": "Session identity and request metadata captured for a device."
       },
       "DeviceStatus": {
         "type": "object",
         "properties": {
           "browser": {
-            "type": "string"
+            "type": "string",
+            "description": "Browser name parsed from the user agent."
           },
           "os": {
-            "type": "string"
+            "type": "string",
+            "description": "Operating system name parsed from the user agent."
           }
-        }
+        },
+        "description": "Parsed browser and operating system details for display."
       },
       "Excerpt": {
         "required": [
@@ -1982,7 +2000,7 @@
             "description": "Manual excerpt text used when autoGenerate is false."
           }
         },
-        "description": "Excerpt generation configuration."
+        "description": "Excerpt generation configuration for a post or single page."
       },
       "GroupKind": {
         "type": "object",
@@ -2247,7 +2265,7 @@
             "$ref": "#/components/schemas/NotificationSpec"
           }
         },
-        "description": "{@link Notification Notification} is a custom extension that used to store notification information for inner use, it\u0027s on-site\n notification.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
+        "description": "Notification extension that stores an on-site notification delivered to a Halo user.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
       },
       "NotificationList": {
         "required": [
@@ -2319,33 +2337,39 @@
         "type": "object",
         "properties": {
           "htmlContent": {
-            "type": "string"
+            "type": "string",
+            "description": "HTML notification content."
           },
           "lastReadAt": {
             "type": "string",
+            "description": "Last time the recipient marked this notification as read.",
             "format": "date-time"
           },
           "rawContent": {
-            "type": "string"
+            "type": "string",
+            "description": "Plain text or source notification content."
           },
           "reason": {
             "minLength": 1,
             "type": "string",
-            "description": "The name of reason"
+            "description": "Reason metadata.name that generated this notification."
           },
           "recipient": {
             "minLength": 1,
             "type": "string",
-            "description": "The name of user"
+            "description": "User metadata.name that receives the notification."
           },
           "title": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Notification title shown in the notification center."
           },
           "unread": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the recipient has not read the notification yet."
           }
-        }
+        },
+        "description": "Notification content and read state for one recipient."
       },
       "NotifierInfo": {
         "type": "object",
@@ -2385,45 +2409,56 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Optional human-readable description of how the token is used."
           },
           "expiresAt": {
             "type": "string",
+            "description": "Time when the token expires. A null value means the token does not expire by time.",
             "format": "date-time"
           },
           "lastUsed": {
             "type": "string",
+            "description": "Last time the token was used successfully.",
             "format": "date-time"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name chosen by the token owner."
           },
           "revoked": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the token has been manually revoked."
           },
           "revokesAt": {
             "type": "string",
+            "description": "Time when the token was revoked.",
             "format": "date-time"
           },
           "roles": {
             "type": "array",
+            "description": "Role names granted to this token.",
             "items": {
               "type": "string"
             }
           },
           "scopes": {
             "type": "array",
+            "description": "Scope strings granted to this token.",
             "items": {
               "type": "string"
             }
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable token identifier stored separately from the secret token value."
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "description": "User metadata.name that owns this token."
           }
-        }
+        },
+        "description": "Desired personal access token settings and lifecycle flags."
       },
       "PersonalAccessToken": {
         "required": [
@@ -2445,7 +2480,8 @@
           "spec": {
             "$ref": "#/components/schemas/PatSpec"
           }
-        }
+        },
+        "description": "Personal access token extension used for non-interactive API authentication on behalf of a Halo user."
       },
       "Post": {
         "required": [
@@ -2472,7 +2508,7 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "Post extension."
+        "description": "Post extension that stores article metadata, publication settings, taxonomy, and derived status."
       },
       "PostAttachmentRequest": {
         "required": [
@@ -2610,7 +2646,7 @@
             ]
           }
         },
-        "description": "Desired content, publication, taxonomy, and rendering configuration of a post."
+        "description": "Desired post content, publication, taxonomy, and rendering configuration."
       },
       "PostStatus": {
         "type": "object",
@@ -2670,7 +2706,7 @@
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
-        "description": "Observed state of a content item."
+        "description": "Observed post state derived by content reconcilers."
       },
       "ReasonTypeInfo": {
         "type": "object",
@@ -2978,7 +3014,7 @@
             "description": "URL slug used to build the tag permalink."
           }
         },
-        "description": "Desired display and rendering configuration of a tag."
+        "description": "Desired tag display and rendering configuration."
       },
       "TagStatus": {
         "type": "object",
@@ -3003,7 +3039,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a tag."
+        "description": "Observed tag state derived by content reconcilers."
       },
       "TestOperation": {
         "required": [
@@ -3142,7 +3178,7 @@
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
         },
-        "description": "User connection extension."
+        "description": "User connection extension that links a Halo user to an external OAuth2 account."
       },
       "UserConnectionSpec": {
         "required": [
@@ -3169,7 +3205,8 @@
             "type": "string",
             "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
-        }
+        },
+        "description": "External OAuth2 account binding for a Halo user."
       },
       "UserDevice": {
         "required": [

@@ -22,6 +22,9 @@ import type { Metadata } from './metadata';
  */
 export interface ConfigMap {
     'apiVersion': string;
+    /**
+     * String key-value configuration entries consumed by Halo or plugins.
+     */
     'data'?: { [key: string]: string; };
     'kind': string;
     'metadata': Metadata;

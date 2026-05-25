@@ -15,7 +15,7 @@
 
 
 /**
- * Desired display and rendering configuration of a tag.
+ * Desired tag display and rendering configuration.
  */
 export interface TagSpec {
     /**

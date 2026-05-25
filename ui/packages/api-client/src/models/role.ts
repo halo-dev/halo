@@ -20,10 +20,16 @@ import type { Metadata } from './metadata';
 // @ts-ignore
 import type { PolicyRule } from './policy-rule';
 
+/**
+ * Role extension that defines RBAC policy rules for users and other subjects.
+ */
 export interface Role {
     'apiVersion': string;
     'kind': string;
     'metadata': Metadata;
+    /**
+     * Policy rules granted by this role.
+     */
     'rules': Array<PolicyRule>;
 }
 

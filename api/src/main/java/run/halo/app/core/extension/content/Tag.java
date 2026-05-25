@@ -20,7 +20,7 @@ import run.halo.app.extension.GroupVersionKind;
  * @since 2.0.0
  */
 @Data
-@Schema(description = "Tag extension for grouping posts by free-form labels.")
+@Schema(name = "Tag")
 @ToString(callSuper = true)
 @GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Tag.KIND, plural = "tags", singular = "tag")
 @EqualsAndHashCode(callSuper = true)
@@ -41,8 +41,8 @@ public class Tag extends AbstractExtension {
     @Nullable
     private TagStatus status;
 
+    /** Desired tag display and rendering configuration. */
     @Data
-    @Schema(description = "Desired display and rendering configuration of a tag.")
     public static class TagSpec {
 
         /** Display name of the tag. */
@@ -72,8 +72,8 @@ public class Tag extends AbstractExtension {
         return this.status;
     }
 
+    /** Observed tag state derived by content reconcilers. */
     @Data
-    @Schema(description = "Observed state of a tag.")
     public static class TagStatus {
 
         /** Absolute permalink calculated from the tag permalink policy. */

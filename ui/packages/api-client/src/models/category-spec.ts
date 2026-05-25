@@ -15,7 +15,7 @@
 
 
 /**
- * Desired display, hierarchy, and rendering configuration of a category.
+ * Desired category display, hierarchy, and rendering configuration.
  */
 export interface CategorySpec {
     /**

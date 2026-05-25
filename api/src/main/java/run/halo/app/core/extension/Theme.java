@@ -16,7 +16,7 @@ import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.model.License;
 
 /**
- * Theme extension.
+ * Theme extension that describes an installable frontend theme and its runtime state.
  *
  * @author guqing
  * @since 2.0.0
@@ -33,54 +33,76 @@ public class Theme extends AbstractExtension {
 
     public static final String REQUEST_RELOAD_ANNOTATION = "theme.halo.run/request-reload";
 
+    /** Desired theme metadata, settings references, compatibility, and template declarations. */
     @Schema(requiredMode = REQUIRED)
     private ThemeSpec spec;
 
+    /** Observed theme lifecycle state reported by the theme manager. */
     private ThemeStatus status;
 
+    /** Desired theme metadata and configuration references. */
     @Data
     @ToString
     public static class ThemeSpec {
         private static final String WILDCARD = "*";
 
+        /** Display name shown for the theme. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String displayName;
 
+        /** Theme author information. */
         @Schema(requiredMode = REQUIRED)
         private Author author;
 
+        /** Human-readable theme description. */
         private String description;
 
+        /** Logo URL or attachment URI for the theme. */
         private String logo;
 
+        /** Theme homepage URL. */
         private String homepage;
 
+        /** Source repository URL. */
         private String repo;
 
+        /** Issue tracker URL. */
         private String issues;
 
+        /** Theme version. The wildcard value means any version. */
         private String version = WILDCARD;
 
+        /** Required Halo version range. The wildcard value means any Halo version. */
         @Schema(requiredMode = NOT_REQUIRED)
         private String requires = WILDCARD;
 
+        /** Setting metadata.name used to render the theme configuration form. */
         private String settingName;
 
+        /** ConfigMap metadata.name storing the theme configuration values. */
         private String configMapName;
 
+        /** Licenses declared by the theme. */
         private List<License> license;
 
+        /** Custom template descriptors exposed by the theme. */
         @Schema
         private CustomTemplates customTemplates;
     }
 
+    /** Observed theme lifecycle and installation state. */
     @Data
     public static class ThemeStatus {
+        /** Current theme lifecycle phase. */
         private ThemePhase phase;
+
+        /** Reconciliation conditions for the theme. */
         private ConditionList conditions;
+
+        /** Local filesystem location where the theme is loaded from. */
         private String location;
 
-        @Schema(description = "Whether the theme appears to be a local development workspace.")
+        /** Whether the theme appears to be a local development workspace. */
         private Boolean inDevelopment;
     }
 
@@ -106,20 +128,29 @@ public class Theme extends AbstractExtension {
         UNKNOWN,
     }
 
+    /** Theme author metadata. */
     @Data
     @ToString
     public static class Author {
 
+        /** Author display name. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
 
+        /** Author website URL. */
         private String website;
     }
 
+    /** Custom template descriptors grouped by the content type they render. */
     @Data
     public static class CustomTemplates {
+        /** Custom templates available for posts. */
         private List<TemplateDescriptor> post;
+
+        /** Custom templates available for categories. */
         private List<TemplateDescriptor> category;
+
+        /** Custom templates available for single pages. */
         private List<TemplateDescriptor> page;
     }
 
@@ -132,13 +163,17 @@ public class Theme extends AbstractExtension {
     @Data
     public static class TemplateDescriptor {
 
+        /** Template display name shown to users. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
 
+        /** Human-readable description of when to use this template. */
         private String description;
 
+        /** Screenshot URL or attachment URI for previewing the template. */
         private String screenshot;
 
+        /** Template file path relative to the theme templates directory. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String file;
     }

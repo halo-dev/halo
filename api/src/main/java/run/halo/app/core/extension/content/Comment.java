@@ -49,10 +49,10 @@ public class Comment extends AbstractExtension {
         return this.status;
     }
 
+    /** Desired state of a top-level comment. */
     @Data
     @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
-    @Schema(description = "Desired state of a top-level comment.")
     public static class CommentSpec extends BaseCommentSpec {
 
         /** Reference to the comment subject extension, such as a Post or SinglePage. */
@@ -63,8 +63,8 @@ public class Comment extends AbstractExtension {
         private Instant lastReadTime;
     }
 
+    /** Common desired state shared by comments and replies. */
     @Data
-    @Schema(description = "Common desired state shared by comments and replies.")
     public static class BaseCommentSpec {
 
         /** Raw comment body submitted by the owner before HTML sanitization and rendering. */
@@ -112,8 +112,8 @@ public class Comment extends AbstractExtension {
         private Boolean hidden;
     }
 
+    /** Identity of a comment or reply owner. */
     @Data
-    @Schema(description = "Identity of a comment or reply owner.")
     public static class CommentOwner {
         public static final String KIND_EMAIL = "Email";
         public static final String AVATAR_ANNO = "avatar";
@@ -145,8 +145,8 @@ public class Comment extends AbstractExtension {
         }
     }
 
+    /** Observed state of a top-level comment. */
     @Data
-    @Schema(description = "Observed state of a comment.")
     public static class CommentStatus {
 
         /** Creation time of the latest reply under this comment. */

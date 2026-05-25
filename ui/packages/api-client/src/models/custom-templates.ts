@@ -17,9 +17,21 @@
 // @ts-ignore
 import type { TemplateDescriptor } from './template-descriptor';
 
+/**
+ * Custom template descriptors grouped by the content type they render.
+ */
 export interface CustomTemplates {
+    /**
+     * Custom templates available for categories.
+     */
     'category'?: Array<TemplateDescriptor>;
+    /**
+     * Custom templates available for single pages.
+     */
     'page'?: Array<TemplateDescriptor>;
+    /**
+     * Custom templates available for posts.
+     */
     'post'?: Array<TemplateDescriptor>;
 }
 

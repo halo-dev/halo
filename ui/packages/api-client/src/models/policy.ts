@@ -20,6 +20,9 @@ import type { Metadata } from './metadata';
 // @ts-ignore
 import type { PolicySpec } from './policy-spec';
 
+/**
+ * Storage policy extension that binds attachment uploads to a policy template and configuration.
+ */
 export interface Policy {
     'apiVersion': string;
     'kind': string;

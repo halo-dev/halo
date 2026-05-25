@@ -14,11 +14,29 @@
 
 
 
+/**
+ * Desired extension point metadata.
+ */
 export interface ExtensionPointSpec {
+    /**
+     * Fully qualified Java class name of the extension point interface.
+     */
     'className': string;
+    /**
+     * Human-readable description of what this extension point allows plugins to provide.
+     */
     'description'?: string;
+    /**
+     * Display name shown for the extension point.
+     */
     'displayName': string;
+    /**
+     * Icon URL, class, or identifier shown for the extension point.
+     */
     'icon'?: string;
+    /**
+     * Registration mode used when loading implementations for this extension point.
+     */
     'type': ExtensionPointSpecTypeEnum;
 }
 

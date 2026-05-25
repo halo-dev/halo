@@ -18,7 +18,7 @@
 import type { Excerpt } from './excerpt';
 
 /**
- * Desired content, publication, taxonomy, and rendering configuration of a post.
+ * Desired post content, publication, taxonomy, and rendering configuration.
  */
 export interface PostSpec {
     /**

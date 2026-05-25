@@ -17,13 +17,25 @@
 // @ts-ignore
 import type { Condition } from './condition';
 
+/**
+ * Observed theme lifecycle and installation state.
+ */
 export interface ThemeStatus {
+    /**
+     * Reconciliation conditions for the theme.
+     */
     'conditions'?: Array<Condition>;
     /**
      * Whether the theme appears to be a local development workspace.
      */
     'inDevelopment'?: boolean;
+    /**
+     * Local filesystem location where the theme is loaded from.
+     */
     'location'?: string;
+    /**
+     * Current theme lifecycle phase.
+     */
     'phase'?: ThemeStatusPhaseEnum;
 }
 

@@ -18,7 +18,7 @@
 import type { Condition } from './condition';
 
 /**
- * Observed state of a single page.
+ * Observed single page state derived by content reconcilers.
  */
 export interface SinglePageStatus {
     /**

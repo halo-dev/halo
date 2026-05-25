@@ -15,7 +15,7 @@
 
 
 /**
- * Attributes used to transfer data
+ * {@link ReasonAttributes ReasonAttributes} is a map that stores the attributes of the reason.
  */
 export interface ReasonAttributes {
     'empty'?: boolean;

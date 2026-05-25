@@ -15,7 +15,7 @@
 
 
 /**
- * Observed state of a category.
+ * Observed category state derived by content reconcilers.
  */
 export interface CategoryStatus {
     /**

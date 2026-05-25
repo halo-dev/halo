@@ -3484,7 +3484,8 @@
           "status": {
             "$ref": "#/components/schemas/AttachmentStatus"
           }
-        }
+        },
+        "description": "Attachment extension that describes an uploaded file and its resolved access URLs."
       },
       "AttachmentList": {
         "required": [
@@ -3550,55 +3551,57 @@
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "Display name of attachment"
+            "description": "Display name shown for the attachment."
           },
           "groupName": {
             "type": "string",
-            "description": "Group name"
+            "description": "Attachment group metadata.name this attachment belongs to."
           },
           "mediaType": {
             "type": "string",
-            "description": "Media type of attachment"
+            "description": "Media type detected or supplied for the attachment, such as image/png."
           },
           "ownerName": {
             "type": "string",
-            "description": "Name of User who uploads the attachment"
+            "description": "User metadata.name of the uploader."
           },
           "policyName": {
             "type": "string",
-            "description": "Policy name"
+            "description": "Storage policy metadata.name used to store this attachment."
           },
           "size": {
             "minimum": 0,
             "type": "integer",
-            "description": "Size of attachment. Unit is Byte",
+            "description": "Size of the attachment in bytes.",
             "format": "int64"
           },
           "tags": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Tags of attachment",
+            "description": "Free-form tags assigned to the attachment.",
             "items": {
-              "type": "string",
-              "description": "Tag name"
+              "type": "string"
             }
           }
-        }
+        },
+        "description": "Desired attachment metadata and storage placement."
       },
       "AttachmentStatus": {
         "type": "object",
         "properties": {
           "permalink": {
             "type": "string",
-            "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+            "description": "Public permalink for the attachment. Local storage usually exposes a public URL, while object storage may\n expose the object URL."
           },
           "thumbnails": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Generated thumbnail URLs keyed by thumbnail size name."
           }
-        }
+        },
+        "description": "Observed attachment access state."
       },
       "AuthProvider": {
         "required": [
@@ -3622,7 +3625,7 @@
             "$ref": "#/components/schemas/AuthProviderSpec"
           }
         },
-        "description": "Auth provider extension."
+        "description": "Authentication provider extension that describes an external or form-based sign-in integration."
       },
       "AuthProviderSpec": {
         "required": [
@@ -3642,43 +3645,52 @@
           },
           "authenticationUrl": {
             "type": "string",
-            "description": "Authentication url of the auth provider"
+            "description": "URL that starts the authentication flow."
           },
           "bindingUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "URL that starts account binding for an already signed-in user."
           },
           "configMapRef": {
             "$ref": "#/components/schemas/ConfigMapRef"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the provider."
           },
           "displayName": {
             "type": "string",
-            "description": "Display name of the auth provider"
+            "description": "Display name shown on sign-in and account binding screens."
           },
           "helpPage": {
-            "type": "string"
+            "type": "string",
+            "description": "Help page URL for users who need sign-in assistance."
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the provider."
           },
           "method": {
-            "type": "string"
+            "type": "string",
+            "description": "HTTP method used when starting the authentication flow."
           },
           "rememberMeSupport": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the provider supports remember-me during sign-in."
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
           },
           "unbindUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "URL that unbinds the external account from the current user."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Provider website URL."
           }
-        }
+        },
+        "description": "Authentication provider metadata and endpoint configuration."
       },
       "Author": {
         "required": [
@@ -3688,12 +3700,15 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Author display name."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Author website URL."
           }
-        }
+        },
+        "description": "Theme author metadata."
       },
       "BackupFile": {
         "type": "object",
@@ -3800,7 +3815,7 @@
             "description": "Theme template used to render the category archive page."
           }
         },
-        "description": "Desired display, hierarchy, and rendering configuration of a category."
+        "description": "Desired category display, hierarchy, and rendering configuration."
       },
       "CategoryStatus": {
         "type": "object",
@@ -3820,7 +3835,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a category."
+        "description": "Observed category state derived by content reconcilers."
       },
       "ChangeOwnPasswordRequest": {
         "required": [
@@ -4099,7 +4114,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a comment."
+        "description": "Observed state of a top-level comment."
       },
       "Condition": {
         "required": [
@@ -4158,7 +4173,8 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "String key-value configuration entries consumed by Halo or plugins."
           },
           "kind": {
             "type": "string"
@@ -4177,9 +4193,11 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name."
           }
-        }
+        },
+        "description": "Reference to a ConfigMap used by this provider."
       },
       "Content": {
         "required": [
@@ -4348,23 +4366,27 @@
         "properties": {
           "category": {
             "type": "array",
+            "description": "Custom templates available for categories.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           },
           "page": {
             "type": "array",
+            "description": "Custom templates available for single pages.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           },
           "post": {
             "type": "array",
+            "description": "Custom templates available for posts.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           }
-        }
+        },
+        "description": "Custom template descriptors grouped by the content type they render."
       },
       "DashboardStats": {
         "type": "object",
@@ -4473,7 +4495,7 @@
             "description": "Manual excerpt text used when autoGenerate is false."
           }
         },
-        "description": "Excerpt generation configuration."
+        "description": "Excerpt generation configuration for a post or single page."
       },
       "Extension": {
         "required": [
@@ -5193,7 +5215,7 @@
             "$ref": "#/components/schemas/PluginStatus"
           }
         },
-        "description": "A custom resource for Plugin."
+        "description": "Plugin extension that describes an installed plugin and its runtime lifecycle state."
       },
       "PluginAuthor": {
         "required": [
@@ -5203,12 +5225,15 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Author display name."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Author website URL."
           }
-        }
+        },
+        "description": "Plugin author metadata."
       },
       "PluginInstallRequest": {
         "type": "object",
@@ -5312,54 +5337,66 @@
             "$ref": "#/components/schemas/PluginAuthor"
           },
           "configMapName": {
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name storing plugin configuration values."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable plugin description."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the plugin."
           },
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the plugin should be enabled."
           },
           "homepage": {
-            "type": "string"
+            "type": "string",
+            "description": "Plugin homepage URL."
           },
           "issues": {
-            "type": "string"
+            "type": "string",
+            "description": "Issue tracker URL."
           },
           "license": {
             "type": "array",
+            "description": "Licenses declared by the plugin.",
             "items": {
               "$ref": "#/components/schemas/License"
             }
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the plugin."
           },
           "pluginDependencies": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Required plugin dependencies keyed by plugin name with version constraints as values."
           },
           "repo": {
-            "type": "string"
+            "type": "string",
+            "description": "Source repository URL."
           },
           "requires": {
             "type": "string",
             "description": "SemVer format."
           },
           "settingName": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name used to render the plugin configuration form."
           },
           "version": {
             "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
             "type": "string",
             "description": "plugin version."
           }
-        }
+        },
+        "description": "Desired plugin metadata and configuration references."
       },
       "PluginStatus": {
         "type": "object",
@@ -5371,15 +5408,18 @@
                 "type": "boolean"
               }
             },
+            "description": "Reconciliation conditions for the plugin.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
           },
           "entry": {
-            "type": "string"
+            "type": "string",
+            "description": "JavaScript bundle entry path served for the plugin UI."
           },
           "lastProbeState": {
             "type": "string",
+            "description": "Last PF4J probe state observed for the plugin.",
             "enum": [
               "CREATED",
               "DISABLED",
@@ -5392,18 +5432,21 @@
           },
           "lastStartTime": {
             "type": "string",
+            "description": "Last time the plugin started successfully.",
             "format": "date-time"
           },
           "loadLocation": {
             "type": "string",
-            "description": "Load location of the plugin, often a path.",
+            "description": "URI location where the plugin artifact was loaded from.",
             "format": "uri"
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Resolved logo URL or attachment URI for the plugin."
           },
           "phase": {
             "type": "string",
+            "description": "Current plugin lifecycle phase.",
             "enum": [
               "PENDING",
               "STARTING",
@@ -5418,9 +5461,11 @@
             ]
           },
           "stylesheet": {
-            "type": "string"
+            "type": "string",
+            "description": "Stylesheet bundle path served for the plugin UI."
           }
-        }
+        },
+        "description": "Observed plugin lifecycle and runtime asset state."
       },
       "PolicyRule": {
         "type": "object",
@@ -5455,7 +5500,7 @@
           },
           "verbs": {
             "type": "array",
-            "description": "about who the rule applies to or which namespace the rule applies to.",
+            "description": "Verbs allowed by this rule, such as get, list, create, update, patch, or delete.",
             "items": {
               "type": "string"
             }
@@ -5488,7 +5533,7 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "Post extension."
+        "description": "Post extension that stores article metadata, publication settings, taxonomy, and derived status."
       },
       "PostRequest": {
         "required": [
@@ -5622,7 +5667,7 @@
             ]
           }
         },
-        "description": "Desired content, publication, taxonomy, and rendering configuration of a post."
+        "description": "Desired post content, publication, taxonomy, and rendering configuration."
       },
       "PostStatus": {
         "type": "object",
@@ -5682,7 +5727,7 @@
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
-        "description": "Observed state of a content item."
+        "description": "Observed post state derived by content reconcilers."
       },
       "Ref": {
         "required": [
@@ -5985,11 +6030,13 @@
           },
           "rules": {
             "type": "array",
+            "description": "Policy rules granted by this role.",
             "items": {
               "$ref": "#/components/schemas/PolicyRule"
             }
           }
-        }
+        },
+        "description": "Role extension that defines RBAC policy rules for users and other subjects."
       },
       "Setting": {
         "required": [
@@ -6013,7 +6060,7 @@
             "$ref": "#/components/schemas/SettingSpec"
           }
         },
-        "description": "{@link Setting Setting} is a custom extension to generate forms based on configuration."
+        "description": "Setting extension that describes one or more configuration forms and their schema."
       },
       "SettingForm": {
         "minLength": 1,
@@ -6025,17 +6072,21 @@
         "properties": {
           "formSchema": {
             "type": "array",
+            "description": "FormKit-compatible schema used to render the form fields.",
             "items": {
               "type": "object"
             }
           },
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable form group name used to store submitted values."
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "Display label shown for this form group."
           }
-        }
+        },
+        "description": "A single form group in a setting definition."
       },
       "SettingRef": {
         "required": [
@@ -6046,13 +6097,16 @@
         "properties": {
           "group": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Setting form group name."
           },
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name."
           }
-        }
+        },
+        "description": "Reference to a setting definition used by this provider."
       },
       "SettingSpec": {
         "required": [
@@ -6063,11 +6117,13 @@
           "forms": {
             "minLength": 1,
             "type": "array",
+            "description": "Form groups rendered for this setting definition.",
             "items": {
               "$ref": "#/components/schemas/SettingForm"
             }
           }
-        }
+        },
+        "description": "Collection of form groups that make up this setting definition."
       },
       "SinglePage": {
         "required": [
@@ -6094,7 +6150,7 @@
             "$ref": "#/components/schemas/SinglePageStatus"
           }
         },
-        "description": "Single page extension."
+        "description": "Single page extension that stores standalone page metadata, publication settings, and derived status."
       },
       "SinglePageRequest": {
         "required": [
@@ -6214,7 +6270,7 @@
             ]
           }
         },
-        "description": "Desired content, publication, and rendering configuration of a single page."
+        "description": "Desired single page content, publication, and rendering configuration."
       },
       "SinglePageStatus": {
         "type": "object",
@@ -6274,7 +6330,7 @@
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
-        "description": "Observed state of a single page."
+        "description": "Observed single page state derived by content reconcilers."
       },
       "Stats": {
         "type": "object",
@@ -6327,7 +6383,7 @@
             "$ref": "#/components/schemas/TagStatus"
           }
         },
-        "description": "Tag extension for grouping posts by free-form labels."
+        "description": "A chunk of items."
       },
       "TagList": {
         "required": [
@@ -6419,7 +6475,7 @@
             "description": "URL slug used to build the tag permalink."
           }
         },
-        "description": "Desired display and rendering configuration of a tag."
+        "description": "Desired tag display and rendering configuration."
       },
       "TagStatus": {
         "type": "object",
@@ -6444,7 +6500,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a tag."
+        "description": "Observed tag state derived by content reconcilers."
       },
       "TemplateDescriptor": {
         "required": [
@@ -6454,18 +6510,22 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of when to use this template."
           },
           "file": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Template file path relative to the theme templates directory."
           },
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Template display name shown to users."
           },
           "screenshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Screenshot URL or attachment URI for previewing the template."
           }
         },
         "description": "Type used to describe custom template page."
@@ -6520,7 +6580,7 @@
             "$ref": "#/components/schemas/ThemeStatus"
           }
         },
-        "description": "Theme extension."
+        "description": "Theme extension that describes an installable frontend theme and its runtime state."
       },
       "ThemeInstallRequest": {
         "type": "object"
@@ -6595,46 +6655,58 @@
             "$ref": "#/components/schemas/Author"
           },
           "configMapName": {
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name storing the theme configuration values."
           },
           "customTemplates": {
             "$ref": "#/components/schemas/CustomTemplates"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable theme description."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the theme."
           },
           "homepage": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme homepage URL."
           },
           "issues": {
-            "type": "string"
+            "type": "string",
+            "description": "Issue tracker URL."
           },
           "license": {
             "type": "array",
+            "description": "Licenses declared by the theme.",
             "items": {
               "$ref": "#/components/schemas/License"
             }
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the theme."
           },
           "repo": {
-            "type": "string"
+            "type": "string",
+            "description": "Source repository URL."
           },
           "requires": {
-            "type": "string"
+            "type": "string",
+            "description": "Required Halo version range. The wildcard value means any Halo version."
           },
           "settingName": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name used to render the theme configuration form."
           },
           "version": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme version. The wildcard value means any version."
           }
-        }
+        },
+        "description": "Desired theme metadata and configuration references."
       },
       "ThemeStatus": {
         "type": "object",
@@ -6646,6 +6718,7 @@
                 "type": "boolean"
               }
             },
+            "description": "Reconciliation conditions for the theme.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
@@ -6655,17 +6728,20 @@
             "description": "Whether the theme appears to be a local development workspace."
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "Local filesystem location where the theme is loaded from."
           },
           "phase": {
             "type": "string",
+            "description": "Current theme lifecycle phase.",
             "enum": [
               "READY",
               "FAILED",
               "UNKNOWN"
             ]
           }
-        }
+        },
+        "description": "Observed theme lifecycle and installation state."
       },
       "UpgradeFromUriRequest": {
         "required": [
@@ -6760,7 +6836,7 @@
             "$ref": "#/components/schemas/UserStatus"
           }
         },
-        "description": "The extension represents user details of Halo."
+        "description": "User extension that stores profile, authentication, and account state for a Halo user."
       },
       "UserEndpoint.ListedUserList": {
         "required": [
@@ -6857,52 +6933,67 @@
         "type": "object",
         "properties": {
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "Avatar URL or attachment URI for the user."
           },
           "bio": {
-            "type": "string"
+            "type": "string",
+            "description": "User biography shown on profile surfaces."
           },
           "disabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the user account is disabled."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the user."
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Email address used for sign-in and notifications."
           },
           "emailVerified": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the email address has been verified."
           },
           "loginHistoryLimit": {
             "type": "integer",
+            "description": "Maximum number of login history entries retained for this user.",
             "format": "int32"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "Password hash or encoded password value."
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "description": "Phone number associated with the user."
           },
           "registeredAt": {
             "type": "string",
+            "description": "Time when the user registered.",
             "format": "date-time"
           },
           "totpEncryptedSecret": {
-            "type": "string"
+            "type": "string",
+            "description": "Encrypted TOTP secret used for two-factor authentication."
           },
           "twoFactorAuthEnabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether two-factor authentication is enabled for this user."
           }
-        }
+        },
+        "description": "Desired user profile and authentication settings."
       },
       "UserStatus": {
         "type": "object",
         "properties": {
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Public permalink of the user\u0027s profile or author page."
           }
-        }
+        },
+        "description": "Observed user state derived by the application."
       },
       "VerifyCodeRequest": {
         "required": [

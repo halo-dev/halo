@@ -20,6 +20,9 @@ import type { ReasonSelector } from './reason-selector';
 // @ts-ignore
 import type { TemplateContent } from './template-content';
 
+/**
+ * Desired notification template selector and content.
+ */
 export interface NotificationTemplateSpec {
     'reasonSelector'?: ReasonSelector;
     'template'?: TemplateContent;

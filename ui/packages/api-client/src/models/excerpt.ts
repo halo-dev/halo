@@ -15,7 +15,7 @@
 
 
 /**
- * Excerpt generation configuration.
+ * Excerpt generation configuration for a post or single page.
  */
 export interface Excerpt {
     /**

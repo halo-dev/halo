@@ -15196,7 +15196,8 @@
           "spec": {
             "$ref": "#/components/schemas/AnnotationSettingSpec"
           }
-        }
+        },
+        "description": "Annotation setting extension that defines dynamic annotation forms for a target extension kind."
       },
       "AnnotationSettingList": {
         "required": [
@@ -15267,6 +15268,7 @@
           "formSchema": {
             "minLength": 1,
             "type": "array",
+            "description": "FormKit-compatible schema used to render annotation fields.",
             "items": {
               "minLength": 1,
               "type": "object"
@@ -15275,7 +15277,8 @@
           "targetRef": {
             "$ref": "#/components/schemas/GroupKind"
           }
-        }
+        },
+        "description": "Desired annotation form configuration for a target resource kind."
       },
       "Attachment": {
         "required": [
@@ -15301,7 +15304,8 @@
           "status": {
             "$ref": "#/components/schemas/AttachmentStatus"
           }
-        }
+        },
+        "description": "Attachment extension that describes an uploaded file and its resolved access URLs."
       },
       "AttachmentList": {
         "required": [
@@ -15367,55 +15371,57 @@
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "Display name of attachment"
+            "description": "Display name shown for the attachment."
           },
           "groupName": {
             "type": "string",
-            "description": "Group name"
+            "description": "Attachment group metadata.name this attachment belongs to."
           },
           "mediaType": {
             "type": "string",
-            "description": "Media type of attachment"
+            "description": "Media type detected or supplied for the attachment, such as image/png."
           },
           "ownerName": {
             "type": "string",
-            "description": "Name of User who uploads the attachment"
+            "description": "User metadata.name of the uploader."
           },
           "policyName": {
             "type": "string",
-            "description": "Policy name"
+            "description": "Storage policy metadata.name used to store this attachment."
           },
           "size": {
             "minimum": 0,
             "type": "integer",
-            "description": "Size of attachment. Unit is Byte",
+            "description": "Size of the attachment in bytes.",
             "format": "int64"
           },
           "tags": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Tags of attachment",
+            "description": "Free-form tags assigned to the attachment.",
             "items": {
-              "type": "string",
-              "description": "Tag name"
+              "type": "string"
             }
           }
-        }
+        },
+        "description": "Desired attachment metadata and storage placement."
       },
       "AttachmentStatus": {
         "type": "object",
         "properties": {
           "permalink": {
             "type": "string",
-            "description": "Permalink of attachment.\nIf it is in local storage, the public URL will be set.\nIf it is in s3 storage, the Object URL will be set.\n"
+            "description": "Public permalink for the attachment. Local storage usually exposes a public URL, while object storage may\n expose the object URL."
           },
           "thumbnails": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Generated thumbnail URLs keyed by thumbnail size name."
           }
-        }
+        },
+        "description": "Observed attachment access state."
       },
       "AuthProvider": {
         "required": [
@@ -15439,7 +15445,7 @@
             "$ref": "#/components/schemas/AuthProviderSpec"
           }
         },
-        "description": "Auth provider extension."
+        "description": "Authentication provider extension that describes an external or form-based sign-in integration."
       },
       "AuthProviderList": {
         "required": [
@@ -15518,43 +15524,52 @@
           },
           "authenticationUrl": {
             "type": "string",
-            "description": "Authentication url of the auth provider"
+            "description": "URL that starts the authentication flow."
           },
           "bindingUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "URL that starts account binding for an already signed-in user."
           },
           "configMapRef": {
             "$ref": "#/components/schemas/ConfigMapRef"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the provider."
           },
           "displayName": {
             "type": "string",
-            "description": "Display name of the auth provider"
+            "description": "Display name shown on sign-in and account binding screens."
           },
           "helpPage": {
-            "type": "string"
+            "type": "string",
+            "description": "Help page URL for users who need sign-in assistance."
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the provider."
           },
           "method": {
-            "type": "string"
+            "type": "string",
+            "description": "HTTP method used when starting the authentication flow."
           },
           "rememberMeSupport": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the provider supports remember-me during sign-in."
           },
           "settingRef": {
             "$ref": "#/components/schemas/SettingRef"
           },
           "unbindUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "URL that unbinds the external account from the current user."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Provider website URL."
           }
-        }
+        },
+        "description": "Authentication provider metadata and endpoint configuration."
       },
       "Author": {
         "required": [
@@ -15564,12 +15579,15 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Author display name."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Author website URL."
           }
-        }
+        },
+        "description": "Theme author metadata."
       },
       "Backup": {
         "required": [
@@ -15594,7 +15612,8 @@
           "status": {
             "$ref": "#/components/schemas/BackupStatus"
           }
-        }
+        },
+        "description": "Backup metadata and runtime state for an exported Halo data package."
       },
       "BackupFile": {
         "type": "object",
@@ -15680,33 +15699,39 @@
         "properties": {
           "expiresAt": {
             "type": "string",
+            "description": "Time after which the generated backup should be considered expired.",
             "format": "date-time"
           },
           "format": {
             "type": "string",
-            "description": "Backup file format. Currently, only zip format is supported."
+            "description": "Backup file format. Currently, only zip is supported."
           }
-        }
+        },
+        "description": "Desired backup options."
       },
       "BackupStatus": {
         "type": "object",
         "properties": {
           "completionTimestamp": {
             "type": "string",
+            "description": "Time when backup execution finished, regardless of success or failure.",
             "format": "date-time"
           },
           "failureMessage": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable failure message for a failed backup."
           },
           "failureReason": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable failure reason code for a failed backup."
           },
           "filename": {
             "type": "string",
-            "description": "Name of backup file."
+            "description": "Name of the generated backup file."
           },
           "phase": {
             "type": "string",
+            "description": "Current backup execution phase.",
             "enum": [
               "PENDING",
               "RUNNING",
@@ -15716,14 +15741,16 @@
           },
           "size": {
             "type": "integer",
-            "description": "Size of backup file. Data unit: byte",
+            "description": "Size of the generated backup file in bytes.",
             "format": "int64"
           },
           "startTimestamp": {
             "type": "string",
+            "description": "Time when backup execution started.",
             "format": "date-time"
           }
-        }
+        },
+        "description": "Observed backup execution state."
       },
       "Category": {
         "required": [
@@ -15869,7 +15896,7 @@
             "description": "Theme template used to render the category archive page."
           }
         },
-        "description": "Desired display, hierarchy, and rendering configuration of a category."
+        "description": "Desired category display, hierarchy, and rendering configuration."
       },
       "CategoryStatus": {
         "type": "object",
@@ -15889,7 +15916,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a category."
+        "description": "Observed category state derived by content reconcilers."
       },
       "CategoryVo": {
         "required": [
@@ -16318,7 +16345,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a comment."
+        "description": "Observed state of a top-level comment."
       },
       "CommentVo": {
         "required": [
@@ -16552,7 +16579,8 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "String key-value configuration entries consumed by Halo or plugins."
           },
           "kind": {
             "type": "string"
@@ -16630,9 +16658,11 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name."
           }
-        }
+        },
+        "description": "Reference to a ConfigMap used by this provider."
       },
       "Content": {
         "required": [
@@ -16805,10 +16835,12 @@
           },
           "approvedComment": {
             "type": "integer",
+            "description": "Number of approved comments recorded for the resource.",
             "format": "int32"
           },
           "downvote": {
             "type": "integer",
+            "description": "Number of downvotes recorded for the resource.",
             "format": "int32"
           },
           "kind": {
@@ -16819,18 +16851,21 @@
           },
           "totalComment": {
             "type": "integer",
+            "description": "Total number of comments recorded for the resource.",
             "format": "int32"
           },
           "upvote": {
             "type": "integer",
+            "description": "Number of upvotes recorded for the resource.",
             "format": "int32"
           },
           "visit": {
             "type": "integer",
+            "description": "Number of visits recorded for the resource.",
             "format": "int32"
           }
         },
-        "description": "A counter for number of requests by extension resource name."
+        "description": "Counter extension that stores aggregate interaction counts for a resource."
       },
       "CounterList": {
         "required": [
@@ -16965,23 +17000,27 @@
         "properties": {
           "category": {
             "type": "array",
+            "description": "Custom templates available for categories.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           },
           "page": {
             "type": "array",
+            "description": "Custom templates available for single pages.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           },
           "post": {
             "type": "array",
+            "description": "Custom templates available for posts.",
             "items": {
               "$ref": "#/components/schemas/TemplateDescriptor"
             }
           }
-        }
+        },
+        "description": "Custom template descriptors grouped by the content type they render."
       },
       "DashboardStats": {
         "type": "object",
@@ -17055,7 +17094,8 @@
           "status": {
             "$ref": "#/components/schemas/DeviceStatus"
           }
-        }
+        },
+        "description": "Device extension that records an authenticated browser session for account security visibility."
       },
       "DeviceList": {
         "required": [
@@ -17126,43 +17166,54 @@
         "properties": {
           "ipAddress": {
             "maxLength": 129,
-            "type": "string"
+            "type": "string",
+            "description": "Client IP address observed for the session."
           },
           "lastAccessedTime": {
             "type": "string",
+            "description": "Last time this session accessed Halo.",
             "format": "date-time"
           },
           "lastAuthenticatedTime": {
             "type": "string",
+            "description": "Last time the user authenticated for this session.",
             "format": "date-time"
           },
           "principalName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Principal name of the authenticated user."
           },
           "rememberMeSeriesId": {
-            "type": "string"
+            "type": "string",
+            "description": "Remember-me series id associated with the session, if any."
           },
           "sessionId": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Web session identifier associated with the device."
           },
           "userAgent": {
             "maxLength": 500,
-            "type": "string"
+            "type": "string",
+            "description": "Client user-agent header captured for the session."
           }
-        }
+        },
+        "description": "Session identity and request metadata captured for a device."
       },
       "DeviceStatus": {
         "type": "object",
         "properties": {
           "browser": {
-            "type": "string"
+            "type": "string",
+            "description": "Browser name parsed from the user agent."
           },
           "os": {
-            "type": "string"
+            "type": "string",
+            "description": "Operating system name parsed from the user agent."
           }
-        }
+        },
+        "description": "Parsed browser and operating system details for display."
       },
       "EmailConfigValidationRequest": {
         "type": "object",
@@ -17224,7 +17275,7 @@
             "description": "Manual excerpt text used when autoGenerate is false."
           }
         },
-        "description": "Excerpt generation configuration."
+        "description": "Excerpt generation configuration for a post or single page."
       },
       "Extension": {
         "required": [
@@ -17268,7 +17319,7 @@
             "$ref": "#/components/schemas/ExtensionSpec"
           }
         },
-        "description": "Extension definition. An {@link ExtensionDefinition ExtensionDefinition} is a type of metadata that provides additional information about\n an extension. An extension is a way to add new functionality to an existing class, structure, enumeration, or\n protocol type without needing to subclass it."
+        "description": "Extension definition that describes one plugin-provided implementation of an extension point."
       },
       "ExtensionDefinitionList": {
         "required": [
@@ -17351,7 +17402,7 @@
             "$ref": "#/components/schemas/ExtensionPointSpec"
           }
         },
-        "description": "Extension point definition. An {@link ExtensionPointDefinition ExtensionPointDefinition} is a concept used in \u003ccode\u003eHalo\u003c/code\u003e to allow for\n the dynamic extension of system. It defines a location within \u003ccode\u003eHalo\u003c/code\u003e where additional functionality can be\n added through the use of plugins or extensions."
+        "description": "Extension point definition that advertises where plugins can contribute implementations."
       },
       "ExtensionPointDefinitionList": {
         "required": [
@@ -17421,25 +17472,31 @@
         "type": "object",
         "properties": {
           "className": {
-            "type": "string"
+            "type": "string",
+            "description": "Fully qualified Java class name of the extension point interface."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of what this extension point allows plugins to provide."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the extension point."
           },
           "icon": {
-            "type": "string"
+            "type": "string",
+            "description": "Icon URL, class, or identifier shown for the extension point."
           },
           "type": {
             "type": "string",
+            "description": "Registration mode used when loading implementations for this extension point.",
             "enum": [
               "SINGLETON",
               "MULTI_INSTANCE"
             ]
           }
-        }
+        },
+        "description": "Desired extension point metadata."
       },
       "ExtensionSpec": {
         "required": [
@@ -17450,21 +17507,27 @@
         "type": "object",
         "properties": {
           "className": {
-            "type": "string"
+            "type": "string",
+            "description": "Fully qualified Java class name of the implementation."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of what this implementation does."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the implementation."
           },
           "extensionPointName": {
-            "type": "string"
+            "type": "string",
+            "description": "ExtensionPointDefinition metadata.name this implementation contributes to."
           },
           "icon": {
-            "type": "string"
+            "type": "string",
+            "description": "Icon URL, class, or identifier shown for the implementation."
           }
-        }
+        },
+        "description": "Desired plugin-provided extension implementation metadata."
       },
       "FileReverseProxyProvider": {
         "type": "object",
@@ -17475,7 +17538,8 @@
           "filename": {
             "type": "string"
           }
-        }
+        },
+        "description": "File provider that resolves a request to a plugin or theme file location."
       },
       "GrantRequest": {
         "type": "object",
@@ -17513,7 +17577,8 @@
           "status": {
             "$ref": "#/components/schemas/GroupStatus"
           }
-        }
+        },
+        "description": "Attachment group extension used to organize attachments and expose aggregate counts."
       },
       "GroupKind": {
         "type": "object",
@@ -17596,9 +17661,10 @@
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "Display name of group"
+            "description": "Display name shown for the attachment group."
           }
-        }
+        },
+        "description": "Desired attachment group metadata."
       },
       "GroupStatus": {
         "type": "object",
@@ -17606,15 +17672,16 @@
           "totalAttachments": {
             "minimum": 0,
             "type": "integer",
-            "description": "Total of attachments under the current group",
+            "description": "Total number of attachments under the group.",
             "format": "int64"
           },
           "updateTimestamp": {
             "type": "string",
-            "description": "Update timestamp of the group",
+            "description": "Last time the group aggregate state was updated.",
             "format": "date-time"
           }
-        }
+        },
+        "description": "Observed attachment group aggregate state."
       },
       "HaloDocument": {
         "required": [
@@ -17767,17 +17834,17 @@
         "properties": {
           "expression": {
             "type": "string",
-            "description": "The expression to be interested in"
+            "description": "Optional expression used to match reasons more flexibly than subject matching."
           },
           "reasonType": {
             "type": "string",
-            "description": "The name of the reason definition to be interested in"
+            "description": "ReasonType metadata.name this subscription is interested in."
           },
           "subject": {
             "$ref": "#/components/schemas/InterestReasonSubject"
           }
         },
-        "description": "The reason to be interested in"
+        "description": "Reason selector that decides which notifications match this subscription."
       },
       "InterestReasonSubject": {
         "required": [
@@ -17788,18 +17855,20 @@
         "properties": {
           "apiVersion": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Subject API version."
           },
           "kind": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Subject kind."
           },
           "name": {
             "type": "string",
-            "description": "if name is not specified, it presents all subjects of the specified reason type and custom resources"
+            "description": "Subject metadata.name. If omitted, all subjects of the selected kind and API version are matched."
           }
         },
-        "description": "The subject name of reason type to be interested in"
+        "description": "Subject selector used by a subscription interest reason."
       },
       "JsonPatch": {
         "minItems": 1,
@@ -18586,7 +18655,8 @@
           "spec": {
             "$ref": "#/components/schemas/MenuSpec"
           }
-        }
+        },
+        "description": "Menu extension that groups ordered menu items for theme navigation."
       },
       "MenuItem": {
         "required": [
@@ -18612,7 +18682,8 @@
           "status": {
             "$ref": "#/components/schemas/MenuItemStatus"
           }
-        }
+        },
+        "description": "Menu item extension that describes a navigable item and its resolved rendering state."
       },
       "MenuItemList": {
         "required": [
@@ -18679,28 +18750,27 @@
           "children": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Children of this menu item",
+            "description": "Child MenuItem metadata.name values shown under this item.",
             "items": {
-              "type": "string",
-              "description": "The name of menu item child"
+              "type": "string"
             }
           },
           "displayName": {
             "type": "string",
-            "description": "The display name of menu item."
+            "description": "Display name shown for the menu item."
           },
           "href": {
             "type": "string",
-            "description": "The href of this menu item."
+            "description": "Direct URL used by the menu item."
           },
           "priority": {
             "type": "integer",
-            "description": "The priority is for ordering.",
+            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32"
           },
           "target": {
             "type": "string",
-            "description": "The \u003ca\u003e target attribute of this menu item.",
+            "description": "HTML anchor target used by the menu item.",
             "enum": [
               "_blank",
               "_self",
@@ -18711,20 +18781,22 @@
           "targetRef": {
             "$ref": "#/components/schemas/Ref"
           }
-        }
+        },
+        "description": "Desired menu item configuration."
       },
       "MenuItemStatus": {
         "type": "object",
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "Calculated Display name of menu item."
+            "description": "Calculated display name after resolving targetRef, falling back to spec.displayName."
           },
           "href": {
             "type": "string",
-            "description": "Calculated href of manu item."
+            "description": "Calculated href after resolving targetRef, falling back to spec.href."
           }
-        }
+        },
+        "description": "Resolved menu item values used for rendering."
       },
       "MenuItemVo": {
         "required": [
@@ -18824,18 +18896,18 @@
         "properties": {
           "displayName": {
             "type": "string",
-            "description": "The display name of the menu."
+            "description": "Display name shown for the menu."
           },
           "menuItems": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Menu items of this menu.",
+            "description": "Ordered MenuItem metadata.name values included in this menu.",
             "items": {
-              "type": "string",
-              "description": "Name of menu item."
+              "type": "string"
             }
           }
-        }
+        },
+        "description": "Desired menu configuration."
       },
       "MenuVo": {
         "required": [
@@ -18977,7 +19049,7 @@
             "$ref": "#/components/schemas/NotificationSpec"
           }
         },
-        "description": "{@link Notification Notification} is a custom extension that used to store notification information for inner use, it\u0027s on-site\n notification.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
+        "description": "Notification extension that stores an on-site notification delivered to a Halo user.\n\n \u003cp\u003eSupports the following operations:\n\n \u003cul\u003e\n   \u003cli\u003eMarked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}\n   \u003cli\u003eGet the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}\n   \u003cli\u003eFilter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}\n \u003c/ul\u003e"
       },
       "NotificationList": {
         "required": [
@@ -19049,33 +19121,39 @@
         "type": "object",
         "properties": {
           "htmlContent": {
-            "type": "string"
+            "type": "string",
+            "description": "HTML notification content."
           },
           "lastReadAt": {
             "type": "string",
+            "description": "Last time the recipient marked this notification as read.",
             "format": "date-time"
           },
           "rawContent": {
-            "type": "string"
+            "type": "string",
+            "description": "Plain text or source notification content."
           },
           "reason": {
             "minLength": 1,
             "type": "string",
-            "description": "The name of reason"
+            "description": "Reason metadata.name that generated this notification."
           },
           "recipient": {
             "minLength": 1,
             "type": "string",
-            "description": "The name of user"
+            "description": "User metadata.name that receives the notification."
           },
           "title": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Notification title shown in the notification center."
           },
           "unread": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the recipient has not read the notification yet."
           }
-        }
+        },
+        "description": "Notification content and read state for one recipient."
       },
       "NotificationTemplate": {
         "required": [
@@ -19098,7 +19176,7 @@
             "$ref": "#/components/schemas/NotificationTemplateSpec"
           }
         },
-        "description": "{@link NotificationTemplate NotificationTemplate} is a custom extension that defines a notification template.\n\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\n\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language, if multiple templates\n are matched, the best match will be selected. This is useful when you want to override the default template."
+        "description": "Notification template extension that defines localized message content for matching reason types.\n\n \u003cp\u003eIt describes the notification template\u0027s name, description, and the template content.\n\n \u003cp\u003e{@link Spec#getReasonSelector Spec#getReasonSelector()} is used to select the template by reasonType and language, if multiple templates\n are matched, the best match will be selected. This is useful when you want to override the default template."
       },
       "NotificationTemplateList": {
         "required": [
@@ -19168,7 +19246,8 @@
           "template": {
             "$ref": "#/components/schemas/TemplateContent"
           }
-        }
+        },
+        "description": "Desired notification template selector and content."
       },
       "NotifierDescriptor": {
         "required": [
@@ -19191,7 +19270,7 @@
             "$ref": "#/components/schemas/NotifierDescriptorSpec"
           }
         },
-        "description": "{@link NotifierDescriptor NotifierDescriptor} is a custom extension that defines a notifier.\n\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to let the user know what\n the notifier is and what it can do in the UI and also let the \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the\n notifier and prepare the notifier\u0027s settings."
+        "description": "Notifier descriptor extension that advertises a notification delivery implementation and its settings.\n\n \u003cp\u003eIt describes the notifier\u0027s name, description, and the extension name of the notifier to let the user know what\n the notifier is and what it can do in the UI and also let the \u003ccode\u003eNotificationCenter\u003c/code\u003e know how to load the\n notifier and prepare the notifier\u0027s settings."
       },
       "NotifierDescriptorList": {
         "required": [
@@ -19260,15 +19339,18 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of what the notifier sends."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the notifier."
           },
           "notifierExtName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Extension name of the notifier implementation."
           },
           "receiverSettingRef": {
             "$ref": "#/components/schemas/NotifierSettingRef"
@@ -19276,7 +19358,8 @@
           "senderSettingRef": {
             "$ref": "#/components/schemas/NotifierSettingRef"
           }
-        }
+        },
+        "description": "Desired notifier descriptor metadata and configuration references."
       },
       "NotifierInfo": {
         "type": "object",
@@ -19300,12 +19383,15 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting form group name."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name."
           }
-        }
+        },
+        "description": "Reference to a notifier setting form group."
       },
       "OwnerInfo": {
         "type": "object",
@@ -19357,45 +19443,56 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Optional human-readable description of how the token is used."
           },
           "expiresAt": {
             "type": "string",
+            "description": "Time when the token expires. A null value means the token does not expire by time.",
             "format": "date-time"
           },
           "lastUsed": {
             "type": "string",
+            "description": "Last time the token was used successfully.",
             "format": "date-time"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name chosen by the token owner."
           },
           "revoked": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the token has been manually revoked."
           },
           "revokesAt": {
             "type": "string",
+            "description": "Time when the token was revoked.",
             "format": "date-time"
           },
           "roles": {
             "type": "array",
+            "description": "Role names granted to this token.",
             "items": {
               "type": "string"
             }
           },
           "scopes": {
             "type": "array",
+            "description": "Scope strings granted to this token.",
             "items": {
               "type": "string"
             }
           },
           "tokenId": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable token identifier stored separately from the secret token value."
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "description": "User metadata.name that owns this token."
           }
-        }
+        },
+        "description": "Desired personal access token settings and lifecycle flags."
       },
       "PersonalAccessToken": {
         "required": [
@@ -19417,7 +19514,8 @@
           "spec": {
             "$ref": "#/components/schemas/PatSpec"
           }
-        }
+        },
+        "description": "Personal access token extension used for non-interactive API authentication on behalf of a Halo user."
       },
       "PersonalAccessTokenList": {
         "required": [
@@ -19503,7 +19601,7 @@
             "$ref": "#/components/schemas/PluginStatus"
           }
         },
-        "description": "A custom resource for Plugin."
+        "description": "Plugin extension that describes an installed plugin and its runtime lifecycle state."
       },
       "PluginAuthor": {
         "required": [
@@ -19513,12 +19611,15 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Author display name."
           },
           "website": {
-            "type": "string"
+            "type": "string",
+            "description": "Author website URL."
           }
-        }
+        },
+        "description": "Plugin author metadata."
       },
       "PluginInstallRequest": {
         "type": "object",
@@ -19622,54 +19723,66 @@
             "$ref": "#/components/schemas/PluginAuthor"
           },
           "configMapName": {
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name storing plugin configuration values."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable plugin description."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the plugin."
           },
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the plugin should be enabled."
           },
           "homepage": {
-            "type": "string"
+            "type": "string",
+            "description": "Plugin homepage URL."
           },
           "issues": {
-            "type": "string"
+            "type": "string",
+            "description": "Issue tracker URL."
           },
           "license": {
             "type": "array",
+            "description": "Licenses declared by the plugin.",
             "items": {
               "$ref": "#/components/schemas/License"
             }
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the plugin."
           },
           "pluginDependencies": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Required plugin dependencies keyed by plugin name with version constraints as values."
           },
           "repo": {
-            "type": "string"
+            "type": "string",
+            "description": "Source repository URL."
           },
           "requires": {
             "type": "string",
             "description": "SemVer format."
           },
           "settingName": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name used to render the plugin configuration form."
           },
           "version": {
             "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
             "type": "string",
             "description": "plugin version."
           }
-        }
+        },
+        "description": "Desired plugin metadata and configuration references."
       },
       "PluginStatus": {
         "type": "object",
@@ -19681,15 +19794,18 @@
                 "type": "boolean"
               }
             },
+            "description": "Reconciliation conditions for the plugin.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
           },
           "entry": {
-            "type": "string"
+            "type": "string",
+            "description": "JavaScript bundle entry path served for the plugin UI."
           },
           "lastProbeState": {
             "type": "string",
+            "description": "Last PF4J probe state observed for the plugin.",
             "enum": [
               "CREATED",
               "DISABLED",
@@ -19702,18 +19818,21 @@
           },
           "lastStartTime": {
             "type": "string",
+            "description": "Last time the plugin started successfully.",
             "format": "date-time"
           },
           "loadLocation": {
             "type": "string",
-            "description": "Load location of the plugin, often a path.",
+            "description": "URI location where the plugin artifact was loaded from.",
             "format": "uri"
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Resolved logo URL or attachment URI for the plugin."
           },
           "phase": {
             "type": "string",
+            "description": "Current plugin lifecycle phase.",
             "enum": [
               "PENDING",
               "STARTING",
@@ -19728,9 +19847,11 @@
             ]
           },
           "stylesheet": {
-            "type": "string"
+            "type": "string",
+            "description": "Stylesheet bundle path served for the plugin UI."
           }
-        }
+        },
+        "description": "Observed plugin lifecycle and runtime asset state."
       },
       "Policy": {
         "required": [
@@ -19753,7 +19874,8 @@
           "spec": {
             "$ref": "#/components/schemas/PolicySpec"
           }
-        }
+        },
+        "description": "Storage policy extension that binds attachment uploads to a policy template and configuration."
       },
       "PolicyList": {
         "required": [
@@ -19847,7 +19969,7 @@
           },
           "verbs": {
             "type": "array",
-            "description": "about who the rule applies to or which namespace the rule applies to.",
+            "description": "Verbs allowed by this rule, such as get, list, create, update, patch, or delete.",
             "items": {
               "type": "string"
             }
@@ -19864,17 +19986,18 @@
         "properties": {
           "configMapName": {
             "type": "string",
-            "description": "Reference name of ConfigMap extension"
+            "description": "ConfigMap metadata.name storing configuration values for this policy."
           },
           "displayName": {
             "type": "string",
-            "description": "Display name of policy"
+            "description": "Display name shown for the storage policy."
           },
           "templateName": {
             "type": "string",
-            "description": "Reference name of PolicyTemplate"
+            "description": "PolicyTemplate metadata.name that provides the storage implementation."
           }
-        }
+        },
+        "description": "Desired storage policy configuration."
       },
       "PolicyTemplate": {
         "required": [
@@ -19896,7 +20019,8 @@
           "spec": {
             "$ref": "#/components/schemas/PolicyTemplateSpec"
           }
-        }
+        },
+        "description": "Storage policy template extension that declares an attachment storage implementation and its settings form."
       },
       "PolicyTemplateList": {
         "required": [
@@ -19964,12 +20088,15 @@
         "type": "object",
         "properties": {
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the storage policy template."
           },
           "settingName": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name used to render configuration fields for policies created from this template."
           }
-        }
+        },
+        "description": "Desired storage policy template metadata."
       },
       "Post": {
         "required": [
@@ -19996,7 +20123,7 @@
             "$ref": "#/components/schemas/PostStatus"
           }
         },
-        "description": "Post extension."
+        "description": "Post extension that stores article metadata, publication settings, taxonomy, and derived status."
       },
       "PostAttachmentRequest": {
         "required": [
@@ -20209,7 +20336,7 @@
             ]
           }
         },
-        "description": "Desired content, publication, taxonomy, and rendering configuration of a post."
+        "description": "Desired post content, publication, taxonomy, and rendering configuration."
       },
       "PostStatus": {
         "type": "object",
@@ -20269,7 +20396,7 @@
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
-        "description": "Observed state of a content item."
+        "description": "Observed post state derived by content reconcilers."
       },
       "PostVo": {
         "required": [
@@ -20337,7 +20464,7 @@
             "$ref": "#/components/schemas/ReasonSpec"
           }
         },
-        "description": "{@link Reason Reason} is a custom extension that defines a reason for a notification, It represents an instance of a\n {@link ReasonType ReasonType}.\n\n \u003cp\u003eIt can be understood as an event that triggers a notification."
+        "description": "Reason extension that represents one notification event instance of a {@link ReasonType ReasonType}.\n\n \u003cp\u003eIt can be understood as an event that triggers a notification."
       },
       "ReasonAttributes": {
         "type": "object",
@@ -20346,7 +20473,7 @@
             "type": "boolean"
           }
         },
-        "description": "Attributes used to transfer data"
+        "description": "{@link ReasonAttributes ReasonAttributes} is a map that stores the attributes of the reason."
       },
       "ReasonList": {
         "required": [
@@ -20415,21 +20542,26 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the attribute."
           },
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Attribute name."
           },
           "optional": {
             "type": "boolean",
+            "description": "Whether the attribute may be absent from a reason.",
             "default": false
           },
           "type": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Attribute value type, such as string, number, boolean, or object."
           }
-        }
+        },
+        "description": "Attribute definition for reasons of a reason type."
       },
       "ReasonSelector": {
         "required": [
@@ -20441,13 +20573,16 @@
           "language": {
             "minLength": 1,
             "type": "string",
+            "description": "Language tag this template applies to, or default for the fallback template.",
             "default": "default"
           },
           "reasonType": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "ReasonType metadata.name this template applies to."
           }
-        }
+        },
+        "description": "Selector used to match a notification template to a reason type and language."
       },
       "ReasonSpec": {
         "required": [
@@ -20461,15 +20596,18 @@
             "$ref": "#/components/schemas/ReasonAttributes"
           },
           "author": {
-            "type": "string"
+            "type": "string",
+            "description": "User metadata.name or system actor that created the reason."
           },
           "reasonType": {
-            "type": "string"
+            "type": "string",
+            "description": "ReasonType metadata.name that defines this reason."
           },
           "subject": {
             "$ref": "#/components/schemas/ReasonSubject"
           }
-        }
+        },
+        "description": "Notification reason data used to render and dispatch notifications."
       },
       "ReasonSubject": {
         "required": [
@@ -20481,21 +20619,27 @@
         "type": "object",
         "properties": {
           "apiVersion": {
-            "type": "string"
+            "type": "string",
+            "description": "Subject API version."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "Subject kind."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Subject metadata.name."
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable subject title shown in notifications."
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "description": "URL that opens the subject."
           }
-        }
+        },
+        "description": "Resource subject associated with a notification reason."
       },
       "ReasonType": {
         "required": [
@@ -20518,7 +20662,7 @@
             "$ref": "#/components/schemas/ReasonTypeSpec"
           }
         },
-        "description": "{@link ReasonType ReasonType} is a custom extension that defines a type of reason.\n\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify."
+        "description": "Reason type extension that defines the schema and display metadata for notification reasons.\n\n \u003cp\u003eOne {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify."
       },
       "ReasonTypeInfo": {
         "type": "object",
@@ -20663,19 +20807,23 @@
         "properties": {
           "description": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of when this reason type is triggered."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for this reason type."
           },
           "properties": {
             "type": "array",
+            "description": "Attribute definitions available on reasons of this type.",
             "items": {
               "$ref": "#/components/schemas/ReasonProperty"
             }
           }
-        }
+        },
+        "description": "Desired reason type metadata and properties available to templates."
       },
       "Ref": {
         "required": [
@@ -20725,7 +20873,8 @@
           "spec": {
             "$ref": "#/components/schemas/RememberMeTokenSpec"
           }
-        }
+        },
+        "description": "Persistent remember-me token used to keep a user\u0027s browser session signed in across restarts."
       },
       "RememberMeTokenList": {
         "required": [
@@ -20796,6 +20945,7 @@
         "properties": {
           "lastUsed": {
             "type": "string",
+            "description": "Last time this remember-me token was used successfully.",
             "format": "date-time"
           },
           "previousTokenValue": {
@@ -20804,17 +20954,21 @@
           },
           "series": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Browser series identifier used by Spring Security remember-me authentication."
           },
           "tokenValue": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Current remember-me token value expected from the browser cookie."
           },
           "username": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "User metadata.name that owns this remember-me token."
           }
-        }
+        },
+        "description": "Persistent remember-me token values for a user and browser series."
       },
       "RemoveOperation": {
         "required": [
@@ -21203,6 +21357,7 @@
           },
           "rules": {
             "type": "array",
+            "description": "Path mapping rules served by this reverse proxy resource.",
             "items": {
               "$ref": "#/components/schemas/ReverseProxyRule"
             }
@@ -21278,7 +21433,8 @@
           "path": {
             "type": "string"
           }
-        }
+        },
+        "description": "A path mapping from a public request path to a file provider."
       },
       "RevertSnapshotForPostParam": {
         "required": [
@@ -21328,11 +21484,13 @@
           },
           "rules": {
             "type": "array",
+            "description": "Policy rules granted by this role.",
             "items": {
               "$ref": "#/components/schemas/PolicyRule"
             }
           }
-        }
+        },
+        "description": "Role extension that defines RBAC policy rules for users and other subjects."
       },
       "RoleBinding": {
         "required": [
@@ -21356,13 +21514,13 @@
           },
           "subjects": {
             "type": "array",
-            "description": "Subjects holds references to the objects the role applies to.",
+            "description": "Subjects that receive the permissions from roleRef.",
             "items": {
               "$ref": "#/components/schemas/Subject"
             }
           }
         },
-        "description": "RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who\n information via Subjects."
+        "description": "RoleBinding extension that grants a Role to one or more subjects."
       },
       "RoleBindingList": {
         "required": [
@@ -21487,15 +21645,15 @@
         "properties": {
           "apiGroup": {
             "type": "string",
-            "description": "APIGroup is the group for the resource being referenced."
+            "description": "API group of the role resource being referenced."
           },
           "kind": {
             "type": "string",
-            "description": "Kind is the type of resource being referenced."
+            "description": "Kind of the role resource being referenced."
           },
           "name": {
             "type": "string",
-            "description": "Name is the name of resource being referenced."
+            "description": "Metadata name of the role resource being referenced."
           }
         },
         "description": "RoleRef contains information that points to the role being used."
@@ -21722,7 +21880,7 @@
             "$ref": "#/components/schemas/SettingSpec"
           }
         },
-        "description": "{@link Setting Setting} is a custom extension to generate forms based on configuration."
+        "description": "Setting extension that describes one or more configuration forms and their schema."
       },
       "SettingForm": {
         "minLength": 1,
@@ -21734,17 +21892,21 @@
         "properties": {
           "formSchema": {
             "type": "array",
+            "description": "FormKit-compatible schema used to render the form fields.",
             "items": {
               "type": "object"
             }
           },
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable form group name used to store submitted values."
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "Display label shown for this form group."
           }
-        }
+        },
+        "description": "A single form group in a setting definition."
       },
       "SettingList": {
         "required": [
@@ -21814,13 +21976,16 @@
         "properties": {
           "group": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Setting form group name."
           },
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name."
           }
-        }
+        },
+        "description": "Reference to a setting definition used by this provider."
       },
       "SettingSpec": {
         "required": [
@@ -21831,11 +21996,13 @@
           "forms": {
             "minLength": 1,
             "type": "array",
+            "description": "Form groups rendered for this setting definition.",
             "items": {
               "$ref": "#/components/schemas/SettingForm"
             }
           }
-        }
+        },
+        "description": "Collection of form groups that make up this setting definition."
       },
       "SetupRequest": {
         "required": [
@@ -21901,7 +22068,7 @@
             "$ref": "#/components/schemas/SinglePageStatus"
           }
         },
-        "description": "Single page extension."
+        "description": "Single page extension that stores standalone page metadata, publication settings, and derived status."
       },
       "SinglePageList": {
         "required": [
@@ -22080,7 +22247,7 @@
             ]
           }
         },
-        "description": "Desired content, publication, and rendering configuration of a single page."
+        "description": "Desired single page content, publication, and rendering configuration."
       },
       "SinglePageStatus": {
         "type": "object",
@@ -22140,7 +22307,7 @@
             "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
-        "description": "Observed state of a single page."
+        "description": "Observed single page state derived by content reconcilers."
       },
       "SinglePageVo": {
         "required": [
@@ -22393,7 +22560,8 @@
             "type": "string",
             "description": "Name of the object being referenced."
           }
-        }
+        },
+        "description": "Subject that receives permissions from a RoleBinding."
       },
       "Subscription": {
         "required": [
@@ -22416,7 +22584,7 @@
             "$ref": "#/components/schemas/SubscriptionSpec"
           }
         },
-        "description": "{@link Subscription Subscription} is a custom extension that defines a subscriber to be notified when a certain {@link Reason Reason} is\n triggered.\n\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to subscribe to."
+        "description": "Subscription extension that records which subscriber should be notified when a matching reason is triggered.\n\n \u003cp\u003eIt holds a {@link Subscriber Subscriber} to the user to be notified, a {@link InterestReason InterestReason} to subscribe to."
       },
       "SubscriptionList": {
         "required": [
@@ -22487,7 +22655,7 @@
         "properties": {
           "disabled": {
             "type": "boolean",
-            "description": "Perhaps users need to unsubscribe and interact without receiving notifications again"
+            "description": "Whether the subscription has been disabled, usually after the subscriber unsubscribes."
           },
           "reason": {
             "$ref": "#/components/schemas/InterestReason"
@@ -22497,9 +22665,10 @@
           },
           "unsubscribeToken": {
             "type": "string",
-            "description": "The token to unsubscribe"
+            "description": "Token used to unsubscribe without authenticating as the subscriber."
           }
-        }
+        },
+        "description": "Desired notification subscription settings."
       },
       "SubscriptionSubscriber": {
         "required": [
@@ -22509,10 +22678,11 @@
         "properties": {
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "User metadata.name of the subscriber."
           }
         },
-        "description": "The subscriber to be notified"
+        "description": "Subscriber that receives notifications."
       },
       "Tag": {
         "required": [
@@ -22631,7 +22801,7 @@
             "description": "URL slug used to build the tag permalink."
           }
         },
-        "description": "Desired display and rendering configuration of a tag."
+        "description": "Desired tag display and rendering configuration."
       },
       "TagStatus": {
         "type": "object",
@@ -22656,7 +22826,7 @@
             "format": "int32"
           }
         },
-        "description": "Observed state of a tag."
+        "description": "Observed tag state derived by content reconcilers."
       },
       "TagVo": {
         "required": [
@@ -22746,16 +22916,20 @@
         "type": "object",
         "properties": {
           "htmlBody": {
-            "type": "string"
+            "type": "string",
+            "description": "HTML body rendered for notification channels that support HTML."
           },
           "rawBody": {
-            "type": "string"
+            "type": "string",
+            "description": "Plain text or source body rendered for notification channels that do not use HTML."
           },
           "title": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Rendered notification title."
           }
-        }
+        },
+        "description": "Notification template content."
       },
       "TemplateDescriptor": {
         "required": [
@@ -22765,18 +22939,22 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of when to use this template."
           },
           "file": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Template file path relative to the theme templates directory."
           },
           "name": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Template display name shown to users."
           },
           "screenshot": {
-            "type": "string"
+            "type": "string",
+            "description": "Screenshot URL or attachment URI for previewing the template."
           }
         },
         "description": "Type used to describe custom template page."
@@ -22831,7 +23009,7 @@
             "$ref": "#/components/schemas/ThemeStatus"
           }
         },
-        "description": "Theme extension."
+        "description": "Theme extension that describes an installable frontend theme and its runtime state."
       },
       "ThemeInstallRequest": {
         "type": "object"
@@ -22906,46 +23084,58 @@
             "$ref": "#/components/schemas/Author"
           },
           "configMapName": {
-            "type": "string"
+            "type": "string",
+            "description": "ConfigMap metadata.name storing the theme configuration values."
           },
           "customTemplates": {
             "$ref": "#/components/schemas/CustomTemplates"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable theme description."
           },
           "displayName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the theme."
           },
           "homepage": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme homepage URL."
           },
           "issues": {
-            "type": "string"
+            "type": "string",
+            "description": "Issue tracker URL."
           },
           "license": {
             "type": "array",
+            "description": "Licenses declared by the theme.",
             "items": {
               "$ref": "#/components/schemas/License"
             }
           },
           "logo": {
-            "type": "string"
+            "type": "string",
+            "description": "Logo URL or attachment URI for the theme."
           },
           "repo": {
-            "type": "string"
+            "type": "string",
+            "description": "Source repository URL."
           },
           "requires": {
-            "type": "string"
+            "type": "string",
+            "description": "Required Halo version range. The wildcard value means any Halo version."
           },
           "settingName": {
-            "type": "string"
+            "type": "string",
+            "description": "Setting metadata.name used to render the theme configuration form."
           },
           "version": {
-            "type": "string"
+            "type": "string",
+            "description": "Theme version. The wildcard value means any version."
           }
-        }
+        },
+        "description": "Desired theme metadata and configuration references."
       },
       "ThemeStatus": {
         "type": "object",
@@ -22957,6 +23147,7 @@
                 "type": "boolean"
               }
             },
+            "description": "Reconciliation conditions for the theme.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
@@ -22966,17 +23157,20 @@
             "description": "Whether the theme appears to be a local development workspace."
           },
           "location": {
-            "type": "string"
+            "type": "string",
+            "description": "Local filesystem location where the theme is loaded from."
           },
           "phase": {
             "type": "string",
+            "description": "Current theme lifecycle phase.",
             "enum": [
               "READY",
               "FAILED",
               "UNKNOWN"
             ]
           }
-        }
+        },
+        "description": "Observed theme lifecycle and installation state."
       },
       "TotpAuthLinkResponse": {
         "type": "object",
@@ -23142,7 +23336,7 @@
             "$ref": "#/components/schemas/UserStatus"
           }
         },
-        "description": "The extension represents user details of Halo."
+        "description": "User extension that stores profile, authentication, and account state for a Halo user."
       },
       "UserConnection": {
         "required": [
@@ -23166,7 +23360,7 @@
             "$ref": "#/components/schemas/UserConnectionSpec"
           }
         },
-        "description": "User connection extension."
+        "description": "User connection extension that links a Halo user to an external OAuth2 account."
       },
       "UserConnectionList": {
         "required": [
@@ -23252,7 +23446,8 @@
             "type": "string",
             "description": "The {@link Metadata#getName Metadata#getName()} of the user associated with the OAuth connection."
           }
-        }
+        },
+        "description": "External OAuth2 account binding for a Halo user."
       },
       "UserDevice": {
         "required": [
@@ -23427,52 +23622,67 @@
         "type": "object",
         "properties": {
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "Avatar URL or attachment URI for the user."
           },
           "bio": {
-            "type": "string"
+            "type": "string",
+            "description": "User biography shown on profile surfaces."
           },
           "disabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the user account is disabled."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name shown for the user."
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Email address used for sign-in and notifications."
           },
           "emailVerified": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the email address has been verified."
           },
           "loginHistoryLimit": {
             "type": "integer",
+            "description": "Maximum number of login history entries retained for this user.",
             "format": "int32"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "Password hash or encoded password value."
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "description": "Phone number associated with the user."
           },
           "registeredAt": {
             "type": "string",
+            "description": "Time when the user registered.",
             "format": "date-time"
           },
           "totpEncryptedSecret": {
-            "type": "string"
+            "type": "string",
+            "description": "Encrypted TOTP secret used for two-factor authentication."
           },
           "twoFactorAuthEnabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether two-factor authentication is enabled for this user."
           }
-        }
+        },
+        "description": "Desired user profile and authentication settings."
       },
       "UserStatus": {
         "type": "object",
         "properties": {
           "permalink": {
-            "type": "string"
+            "type": "string",
+            "description": "Public permalink of the user\u0027s profile or author page."
           }
-        }
+        },
+        "description": "Observed user state derived by the application."
       },
       "VerifyCodeRequest": {
         "required": [

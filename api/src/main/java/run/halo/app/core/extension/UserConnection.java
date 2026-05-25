@@ -11,7 +11,7 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
 
 /**
- * User connection extension.
+ * User connection extension that links a Halo user to an external OAuth2 account.
  *
  * @author guqing
  * @since 2.4.0
@@ -26,9 +26,11 @@ import run.halo.app.extension.Metadata;
         plural = "userconnections")
 public class UserConnection extends AbstractExtension {
 
+    /** Desired external account binding information. */
     @Schema(requiredMode = REQUIRED)
     private UserConnectionSpec spec;
 
+    /** External OAuth2 account binding for a Halo user. */
     @Data
     public static class UserConnectionSpec {
 

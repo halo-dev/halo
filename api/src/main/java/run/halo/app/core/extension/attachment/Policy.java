@@ -10,6 +10,7 @@ import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
+/** Storage policy extension that binds attachment uploads to a policy template and configuration. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -19,19 +20,23 @@ public class Policy extends AbstractExtension {
 
     public static final String KIND = "Policy";
 
+    /** Desired storage policy metadata and template references. */
     @Schema(requiredMode = REQUIRED)
     private PolicySpec spec;
 
+    /** Desired storage policy configuration. */
     @Data
     public static class PolicySpec {
 
-        @Schema(requiredMode = REQUIRED, description = "Display name of policy")
+        /** Display name shown for the storage policy. */
+        @Schema(requiredMode = REQUIRED)
         private String displayName;
 
-        @Schema(requiredMode = REQUIRED, description = "Reference name of PolicyTemplate")
+        /** PolicyTemplate metadata.name that provides the storage implementation. */
+        @Schema(requiredMode = REQUIRED)
         private String templateName;
 
-        @Schema(description = "Reference name of ConfigMap extension")
+        /** ConfigMap metadata.name storing configuration values for this policy. */
         private String configMapName;
     }
 }

@@ -23,19 +23,55 @@ import type { CustomTemplates } from './custom-templates';
 // @ts-ignore
 import type { License } from './license';
 
+/**
+ * Desired theme metadata and configuration references.
+ */
 export interface ThemeSpec {
     'author': Author;
+    /**
+     * ConfigMap metadata.name storing the theme configuration values.
+     */
     'configMapName'?: string;
     'customTemplates'?: CustomTemplates;
+    /**
+     * Human-readable theme description.
+     */
     'description'?: string;
+    /**
+     * Display name shown for the theme.
+     */
     'displayName': string;
+    /**
+     * Theme homepage URL.
+     */
     'homepage'?: string;
+    /**
+     * Issue tracker URL.
+     */
     'issues'?: string;
+    /**
+     * Licenses declared by the theme.
+     */
     'license'?: Array<License>;
+    /**
+     * Logo URL or attachment URI for the theme.
+     */
     'logo'?: string;
+    /**
+     * Source repository URL.
+     */
     'repo'?: string;
+    /**
+     * Required Halo version range. The wildcard value means any Halo version.
+     */
     'requires'?: string;
+    /**
+     * Setting metadata.name used to render the theme configuration form.
+     */
     'settingName'?: string;
+    /**
+     * Theme version. The wildcard value means any version.
+     */
     'version'?: string;
 }
 

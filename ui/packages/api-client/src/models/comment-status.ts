@@ -15,7 +15,7 @@
 
 
 /**
- * Observed state of a comment.
+ * Observed state of a top-level comment.
  */
 export interface CommentStatus {
     /**

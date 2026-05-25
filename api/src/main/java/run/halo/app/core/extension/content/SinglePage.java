@@ -17,7 +17,7 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 
 /**
- * Single page extension.
+ * Single page extension that stores standalone page metadata, publication settings, and derived status.
  *
  * @author guqing
  * @since 2.0.0
@@ -65,8 +65,8 @@ public class SinglePage extends AbstractExtension {
         return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
     }
 
+    /** Desired single page content, publication, and rendering configuration. */
     @Data
-    @Schema(description = "Desired content, publication, and rendering configuration of a single page.")
     public static class SinglePageSpec {
         /** Display title of the single page. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
@@ -131,9 +131,9 @@ public class SinglePage extends AbstractExtension {
         private List<Map<String, String>> htmlMetas;
     }
 
+    /** Observed single page state derived by content reconcilers. */
     @Data
     @EqualsAndHashCode(callSuper = true)
-    @Schema(description = "Observed state of a single page.")
     public static class SinglePageStatus extends Post.PostStatus {}
 
     public static void changePublishedState(SinglePage page, boolean value) {

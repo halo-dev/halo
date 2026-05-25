@@ -17,7 +17,13 @@
 // @ts-ignore
 import type { GroupKind } from './group-kind';
 
+/**
+ * Desired annotation form configuration for a target resource kind.
+ */
 export interface AnnotationSettingSpec {
+    /**
+     * FormKit-compatible schema used to render annotation fields.
+     */
     'formSchema': Array<object>;
     'targetRef': GroupKind;
 }

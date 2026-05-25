@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { NotificationSpec } from './notification-spec';
 
 /**
- * {@link Notification Notification} is a custom extension that used to store notification information for inner use, it\'s on-site  notification.   <p>Supports the following operations:   <ul>    <li>Marked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}    <li>Get the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}    <li>Filter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}  </ul>
+ * Notification extension that stores an on-site notification delivered to a Halo user.   <p>Supports the following operations:   <ul>    <li>Marked as read: {@link NotificationSpec#setUnread(boolean) NotificationSpec#setUnread(boolean)}    <li>Get the last read time: {@link NotificationSpec#getLastReadAt NotificationSpec#getLastReadAt()}    <li>Filter by recipient: {@link NotificationSpec#getRecipient NotificationSpec#getRecipient()}  </ul>
  */
 export interface Notification {
     'apiVersion': string;
