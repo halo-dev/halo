@@ -199,19 +199,21 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
         private boolean[][] stateMatrix;
     }
 
-    /** Reason type metadata used by notification preference UI. */
+    /**
+     * Reason type metadata used by notification preference UI.
+     *
+     * @param name reason type {@code metadata.name}
+     * @param displayName display name of the reason type
+     * @param description description of the reason type
+     * @param uiPermissions UI permissions required to manage this reason type
+     */
     record ReasonTypeInfo(
-            /** {@code metadata.name} of the reason type. */
-            @Schema(requiredMode = REQUIRED)
-            String name,
+            @Schema(requiredMode = REQUIRED) String name,
 
-            /** Display name of the reason type. */
             String displayName,
 
-            /** Description of the reason type. */
             String description,
 
-            /** UI permissions required to manage this reason type. */
             Set<String> uiPermissions) {
 
         public static ReasonTypeInfo from(ReasonType reasonType) {
@@ -229,23 +231,22 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
         }
     }
 
-    /** Notifier metadata used by notification preference UI. */
-    record NotifierInfo(
-            /** {@code metadata.name} of the notifier. */
-            @Schema(requiredMode = REQUIRED)
-            String name,
+    /**
+     * Notifier metadata used by notification preference UI.
+     *
+     * @param name notifier {@code metadata.name}
+     * @param displayName display name of the notifier
+     * @param description description of the notifier
+     */
+    record NotifierInfo(@Schema(requiredMode = REQUIRED) String name, String displayName, String description) {}
 
-            /** Display name of the notifier. */
-            String displayName,
-
-            /** Description of the notifier. */
-            String description) {}
-
-    /** Payload for saving notifier selections by reason type. */
+    /**
+     * Payload for saving notifier selections by reason type.
+     *
+     * @param reasonTypeNotifiers notifier selections grouped by reason type
+     */
     record ReasonTypeNotifierCollectionRequest(
-            /** Notifier selections grouped by reason type. */
-            @Schema(requiredMode = REQUIRED)
-            List<ReasonTypeNotifierRequest> reasonTypeNotifiers) {}
+            @Schema(requiredMode = REQUIRED) List<ReasonTypeNotifierRequest> reasonTypeNotifiers) {}
 
     /** Notifier selection for one reason type. */
     @Data

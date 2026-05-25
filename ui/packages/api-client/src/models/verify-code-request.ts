@@ -18,7 +18,13 @@
  * Payload for verifying an email address by code.
  */
 export interface VerifyCodeRequest {
+    /**
+     * email verification code
+     */
     'code': string;
+    /**
+     * current password of the authenticated user
+     */
     'password': string;
 }
 

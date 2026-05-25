@@ -24,6 +24,9 @@ import type { User } from './user';
  * User detail response with resolved roles.
  */
 export interface DetailedUser {
+    /**
+     * roles granted to the user
+     */
     'roles': Array<Role>;
     'user': User;
 }

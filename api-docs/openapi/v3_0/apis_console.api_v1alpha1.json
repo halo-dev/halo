@@ -3920,13 +3920,16 @@
         "type": "object",
         "properties": {
           "oldPassword": {
-            "type": "string"
+            "type": "string",
+            "description": "old password"
           },
           "password": {
             "minLength": 5,
-            "type": "string"
+            "type": "string",
+            "description": "new password"
           }
-        }
+        },
+        "description": "Payload for changing the current user\u0027s password."
       },
       "ChangePasswordRequest": {
         "required": [
@@ -3936,9 +3939,11 @@
         "properties": {
           "password": {
             "minLength": 5,
-            "type": "string"
+            "type": "string",
+            "description": "new password"
           }
-        }
+        },
+        "description": "Payload for changing a user\u0027s password."
       },
       "Comment": {
         "required": [
@@ -4401,32 +4406,41 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "metadata annotations to set on the user"
           },
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "avatar URL of the user"
           },
           "bio": {
-            "type": "string"
+            "type": "string",
+            "description": "biography or profile text of the user"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name shown in the console and theme"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "email address of the user"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "user \u003ccode\u003emetadata.name\u003c/code\u003e, which also serves as the login name"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "raw password to set for the user"
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "description": "phone number of the user"
           },
           "roles": {
             "uniqueItems": true,
             "type": "array",
+            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant to the user after creation",
             "items": {
               "type": "string"
             }
@@ -4514,6 +4528,7 @@
         "properties": {
           "roles": {
             "type": "array",
+            "description": "roles granted to the user",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
@@ -4565,7 +4580,8 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "description": "email address to verify"
           }
         },
         "description": "Payload for sending an email verification code."
@@ -4617,6 +4633,7 @@
           "roles": {
             "uniqueItems": true,
             "type": "array",
+            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant",
             "items": {
               "type": "string"
             }
@@ -4669,6 +4686,7 @@
         "properties": {
           "uri": {
             "type": "string",
+            "description": "remote URI of the theme ZIP file",
             "format": "uri"
           }
         },
@@ -6101,7 +6119,8 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "snapshot \u003ccode\u003emetadata.name\u003c/code\u003e to restore as the post\u0027s head content"
           }
         },
         "description": "Request body for restoring post content from a snapshot."
@@ -6114,7 +6133,8 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "snapshot \u003ccode\u003emetadata.name\u003c/code\u003e to restore as the single page\u0027s head content"
           }
         },
         "description": "Request body for restoring single page content from a snapshot."
@@ -6861,6 +6881,7 @@
         "properties": {
           "uri": {
             "type": "string",
+            "description": "remote URI of the theme ZIP file",
             "format": "uri"
           }
         },
@@ -6906,16 +6927,20 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "custom file name"
           },
           "groupName": {
-            "type": "string"
+            "type": "string",
+            "description": "attachment group \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "policyName": {
-            "type": "string"
+            "type": "string",
+            "description": "storage policy \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "url": {
             "type": "string",
+            "description": "remote file URL to transfer into storage",
             "format": "url"
           }
         },
@@ -7118,10 +7143,12 @@
         "properties": {
           "code": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "email verification code"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "current password of the authenticated user"
           }
         },
         "description": "Payload for verifying an email address by code."

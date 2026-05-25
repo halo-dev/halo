@@ -412,11 +412,13 @@ public class ThemeEndpoint implements CustomEndpoint {
         FilePart getFile();
     }
 
-    /** Payload for upgrading a theme from a remote URI. */
+    /**
+     * Payload for upgrading a theme from a remote URI.
+     *
+     * @param uri remote URI of the theme ZIP file
+     */
     public record UpgradeFromUriRequest(
-            /** Remote URI of the theme ZIP file. */
-            @Schema(requiredMode = REQUIRED)
-            URI uri) {}
+            @Schema(requiredMode = REQUIRED) URI uri) {}
 
     public static class UpgradeRequest implements IUpgradeRequest {
 
@@ -517,11 +519,13 @@ public class ThemeEndpoint implements CustomEndpoint {
         }
     }
 
-    /** Payload for installing a theme from a remote URI. */
+    /**
+     * Payload for installing a theme from a remote URI.
+     *
+     * @param uri remote URI of the theme ZIP file
+     */
     public record InstallFromUriRequest(
-            /** Remote URI of the theme ZIP file. */
-            @Schema(requiredMode = REQUIRED)
-            URI uri) {}
+            @Schema(requiredMode = REQUIRED) URI uri) {}
 
     Mono<ServerResponse> install(ServerRequest request) {
         return request.multipartData()

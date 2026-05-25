@@ -202,8 +202,9 @@ public class PostEndpoint implements CustomEndpoint {
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("headSnapshot")
-                                        .description("Snapshot metadata.name to publish. Defaults to the current base snapshot "
-                                                + "when no head snapshot exists.")
+                                        .description(
+                                                "Snapshot metadata.name to publish. Defaults to the current base snapshot "
+                                                        + "when no head snapshot exists.")
                                         .in(ParameterIn.QUERY)
                                         .required(false))
                                 .parameter(parameterBuilder()
@@ -276,10 +277,13 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
-    /** Request body for restoring post content from a snapshot. */
+    /**
+     * Request body for restoring post content from a snapshot.
+     *
+     * @param snapshotName snapshot {@code metadata.name} to restore as the post's head content
+     */
     @Schema(name = "RevertSnapshotForPostParam")
     record RevertSnapshotParam(
-            /** {@code metadata.name} of the snapshot that should become the post's head content. */
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)
             String snapshotName) {}
 

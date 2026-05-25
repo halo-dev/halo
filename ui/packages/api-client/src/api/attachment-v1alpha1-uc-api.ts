@@ -34,10 +34,10 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
     return {
         /**
          * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
-         * @param {File} file Attachment data.
+         * @param {File} file attachment data
          * @param {boolean} [waitForPermalink] Wait for permalink.
-         * @param {string} [postName] Post &lt;code&gt;metadata.name&lt;/code&gt;.
-         * @param {string} [singlePageName] Single page &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [postName] post &lt;code&gt;metadata.name&lt;/code&gt;
+         * @param {string} [singlePageName] single page &lt;code&gt;metadata.name&lt;/code&gt;
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
@@ -289,10 +289,10 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
     return {
         /**
          * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
-         * @param {File} file Attachment data.
+         * @param {File} file attachment data
          * @param {boolean} [waitForPermalink] Wait for permalink.
-         * @param {string} [postName] Post &lt;code&gt;metadata.name&lt;/code&gt;.
-         * @param {string} [singlePageName] Single page &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [postName] post &lt;code&gt;metadata.name&lt;/code&gt;
+         * @param {string} [singlePageName] single page &lt;code&gt;metadata.name&lt;/code&gt;
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
@@ -405,7 +405,7 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
  */
 export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
     /**
-     * Attachment data.
+     * attachment data
      */
     readonly file: File
 
@@ -415,12 +415,12 @@ export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
     readonly waitForPermalink?: boolean
 
     /**
-     * Post &lt;code&gt;metadata.name&lt;/code&gt;.
+     * post &lt;code&gt;metadata.name&lt;/code&gt;
      */
     readonly postName?: string
 
     /**
-     * Single page &lt;code&gt;metadata.name&lt;/code&gt;.
+     * single page &lt;code&gt;metadata.name&lt;/code&gt;
      */
     readonly singlePageName?: string
 }

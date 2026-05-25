@@ -18,14 +18,41 @@
  * Payload for creating a user from the console.
  */
 export interface CreateUserRequest {
+    /**
+     * metadata annotations to set on the user
+     */
     'annotations'?: { [key: string]: string; };
+    /**
+     * avatar URL of the user
+     */
     'avatar'?: string;
+    /**
+     * biography or profile text of the user
+     */
     'bio'?: string;
+    /**
+     * display name shown in the console and theme
+     */
     'displayName'?: string;
+    /**
+     * email address of the user
+     */
     'email': string;
+    /**
+     * user <code>metadata.name</code>, which also serves as the login name
+     */
     'name': string;
+    /**
+     * raw password to set for the user
+     */
     'password'?: string;
+    /**
+     * phone number of the user
+     */
     'phone'?: string;
+    /**
+     * role <code>metadata.name</code> values to grant to the user after creation
+     */
     'roles'?: Array<string>;
 }
 

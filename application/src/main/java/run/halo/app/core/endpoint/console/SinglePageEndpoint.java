@@ -245,10 +245,13 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
-    /** Request body for restoring single page content from a snapshot. */
+    /**
+     * Request body for restoring single page content from a snapshot.
+     *
+     * @param snapshotName snapshot {@code metadata.name} to restore as the single page's head content
+     */
     @Schema(name = "RevertSnapshotForSingleParam")
     record RevertSnapshotParam(
-            /** {@code metadata.name} of the snapshot that should become the single page's head content. */
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)
             String snapshotName) {}
 

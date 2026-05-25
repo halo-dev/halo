@@ -423,17 +423,21 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                 .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin));
     }
 
-    /** Payload for installing a plugin from a remote URI. */
+    /**
+     * Payload for installing a plugin from a remote URI.
+     *
+     * @param uri remote URI of the plugin JAR file
+     */
     public record InstallFromUriRequest(
-            /** Remote URI of the plugin JAR file. */
-            @Schema(requiredMode = REQUIRED)
-            URI uri) {}
+            @Schema(requiredMode = REQUIRED) URI uri) {}
 
-    /** Payload for upgrading a plugin from a remote URI. */
+    /**
+     * Payload for upgrading a plugin from a remote URI.
+     *
+     * @param uri remote URI of the plugin JAR file
+     */
     public record UpgradeFromUriRequest(
-            /** Remote URI of the plugin JAR file. */
-            @Schema(requiredMode = REQUIRED)
-            URI uri) {}
+            @Schema(requiredMode = REQUIRED) URI uri) {}
 
     private Mono<ServerResponse> reload(ServerRequest serverRequest) {
         var name = serverRequest.pathVariable("name");

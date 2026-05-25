@@ -18,6 +18,9 @@
  * Payload for marking multiple notifications as read.
  */
 export interface MarkSpecifiedRequest {
+    /**
+     * notification <code>metadata.name</code> values to mark as read
+     */
     'names': Array<string>;
 }
 

@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Payload for changing the current user\'s password.
+ */
 export interface ChangeOwnPasswordRequest {
+    /**
+     * old password
+     */
     'oldPassword': string;
+    /**
+     * new password
+     */
     'password': string;
 }
 

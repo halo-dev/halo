@@ -16134,13 +16134,16 @@
         "type": "object",
         "properties": {
           "oldPassword": {
-            "type": "string"
+            "type": "string",
+            "description": "old password"
           },
           "password": {
             "minLength": 5,
-            "type": "string"
+            "type": "string",
+            "description": "new password"
           }
-        }
+        },
+        "description": "Payload for changing the current user\u0027s password."
       },
       "ChangePasswordRequest": {
         "required": [
@@ -16150,9 +16153,11 @@
         "properties": {
           "password": {
             "minLength": 5,
-            "type": "string"
+            "type": "string",
+            "description": "new password"
           }
-        }
+        },
+        "description": "Payload for changing a user\u0027s password."
       },
       "Comment": {
         "required": [
@@ -17058,25 +17063,32 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "hostname": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor host name"
           },
           "language": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor browser language"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           },
           "referrer": {
-            "type": "string"
+            "type": "string",
+            "description": "referrer URL of the visit"
           },
           "screen": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor screen size or display descriptor"
           }
         },
         "description": "Payload for counting a visit to an extension resource."
@@ -17092,32 +17104,41 @@
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "metadata annotations to set on the user"
           },
           "avatar": {
-            "type": "string"
+            "type": "string",
+            "description": "avatar URL of the user"
           },
           "bio": {
-            "type": "string"
+            "type": "string",
+            "description": "biography or profile text of the user"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name shown in the console and theme"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "email address of the user"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "user \u003ccode\u003emetadata.name\u003c/code\u003e, which also serves as the login name"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "raw password to set for the user"
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "description": "phone number of the user"
           },
           "roles": {
             "uniqueItems": true,
             "type": "array",
+            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant to the user after creation",
             "items": {
               "type": "string"
             }
@@ -17205,6 +17226,7 @@
         "properties": {
           "roles": {
             "type": "array",
+            "description": "roles granted to the user",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
@@ -17402,7 +17424,8 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "description": "email address to verify"
           }
         },
         "description": "Payload for sending an email verification code."
@@ -17698,6 +17721,7 @@
           "roles": {
             "uniqueItems": true,
             "type": "array",
+            "description": "role \u003ccode\u003emetadata.name\u003c/code\u003e values to grant",
             "items": {
               "type": "string"
             }
@@ -17977,6 +18001,7 @@
         "properties": {
           "uri": {
             "type": "string",
+            "description": "remote URI of the theme ZIP file",
             "format": "uri"
           }
         },
@@ -18788,6 +18813,7 @@
         "properties": {
           "names": {
             "type": "array",
+            "description": "notification \u003ccode\u003emetadata.name\u003c/code\u003e values to mark as read",
             "items": {
               "type": "string"
             }
@@ -19529,13 +19555,16 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the notifier"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the notifier"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "notifier \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
         },
         "description": "Notifier metadata used by notification preference UI."
@@ -20309,18 +20338,19 @@
         "properties": {
           "file": {
             "type": "string",
-            "description": "Attachment data.",
+            "description": "attachment data",
             "format": "binary"
           },
           "postName": {
             "type": "string",
-            "description": "Post \u003ccode\u003emetadata.name\u003c/code\u003e."
+            "description": "post \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "singlePageName": {
             "type": "string",
-            "description": "Single page \u003ccode\u003emetadata.name\u003c/code\u003e."
+            "description": "single page \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
-        }
+        },
+        "description": "Multipart payload for uploading a post attachment."
       },
       "PostList": {
         "required": [
@@ -20848,17 +20878,21 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the reason type"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the reason type"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "reason type \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "uiPermissions": {
             "uniqueItems": true,
             "type": "array",
+            "description": "UI permissions required to manage this reason type",
             "items": {
               "type": "string"
             }
@@ -20933,6 +20967,7 @@
         "properties": {
           "reasonTypeNotifiers": {
             "type": "array",
+            "description": "notifier selections grouped by reason type",
             "items": {
               "$ref": "#/components/schemas/ReasonTypeNotifierRequest"
             }
@@ -21644,7 +21679,8 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "snapshot \u003ccode\u003emetadata.name\u003c/code\u003e to restore as the post\u0027s head content"
           }
         },
         "description": "Request body for restoring post content from a snapshot."
@@ -21657,7 +21693,8 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "snapshot \u003ccode\u003emetadata.name\u003c/code\u003e to restore as the single page\u0027s head content"
           }
         },
         "description": "Request body for restoring single page content from a snapshot."
@@ -23452,10 +23489,12 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "custom file name"
           },
           "url": {
             "type": "string",
+            "description": "remote file URL to transfer into user-center storage",
             "format": "url"
           }
         },
@@ -23469,6 +23508,7 @@
         "properties": {
           "uri": {
             "type": "string",
+            "description": "remote URI of the theme ZIP file",
             "format": "uri"
           }
         },
@@ -23514,16 +23554,20 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "custom file name"
           },
           "groupName": {
-            "type": "string"
+            "type": "string",
+            "description": "attachment group \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "policyName": {
-            "type": "string"
+            "type": "string",
+            "description": "storage policy \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "url": {
             "type": "string",
+            "description": "remote file URL to transfer into storage",
             "format": "url"
           }
         },
@@ -23918,10 +23962,12 @@
         "properties": {
           "code": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "email verification code"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "current password of the authenticated user"
           }
         },
         "description": "Payload for verifying an email address by code."
@@ -23935,13 +23981,16 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           }
         },
         "description": "Payload for voting on an extension resource."

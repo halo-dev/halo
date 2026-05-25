@@ -2204,6 +2204,7 @@
         "properties": {
           "names": {
             "type": "array",
+            "description": "notification \u003ccode\u003emetadata.name\u003c/code\u003e values to mark as read",
             "items": {
               "type": "string"
             }
@@ -2431,13 +2432,16 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the notifier"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the notifier"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "notifier \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
         },
         "description": "Notifier metadata used by notification preference UI."
@@ -2577,18 +2581,19 @@
         "properties": {
           "file": {
             "type": "string",
-            "description": "Attachment data.",
+            "description": "attachment data",
             "format": "binary"
           },
           "postName": {
             "type": "string",
-            "description": "Post \u003ccode\u003emetadata.name\u003c/code\u003e."
+            "description": "post \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "singlePageName": {
             "type": "string",
-            "description": "Single page \u003ccode\u003emetadata.name\u003c/code\u003e."
+            "description": "single page \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
-        }
+        },
+        "description": "Multipart payload for uploading a post attachment."
       },
       "PostSpec": {
         "required": [
@@ -2775,17 +2780,21 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the reason type"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the reason type"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "reason type \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "uiPermissions": {
             "uniqueItems": true,
             "type": "array",
+            "description": "UI permissions required to manage this reason type",
             "items": {
               "type": "string"
             }
@@ -2801,6 +2810,7 @@
         "properties": {
           "reasonTypeNotifiers": {
             "type": "array",
+            "description": "notifier selections grouped by reason type",
             "items": {
               "$ref": "#/components/schemas/ReasonTypeNotifierRequest"
             }
@@ -3228,10 +3238,12 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "custom file name"
           },
           "url": {
             "type": "string",
+            "description": "remote file URL to transfer into user-center storage",
             "format": "url"
           }
         },

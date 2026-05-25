@@ -195,8 +195,9 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User metadata.name. If the name is equal to '-', it will change the "
-                                                + "password of current user.")
+                                        .description(
+                                                "User metadata.name. If the name is equal to '-', it will change the "
+                                                        + "password of current user.")
                                         .required(true))
                                 .requestBody(
                                         requestBodyBuilder().required(true).implementation(ChangePasswordRequest.class))
@@ -293,23 +294,25 @@ public class UserEndpoint implements CustomEndpoint {
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
-    /** Payload for sending an email verification code. */
+    /**
+     * Payload for sending an email verification code.
+     *
+     * @param email email address to verify
+     */
     public record EmailVerifyRequest(
-            /** Email address to verify. */
-            @Schema(requiredMode = REQUIRED)
-            @Email
-            @NotBlank
+            @Schema(requiredMode = REQUIRED) @Email @NotBlank
             String email) {}
 
-    /** Payload for verifying an email address by code. */
+    /**
+     * Payload for verifying an email address by code.
+     *
+     * @param password current password of the authenticated user
+     * @param code email verification code
+     */
     public record VerifyCodeRequest(
-            /** Current password of the authenticated user. */
-            @Schema(requiredMode = REQUIRED)
-            String password,
+            @Schema(requiredMode = REQUIRED) String password,
 
-            /** Email verification code. */
-            @Schema(requiredMode = REQUIRED, minLength = 1)
-            String code) {}
+            @Schema(requiredMode = REQUIRED, minLength = 1) String code) {}
 
     private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
         var emailMono = request.bodyToMono(EmailVerifyRequest.class)
@@ -483,35 +486,36 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
-    /** Payload for creating a user from the console. */
+    /**
+     * Payload for creating a user from the console.
+     *
+     * @param name user {@code metadata.name}, which also serves as the login name
+     * @param email email address of the user
+     * @param displayName display name shown in the console and theme
+     * @param avatar avatar URL of the user
+     * @param phone phone number of the user
+     * @param password raw password to set for the user
+     * @param bio biography or profile text of the user
+     * @param annotations metadata annotations to set on the user
+     * @param roles role {@code metadata.name} values to grant to the user after creation
+     */
     record CreateUserRequest(
-            /** User {@code metadata.name}, which also serves as the login name. */
-            @Schema(requiredMode = REQUIRED)
-            String name,
+            @Schema(requiredMode = REQUIRED) String name,
 
-            /** Email address of the user. */
-            @Schema(requiredMode = REQUIRED)
-            String email,
+            @Schema(requiredMode = REQUIRED) String email,
 
-            /** Display name shown in the console and theme. */
             String displayName,
 
-            /** Avatar URL of the user. */
             String avatar,
 
-            /** Phone number of the user. */
             String phone,
 
-            /** Raw password to set for the user. */
             String password,
 
-            /** Biography or profile text of the user. */
             String bio,
 
-            /** Metadata annotations to set on the user. */
             Map<String, String> annotations,
 
-            /** Role {@code metadata.name} values to grant to the user after creation. */
             Set<String> roles) {
 
         /**
@@ -643,14 +647,16 @@ public class UserEndpoint implements CustomEndpoint {
                         .bodyValue(updatedUser));
     }
 
+    /**
+     * Payload for changing the current user's password.
+     *
+     * @param oldPassword old password
+     * @param password new password
+     */
     record ChangeOwnPasswordRequest(
-            /** Old password. */
-            @Schema(requiredMode = REQUIRED)
-            String oldPassword,
+            @Schema(requiredMode = REQUIRED) String oldPassword,
 
-            /** New password. */
-            @Schema(requiredMode = REQUIRED, minLength = 5)
-            String password) {
+            @Schema(requiredMode = REQUIRED, minLength = 5) String password) {
 
         public ChangeOwnPasswordRequest {
             if (password == null || password.length() < 5 || password.length() > 257) {
@@ -660,10 +666,13 @@ public class UserEndpoint implements CustomEndpoint {
         }
     }
 
+    /**
+     * Payload for changing a user's password.
+     *
+     * @param password new password
+     */
     record ChangePasswordRequest(
-            /** New password. */
-            @Schema(requiredMode = REQUIRED, minLength = 5)
-            String password) {}
+            @Schema(requiredMode = REQUIRED, minLength = 5) String password) {}
 
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
@@ -676,15 +685,16 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
-    /** User detail response with resolved roles. */
+    /**
+     * User detail response with resolved roles.
+     *
+     * @param user user extension
+     * @param roles roles granted to the user
+     */
     record DetailedUser(
-            /** User extension. */
-            @Schema(requiredMode = REQUIRED)
-            User user,
+            @Schema(requiredMode = REQUIRED) User user,
 
-            /** Roles granted to the user. */
-            @Schema(requiredMode = REQUIRED)
-            List<Role> roles) {}
+            @Schema(requiredMode = REQUIRED) List<Role> roles) {}
 
     Mono<ServerResponse> grantPermission(ServerRequest request) {
         var username = request.pathVariable("name");
@@ -695,11 +705,12 @@ public class UserEndpoint implements CustomEndpoint {
                         .then(ServerResponse.ok().build()));
     }
 
-    /** Payload for granting roles to a user. */
-    record GrantRequest(
-            /** Role {@code metadata.name} values to grant. */
-            @Schema(requiredMode = REQUIRED)
-            Set<String> roles) {}
+    /**
+     * Payload for granting roles to a user.
+     *
+     * @param roles role {@code metadata.name} values to grant
+     */
+    record GrantRequest(@Schema(requiredMode = REQUIRED) Set<String> roles) {}
 
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
         var username = request.pathVariable("name");

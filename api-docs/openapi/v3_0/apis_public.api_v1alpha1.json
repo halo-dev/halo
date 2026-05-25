@@ -1945,25 +1945,32 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "hostname": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor host name"
           },
           "language": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor browser language"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           },
           "referrer": {
-            "type": "string"
+            "type": "string",
+            "description": "referrer URL of the visit"
           },
           "screen": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor screen size or display descriptor"
           }
         },
         "description": "Payload for counting a visit to an extension resource."
@@ -3665,13 +3672,16 @@
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           }
         },
         "description": "Payload for voting on an extension resource."

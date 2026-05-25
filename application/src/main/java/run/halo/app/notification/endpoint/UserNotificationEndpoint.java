@@ -130,11 +130,13 @@ public class UserNotificationEndpoint implements CustomEndpoint {
         return GroupVersion.parseAPIVersion("api.notification.halo.run/v1alpha1");
     }
 
-    /** Payload for marking multiple notifications as read. */
+    /**
+     * Payload for marking multiple notifications as read.
+     *
+     * @param names notification {@code metadata.name} values to mark as read
+     */
     record MarkSpecifiedRequest(
-            /** {@code metadata.name} values of notifications to mark as read. */
-            @Schema(requiredMode = REQUIRED)
-            List<String> names) {}
+            @Schema(requiredMode = REQUIRED) List<String> names) {}
 
     private Mono<ServerResponse> listNotification(ServerRequest request) {
         var username = request.pathVariable("username");

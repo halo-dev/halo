@@ -18,12 +18,33 @@
  * Payload for counting a visit to an extension resource.
  */
 export interface CounterRequest {
+    /**
+     * API group of the extension resource
+     */
     'group'?: string;
+    /**
+     * visitor host name
+     */
     'hostname'?: string;
+    /**
+     * visitor browser language
+     */
     'language'?: string;
+    /**
+     * extension resource <code>metadata.name</code>
+     */
     'name': string;
+    /**
+     * plural name of the extension resource
+     */
     'plural': string;
+    /**
+     * referrer URL of the visit
+     */
     'referrer'?: string;
+    /**
+     * visitor screen size or display descriptor
+     */
     'screen'?: string;
 }
 

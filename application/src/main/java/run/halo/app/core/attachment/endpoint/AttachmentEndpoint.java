@@ -117,20 +117,21 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .bodyValue(listResult));
     }
 
-    /** Request payload for creating an attachment from a remote URL. */
+    /**
+     * Request payload for creating an attachment from a remote URL.
+     *
+     * @param url remote file URL to transfer into storage
+     * @param policyName storage policy {@code metadata.name}
+     * @param groupName attachment group {@code metadata.name}
+     * @param filename custom file name
+     */
     public record UploadFromUrlRequest(
-            /** Remote file URL to transfer into storage. */
-            @Schema(requiredMode = REQUIRED)
-            URL url,
+            @Schema(requiredMode = REQUIRED) URL url,
 
-            /** Storage policy {@code metadata.name}. */
-            @Schema(requiredMode = REQUIRED)
-            String policyName,
+            @Schema(requiredMode = REQUIRED) String policyName,
 
-            /** Attachment group {@code metadata.name}. */
             String groupName,
 
-            /** Custom file name. */
             String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {

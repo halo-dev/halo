@@ -18,6 +18,9 @@
  * Payload for sending an email verification code.
  */
 export interface EmailVerifyRequest {
+    /**
+     * email address to verify
+     */
     'email': string;
 }
 

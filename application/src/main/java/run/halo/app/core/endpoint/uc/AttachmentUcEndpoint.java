@@ -290,15 +290,16 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         return GroupVersion.parseAPIVersion("uc.api.storage.halo.run/v1alpha1");
     }
 
-    /** User-center request payload for uploading from a URL. */
+    /**
+     * User-center request payload for uploading from a URL.
+     *
+     * @param url remote file URL to transfer into user-center storage
+     * @param filename custom file name
+     */
     @Schema(name = "UcUploadFromUrlRequest")
     public record UploadFromUrlRequest(
-            /** Remote file URL to transfer into user-center storage. */
-            @Schema(requiredMode = REQUIRED)
-            URL url,
+            @Schema(requiredMode = REQUIRED) URL url, String filename) {
 
-            /** Custom file name. */
-            String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");
@@ -306,19 +307,20 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         }
     }
 
+    /**
+     * Multipart payload for uploading a post attachment.
+     *
+     * @param file attachment data
+     * @param postName post {@code metadata.name}
+     * @param singlePageName single page {@code metadata.name}
+     */
     @Schema(types = "object")
     public record PostAttachmentRequest(
-            /** Attachment data. */
-            @Schema(requiredMode = REQUIRED)
-            FilePart file,
+            @Schema(requiredMode = REQUIRED) FilePart file,
 
-            /** Post {@code metadata.name}. */
-            @Schema(requiredMode = NOT_REQUIRED)
-            String postName,
+            @Schema(requiredMode = NOT_REQUIRED) String postName,
 
-            /** Single page {@code metadata.name}. */
-            @Schema(requiredMode = NOT_REQUIRED)
-            String singlePageName) {
+            @Schema(requiredMode = NOT_REQUIRED) String singlePageName) {
 
         /** Attachment data. */
         public FilePart getFile() {

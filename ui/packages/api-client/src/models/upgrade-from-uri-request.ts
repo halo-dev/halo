@@ -18,6 +18,9 @@
  * Payload for upgrading a theme from a remote URI.
  */
 export interface UpgradeFromUriRequest {
+    /**
+     * remote URI of the theme ZIP file
+     */
     'uri': string;
 }
 

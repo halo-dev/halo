@@ -109,43 +109,44 @@ public class TrackerEndpoint implements CustomEndpoint {
                 .then(ServerResponse.ok().build());
     }
 
-    /** Payload for voting on an extension resource. */
+    /**
+     * Payload for voting on an extension resource.
+     *
+     * @param group API group of the extension resource
+     * @param plural plural name of the extension resource
+     * @param name extension resource {@code metadata.name}
+     */
     public record VoteRequest(
-            /** API group of the extension resource. */
-            @Schema(requiredMode = REQUIRED)
-            String group,
+            @Schema(requiredMode = REQUIRED) String group,
 
-            /** Plural name of the extension resource. */
-            @Schema(requiredMode = REQUIRED)
-            String plural,
+            @Schema(requiredMode = REQUIRED) String plural,
 
-            /** {@code metadata.name} of the extension resource. */
-            @Schema(requiredMode = REQUIRED)
-            String name) {}
+            @Schema(requiredMode = REQUIRED) String name) {}
 
-    /** Payload for counting a visit to an extension resource. */
+    /**
+     * Payload for counting a visit to an extension resource.
+     *
+     * @param group API group of the extension resource
+     * @param plural plural name of the extension resource
+     * @param name extension resource {@code metadata.name}
+     * @param hostname visitor host name
+     * @param screen visitor screen size or display descriptor
+     * @param language visitor browser language
+     * @param referrer referrer URL of the visit
+     */
     public record CounterRequest(
-            /** API group of the extension resource. */
             String group,
 
-            /** Plural name of the extension resource. */
-            @Schema(requiredMode = REQUIRED)
-            String plural,
+            @Schema(requiredMode = REQUIRED) String plural,
 
-            /** {@code metadata.name} of the extension resource. */
-            @Schema(requiredMode = REQUIRED)
-            String name,
+            @Schema(requiredMode = REQUIRED) String name,
 
-            /** Visitor host name. */
             String hostname,
 
-            /** Visitor screen size or display descriptor. */
             String screen,
 
-            /** Visitor browser language. */
             String language,
 
-            /** Referrer URL of the visit. */
             String referrer) {
         /** Construct counter request. group and session uid can be empty. */
         public CounterRequest {

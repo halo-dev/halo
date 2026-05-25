@@ -18,8 +18,17 @@
  * Payload for voting on an extension resource.
  */
 export interface VoteRequest {
+    /**
+     * API group of the extension resource
+     */
     'group': string;
+    /**
+     * extension resource <code>metadata.name</code>
+     */
     'name': string;
+    /**
+     * plural name of the extension resource
+     */
     'plural': string;
 }
 
