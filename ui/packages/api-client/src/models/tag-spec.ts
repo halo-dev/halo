@@ -19,7 +19,7 @@
  */
 export interface TagSpec {
     /**
-     * Display color of the tag in 3- or 6-digit hex notation.
+     * Display color of the tag in 3- or 6-digit hex notation, such as #fff or #ffffff.
      */
     'color'?: string;
     /**
@@ -35,7 +35,7 @@ export interface TagSpec {
      */
     'displayName': string;
     /**
-     * URL slug of the tag.
+     * URL slug used to build the tag permalink.
      */
     'slug': string;
 }

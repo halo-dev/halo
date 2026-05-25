@@ -28,14 +28,11 @@ public class Reply extends AbstractExtension {
     public static final String REQUIRE_SYNC_ON_STARTUP_INDEX_NAME = "requireSyncOnStartup";
 
     /** Desired state of the reply, including the parent comment, optional quoted reply, owner, and body. */
-    @Schema(
-            requiredMode = REQUIRED,
-            description = "Desired state of the reply, including the parent comment, optional quoted reply, owner, and "
-                    + "body.")
+    @Schema(requiredMode = REQUIRED)
     private ReplySpec spec;
 
     /** Observed state of the reply. */
-    @Schema(requiredMode = REQUIRED, description = "Observed state of the reply.")
+    @Schema(requiredMode = REQUIRED)
     private Status status = new Status();
 
     @Data
@@ -43,12 +40,11 @@ public class Reply extends AbstractExtension {
     @Schema(description = "Desired state of a reply.")
     public static class ReplySpec extends Comment.BaseCommentSpec {
 
-        /** Metadata name of the parent comment. */
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "Metadata name of the parent comment.")
+        /** Parent Comment metadata.name. */
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String commentName;
 
-        /** Metadata name of the reply being quoted, when this reply is addressed to another reply. */
-        @Schema(description = "Metadata name of the reply being quoted, when this reply is addressed to another reply.")
+        /** Quoted Reply metadata.name when this reply responds to another reply. */
         private String quoteReply;
     }
 
@@ -56,7 +52,6 @@ public class Reply extends AbstractExtension {
     @Schema(name = "ReplyStatus", description = "Observed state of a reply.")
     public static class Status {
         /** Metadata version observed by the last successful reconciliation. */
-        @Schema(description = "Metadata version observed by the last successful reconciliation.")
         private Long observedVersion;
     }
 

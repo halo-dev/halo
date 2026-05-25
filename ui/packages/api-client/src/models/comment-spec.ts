@@ -37,15 +37,15 @@ export interface CommentSpec {
      */
     'approvedTime'?: string;
     /**
-     * HTML content that is rendered on the theme side.
+     * Rendered HTML content displayed to REST and theme consumers.
      */
     'content': string;
     /**
-     * User-defined creation time. Defaults to metadata.creationTimestamp when omitted.
+     * Creation time supplied by the caller. If absent, metadata.creationTimestamp is used.
      */
     'creationTime'?: string;
     /**
-     * Whether the comment should be hidden from theme-side public output.
+     * Whether the comment should be hidden from public REST and theme output.
      */
     'hidden': boolean;
     /**
@@ -58,11 +58,11 @@ export interface CommentSpec {
     'lastReadTime'?: string;
     'owner': CommentOwner;
     /**
-     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */
     'priority': number;
     /**
-     * Raw comment body submitted by the owner before HTML sanitization or rendering.
+     * Raw comment body submitted by the owner before HTML sanitization and rendering.
      */
     'raw': string;
     'subjectRef': Ref;

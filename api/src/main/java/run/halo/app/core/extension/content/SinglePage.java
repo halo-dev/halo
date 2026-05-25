@@ -43,15 +43,11 @@ public class SinglePage extends AbstractExtension {
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
 
     /** Desired state of the single page, including content snapshots, publishing options, and theme hints. */
-    @Schema(
-            requiredMode = REQUIRED,
-            description = "Desired state of the single page, including content snapshots, publishing options, and "
-                    + "theme hints.")
+    @Schema(requiredMode = REQUIRED)
     @Nullable
     private SinglePageSpec spec;
 
     /** Observed state of the single page, populated by reconcilers and other internal controllers. */
-    @Schema(description = "Observed state of the single page, populated by reconcilers and other internal controllers.")
     @Nullable
     private SinglePageStatus status;
 
@@ -73,93 +69,65 @@ public class SinglePage extends AbstractExtension {
     @Schema(description = "Desired content, publication, and rendering configuration of a single page.")
     public static class SinglePageSpec {
         /** Display title of the single page. */
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "Display title of the single page.")
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String title;
 
         /** URL slug used to build the single page permalink. */
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "URL slug of the single page.")
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
-        /** Snapshot name selected as the released version for theme-side rendering after publishing. */
-        @Schema(
-                description =
-                        "Snapshot name selected as the released version for theme-side rendering after publishing.")
+        /** Snapshot metadata.name selected as the published content version. */
         private String releaseSnapshot;
 
-        /** Snapshot name of the latest draft content. */
-        @Schema(description = "Snapshot name of the latest draft content.")
+        /** Snapshot metadata.name containing the latest editable draft content. */
         private String headSnapshot;
 
-        /** Base snapshot name used to apply snapshot patches. */
-        @Schema(description = "Base snapshot name used to apply snapshot patches.")
+        /** Base Snapshot metadata.name used to reconstruct raw and rendered content from patches. */
         private String baseSnapshot;
 
-        /** Username of the single page owner. */
-        @Schema(description = "Username of the single page owner.")
+        /** User metadata.name of the single page owner. */
         private String owner;
 
         /** Theme template used to render this single page. */
-        @Schema(description = "Theme template used to render this single page.")
         private String template;
 
         /** Cover image URL or attachment URI of the single page. */
-        @Schema(description = "Cover image URL or attachment URI of the single page.")
         private String cover;
 
         /** Whether the single page is logically deleted and should be treated as recycled. */
-        @Schema(
-                requiredMode = REQUIRED,
-                defaultValue = "false",
-                description = "Whether the single page is logically deleted and should be treated as recycled.")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean deleted;
 
-        /** Desired publish state; false keeps or moves the single page to draft. */
-        @Schema(
-                requiredMode = REQUIRED,
-                defaultValue = "false",
-                description = "Desired publish state. False keeps or moves the single page to draft.")
+        /** Desired publish state. False keeps the single page as a draft or moves it back to draft. */
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean publish;
 
         /** Time when the single page was published or is scheduled to be published. */
-        @Schema(description = "Time when the single page was published or is scheduled to be published.")
         private Instant publishTime;
 
         /** Whether the single page should be pinned ahead of normal page ordering. */
-        @Schema(
-                requiredMode = REQUIRED,
-                defaultValue = "false",
-                description = "Whether the single page should be pinned ahead of normal page ordering.")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean pinned;
 
         /** Whether new comments are allowed for this single page. */
-        @Schema(
-                requiredMode = REQUIRED,
-                defaultValue = "true",
-                description = "Whether new comments are allowed for this single page.")
+        @Schema(requiredMode = REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
         /**
-         * Visibility of the single page in theme-side queries; only PUBLIC content is returned to anonymous visitors.
+         * Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC single pages.
          */
-        @Schema(
-                requiredMode = REQUIRED,
-                description = "Visibility of the single page in theme-side queries. Only PUBLIC content is returned "
-                        + "to anonymous visitors.")
+        @Schema(requiredMode = REQUIRED)
         private Post.VisibleEnum visible;
 
-        /** Sorting priority; larger values are ordered ahead by consumers that sort by priority. */
-        @Schema(
-                requiredMode = REQUIRED,
-                defaultValue = "0",
-                description = "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.")
+        /** Sorting priority. Higher values sort before lower values where priority ordering is applied. */
+        @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
         /** Excerpt configuration for the single page. */
-        @Schema(requiredMode = REQUIRED, description = "Excerpt configuration for the single page.")
+        @Schema(requiredMode = REQUIRED)
         private Post.Excerpt excerpt;
 
-        /** HTML meta tag attribute maps injected into the single page template head. */
-        @Schema(description = "HTML meta tag attribute maps injected into the single page template head.")
+        /** HTML meta tag attribute maps injected into the rendered single page head. */
         private List<Map<String, String>> htmlMetas;
     }
 

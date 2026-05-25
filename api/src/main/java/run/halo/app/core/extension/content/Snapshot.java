@@ -43,10 +43,7 @@ public class Snapshot extends AbstractExtension {
     public static final String PATCHED_RAW_ANNO = "content.halo.run/patched-raw";
 
     /** Desired state of the snapshot, including the subject, content patches, and authorship information. */
-    @Schema(
-            requiredMode = REQUIRED,
-            description = "Desired state of the snapshot, including the subject, content patches, and authorship "
-                    + "information.")
+    @Schema(requiredMode = REQUIRED)
     private SnapShotSpec spec;
 
     @Data
@@ -54,48 +51,30 @@ public class Snapshot extends AbstractExtension {
     public static class SnapShotSpec {
 
         /** Reference to the content extension that owns this snapshot, such as a Post or SinglePage. */
-        @Schema(
-                requiredMode = REQUIRED,
-                description = "Reference to the content extension that owns this snapshot, such as a Post or "
-                        + "SinglePage.")
+        @Schema(requiredMode = REQUIRED)
         private Ref subjectRef;
 
-        /** such as: markdown | html | json | asciidoc | latex. */
-        @Schema(
-                requiredMode = REQUIRED,
-                minLength = 1,
-                maxLength = 50,
-                description = "Type of the raw source content, such as markdown, html, json, asciidoc, or latex.")
+        /** Source format of the raw content, such as markdown, html, json, asciidoc, or latex. */
+        @Schema(requiredMode = REQUIRED, minLength = 1, maxLength = 50)
         private String rawType;
 
-        /** Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot. */
-        @Schema(
-                description = "Raw source content for a base snapshot, or a JSON Patch from the base raw content for "
-                        + "a derived snapshot.")
+        /** Full raw source content for a base snapshot, or a JSON-encoded line diff from the base raw content. */
         private String rawPatch;
 
-        /**
-         * Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot.
-         */
-        @Schema(
-                description = "Rendered content for a base snapshot, or a JSON Patch from the base rendered content "
-                        + "for a derived snapshot.")
+        /** Full rendered content for a base snapshot, or a JSON-encoded line diff from the base rendered content. */
         private String contentPatch;
 
-        /** Parent snapshot name in the snapshot revision chain. */
-        @Schema(description = "Parent snapshot name in the snapshot revision chain.")
+        /** Parent Snapshot metadata.name in the snapshot revision chain. */
         private String parentSnapshotName;
 
         /** Last time the snapshot content was modified. */
-        @Schema(description = "Last time the snapshot content was modified.")
         private Instant lastModifyTime;
 
-        /** Username of the snapshot owner. */
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "Username of the snapshot owner.")
+        /** User metadata.name of the snapshot owner. */
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String owner;
 
-        /** Usernames that contributed to this snapshot. */
-        @Schema(description = "Usernames that contributed to this snapshot.")
+        /** User metadata.name values that contributed to this snapshot. */
         private Set<String> contributors;
     }
 

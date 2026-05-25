@@ -26,7 +26,7 @@ export interface SinglePageSpec {
      */
     'allowComment': boolean;
     /**
-     * Base snapshot name used to apply snapshot patches.
+     * Base Snapshot metadata.name used to reconstruct raw and rendered content from patches.
      */
     'baseSnapshot'?: string;
     /**
@@ -39,15 +39,15 @@ export interface SinglePageSpec {
     'deleted': boolean;
     'excerpt': Excerpt;
     /**
-     * Snapshot name of the latest draft content.
+     * Snapshot metadata.name containing the latest editable draft content.
      */
     'headSnapshot'?: string;
     /**
-     * HTML meta tag attribute maps injected into the single page template head.
+     * HTML meta tag attribute maps injected into the rendered single page head.
      */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
     /**
-     * Username of the single page owner.
+     * User metadata.name of the single page owner.
      */
     'owner'?: string;
     /**
@@ -55,11 +55,11 @@ export interface SinglePageSpec {
      */
     'pinned': boolean;
     /**
-     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */
     'priority': number;
     /**
-     * Desired publish state. False keeps or moves the single page to draft.
+     * Desired publish state. False keeps the single page as a draft or moves it back to draft.
      */
     'publish': boolean;
     /**
@@ -67,11 +67,11 @@ export interface SinglePageSpec {
      */
     'publishTime'?: string;
     /**
-     * Snapshot name selected as the released version for theme-side rendering after publishing.
+     * Snapshot metadata.name selected as the published content version.
      */
     'releaseSnapshot'?: string;
     /**
-     * URL slug of the single page.
+     * URL slug used to build the single page permalink.
      */
     'slug': string;
     /**
@@ -83,7 +83,7 @@ export interface SinglePageSpec {
      */
     'title': string;
     /**
-     * Visibility of the single page in theme-side queries. Only PUBLIC content is returned to anonymous visitors.
+     * Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC single pages.
      */
     'visible': SinglePageSpecVisibleEnum;
 }

@@ -23,7 +23,7 @@ export interface Excerpt {
      */
     'autoGenerate': boolean;
     /**
-     * Manual excerpt text used when auto generation is disabled.
+     * Manual excerpt text used when autoGenerate is false.
      */
     'raw'?: string;
 }

@@ -31,7 +31,7 @@ export interface CommentOwner {
      */
     'kind': string;
     /**
-     * Owner identifier, such as a username for User owners or an email address for Email owners.
+     * Owner identifier. For User owners, this is the User metadata.name; for Email owners, an email address.
      */
     'name': string;
 }

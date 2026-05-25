@@ -1733,10 +1733,9 @@
         "properties": {
           "children": {
             "type": "array",
-            "description": "Child category extension names.",
+            "description": "Child Category metadata.name values.",
             "items": {
-              "type": "string",
-              "description": "Child category extension names."
+              "type": "string"
             }
           },
           "cover": {
@@ -1754,27 +1753,27 @@
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "Whether this category tree and its posts should be hidden from theme-side lists."
+            "description": "Hides this root category tree and its posts from theme-side lists. Permalinks remain accessible, and only\n root categories are expected to set this flag."
           },
           "postTemplate": {
             "maxLength": 255,
             "type": "string",
-            "description": "Theme template used to render posts associated with this category when the post does not specify its own template."
+            "description": "Theme template used for posts in this category when the post does not specify its own spec.template."
           },
           "preventParentPostCascadeQuery": {
             "type": "boolean",
-            "description": "Whether ancestor category post queries should stop cascading into this category\u0027s children."
+            "description": "Stops parent category post queries from cascading into this category tree. Direct post queries for this\n category are unaffected."
           },
           "priority": {
             "type": "integer",
-            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
+            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32",
             "default": 0
           },
           "slug": {
             "minLength": 1,
             "type": "string",
-            "description": "URL slug of the category."
+            "description": "URL slug used to build the category permalink."
           },
           "template": {
             "maxLength": 255,
@@ -1980,7 +1979,7 @@
           },
           "raw": {
             "type": "string",
-            "description": "Manual excerpt text used when auto generation is disabled."
+            "description": "Manual excerpt text used when autoGenerate is false."
           }
         },
         "description": "Excerpt generation configuration."
@@ -2516,14 +2515,13 @@
           },
           "baseSnapshot": {
             "type": "string",
-            "description": "Base snapshot name used to apply snapshot patches."
+            "description": "Base Snapshot metadata.name used to reconstruct raw and rendered content from patches."
           },
           "categories": {
             "type": "array",
-            "description": "Category extension names associated with the post.",
+            "description": "Category metadata.name values associated with the post.",
             "items": {
-              "type": "string",
-              "description": "Category extension names associated with the post."
+              "type": "string"
             }
           },
           "cover": {
@@ -2540,23 +2538,21 @@
           },
           "headSnapshot": {
             "type": "string",
-            "description": "Snapshot name of the latest draft content."
+            "description": "Snapshot metadata.name containing the latest editable draft content."
           },
           "htmlMetas": {
             "type": "array",
-            "description": "HTML meta tag attribute maps injected into the post template head.",
+            "description": "HTML meta tag attribute maps injected into the rendered post page head.",
             "items": {
               "type": "object",
               "additionalProperties": {
-                "type": "string",
-                "description": "HTML meta tag attribute maps injected into the post template head."
-              },
-              "description": "HTML meta tag attribute maps injected into the post template head."
+                "type": "string"
+              }
             }
           },
           "owner": {
             "type": "string",
-            "description": "Username of the post owner."
+            "description": "User metadata.name of the post owner."
           },
           "pinned": {
             "type": "boolean",
@@ -2565,13 +2561,13 @@
           },
           "priority": {
             "type": "integer",
-            "description": "Sorting priority. Larger values are ordered ahead by consumers that sort by priority.",
+            "description": "Sorting priority. Higher values sort before lower values where priority ordering is applied.",
             "format": "int32",
             "default": 0
           },
           "publish": {
             "type": "boolean",
-            "description": "Desired publish state. False keeps or moves the post to draft.",
+            "description": "Desired publish state. False keeps the post as a draft or moves it back to draft.",
             "default": false
           },
           "publishTime": {
@@ -2581,19 +2577,18 @@
           },
           "releaseSnapshot": {
             "type": "string",
-            "description": "Snapshot name selected as the released version for theme-side rendering after publishing."
+            "description": "Snapshot metadata.name selected as the published content version."
           },
           "slug": {
             "minLength": 1,
             "type": "string",
-            "description": "URL slug of the post."
+            "description": "URL slug used to build the post permalink."
           },
           "tags": {
             "type": "array",
-            "description": "Tag extension names associated with the post.",
+            "description": "Tag metadata.name values associated with the post.",
             "items": {
-              "type": "string",
-              "description": "Tag extension names associated with the post."
+              "type": "string"
             }
           },
           "template": {
@@ -2607,7 +2602,7 @@
           },
           "visible": {
             "type": "string",
-            "description": "Visibility of the post in theme-side queries. Only PUBLIC content is returned to anonymous visitors.",
+            "description": "Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC posts.",
             "enum": [
               "PUBLIC",
               "INTERNAL",
@@ -2632,17 +2627,16 @@
                 "type": "boolean"
               }
             },
-            "description": "Latest reconciliation conditions for the content item.",
+            "description": "Reconciliation conditions reported by controllers for this content item.",
             "items": {
               "$ref": "#/components/schemas/Condition"
             }
           },
           "contributors": {
             "type": "array",
-            "description": "Usernames that contributed to the content snapshots.",
+            "description": "User metadata.name values that contributed to the content snapshots.",
             "items": {
-              "type": "string",
-              "description": "Usernames that contributed to the content snapshots."
+              "type": "string"
             }
           },
           "excerpt": {
@@ -2651,7 +2645,7 @@
           },
           "hideFromList": {
             "type": "boolean",
-            "description": "Whether any associated category hides the content item from theme-side lists."
+            "description": "Whether any associated category hides this content item from theme-side lists."
           },
           "inProgress": {
             "type": "boolean",
@@ -2673,7 +2667,7 @@
           },
           "phase": {
             "type": "string",
-            "description": "Current publishing phase of the content item, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
+            "description": "Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED."
           }
         },
         "description": "Observed state of a content item."
@@ -2836,15 +2830,14 @@
         "properties": {
           "contentPatch": {
             "type": "string",
-            "description": "Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot."
+            "description": "Full rendered content for a base snapshot, or a JSON-encoded line diff from the base rendered content."
           },
           "contributors": {
             "uniqueItems": true,
             "type": "array",
-            "description": "Usernames that contributed to this snapshot.",
+            "description": "User metadata.name values that contributed to this snapshot.",
             "items": {
-              "type": "string",
-              "description": "Usernames that contributed to this snapshot."
+              "type": "string"
             }
           },
           "lastModifyTime": {
@@ -2855,21 +2848,21 @@
           "owner": {
             "minLength": 1,
             "type": "string",
-            "description": "Username of the snapshot owner."
+            "description": "User metadata.name of the snapshot owner."
           },
           "parentSnapshotName": {
             "type": "string",
-            "description": "Parent snapshot name in the snapshot revision chain."
+            "description": "Parent Snapshot metadata.name in the snapshot revision chain."
           },
           "rawPatch": {
             "type": "string",
-            "description": "Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot."
+            "description": "Full raw source content for a base snapshot, or a JSON-encoded line diff from the base raw content."
           },
           "rawType": {
             "maxLength": 50,
             "minLength": 1,
             "type": "string",
-            "description": "Type of the raw source content, such as markdown, html, json, asciidoc, or latex."
+            "description": "Source format of the raw content, such as markdown, html, json, asciidoc, or latex."
           },
           "subjectRef": {
             "$ref": "#/components/schemas/Ref"
@@ -2964,7 +2957,7 @@
           "color": {
             "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
             "type": "string",
-            "description": "Display color of the tag in 3- or 6-digit hex notation."
+            "description": "Display color of the tag in 3- or 6-digit hex notation, such as #fff or #ffffff."
           },
           "cover": {
             "type": "string",
@@ -2982,7 +2975,7 @@
           "slug": {
             "minLength": 1,
             "type": "string",
-            "description": "URL slug of the tag."
+            "description": "URL slug used to build the tag permalink."
           }
         },
         "description": "Desired display and rendering configuration of a tag."

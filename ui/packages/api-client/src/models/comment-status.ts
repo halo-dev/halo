@@ -35,7 +35,7 @@ export interface CommentStatus {
      */
     'replyCount'?: number;
     /**
-     * Number of replies created after spec.lastReadTime.
+     * Number of replies created after the comment owner\'s last read time.
      */
     'unreadReplyCount'?: number;
     /**

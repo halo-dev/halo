@@ -26,11 +26,11 @@ export interface PostStatus {
      */
     'commentsCount'?: number;
     /**
-     * Latest reconciliation conditions for the content item.
+     * Reconciliation conditions reported by controllers for this content item.
      */
     'conditions'?: Array<Condition>;
     /**
-     * Usernames that contributed to the content snapshots.
+     * User metadata.name values that contributed to the content snapshots.
      */
     'contributors'?: Array<string>;
     /**
@@ -38,7 +38,7 @@ export interface PostStatus {
      */
     'excerpt'?: string;
     /**
-     * Whether any associated category hides the content item from theme-side lists.
+     * Whether any associated category hides this content item from theme-side lists.
      */
     'hideFromList'?: boolean;
     /**
@@ -58,7 +58,7 @@ export interface PostStatus {
      */
     'permalink'?: string;
     /**
-     * Current publishing phase of the content item, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+     * Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
      */
     'phase'?: string;
 }

@@ -26,11 +26,11 @@ export interface PostSpec {
      */
     'allowComment': boolean;
     /**
-     * Base snapshot name used to apply snapshot patches.
+     * Base Snapshot metadata.name used to reconstruct raw and rendered content from patches.
      */
     'baseSnapshot'?: string;
     /**
-     * Category extension names associated with the post.
+     * Category metadata.name values associated with the post.
      */
     'categories'?: Array<string>;
     /**
@@ -43,15 +43,15 @@ export interface PostSpec {
     'deleted': boolean;
     'excerpt': Excerpt;
     /**
-     * Snapshot name of the latest draft content.
+     * Snapshot metadata.name containing the latest editable draft content.
      */
     'headSnapshot'?: string;
     /**
-     * HTML meta tag attribute maps injected into the post template head.
+     * HTML meta tag attribute maps injected into the rendered post page head.
      */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
     /**
-     * Username of the post owner.
+     * User metadata.name of the post owner.
      */
     'owner'?: string;
     /**
@@ -59,11 +59,11 @@ export interface PostSpec {
      */
     'pinned': boolean;
     /**
-     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */
     'priority': number;
     /**
-     * Desired publish state. False keeps or moves the post to draft.
+     * Desired publish state. False keeps the post as a draft or moves it back to draft.
      */
     'publish': boolean;
     /**
@@ -71,15 +71,15 @@ export interface PostSpec {
      */
     'publishTime'?: string;
     /**
-     * Snapshot name selected as the released version for theme-side rendering after publishing.
+     * Snapshot metadata.name selected as the published content version.
      */
     'releaseSnapshot'?: string;
     /**
-     * URL slug of the post.
+     * URL slug used to build the post permalink.
      */
     'slug': string;
     /**
-     * Tag extension names associated with the post.
+     * Tag metadata.name values associated with the post.
      */
     'tags'?: Array<string>;
     /**
@@ -91,7 +91,7 @@ export interface PostSpec {
      */
     'title': string;
     /**
-     * Visibility of the post in theme-side queries. Only PUBLIC content is returned to anonymous visitors.
+     * Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC posts.
      */
     'visible': PostSpecVisibleEnum;
 }

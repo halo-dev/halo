@@ -19,7 +19,7 @@
  */
 export interface CategorySpec {
     /**
-     * Child category extension names.
+     * Child Category metadata.name values.
      */
     'children'?: Array<string>;
     /**
@@ -35,23 +35,23 @@ export interface CategorySpec {
      */
     'displayName': string;
     /**
-     * Whether this category tree and its posts should be hidden from theme-side lists.
+     * Hides this root category tree and its posts from theme-side lists. Permalinks remain accessible, and only  root categories are expected to set this flag.
      */
     'hideFromList'?: boolean;
     /**
-     * Theme template used to render posts associated with this category when the post does not specify its own template.
+     * Theme template used for posts in this category when the post does not specify its own spec.template.
      */
     'postTemplate'?: string;
     /**
-     * Whether ancestor category post queries should stop cascading into this category\'s children.
+     * Stops parent category post queries from cascading into this category tree. Direct post queries for this  category are unaffected.
      */
     'preventParentPostCascadeQuery'?: boolean;
     /**
-     * Sorting priority. Larger values are ordered ahead by consumers that sort by priority.
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */
     'priority': number;
     /**
-     * URL slug of the category.
+     * URL slug used to build the category permalink.
      */
     'slug': string;
     /**

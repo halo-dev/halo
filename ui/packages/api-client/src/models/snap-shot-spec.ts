@@ -22,11 +22,11 @@ import type { Ref } from './ref';
  */
 export interface SnapShotSpec {
     /**
-     * Rendered content for a base snapshot, or a JSON Patch from the base rendered content for a derived snapshot.
+     * Full rendered content for a base snapshot, or a JSON-encoded line diff from the base rendered content.
      */
     'contentPatch'?: string;
     /**
-     * Usernames that contributed to this snapshot.
+     * User metadata.name values that contributed to this snapshot.
      */
     'contributors'?: Array<string>;
     /**
@@ -34,19 +34,19 @@ export interface SnapShotSpec {
      */
     'lastModifyTime'?: string;
     /**
-     * Username of the snapshot owner.
+     * User metadata.name of the snapshot owner.
      */
     'owner': string;
     /**
-     * Parent snapshot name in the snapshot revision chain.
+     * Parent Snapshot metadata.name in the snapshot revision chain.
      */
     'parentSnapshotName'?: string;
     /**
-     * Raw source content for a base snapshot, or a JSON Patch from the base raw content for a derived snapshot.
+     * Full raw source content for a base snapshot, or a JSON-encoded line diff from the base raw content.
      */
     'rawPatch'?: string;
     /**
-     * Type of the raw source content, such as markdown, html, json, asciidoc, or latex.
+     * Source format of the raw content, such as markdown, html, json, asciidoc, or latex.
      */
     'rawType': string;
     'subjectRef': Ref;
