@@ -24,7 +24,7 @@ import type { PostSpec } from './post-spec';
 import type { PostStatus } from './post-status';
 
 /**
- * Post extension.
+ * Post extension that stores article metadata, publication settings, taxonomy, and derived status.
  */
 export interface Post {
     'apiVersion': string;

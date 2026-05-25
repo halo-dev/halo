@@ -17,9 +17,21 @@
 // @ts-ignore
 import type { ReasonProperty } from './reason-property';
 
+/**
+ * Desired reason type metadata and properties available to templates.
+ */
 export interface ReasonTypeSpec {
+    /**
+     * Human-readable description of when this reason type is triggered.
+     */
     'description': string;
+    /**
+     * Display name shown for this reason type.
+     */
     'displayName': string;
+    /**
+     * Attribute definitions available on reasons of this type.
+     */
     'properties'?: Array<ReasonProperty>;
 }
 

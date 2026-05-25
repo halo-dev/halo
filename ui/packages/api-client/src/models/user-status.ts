@@ -14,7 +14,13 @@
 
 
 
+/**
+ * Observed user state derived by the application.
+ */
 export interface UserStatus {
+    /**
+     * Public permalink of the user\'s profile or author page.
+     */
     'permalink'?: string;
 }
 

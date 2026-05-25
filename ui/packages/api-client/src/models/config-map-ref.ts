@@ -14,7 +14,13 @@
 
 
 
+/**
+ * Reference to a ConfigMap used by this provider.
+ */
 export interface ConfigMapRef {
+    /**
+     * ConfigMap metadata.name.
+     */
     'name': string;
 }
 

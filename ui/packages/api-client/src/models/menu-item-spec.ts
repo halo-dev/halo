@@ -17,25 +17,28 @@
 // @ts-ignore
 import type { Ref } from './ref';
 
+/**
+ * Desired menu item configuration.
+ */
 export interface MenuItemSpec {
     /**
-     * Children of this menu item
+     * Child MenuItem metadata.name values shown under this item.
      */
     'children'?: Array<string>;
     /**
-     * The display name of menu item.
+     * Display name shown for the menu item.
      */
     'displayName'?: string;
     /**
-     * The href of this menu item.
+     * Direct URL used by the menu item.
      */
     'href'?: string;
     /**
-     * The priority is for ordering.
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */
     'priority'?: number;
     /**
-     * The <a> target attribute of this menu item.
+     * HTML anchor target used by the menu item.
      */
     'target'?: MenuItemSpecTargetEnum;
     'targetRef'?: Ref;

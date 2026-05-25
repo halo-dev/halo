@@ -15,7 +15,7 @@
 
 
 /**
- * Observed state of a tag.
+ * Observed tag state derived by content reconcilers.
  */
 export interface TagStatus {
     /**

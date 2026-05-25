@@ -18,9 +18,21 @@
  * Type used to describe custom template page.
  */
 export interface TemplateDescriptor {
+    /**
+     * Human-readable description of when to use this template.
+     */
     'description'?: string;
+    /**
+     * Template file path relative to the theme templates directory.
+     */
     'file': string;
+    /**
+     * Template display name shown to users.
+     */
     'name': string;
+    /**
+     * Screenshot URL or attachment URI for previewing the template.
+     */
     'screenshot'?: string;
 }
 

@@ -18,16 +18,31 @@
 import type { Metadata } from './metadata';
 
 /**
- * A counter for number of requests by extension resource name.
+ * Counter extension that stores aggregate interaction counts for a resource.
  */
 export interface Counter {
     'apiVersion': string;
+    /**
+     * Number of approved comments recorded for the resource.
+     */
     'approvedComment'?: number;
+    /**
+     * Number of downvotes recorded for the resource.
+     */
     'downvote'?: number;
     'kind': string;
     'metadata': Metadata;
+    /**
+     * Total number of comments recorded for the resource.
+     */
     'totalComment'?: number;
+    /**
+     * Number of upvotes recorded for the resource.
+     */
     'upvote'?: number;
+    /**
+     * Number of visits recorded for the resource.
+     */
     'visit'?: number;
 }
 

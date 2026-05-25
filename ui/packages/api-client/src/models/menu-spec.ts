@@ -14,13 +14,16 @@
 
 
 
+/**
+ * Desired menu configuration.
+ */
 export interface MenuSpec {
     /**
-     * The display name of the menu.
+     * Display name shown for the menu.
      */
     'displayName': string;
     /**
-     * Menu items of this menu.
+     * Ordered MenuItem metadata.name values included in this menu.
      */
     'menuItems'?: Array<string>;
 }

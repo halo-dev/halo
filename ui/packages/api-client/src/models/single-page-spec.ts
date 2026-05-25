@@ -18,7 +18,7 @@
 import type { Excerpt } from './excerpt';
 
 /**
- * Desired content, publication, and rendering configuration of a single page.
+ * Desired single page content, publication, and rendering configuration.
  */
 export interface SinglePageSpec {
     /**

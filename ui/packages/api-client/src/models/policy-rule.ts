@@ -35,7 +35,7 @@ export interface PolicyRule {
      */
     'resources'?: Array<string>;
     /**
-     * about who the rule applies to or which namespace the rule applies to.
+     * Verbs allowed by this rule, such as get, list, create, update, patch, or delete.
      */
     'verbs'?: Array<string>;
 }

@@ -24,7 +24,7 @@ import type { ThemeSpec } from './theme-spec';
 import type { ThemeStatus } from './theme-status';
 
 /**
- * Theme extension.
+ * Theme extension that describes an installable frontend theme and its runtime state.
  */
 export interface Theme {
     'apiVersion': string;

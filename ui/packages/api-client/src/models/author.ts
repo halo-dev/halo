@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Theme author metadata.
+ */
 export interface Author {
+    /**
+     * Author display name.
+     */
     'name': string;
+    /**
+     * Author website URL.
+     */
     'website'?: string;
 }
 

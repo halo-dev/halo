@@ -18,7 +18,7 @@
 import type { Condition } from './condition';
 
 /**
- * Observed state of a content item.
+ * Observed post state derived by content reconcilers.
  */
 export interface PostStatus {
     /**

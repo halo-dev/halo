@@ -14,11 +14,17 @@
 
 
 
+/**
+ * Observed attachment access state.
+ */
 export interface AttachmentStatus {
     /**
-     * Permalink of attachment. If it is in local storage, the public URL will be set. If it is in s3 storage, the Object URL will be set. 
+     * Public permalink for the attachment. Local storage usually exposes a public URL, while object storage may  expose the object URL.
      */
     'permalink'?: string;
+    /**
+     * Generated thumbnail URLs keyed by thumbnail size name.
+     */
     'thumbnails'?: { [key: string]: string; };
 }
 
