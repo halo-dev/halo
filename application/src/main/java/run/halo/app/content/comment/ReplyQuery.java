@@ -5,7 +5,6 @@ import static run.halo.app.extension.index.query.Queries.equal;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToListOptions;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.data.domain.Sort;
@@ -29,7 +28,7 @@ public class ReplyQuery extends SortableRequest {
         super(exchange);
     }
 
-    @Schema(description = "Metadata name of the comment whose replies should be listed.")
+    /** Metadata name of the comment whose replies should be listed. */
     public String getCommentName() {
         String commentName = queryParams.getFirst("commentName");
         if (StringUtils.isBlank(commentName)) {

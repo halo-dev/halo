@@ -31,7 +31,7 @@ export interface ContentUpdateParam {
      */
     'rawType': string;
     /**
-     * Expected metadata version of the current head snapshot. If it conflicts with the latest snapshot version, Halo creates a new head snapshot instead of overwriting it.
+     * Expected current head snapshot version; conflicts create a new head snapshot.
      */
     'version'?: number;
 }

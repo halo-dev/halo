@@ -14,16 +14,16 @@ import lombok.Data;
 @Data
 public class Stats {
 
-    @Schema(description = "Total visit count.")
+    /** Total visit count. */
     private Integer visit;
 
-    @Schema(description = "Total upvote count.")
+    /** Total upvote count. */
     private Integer upvote;
 
-    @Schema(description = "Total comment count, including comments that may not be approved.")
+    /** Total comment count, including comments that may not be approved. */
     private Integer totalComment;
 
-    @Schema(description = "Total approved comment count.")
+    /** Total approved comment count. */
     private Integer approvedComment;
 
     public Stats() {}

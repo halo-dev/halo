@@ -34,7 +34,7 @@ public class ListedSnapshotDto {
         @Schema(description = "User name of the snapshot owner.", requiredMode = REQUIRED)
         private String owner;
 
-        @Schema(description = "Last modification time of the snapshot content.")
+        /** Last modification time of the snapshot content. */
         private Instant modifyTime;
     }
 

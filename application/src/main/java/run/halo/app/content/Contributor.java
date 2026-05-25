@@ -12,12 +12,12 @@ import lombok.Data;
 @Schema(description = "User summary for a content owner or contributor.")
 @Data
 public class Contributor {
-    @Schema(description = "User display name.")
+    /** User display name. */
     private String displayName;
 
-    @Schema(description = "User avatar URL.")
+    /** User avatar URL. */
     private String avatar;
 
-    @Schema(description = "User metadata name.")
+    /** User metadata name. */
     private String name;
 }

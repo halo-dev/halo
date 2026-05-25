@@ -33,10 +33,10 @@ public class ReplyRequest {
     @Schema(description = "Whether the reply should be hidden from normal display.", defaultValue = "false")
     private Boolean hidden;
 
-    @Schema(description = "Guest/email owner information. If omitted, Halo uses the current authenticated user.")
+    /** Guest/email owner information. If omitted, Halo uses the current authenticated user. */
     private CommentEmailOwner owner;
 
-    @Schema(description = "Metadata name of the reply being quoted, if this reply quotes another reply.")
+    /** Metadata name of the reply being quoted, if this reply quotes another reply. */
     private String quoteReply;
 
     /**

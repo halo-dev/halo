@@ -22,7 +22,7 @@ public class CommentRequest {
     @Schema(description = "Reference to the subject being commented on.", requiredMode = REQUIRED)
     private Ref subjectRef;
 
-    @Schema(description = "Guest/email owner information. If omitted, Halo uses the current authenticated user.")
+    /** Guest/email owner information. If omitted, Halo uses the current authenticated user. */
     private CommentEmailOwner owner;
 
     @Schema(description = "Original comment text submitted by the editor.", requiredMode = REQUIRED, minLength = 1)

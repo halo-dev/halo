@@ -12,23 +12,20 @@ import run.halo.app.core.extension.content.Comment;
 /**
  * Guest/email creator information for a comment or reply.
  *
- * @param email email for comment owner
- * @param avatar avatar for comment owner
- * @param displayName display name for comment owner
- * @param website website for comment owner
+ * @param email Email address of the guest commenter. It is used as the owner name when present.
+ * @param avatar Avatar URL of the guest commenter.
+ * @param displayName Display name of the guest commenter.
+ * @param website Website URL of the guest commenter.
  */
 @Schema(description = "Guest/email owner information used when a comment is not owned by a Halo user.")
 public record CommentEmailOwner(
-        @Schema(description = "Email address of the guest commenter. It is used as the owner name when present.")
         String email,
 
-        @Schema(description = "Avatar URL of the guest commenter.")
         String avatar,
 
         @Schema(description = "Display name of the guest commenter.", requiredMode = REQUIRED)
         String displayName,
 
-        @Schema(description = "Website URL of the guest commenter.")
         String website) {
 
     public CommentEmailOwner {

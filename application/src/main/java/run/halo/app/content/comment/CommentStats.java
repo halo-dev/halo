@@ -15,7 +15,7 @@ import lombok.Value;
 @Builder
 public class CommentStats {
 
-    @Schema(description = "Total upvote count.")
+    /** Total upvote count. */
     Integer upvote;
 
     public static CommentStats empty() {

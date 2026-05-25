@@ -23,7 +23,7 @@ public record ContentRequest(
         @Schema(description = "Reference to the post or single page that owns the content.", requiredMode = REQUIRED)
         Ref subjectRef,
 
-        @Schema(description = "Current head snapshot name used as the update target.")
+        /** Current head snapshot name used as the update target. */
         String headSnapshotName,
 
         @Schema(description = "Expected metadata version of the current head snapshot.", requiredMode = NOT_REQUIRED)

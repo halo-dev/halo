@@ -17,19 +17,19 @@ import run.halo.app.core.extension.content.Comment;
 @Builder
 public class OwnerInfo {
 
-    @Schema(description = "Owner kind, such as User or email.")
+    /** Owner kind, such as User or email. */
     String kind;
 
-    @Schema(description = "Owner name. For Halo users, this is the user metadata name.")
+    /** Owner name. For Halo users, this is the user metadata name. */
     String name;
 
-    @Schema(description = "Owner display name.")
+    /** Owner display name. */
     String displayName;
 
-    @Schema(description = "Owner avatar URL.")
+    /** Owner avatar URL. */
     String avatar;
 
-    @Schema(description = "Owner email address when available.")
+    /** Owner email address when available. */
     String email;
 
     /**
