@@ -49,12 +49,12 @@ public class MenuQueryEndpoint implements CustomEndpoint {
                         "menus/{name}",
                         this::getByName,
                         builder -> builder.operationId("queryMenuByName")
-                                .description("Gets menu by name.")
+                                .description("Gets menu by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Menu name")
+                                        .description("Menu metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(MenuVo.class)))
                 .build();

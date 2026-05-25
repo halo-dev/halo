@@ -33,7 +33,7 @@ import type { UploadFromUrlRequest } from '../models';
 export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
+         * Create an attachment by transferring a remote file from the provided URL to the specified storage policy.
          * @param {UploadFromUrlRequest} uploadFromUrlRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -76,7 +76,7 @@ export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * 
+         * Search attachments with pagination, sorting, keyword, grouping, and media type filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -153,10 +153,10 @@ export const AttachmentV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * 
-         * @param {File} file 
-         * @param {string} policyName Storage policy name
-         * @param {string} [groupName] The name of the group to which the attachment belongs
+         * Upload an attachment from a multipart file with the specified storage policy and optional group.
+         * @param {File} file Attachment file.
+         * @param {string} policyName Storage policy &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [groupName] Attachment group &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -278,7 +278,7 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
     const localVarAxiosParamCreator = AttachmentV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * 
+         * Create an attachment by transferring a remote file from the provided URL to the specified storage policy.
          * @param {UploadFromUrlRequest} uploadFromUrlRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -290,7 +290,7 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Search attachments with pagination, sorting, keyword, grouping, and media type filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -309,10 +309,10 @@ export const AttachmentV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @param {File} file 
-         * @param {string} policyName Storage policy name
-         * @param {string} [groupName] The name of the group to which the attachment belongs
+         * Upload an attachment from a multipart file with the specified storage policy and optional group.
+         * @param {File} file Attachment file.
+         * @param {string} policyName Storage policy &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [groupName] Attachment group &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -346,7 +346,7 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
     const localVarFp = AttachmentV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * 
+         * Create an attachment by transferring a remote file from the provided URL to the specified storage policy.
          * @param {AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -355,7 +355,7 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.externalTransferAttachment(requestParameters.uploadFromUrlRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Search attachments with pagination, sorting, keyword, grouping, and media type filters.
          * @param {AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -364,7 +364,7 @@ export const AttachmentV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.searchAttachments(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.ungrouped, requestParameters.keyword, requestParameters.accepts, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Upload an attachment from a multipart file with the specified storage policy and optional group.
          * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -440,15 +440,18 @@ export interface AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest {
  * Request parameters for uploadAttachment operation in AttachmentV1alpha1ConsoleApi.
  */
 export interface AttachmentV1alpha1ConsoleApiUploadAttachmentRequest {
+    /**
+     * Attachment file.
+     */
     readonly file: File
 
     /**
-     * Storage policy name
+     * Storage policy &lt;code&gt;metadata.name&lt;/code&gt;.
      */
     readonly policyName: string
 
     /**
-     * The name of the group to which the attachment belongs
+     * Attachment group &lt;code&gt;metadata.name&lt;/code&gt;.
      */
     readonly groupName?: string
 }
@@ -478,7 +481,7 @@ export interface AttachmentV1alpha1ConsoleApiUploadAttachmentForConsoleRequest {
  */
 export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * 
+     * Create an attachment by transferring a remote file from the provided URL to the specified storage policy.
      * @param {AttachmentV1alpha1ConsoleApiExternalTransferAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -488,7 +491,7 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Search attachments with pagination, sorting, keyword, grouping, and media type filters.
      * @param {AttachmentV1alpha1ConsoleApiSearchAttachmentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -498,7 +501,7 @@ export class AttachmentV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Upload an attachment from a multipart file with the specified storage policy and optional group.
      * @param {AttachmentV1alpha1ConsoleApiUploadAttachmentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

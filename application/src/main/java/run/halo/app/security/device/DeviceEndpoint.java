@@ -132,16 +132,20 @@ public class DeviceEndpoint implements CustomEndpoint {
                 .map(Principal::getName);
     }
 
+    /** User device entry with session state. */
     @Data
     @Accessors(chain = true)
     @Schema(name = "UserDevice")
     static class DeviceDto {
+        /** Device extension. */
         @Schema(requiredMode = REQUIRED)
         private Device device;
 
+        /** Whether this device matches the current session. */
         @Schema(requiredMode = REQUIRED)
         boolean currentDevice;
 
+        /** Whether the device session is still active. */
         @Schema(requiredMode = REQUIRED)
         boolean active;
     }

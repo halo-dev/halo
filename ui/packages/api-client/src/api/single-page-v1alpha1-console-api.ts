@@ -42,8 +42,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
     return {
         /**
          * Delete a content snapshot from a single page and return the deleted content.
-         * @param {string} name Metadata name of the single page.
-         * @param {string} snapshotName Name of the content snapshot to delete.
+         * @param {string} name metadata.name of the single page.
+         * @param {string} snapshotName Content snapshot metadata.name to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -133,8 +133,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Fetch a single page content snapshot reconstructed from its base snapshot.
-         * @param {string} name Metadata name of the single page.
-         * @param {string} snapshotName Name of the content snapshot to fetch.
+         * @param {string} name metadata.name of the single page.
+         * @param {string} snapshotName Content snapshot metadata.name to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -181,7 +181,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Fetch the editable head content of a single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -222,7 +222,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Fetch the released content currently served for a published single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -263,7 +263,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * List content snapshots for a single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -386,7 +386,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Publish a single page. By default, the request waits until the release snapshot is available.
-         * @param {string} name Metadata name of the single page to publish.
+         * @param {string} name metadata.name of the single page to publish.
          * @param {boolean} [async] Whether to return immediately after marking the single page for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -432,7 +432,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Restore the single page content from a specified snapshot.
-         * @param {string} name Metadata name of the single page whose content will be restored.
+         * @param {string} name metadata.name of the single page whose content will be restored.
          * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -479,7 +479,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Update single page metadata, spec, and content in one request.
-         * @param {string} name Metadata name of the single page to update.
+         * @param {string} name metadata.name of the single page to update.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -526,7 +526,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
         },
         /**
          * Update only the content of an existing single page.
-         * @param {string} name Metadata name of the single page whose content will be updated.
+         * @param {string} name metadata.name of the single page whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -582,8 +582,8 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
     return {
         /**
          * Delete a content snapshot from a single page and return the deleted content.
-         * @param {string} name Metadata name of the single page.
-         * @param {string} snapshotName Name of the content snapshot to delete.
+         * @param {string} name metadata.name of the single page.
+         * @param {string} snapshotName Content snapshot metadata.name to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -607,8 +607,8 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Fetch a single page content snapshot reconstructed from its base snapshot.
-         * @param {string} name Metadata name of the single page.
-         * @param {string} snapshotName Name of the content snapshot to fetch.
+         * @param {string} name metadata.name of the single page.
+         * @param {string} snapshotName Content snapshot metadata.name to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -620,7 +620,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Fetch the editable head content of a single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -632,7 +632,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Fetch the released content currently served for a published single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -644,7 +644,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * List content snapshots for a single page.
-         * @param {string} name Metadata name of the single page.
+         * @param {string} name metadata.name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -676,7 +676,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Publish a single page. By default, the request waits until the release snapshot is available.
-         * @param {string} name Metadata name of the single page to publish.
+         * @param {string} name metadata.name of the single page to publish.
          * @param {boolean} [async] Whether to return immediately after marking the single page for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -689,7 +689,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Restore the single page content from a specified snapshot.
-         * @param {string} name Metadata name of the single page whose content will be restored.
+         * @param {string} name metadata.name of the single page whose content will be restored.
          * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -702,7 +702,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Update single page metadata, spec, and content in one request.
-         * @param {string} name Metadata name of the single page to update.
+         * @param {string} name metadata.name of the single page to update.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -715,7 +715,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
         },
         /**
          * Update only the content of an existing single page.
-         * @param {string} name Metadata name of the single page whose content will be updated.
+         * @param {string} name metadata.name of the single page whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -842,12 +842,12 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
  */
 export interface SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest {
     /**
-     * Metadata name of the single page.
+     * metadata.name of the single page.
      */
     readonly name: string
 
     /**
-     * Name of the content snapshot to delete.
+     * Content snapshot metadata.name to delete.
      */
     readonly snapshotName: string
 }
@@ -864,12 +864,12 @@ export interface SinglePageV1alpha1ConsoleApiDraftSinglePageRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest {
     /**
-     * Metadata name of the single page.
+     * metadata.name of the single page.
      */
     readonly name: string
 
     /**
-     * Name of the content snapshot to fetch.
+     * Content snapshot metadata.name to fetch.
      */
     readonly snapshotName: string
 }
@@ -879,7 +879,7 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest {
     /**
-     * Metadata name of the single page.
+     * metadata.name of the single page.
      */
     readonly name: string
 }
@@ -889,7 +889,7 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest {
     /**
-     * Metadata name of the single page.
+     * metadata.name of the single page.
      */
     readonly name: string
 }
@@ -899,7 +899,7 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentReques
  */
 export interface SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest {
     /**
-     * Metadata name of the single page.
+     * metadata.name of the single page.
      */
     readonly name: string
 }
@@ -959,7 +959,7 @@ export interface SinglePageV1alpha1ConsoleApiListSinglePagesRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiPublishSinglePageRequest {
     /**
-     * Metadata name of the single page to publish.
+     * metadata.name of the single page to publish.
      */
     readonly name: string
 
@@ -974,7 +974,7 @@ export interface SinglePageV1alpha1ConsoleApiPublishSinglePageRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest {
     /**
-     * Metadata name of the single page whose content will be restored.
+     * metadata.name of the single page whose content will be restored.
      */
     readonly name: string
 
@@ -986,7 +986,7 @@ export interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSingleP
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest {
     /**
-     * Metadata name of the single page to update.
+     * metadata.name of the single page to update.
      */
     readonly name: string
 
@@ -998,7 +998,7 @@ export interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest {
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest {
     /**
-     * Metadata name of the single page whose content will be updated.
+     * metadata.name of the single page whose content will be updated.
      */
     readonly name: string
 

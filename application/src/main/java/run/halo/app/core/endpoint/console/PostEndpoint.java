@@ -70,7 +70,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post.")
+                                        .description("metadata.name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -83,13 +83,13 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post.")
+                                        .description("metadata.name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
-                                        .description("Name of the content snapshot to fetch.")
+                                        .description("Content snapshot metadata.name to fetch.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -102,7 +102,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post.")
+                                        .description("metadata.name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -115,7 +115,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post.")
+                                        .description("metadata.name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -140,7 +140,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post to update.")
+                                        .description("metadata.name of the post to update.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -158,7 +158,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post whose content will be updated.")
+                                        .description("metadata.name of the post whose content will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -176,7 +176,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post whose content will be restored.")
+                                        .description("metadata.name of the post whose content will be restored.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -196,14 +196,15 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post to publish.")
+                                        .description("metadata.name of the post to publish.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("headSnapshot")
-                                        .description("Snapshot name to publish. Defaults to the current base snapshot "
-                                                + "when no head snapshot exists.")
+                                        .description(
+                                                "Snapshot metadata.name to publish. Defaults to the current base snapshot "
+                                                        + "when no head snapshot exists.")
                                         .in(ParameterIn.QUERY)
                                         .required(false))
                                 .parameter(parameterBuilder()
@@ -222,7 +223,7 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post to unpublish.")
+                                        .description("metadata.name of the post to unpublish.")
                                         .in(ParameterIn.PATH)
                                         .required(true))
                                 .response(responseBuilder().implementation(Post.class)))
@@ -234,9 +235,10 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post to recycle.")
+                                        .description("metadata.name of the post to recycle.")
                                         .in(ParameterIn.PATH)
-                                        .required(true)))
+                                        .required(true))
+                                .response(responseBuilder().implementation(Post.class)))
                 .DELETE(
                         "posts/{name}/content",
                         this::deleteContent,
@@ -245,13 +247,13 @@ public class PostEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the post.")
+                                        .description("metadata.name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
-                                        .description("Name of the content snapshot to delete.")
+                                        .description("Content snapshot metadata.name to delete.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -275,14 +277,14 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
-    @Schema(
-            name = "RevertSnapshotForPostParam",
-            description = "Request body for restoring post content from a snapshot.")
+    /**
+     * Request body for restoring post content from a snapshot.
+     *
+     * @param snapshotName snapshot {@code metadata.name} to restore as the post's head content
+     */
+    @Schema(name = "RevertSnapshotForPostParam")
     record RevertSnapshotParam(
-            @Schema(
-                    description = "Name of the snapshot that should become the post's head content.",
-                    requiredMode = Schema.RequiredMode.REQUIRED,
-                    minLength = 1)
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)
             String snapshotName) {}
 
     private Mono<ServerResponse> fetchContent(ServerRequest request) {

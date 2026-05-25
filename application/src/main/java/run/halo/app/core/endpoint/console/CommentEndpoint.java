@@ -73,7 +73,7 @@ public class CommentEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the comment to reply to.")
+                                        .description("metadata.name of the comment to reply to.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))

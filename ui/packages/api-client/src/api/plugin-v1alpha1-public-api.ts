@@ -27,8 +27,8 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 export const PluginV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Gets plugin available by name.
-         * @param {string} name Plugin name
+         * Gets plugin available by metadata.name.
+         * @param {string} name Plugin metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -77,8 +77,8 @@ export const PluginV1alpha1PublicApiFp = function(configuration?: Configuration)
     const localVarAxiosParamCreator = PluginV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
-         * Gets plugin available by name.
-         * @param {string} name Plugin name
+         * Gets plugin available by metadata.name.
+         * @param {string} name Plugin metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -98,7 +98,7 @@ export const PluginV1alpha1PublicApiFactory = function (configuration?: Configur
     const localVarFp = PluginV1alpha1PublicApiFp(configuration)
     return {
         /**
-         * Gets plugin available by name.
+         * Gets plugin available by metadata.name.
          * @param {PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -114,7 +114,7 @@ export const PluginV1alpha1PublicApiFactory = function (configuration?: Configur
  */
 export interface PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest {
     /**
-     * Plugin name
+     * Plugin metadata.name
      */
     readonly name: string
 }
@@ -124,7 +124,7 @@ export interface PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest {
  */
 export class PluginV1alpha1PublicApi extends BaseAPI {
     /**
-     * Gets plugin available by name.
+     * Gets plugin available by metadata.name.
      * @param {PluginV1alpha1PublicApiQueryPluginAvailableByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

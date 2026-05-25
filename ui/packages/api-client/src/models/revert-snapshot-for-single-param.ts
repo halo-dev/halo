@@ -19,7 +19,7 @@
  */
 export interface RevertSnapshotForSingleParam {
     /**
-     * Name of the snapshot that should become the single page\'s head content.
+     * snapshot <code>metadata.name</code> to restore as the single page\'s head content
      */
     'snapshotName': string;
 }

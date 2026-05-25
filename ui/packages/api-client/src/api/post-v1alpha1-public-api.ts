@@ -33,8 +33,8 @@ import type { PostVo } from '../models';
 export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Gets a post by name.
-         * @param {string} name Post name
+         * Gets a post by metadata.name.
+         * @param {string} name Post metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -74,8 +74,8 @@ export const PostV1alpha1PublicApiAxiosParamCreator = function (configuration?: 
             };
         },
         /**
-         * Gets a post navigation by name.
-         * @param {string} name Post name
+         * Gets a post navigation by metadata.name.
+         * @param {string} name Post metadata.name
          * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -191,8 +191,8 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PostV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
-         * Gets a post by name.
-         * @param {string} name Post name
+         * Gets a post by metadata.name.
+         * @param {string} name Post metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -203,8 +203,8 @@ export const PostV1alpha1PublicApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Gets a post navigation by name.
-         * @param {string} name Post name
+         * Gets a post navigation by metadata.name.
+         * @param {string} name Post metadata.name
          * @param {string} [scope] Scope of navigation. Use \&#39;category\&#39; to limit navigation to the post\&#39;s primary category. Defaults to global scope.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -241,7 +241,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
     const localVarFp = PostV1alpha1PublicApiFp(configuration)
     return {
         /**
-         * Gets a post by name.
+         * Gets a post by metadata.name.
          * @param {PostV1alpha1PublicApiQueryPostByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -250,7 +250,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
             return localVarFp.queryPostByName(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Gets a post navigation by name.
+         * Gets a post navigation by metadata.name.
          * @param {PostV1alpha1PublicApiQueryPostNavigationByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -275,7 +275,7 @@ export const PostV1alpha1PublicApiFactory = function (configuration?: Configurat
  */
 export interface PostV1alpha1PublicApiQueryPostByNameRequest {
     /**
-     * Post name
+     * Post metadata.name
      */
     readonly name: string
 }
@@ -285,7 +285,7 @@ export interface PostV1alpha1PublicApiQueryPostByNameRequest {
  */
 export interface PostV1alpha1PublicApiQueryPostNavigationByNameRequest {
     /**
-     * Post name
+     * Post metadata.name
      */
     readonly name: string
 
@@ -330,7 +330,7 @@ export interface PostV1alpha1PublicApiQueryPostsRequest {
  */
 export class PostV1alpha1PublicApi extends BaseAPI {
     /**
-     * Gets a post by name.
+     * Gets a post by metadata.name.
      * @param {PostV1alpha1PublicApiQueryPostByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -340,7 +340,7 @@ export class PostV1alpha1PublicApi extends BaseAPI {
     }
 
     /**
-     * Gets a post navigation by name.
+     * Gets a post navigation by metadata.name.
      * @param {PostV1alpha1PublicApiQueryPostNavigationByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

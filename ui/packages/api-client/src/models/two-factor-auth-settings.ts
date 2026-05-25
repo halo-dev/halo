@@ -14,13 +14,25 @@
 
 
 
+/**
+ * Two-factor authentication settings for the current user.
+ */
 export interface TwoFactorAuthSettings {
     /**
      * Check if 2FA is available.
      */
-    'available'?: boolean;
-    'emailVerified'?: boolean;
-    'enabled'?: boolean;
-    'totpConfigured'?: boolean;
+    'available': boolean;
+    /**
+     * Whether the user\'s email address has been verified.
+     */
+    'emailVerified': boolean;
+    /**
+     * Whether two-factor authentication is enabled for the user.
+     */
+    'enabled': boolean;
+    /**
+     * Whether a TOTP authenticator has been configured.
+     */
+    'totpConfigured': boolean;
 }
 

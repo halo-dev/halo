@@ -23,7 +23,7 @@
         "operationId": "FetchReceiverConfig",
         "parameters": [
           {
-            "description": "Notifier name",
+            "description": "Notifier metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -53,7 +53,7 @@
         "operationId": "SaveReceiverConfig",
         "parameters": [
           {
-            "description": "Notifier name",
+            "description": "Notifier metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -89,7 +89,7 @@
         "operationId": "ListUserNotificationPreferences",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -119,7 +119,7 @@
         "operationId": "SaveUserNotificationPreferences",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -160,7 +160,7 @@
         "operationId": "ListUserNotifications",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -243,7 +243,7 @@
         "operationId": "MarkNotificationsAsRead",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -288,7 +288,7 @@
         "operationId": "DeleteSpecifiedNotification",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -297,7 +297,7 @@
             }
           },
           {
-            "description": "Notification name",
+            "description": "Notification metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -329,7 +329,7 @@
         "operationId": "MarkNotificationAsRead",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -338,7 +338,7 @@
             }
           },
           {
-            "description": "Notification name",
+            "description": "Notification metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -535,11 +535,11 @@
     },
     "/apis/uc.api.content.halo.run/v1alpha1/posts/{name}": {
       "get": {
-        "description": "Get a post owned by the current user by metadata name.",
+        "description": "Get a post owned by the current user by metadata.name.",
         "operationId": "GetMyPost",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -569,7 +569,7 @@
         "operationId": "UpdateMyPost",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -612,7 +612,7 @@
         "operationId": "GetMyPostDraft",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -650,7 +650,7 @@
         "operationId": "UpdateMyPostDraft",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -693,7 +693,7 @@
         "operationId": "PublishMyPost",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -725,7 +725,7 @@
         "operationId": "RecycleMyPost",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -757,7 +757,7 @@
         "operationId": "UnpublishMyPost",
         "parameters": [
           {
-            "description": "Metadata name of a post owned by the current user.",
+            "description": "metadata.name of a post owned by the current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -789,7 +789,7 @@
         "operationId": "GetSnapshotForPost",
         "parameters": [
           {
-            "description": "Metadata name of the snapshot to fetch.",
+            "description": "metadata.name of the snapshot to fetch.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -798,7 +798,7 @@
             }
           },
           {
-            "description": "Metadata name of the post that owns the snapshot. The post must belong to the current user.",
+            "description": "metadata.name of the post that owns the snapshot. The post must belong to the current user.",
             "in": "query",
             "name": "postName",
             "required": true,
@@ -1045,6 +1045,7 @@
     },
     "/apis/uc.api.security.halo.run/v1alpha1/authentications/two-factor/totp/-": {
       "delete": {
+        "description": "Delete the current user\u0027s configured TOTP authenticator after password verification.",
         "operationId": "DeleteTotp",
         "requestBody": {
           "content": {
@@ -1201,6 +1202,7 @@
         "operationId": "DeletePat",
         "parameters": [
           {
+            "description": "metadata.name of the PAT to delete.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1209,7 +1211,18 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PersonalAccessTokenV1alpha1Uc"
         ]
@@ -1219,6 +1232,7 @@
         "operationId": "ObtainPat",
         "parameters": [
           {
+            "description": "metadata.name of the PAT to fetch.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1227,7 +1241,18 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PersonalAccessTokenV1alpha1Uc"
         ]
@@ -1239,6 +1264,7 @@
         "operationId": "RestorePat",
         "parameters": [
           {
+            "description": "metadata.name of the PAT to restore.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1247,7 +1273,18 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PersonalAccessTokenV1alpha1Uc"
         ]
@@ -1259,6 +1296,7 @@
         "operationId": "RevokePat",
         "parameters": [
           {
+            "description": "metadata.name of the PAT to revoke.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1267,7 +1305,18 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAccessToken"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PersonalAccessTokenV1alpha1Uc"
         ]
@@ -2148,15 +2197,20 @@
         }
       },
       "MarkSpecifiedRequest": {
+        "required": [
+          "names"
+        ],
         "type": "object",
         "properties": {
           "names": {
             "type": "array",
+            "description": "notification \u003ccode\u003emetadata.name\u003c/code\u003e values to mark as read",
             "items": {
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Payload for marking multiple notifications as read."
       },
       "Metadata": {
         "required": [
@@ -2372,18 +2426,25 @@
         "description": "Notification content and read state for one recipient."
       },
       "NotifierInfo": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the notifier"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the notifier"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "notifier \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
-        }
+        },
+        "description": "Notifier metadata used by notification preference UI."
       },
       "PasswordRequest": {
         "required": [
@@ -2392,13 +2453,15 @@
         "type": "object",
         "properties": {
           "password": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Current password of the authenticated user."
           },
           "totpCode": {
-            "type": "string"
+            "type": "string",
+            "description": "Current TOTP code, required when TOTP has already been configured."
           }
-        }
+        },
+        "description": "Password verification payload for changing two-factor authentication settings."
       },
       "PatSpec": {
         "required": [
@@ -2518,17 +2581,19 @@
         "properties": {
           "file": {
             "type": "string",
+            "description": "attachment data",
             "format": "binary"
           },
           "postName": {
             "type": "string",
-            "description": "Post name."
+            "description": "post \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "singlePageName": {
             "type": "string",
-            "description": "Single page name."
+            "description": "single page \u003ccode\u003emetadata.name\u003c/code\u003e"
           }
-        }
+        },
+        "description": "Multipart payload for uploading a post attachment."
       },
       "PostSpec": {
         "required": [
@@ -2709,25 +2774,33 @@
         "description": "Observed post state derived by content reconcilers."
       },
       "ReasonTypeInfo": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "description of the reason type"
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "display name of the reason type"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "reason type \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "uiPermissions": {
             "uniqueItems": true,
             "type": "array",
+            "description": "UI permissions required to manage this reason type",
             "items": {
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Reason type metadata used by notification preference UI."
       },
       "ReasonTypeNotifierCollectionRequest": {
         "required": [
@@ -2737,29 +2810,39 @@
         "properties": {
           "reasonTypeNotifiers": {
             "type": "array",
+            "description": "notifier selections grouped by reason type",
             "items": {
               "$ref": "#/components/schemas/ReasonTypeNotifierRequest"
             }
           }
-        }
+        },
+        "description": "Payload for saving notifier selections by reason type."
       },
       "ReasonTypeNotifierMatrix": {
+        "required": [
+          "notifiers",
+          "reasonTypes",
+          "stateMatrix"
+        ],
         "type": "object",
         "properties": {
           "notifiers": {
             "type": "array",
+            "description": "Notification notifiers available to the user.",
             "items": {
               "$ref": "#/components/schemas/NotifierInfo"
             }
           },
           "reasonTypes": {
             "type": "array",
+            "description": "Reason types available to the user.",
             "items": {
               "$ref": "#/components/schemas/ReasonTypeInfo"
             }
           },
           "stateMatrix": {
             "type": "array",
+            "description": "Enabled-state matrix indexed by reason type and notifier.",
             "items": {
               "type": "array",
               "items": {
@@ -2767,21 +2850,29 @@
               }
             }
           }
-        }
+        },
+        "description": "Matrix describing which notifiers are enabled for each reason type."
       },
       "ReasonTypeNotifierRequest": {
+        "required": [
+          "notifiers",
+          "reasonType"
+        ],
         "type": "object",
         "properties": {
           "notifiers": {
             "type": "array",
+            "description": "\u003ccode\u003emetadata.name\u003c/code\u003e values of enabled notifiers.",
             "items": {
               "type": "string"
             }
           },
           "reasonType": {
-            "type": "string"
+            "type": "string",
+            "description": "\u003ccode\u003emetadata.name\u003c/code\u003e of the reason type."
           }
-        }
+        },
+        "description": "Notifier selection for one reason type."
       },
       "Ref": {
         "required": [
@@ -3067,17 +3158,23 @@
         }
       },
       "TotpAuthLinkResponse": {
+        "required": [
+          "authLink",
+          "rawSecret"
+        ],
         "type": "object",
         "properties": {
           "authLink": {
             "type": "string",
-            "description": "QR Code with base64 encoded.",
+            "description": "otpauth URI that can be encoded as a QR code.",
             "format": "uri"
           },
           "rawSecret": {
-            "type": "string"
+            "type": "string",
+            "description": "Raw TOTP secret for manual authenticator setup."
           }
-        }
+        },
+        "description": "TOTP provisioning data for configuring an authenticator app."
       },
       "TotpRequest": {
         "required": [
@@ -3088,22 +3185,31 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "TOTP code generated from the new secret."
           },
           "currentTotpCode": {
-            "type": "string"
+            "type": "string",
+            "description": "Current TOTP code, required when replacing an existing TOTP authenticator."
           },
           "password": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Current password of the authenticated user."
           },
           "secret": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Raw TOTP secret returned by the auth-link endpoint."
           }
-        }
+        },
+        "description": "TOTP configuration payload."
       },
       "TwoFactorAuthSettings": {
+        "required": [
+          "available",
+          "emailVerified",
+          "enabled",
+          "totpConfigured"
+        ],
         "type": "object",
         "properties": {
           "available": {
@@ -3111,15 +3217,19 @@
             "description": "Check if 2FA is available."
           },
           "emailVerified": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the user\u0027s email address has been verified."
           },
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether two-factor authentication is enabled for the user."
           },
           "totpConfigured": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether a TOTP authenticator has been configured."
           }
-        }
+        },
+        "description": "Two-factor authentication settings for the current user."
       },
       "UcUploadFromUrlRequest": {
         "required": [
@@ -3129,13 +3239,15 @@
         "properties": {
           "filename": {
             "type": "string",
-            "description": "Custom file name"
+            "description": "custom file name"
           },
           "url": {
             "type": "string",
+            "description": "remote file URL to transfer into user-center storage",
             "format": "url"
           }
-        }
+        },
+        "description": "User-center request payload for uploading from a URL."
       },
       "UploadForm": {
         "type": "object",
@@ -3217,15 +3329,18 @@
         "type": "object",
         "properties": {
           "active": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the device session is still active."
           },
           "currentDevice": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether this device matches the current session."
           },
           "device": {
             "$ref": "#/components/schemas/Device"
           }
-        }
+        },
+        "description": "User device entry with session state."
       }
     },
     "securitySchemes": {

@@ -65,7 +65,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page.")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -78,7 +78,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page.")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -92,13 +92,13 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page.")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
-                                        .description("Name of the content snapshot to fetch.")
+                                        .description("Content snapshot metadata.name to fetch.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -111,7 +111,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page.")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -137,7 +137,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page to update.")
+                                        .description("metadata.name of the single page to update.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -156,7 +156,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page whose content will be updated.")
+                                        .description("metadata.name of the single page whose content will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -174,7 +174,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page whose content will be restored.")
+                                        .description("metadata.name of the single page whose content will be restored.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -194,7 +194,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page to publish.")
+                                        .description("metadata.name of the single page to publish.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -215,13 +215,13 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Metadata name of the single page.")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
-                                        .description("Name of the content snapshot to delete.")
+                                        .description("Content snapshot metadata.name to delete.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -245,14 +245,14 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
-    @Schema(
-            name = "RevertSnapshotForSingleParam",
-            description = "Request body for restoring single page content from a snapshot.")
+    /**
+     * Request body for restoring single page content from a snapshot.
+     *
+     * @param snapshotName snapshot {@code metadata.name} to restore as the single page's head content
+     */
+    @Schema(name = "RevertSnapshotForSingleParam")
     record RevertSnapshotParam(
-            @Schema(
-                    description = "Name of the snapshot that should become the single page's head content.",
-                    requiredMode = Schema.RequiredMode.REQUIRED,
-                    minLength = 1)
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)
             String snapshotName) {}
 
     private Mono<ServerResponse> fetchContent(ServerRequest request) {

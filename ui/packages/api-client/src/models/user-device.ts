@@ -17,8 +17,17 @@
 // @ts-ignore
 import type { Device } from './device';
 
+/**
+ * User device entry with session state.
+ */
 export interface UserDevice {
+    /**
+     * Whether the device session is still active.
+     */
     'active': boolean;
+    /**
+     * Whether this device matches the current session.
+     */
     'currentDevice': boolean;
     'device': Device;
 }

@@ -93,11 +93,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/categories/{name}": {
       "get": {
-        "description": "Gets category by name.",
+        "description": "Gets category by metadata.name.",
         "operationId": "queryCategoryByName",
         "parameters": [
           {
-            "description": "Category name",
+            "description": "Category metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -125,11 +125,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/categories/{name}/posts": {
       "get": {
-        "description": "Lists posts by category name.",
+        "description": "Lists posts by category metadata.name.",
         "operationId": "queryPostsByCategoryName",
         "parameters": [
           {
-            "description": "Category name",
+            "description": "Category metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -282,11 +282,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/posts/{name}": {
       "get": {
-        "description": "Gets a post by name.",
+        "description": "Gets a post by metadata.name.",
         "operationId": "queryPostByName",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Post metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -314,11 +314,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/posts/{name}/navigation": {
       "get": {
-        "description": "Gets a post navigation by name.",
+        "description": "Gets a post navigation by metadata.name.",
         "operationId": "queryPostNavigationByName",
         "parameters": [
           {
-            "description": "Post name",
+            "description": "Post metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -428,11 +428,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/singlepages/{name}": {
       "get": {
-        "description": "Gets single page by name",
+        "description": "Gets single page by metadata.name",
         "operationId": "querySinglePageByName",
         "parameters": [
           {
-            "description": "SinglePage name",
+            "description": "SinglePage metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -534,11 +534,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/tags/{name}": {
       "get": {
-        "description": "Gets tag by name",
+        "description": "Gets tag by metadata.name",
         "operationId": "queryTagByName",
         "parameters": [
           {
-            "description": "Tag name",
+            "description": "Tag metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -566,11 +566,11 @@
     },
     "/apis/api.content.halo.run/v1alpha1/tags/{name}/posts": {
       "get": {
-        "description": "Lists posts by tag name",
+        "description": "Lists posts by tag metadata.name",
         "operationId": "queryPostsByTagName",
         "parameters": [
           {
-            "description": "Tag name",
+            "description": "Tag metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -708,7 +708,7 @@
             }
           },
           {
-            "description": "The comment subject name.",
+            "description": "The comment subject metadata.name.",
             "in": "query",
             "name": "name",
             "required": true,
@@ -786,6 +786,7 @@
         "operationId": "GetComment",
         "parameters": [
           {
+            "description": "metadata.name of the comment to fetch.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -817,6 +818,7 @@
         "operationId": "ListCommentReplies",
         "parameters": [
           {
+            "description": "metadata.name of the comment whose replies will be listed.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -864,6 +866,7 @@
         "operationId": "CreateReply_1",
         "parameters": [
           {
+            "description": "metadata.name of the comment to reply to.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -953,11 +956,11 @@
     },
     "/apis/api.halo.run/v1alpha1/menus/{name}": {
       "get": {
-        "description": "Gets menu by name.",
+        "description": "Gets menu by metadata.name.",
         "operationId": "queryMenuByName",
         "parameters": [
           {
-            "description": "Menu name",
+            "description": "Menu metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1122,11 +1125,11 @@
     },
     "/apis/api.plugin.halo.run/v1alpha1/plugins/{name}/available": {
       "get": {
-        "description": "Gets plugin available by name.",
+        "description": "Gets plugin available by metadata.name.",
         "operationId": "queryPluginAvailableByName",
         "parameters": [
           {
-            "description": "Plugin name",
+            "description": "Plugin metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1935,30 +1938,42 @@
         }
       },
       "CounterRequest": {
+        "required": [
+          "name",
+          "plural"
+        ],
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "hostname": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor host name"
           },
           "language": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor browser language"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           },
           "referrer": {
-            "type": "string"
+            "type": "string",
+            "description": "referrer URL of the visit"
           },
           "screen": {
-            "type": "string"
+            "type": "string",
+            "description": "visitor screen size or display descriptor"
           }
-        }
+        },
+        "description": "Payload for counting a visit to an extension resource."
       },
       "Excerpt": {
         "required": [
@@ -3649,18 +3664,27 @@
         }
       },
       "VoteRequest": {
+        "required": [
+          "group",
+          "name",
+          "plural"
+        ],
         "type": "object",
         "properties": {
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "API group of the extension resource"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "extension resource \u003ccode\u003emetadata.name\u003c/code\u003e"
           },
           "plural": {
-            "type": "string"
+            "type": "string",
+            "description": "plural name of the extension resource"
           }
-        }
+        },
+        "description": "Payload for voting on an extension resource."
       }
     },
     "securitySchemes": {

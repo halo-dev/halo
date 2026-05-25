@@ -19,7 +19,7 @@
  */
 export interface RevertSnapshotForPostParam {
     /**
-     * Name of the snapshot that should become the post\'s head content.
+     * snapshot <code>metadata.name</code> to restore as the post\'s head content
      */
     'snapshotName': string;
 }
