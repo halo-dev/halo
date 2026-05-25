@@ -9,23 +9,25 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.Extension;
 
 /**
- * Listed comment.
+ * Comment list item returned by the console comment API.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Comment list item with resolved owner, subject, and counters.")
 @Data
 @Builder
 public class ListedComment {
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Comment extension data.", requiredMode = REQUIRED)
     private Comment comment;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved owner information for display.", requiredMode = REQUIRED)
     private OwnerInfo owner;
 
+    /** Resolved subject extension that the comment belongs to, when available. */
     private Extension subject;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Aggregated counters for the comment.", requiredMode = REQUIRED)
     private CommentStats stats;
 }

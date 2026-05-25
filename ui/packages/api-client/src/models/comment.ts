@@ -23,6 +23,9 @@ import type { CommentStatus } from './comment-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Comment extension for a post, single page, or another commentable subject.
+ */
 export interface Comment {
     'apiVersion': string;
     'kind': string;

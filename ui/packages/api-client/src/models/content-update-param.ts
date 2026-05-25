@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Content update payload for post and single page editors.
+ */
 export interface ContentUpdateParam {
+    /**
+     * Rendered HTML or normalized content derived from raw.
+     */
     'content': string;
+    /**
+     * Source text stored by the editor.
+     */
     'raw': string;
+    /**
+     * Editor/source format of the raw content, for example HTML or Markdown.
+     */
     'rawType': string;
+    /**
+     * Expected current head snapshot version; conflicts create a new head snapshot.
+     */
     'version'?: number;
 }
 

@@ -29,13 +29,13 @@ import type { TagList } from '../models';
 export const TagV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * List Post Tags.
+         * List post tags with pagination, sorting, and keyword filtering.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Post tags filtered by keyword.
+         * @param {string} [keyword] Keyword used to match the tag display name or slug.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -105,13 +105,13 @@ export const TagV1alpha1ConsoleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TagV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * List Post Tags.
+         * List post tags with pagination, sorting, and keyword filtering.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Post tags filtered by keyword.
+         * @param {string} [keyword] Keyword used to match the tag display name or slug.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -131,7 +131,7 @@ export const TagV1alpha1ConsoleApiFactory = function (configuration?: Configurat
     const localVarFp = TagV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * List Post Tags.
+         * List post tags with pagination, sorting, and keyword filtering.
          * @param {TagV1alpha1ConsoleApiListPostTagsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -172,7 +172,7 @@ export interface TagV1alpha1ConsoleApiListPostTagsRequest {
     readonly sort?: Array<string>
 
     /**
-     * Post tags filtered by keyword.
+     * Keyword used to match the tag display name or slug.
      */
     readonly keyword?: string
 }
@@ -182,7 +182,7 @@ export interface TagV1alpha1ConsoleApiListPostTagsRequest {
  */
 export class TagV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * List Post Tags.
+     * List post tags with pagination, sorting, and keyword filtering.
      * @param {TagV1alpha1ConsoleApiListPostTagsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

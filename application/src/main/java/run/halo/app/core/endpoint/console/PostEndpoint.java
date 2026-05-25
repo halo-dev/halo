@@ -35,7 +35,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
- * Endpoint for managing posts.
+ * Console endpoint for managing posts and their content snapshots.
  *
  * @author guqing
  * @since 2.0.0
@@ -55,7 +55,8 @@ public class PostEndpoint implements CustomEndpoint {
         return SpringdocRouteBuilder.route()
                 .GET("posts", this::listPost, builder -> {
                     builder.operationId("ListPosts")
-                            .description("List posts.")
+                            .description("List posts with pagination, sorting, keyword, publish phase, and category "
+                                    + "filters.")
                             .tag(tag)
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(ListedPost.class)));
@@ -65,10 +66,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/head-content",
                         this::fetchHeadContent,
                         builder -> builder.operationId("fetchPostHeadContent")
-                                .description("Fetch head content of post.")
+                                .description("Fetch the editable head content of a post.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -77,15 +79,17 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/content",
                         this::fetchContent,
                         builder -> builder.operationId("fetchPostContent")
-                                .description("Fetch content of post.")
+                                .description("Fetch a post content snapshot reconstructed from its base snapshot.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
+                                        .description("Name of the content snapshot to fetch.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -94,10 +98,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/release-content",
                         this::fetchReleaseContent,
                         builder -> builder.operationId("fetchPostReleaseContent")
-                                .description("Fetch release content of post.")
+                                .description("Fetch the released content currently served for a published post.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -106,10 +111,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/snapshot",
                         this::listSnapshots,
                         builder -> builder.operationId("listPostSnapshots")
-                                .description("List all snapshots for post content.")
+                                .description("List content snapshots for a post.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -118,7 +124,7 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts",
                         this::draftPost,
                         builder -> builder.operationId("DraftPost")
-                                .description("Draft a post.")
+                                .description("Create a draft post together with its initial content.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -130,10 +136,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}",
                         this::updatePost,
                         builder -> builder.operationId("UpdateDraftPost")
-                                .description("Update a post.")
+                                .description("Update post metadata, spec, and content in one request.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post to update.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -147,10 +154,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/content",
                         this::updateContent,
                         builder -> builder.operationId("UpdatePostContent")
-                                .description("Update a post's content.")
+                                .description("Update only the content of an existing post.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post whose content will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -164,10 +172,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/revert-content",
                         this::revertToSpecifiedSnapshot,
                         builder -> builder.operationId("revertToSpecifiedSnapshotForPost")
-                                .description("Revert to specified snapshot for post content.")
+                                .description("Restore the post content from a specified snapshot.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post whose content will be restored.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -182,20 +191,25 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/publish",
                         this::publishPost,
                         builder -> builder.operationId("PublishPost")
-                                .description("Publish a post.")
+                                .description("Publish a post. By default, the request waits until the release snapshot "
+                                        + "is available.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post to publish.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("headSnapshot")
-                                        .description("Head snapshot name of content.")
+                                        .description("Snapshot name to publish. Defaults to the current base snapshot "
+                                                + "when no head snapshot exists.")
                                         .in(ParameterIn.QUERY)
                                         .required(false))
                                 .parameter(parameterBuilder()
                                         .name("async")
+                                        .description("Whether to return immediately after marking the post for "
+                                                + "publishing.")
                                         .in(ParameterIn.QUERY)
                                         .implementation(Boolean.class)
                                         .required(false))
@@ -204,10 +218,11 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/unpublish",
                         this::unpublishPost,
                         builder -> builder.operationId("UnpublishPost")
-                                .description("UnPublish a post.")
+                                .description("Unpublish a post so it is no longer served as published content.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post to unpublish.")
                                         .in(ParameterIn.PATH)
                                         .required(true))
                                 .response(responseBuilder().implementation(Post.class)))
@@ -215,25 +230,28 @@ public class PostEndpoint implements CustomEndpoint {
                         "posts/{name}/recycle",
                         this::recyclePost,
                         builder -> builder.operationId("RecyclePost")
-                                .description("Recycle a post.")
+                                .description("Move a post to the recycle bin by marking it as deleted.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post to recycle.")
                                         .in(ParameterIn.PATH)
                                         .required(true)))
                 .DELETE(
                         "posts/{name}/content",
                         this::deleteContent,
                         builder -> builder.operationId("deletePostContent")
-                                .description("Delete a content for post.")
+                                .description("Delete a content snapshot from a post and return the deleted content.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the post.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
+                                        .description("Name of the content snapshot to delete.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -257,9 +275,14 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
-    @Schema(name = "RevertSnapshotForPostParam")
+    @Schema(
+            name = "RevertSnapshotForPostParam",
+            description = "Request body for restoring post content from a snapshot.")
     record RevertSnapshotParam(
-            @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)
+            @Schema(
+                    description = "Name of the snapshot that should become the post's head content.",
+                    requiredMode = Schema.RequiredMode.REQUIRED,
+                    minLength = 1)
             String snapshotName) {}
 
     private Mono<ServerResponse> fetchContent(ServerRequest request) {

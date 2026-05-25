@@ -22,7 +22,10 @@ function onSubmit(data: SecretFormState) {
   emit("submit", data);
 }
 
-const stringDataArray = ref<{ key: string; value: string }[]>([]);
+const stringDataArray = ref<{ key: string; value: string }[]>(
+  props.formState?.stringDataArray.map(({ key, value }) => ({ key, value })) ||
+    []
+);
 
 onMounted(() => {
   if (props.formState) {

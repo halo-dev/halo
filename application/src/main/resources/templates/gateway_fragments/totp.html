@@ -19,6 +19,7 @@
         name="code"
         autocomplete="one-time-code"
         pattern="\d{6}"
+        maxlength="6"
         autofocus
         required
       />
@@ -30,4 +31,22 @@
   <div class="form-item">
     <a th:href="@{/logout}" class="cancel-link" th:text="#{form.cancel}"></a>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("two-factor-form");
+      const codeInput = document.getElementById("code");
+      let submitting = false;
+
+      codeInput.addEventListener("input", function (event) {
+        if (submitting || event.isComposing) {
+          return;
+        }
+
+        if (/^\d{6}$/.test(codeInput.value)) {
+          submitting = true;
+          form.requestSubmit();
+        }
+      });
+    });
+  </script>
 </form>

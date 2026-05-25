@@ -27,7 +27,7 @@ import type { Extension } from './extension';
 import type { OwnerInfo } from './owner-info';
 
 /**
- * A chunk of items.
+ * Comment list item with resolved owner, subject, and counters.
  */
 export interface ListedComment {
     'comment': Comment;

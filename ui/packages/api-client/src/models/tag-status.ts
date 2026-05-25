@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Observed state of a tag.
+ */
 export interface TagStatus {
+    /**
+     * Metadata version observed by the last successful reconciliation.
+     */
     'observedVersion'?: number;
+    /**
+     * Absolute permalink calculated from the tag permalink policy.
+     */
     'permalink'?: string;
+    /**
+     * Total number of posts associated with the tag.
+     */
     'postCount'?: number;
+    /**
+     * Total number of published and public posts associated with the tag.
+     */
     'visiblePostCount'?: number;
 }
 
