@@ -41,9 +41,9 @@ import type { RevertSnapshotForPostParam } from '../models';
 export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Delete a content for post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Delete a content snapshot from a post and return the deleted content.
+         * @param {string} name Metadata name of the post.
+         * @param {string} snapshotName Name of the content snapshot to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -89,7 +89,7 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Draft a post.
+         * Create a draft post together with its initial content.
          * @param {PostRequest} postRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -132,9 +132,9 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Fetch content of post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Fetch a post content snapshot reconstructed from its base snapshot.
+         * @param {string} name Metadata name of the post.
+         * @param {string} snapshotName Name of the content snapshot to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -180,8 +180,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Fetch head content of post.
-         * @param {string} name 
+         * Fetch the editable head content of a post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -221,8 +221,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Fetch release content of post.
-         * @param {string} name 
+         * Fetch the released content currently served for a published post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -262,8 +262,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * List all snapshots for post content.
-         * @param {string} name 
+         * List content snapshots for a post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -303,15 +303,15 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * List posts.
+         * List posts with pagination, sorting, keyword, publish phase, and category filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {ListPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
-         * @param {string} [keyword] Posts filtered by keyword.
-         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
+         * @param {ListPostsPublishPhaseEnum} [publishPhase] Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {string} [keyword] Keyword used to match post title, slug, or excerpt.
+         * @param {string} [categoryWithChildren] Category metadata name used to include posts in that category and its child categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -380,10 +380,10 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Publish a post.
-         * @param {string} name 
-         * @param {string} [headSnapshot] Head snapshot name of content.
-         * @param {boolean} [async] 
+         * Publish a post. By default, the request waits until the release snapshot is available.
+         * @param {string} name Metadata name of the post to publish.
+         * @param {string} [headSnapshot] Snapshot name to publish. Defaults to the current base snapshot when no head snapshot exists.
+         * @param {boolean} [async] Whether to return immediately after marking the post for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -431,8 +431,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Recycle a post.
-         * @param {string} name 
+         * Move a post to the recycle bin by marking it as deleted.
+         * @param {string} name Metadata name of the post to recycle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -472,8 +472,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Revert to specified snapshot for post content.
-         * @param {string} name 
+         * Restore the post content from a specified snapshot.
+         * @param {string} name Metadata name of the post whose content will be restored.
          * @param {RevertSnapshotForPostParam} revertSnapshotForPostParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -519,8 +519,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * UnPublish a post.
-         * @param {string} name 
+         * Unpublish a post so it is no longer served as published content.
+         * @param {string} name Metadata name of the post to unpublish.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -560,8 +560,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Update a post.
-         * @param {string} name 
+         * Update post metadata, spec, and content in one request.
+         * @param {string} name Metadata name of the post to update.
          * @param {PostRequest} postRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -607,8 +607,8 @@ export const PostV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Update a post\'s content.
-         * @param {string} name 
+         * Update only the content of an existing post.
+         * @param {string} name Metadata name of the post whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -663,9 +663,9 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
     const localVarAxiosParamCreator = PostV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Delete a content for post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Delete a content snapshot from a post and return the deleted content.
+         * @param {string} name Metadata name of the post.
+         * @param {string} snapshotName Name of the content snapshot to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -676,7 +676,7 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Draft a post.
+         * Create a draft post together with its initial content.
          * @param {PostRequest} postRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -688,9 +688,9 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch content of post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Fetch a post content snapshot reconstructed from its base snapshot.
+         * @param {string} name Metadata name of the post.
+         * @param {string} snapshotName Name of the content snapshot to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -701,8 +701,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch head content of post.
-         * @param {string} name 
+         * Fetch the editable head content of a post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -713,8 +713,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch release content of post.
-         * @param {string} name 
+         * Fetch the released content currently served for a published post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -725,8 +725,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List all snapshots for post content.
-         * @param {string} name 
+         * List content snapshots for a post.
+         * @param {string} name Metadata name of the post.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -737,15 +737,15 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List posts.
+         * List posts with pagination, sorting, keyword, publish phase, and category filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {ListPostsPublishPhaseEnum} [publishPhase] Posts filtered by publish phase.
-         * @param {string} [keyword] Posts filtered by keyword.
-         * @param {string} [categoryWithChildren] Posts filtered by category including sub-categories.
+         * @param {ListPostsPublishPhaseEnum} [publishPhase] Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {string} [keyword] Keyword used to match post title, slug, or excerpt.
+         * @param {string} [categoryWithChildren] Category metadata name used to include posts in that category and its child categories.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -756,10 +756,10 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Publish a post.
-         * @param {string} name 
-         * @param {string} [headSnapshot] Head snapshot name of content.
-         * @param {boolean} [async] 
+         * Publish a post. By default, the request waits until the release snapshot is available.
+         * @param {string} name Metadata name of the post to publish.
+         * @param {string} [headSnapshot] Snapshot name to publish. Defaults to the current base snapshot when no head snapshot exists.
+         * @param {boolean} [async] Whether to return immediately after marking the post for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -770,8 +770,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Recycle a post.
-         * @param {string} name 
+         * Move a post to the recycle bin by marking it as deleted.
+         * @param {string} name Metadata name of the post to recycle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -782,8 +782,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Revert to specified snapshot for post content.
-         * @param {string} name 
+         * Restore the post content from a specified snapshot.
+         * @param {string} name Metadata name of the post whose content will be restored.
          * @param {RevertSnapshotForPostParam} revertSnapshotForPostParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -795,8 +795,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * UnPublish a post.
-         * @param {string} name 
+         * Unpublish a post so it is no longer served as published content.
+         * @param {string} name Metadata name of the post to unpublish.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -807,8 +807,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update a post.
-         * @param {string} name 
+         * Update post metadata, spec, and content in one request.
+         * @param {string} name Metadata name of the post to update.
          * @param {PostRequest} postRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -820,8 +820,8 @@ export const PostV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update a post\'s content.
-         * @param {string} name 
+         * Update only the content of an existing post.
+         * @param {string} name Metadata name of the post whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -842,7 +842,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
     const localVarFp = PostV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Delete a content for post.
+         * Delete a content snapshot from a post and return the deleted content.
          * @param {PostV1alpha1ConsoleApiDeletePostContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -851,7 +851,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.deletePostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Draft a post.
+         * Create a draft post together with its initial content.
          * @param {PostV1alpha1ConsoleApiDraftPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -860,7 +860,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.draftPost(requestParameters.postRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch content of post.
+         * Fetch a post content snapshot reconstructed from its base snapshot.
          * @param {PostV1alpha1ConsoleApiFetchPostContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -869,7 +869,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.fetchPostContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch head content of post.
+         * Fetch the editable head content of a post.
          * @param {PostV1alpha1ConsoleApiFetchPostHeadContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -878,7 +878,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.fetchPostHeadContent(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch release content of post.
+         * Fetch the released content currently served for a published post.
          * @param {PostV1alpha1ConsoleApiFetchPostReleaseContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -887,7 +887,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.fetchPostReleaseContent(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all snapshots for post content.
+         * List content snapshots for a post.
          * @param {PostV1alpha1ConsoleApiListPostSnapshotsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -896,7 +896,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.listPostSnapshots(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * List posts.
+         * List posts with pagination, sorting, keyword, publish phase, and category filters.
          * @param {PostV1alpha1ConsoleApiListPostsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -905,7 +905,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.listPosts(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.publishPhase, requestParameters.keyword, requestParameters.categoryWithChildren, options).then((request) => request(axios, basePath));
         },
         /**
-         * Publish a post.
+         * Publish a post. By default, the request waits until the release snapshot is available.
          * @param {PostV1alpha1ConsoleApiPublishPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -914,7 +914,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.publishPost(requestParameters.name, requestParameters.headSnapshot, requestParameters.async, options).then((request) => request(axios, basePath));
         },
         /**
-         * Recycle a post.
+         * Move a post to the recycle bin by marking it as deleted.
          * @param {PostV1alpha1ConsoleApiRecyclePostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -923,7 +923,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.recyclePost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Revert to specified snapshot for post content.
+         * Restore the post content from a specified snapshot.
          * @param {PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -932,7 +932,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.revertToSpecifiedSnapshotForPost(requestParameters.name, requestParameters.revertSnapshotForPostParam, options).then((request) => request(axios, basePath));
         },
         /**
-         * UnPublish a post.
+         * Unpublish a post so it is no longer served as published content.
          * @param {PostV1alpha1ConsoleApiUnpublishPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -941,7 +941,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.unpublishPost(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a post.
+         * Update post metadata, spec, and content in one request.
          * @param {PostV1alpha1ConsoleApiUpdateDraftPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -950,7 +950,7 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.updateDraftPost(requestParameters.name, requestParameters.postRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a post\'s content.
+         * Update only the content of an existing post.
          * @param {PostV1alpha1ConsoleApiUpdatePostContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -965,8 +965,14 @@ export const PostV1alpha1ConsoleApiFactory = function (configuration?: Configura
  * Request parameters for deletePostContent operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiDeletePostContentRequest {
+    /**
+     * Metadata name of the post.
+     */
     readonly name: string
 
+    /**
+     * Name of the content snapshot to delete.
+     */
     readonly snapshotName: string
 }
 
@@ -981,8 +987,14 @@ export interface PostV1alpha1ConsoleApiDraftPostRequest {
  * Request parameters for fetchPostContent operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiFetchPostContentRequest {
+    /**
+     * Metadata name of the post.
+     */
     readonly name: string
 
+    /**
+     * Name of the content snapshot to fetch.
+     */
     readonly snapshotName: string
 }
 
@@ -990,6 +1002,9 @@ export interface PostV1alpha1ConsoleApiFetchPostContentRequest {
  * Request parameters for fetchPostHeadContent operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiFetchPostHeadContentRequest {
+    /**
+     * Metadata name of the post.
+     */
     readonly name: string
 }
 
@@ -997,6 +1012,9 @@ export interface PostV1alpha1ConsoleApiFetchPostHeadContentRequest {
  * Request parameters for fetchPostReleaseContent operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiFetchPostReleaseContentRequest {
+    /**
+     * Metadata name of the post.
+     */
     readonly name: string
 }
 
@@ -1004,6 +1022,9 @@ export interface PostV1alpha1ConsoleApiFetchPostReleaseContentRequest {
  * Request parameters for listPostSnapshots operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiListPostSnapshotsRequest {
+    /**
+     * Metadata name of the post.
+     */
     readonly name: string
 }
 
@@ -1037,17 +1058,17 @@ export interface PostV1alpha1ConsoleApiListPostsRequest {
     readonly sort?: Array<string>
 
     /**
-     * Posts filtered by publish phase.
+     * Filter posts by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
      */
     readonly publishPhase?: ListPostsPublishPhaseEnum
 
     /**
-     * Posts filtered by keyword.
+     * Keyword used to match post title, slug, or excerpt.
      */
     readonly keyword?: string
 
     /**
-     * Posts filtered by category including sub-categories.
+     * Category metadata name used to include posts in that category and its child categories.
      */
     readonly categoryWithChildren?: string
 }
@@ -1056,13 +1077,19 @@ export interface PostV1alpha1ConsoleApiListPostsRequest {
  * Request parameters for publishPost operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiPublishPostRequest {
+    /**
+     * Metadata name of the post to publish.
+     */
     readonly name: string
 
     /**
-     * Head snapshot name of content.
+     * Snapshot name to publish. Defaults to the current base snapshot when no head snapshot exists.
      */
     readonly headSnapshot?: string
 
+    /**
+     * Whether to return immediately after marking the post for publishing.
+     */
     readonly async?: boolean
 }
 
@@ -1070,6 +1097,9 @@ export interface PostV1alpha1ConsoleApiPublishPostRequest {
  * Request parameters for recyclePost operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiRecyclePostRequest {
+    /**
+     * Metadata name of the post to recycle.
+     */
     readonly name: string
 }
 
@@ -1077,6 +1107,9 @@ export interface PostV1alpha1ConsoleApiRecyclePostRequest {
  * Request parameters for revertToSpecifiedSnapshotForPost operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest {
+    /**
+     * Metadata name of the post whose content will be restored.
+     */
     readonly name: string
 
     readonly revertSnapshotForPostParam: RevertSnapshotForPostParam
@@ -1086,6 +1119,9 @@ export interface PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest {
  * Request parameters for unpublishPost operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiUnpublishPostRequest {
+    /**
+     * Metadata name of the post to unpublish.
+     */
     readonly name: string
 }
 
@@ -1093,6 +1129,9 @@ export interface PostV1alpha1ConsoleApiUnpublishPostRequest {
  * Request parameters for updateDraftPost operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiUpdateDraftPostRequest {
+    /**
+     * Metadata name of the post to update.
+     */
     readonly name: string
 
     readonly postRequest: PostRequest
@@ -1102,6 +1141,9 @@ export interface PostV1alpha1ConsoleApiUpdateDraftPostRequest {
  * Request parameters for updatePostContent operation in PostV1alpha1ConsoleApi.
  */
 export interface PostV1alpha1ConsoleApiUpdatePostContentRequest {
+    /**
+     * Metadata name of the post whose content will be updated.
+     */
     readonly name: string
 
     readonly content: Content
@@ -1112,7 +1154,7 @@ export interface PostV1alpha1ConsoleApiUpdatePostContentRequest {
  */
 export class PostV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Delete a content for post.
+     * Delete a content snapshot from a post and return the deleted content.
      * @param {PostV1alpha1ConsoleApiDeletePostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1122,7 +1164,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Draft a post.
+     * Create a draft post together with its initial content.
      * @param {PostV1alpha1ConsoleApiDraftPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1132,7 +1174,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch content of post.
+     * Fetch a post content snapshot reconstructed from its base snapshot.
      * @param {PostV1alpha1ConsoleApiFetchPostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1142,7 +1184,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch head content of post.
+     * Fetch the editable head content of a post.
      * @param {PostV1alpha1ConsoleApiFetchPostHeadContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1152,7 +1194,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch release content of post.
+     * Fetch the released content currently served for a published post.
      * @param {PostV1alpha1ConsoleApiFetchPostReleaseContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1162,7 +1204,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * List all snapshots for post content.
+     * List content snapshots for a post.
      * @param {PostV1alpha1ConsoleApiListPostSnapshotsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1172,7 +1214,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * List posts.
+     * List posts with pagination, sorting, keyword, publish phase, and category filters.
      * @param {PostV1alpha1ConsoleApiListPostsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1182,7 +1224,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Publish a post.
+     * Publish a post. By default, the request waits until the release snapshot is available.
      * @param {PostV1alpha1ConsoleApiPublishPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1192,7 +1234,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Recycle a post.
+     * Move a post to the recycle bin by marking it as deleted.
      * @param {PostV1alpha1ConsoleApiRecyclePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1202,7 +1244,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Revert to specified snapshot for post content.
+     * Restore the post content from a specified snapshot.
      * @param {PostV1alpha1ConsoleApiRevertToSpecifiedSnapshotForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1212,7 +1254,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * UnPublish a post.
+     * Unpublish a post so it is no longer served as published content.
      * @param {PostV1alpha1ConsoleApiUnpublishPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1222,7 +1264,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Update a post.
+     * Update post metadata, spec, and content in one request.
      * @param {PostV1alpha1ConsoleApiUpdateDraftPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1232,7 +1274,7 @@ export class PostV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Update a post\'s content.
+     * Update only the content of an existing post.
      * @param {PostV1alpha1ConsoleApiUpdatePostContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Display fields for a content snapshot list item.
+ */
 export interface ListedSnapshotSpec {
+    /**
+     * Last modification time of the snapshot content.
+     */
     'modifyTime'?: string;
+    /**
+     * User name of the snapshot owner.
+     */
     'owner': string;
 }
 

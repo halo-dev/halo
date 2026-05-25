@@ -14,7 +14,13 @@
 
 
 
+/**
+ * Request body for restoring single page content from a snapshot.
+ */
 export interface RevertSnapshotForSingleParam {
+    /**
+     * Name of the snapshot that should become the single page\'s head content.
+     */
     'snapshotName': string;
 }
 

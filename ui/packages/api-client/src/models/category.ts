@@ -23,6 +23,9 @@ import type { CategoryStatus } from './category-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Category extension for grouping posts and building category archives.
+ */
 export interface Category {
     'apiVersion': string;
     'kind': string;

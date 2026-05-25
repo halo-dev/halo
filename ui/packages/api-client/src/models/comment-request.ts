@@ -21,13 +21,25 @@ import type { CommentEmailOwner } from './comment-email-owner';
 import type { Ref } from './ref';
 
 /**
- * Request parameter object for {@link Comment Comment}.
+ * Comment creation payload for console comment APIs.
  */
 export interface CommentRequest {
+    /**
+     * Whether to subscribe the owner to notifications for future replies.
+     */
     'allowNotification'?: boolean;
+    /**
+     * Rendered HTML content for the comment. Unsafe HTML is rejected.
+     */
     'content': string;
+    /**
+     * Whether the comment should be hidden from normal display.
+     */
     'hidden'?: boolean;
     'owner'?: CommentEmailOwner;
+    /**
+     * Original comment text submitted by the editor.
+     */
     'raw': string;
     'subjectRef': Ref;
 }

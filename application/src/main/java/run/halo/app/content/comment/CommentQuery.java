@@ -74,17 +74,17 @@ public class CommentQuery extends SortableRequest {
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("keyword")
-                        .description("Comments filtered by keyword.")
+                        .description("Keyword used to match the raw comment text.")
                         .implementation(String.class))
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("ownerKind")
-                        .description("Commenter kind.")
+                        .description("Kind of the commenter identity. Defaults to User when ownerName is provided.")
                         .implementation(String.class))
                 .parameter(parameterBuilder()
                         .in(ParameterIn.QUERY)
                         .name("ownerName")
-                        .description("Commenter name.")
+                        .description("Name of the commenter identity to filter by.")
                         .implementation(String.class));
     }
 }

@@ -30,14 +30,23 @@ import type { Stats } from './stats';
 import type { Tag } from './tag';
 
 /**
- * A chunk of items.
+ * Post list item with resolved categories, tags, contributors, owner, and counters.
  */
 export interface ListedPost {
+    /**
+     * Resolved categories referenced by the post spec.
+     */
     'categories': Array<Category>;
+    /**
+     * Users that have contributed to the post content snapshots.
+     */
     'contributors': Array<Contributor>;
     'owner': Contributor;
     'post': Post;
     'stats': Stats;
+    /**
+     * Resolved tags referenced by the post spec.
+     */
     'tags': Array<Tag>;
 }
 

@@ -62,11 +62,12 @@ public class Post extends AbstractExtension {
     public static final String ARCHIVE_MONTH_LABEL = "content.halo.run/archive-month";
     public static final String ARCHIVE_DAY_LABEL = "content.halo.run/archive-day";
 
+    /** Desired state of the post, including content snapshots, publishing options, taxonomy, and theme hints. */
     @Schema(requiredMode = RequiredMode.REQUIRED)
     @Nullable
     private PostSpec spec;
 
-    @Schema
+    /** Observed state of the post, populated by reconcilers and other internal controllers. */
     @Nullable
     private PostStatus status;
 
@@ -103,78 +104,106 @@ public class Post extends AbstractExtension {
     }
 
     @Data
+    @Schema(description = "Desired content, publication, taxonomy, and rendering configuration of a post.")
     public static class PostSpec {
+        /** Display title of the post. */
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
         private String title;
 
+        /** URL slug used to build the post permalink. */
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
         private String slug;
 
-        /** 文章引用到的已发布的内容，用于主题端显示. */
+        /** Snapshot metadata.name selected as the published content version. */
         private String releaseSnapshot;
 
+        /** Snapshot metadata.name containing the latest editable draft content. */
         private String headSnapshot;
 
+        /** Base Snapshot metadata.name used to reconstruct raw and rendered content from patches. */
         private String baseSnapshot;
 
+        /** User metadata.name of the post owner. */
         private String owner;
 
+        /** Theme template used to render this post. */
         private String template;
 
+        /** Cover image URL or attachment URI of the post. */
         private String cover;
 
+        /** Whether the post is logically deleted and should be treated as recycled. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean deleted;
 
+        /** Desired publish state. False keeps the post as a draft or moves it back to draft. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean publish;
 
+        /** Time when the post was published or is scheduled to be published. */
         private Instant publishTime;
 
+        /** Whether the post should be pinned ahead of normal post ordering. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean pinned;
 
+        /** Whether new comments are allowed for this post. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
+        /** Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC posts. */
         @Schema(requiredMode = RequiredMode.REQUIRED)
         private VisibleEnum visible;
 
+        /** Sorting priority. Higher values sort before lower values where priority ordering is applied. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "0")
         private Integer priority;
 
+        /** Excerpt configuration for the post. */
         @Schema(requiredMode = RequiredMode.REQUIRED)
         private Excerpt excerpt;
 
+        /** Category metadata.name values associated with the post. */
         private List<String> categories;
 
+        /** Tag metadata.name values associated with the post. */
         private List<String> tags;
 
+        /** HTML meta tag attribute maps injected into the rendered post page head. */
         private List<Map<String, String>> htmlMetas;
     }
 
     @Data
+    @Schema(description = "Observed state of a content item.")
     public static class PostStatus {
+        /** Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED. */
         private String phase;
 
-        @Schema
+        /** Reconciliation conditions reported by controllers for this content item. */
         private ConditionList conditions;
 
+        /** Absolute permalink calculated from the content permalink policy. */
         private String permalink;
 
+        /** Excerpt text resolved from the content excerpt configuration. */
         private String excerpt;
 
+        /** Whether the latest draft snapshot differs from the released snapshot. */
         private Boolean inProgress;
 
+        /** Total number of comments associated with the content item. */
         private Integer commentsCount;
 
+        /** User metadata.name values that contributed to the content snapshots. */
         private List<String> contributors;
 
-        /** see {@link Category.CategorySpec#isHideFromList()}. */
+        /** Whether any associated category hides this content item from theme-side lists. */
         private Boolean hideFromList;
 
+        /** Last modification time of the released snapshot. */
         private Instant lastModifyTime;
 
+        /** Metadata version observed by the last successful reconciliation. */
         private Long observedVersion;
 
         @JsonIgnore
@@ -187,14 +216,18 @@ public class Post extends AbstractExtension {
     }
 
     @Data
+    @Schema(description = "Excerpt generation configuration.")
     public static class Excerpt {
 
+        /** Whether Halo should generate the excerpt from the released content automatically. */
         @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
         private Boolean autoGenerate;
 
+        /** Manual excerpt text used when autoGenerate is false. */
         private String raw;
     }
 
+    /** Publishing phase calculated for a post. */
     public enum PostPhase {
         DRAFT,
         PENDING_APPROVAL,
@@ -217,9 +250,13 @@ public class Post extends AbstractExtension {
         }
     }
 
+    /** Visibility options used by theme-side content queries. */
     public enum VisibleEnum {
+        /** Eligible for public theme-side listings and routing. */
         PUBLIC,
+        /** Non-public visibility value for internal or caller-specific access rules. */
         INTERNAL,
+        /** Non-public visibility value intended for owner-only content. */
         PRIVATE;
 
         /**

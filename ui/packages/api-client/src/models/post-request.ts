@@ -21,7 +21,7 @@ import type { ContentUpdateParam } from './content-update-param';
 import type { Post } from './post';
 
 /**
- * Post and content data for creating and updating post.
+ * Post editor payload containing the post extension and its editable content.
  */
 export interface PostRequest {
     'content': ContentUpdateParam;

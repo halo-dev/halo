@@ -30,8 +30,6 @@ import type { ListedSinglePageList } from '../models';
 // @ts-ignore
 import type { ListedSnapshotDto } from '../models';
 // @ts-ignore
-import type { Post } from '../models';
-// @ts-ignore
 import type { RevertSnapshotForSingleParam } from '../models';
 // @ts-ignore
 import type { SinglePage } from '../models';
@@ -43,9 +41,9 @@ import type { SinglePageRequest } from '../models';
 export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Delete a content for post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Delete a content snapshot from a single page and return the deleted content.
+         * @param {string} name Metadata name of the single page.
+         * @param {string} snapshotName Name of the content snapshot to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -91,7 +89,7 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Draft a single page.
+         * Create a draft single page together with its initial content.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -134,9 +132,9 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Fetch content of single page.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Fetch a single page content snapshot reconstructed from its base snapshot.
+         * @param {string} name Metadata name of the single page.
+         * @param {string} snapshotName Name of the content snapshot to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -182,8 +180,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Fetch head content of single page.
-         * @param {string} name 
+         * Fetch the editable head content of a single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -223,8 +221,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Fetch release content of single page.
-         * @param {string} name 
+         * Fetch the released content currently served for a published single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -264,8 +262,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * List all snapshots for single page content.
-         * @param {string} name 
+         * List content snapshots for a single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -305,16 +303,16 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * List single pages.
+         * List single pages with pagination, sorting, keyword, publish phase, visibility, and contributor filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {Array<string>} [contributor] SinglePages filtered by contributor.
-         * @param {ListSinglePagesPublishPhaseEnum} [publishPhase] SinglePages filtered by publish phase.
-         * @param {ListSinglePagesVisibleEnum} [visible] SinglePages filtered by visibility.
-         * @param {string} [keyword] SinglePages filtered by keyword.
+         * @param {Array<string>} [contributor] Contributor user names used to filter single pages. A page matches when any listed contributor appears in status.contributors.
+         * @param {ListSinglePagesPublishPhaseEnum} [publishPhase] Filter single pages by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {ListSinglePagesVisibleEnum} [visible] Filter single pages by visibility, such as PUBLIC, INTERNAL, or PRIVATE.
+         * @param {string} [keyword] Keyword used to match single page title, slug, or excerpt.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -387,12 +385,13 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Publish a single page.
-         * @param {string} name 
+         * Publish a single page. By default, the request waits until the release snapshot is available.
+         * @param {string} name Metadata name of the single page to publish.
+         * @param {boolean} [async] Whether to return immediately after marking the single page for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        publishSinglePage: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        publishSinglePage: async (name: string, async?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('publishSinglePage', 'name', name)
             const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/publish`
@@ -416,6 +415,10 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (async !== undefined) {
+                localVarQueryParameter['async'] = async;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -428,8 +431,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Revert to specified snapshot for single page content.
-         * @param {string} name 
+         * Restore the single page content from a specified snapshot.
+         * @param {string} name Metadata name of the single page whose content will be restored.
          * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -475,8 +478,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Update a single page.
-         * @param {string} name 
+         * Update single page metadata, spec, and content in one request.
+         * @param {string} name Metadata name of the single page to update.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -522,8 +525,8 @@ export const SinglePageV1alpha1ConsoleApiAxiosParamCreator = function (configura
             };
         },
         /**
-         * Update a single page\'s content.
-         * @param {string} name 
+         * Update only the content of an existing single page.
+         * @param {string} name Metadata name of the single page whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -578,9 +581,9 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
     const localVarAxiosParamCreator = SinglePageV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Delete a content for post.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Delete a content snapshot from a single page and return the deleted content.
+         * @param {string} name Metadata name of the single page.
+         * @param {string} snapshotName Name of the content snapshot to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -591,7 +594,7 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Draft a single page.
+         * Create a draft single page together with its initial content.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -603,9 +606,9 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch content of single page.
-         * @param {string} name 
-         * @param {string} snapshotName 
+         * Fetch a single page content snapshot reconstructed from its base snapshot.
+         * @param {string} name Metadata name of the single page.
+         * @param {string} snapshotName Name of the content snapshot to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -616,8 +619,8 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch head content of single page.
-         * @param {string} name 
+         * Fetch the editable head content of a single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -628,8 +631,8 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Fetch release content of single page.
-         * @param {string} name 
+         * Fetch the released content currently served for a published single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -640,8 +643,8 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List all snapshots for single page content.
-         * @param {string} name 
+         * List content snapshots for a single page.
+         * @param {string} name Metadata name of the single page.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -652,16 +655,16 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List single pages.
+         * List single pages with pagination, sorting, keyword, publish phase, visibility, and contributor filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {Array<string>} [contributor] SinglePages filtered by contributor.
-         * @param {ListSinglePagesPublishPhaseEnum} [publishPhase] SinglePages filtered by publish phase.
-         * @param {ListSinglePagesVisibleEnum} [visible] SinglePages filtered by visibility.
-         * @param {string} [keyword] SinglePages filtered by keyword.
+         * @param {Array<string>} [contributor] Contributor user names used to filter single pages. A page matches when any listed contributor appears in status.contributors.
+         * @param {ListSinglePagesPublishPhaseEnum} [publishPhase] Filter single pages by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+         * @param {ListSinglePagesVisibleEnum} [visible] Filter single pages by visibility, such as PUBLIC, INTERNAL, or PRIVATE.
+         * @param {string} [keyword] Keyword used to match single page title, slug, or excerpt.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -672,33 +675,34 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Publish a single page.
-         * @param {string} name 
+         * Publish a single page. By default, the request waits until the release snapshot is available.
+         * @param {string} name Metadata name of the single page to publish.
+         * @param {boolean} [async] Whether to return immediately after marking the single page for publishing.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async publishSinglePage(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.publishSinglePage(name, options);
+        async publishSinglePage(name: string, async?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.publishSinglePage(name, async, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SinglePageV1alpha1ConsoleApi.publishSinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Revert to specified snapshot for single page content.
-         * @param {string} name 
+         * Restore the single page content from a specified snapshot.
+         * @param {string} name Metadata name of the single page whose content will be restored.
          * @param {RevertSnapshotForSingleParam} revertSnapshotForSingleParam 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async revertToSpecifiedSnapshotForSinglePage(name: string, revertSnapshotForSingleParam: RevertSnapshotForSingleParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+        async revertToSpecifiedSnapshotForSinglePage(name: string, revertSnapshotForSingleParam: RevertSnapshotForSingleParam, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.revertToSpecifiedSnapshotForSinglePage(name, revertSnapshotForSingleParam, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SinglePageV1alpha1ConsoleApi.revertToSpecifiedSnapshotForSinglePage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update a single page.
-         * @param {string} name 
+         * Update single page metadata, spec, and content in one request.
+         * @param {string} name Metadata name of the single page to update.
          * @param {SinglePageRequest} singlePageRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -710,13 +714,13 @@ export const SinglePageV1alpha1ConsoleApiFp = function(configuration?: Configura
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Update a single page\'s content.
-         * @param {string} name 
+         * Update only the content of an existing single page.
+         * @param {string} name Metadata name of the single page whose content will be updated.
          * @param {Content} content 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateSinglePageContent(name: string, content: Content, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
+        async updateSinglePageContent(name: string, content: Content, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateSinglePageContent(name, content, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SinglePageV1alpha1ConsoleApi.updateSinglePageContent']?.[localVarOperationServerIndex]?.url;
@@ -732,7 +736,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
     const localVarFp = SinglePageV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Delete a content for post.
+         * Delete a content snapshot from a single page and return the deleted content.
          * @param {SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -741,7 +745,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.deleteSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Draft a single page.
+         * Create a draft single page together with its initial content.
          * @param {SinglePageV1alpha1ConsoleApiDraftSinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -750,7 +754,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.draftSinglePage(requestParameters.singlePageRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch content of single page.
+         * Fetch a single page content snapshot reconstructed from its base snapshot.
          * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -759,7 +763,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.fetchSinglePageContent(requestParameters.name, requestParameters.snapshotName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch head content of single page.
+         * Fetch the editable head content of a single page.
          * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -768,7 +772,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.fetchSinglePageHeadContent(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Fetch release content of single page.
+         * Fetch the released content currently served for a published single page.
          * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -777,7 +781,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.fetchSinglePageReleaseContent(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all snapshots for single page content.
+         * List content snapshots for a single page.
          * @param {SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -786,7 +790,7 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.listSinglePageSnapshots(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * List single pages.
+         * List single pages with pagination, sorting, keyword, publish phase, visibility, and contributor filters.
          * @param {SinglePageV1alpha1ConsoleApiListSinglePagesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -795,25 +799,25 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.listSinglePages(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.contributor, requestParameters.publishPhase, requestParameters.visible, requestParameters.keyword, options).then((request) => request(axios, basePath));
         },
         /**
-         * Publish a single page.
+         * Publish a single page. By default, the request waits until the release snapshot is available.
          * @param {SinglePageV1alpha1ConsoleApiPublishSinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         publishSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiPublishSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
-            return localVarFp.publishSinglePage(requestParameters.name, options).then((request) => request(axios, basePath));
+            return localVarFp.publishSinglePage(requestParameters.name, requestParameters.async, options).then((request) => request(axios, basePath));
         },
         /**
-         * Revert to specified snapshot for single page content.
+         * Restore the single page content from a specified snapshot.
          * @param {SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        revertToSpecifiedSnapshotForSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+        revertToSpecifiedSnapshotForSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
             return localVarFp.revertToSpecifiedSnapshotForSinglePage(requestParameters.name, requestParameters.revertSnapshotForSingleParam, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a single page.
+         * Update single page metadata, spec, and content in one request.
          * @param {SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -822,12 +826,12 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
             return localVarFp.updateDraftSinglePage(requestParameters.name, requestParameters.singlePageRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a single page\'s content.
+         * Update only the content of an existing single page.
          * @param {SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateSinglePageContent(requestParameters: SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<Post> {
+        updateSinglePageContent(requestParameters: SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest, options?: RawAxiosRequestConfig): AxiosPromise<SinglePage> {
             return localVarFp.updateSinglePageContent(requestParameters.name, requestParameters.content, options).then((request) => request(axios, basePath));
         },
     };
@@ -837,8 +841,14 @@ export const SinglePageV1alpha1ConsoleApiFactory = function (configuration?: Con
  * Request parameters for deleteSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest {
+    /**
+     * Metadata name of the single page.
+     */
     readonly name: string
 
+    /**
+     * Name of the content snapshot to delete.
+     */
     readonly snapshotName: string
 }
 
@@ -853,8 +863,14 @@ export interface SinglePageV1alpha1ConsoleApiDraftSinglePageRequest {
  * Request parameters for fetchSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest {
+    /**
+     * Metadata name of the single page.
+     */
     readonly name: string
 
+    /**
+     * Name of the content snapshot to fetch.
+     */
     readonly snapshotName: string
 }
 
@@ -862,6 +878,9 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest {
  * Request parameters for fetchSinglePageHeadContent operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest {
+    /**
+     * Metadata name of the single page.
+     */
     readonly name: string
 }
 
@@ -869,6 +888,9 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest {
  * Request parameters for fetchSinglePageReleaseContent operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest {
+    /**
+     * Metadata name of the single page.
+     */
     readonly name: string
 }
 
@@ -876,6 +898,9 @@ export interface SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentReques
  * Request parameters for listSinglePageSnapshots operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest {
+    /**
+     * Metadata name of the single page.
+     */
     readonly name: string
 }
 
@@ -909,22 +934,22 @@ export interface SinglePageV1alpha1ConsoleApiListSinglePagesRequest {
     readonly sort?: Array<string>
 
     /**
-     * SinglePages filtered by contributor.
+     * Contributor user names used to filter single pages. A page matches when any listed contributor appears in status.contributors.
      */
     readonly contributor?: Array<string>
 
     /**
-     * SinglePages filtered by publish phase.
+     * Filter single pages by publish phase. Supported values follow PostPhase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
      */
     readonly publishPhase?: ListSinglePagesPublishPhaseEnum
 
     /**
-     * SinglePages filtered by visibility.
+     * Filter single pages by visibility, such as PUBLIC, INTERNAL, or PRIVATE.
      */
     readonly visible?: ListSinglePagesVisibleEnum
 
     /**
-     * SinglePages filtered by keyword.
+     * Keyword used to match single page title, slug, or excerpt.
      */
     readonly keyword?: string
 }
@@ -933,13 +958,24 @@ export interface SinglePageV1alpha1ConsoleApiListSinglePagesRequest {
  * Request parameters for publishSinglePage operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiPublishSinglePageRequest {
+    /**
+     * Metadata name of the single page to publish.
+     */
     readonly name: string
+
+    /**
+     * Whether to return immediately after marking the single page for publishing.
+     */
+    readonly async?: boolean
 }
 
 /**
  * Request parameters for revertToSpecifiedSnapshotForSinglePage operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest {
+    /**
+     * Metadata name of the single page whose content will be restored.
+     */
     readonly name: string
 
     readonly revertSnapshotForSingleParam: RevertSnapshotForSingleParam
@@ -949,6 +985,9 @@ export interface SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSingleP
  * Request parameters for updateDraftSinglePage operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest {
+    /**
+     * Metadata name of the single page to update.
+     */
     readonly name: string
 
     readonly singlePageRequest: SinglePageRequest
@@ -958,6 +997,9 @@ export interface SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest {
  * Request parameters for updateSinglePageContent operation in SinglePageV1alpha1ConsoleApi.
  */
 export interface SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest {
+    /**
+     * Metadata name of the single page whose content will be updated.
+     */
     readonly name: string
 
     readonly content: Content
@@ -968,7 +1010,7 @@ export interface SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest {
  */
 export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Delete a content for post.
+     * Delete a content snapshot from a single page and return the deleted content.
      * @param {SinglePageV1alpha1ConsoleApiDeleteSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -978,7 +1020,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Draft a single page.
+     * Create a draft single page together with its initial content.
      * @param {SinglePageV1alpha1ConsoleApiDraftSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -988,7 +1030,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch content of single page.
+     * Fetch a single page content snapshot reconstructed from its base snapshot.
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -998,7 +1040,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch head content of single page.
+     * Fetch the editable head content of a single page.
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageHeadContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1008,7 +1050,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Fetch release content of single page.
+     * Fetch the released content currently served for a published single page.
      * @param {SinglePageV1alpha1ConsoleApiFetchSinglePageReleaseContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1018,7 +1060,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * List all snapshots for single page content.
+     * List content snapshots for a single page.
      * @param {SinglePageV1alpha1ConsoleApiListSinglePageSnapshotsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1028,7 +1070,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * List single pages.
+     * List single pages with pagination, sorting, keyword, publish phase, visibility, and contributor filters.
      * @param {SinglePageV1alpha1ConsoleApiListSinglePagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1038,17 +1080,17 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Publish a single page.
+     * Publish a single page. By default, the request waits until the release snapshot is available.
      * @param {SinglePageV1alpha1ConsoleApiPublishSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public publishSinglePage(requestParameters: SinglePageV1alpha1ConsoleApiPublishSinglePageRequest, options?: RawAxiosRequestConfig) {
-        return SinglePageV1alpha1ConsoleApiFp(this.configuration).publishSinglePage(requestParameters.name, options).then((request) => request(this.axios, this.basePath));
+        return SinglePageV1alpha1ConsoleApiFp(this.configuration).publishSinglePage(requestParameters.name, requestParameters.async, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Revert to specified snapshot for single page content.
+     * Restore the single page content from a specified snapshot.
      * @param {SinglePageV1alpha1ConsoleApiRevertToSpecifiedSnapshotForSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1058,7 +1100,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Update a single page.
+     * Update single page metadata, spec, and content in one request.
      * @param {SinglePageV1alpha1ConsoleApiUpdateDraftSinglePageRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1068,7 +1110,7 @@ export class SinglePageV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Update a single page\'s content.
+     * Update only the content of an existing single page.
      * @param {SinglePageV1alpha1ConsoleApiUpdateSinglePageContentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

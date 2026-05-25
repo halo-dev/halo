@@ -24,7 +24,7 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
 /**
- * Endpoint for managing comment.
+ * Console endpoint for listing comments and creating comments or replies on behalf of console users.
  *
  * @author guqing
  * @since 2.0.0
@@ -46,7 +46,7 @@ public class CommentEndpoint implements CustomEndpoint {
         return SpringdocRouteBuilder.route()
                 .GET("comments", this::listComments, builder -> {
                     builder.operationId("ListComments")
-                            .description("List comments.")
+                            .description("List comments with pagination, sorting, keyword, and commenter filters.")
                             .tag(tag)
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(ListedComment.class)));
@@ -56,7 +56,8 @@ public class CommentEndpoint implements CustomEndpoint {
                         "comments",
                         this::createComment,
                         builder -> builder.operationId("CreateComment")
-                                .description("Create a comment.")
+                                .description("Create a comment for a subject. Console-created comments are created "
+                                        + "through the comment service with request IP and user agent captured.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -68,10 +69,11 @@ public class CommentEndpoint implements CustomEndpoint {
                         "comments/{name}/reply",
                         this::createReply,
                         builder -> builder.operationId("CreateReply")
-                                .description("Create a reply.")
+                                .description("Create an approved reply under an existing comment.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("Metadata name of the comment to reply to.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))

@@ -20,6 +20,9 @@ import type { Metadata } from './metadata';
 // @ts-ignore
 import type { SnapShotSpec } from './snap-shot-spec';
 
+/**
+ * Snapshot extension that stores a version of post or single page content.
+ */
 export interface Snapshot {
     'apiVersion': string;
     'kind': string;

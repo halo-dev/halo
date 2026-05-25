@@ -29,10 +29,10 @@ import type { Snapshot } from '../models';
 export const SnapshotV1alpha1UcApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Get snapshot for one post.
-         * @param {string} name Snapshot name.
-         * @param {string} postName Post name.
-         * @param {boolean} [patched] Should include patched content and raw or not.
+         * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
+         * @param {string} name Metadata name of the snapshot to fetch.
+         * @param {string} postName Metadata name of the post that owns the snapshot. The post must belong to the current user.
+         * @param {boolean} [patched] Whether to return the snapshot patched against the post base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -91,10 +91,10 @@ export const SnapshotV1alpha1UcApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SnapshotV1alpha1UcApiAxiosParamCreator(configuration)
     return {
         /**
-         * Get snapshot for one post.
-         * @param {string} name Snapshot name.
-         * @param {string} postName Post name.
-         * @param {boolean} [patched] Should include patched content and raw or not.
+         * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
+         * @param {string} name Metadata name of the snapshot to fetch.
+         * @param {string} postName Metadata name of the post that owns the snapshot. The post must belong to the current user.
+         * @param {boolean} [patched] Whether to return the snapshot patched against the post base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -114,7 +114,7 @@ export const SnapshotV1alpha1UcApiFactory = function (configuration?: Configurat
     const localVarFp = SnapshotV1alpha1UcApiFp(configuration)
     return {
         /**
-         * Get snapshot for one post.
+         * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
          * @param {SnapshotV1alpha1UcApiGetSnapshotForPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -130,17 +130,17 @@ export const SnapshotV1alpha1UcApiFactory = function (configuration?: Configurat
  */
 export interface SnapshotV1alpha1UcApiGetSnapshotForPostRequest {
     /**
-     * Snapshot name.
+     * Metadata name of the snapshot to fetch.
      */
     readonly name: string
 
     /**
-     * Post name.
+     * Metadata name of the post that owns the snapshot. The post must belong to the current user.
      */
     readonly postName: string
 
     /**
-     * Should include patched content and raw or not.
+     * Whether to return the snapshot patched against the post base snapshot. Defaults to false.
      */
     readonly patched?: boolean
 }
@@ -150,7 +150,7 @@ export interface SnapshotV1alpha1UcApiGetSnapshotForPostRequest {
  */
 export class SnapshotV1alpha1UcApi extends BaseAPI {
     /**
-     * Get snapshot for one post.
+     * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
      * @param {SnapshotV1alpha1UcApiGetSnapshotForPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -17,19 +17,49 @@
 // @ts-ignore
 import type { Condition } from './condition';
 
+/**
+ * Observed state of a content item.
+ */
 export interface PostStatus {
+    /**
+     * Total number of comments associated with the content item.
+     */
     'commentsCount'?: number;
+    /**
+     * Reconciliation conditions reported by controllers for this content item.
+     */
     'conditions'?: Array<Condition>;
+    /**
+     * User metadata.name values that contributed to the content snapshots.
+     */
     'contributors'?: Array<string>;
+    /**
+     * Excerpt text resolved from the content excerpt configuration.
+     */
     'excerpt'?: string;
     /**
-     * see {@link Category.CategorySpec#isHideFromList Category.CategorySpec#isHideFromList()}.
+     * Whether any associated category hides this content item from theme-side lists.
      */
     'hideFromList'?: boolean;
+    /**
+     * Whether the latest draft snapshot differs from the released snapshot.
+     */
     'inProgress'?: boolean;
+    /**
+     * Last modification time of the released snapshot.
+     */
     'lastModifyTime'?: string;
+    /**
+     * Metadata version observed by the last successful reconciliation.
+     */
     'observedVersion'?: number;
+    /**
+     * Absolute permalink calculated from the content permalink policy.
+     */
     'permalink'?: string;
+    /**
+     * Current publishing phase, such as DRAFT, PENDING_APPROVAL, PUBLISHED, or FAILED.
+     */
     'phase'?: string;
 }
 
