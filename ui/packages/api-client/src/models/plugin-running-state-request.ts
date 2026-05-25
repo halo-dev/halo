@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Payload for changing a plugin running state.
+ */
 export interface PluginRunningStateRequest {
+    /**
+     * Whether to change the state asynchronously.
+     */
     'async'?: boolean;
-    'enable'?: boolean;
+    /**
+     * Whether the plugin should be enabled.
+     */
+    'enable': boolean;
 }
 

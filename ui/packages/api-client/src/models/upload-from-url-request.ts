@@ -14,18 +14,12 @@
 
 
 
+/**
+ * Request payload for creating an attachment from a remote URL.
+ */
 export interface UploadFromUrlRequest {
-    /**
-     * Custom file name
-     */
     'filename'?: string;
-    /**
-     * The name of the group to which the attachment belongs
-     */
     'groupName'?: string;
-    /**
-     * Storage policy name
-     */
     'policyName': string;
     'url': string;
 }

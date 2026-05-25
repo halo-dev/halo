@@ -55,22 +55,22 @@ public class TagQueryEndpoint implements CustomEndpoint {
                         "tags/{name}",
                         this::getTagByName,
                         builder -> builder.operationId("queryTagByName")
-                                .description("Gets tag by name")
+                                .description("Gets tag by metadata.name")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Tag name")
+                                        .description("Tag metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(TagVo.class)))
                 .GET("tags/{name}/posts", this::listPostsByTagName, builder -> {
                     builder.operationId("queryPostsByTagName")
-                            .description("Lists posts by tag name")
+                            .description("Lists posts by tag metadata.name")
                             .tag(tag)
                             .parameter(parameterBuilder()
                                     .in(ParameterIn.PATH)
                                     .name("name")
-                                    .description("Tag name")
+                                    .description("Tag metadata.name")
                                     .required(true))
                             .response(responseBuilder().implementation(ListedPostVo.class));
                     PostPublicQuery.buildParameters(builder);

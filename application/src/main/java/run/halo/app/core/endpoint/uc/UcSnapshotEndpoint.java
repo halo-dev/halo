@@ -59,7 +59,7 @@ public class UcSnapshotEndpoint implements CustomEndpoint {
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
                                                         .implementation(String.class)
-                                                        .description("Metadata name of the snapshot to fetch."))
+                                                        .description("metadata.name of the snapshot to fetch."))
                                                 .parameter(
                                                         parameterBuilder()
                                                                 .name("postName")
@@ -67,7 +67,7 @@ public class UcSnapshotEndpoint implements CustomEndpoint {
                                                                 .required(true)
                                                                 .implementation(String.class)
                                                                 .description(
-                                                                        "Metadata name of the post that owns the "
+                                                                        "metadata.name of the post that owns the "
                                                                                 + "snapshot. The post must belong to the current user."))
                                                 .parameter(parameterBuilder()
                                                         .name("patched")

@@ -15,9 +15,6 @@
 
 
 export interface ChangePasswordRequest {
-    /**
-     * New password.
-     */
     'password': string;
 }
 

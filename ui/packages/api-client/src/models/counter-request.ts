@@ -14,12 +14,15 @@
 
 
 
+/**
+ * Payload for counting a visit to an extension resource.
+ */
 export interface CounterRequest {
     'group'?: string;
     'hostname'?: string;
     'language'?: string;
-    'name'?: string;
-    'plural'?: string;
+    'name': string;
+    'plural': string;
     'referrer'?: string;
     'screen'?: string;
 }

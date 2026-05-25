@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Password verification payload for changing two-factor authentication settings.
+ */
 export interface PasswordRequest {
+    /**
+     * Current password of the authenticated user.
+     */
     'password': string;
+    /**
+     * Current TOTP code, required when TOTP has already been configured.
+     */
     'totpCode'?: string;
 }
 

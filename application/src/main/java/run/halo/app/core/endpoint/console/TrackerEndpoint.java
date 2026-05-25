@@ -1,9 +1,11 @@
 package run.halo.app.core.endpoint.console;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -107,15 +109,43 @@ public class TrackerEndpoint implements CustomEndpoint {
                 .then(ServerResponse.ok().build());
     }
 
-    public record VoteRequest(String group, String plural, String name) {}
-
-    public record CounterRequest(
+    /** Payload for voting on an extension resource. */
+    public record VoteRequest(
+            /** API group of the extension resource. */
+            @Schema(requiredMode = REQUIRED)
             String group,
+
+            /** Plural name of the extension resource. */
+            @Schema(requiredMode = REQUIRED)
             String plural,
+
+            /** {@code metadata.name} of the extension resource. */
+            @Schema(requiredMode = REQUIRED)
+            String name) {}
+
+    /** Payload for counting a visit to an extension resource. */
+    public record CounterRequest(
+            /** API group of the extension resource. */
+            String group,
+
+            /** Plural name of the extension resource. */
+            @Schema(requiredMode = REQUIRED)
+            String plural,
+
+            /** {@code metadata.name} of the extension resource. */
+            @Schema(requiredMode = REQUIRED)
             String name,
+
+            /** Visitor host name. */
             String hostname,
+
+            /** Visitor screen size or display descriptor. */
             String screen,
+
+            /** Visitor browser language. */
             String language,
+
+            /** Referrer URL of the visit. */
             String referrer) {
         /** Construct counter request. group and session uid can be empty. */
         public CounterRequest {

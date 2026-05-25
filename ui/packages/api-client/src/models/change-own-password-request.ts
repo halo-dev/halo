@@ -15,13 +15,7 @@
 
 
 export interface ChangeOwnPasswordRequest {
-    /**
-     * Old password.
-     */
     'oldPassword': string;
-    /**
-     * New password.
-     */
     'password': string;
 }
 

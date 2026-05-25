@@ -17,6 +17,9 @@
 // @ts-ignore
 import type { ReasonTypeNotifierRequest } from './reason-type-notifier-request';
 
+/**
+ * Payload for saving notifier selections by reason type.
+ */
 export interface ReasonTypeNotifierCollectionRequest {
     'reasonTypeNotifiers': Array<ReasonTypeNotifierRequest>;
 }

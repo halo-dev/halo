@@ -64,7 +64,7 @@ public class UcPostEndpoint implements CustomEndpoint {
         var tag = "PostV1alpha1Uc";
         var namePathParam = parameterBuilder()
                 .name("name")
-                .description("Metadata name of a post owned by the current user.")
+                .description("metadata.name of a post owned by the current user.")
                 .in(ParameterIn.PATH)
                 .required(true)
                 .implementation(String.class);
@@ -101,7 +101,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         builder -> builder.operationId("GetMyPost")
                                                 .tag(tag)
                                                 .parameter(namePathParam)
-                                                .description("Get a post owned by the current user by metadata name.")
+                                                .description("Get a post owned by the current user by metadata.name.")
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .PUT(
                                         "/{name}",

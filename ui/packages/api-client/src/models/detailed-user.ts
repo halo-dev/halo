@@ -20,6 +20,9 @@ import type { Role } from './role';
 // @ts-ignore
 import type { User } from './user';
 
+/**
+ * User detail response with resolved roles.
+ */
 export interface DetailedUser {
     'roles': Array<Role>;
     'user': User;

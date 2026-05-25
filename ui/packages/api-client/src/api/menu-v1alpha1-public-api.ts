@@ -29,8 +29,8 @@ import type { MenuVo } from '../models';
 export const MenuV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Gets menu by name.
-         * @param {string} name Menu name
+         * Gets menu by metadata.name.
+         * @param {string} name Menu metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -116,8 +116,8 @@ export const MenuV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MenuV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
-         * Gets menu by name.
-         * @param {string} name Menu name
+         * Gets menu by metadata.name.
+         * @param {string} name Menu metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -148,7 +148,7 @@ export const MenuV1alpha1PublicApiFactory = function (configuration?: Configurat
     const localVarFp = MenuV1alpha1PublicApiFp(configuration)
     return {
         /**
-         * Gets menu by name.
+         * Gets menu by metadata.name.
          * @param {MenuV1alpha1PublicApiQueryMenuByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -172,7 +172,7 @@ export const MenuV1alpha1PublicApiFactory = function (configuration?: Configurat
  */
 export interface MenuV1alpha1PublicApiQueryMenuByNameRequest {
     /**
-     * Menu name
+     * Menu metadata.name
      */
     readonly name: string
 }
@@ -182,7 +182,7 @@ export interface MenuV1alpha1PublicApiQueryMenuByNameRequest {
  */
 export class MenuV1alpha1PublicApi extends BaseAPI {
     /**
-     * Gets menu by name.
+     * Gets menu by metadata.name.
      * @param {MenuV1alpha1PublicApiQueryMenuByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

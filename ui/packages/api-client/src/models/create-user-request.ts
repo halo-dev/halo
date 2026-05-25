@@ -14,6 +14,9 @@
 
 
 
+/**
+ * Payload for creating a user from the console.
+ */
 export interface CreateUserRequest {
     'annotations'?: { [key: string]: string; };
     'avatar'?: string;

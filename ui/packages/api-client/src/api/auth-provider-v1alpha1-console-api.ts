@@ -32,7 +32,7 @@ export const AuthProviderV1alpha1ConsoleApiAxiosParamCreator = function (configu
     return {
         /**
          * Disables an auth provider
-         * @param {string} name 
+         * @param {string} name metadata.name of the auth provider to disable.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -73,7 +73,7 @@ export const AuthProviderV1alpha1ConsoleApiAxiosParamCreator = function (configu
         },
         /**
          * Enables an auth provider
-         * @param {string} name 
+         * @param {string} name metadata.name of the auth provider to enable.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -160,7 +160,7 @@ export const AuthProviderV1alpha1ConsoleApiFp = function(configuration?: Configu
     return {
         /**
          * Disables an auth provider
-         * @param {string} name 
+         * @param {string} name metadata.name of the auth provider to disable.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -172,7 +172,7 @@ export const AuthProviderV1alpha1ConsoleApiFp = function(configuration?: Configu
         },
         /**
          * Enables an auth provider
-         * @param {string} name 
+         * @param {string} name metadata.name of the auth provider to enable.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -235,6 +235,9 @@ export const AuthProviderV1alpha1ConsoleApiFactory = function (configuration?: C
  * Request parameters for disableAuthProvider operation in AuthProviderV1alpha1ConsoleApi.
  */
 export interface AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest {
+    /**
+     * metadata.name of the auth provider to disable.
+     */
     readonly name: string
 }
 
@@ -242,6 +245,9 @@ export interface AuthProviderV1alpha1ConsoleApiDisableAuthProviderRequest {
  * Request parameters for enableAuthProvider operation in AuthProviderV1alpha1ConsoleApi.
  */
 export interface AuthProviderV1alpha1ConsoleApiEnableAuthProviderRequest {
+    /**
+     * metadata.name of the auth provider to enable.
+     */
     readonly name: string
 }
 

@@ -55,22 +55,22 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
                         "categories/{name}",
                         this::getByName,
                         builder -> builder.operationId("queryCategoryByName")
-                                .description("Gets category by name.")
+                                .description("Gets category by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Category name")
+                                        .description("Category metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(CategoryVo.class)))
                 .GET("categories/{name}/posts", this::listPostsByCategoryName, builder -> {
                     builder.operationId("queryPostsByCategoryName")
-                            .description("Lists posts by category name.")
+                            .description("Lists posts by category metadata.name.")
                             .tag(tag)
                             .parameter(parameterBuilder()
                                     .in(ParameterIn.PATH)
                                     .name("name")
-                                    .description("Category name")
+                                    .description("Category metadata.name")
                                     .required(true))
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(ListedPostVo.class)));

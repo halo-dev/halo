@@ -14,6 +14,9 @@
 
 
 
+/**
+ * Payload for installing a theme from a remote URI.
+ */
 export interface InstallFromUriRequest {
     'uri': string;
 }

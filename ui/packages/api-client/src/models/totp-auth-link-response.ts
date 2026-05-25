@@ -14,11 +14,17 @@
 
 
 
+/**
+ * TOTP provisioning data for configuring an authenticator app.
+ */
 export interface TotpAuthLinkResponse {
     /**
-     * QR Code with base64 encoded.
+     * otpauth URI that can be encoded as a QR code.
      */
-    'authLink'?: string;
-    'rawSecret'?: string;
+    'authLink': string;
+    /**
+     * Raw TOTP secret for manual authenticator setup.
+     */
+    'rawSecret': string;
 }
 

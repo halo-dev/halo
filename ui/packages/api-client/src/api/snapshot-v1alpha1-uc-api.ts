@@ -30,8 +30,8 @@ export const SnapshotV1alpha1UcApiAxiosParamCreator = function (configuration?: 
     return {
         /**
          * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
-         * @param {string} name Metadata name of the snapshot to fetch.
-         * @param {string} postName Metadata name of the post that owns the snapshot. The post must belong to the current user.
+         * @param {string} name metadata.name of the snapshot to fetch.
+         * @param {string} postName metadata.name of the post that owns the snapshot. The post must belong to the current user.
          * @param {boolean} [patched] Whether to return the snapshot patched against the post base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -92,8 +92,8 @@ export const SnapshotV1alpha1UcApiFp = function(configuration?: Configuration) {
     return {
         /**
          * Get a content snapshot for a post owned by the current user. The snapshot must belong to the post specified by postName.
-         * @param {string} name Metadata name of the snapshot to fetch.
-         * @param {string} postName Metadata name of the post that owns the snapshot. The post must belong to the current user.
+         * @param {string} name metadata.name of the snapshot to fetch.
+         * @param {string} postName metadata.name of the post that owns the snapshot. The post must belong to the current user.
          * @param {boolean} [patched] Whether to return the snapshot patched against the post base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -130,12 +130,12 @@ export const SnapshotV1alpha1UcApiFactory = function (configuration?: Configurat
  */
 export interface SnapshotV1alpha1UcApiGetSnapshotForPostRequest {
     /**
-     * Metadata name of the snapshot to fetch.
+     * metadata.name of the snapshot to fetch.
      */
     readonly name: string
 
     /**
-     * Metadata name of the post that owns the snapshot. The post must belong to the current user.
+     * metadata.name of the post that owns the snapshot. The post must belong to the current user.
      */
     readonly postName: string
 

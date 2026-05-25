@@ -76,8 +76,8 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Get a post owned by the current user by metadata name.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * Get a post owned by the current user by metadata.name.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -118,7 +118,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Get the editable draft snapshot of a post owned by the current user.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {boolean} [patched] Whether to return the head snapshot patched against the base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -241,7 +241,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Publish a post owned by the current user from its current head snapshot.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -282,7 +282,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Move a post owned by the current user to the recycle bin.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -323,7 +323,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Unpublish a post owned by the current user so it is no longer served as published content.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -364,7 +364,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {Post} post Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -411,7 +411,7 @@ export const PostV1alpha1UcApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {Snapshot} snapshot Snapshot payload carrying JSON-serialized Content in metadata.annotations[\&#39;content.halo.run/content-json\&#39;].
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -478,8 +478,8 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get a post owned by the current user by metadata name.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * Get a post owned by the current user by metadata.name.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -491,7 +491,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Get the editable draft snapshot of a post owned by the current user.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {boolean} [patched] Whether to return the head snapshot patched against the base snapshot. Defaults to false.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -523,7 +523,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Publish a post owned by the current user from its current head snapshot.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -535,7 +535,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Move a post owned by the current user to the recycle bin.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -547,7 +547,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Unpublish a post owned by the current user so it is no longer served as published content.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -559,7 +559,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Update post metadata and editable spec fields for the current user. Content is not updated by this operation.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {Post} post Post extension with updated metadata/spec values. The server preserves owner, publish, snapshot, and deleted state fields, and ignores the content-json annotation here.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -572,7 +572,7 @@ export const PostV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Update the editable draft snapshot of a post owned by the current user. The snapshot must belong to the post and must be the current head snapshot.
-         * @param {string} name Metadata name of a post owned by the current user.
+         * @param {string} name metadata.name of a post owned by the current user.
          * @param {Snapshot} snapshot Snapshot payload carrying JSON-serialized Content in metadata.annotations[\&#39;content.halo.run/content-json\&#39;].
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -602,7 +602,7 @@ export const PostV1alpha1UcApiFactory = function (configuration?: Configuration,
             return localVarFp.createMyPost(requestParameters.post, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a post owned by the current user by metadata name.
+         * Get a post owned by the current user by metadata.name.
          * @param {PostV1alpha1UcApiGetMyPostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -691,7 +691,7 @@ export interface PostV1alpha1UcApiCreateMyPostRequest {
  */
 export interface PostV1alpha1UcApiGetMyPostRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -701,7 +701,7 @@ export interface PostV1alpha1UcApiGetMyPostRequest {
  */
 export interface PostV1alpha1UcApiGetMyPostDraftRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 
@@ -761,7 +761,7 @@ export interface PostV1alpha1UcApiListMyPostsRequest {
  */
 export interface PostV1alpha1UcApiPublishMyPostRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -771,7 +771,7 @@ export interface PostV1alpha1UcApiPublishMyPostRequest {
  */
 export interface PostV1alpha1UcApiRecycleMyPostRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -781,7 +781,7 @@ export interface PostV1alpha1UcApiRecycleMyPostRequest {
  */
 export interface PostV1alpha1UcApiUnpublishMyPostRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 }
@@ -791,7 +791,7 @@ export interface PostV1alpha1UcApiUnpublishMyPostRequest {
  */
 export interface PostV1alpha1UcApiUpdateMyPostRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 
@@ -806,7 +806,7 @@ export interface PostV1alpha1UcApiUpdateMyPostRequest {
  */
 export interface PostV1alpha1UcApiUpdateMyPostDraftRequest {
     /**
-     * Metadata name of a post owned by the current user.
+     * metadata.name of a post owned by the current user.
      */
     readonly name: string
 
@@ -831,7 +831,7 @@ export class PostV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * Get a post owned by the current user by metadata name.
+     * Get a post owned by the current user by metadata.name.
      * @param {PostV1alpha1UcApiGetMyPostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

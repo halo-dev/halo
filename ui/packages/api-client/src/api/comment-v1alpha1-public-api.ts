@@ -85,7 +85,7 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         },
         /**
          * Create a reply.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -132,7 +132,7 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         },
         /**
          * Get a comment.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -173,7 +173,7 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
         },
         /**
          * List comment replies.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment whose replies will be listed.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {*} [options] Override http request option.
@@ -226,7 +226,7 @@ export const CommentV1alpha1PublicApiAxiosParamCreator = function (configuration
          * List comments.
          * @param {string} version The comment subject version.
          * @param {string} kind The comment subject kind.
-         * @param {string} name The comment subject name.
+         * @param {string} name The comment subject metadata.name.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
@@ -333,7 +333,7 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         },
         /**
          * Create a reply.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -346,7 +346,7 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         },
         /**
          * Get a comment.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -358,7 +358,7 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
         },
         /**
          * List comment replies.
-         * @param {string} name 
+         * @param {string} name metadata.name of the comment whose replies will be listed.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {*} [options] Override http request option.
@@ -374,7 +374,7 @@ export const CommentV1alpha1PublicApiFp = function(configuration?: Configuration
          * List comments.
          * @param {string} version The comment subject version.
          * @param {string} kind The comment subject kind.
-         * @param {string} name The comment subject name.
+         * @param {string} name The comment subject metadata.name.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
@@ -458,6 +458,9 @@ export interface CommentV1alpha1PublicApiCreateComment1Request {
  * Request parameters for createReply1 operation in CommentV1alpha1PublicApi.
  */
 export interface CommentV1alpha1PublicApiCreateReply1Request {
+    /**
+     * metadata.name of the comment to reply to.
+     */
     readonly name: string
 
     readonly replyRequest: ReplyRequest
@@ -467,6 +470,9 @@ export interface CommentV1alpha1PublicApiCreateReply1Request {
  * Request parameters for getComment operation in CommentV1alpha1PublicApi.
  */
 export interface CommentV1alpha1PublicApiGetCommentRequest {
+    /**
+     * metadata.name of the comment to fetch.
+     */
     readonly name: string
 }
 
@@ -474,6 +480,9 @@ export interface CommentV1alpha1PublicApiGetCommentRequest {
  * Request parameters for listCommentReplies operation in CommentV1alpha1PublicApi.
  */
 export interface CommentV1alpha1PublicApiListCommentRepliesRequest {
+    /**
+     * metadata.name of the comment whose replies will be listed.
+     */
     readonly name: string
 
     /**
@@ -502,7 +511,7 @@ export interface CommentV1alpha1PublicApiListComments1Request {
     readonly kind: string
 
     /**
-     * The comment subject name.
+     * The comment subject metadata.name.
      */
     readonly name: string
 

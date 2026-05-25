@@ -38,8 +38,8 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
     return {
         /**
          * Delete the specified notification.
-         * @param {string} username Username
-         * @param {string} name Notification name
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -83,7 +83,7 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
         },
         /**
          * List notification preferences for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -124,7 +124,7 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
         },
         /**
          * List notifications for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -190,8 +190,8 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
         },
         /**
          * Mark the specified notification as read.
-         * @param {string} username Username
-         * @param {string} name Notification name
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -235,7 +235,7 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
         },
         /**
          * Mark the specified notifications as read.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {MarkSpecifiedRequest} markSpecifiedRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -282,7 +282,7 @@ export const NotificationV1alpha1UcApiAxiosParamCreator = function (configuratio
         },
         /**
          * Save notification preferences for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {ReasonTypeNotifierCollectionRequest} [reasonTypeNotifierCollectionRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -336,8 +336,8 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
     return {
         /**
          * Delete the specified notification.
-         * @param {string} username Username
-         * @param {string} name Notification name
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -349,7 +349,7 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
         },
         /**
          * List notification preferences for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -361,7 +361,7 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
         },
         /**
          * List notifications for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -378,8 +378,8 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
         },
         /**
          * Mark the specified notification as read.
-         * @param {string} username Username
-         * @param {string} name Notification name
+         * @param {string} username User metadata.name
+         * @param {string} name Notification metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -391,7 +391,7 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
         },
         /**
          * Mark the specified notifications as read.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {MarkSpecifiedRequest} markSpecifiedRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -404,7 +404,7 @@ export const NotificationV1alpha1UcApiFp = function(configuration?: Configuratio
         },
         /**
          * Save notification preferences for the authenticated user.
-         * @param {string} username Username
+         * @param {string} username User metadata.name
          * @param {ReasonTypeNotifierCollectionRequest} [reasonTypeNotifierCollectionRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -486,12 +486,12 @@ export const NotificationV1alpha1UcApiFactory = function (configuration?: Config
  */
 export interface NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 
     /**
-     * Notification name
+     * Notification metadata.name
      */
     readonly name: string
 }
@@ -501,7 +501,7 @@ export interface NotificationV1alpha1UcApiDeleteSpecifiedNotificationRequest {
  */
 export interface NotificationV1alpha1UcApiListUserNotificationPreferencesRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 }
@@ -511,7 +511,7 @@ export interface NotificationV1alpha1UcApiListUserNotificationPreferencesRequest
  */
 export interface NotificationV1alpha1UcApiListUserNotificationsRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 
@@ -546,12 +546,12 @@ export interface NotificationV1alpha1UcApiListUserNotificationsRequest {
  */
 export interface NotificationV1alpha1UcApiMarkNotificationAsReadRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 
     /**
-     * Notification name
+     * Notification metadata.name
      */
     readonly name: string
 }
@@ -561,7 +561,7 @@ export interface NotificationV1alpha1UcApiMarkNotificationAsReadRequest {
  */
 export interface NotificationV1alpha1UcApiMarkNotificationsAsReadRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 
@@ -573,7 +573,7 @@ export interface NotificationV1alpha1UcApiMarkNotificationsAsReadRequest {
  */
 export interface NotificationV1alpha1UcApiSaveUserNotificationPreferencesRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 

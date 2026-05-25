@@ -1,11 +1,13 @@
 package run.halo.app.notification.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +56,7 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                             .parameter(parameterBuilder()
                                     .in(ParameterIn.PATH)
                                     .name("username")
-                                    .description("Username")
+                                    .description("User metadata.name")
                                     .required(true))
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(Notification.class)));
@@ -69,12 +71,12 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("username")
-                                        .description("Username")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Notification name")
+                                        .description("Notification metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(Notification.class)))
                 .PUT(
@@ -86,7 +88,7 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("username")
-                                        .description("Username")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -104,12 +106,12 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("username")
-                                        .description("Username")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Notification name")
+                                        .description("Notification metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(Notification.class)))
                 .build();
@@ -128,7 +130,11 @@ public class UserNotificationEndpoint implements CustomEndpoint {
         return GroupVersion.parseAPIVersion("api.notification.halo.run/v1alpha1");
     }
 
-    record MarkSpecifiedRequest(List<String> names) {}
+    /** Payload for marking multiple notifications as read. */
+    record MarkSpecifiedRequest(
+            /** {@code metadata.name} values of notifications to mark as read. */
+            @Schema(requiredMode = REQUIRED)
+            List<String> names) {}
 
     private Mono<ServerResponse> listNotification(ServerRequest request) {
         var username = request.pathVariable("username");

@@ -81,7 +81,7 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
         },
         /**
          * Create an approved reply under an existing comment.
-         * @param {string} name Metadata name of the comment to reply to.
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -226,7 +226,7 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
         },
         /**
          * Create an approved reply under an existing comment.
-         * @param {string} name Metadata name of the comment to reply to.
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -307,7 +307,7 @@ export interface CommentV1alpha1ConsoleApiCreateCommentRequest {
  */
 export interface CommentV1alpha1ConsoleApiCreateReplyRequest {
     /**
-     * Metadata name of the comment to reply to.
+     * metadata.name of the comment to reply to.
      */
     readonly name: string
 

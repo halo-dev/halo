@@ -14,7 +14,10 @@
 
 
 
+/**
+ * Payload for granting roles to a user.
+ */
 export interface GrantRequest {
-    'roles'?: Array<string>;
+    'roles': Array<string>;
 }
 

@@ -64,6 +64,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                 })
                                 .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
                         builder -> builder.operationId("UploadAttachment")
+                                .description("Upload an attachment from a multipart file with the specified storage "
+                                        + "policy and optional group.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -85,6 +87,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                 })
                                 .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
                         builder -> builder.operationId("ExternalTransferAttachment")
+                                .description("Create an attachment by transferring a remote file from the provided "
+                                        + "URL to the specified storage policy.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -95,6 +99,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                 .build())
                 .GET("/attachments", this::search, builder -> {
                     builder.operationId("SearchAttachments")
+                            .description("Search attachments with pagination, sorting, keyword, grouping, and media "
+                                    + "type filters.")
                             .tag(tag)
                             .response(responseBuilder().implementation(generateGenericClass(Attachment.class)));
                     SearchRequest.buildParameters(builder);
@@ -111,16 +117,21 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .bodyValue(listResult));
     }
 
+    /** Request payload for creating an attachment from a remote URL. */
     public record UploadFromUrlRequest(
-            @Schema(requiredMode = REQUIRED) URL url,
+            /** Remote file URL to transfer into storage. */
+            @Schema(requiredMode = REQUIRED)
+            URL url,
 
-            @Schema(requiredMode = REQUIRED, description = "Storage " + "policy name")
+            /** Storage policy {@code metadata.name}. */
+            @Schema(requiredMode = REQUIRED)
             String policyName,
 
-            @Schema(description = "The name of the group to which the " + "attachment belongs")
+            /** Attachment group {@code metadata.name}. */
             String groupName,
 
-            @Schema(description = "Custom file name") String filename) {
+            /** Custom file name. */
+            String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");
@@ -132,16 +143,19 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
     }
 
+    /** Multipart payload for uploading an attachment. */
     @Schema(types = "object")
     public interface IUploadRequest {
 
-        @Schema(requiredMode = REQUIRED, description = "Attachment file")
+        /** Attachment file. */
+        @Schema(requiredMode = REQUIRED)
         FilePart getFile();
 
-        @Schema(requiredMode = REQUIRED, description = "Storage policy name")
+        /** Storage policy {@code metadata.name}. */
+        @Schema(requiredMode = REQUIRED)
         String getPolicyName();
 
-        @Schema(description = "The name of the group to which the attachment belongs")
+        /** Attachment group {@code metadata.name}. */
         String getGroupName();
     }
 

@@ -14,9 +14,12 @@
 
 
 
+/**
+ * Payload for voting on an extension resource.
+ */
 export interface VoteRequest {
-    'group'?: string;
-    'name'?: string;
-    'plural'?: string;
+    'group': string;
+    'name': string;
+    'plural': string;
 }
 

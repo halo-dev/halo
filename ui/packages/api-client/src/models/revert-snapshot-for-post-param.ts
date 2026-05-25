@@ -18,9 +18,6 @@
  * Request body for restoring post content from a snapshot.
  */
 export interface RevertSnapshotForPostParam {
-    /**
-     * Name of the snapshot that should become the post\'s head content.
-     */
     'snapshotName': string;
 }
 

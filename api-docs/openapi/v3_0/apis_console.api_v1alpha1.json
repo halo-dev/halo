@@ -19,6 +19,7 @@
   "paths": {
     "/apis/api.console.halo.run/v1alpha1/attachments": {
       "get": {
+        "description": "Search attachments with pagination, sorting, keyword, grouping, and media type filters.",
         "operationId": "SearchAttachments",
         "parameters": [
           {
@@ -119,6 +120,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/attachments/-/upload-from-url": {
       "post": {
+        "description": "Create an attachment by transferring a remote file from the provided URL to the specified storage policy.",
         "operationId": "ExternalTransferAttachment",
         "requestBody": {
           "content": {
@@ -149,6 +151,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/attachments/upload": {
       "post": {
+        "description": "Upload an attachment from a multipart file with the specified storage policy and optional group.",
         "operationId": "UploadAttachment",
         "requestBody": {
           "content": {
@@ -207,6 +210,7 @@
         "operationId": "disableAuthProvider",
         "parameters": [
           {
+            "description": "metadata.name of the auth provider to disable.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -238,6 +242,7 @@
         "operationId": "enableAuthProvider",
         "parameters": [
           {
+            "description": "metadata.name of the auth provider to enable.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -396,7 +401,7 @@
         "operationId": "CreateReply",
         "parameters": [
           {
-            "description": "Metadata name of the comment to reply to.",
+            "description": "metadata.name of the comment to reply to.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -434,9 +439,13 @@
     },
     "/apis/api.console.halo.run/v1alpha1/indices/-/rebuild": {
       "post": {
-        "description": "Rebuild all indices",
+        "description": "Submit a request to rebuild all search indices.",
         "operationId": "RebuildAllIndices",
-        "responses": {},
+        "responses": {
+          "202": {
+            "description": "Accepted, rebuild request has been submitted."
+          }
+        },
         "tags": [
           "IndicesV1alpha1Console"
         ]
@@ -448,7 +457,7 @@
         "operationId": "FetchSenderConfig",
         "parameters": [
           {
-            "description": "Notifier name",
+            "description": "Notifier metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -478,7 +487,7 @@
         "operationId": "SaveSenderConfig",
         "parameters": [
           {
-            "description": "Notifier name",
+            "description": "Notifier metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -565,7 +574,7 @@
             }
           },
           {
-            "description": "Keyword of plugin name or description",
+            "description": "Keyword of plugin display name or description",
             "in": "query",
             "name": "keyword",
             "schema": {
@@ -708,6 +717,7 @@
         "operationId": "fetchPluginJsonConfig",
         "parameters": [
           {
+            "description": "metadata.name of the plugin whose JSON config will be fetched.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -737,6 +747,7 @@
         "operationId": "updatePluginJsonConfig",
         "parameters": [
           {
+            "description": "metadata.name of the plugin whose JSON config will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -768,10 +779,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/plugin-state": {
       "put": {
-        "description": "Change the running state of a plugin by name.",
+        "description": "Change the running state of a plugin by metadata.name.",
         "operationId": "ChangePluginRunningState",
         "parameters": [
           {
+            "description": "metadata.name of the plugin whose running state will be changed.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -809,10 +821,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/{name}/reload": {
       "put": {
-        "description": "Reload a plugin by name.",
+        "description": "Reload a plugin by metadata.name.",
         "operationId": "reloadPlugin",
         "parameters": [
           {
+            "description": "metadata.name of the plugin to reload.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -844,6 +857,7 @@
         "operationId": "ResetPluginConfig",
         "parameters": [
           {
+            "description": "metadata.name of the plugin whose setting config will be reset.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -875,6 +889,7 @@
         "operationId": "fetchPluginSetting",
         "parameters": [
           {
+            "description": "metadata.name of the plugin whose setting will be fetched.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -906,6 +921,7 @@
         "operationId": "UpgradePlugin",
         "parameters": [
           {
+            "description": "metadata.name of the plugin to upgrade.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -924,7 +940,18 @@
           },
           "required": true
         },
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Plugin"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PluginV1alpha1Console"
         ]
@@ -936,6 +963,7 @@
         "operationId": "UpgradePluginFromUri",
         "parameters": [
           {
+            "description": "metadata.name of the plugin to upgrade.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1110,7 +1138,7 @@
         "operationId": "UpdateDraftPost",
         "parameters": [
           {
-            "description": "Metadata name of the post to update.",
+            "description": "metadata.name of the post to update.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1152,7 +1180,7 @@
         "operationId": "deletePostContent",
         "parameters": [
           {
-            "description": "Metadata name of the post.",
+            "description": "metadata.name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1161,7 +1189,7 @@
             }
           },
           {
-            "description": "Name of the content snapshot to delete.",
+            "description": "Content snapshot metadata.name to delete.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -1191,7 +1219,7 @@
         "operationId": "fetchPostContent",
         "parameters": [
           {
-            "description": "Metadata name of the post.",
+            "description": "metadata.name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1200,7 +1228,7 @@
             }
           },
           {
-            "description": "Name of the content snapshot to fetch.",
+            "description": "Content snapshot metadata.name to fetch.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -1230,7 +1258,7 @@
         "operationId": "UpdatePostContent",
         "parameters": [
           {
-            "description": "Metadata name of the post whose content will be updated.",
+            "description": "metadata.name of the post whose content will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1272,7 +1300,7 @@
         "operationId": "fetchPostHeadContent",
         "parameters": [
           {
-            "description": "Metadata name of the post.",
+            "description": "metadata.name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1304,7 +1332,7 @@
         "operationId": "PublishPost",
         "parameters": [
           {
-            "description": "Metadata name of the post to publish.",
+            "description": "metadata.name of the post to publish.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1313,7 +1341,7 @@
             }
           },
           {
-            "description": "Snapshot name to publish. Defaults to the current base snapshot when no head snapshot exists.",
+            "description": "Snapshot metadata.name to publish. Defaults to the current base snapshot when no head snapshot exists.",
             "in": "query",
             "name": "headSnapshot",
             "schema": {
@@ -1352,7 +1380,7 @@
         "operationId": "RecyclePost",
         "parameters": [
           {
-            "description": "Metadata name of the post to recycle.",
+            "description": "metadata.name of the post to recycle.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1361,7 +1389,18 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "PostV1alpha1Console"
         ]
@@ -1373,7 +1412,7 @@
         "operationId": "fetchPostReleaseContent",
         "parameters": [
           {
-            "description": "Metadata name of the post.",
+            "description": "metadata.name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1405,7 +1444,7 @@
         "operationId": "revertToSpecifiedSnapshotForPost",
         "parameters": [
           {
-            "description": "Metadata name of the post whose content will be restored.",
+            "description": "metadata.name of the post whose content will be restored.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1447,7 +1486,7 @@
         "operationId": "listPostSnapshots",
         "parameters": [
           {
-            "description": "Metadata name of the post.",
+            "description": "metadata.name of the post.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1482,7 +1521,7 @@
         "operationId": "UnpublishPost",
         "parameters": [
           {
-            "description": "Metadata name of the post to unpublish.",
+            "description": "metadata.name of the post to unpublish.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1746,7 +1785,7 @@
         "operationId": "UpdateDraftSinglePage",
         "parameters": [
           {
-            "description": "Metadata name of the single page to update.",
+            "description": "metadata.name of the single page to update.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1788,7 +1827,7 @@
         "operationId": "deleteSinglePageContent",
         "parameters": [
           {
-            "description": "Metadata name of the single page.",
+            "description": "metadata.name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1797,7 +1836,7 @@
             }
           },
           {
-            "description": "Name of the content snapshot to delete.",
+            "description": "Content snapshot metadata.name to delete.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -1827,7 +1866,7 @@
         "operationId": "fetchSinglePageContent",
         "parameters": [
           {
-            "description": "Metadata name of the single page.",
+            "description": "metadata.name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1836,7 +1875,7 @@
             }
           },
           {
-            "description": "Name of the content snapshot to fetch.",
+            "description": "Content snapshot metadata.name to fetch.",
             "in": "query",
             "name": "snapshotName",
             "required": true,
@@ -1866,7 +1905,7 @@
         "operationId": "UpdateSinglePageContent",
         "parameters": [
           {
-            "description": "Metadata name of the single page whose content will be updated.",
+            "description": "metadata.name of the single page whose content will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1908,7 +1947,7 @@
         "operationId": "fetchSinglePageHeadContent",
         "parameters": [
           {
-            "description": "Metadata name of the single page.",
+            "description": "metadata.name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1940,7 +1979,7 @@
         "operationId": "PublishSinglePage",
         "parameters": [
           {
-            "description": "Metadata name of the single page to publish.",
+            "description": "metadata.name of the single page to publish.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -1980,7 +2019,7 @@
         "operationId": "fetchSinglePageReleaseContent",
         "parameters": [
           {
-            "description": "Metadata name of the single page.",
+            "description": "metadata.name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2012,7 +2051,7 @@
         "operationId": "revertToSpecifiedSnapshotForSinglePage",
         "parameters": [
           {
-            "description": "Metadata name of the single page whose content will be restored.",
+            "description": "metadata.name of the single page whose content will be restored.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2054,7 +2093,7 @@
         "operationId": "listSinglePageSnapshots",
         "parameters": [
           {
-            "description": "Metadata name of the single page.",
+            "description": "metadata.name of the single page.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2342,10 +2381,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/themes/{name}/activation": {
       "put": {
-        "description": "Activate a theme by name.",
+        "description": "Activate a theme by metadata.name.",
         "operationId": "activateTheme",
         "parameters": [
           {
+            "description": "metadata.name of the theme to activate.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2377,6 +2417,7 @@
         "operationId": "InvalidateCache",
         "parameters": [
           {
+            "description": "metadata.name of the theme whose template cache will be invalidated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2401,6 +2442,7 @@
         "operationId": "fetchThemeJsonConfig",
         "parameters": [
           {
+            "description": "metadata.name of the theme whose JSON config will be fetched.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2430,6 +2472,7 @@
         "operationId": "updateThemeJsonConfig",
         "parameters": [
           {
+            "description": "metadata.name of the theme whose JSON config will be updated.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2465,6 +2508,7 @@
         "operationId": "Reload",
         "parameters": [
           {
+            "description": "metadata.name of the theme to reload.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2496,6 +2540,7 @@
         "operationId": "ResetThemeConfig",
         "parameters": [
           {
+            "description": "metadata.name of the theme whose setting config will be reset.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2527,6 +2572,7 @@
         "operationId": "fetchThemeSetting",
         "parameters": [
           {
+            "description": "metadata.name of the theme whose setting will be fetched.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2558,6 +2604,7 @@
         "operationId": "UpgradeTheme",
         "parameters": [
           {
+            "description": "metadata.name of the theme to upgrade.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2576,7 +2623,18 @@
           },
           "required": true
         },
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Theme"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
         "tags": [
           "ThemeV1alpha1Console"
         ]
@@ -2588,6 +2646,7 @@
         "operationId": "UpgradeThemeFromUri",
         "parameters": [
           {
+            "description": "metadata.name of the theme to upgrade.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2688,7 +2747,7 @@
             }
           },
           {
-            "description": "Role name",
+            "description": "Role metadata.name",
             "in": "query",
             "name": "role",
             "schema": {
@@ -2875,11 +2934,11 @@
     },
     "/apis/api.console.halo.run/v1alpha1/users/{name}": {
       "get": {
-        "description": "Get user detail by name",
+        "description": "Get user detail by metadata.name",
         "operationId": "GetUserDetail",
         "parameters": [
           {
-            "description": "User name",
+            "description": "User metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2911,7 +2970,7 @@
         "operationId": "DeleteUserAvatar",
         "parameters": [
           {
-            "description": "User name",
+            "description": "User metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2941,7 +3000,7 @@
         "operationId": "UploadUserAvatar",
         "parameters": [
           {
-            "description": "User name",
+            "description": "User metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -2983,7 +3042,7 @@
         "operationId": "ChangeAnyonePassword",
         "parameters": [
           {
-            "description": "Name of user. If the name is equal to \u0027-\u0027, it will change the password of current user.",
+            "description": "User metadata.name. If the name is equal to \u0027-\u0027, it will change the password of current user.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3025,7 +3084,7 @@
         "operationId": "GetPermissions",
         "parameters": [
           {
-            "description": "User name",
+            "description": "User metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3055,7 +3114,7 @@
         "operationId": "GrantPermission",
         "parameters": [
           {
-            "description": "User name",
+            "description": "User metadata.name",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3183,10 +3242,11 @@
     },
     "/apis/console.api.migration.halo.run/v1alpha1/backups/{name}/files/{filename}": {
       "get": {
+        "description": "Download a file from the specified backup as an octet-stream attachment.",
         "operationId": "DownloadBackups",
         "parameters": [
           {
-            "description": "Backup name.",
+            "description": "Backup metadata.name.",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3204,7 +3264,11 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+          "default": {
+            "description": "Backup file downloaded successfully."
+          }
+        },
         "tags": [
           "MigrationV1alpha1Console"
         ]
@@ -3224,7 +3288,18 @@
           },
           "required": true
         },
-        "responses": {},
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Backup restored successfully."
+          }
+        },
         "tags": [
           "MigrationV1alpha1Console"
         ]
@@ -3257,11 +3332,11 @@
     },
     "/apis/console.api.security.halo.run/v1alpha1/users/{username}/disable": {
       "post": {
-        "description": "Disable user by username",
+        "description": "Disable user by metadata.name",
         "operationId": "DisableUser",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -3289,11 +3364,11 @@
     },
     "/apis/console.api.security.halo.run/v1alpha1/users/{username}/enable": {
       "post": {
-        "description": "Enable user by username",
+        "description": "Enable user by metadata.name",
         "operationId": "EnableUser",
         "parameters": [
           {
-            "description": "Username",
+            "description": "User metadata.name",
             "in": "path",
             "name": "username",
             "required": true,
@@ -3355,7 +3430,7 @@
         "operationId": "getPolicyConfigByGroup",
         "parameters": [
           {
-            "description": "Name of the policy",
+            "description": "metadata.name of the policy",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3364,7 +3439,7 @@
             }
           },
           {
-            "description": "Name of the group",
+            "description": "Config group name",
             "in": "path",
             "name": "group",
             "required": true,
@@ -3394,7 +3469,7 @@
         "operationId": "updatePolicyConfigByGroup",
         "parameters": [
           {
-            "description": "Name of the policy",
+            "description": "metadata.name of the policy",
             "in": "path",
             "name": "name",
             "required": true,
@@ -3403,7 +3478,7 @@
             }
           },
           {
-            "description": "Name of the group",
+            "description": "Config group name",
             "in": "path",
             "name": "group",
             "required": true,
@@ -3845,13 +3920,11 @@
         "type": "object",
         "properties": {
           "oldPassword": {
-            "type": "string",
-            "description": "Old password."
+            "type": "string"
           },
           "password": {
             "minLength": 5,
-            "type": "string",
-            "description": "New password."
+            "type": "string"
           }
         }
       },
@@ -3863,8 +3936,7 @@
         "properties": {
           "password": {
             "minLength": 5,
-            "type": "string",
-            "description": "New password."
+            "type": "string"
           }
         }
       },
@@ -4359,7 +4431,8 @@
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Payload for creating a user from the console."
       },
       "CustomTemplates": {
         "type": "object",
@@ -4389,33 +4462,48 @@
         "description": "Custom template descriptors grouped by the content type they render."
       },
       "DashboardStats": {
+        "required": [
+          "approvedComments",
+          "comments",
+          "posts",
+          "upvotes",
+          "users",
+          "visits"
+        ],
         "type": "object",
         "properties": {
           "approvedComments": {
             "type": "integer",
+            "description": "Approved comment count.",
             "format": "int64"
           },
           "comments": {
             "type": "integer",
+            "description": "Total comment count.",
             "format": "int64"
           },
           "posts": {
             "type": "integer",
+            "description": "Total non-deleted post count.",
             "format": "int64"
           },
           "upvotes": {
             "type": "integer",
+            "description": "Total upvote count.",
             "format": "int64"
           },
           "users": {
             "type": "integer",
+            "description": "Total user count.",
             "format": "int64"
           },
           "visits": {
             "type": "integer",
+            "description": "Total visit count.",
             "format": "int64"
           }
-        }
+        },
+        "description": "Dashboard statistics for the console overview."
       },
       "DetailedUser": {
         "required": [
@@ -4433,7 +4521,8 @@
           "user": {
             "$ref": "#/components/schemas/User"
           }
-        }
+        },
+        "description": "User detail response with resolved roles."
       },
       "EmailConfigValidationRequest": {
         "type": "object",
@@ -4465,7 +4554,8 @@
           "username": {
             "type": "string"
           }
-        }
+        },
+        "description": "Email sender configuration to validate."
       },
       "EmailVerifyRequest": {
         "required": [
@@ -4477,7 +4567,8 @@
             "type": "string",
             "format": "email"
           }
-        }
+        },
+        "description": "Payload for sending an email verification code."
       },
       "Excerpt": {
         "required": [
@@ -4518,6 +4609,9 @@
         "description": "Extension is an interface which represents an Extension. It contains setters and getters of GroupVersionKind and\n Metadata."
       },
       "GrantRequest": {
+        "required": [
+          "roles"
+        ],
         "type": "object",
         "properties": {
           "roles": {
@@ -4527,7 +4621,8 @@
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Payload for granting roles to a user."
       },
       "IAvatarUploadRequest": {
         "required": [
@@ -4537,9 +4632,11 @@
         "properties": {
           "file": {
             "type": "string",
+            "description": "Avatar file.",
             "format": "binary"
           }
-        }
+        },
+        "description": "Multipart payload for uploading a user avatar."
       },
       "IUploadRequest": {
         "required": [
@@ -4550,17 +4647,19 @@
         "properties": {
           "file": {
             "type": "string",
+            "description": "Attachment file.",
             "format": "binary"
           },
           "groupName": {
             "type": "string",
-            "description": "The name of the group to which the attachment belongs"
+            "description": "Attachment group \u003ccode\u003emetadata.name\u003c/code\u003e."
           },
           "policyName": {
             "type": "string",
-            "description": "Storage policy name"
+            "description": "Storage policy \u003ccode\u003emetadata.name\u003c/code\u003e."
           }
-        }
+        },
+        "description": "Multipart payload for uploading an attachment."
       },
       "InstallFromUriRequest": {
         "required": [
@@ -4572,7 +4671,8 @@
             "type": "string",
             "format": "uri"
           }
-        }
+        },
+        "description": "Payload for installing a theme from a remote URI."
       },
       "JsonPatch": {
         "minItems": 1,
@@ -5240,22 +5340,24 @@
         "properties": {
           "file": {
             "type": "string",
+            "description": "Plugin JAR file.",
             "format": "binary"
           },
           "presetName": {
             "type": "string",
-            "description": "Plugin preset name. We will find the plugin from plugin presets"
+            "description": "Plugin preset name. Halo finds the plugin from plugin presets."
           },
           "source": {
             "type": "string",
-            "description": "Install source. Default is file.",
+            "description": "Install source. Defaults to file.",
             "enum": [
               "FILE",
               "PRESET",
               "URL"
             ]
           }
-        }
+        },
+        "description": "Multipart payload for installing a plugin."
       },
       "PluginList": {
         "required": [
@@ -5317,15 +5419,22 @@
         }
       },
       "PluginRunningStateRequest": {
+        "required": [
+          "enable"
+        ],
         "type": "object",
         "properties": {
           "async": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether to change the state asynchronously.",
+            "default": false
           },
           "enable": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the plugin should be enabled."
           }
-        }
+        },
+        "description": "Payload for changing a plugin running state."
       },
       "PluginSpec": {
         "required": [
@@ -5966,7 +6075,7 @@
         "properties": {
           "backupName": {
             "type": "string",
-            "description": "Backup metadata name."
+            "description": "Backup \u003ccode\u003emetadata.name\u003c/code\u003e."
           },
           "downloadUrl": {
             "type": "string",
@@ -5974,13 +6083,15 @@
           },
           "file": {
             "type": "string",
+            "description": "Backup file.",
             "format": "binary"
           },
           "filename": {
             "type": "string",
             "description": "Filename of backup file in backups root."
           }
-        }
+        },
+        "description": "Multipart payload for restoring a backup."
       },
       "RevertSnapshotForPostParam": {
         "required": [
@@ -5990,8 +6101,7 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string",
-            "description": "Name of the snapshot that should become the post\u0027s head content."
+            "type": "string"
           }
         },
         "description": "Request body for restoring post content from a snapshot."
@@ -6004,8 +6114,7 @@
         "properties": {
           "snapshotName": {
             "minLength": 1,
-            "type": "string",
-            "description": "Name of the snapshot that should become the single page\u0027s head content."
+            "type": "string"
           }
         },
         "description": "Request body for restoring single page content from a snapshot."
@@ -6583,7 +6692,8 @@
         "description": "Theme extension that describes an installable frontend theme and its runtime state."
       },
       "ThemeInstallRequest": {
-        "type": "object"
+        "type": "object",
+        "description": "Multipart payload for installing a theme."
       },
       "ThemeList": {
         "required": [
@@ -6753,7 +6863,8 @@
             "type": "string",
             "format": "uri"
           }
-        }
+        },
+        "description": "Payload for upgrading a theme from a remote URI."
       },
       "UpgradeRequest": {
         "required": [
@@ -6763,6 +6874,7 @@
         "properties": {
           "file": {
             "type": "string",
+            "description": "Theme zip file.",
             "format": "binary"
           }
         }
@@ -6794,22 +6906,20 @@
         "type": "object",
         "properties": {
           "filename": {
-            "type": "string",
-            "description": "Custom file name"
+            "type": "string"
           },
           "groupName": {
-            "type": "string",
-            "description": "The name of the group to which the attachment belongs"
+            "type": "string"
           },
           "policyName": {
-            "type": "string",
-            "description": "Storage policy name"
+            "type": "string"
           },
           "url": {
             "type": "string",
             "format": "url"
           }
-        }
+        },
+        "description": "Request payload for creating an attachment from a remote URL."
       },
       "User": {
         "required": [
@@ -6907,23 +7017,27 @@
         "properties": {
           "permissions": {
             "type": "array",
+            "description": "Role templates or permissions resolved from granted roles.",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "roles": {
             "type": "array",
+            "description": "Roles granted to the user.",
             "items": {
               "$ref": "#/components/schemas/Role"
             }
           },
           "uiPermissions": {
             "type": "array",
+            "description": "Resolved UI permission identifiers.",
             "items": {
               "type": "string"
             }
           }
-        }
+        },
+        "description": "Resolved role and permission information for a user."
       },
       "UserSpec": {
         "required": [
@@ -7009,7 +7123,8 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "description": "Payload for verifying an email address by code."
       }
     },
     "securitySchemes": {

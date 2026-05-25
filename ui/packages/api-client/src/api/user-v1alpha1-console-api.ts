@@ -48,7 +48,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
     return {
         /**
          * Change anyone password of user for admin.
-         * @param {string} name Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
+         * @param {string} name User metadata.name. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
          * @param {ChangePasswordRequest} changePasswordRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -181,7 +181,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * delete user avatar
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -221,8 +221,8 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Disable user by username
-         * @param {string} username Username
+         * Disable user by metadata.name
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -262,8 +262,8 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Enable user by username
-         * @param {string} username Username
+         * Enable user by metadata.name
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -341,7 +341,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * Get permissions of user
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -381,8 +381,8 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Get user detail by name
-         * @param {string} name User name
+         * Get user detail by metadata.name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -423,7 +423,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * Grant permissions to user
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {GrantRequest} grantRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -476,7 +476,7 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword to search
-         * @param {string} [role] Role name
+         * @param {string} [role] Role metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -628,8 +628,8 @@ export const UserV1alpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * upload user avatar
-         * @param {string} name User name
-         * @param {File} file 
+         * @param {string} name User metadata.name
+         * @param {File} file Avatar file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -732,7 +732,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
     return {
         /**
          * Change anyone password of user for admin.
-         * @param {string} name Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
+         * @param {string} name User metadata.name. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
          * @param {ChangePasswordRequest} changePasswordRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -769,7 +769,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * delete user avatar
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -780,8 +780,8 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Disable user by username
-         * @param {string} username Username
+         * Disable user by metadata.name
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -792,8 +792,8 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Enable user by username
-         * @param {string} username Username
+         * Enable user by metadata.name
+         * @param {string} username User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -816,7 +816,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * Get permissions of user
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -827,8 +827,8 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Get user detail by name
-         * @param {string} name User name
+         * Get user detail by metadata.name
+         * @param {string} name User metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -840,7 +840,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * Grant permissions to user
-         * @param {string} name User name
+         * @param {string} name User metadata.name
          * @param {GrantRequest} grantRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -859,7 +859,7 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {string} [keyword] Keyword to search
-         * @param {string} [role] Role name
+         * @param {string} [role] Role metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -895,8 +895,8 @@ export const UserV1alpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * upload user avatar
-         * @param {string} name User name
-         * @param {File} file 
+         * @param {string} name User metadata.name
+         * @param {File} file Avatar file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -964,7 +964,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.deleteUserAvatar(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Disable user by username
+         * Disable user by metadata.name
          * @param {UserV1alpha1ConsoleApiDisableUserRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -973,7 +973,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.disableUser(requestParameters.username, options).then((request) => request(axios, basePath));
         },
         /**
-         * Enable user by username
+         * Enable user by metadata.name
          * @param {UserV1alpha1ConsoleApiEnableUserRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -999,7 +999,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
             return localVarFp.getPermissions(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get user detail by name
+         * Get user detail by metadata.name
          * @param {UserV1alpha1ConsoleApiGetUserDetailRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1069,7 +1069,7 @@ export const UserV1alpha1ConsoleApiFactory = function (configuration?: Configura
  */
 export interface UserV1alpha1ConsoleApiChangeAnyonePasswordRequest {
     /**
-     * Name of user. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
+     * User metadata.name. If the name is equal to \&#39;-\&#39;, it will change the password of current user.
      */
     readonly name: string
 
@@ -1095,7 +1095,7 @@ export interface UserV1alpha1ConsoleApiCreateUserRequest {
  */
 export interface UserV1alpha1ConsoleApiDeleteUserAvatarRequest {
     /**
-     * User name
+     * User metadata.name
      */
     readonly name: string
 }
@@ -1105,7 +1105,7 @@ export interface UserV1alpha1ConsoleApiDeleteUserAvatarRequest {
  */
 export interface UserV1alpha1ConsoleApiDisableUserRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 }
@@ -1115,7 +1115,7 @@ export interface UserV1alpha1ConsoleApiDisableUserRequest {
  */
 export interface UserV1alpha1ConsoleApiEnableUserRequest {
     /**
-     * Username
+     * User metadata.name
      */
     readonly username: string
 }
@@ -1125,7 +1125,7 @@ export interface UserV1alpha1ConsoleApiEnableUserRequest {
  */
 export interface UserV1alpha1ConsoleApiGetPermissionsRequest {
     /**
-     * User name
+     * User metadata.name
      */
     readonly name: string
 }
@@ -1135,7 +1135,7 @@ export interface UserV1alpha1ConsoleApiGetPermissionsRequest {
  */
 export interface UserV1alpha1ConsoleApiGetUserDetailRequest {
     /**
-     * User name
+     * User metadata.name
      */
     readonly name: string
 }
@@ -1145,7 +1145,7 @@ export interface UserV1alpha1ConsoleApiGetUserDetailRequest {
  */
 export interface UserV1alpha1ConsoleApiGrantPermissionRequest {
     /**
-     * User name
+     * User metadata.name
      */
     readonly name: string
 
@@ -1187,7 +1187,7 @@ export interface UserV1alpha1ConsoleApiListUsersRequest {
     readonly keyword?: string
 
     /**
-     * Role name
+     * Role metadata.name
      */
     readonly role?: string
 }
@@ -1211,10 +1211,13 @@ export interface UserV1alpha1ConsoleApiUpdateCurrentUserRequest {
  */
 export interface UserV1alpha1ConsoleApiUploadUserAvatarRequest {
     /**
-     * User name
+     * User metadata.name
      */
     readonly name: string
 
+    /**
+     * Avatar file.
+     */
     readonly file: File
 }
 
@@ -1270,7 +1273,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Disable user by username
+     * Disable user by metadata.name
      * @param {UserV1alpha1ConsoleApiDisableUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1280,7 +1283,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Enable user by username
+     * Enable user by metadata.name
      * @param {UserV1alpha1ConsoleApiEnableUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1309,7 +1312,7 @@ export class UserV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Get user detail by name
+     * Get user detail by metadata.name
      * @param {UserV1alpha1ConsoleApiGetUserDetailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -290,10 +290,15 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
         return GroupVersion.parseAPIVersion("uc.api.storage.halo.run/v1alpha1");
     }
 
+    /** User-center request payload for uploading from a URL. */
     @Schema(name = "UcUploadFromUrlRequest")
     public record UploadFromUrlRequest(
-            @Schema(requiredMode = REQUIRED) URL url,
-            @Schema(description = "Custom file name") String filename) {
+            /** Remote file URL to transfer into user-center storage. */
+            @Schema(requiredMode = REQUIRED)
+            URL url,
+
+            /** Custom file name. */
+            String filename) {
         public UploadFromUrlRequest {
             if (Objects.isNull(url)) {
                 throw new ServerWebInputException("Required url is missing.");
@@ -303,14 +308,32 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
 
     @Schema(types = "object")
     public record PostAttachmentRequest(
-            @Schema(requiredMode = REQUIRED, description = "Attachment data.")
+            /** Attachment data. */
+            @Schema(requiredMode = REQUIRED)
             FilePart file,
 
-            @Schema(requiredMode = NOT_REQUIRED, description = "Post name.")
+            /** Post {@code metadata.name}. */
+            @Schema(requiredMode = NOT_REQUIRED)
             String postName,
 
-            @Schema(requiredMode = NOT_REQUIRED, description = "Single page name.")
+            /** Single page {@code metadata.name}. */
+            @Schema(requiredMode = NOT_REQUIRED)
             String singlePageName) {
+
+        /** Attachment data. */
+        public FilePart getFile() {
+            return file;
+        }
+
+        /** Post {@code metadata.name}. */
+        public String getPostName() {
+            return postName;
+        }
+
+        /** Single page {@code metadata.name}. */
+        public String getSinglePageName() {
+            return singlePageName;
+        }
 
         /**
          * Convert multipart data into PostAttachmentRequest.

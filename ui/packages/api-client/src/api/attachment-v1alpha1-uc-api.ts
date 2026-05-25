@@ -34,10 +34,10 @@ export const AttachmentV1alpha1UcApiAxiosParamCreator = function (configuration?
     return {
         /**
          * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
-         * @param {File} file 
+         * @param {File} file Attachment data.
          * @param {boolean} [waitForPermalink] Wait for permalink.
-         * @param {string} [postName] Post name.
-         * @param {string} [singlePageName] Single page name.
+         * @param {string} [postName] Post &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [singlePageName] Single page &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
@@ -289,10 +289,10 @@ export const AttachmentV1alpha1UcApiFp = function(configuration?: Configuration)
     return {
         /**
          * Create attachment for the given post. Deprecated in favor of /attachments/-/upload.
-         * @param {File} file 
+         * @param {File} file Attachment data.
          * @param {boolean} [waitForPermalink] Wait for permalink.
-         * @param {string} [postName] Post name.
-         * @param {string} [singlePageName] Single page name.
+         * @param {string} [postName] Post &lt;code&gt;metadata.name&lt;/code&gt;.
+         * @param {string} [singlePageName] Single page &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {*} [options] Override http request option.
          * @deprecated
          * @throws {RequiredError}
@@ -404,6 +404,9 @@ export const AttachmentV1alpha1UcApiFactory = function (configuration?: Configur
  * Request parameters for createAttachmentForPost operation in AttachmentV1alpha1UcApi.
  */
 export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
+    /**
+     * Attachment data.
+     */
     readonly file: File
 
     /**
@@ -412,12 +415,12 @@ export interface AttachmentV1alpha1UcApiCreateAttachmentForPostRequest {
     readonly waitForPermalink?: boolean
 
     /**
-     * Post name.
+     * Post &lt;code&gt;metadata.name&lt;/code&gt;.
      */
     readonly postName?: string
 
     /**
-     * Single page name.
+     * Single page &lt;code&gt;metadata.name&lt;/code&gt;.
      */
     readonly singlePageName?: string
 }
