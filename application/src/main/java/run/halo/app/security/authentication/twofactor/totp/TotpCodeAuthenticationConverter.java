@@ -38,7 +38,11 @@ public class TotpCodeAuthenticationConverter implements ServerAuthenticationConv
                 .filter(TwoFactorAuthentication.class::isInstance)
                 .switchIfEmpty(Mono.error(() -> new TwoFactorAuthException("MFA Authentication required.")))
                 .flatMap(authentication -> exchange.getFormData())
-                .handle((formData, sink) -> {
+                // Explicit <Authentication> type witness anchors the chain through
+                // transformDeferred(RateLimiterOperator<T>) so that onErrorMap below
+                // resolves correctly — mirrors LoginAuthenticationConverter's
+                // .<Authentication>flatMap pattern.
+                .<Authentication>handle((formData, sink) -> {
                     var codeStr = formData.getFirst(codeParameter);
                     if (StringUtils.isBlank(codeStr)) {
                         sink.error(new TwoFactorAuthException("Empty code parameter."));
