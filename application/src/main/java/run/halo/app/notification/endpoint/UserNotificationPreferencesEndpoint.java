@@ -73,7 +73,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("username")
-                                        .description("Username")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(ReasonTypeNotifierMatrix.class)))
                 .POST(
@@ -85,7 +85,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("username")
-                                        .description("Username")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .requestBody(
                                         requestBodyBuilder().implementation(ReasonTypeNotifierCollectionRequest.class))
@@ -182,15 +182,39 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                 });
     }
 
+    /** Matrix describing which notifiers are enabled for each reason type. */
     @Data
     @Accessors(chain = true)
     static class ReasonTypeNotifierMatrix {
+        /** Reason types available to the user. */
+        @Schema(requiredMode = REQUIRED)
         private List<ReasonTypeInfo> reasonTypes;
+
+        /** Notification notifiers available to the user. */
+        @Schema(requiredMode = REQUIRED)
         private List<NotifierInfo> notifiers;
+
+        /** Enabled-state matrix indexed by reason type and notifier. */
+        @Schema(requiredMode = REQUIRED)
         private boolean[][] stateMatrix;
     }
 
-    record ReasonTypeInfo(String name, String displayName, String description, Set<String> uiPermissions) {
+    /**
+     * Reason type metadata used by notification preference UI.
+     *
+     * @param name reason type {@code metadata.name}
+     * @param displayName display name of the reason type
+     * @param description description of the reason type
+     * @param uiPermissions UI permissions required to manage this reason type
+     */
+    record ReasonTypeInfo(
+            @Schema(requiredMode = REQUIRED) String name,
+
+            String displayName,
+
+            String description,
+
+            Set<String> uiPermissions) {
 
         public static ReasonTypeInfo from(ReasonType reasonType) {
             var uiPermissions = Optional.of(MetadataUtil.nullSafeAnnotations(reasonType))
@@ -207,14 +231,32 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
         }
     }
 
-    record NotifierInfo(String name, String displayName, String description) {}
+    /**
+     * Notifier metadata used by notification preference UI.
+     *
+     * @param name notifier {@code metadata.name}
+     * @param displayName display name of the notifier
+     * @param description description of the notifier
+     */
+    record NotifierInfo(@Schema(requiredMode = REQUIRED) String name, String displayName, String description) {}
 
+    /**
+     * Payload for saving notifier selections by reason type.
+     *
+     * @param reasonTypeNotifiers notifier selections grouped by reason type
+     */
     record ReasonTypeNotifierCollectionRequest(
             @Schema(requiredMode = REQUIRED) List<ReasonTypeNotifierRequest> reasonTypeNotifiers) {}
 
+    /** Notifier selection for one reason type. */
     @Data
     static class ReasonTypeNotifierRequest {
+        /** {@code metadata.name} of the reason type. */
+        @Schema(requiredMode = REQUIRED)
         private String reasonType;
+
+        /** {@code metadata.name} values of enabled notifiers. */
+        @Schema(requiredMode = REQUIRED)
         private List<String> notifiers;
     }
 

@@ -23,6 +23,9 @@ import type { GroupStatus } from './group-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Attachment group extension used to organize attachments and expose aggregate counts.
+ */
 export interface Group {
     'apiVersion': string;
     'kind': string;

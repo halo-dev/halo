@@ -20,6 +20,9 @@ import type { Metadata } from './metadata';
 // @ts-ignore
 import type { RememberMeTokenSpec } from './remember-me-token-spec';
 
+/**
+ * Persistent remember-me token used to keep a user\'s browser session signed in across restarts.
+ */
 export interface RememberMeToken {
     'apiVersion': string;
     'kind': string;

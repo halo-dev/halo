@@ -1,8 +1,10 @@
 package run.halo.app.core.endpoint.console;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static run.halo.app.extension.index.query.Queries.*;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
@@ -94,13 +96,31 @@ public class StatsEndpoint implements CustomEndpoint {
                 .flatMap(body -> ServerResponse.ok().bodyValue(body));
     }
 
+    /** Dashboard statistics for the console overview. */
     @Data
     public static class DashboardStats {
+        /** Total visit count. */
+        @Schema(requiredMode = REQUIRED)
         private long visits;
+
+        /** Total comment count. */
+        @Schema(requiredMode = REQUIRED)
         private long comments;
+
+        /** Approved comment count. */
+        @Schema(requiredMode = REQUIRED)
         private long approvedComments;
+
+        /** Total upvote count. */
+        @Schema(requiredMode = REQUIRED)
         private long upvotes;
+
+        /** Total user count. */
+        @Schema(requiredMode = REQUIRED)
         private long users;
+
+        /** Total non-deleted post count. */
+        @Schema(requiredMode = REQUIRED)
         private long posts;
 
         /**

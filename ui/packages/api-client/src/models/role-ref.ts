@@ -19,15 +19,15 @@
  */
 export interface RoleRef {
     /**
-     * APIGroup is the group for the resource being referenced.
+     * API group of the role resource being referenced.
      */
     'apiGroup'?: string;
     /**
-     * Kind is the type of resource being referenced.
+     * Kind of the role resource being referenced.
      */
     'kind'?: string;
     /**
-     * Name is the name of resource being referenced.
+     * Metadata name of the role resource being referenced.
      */
     'name'?: string;
 }

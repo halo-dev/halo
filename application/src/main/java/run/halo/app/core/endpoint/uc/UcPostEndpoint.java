@@ -35,9 +35,19 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
+/**
+ * User-center endpoint for managing posts owned by the current user.
+ *
+ * @author guqing
+ * @since 2.0.0
+ */
 @Component
 public class UcPostEndpoint implements CustomEndpoint {
 
+    /**
+     * Annotation used by UC post APIs to carry JSON-serialized {@link Content} together with a {@link Post} or
+     * {@link Snapshot} payload.
+     */
     private static final String CONTENT_JSON_ANNO = "content.halo.run/content-json";
 
     private final PostService postService;
@@ -54,14 +64,17 @@ public class UcPostEndpoint implements CustomEndpoint {
         var tag = "PostV1alpha1Uc";
         var namePathParam = parameterBuilder()
                 .name("name")
-                .description("Post name")
+                .description("metadata.name of a post owned by the current user.")
                 .in(ParameterIn.PATH)
-                .required(true);
+                .required(true)
+                .implementation(String.class);
         return route().nest(
                         path("/posts"),
                         () -> route().GET(this::listMyPost, builder -> {
                                     builder.operationId("ListMyPosts")
-                                            .description("List posts owned by the current user.")
+                                            .description(
+                                                    "List posts owned by the current user with pagination, sorting, "
+                                                            + "keyword, publish phase, and category filters.")
                                             .tag(tag)
                                             .response(responseBuilder()
                                                     .implementation(ListResult.generateGenericClass(ListedPost.class)));
@@ -71,13 +84,16 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         this::createMyPost,
                                         builder -> builder.operationId("CreateMyPost")
                                                 .tag(tag)
-                                                .description("""
-                            Create my post. If you want to create a post with content, please set
-                             annotation: "content.halo.run/content-json" into annotations and refer
-                             to Content for corresponding data type.
-                            """)
-                                                .requestBody(
-                                                        requestBodyBuilder().implementation(Post.class))
+                                                .description("Create a draft post for the current user. To create it "
+                                                        + "with initial content, put JSON-serialized Content into "
+                                                        + "metadata.annotations['content.halo.run/content-json'].")
+                                                .requestBody(requestBodyBuilder()
+                                                        .required(true)
+                                                        .description("Post extension to create. The server assigns "
+                                                                + "spec.owner from the current user and consumes the "
+                                                                + "content-json annotation as initial content when "
+                                                                + "present.")
+                                                        .implementation(Post.class))
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .GET(
                                         "/{name}",
@@ -85,7 +101,7 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         builder -> builder.operationId("GetMyPost")
                                                 .tag(tag)
                                                 .parameter(namePathParam)
-                                                .description("Get post that belongs to the current user.")
+                                                .description("Get a post owned by the current user by metadata.name.")
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .PUT(
                                         "/{name}",
@@ -93,44 +109,57 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         builder -> builder.operationId("UpdateMyPost")
                                                 .tag(tag)
                                                 .parameter(namePathParam)
-                                                .description("Update my post.")
-                                                .requestBody(
-                                                        requestBodyBuilder().implementation(Post.class))
+                                                .description("Update post metadata and editable spec fields for the "
+                                                        + "current user. Content is not updated by this operation.")
+                                                .requestBody(requestBodyBuilder()
+                                                        .required(true)
+                                                        .description(
+                                                                "Post extension with updated metadata/spec values. "
+                                                                        + "The server preserves owner, publish, snapshot, and "
+                                                                        + "deleted state fields, and ignores the content-json "
+                                                                        + "annotation here.")
+                                                        .implementation(Post.class))
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .GET(
                                         "/{name}/draft",
                                         this::getMyPostDraft,
                                         builder -> builder.tag(tag)
                                                 .operationId("GetMyPostDraft")
-                                                .description("Get my post draft.")
+                                                .description("Get the editable draft snapshot of a post owned by the "
+                                                        + "current user.")
                                                 .parameter(namePathParam)
                                                 .parameter(parameterBuilder()
                                                         .name("patched")
                                                         .in(ParameterIn.QUERY)
                                                         .required(false)
                                                         .implementation(Boolean.class)
-                                                        .description("Should include patched content and raw or not."))
+                                                        .description("Whether to return the head snapshot patched "
+                                                                + "against the base snapshot. Defaults to false."))
                                                 .response(responseBuilder().implementation(Snapshot.class)))
                                 .PUT(
                                         "/{name}/draft",
                                         this::updateMyPostDraft,
                                         builder -> builder.tag(tag)
                                                 .operationId("UpdateMyPostDraft")
-                                                .description("""
-                            Update draft of my post. Please make sure set annotation:
-                            "content.halo.run/content-json" into annotations and refer to
-                            Content for corresponding data type.
-                             """)
+                                                .description("Update the editable draft snapshot of a post owned by "
+                                                        + "the current user. The snapshot must belong to the post and "
+                                                        + "must be the current head snapshot.")
                                                 .parameter(namePathParam)
-                                                .requestBody(
-                                                        requestBodyBuilder().implementation(Snapshot.class))
+                                                .requestBody(requestBodyBuilder()
+                                                        .required(true)
+                                                        .description(
+                                                                "Snapshot payload carrying JSON-serialized Content "
+                                                                        + "in metadata.annotations['content.halo.run/content-json'].")
+                                                        .implementation(Snapshot.class))
                                                 .response(responseBuilder().implementation(Snapshot.class)))
                                 .PUT(
                                         "/{name}/publish",
                                         this::publishMyPost,
                                         builder -> builder.tag(tag)
                                                 .operationId("PublishMyPost")
-                                                .description("Publish my post.")
+                                                .description(
+                                                        "Publish a post owned by the current user from its current "
+                                                                + "head snapshot.")
                                                 .parameter(namePathParam)
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .PUT(
@@ -138,7 +167,8 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         this::unpublishMyPost,
                                         builder -> builder.tag(tag)
                                                 .operationId("UnpublishMyPost")
-                                                .description("Unpublish my post.")
+                                                .description("Unpublish a post owned by the current user so it is no "
+                                                        + "longer served as published content.")
                                                 .parameter(namePathParam)
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .DELETE(
@@ -146,7 +176,8 @@ public class UcPostEndpoint implements CustomEndpoint {
                                         this::recycleMyPost,
                                         builder -> builder.tag(tag)
                                                 .operationId("RecycleMyPost")
-                                                .description("Move my post to recycle bin.")
+                                                .description(
+                                                        "Move a post owned by the current user to the recycle bin.")
                                                 .parameter(namePathParam)
                                                 .response(responseBuilder().implementation(Post.class)))
                                 .build())

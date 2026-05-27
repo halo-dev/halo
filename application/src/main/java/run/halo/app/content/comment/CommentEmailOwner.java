@@ -1,5 +1,8 @@
 package run.halo.app.content.comment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -7,15 +10,23 @@ import org.springframework.util.Assert;
 import run.halo.app.core.extension.content.Comment;
 
 /**
- * The creator info of the comment. This {@link CommentEmailOwner} is only applicable to the user who is allowed to
- * comment without logging in.
+ * Guest/email creator information for a comment or reply.
  *
- * @param email email for comment owner
- * @param avatar avatar for comment owner
- * @param displayName display name for comment owner
- * @param website website for comment owner
+ * @param email Email address of the guest commenter. It is used as the owner name when present.
+ * @param avatar Avatar URL of the guest commenter.
+ * @param displayName Display name of the guest commenter.
+ * @param website Website URL of the guest commenter.
  */
-public record CommentEmailOwner(String email, String avatar, String displayName, String website) {
+@Schema(description = "Guest/email owner information used when a comment is not owned by a Halo user.")
+public record CommentEmailOwner(
+        String email,
+
+        String avatar,
+
+        @Schema(description = "Display name of the guest commenter.", requiredMode = REQUIRED)
+        String displayName,
+
+        String website) {
 
     public CommentEmailOwner {
         Assert.hasText(displayName, "The 'displayName' must not be empty.");

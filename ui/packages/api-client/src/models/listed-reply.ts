@@ -24,7 +24,7 @@ import type { OwnerInfo } from './owner-info';
 import type { Reply } from './reply';
 
 /**
- * A chunk of items.
+ * Reply list item with resolved owner and counters.
  */
 export interface ListedReply {
     'owner': OwnerInfo;

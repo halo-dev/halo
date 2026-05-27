@@ -21,7 +21,7 @@ import type { ContentUpdateParam } from './content-update-param';
 import type { SinglePage } from './single-page';
 
 /**
- * A request parameter for {@link SinglePage SinglePage}.
+ * Single page editor payload containing the page extension and its editable content.
  */
 export interface SinglePageRequest {
     'content': ContentUpdateParam;

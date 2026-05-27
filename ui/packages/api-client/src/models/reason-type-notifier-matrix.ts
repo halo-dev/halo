@@ -20,9 +20,21 @@ import type { NotifierInfo } from './notifier-info';
 // @ts-ignore
 import type { ReasonTypeInfo } from './reason-type-info';
 
+/**
+ * Matrix describing which notifiers are enabled for each reason type.
+ */
 export interface ReasonTypeNotifierMatrix {
-    'notifiers'?: Array<NotifierInfo>;
-    'reasonTypes'?: Array<ReasonTypeInfo>;
-    'stateMatrix'?: Array<Array<boolean>>;
+    /**
+     * Notification notifiers available to the user.
+     */
+    'notifiers': Array<NotifierInfo>;
+    /**
+     * Reason types available to the user.
+     */
+    'reasonTypes': Array<ReasonTypeInfo>;
+    /**
+     * Enabled-state matrix indexed by reason type and notifier.
+     */
+    'stateMatrix': Array<Array<boolean>>;
 }
 

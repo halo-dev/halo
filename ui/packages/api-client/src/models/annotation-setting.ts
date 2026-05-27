@@ -20,6 +20,9 @@ import type { AnnotationSettingSpec } from './annotation-setting-spec';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Annotation setting extension that defines dynamic annotation forms for a target extension kind.
+ */
 export interface AnnotationSetting {
     'apiVersion': string;
     'kind': string;

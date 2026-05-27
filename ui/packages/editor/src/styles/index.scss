@@ -10,3 +10,11 @@
 @use "range-selection.scss";
 @use "details.scss";
 @use "figure.scss";
+
+.halo-rich-text-editor {
+  .ProseMirror {
+    :where(* > :first-child, [data-editor-ui="true"] + *) {
+      margin-top: 0 !important;
+    }
+  }
+}

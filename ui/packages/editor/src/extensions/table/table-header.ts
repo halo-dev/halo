@@ -17,6 +17,10 @@ export interface TableCellOptions {
   HTMLAttributes: Record<string, any>;
 }
 
+const markEditorUiElement = (element: HTMLElement) => {
+  element.dataset.editorUi = "true";
+};
+
 const TableHeader = Node.create<TableCellOptions>({
   name: "tableHeader",
   content: "block+",
@@ -107,6 +111,7 @@ const TableHeader = Node.create<TableCellOptions>({
                     let grip = storage.gripMap.get(key) as HTMLElement;
                     if (!grip) {
                       grip = document.createElement("a");
+                      markEditorUiElement(grip);
                       const instance = h(
                         VTooltipComponent,
                         {

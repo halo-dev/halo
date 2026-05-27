@@ -14,11 +14,17 @@
 
 
 
+/**
+ * User-center request payload for uploading from a URL.
+ */
 export interface UcUploadFromUrlRequest {
     /**
-     * Custom file name
+     * custom file name
      */
     'filename'?: string;
+    /**
+     * remote file URL to transfer into user-center storage
+     */
     'url': string;
 }
 

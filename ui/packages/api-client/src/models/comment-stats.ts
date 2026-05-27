@@ -15,9 +15,12 @@
 
 
 /**
- * comment stats value object.
+ * Aggregated counters for a comment or reply.
  */
 export interface CommentStats {
+    /**
+     * Total upvote count.
+     */
     'upvote'?: number;
 }
 

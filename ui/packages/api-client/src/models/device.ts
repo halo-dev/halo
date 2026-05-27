@@ -23,6 +23,9 @@ import type { DeviceStatus } from './device-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Device extension that records an authenticated browser session for account security visibility.
+ */
 export interface Device {
     'apiVersion': string;
     'kind': string;

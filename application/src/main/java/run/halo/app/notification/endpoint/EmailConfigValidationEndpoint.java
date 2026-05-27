@@ -96,6 +96,7 @@ public class EmailConfigValidationEndpoint implements CustomEndpoint {
                 });
     }
 
+    /** Email sender configuration to validate. */
     @Data
     @EqualsAndHashCode(callSuper = true)
     @Schema(name = "EmailConfigValidationRequest")

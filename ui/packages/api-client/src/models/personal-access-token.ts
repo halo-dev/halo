@@ -20,6 +20,9 @@ import type { Metadata } from './metadata';
 // @ts-ignore
 import type { PatSpec } from './pat-spec';
 
+/**
+ * Personal access token extension used for non-interactive API authentication on behalf of a Halo user.
+ */
 export interface PersonalAccessToken {
     'apiVersion': string;
     'kind': string;

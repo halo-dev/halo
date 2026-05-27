@@ -14,7 +14,13 @@
 
 
 
+/**
+ * Observed state of a reply.
+ */
 export interface ReplyStatus {
+    /**
+     * Metadata version observed by the last successful reconciliation.
+     */
     'observedVersion'?: number;
 }
 

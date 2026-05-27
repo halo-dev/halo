@@ -9,24 +9,27 @@ import lombok.experimental.Accessors;
 import run.halo.app.core.extension.content.SinglePage;
 
 /**
- * An aggregate object of {@link SinglePage} and {@link Contributor} single page list.
+ * Aggregate object returned by the console single page list API.
  *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Single page list item with resolved contributors, owner, and counters.")
 @Data
 @Accessors(chain = true)
 public class ListedSinglePage {
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Single page extension data.", requiredMode = REQUIRED)
     private SinglePage page;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Users that have contributed to the single page content snapshots.", requiredMode = REQUIRED)
     private List<Contributor> contributors;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Resolved owner of the single page.", requiredMode = REQUIRED)
     private Contributor owner;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(
+            description = "Aggregated visit, upvote, and comment counters for the single page.",
+            requiredMode = REQUIRED)
     private Stats stats;
 }

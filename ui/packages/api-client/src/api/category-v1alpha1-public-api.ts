@@ -95,8 +95,8 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * Gets category by name.
-         * @param {string} name Category name
+         * Gets category by metadata.name.
+         * @param {string} name Category metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -136,8 +136,8 @@ export const CategoryV1alpha1PublicApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * Lists posts by category name.
-         * @param {string} name Category name
+         * Lists posts by category metadata.name.
+         * @param {string} name Category metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -227,8 +227,8 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Gets category by name.
-         * @param {string} name Category name
+         * Gets category by metadata.name.
+         * @param {string} name Category metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -239,8 +239,8 @@ export const CategoryV1alpha1PublicApiFp = function(configuration?: Configuratio
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Lists posts by category name.
-         * @param {string} name Category name
+         * Lists posts by category metadata.name.
+         * @param {string} name Category metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -274,7 +274,7 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
             return localVarFp.queryCategories(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
-         * Gets category by name.
+         * Gets category by metadata.name.
          * @param {CategoryV1alpha1PublicApiQueryCategoryByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -283,7 +283,7 @@ export const CategoryV1alpha1PublicApiFactory = function (configuration?: Config
             return localVarFp.queryCategoryByName(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Lists posts by category name.
+         * Lists posts by category metadata.name.
          * @param {CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -329,7 +329,7 @@ export interface CategoryV1alpha1PublicApiQueryCategoriesRequest {
  */
 export interface CategoryV1alpha1PublicApiQueryCategoryByNameRequest {
     /**
-     * Category name
+     * Category metadata.name
      */
     readonly name: string
 }
@@ -339,7 +339,7 @@ export interface CategoryV1alpha1PublicApiQueryCategoryByNameRequest {
  */
 export interface CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest {
     /**
-     * Category name
+     * Category metadata.name
      */
     readonly name: string
 
@@ -384,7 +384,7 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
     }
 
     /**
-     * Gets category by name.
+     * Gets category by metadata.name.
      * @param {CategoryV1alpha1PublicApiQueryCategoryByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -394,7 +394,7 @@ export class CategoryV1alpha1PublicApi extends BaseAPI {
     }
 
     /**
-     * Lists posts by category name.
+     * Lists posts by category metadata.name.
      * @param {CategoryV1alpha1PublicApiQueryPostsByCategoryNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -262,4 +262,10 @@ spotless {
         target 'src/**/*.sql'
         dbeaver()
     }
+    format 'webResources', {
+        target 'src/main/resources/templates/**/*.html',
+            'src/main/resources/static/styles/**/*.css',
+            'src/main/resources/static/js/**/*.js'
+        prettier().config(['tabWidth': 2, 'printWidth': 120])
+    }
 }

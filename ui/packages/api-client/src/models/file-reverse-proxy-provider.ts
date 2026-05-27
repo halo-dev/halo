@@ -14,6 +14,9 @@
 
 
 
+/**
+ * File provider that resolves a request to a plugin or theme file location.
+ */
 export interface FileReverseProxyProvider {
     'directory'?: string;
     'filename'?: string;

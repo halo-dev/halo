@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.content;
 
+/** Shared API group, version, annotation, and checksum keys for content extensions. */
 public enum Constant {
     ;
 

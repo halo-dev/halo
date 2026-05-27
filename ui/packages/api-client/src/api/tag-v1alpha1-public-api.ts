@@ -33,8 +33,8 @@ import type { TagVoList } from '../models';
 export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Lists posts by tag name
-         * @param {string} name Tag name
+         * Lists posts by tag metadata.name
+         * @param {string} name Tag metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -99,8 +99,8 @@ export const TagV1alpha1PublicApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
-         * Gets tag by name
-         * @param {string} name Tag name
+         * Gets tag by metadata.name
+         * @param {string} name Tag metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -211,8 +211,8 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TagV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
-         * Lists posts by tag name
-         * @param {string} name Tag name
+         * Lists posts by tag metadata.name
+         * @param {string} name Tag metadata.name
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -228,8 +228,8 @@ export const TagV1alpha1PublicApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Gets tag by name
-         * @param {string} name Tag name
+         * Gets tag by metadata.name
+         * @param {string} name Tag metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -265,7 +265,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
     const localVarFp = TagV1alpha1PublicApiFp(configuration)
     return {
         /**
-         * Lists posts by tag name
+         * Lists posts by tag metadata.name
          * @param {TagV1alpha1PublicApiQueryPostsByTagNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -274,7 +274,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
             return localVarFp.queryPostsByTagName(requestParameters.name, requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, options).then((request) => request(axios, basePath));
         },
         /**
-         * Gets tag by name
+         * Gets tag by metadata.name
          * @param {TagV1alpha1PublicApiQueryTagByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -299,7 +299,7 @@ export const TagV1alpha1PublicApiFactory = function (configuration?: Configurati
  */
 export interface TagV1alpha1PublicApiQueryPostsByTagNameRequest {
     /**
-     * Tag name
+     * Tag metadata.name
      */
     readonly name: string
 
@@ -334,7 +334,7 @@ export interface TagV1alpha1PublicApiQueryPostsByTagNameRequest {
  */
 export interface TagV1alpha1PublicApiQueryTagByNameRequest {
     /**
-     * Tag name
+     * Tag metadata.name
      */
     readonly name: string
 }
@@ -374,7 +374,7 @@ export interface TagV1alpha1PublicApiQueryTagsRequest {
  */
 export class TagV1alpha1PublicApi extends BaseAPI {
     /**
-     * Lists posts by tag name
+     * Lists posts by tag metadata.name
      * @param {TagV1alpha1PublicApiQueryPostsByTagNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -384,7 +384,7 @@ export class TagV1alpha1PublicApi extends BaseAPI {
     }
 
     /**
-     * Gets tag by name
+     * Gets tag by metadata.name
      * @param {TagV1alpha1PublicApiQueryTagByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
