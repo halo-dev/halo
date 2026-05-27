@@ -53,6 +53,9 @@ class PreviewRouterFunctionTest {
     ViewNameResolver viewNameResolver;
 
     @Mock
+    PostViewNameResolver postViewNameResolver;
+
+    @Mock
     ViewResolver viewResolver;
 
     @Mock
@@ -99,7 +102,7 @@ class PreviewRouterFunctionTest {
         when(postPublicQueryService.convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot())))
                 .thenReturn(Mono.just(postVo));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), eq("postTemplate"), eq("post")))
+        when(postViewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), eq(postVo)))
                 .thenReturn(Mono.just("postView"));
 
         webTestClient
@@ -110,6 +113,7 @@ class PreviewRouterFunctionTest {
                 .isOk();
 
         verify(viewResolver).resolveViewName(any(), any());
+        verify(postViewNameResolver).resolveViewNameOrDefault(any(ServerRequest.class), eq(postVo));
         verify(postPublicQueryService).convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot()));
         verify(client).fetch(eq(Post.class), eq("post1"));
     }

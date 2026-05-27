@@ -1,13 +1,11 @@
 package run.halo.app.theme.router.factories;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static run.halo.app.content.permalinks.PostPermalinkPolicy.DEFAULT_CATEGORY;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -30,11 +28,10 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
+import run.halo.app.theme.router.PostViewNameResolver;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 
@@ -50,7 +47,7 @@ public class PostRouteFactory implements RouteFactory {
 
     private final PostFinder postFinder;
 
-    private final ViewNameResolver viewNameResolver;
+    private final PostViewNameResolver postViewNameResolver;
 
     private final ReactiveExtensionClient client;
 
@@ -108,19 +105,10 @@ public class PostRouteFactory implements RouteFactory {
                 })
                 .flatMap(postVo -> {
                     Map<String, Object> model = ModelMapUtils.postModel(postVo);
-                    return determineTemplate(request, postVo)
+                    return postViewNameResolver
+                            .resolveViewNameOrDefault(request, postVo)
                             .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
                 });
-    }
-
-    Mono<String> determineTemplate(ServerRequest request, PostVo postVo) {
-        return Flux.fromIterable(defaultIfNull(postVo.getCategories(), List.of()))
-                .filter(category -> isNotBlank(category.getSpec().getPostTemplate()))
-                .concatMap(category -> viewNameResolver.resolveViewNameOrDefault(
-                        request, category.getSpec().getPostTemplate(), null))
-                .next()
-                .switchIfEmpty(Mono.defer(() -> viewNameResolver.resolveViewNameOrDefault(
-                        request, postVo.getSpec().getTemplate(), DefaultTemplateEnum.POST.getValue())));
     }
 
     Mono<PostVo> bestMatchPost(PostPatternVariable variable) {
