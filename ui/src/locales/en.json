@@ -782,7 +782,7 @@
   "core.uc_profile.pat.operations.delete.description": "Are you sure you want to delete this personal access token?",
   "core.uc_profile.pat.operations.revoke.button": "Revoke",
   "core.uc_profile.pat.operations.revoke.title": "Revoke Personal Access Token",
-  "core.uc_profile.pat.operations.revoke.description": "Are you sure you want to revoke this personal access token?",
+  "core.uc_profile.pat.operations.revoke.description": "After revocation, this personal access token will become invalid immediately and can no longer be used to access APIs or perform operations. Continue?",
   "core.uc_profile.pat.operations.revoke.toast_success": "Revocation succeeded",
   "core.uc_profile.pat.operations.copy.title": "Please copy and save immediately, Token will only be displayed once.",
   "core.uc_profile.pat.operations.restore.button": "Restore",

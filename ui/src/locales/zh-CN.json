@@ -790,7 +790,7 @@
   "core.uc_profile.pat.operations.delete.description": "确定要删除该个人令牌吗？",
   "core.uc_profile.pat.operations.revoke.button": "撤销",
   "core.uc_profile.pat.operations.revoke.title": "撤销个人令牌",
-  "core.uc_profile.pat.operations.revoke.description": "撤销个人令牌",
+  "core.uc_profile.pat.operations.revoke.description": "撤销后，该个人令牌将立即失效，无法继续用于访问 API 或执行操作。是否继续？",
   "core.uc_profile.pat.operations.revoke.toast_success": "撤销成功",
   "core.uc_profile.pat.operations.copy.title": "请立即复制并保存，Token 将仅显示一次。",
   "core.uc_profile.pat.operations.restore.button": "恢复",
