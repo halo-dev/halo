@@ -27,6 +27,9 @@ export interface ReverseProxy {
     'apiVersion': string;
     'kind': string;
     'metadata': Metadata;
+    /**
+     * Path mapping rules served by this reverse proxy resource.
+     */
     'rules'?: Array<ReverseProxyRule>;
 }
 

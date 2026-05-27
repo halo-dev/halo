@@ -14,6 +14,9 @@
 
 
 
+/**
+ * Subject that receives permissions from a RoleBinding.
+ */
 export interface Subject {
     /**
      * APIGroup holds the API group of the referenced subject. Defaults to \"\" for ServiceAccount subjects. Defaults  to \"rbac.authorization.halo.run\" for User and Group subjects.

@@ -27,7 +27,7 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 export const IndicesV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Rebuild all indices
+         * Submit a request to rebuild all search indices.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -73,7 +73,7 @@ export const IndicesV1alpha1ConsoleApiFp = function(configuration?: Configuratio
     const localVarAxiosParamCreator = IndicesV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Rebuild all indices
+         * Submit a request to rebuild all search indices.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -93,7 +93,7 @@ export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Config
     const localVarFp = IndicesV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Rebuild all indices
+         * Submit a request to rebuild all search indices.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -108,7 +108,7 @@ export const IndicesV1alpha1ConsoleApiFactory = function (configuration?: Config
  */
 export class IndicesV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Rebuild all indices
+     * Submit a request to rebuild all search indices.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */

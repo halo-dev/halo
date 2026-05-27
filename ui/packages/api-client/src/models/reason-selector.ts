@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Selector used to match a notification template to a reason type and language.
+ */
 export interface ReasonSelector {
+    /**
+     * Language tag this template applies to, or default for the fallback template.
+     */
     'language': string;
+    /**
+     * ReasonType metadata.name this template applies to.
+     */
     'reasonType': string;
 }
 

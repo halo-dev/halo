@@ -14,6 +14,9 @@
 
 
 
+/**
+ * External OAuth2 account binding for a Halo user.
+ */
 export interface UserConnectionSpec {
     /**
      * The unique identifier for the user\'s connection to the OAuth provider. for example, the user\'s GitHub id.

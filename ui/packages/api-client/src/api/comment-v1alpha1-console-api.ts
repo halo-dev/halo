@@ -37,7 +37,7 @@ import type { ReplyRequest } from '../models';
 export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create a comment.
+         * Create a comment for a subject. Console-created comments are created through the comment service with request IP and user agent captured.
          * @param {CommentRequest} commentRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -80,8 +80,8 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * Create a reply.
-         * @param {string} name 
+         * Create an approved reply under an existing comment.
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -127,15 +127,15 @@ export const CommentV1alpha1ConsoleApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * List comments.
+         * List comments with pagination, sorting, keyword, and commenter filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Comments filtered by keyword.
-         * @param {string} [ownerKind] Commenter kind.
-         * @param {string} [ownerName] Commenter name.
+         * @param {string} [keyword] Keyword used to match the raw comment text.
+         * @param {string} [ownerKind] Kind of the commenter identity. Defaults to User when ownerName is provided.
+         * @param {string} [ownerName] Name of the commenter identity to filter by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -213,7 +213,7 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
     const localVarAxiosParamCreator = CommentV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create a comment.
+         * Create a comment for a subject. Console-created comments are created through the comment service with request IP and user agent captured.
          * @param {CommentRequest} commentRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -225,8 +225,8 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Create a reply.
-         * @param {string} name 
+         * Create an approved reply under an existing comment.
+         * @param {string} name metadata.name of the comment to reply to.
          * @param {ReplyRequest} replyRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -238,15 +238,15 @@ export const CommentV1alpha1ConsoleApiFp = function(configuration?: Configuratio
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * List comments.
+         * List comments with pagination, sorting, keyword, and commenter filters.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Comments filtered by keyword.
-         * @param {string} [ownerKind] Commenter kind.
-         * @param {string} [ownerName] Commenter name.
+         * @param {string} [keyword] Keyword used to match the raw comment text.
+         * @param {string} [ownerKind] Kind of the commenter identity. Defaults to User when ownerName is provided.
+         * @param {string} [ownerName] Name of the commenter identity to filter by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -266,7 +266,7 @@ export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Config
     const localVarFp = CommentV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Create a comment.
+         * Create a comment for a subject. Console-created comments are created through the comment service with request IP and user agent captured.
          * @param {CommentV1alpha1ConsoleApiCreateCommentRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -275,7 +275,7 @@ export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Config
             return localVarFp.createComment(requestParameters.commentRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create a reply.
+         * Create an approved reply under an existing comment.
          * @param {CommentV1alpha1ConsoleApiCreateReplyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -284,7 +284,7 @@ export const CommentV1alpha1ConsoleApiFactory = function (configuration?: Config
             return localVarFp.createReply(requestParameters.name, requestParameters.replyRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * List comments.
+         * List comments with pagination, sorting, keyword, and commenter filters.
          * @param {CommentV1alpha1ConsoleApiListCommentsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -306,6 +306,9 @@ export interface CommentV1alpha1ConsoleApiCreateCommentRequest {
  * Request parameters for createReply operation in CommentV1alpha1ConsoleApi.
  */
 export interface CommentV1alpha1ConsoleApiCreateReplyRequest {
+    /**
+     * metadata.name of the comment to reply to.
+     */
     readonly name: string
 
     readonly replyRequest: ReplyRequest
@@ -341,17 +344,17 @@ export interface CommentV1alpha1ConsoleApiListCommentsRequest {
     readonly sort?: Array<string>
 
     /**
-     * Comments filtered by keyword.
+     * Keyword used to match the raw comment text.
      */
     readonly keyword?: string
 
     /**
-     * Commenter kind.
+     * Kind of the commenter identity. Defaults to User when ownerName is provided.
      */
     readonly ownerKind?: string
 
     /**
-     * Commenter name.
+     * Name of the commenter identity to filter by.
      */
     readonly ownerName?: string
 }
@@ -361,7 +364,7 @@ export interface CommentV1alpha1ConsoleApiListCommentsRequest {
  */
 export class CommentV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Create a comment.
+     * Create a comment for a subject. Console-created comments are created through the comment service with request IP and user agent captured.
      * @param {CommentV1alpha1ConsoleApiCreateCommentRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -371,7 +374,7 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Create a reply.
+     * Create an approved reply under an existing comment.
      * @param {CommentV1alpha1ConsoleApiCreateReplyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -381,7 +384,7 @@ export class CommentV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * List comments.
+     * List comments with pagination, sorting, keyword, and commenter filters.
      * @param {CommentV1alpha1ConsoleApiListCommentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

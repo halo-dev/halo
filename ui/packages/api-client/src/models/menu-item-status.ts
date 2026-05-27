@@ -14,13 +14,16 @@
 
 
 
+/**
+ * Resolved menu item values used for rendering.
+ */
 export interface MenuItemStatus {
     /**
-     * Calculated Display name of menu item.
+     * Calculated display name after resolving targetRef, falling back to spec.displayName.
      */
     'displayName'?: string;
     /**
-     * Calculated href of manu item.
+     * Calculated href after resolving targetRef, falling back to spec.href.
      */
     'href'?: string;
 }

@@ -14,9 +14,12 @@
 
 
 
+/**
+ * Payload for changing a user\'s password.
+ */
 export interface ChangePasswordRequest {
     /**
-     * New password.
+     * new password
      */
     'password': string;
 }

@@ -14,33 +14,36 @@
 
 
 
+/**
+ * Desired attachment metadata and storage placement.
+ */
 export interface AttachmentSpec {
     /**
-     * Display name of attachment
+     * Display name shown for the attachment.
      */
     'displayName'?: string;
     /**
-     * Group name
+     * Attachment group metadata.name this attachment belongs to.
      */
     'groupName'?: string;
     /**
-     * Media type of attachment
+     * Media type detected or supplied for the attachment, such as image/png.
      */
     'mediaType'?: string;
     /**
-     * Name of User who uploads the attachment
+     * User metadata.name of the uploader.
      */
     'ownerName'?: string;
     /**
-     * Policy name
+     * Storage policy metadata.name used to store this attachment.
      */
     'policyName'?: string;
     /**
-     * Size of attachment. Unit is Byte
+     * Size of the attachment in bytes.
      */
     'size'?: number;
     /**
-     * Tags of attachment
+     * Free-form tags assigned to the attachment.
      */
     'tags'?: Array<string>;
 }

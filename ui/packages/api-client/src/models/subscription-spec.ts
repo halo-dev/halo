@@ -20,15 +20,18 @@ import type { InterestReason } from './interest-reason';
 // @ts-ignore
 import type { SubscriptionSubscriber } from './subscription-subscriber';
 
+/**
+ * Desired notification subscription settings.
+ */
 export interface SubscriptionSpec {
     /**
-     * Perhaps users need to unsubscribe and interact without receiving notifications again
+     * Whether the subscription has been disabled, usually after the subscriber unsubscribes.
      */
     'disabled'?: boolean;
     'reason': InterestReason;
     'subscriber': SubscriptionSubscriber;
     /**
-     * The token to unsubscribe
+     * Token used to unsubscribe without authenticating as the subscriber.
      */
     'unsubscribeToken': string;
 }

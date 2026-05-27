@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Plugin author metadata.
+ */
 export interface PluginAuthor {
+    /**
+     * Author display name.
+     */
     'name': string;
+    /**
+     * Author website URL.
+     */
     'website'?: string;
 }
 

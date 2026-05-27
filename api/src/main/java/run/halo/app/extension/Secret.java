@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
  *
  * @author guqing
  * @see <a
- *     href="https://github.com/kubernetes/kubernetes/blob/f33498a8256b455b677ad4d30440869318b84204/staging/src/k8s.io/api/core/v1/types.go">kebernetes
+ *     href="https://github.com/kubernetes/kubernetes/blob/f33498a8256b455b677ad4d30440869318b84204/staging/src/k8s.io/api/core/v1/types.go">Kubernetes
  *     Secret</a>
  * @since 2.0.0
  */

@@ -14,6 +14,9 @@
 
 
 
+/**
+ * Email sender configuration to validate.
+ */
 export interface EmailConfigValidationRequest {
     /**
      * Gets email display name.

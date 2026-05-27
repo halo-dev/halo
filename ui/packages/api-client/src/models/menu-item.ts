@@ -23,6 +23,9 @@ import type { MenuItemStatus } from './menu-item-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Menu item extension that describes a navigable item and its resolved rendering state.
+ */
 export interface MenuItem {
     'apiVersion': string;
     'kind': string;

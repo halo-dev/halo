@@ -28,8 +28,8 @@ export const PolicyAlpha1ConsoleApiAxiosParamCreator = function (configuration?:
     return {
         /**
          * Get policy config by group
-         * @param {string} name Name of the policy
-         * @param {string} group Name of the group
+         * @param {string} name metadata.name of the policy
+         * @param {string} group Config group name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -73,8 +73,8 @@ export const PolicyAlpha1ConsoleApiAxiosParamCreator = function (configuration?:
         },
         /**
          * Update policy config by group
-         * @param {string} name Name of the policy
-         * @param {string} group Name of the group
+         * @param {string} name metadata.name of the policy
+         * @param {string} group Config group name
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -133,8 +133,8 @@ export const PolicyAlpha1ConsoleApiFp = function(configuration?: Configuration) 
     return {
         /**
          * Get policy config by group
-         * @param {string} name Name of the policy
-         * @param {string} group Name of the group
+         * @param {string} name metadata.name of the policy
+         * @param {string} group Config group name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -146,8 +146,8 @@ export const PolicyAlpha1ConsoleApiFp = function(configuration?: Configuration) 
         },
         /**
          * Update policy config by group
-         * @param {string} name Name of the policy
-         * @param {string} group Name of the group
+         * @param {string} name metadata.name of the policy
+         * @param {string} group Config group name
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -193,12 +193,12 @@ export const PolicyAlpha1ConsoleApiFactory = function (configuration?: Configura
  */
 export interface PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest {
     /**
-     * Name of the policy
+     * metadata.name of the policy
      */
     readonly name: string
 
     /**
-     * Name of the group
+     * Config group name
      */
     readonly group: string
 }
@@ -208,12 +208,12 @@ export interface PolicyAlpha1ConsoleApiGetPolicyConfigByGroupRequest {
  */
 export interface PolicyAlpha1ConsoleApiUpdatePolicyConfigByGroupRequest {
     /**
-     * Name of the policy
+     * metadata.name of the policy
      */
     readonly name: string
 
     /**
-     * Name of the group
+     * Config group name
      */
     readonly group: string
 

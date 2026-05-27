@@ -5,6 +5,8 @@ import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -61,6 +63,8 @@ import run.halo.app.theme.service.ThemeUtils;
 class ThemeReconciler implements Reconciler<Request> {
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
     private static final String FINALIZER_NAME = "theme-protection";
+    private static final List<String> LOCAL_DEVELOPMENT_INDICATORS =
+            List.of(".git", "package.json", "pnpm-lock.yaml", "yarn.lock", "package-lock.json", "node_modules");
 
     private final ExtensionClient client;
 
@@ -155,6 +159,7 @@ class ThemeReconciler implements Reconciler<Request> {
         var name = theme.getMetadata().getName();
         var themePath = themeRoot.get().resolve(name);
         status.setLocation(themePath.toAbsolutePath().toString());
+        status.setInDevelopment(hasLocalDevelopmentIndicators(themePath));
 
         status.setPhase(Theme.ThemePhase.READY);
         var conditionBuilder = Condition.builder()
@@ -178,6 +183,10 @@ class ThemeReconciler implements Reconciler<Request> {
                             requires, normalVersion));
         }
         Theme.nullSafeConditionList(theme).addAndEvictFIFO(conditionBuilder.build());
+    }
+
+    private static boolean hasLocalDevelopmentIndicators(Path themePath) {
+        return LOCAL_DEVELOPMENT_INDICATORS.stream().anyMatch(indicator -> Files.exists(themePath.resolve(indicator)));
     }
 
     private void themeSettingDefaultConfig(Theme theme) {

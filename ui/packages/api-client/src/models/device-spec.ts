@@ -14,13 +14,37 @@
 
 
 
+/**
+ * Session identity and request metadata captured for a device.
+ */
 export interface DeviceSpec {
+    /**
+     * Client IP address observed for the session.
+     */
     'ipAddress': string;
+    /**
+     * Last time this session accessed Halo.
+     */
     'lastAccessedTime'?: string;
+    /**
+     * Last time the user authenticated for this session.
+     */
     'lastAuthenticatedTime'?: string;
+    /**
+     * Principal name of the authenticated user.
+     */
     'principalName': string;
+    /**
+     * Remember-me series id associated with the session, if any.
+     */
     'rememberMeSeriesId'?: string;
+    /**
+     * Web session identifier associated with the device.
+     */
     'sessionId': string;
+    /**
+     * Client user-agent header captured for the session.
+     */
     'userAgent'?: string;
 }
 

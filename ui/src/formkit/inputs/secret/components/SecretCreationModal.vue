@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { coreApiClient } from "@halo-dev/api-client";
 import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { utils } from "@halo-dev/ui-shared";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { secretAnnotations } from "@/constants/annotations";
 import { Q_KEY } from "../composables/use-secrets-fetch";
 import type { RequiredKey, SecretFormState } from "../types";
@@ -10,12 +11,13 @@ import SecretForm from "./SecretForm.vue";
 
 const queryClient = useQueryClient();
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    descriptionPreset?: string;
     formState?: SecretFormState;
     requiredKeys?: RequiredKey[];
   }>(),
-  { formState: undefined, requiredKeys: () => [] }
+  { descriptionPreset: undefined, formState: undefined, requiredKeys: () => [] }
 );
 
 const emit = defineEmits<{
@@ -24,6 +26,26 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
+
+const initialFormState = computed<SecretFormState | undefined>(() => {
+  if (props.formState) {
+    return props.formState;
+  }
+
+  const descriptionPreset = props.descriptionPreset?.trim();
+
+  if (!descriptionPreset) {
+    return;
+  }
+
+  return {
+    description: `${descriptionPreset} - ${utils.date.format(new Date())}`,
+    stringDataArray: props.requiredKeys.map((key) => ({
+      key: key.key,
+      value: "",
+    })),
+  };
+});
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["create-secret"],
@@ -76,7 +98,7 @@ function onSubmit(data: SecretFormState) {
     @close="emit('close')"
   >
     <SecretForm
-      :form-state="formState"
+      :form-state="initialFormState"
       :required-keys="requiredKeys"
       @submit="onSubmit"
     />

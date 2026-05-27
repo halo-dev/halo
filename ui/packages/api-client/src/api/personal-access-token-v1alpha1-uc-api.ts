@@ -30,7 +30,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
     return {
         /**
          * Delete a PAT
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -114,7 +114,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
         },
         /**
          * Obtain a PAT.
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -192,7 +192,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
         },
         /**
          * Restore a PAT.
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to restore.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -233,7 +233,7 @@ export const PersonalAccessTokenV1alpha1UcApiAxiosParamCreator = function (confi
         },
         /**
          * Revoke a PAT
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to revoke.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -283,11 +283,11 @@ export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Confi
     return {
         /**
          * Delete a PAT
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to delete.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deletePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deletePat(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PersonalAccessTokenV1alpha1UcApi.deletePat']?.[localVarOperationServerIndex]?.url;
@@ -307,11 +307,11 @@ export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Confi
         },
         /**
          * Obtain a PAT.
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to fetch.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async obtainPat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async obtainPat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.obtainPat(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PersonalAccessTokenV1alpha1UcApi.obtainPat']?.[localVarOperationServerIndex]?.url;
@@ -330,11 +330,11 @@ export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Confi
         },
         /**
          * Restore a PAT.
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to restore.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async restorePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async restorePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.restorePat(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PersonalAccessTokenV1alpha1UcApi.restorePat']?.[localVarOperationServerIndex]?.url;
@@ -342,11 +342,11 @@ export const PersonalAccessTokenV1alpha1UcApiFp = function(configuration?: Confi
         },
         /**
          * Revoke a PAT
-         * @param {string} name 
+         * @param {string} name metadata.name of the PAT to revoke.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async revokePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async revokePat(name: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.revokePat(name, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PersonalAccessTokenV1alpha1UcApi.revokePat']?.[localVarOperationServerIndex]?.url;
@@ -367,7 +367,7 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletePat(requestParameters: PersonalAccessTokenV1alpha1UcApiDeletePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        deletePat(requestParameters: PersonalAccessTokenV1alpha1UcApiDeletePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessToken> {
             return localVarFp.deletePat(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -385,7 +385,7 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        obtainPat(requestParameters: PersonalAccessTokenV1alpha1UcApiObtainPatRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        obtainPat(requestParameters: PersonalAccessTokenV1alpha1UcApiObtainPatRequest, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessToken> {
             return localVarFp.obtainPat(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -402,7 +402,7 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        restorePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRestorePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        restorePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRestorePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessToken> {
             return localVarFp.restorePat(requestParameters.name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -411,7 +411,7 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        revokePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRevokePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        revokePat(requestParameters: PersonalAccessTokenV1alpha1UcApiRevokePatRequest, options?: RawAxiosRequestConfig): AxiosPromise<PersonalAccessToken> {
             return localVarFp.revokePat(requestParameters.name, options).then((request) => request(axios, basePath));
         },
     };
@@ -421,6 +421,9 @@ export const PersonalAccessTokenV1alpha1UcApiFactory = function (configuration?:
  * Request parameters for deletePat operation in PersonalAccessTokenV1alpha1UcApi.
  */
 export interface PersonalAccessTokenV1alpha1UcApiDeletePatRequest {
+    /**
+     * metadata.name of the PAT to delete.
+     */
     readonly name: string
 }
 
@@ -435,6 +438,9 @@ export interface PersonalAccessTokenV1alpha1UcApiGeneratePatRequest {
  * Request parameters for obtainPat operation in PersonalAccessTokenV1alpha1UcApi.
  */
 export interface PersonalAccessTokenV1alpha1UcApiObtainPatRequest {
+    /**
+     * metadata.name of the PAT to fetch.
+     */
     readonly name: string
 }
 
@@ -442,6 +448,9 @@ export interface PersonalAccessTokenV1alpha1UcApiObtainPatRequest {
  * Request parameters for restorePat operation in PersonalAccessTokenV1alpha1UcApi.
  */
 export interface PersonalAccessTokenV1alpha1UcApiRestorePatRequest {
+    /**
+     * metadata.name of the PAT to restore.
+     */
     readonly name: string
 }
 
@@ -449,6 +458,9 @@ export interface PersonalAccessTokenV1alpha1UcApiRestorePatRequest {
  * Request parameters for revokePat operation in PersonalAccessTokenV1alpha1UcApi.
  */
 export interface PersonalAccessTokenV1alpha1UcApiRevokePatRequest {
+    /**
+     * metadata.name of the PAT to revoke.
+     */
     readonly name: string
 }
 

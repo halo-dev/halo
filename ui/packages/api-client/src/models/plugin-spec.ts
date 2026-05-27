@@ -20,22 +20,58 @@ import type { License } from './license';
 // @ts-ignore
 import type { PluginAuthor } from './plugin-author';
 
+/**
+ * Desired plugin metadata and configuration references.
+ */
 export interface PluginSpec {
     'author'?: PluginAuthor;
+    /**
+     * ConfigMap metadata.name storing plugin configuration values.
+     */
     'configMapName'?: string;
+    /**
+     * Human-readable plugin description.
+     */
     'description'?: string;
+    /**
+     * Display name shown for the plugin.
+     */
     'displayName'?: string;
+    /**
+     * Whether the plugin should be enabled.
+     */
     'enabled'?: boolean;
+    /**
+     * Plugin homepage URL.
+     */
     'homepage'?: string;
+    /**
+     * Issue tracker URL.
+     */
     'issues'?: string;
+    /**
+     * Licenses declared by the plugin.
+     */
     'license'?: Array<License>;
+    /**
+     * Logo URL or attachment URI for the plugin.
+     */
     'logo'?: string;
+    /**
+     * Required plugin dependencies keyed by plugin name with version constraints as values.
+     */
     'pluginDependencies'?: { [key: string]: string; };
+    /**
+     * Source repository URL.
+     */
     'repo'?: string;
     /**
      * SemVer format.
      */
     'requires'?: string;
+    /**
+     * Setting metadata.name used to render the plugin configuration form.
+     */
     'settingName'?: string;
     /**
      * plugin version.

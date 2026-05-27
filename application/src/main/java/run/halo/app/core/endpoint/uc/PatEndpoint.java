@@ -54,7 +54,9 @@ class PatEndpoint implements CustomEndpoint {
                                                 .parameter(parameterBuilder()
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
-                                                        .name("name")))
+                                                        .description("metadata.name of the PAT to fetch.")
+                                                        .name("name"))
+                                                .response(responseBuilder().implementation(PersonalAccessToken.class)))
                                 .PUT(
                                         "/{name}/actions/revocation",
                                         patHandler::revoke,
@@ -64,7 +66,9 @@ class PatEndpoint implements CustomEndpoint {
                                                 .parameter(parameterBuilder()
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
-                                                        .name("name")))
+                                                        .description("metadata.name of the PAT to revoke.")
+                                                        .name("name"))
+                                                .response(responseBuilder().implementation(PersonalAccessToken.class)))
                                 .PUT(
                                         "/{name}/actions/restoration",
                                         patHandler::restore,
@@ -74,7 +78,9 @@ class PatEndpoint implements CustomEndpoint {
                                                 .parameter(parameterBuilder()
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
-                                                        .name("name")))
+                                                        .description("metadata.name of the PAT to restore.")
+                                                        .name("name"))
+                                                .response(responseBuilder().implementation(PersonalAccessToken.class)))
                                 .DELETE(
                                         "/{name}",
                                         patHandler::delete,
@@ -84,7 +90,9 @@ class PatEndpoint implements CustomEndpoint {
                                                 .parameter(parameterBuilder()
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
-                                                        .name("name")))
+                                                        .description("metadata.name of the PAT to delete.")
+                                                        .name("name"))
+                                                .response(responseBuilder().implementation(PersonalAccessToken.class)))
                                 .build())
                 .build();
     }

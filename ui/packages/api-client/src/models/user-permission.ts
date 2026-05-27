@@ -17,9 +17,21 @@
 // @ts-ignore
 import type { Role } from './role';
 
+/**
+ * Resolved role and permission information for a user.
+ */
 export interface UserPermission {
+    /**
+     * Role templates or permissions resolved from granted roles.
+     */
     'permissions': Array<Role>;
+    /**
+     * Roles granted to the user.
+     */
     'roles': Array<Role>;
+    /**
+     * Resolved UI permission identifiers.
+     */
     'uiPermissions': Array<string>;
 }
 

@@ -31,7 +31,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
- * Endpoint for managing {@link SinglePage}.
+ * Console endpoint for managing {@link SinglePage} content and snapshots.
  *
  * @author guqing
  * @since 2.0.0
@@ -50,7 +50,8 @@ public class SinglePageEndpoint implements CustomEndpoint {
         return SpringdocRouteBuilder.route()
                 .GET("singlepages", this::listSinglePage, builder -> {
                     builder.operationId("ListSinglePages")
-                            .description("List single pages.")
+                            .description("List single pages with pagination, sorting, keyword, publish phase, "
+                                    + "visibility, and contributor filters.")
                             .tag(tag)
                             .response(responseBuilder()
                                     .implementation(ListResult.generateGenericClass(ListedSinglePage.class)));
@@ -60,10 +61,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}/head-content",
                         this::fetchHeadContent,
                         builder -> builder.operationId("fetchSinglePageHeadContent")
-                                .description("Fetch head content of single page.")
+                                .description("Fetch the editable head content of a single page.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -72,10 +74,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}/release-content",
                         this::fetchReleaseContent,
                         builder -> builder.operationId("fetchSinglePageReleaseContent")
-                                .description("Fetch release content of single page.")
+                                .description("Fetch the released content currently served for a published single page.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -84,15 +87,18 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}/content",
                         this::fetchContent,
                         builder -> builder.operationId("fetchSinglePageContent")
-                                .description("Fetch content of single page.")
+                                .description(
+                                        "Fetch a single page content snapshot reconstructed from its base snapshot.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
+                                        .description("Content snapshot metadata.name to fetch.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -101,10 +107,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}/snapshot",
                         this::listSnapshots,
                         builder -> builder.operationId("listSinglePageSnapshots")
-                                .description("List all snapshots for single page content.")
+                                .description("List content snapshots for a single page.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -113,7 +120,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages",
                         this::draftSinglePage,
                         builder -> builder.operationId("DraftSinglePage")
-                                .description("Draft a single page.")
+                                .description("Create a draft single page together with its initial content.")
                                 .tag(tag)
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -126,10 +133,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}",
                         this::updateSinglePage,
                         builder -> builder.operationId("UpdateDraftSinglePage")
-                                .description("Update a single page.")
+                                .description("Update single page metadata, spec, and content in one request.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page to update.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -144,10 +152,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         "singlepages/{name}/content",
                         this::updateContent,
                         builder -> builder.operationId("UpdateSinglePageContent")
-                                .description("Update a single page's content.")
+                                .description("Update only the content of an existing single page.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page whose content will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -156,15 +165,16 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                         .content(contentBuilder()
                                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                                 .schema(Builder.schemaBuilder().implementation(Content.class))))
-                                .response(responseBuilder().implementation(Post.class)))
+                                .response(responseBuilder().implementation(SinglePage.class)))
                 .PUT(
                         "singlepages/{name}/revert-content",
                         this::revertToSpecifiedSnapshot,
                         builder -> builder.operationId("revertToSpecifiedSnapshotForSinglePage")
-                                .description("Revert to specified snapshot for single page content.")
+                                .description("Restore the single page content from a specified snapshot.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page whose content will be restored.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -174,32 +184,44 @@ public class SinglePageEndpoint implements CustomEndpoint {
                                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                                 .schema(Builder.schemaBuilder()
                                                         .implementation(RevertSnapshotParam.class))))
-                                .response(responseBuilder().implementation(Post.class)))
+                                .response(responseBuilder().implementation(SinglePage.class)))
                 .PUT(
                         "singlepages/{name}/publish",
                         this::publishSinglePage,
                         builder -> builder.operationId("PublishSinglePage")
-                                .description("Publish a single page.")
+                                .description("Publish a single page. By default, the request waits until the release "
+                                        + "snapshot is available.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page to publish.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
+                                .parameter(parameterBuilder()
+                                        .name("async")
+                                        .description("Whether to return immediately after marking the single page for "
+                                                + "publishing.")
+                                        .in(ParameterIn.QUERY)
+                                        .implementation(Boolean.class)
+                                        .required(false))
                                 .response(responseBuilder().implementation(SinglePage.class)))
                 .DELETE(
                         "singlepages/{name}/content",
                         this::deleteContent,
                         builder -> builder.operationId("deleteSinglePageContent")
-                                .description("Delete a content for post.")
+                                .description("Delete a content snapshot from a single page and return the deleted "
+                                        + "content.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the single page.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
                                 .parameter(parameterBuilder()
                                         .name("snapshotName")
+                                        .description("Content snapshot metadata.name to delete.")
                                         .in(ParameterIn.QUERY)
                                         .required(true)
                                         .implementation(String.class))
@@ -223,6 +245,11 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
+    /**
+     * Request body for restoring single page content from a snapshot.
+     *
+     * @param snapshotName snapshot {@code metadata.name} to restore as the single page's head content
+     */
     @Schema(name = "RevertSnapshotForSingleParam")
     record RevertSnapshotParam(
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED, minLength = 1)

@@ -129,12 +129,12 @@ public class UserEndpoint implements CustomEndpoint {
                         "/users/{name}",
                         this::getUserByName,
                         builder -> builder.operationId("GetUserDetail")
-                                .description("Get user detail by name")
+                                .description("Get user detail by metadata.name")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User name")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(DetailedUser.class)))
                 .PUT(
@@ -154,7 +154,7 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User name")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .requestBody(requestBodyBuilder().required(true).implementation(GrantRequest.class))
                                 .response(responseBuilder().implementation(User.class)))
@@ -176,7 +176,7 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User name")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(UserPermission.class)))
                 .PUT(
@@ -198,8 +198,9 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Name of user. If the name is equal to '-', it will change the "
-                                                + "password of current user.")
+                                        .description(
+                                                "User metadata.name. If the name is equal to '-', it will change the "
+                                                        + "password of current user.")
                                         .required(true))
                                 .requestBody(
                                         requestBodyBuilder().required(true).implementation(ChangePasswordRequest.class))
@@ -221,7 +222,7 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User name")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -238,7 +239,7 @@ public class UserEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("User name")
+                                        .description("User metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(User.class))
                                 .build())
@@ -296,12 +297,24 @@ public class UserEndpoint implements CustomEndpoint {
                 .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
+    /**
+     * Payload for sending an email verification code.
+     *
+     * @param email email address to verify
+     */
     public record EmailVerifyRequest(
             @Schema(requiredMode = REQUIRED) @Email @NotBlank
             String email) {}
 
+    /**
+     * Payload for verifying an email address by code.
+     *
+     * @param password current password of the authenticated user
+     * @param code email verification code
+     */
     public record VerifyCodeRequest(
             @Schema(requiredMode = REQUIRED) String password,
+
             @Schema(requiredMode = REQUIRED, minLength = 1) String code) {}
 
     private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
@@ -376,9 +389,11 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
+    /** Multipart payload for uploading a user avatar. */
     @Schema(types = "object")
     public interface IAvatarUploadRequest {
-        @Schema(requiredMode = REQUIRED, description = "Avatar file")
+        /** Avatar file. */
+        @Schema(requiredMode = REQUIRED)
         FilePart getFile();
     }
 
@@ -474,15 +489,36 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
+    /**
+     * Payload for creating a user from the console.
+     *
+     * @param name user {@code metadata.name}, which also serves as the login name
+     * @param email email address of the user
+     * @param displayName display name shown in the console and theme
+     * @param avatar avatar URL of the user
+     * @param phone phone number of the user
+     * @param password raw password to set for the user
+     * @param bio biography or profile text of the user
+     * @param annotations metadata annotations to set on the user
+     * @param roles role {@code metadata.name} values to grant to the user after creation
+     */
     record CreateUserRequest(
             @Schema(requiredMode = REQUIRED) String name,
+
             @Schema(requiredMode = REQUIRED) String email,
+
             String displayName,
+
             String avatar,
+
             String phone,
+
             String password,
+
             String bio,
+
             Map<String, String> annotations,
+
             Set<String> roles) {
 
         /**
@@ -614,12 +650,16 @@ public class UserEndpoint implements CustomEndpoint {
                         .bodyValue(updatedUser));
     }
 
+    /**
+     * Payload for changing the current user's password.
+     *
+     * @param oldPassword old password
+     * @param password new password
+     */
     record ChangeOwnPasswordRequest(
-            @Schema(description = "Old password.", requiredMode = REQUIRED)
-            String oldPassword,
+            @Schema(requiredMode = REQUIRED) String oldPassword,
 
-            @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 5)
-            String password) {
+            @Schema(requiredMode = REQUIRED, minLength = 5) String password) {
 
         public ChangeOwnPasswordRequest {
             if (password == null || password.length() < 5 || password.length() > 257) {
@@ -629,9 +669,13 @@ public class UserEndpoint implements CustomEndpoint {
         }
     }
 
+    /**
+     * Payload for changing a user's password.
+     *
+     * @param password new password
+     */
     record ChangePasswordRequest(
-            @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 5)
-            String password) {}
+            @Schema(requiredMode = REQUIRED, minLength = 5) String password) {}
 
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
@@ -644,8 +688,15 @@ public class UserEndpoint implements CustomEndpoint {
                 .flatMap(detailedUser -> ServerResponse.ok().bodyValue(detailedUser));
     }
 
+    /**
+     * User detail response with resolved roles.
+     *
+     * @param user user extension
+     * @param roles roles granted to the user
+     */
     record DetailedUser(
             @Schema(requiredMode = REQUIRED) User user,
+
             @Schema(requiredMode = REQUIRED) List<Role> roles) {}
 
     Mono<ServerResponse> grantPermission(ServerRequest request) {
@@ -657,7 +708,12 @@ public class UserEndpoint implements CustomEndpoint {
                         .then(ServerResponse.ok().build()));
     }
 
-    record GrantRequest(Set<String> roles) {}
+    /**
+     * Payload for granting roles to a user.
+     *
+     * @param roles role {@code metadata.name} values to grant
+     */
+    record GrantRequest(@Schema(requiredMode = REQUIRED) Set<String> roles) {}
 
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
         var username = request.pathVariable("name");
@@ -704,14 +760,18 @@ public class UserEndpoint implements CustomEndpoint {
         return uiPerms.stream().distinct().sorted().toList();
     }
 
+    /** Resolved role and permission information for a user. */
     @Data
     public static class UserPermission {
+        /** Roles granted to the user. */
         @Schema(requiredMode = REQUIRED)
         private List<Role> roles;
 
+        /** Role templates or permissions resolved from granted roles. */
         @Schema(requiredMode = REQUIRED)
         private List<Role> permissions;
 
+        /** Resolved UI permission identifiers. */
         @Schema(requiredMode = REQUIRED)
         private List<String> uiPermissions;
     }
@@ -776,7 +836,7 @@ public class UserEndpoint implements CustomEndpoint {
                     .parameter(parameterBuilder()
                             .in(ParameterIn.QUERY)
                             .name("role")
-                            .description("Role name")
+                            .description("Role metadata.name")
                             .implementation(String.class)
                             .required(false))
                     .parameter(parameterBuilder()

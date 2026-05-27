@@ -76,7 +76,7 @@ export const TwoFactorAuthV1alpha1UcApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * 
+         * Delete the current user\'s configured TOTP authenticator after password verification.
          * @param {PasswordRequest} [passwordRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -294,7 +294,7 @@ export const TwoFactorAuthV1alpha1UcApiFp = function(configuration?: Configurati
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * Delete the current user\'s configured TOTP authenticator after password verification.
          * @param {PasswordRequest} [passwordRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -370,7 +370,7 @@ export const TwoFactorAuthV1alpha1UcApiFactory = function (configuration?: Confi
             return localVarFp.configurerTotp(requestParameters.totpRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Delete the current user\'s configured TOTP authenticator after password verification.
          * @param {TwoFactorAuthV1alpha1UcApiDeleteTotpRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -458,7 +458,7 @@ export class TwoFactorAuthV1alpha1UcApi extends BaseAPI {
     }
 
     /**
-     * 
+     * Delete the current user\'s configured TOTP authenticator after password verification.
      * @param {TwoFactorAuthV1alpha1UcApiDeleteTotpRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

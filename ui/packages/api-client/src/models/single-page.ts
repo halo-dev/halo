@@ -24,7 +24,7 @@ import type { SinglePageSpec } from './single-page-spec';
 import type { SinglePageStatus } from './single-page-status';
 
 /**
- * Single page extension.
+ * Single page extension that stores standalone page metadata, publication settings, and derived status.
  */
 export interface SinglePage {
     'apiVersion': string;

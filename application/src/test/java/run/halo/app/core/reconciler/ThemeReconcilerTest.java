@@ -245,6 +245,28 @@ class ThemeReconcilerTest {
         themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
         verify(extensionClient).update(themeUpdateCaptor.capture());
         assertThat(themeUpdateCaptor.getValue().getStatus().getPhase()).isEqualTo(Theme.ThemePhase.READY);
+        assertThat(themeUpdateCaptor.getValue().getStatus().getInDevelopment()).isFalse();
+    }
+
+    @Test
+    void shouldMarkThemeAsInDevelopmentWhenDevelopmentIndicatorsExist() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-status");
+        Files.createDirectories(testWorkDir.resolve("theme-test").resolve(".git"));
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeReconciler =
+                new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier, templateEngineManager);
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        assertThat(themeUpdateCaptor.getValue().getStatus().getInDevelopment()).isTrue();
     }
 
     private Theme fakeTheme() {

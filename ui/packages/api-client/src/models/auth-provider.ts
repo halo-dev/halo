@@ -21,7 +21,7 @@ import type { AuthProviderSpec } from './auth-provider-spec';
 import type { Metadata } from './metadata';
 
 /**
- * Auth provider extension.
+ * Authentication provider extension that describes an external or form-based sign-in integration.
  */
 export interface AuthProvider {
     'apiVersion': string;

@@ -14,9 +14,21 @@
 
 
 
+/**
+ * Notifier metadata used by notification preference UI.
+ */
 export interface NotifierInfo {
+    /**
+     * description of the notifier
+     */
     'description'?: string;
+    /**
+     * display name of the notifier
+     */
     'displayName'?: string;
-    'name'?: string;
+    /**
+     * notifier <code>metadata.name</code>
+     */
+    'name': string;
 }
 

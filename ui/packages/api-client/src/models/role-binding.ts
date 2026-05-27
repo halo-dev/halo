@@ -24,7 +24,7 @@ import type { RoleRef } from './role-ref';
 import type { Subject } from './subject';
 
 /**
- * RoleBinding references a role, but does not contain it. It can reference a Role in the global. It adds who  information via Subjects.
+ * RoleBinding extension that grants a Role to one or more subjects.
  */
 export interface RoleBinding {
     'apiVersion': string;
@@ -32,7 +32,7 @@ export interface RoleBinding {
     'metadata': Metadata;
     'roleRef'?: RoleRef;
     /**
-     * Subjects holds references to the objects the role applies to.
+     * Subjects that receive the permissions from roleRef.
      */
     'subjects'?: Array<Subject>;
 }

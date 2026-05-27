@@ -24,6 +24,12 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.exception.NotFoundException;
 
+/**
+ * User-center endpoint for reading post content snapshots owned by the current user.
+ *
+ * @author guqing
+ * @since 2.0.0
+ */
 @Component
 public class UcSnapshotEndpoint implements CustomEndpoint {
 
@@ -45,23 +51,31 @@ public class UcSnapshotEndpoint implements CustomEndpoint {
                                         "/{name}",
                                         this::getSnapshot,
                                         builder -> builder.operationId("GetSnapshotForPost")
-                                                .description("Get snapshot for one post.")
+                                                .description("Get a content snapshot for a post owned by the current "
+                                                        + "user. The snapshot must belong to the post specified by "
+                                                        + "postName.")
                                                 .parameter(parameterBuilder()
                                                         .name("name")
                                                         .in(ParameterIn.PATH)
                                                         .required(true)
-                                                        .description("Snapshot name."))
-                                                .parameter(parameterBuilder()
-                                                        .name("postName")
-                                                        .in(ParameterIn.QUERY)
-                                                        .required(true)
-                                                        .description("Post name."))
+                                                        .implementation(String.class)
+                                                        .description("metadata.name of the snapshot to fetch."))
+                                                .parameter(
+                                                        parameterBuilder()
+                                                                .name("postName")
+                                                                .in(ParameterIn.QUERY)
+                                                                .required(true)
+                                                                .implementation(String.class)
+                                                                .description(
+                                                                        "metadata.name of the post that owns the "
+                                                                                + "snapshot. The post must belong to the current user."))
                                                 .parameter(parameterBuilder()
                                                         .name("patched")
                                                         .in(ParameterIn.QUERY)
                                                         .required(false)
                                                         .implementation(Boolean.class)
-                                                        .description("Should include patched content and raw or not."))
+                                                        .description("Whether to return the snapshot patched against "
+                                                                + "the post base snapshot. Defaults to false."))
                                                 .response(responseBuilder().implementation(Snapshot.class))
                                                 .tag(tag))
                                 .build())
