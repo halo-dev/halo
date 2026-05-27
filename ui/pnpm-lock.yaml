@@ -672,6 +672,9 @@ importers:
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
+      semver:
+        specifier: ^7.7.4
+        version: 7.7.4
       vite:
         specifier: ^6.0.0 || ^7.0.0 || ^8.0.0
         version: 8.0.0(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2)
@@ -679,6 +682,9 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
 
 packages:
 
@@ -2812,6 +2818,9 @@ packages:
 
   '@types/scheduler@0.16.8':
     resolution: {integrity: sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==}
+
+  '@types/semver@7.7.1':
+    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
   '@types/send@0.17.4':
     resolution: {integrity: sha512-x2EM6TJOybec7c52BX0ZspPodMsQUd5L6PRwOunVyVUhXiBSKf3AezDL8Dgvgt5o0UfKNfuA0eMLr2wLT4AiBA==}
@@ -9329,6 +9338,8 @@ snapshots:
       htmlparser2: 8.0.2
 
   '@types/scheduler@0.16.8': {}
+
+  '@types/semver@7.7.1': {}
 
   '@types/send@0.17.4':
     dependencies:

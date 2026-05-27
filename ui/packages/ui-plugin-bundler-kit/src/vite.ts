@@ -5,10 +5,13 @@ import {
   UserConfig,
   UserConfigFnObject,
 } from "vite";
-import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
+import { DEFAULT_OUT_DIR_PROD, getDefaultOutDirDev } from "./constants/build";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { getHaloPluginManifest } from "./utils/halo-plugin";
+import {
+  getHaloPluginBundleLocation,
+  getHaloPluginManifest,
+} from "./utils/halo-plugin";
 
 export interface ViteUserConfig {
   /**
@@ -26,6 +29,7 @@ export interface ViteUserConfig {
 
 function createVitePresetsConfig(manifestPath: string) {
   const manifest = getHaloPluginManifest(manifestPath);
+  const bundleLocation = getHaloPluginBundleLocation(manifest);
 
   return defineConfig(({ mode }) => {
     const isProduction = mode === "production";
@@ -35,7 +39,9 @@ function createVitePresetsConfig(manifestPath: string) {
       plugins: [Vue()],
       define: { "process.env.NODE_ENV": "'production'" },
       build: {
-        outDir: isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV,
+        outDir: isProduction
+          ? DEFAULT_OUT_DIR_PROD
+          : getDefaultOutDirDev(bundleLocation),
         emptyOutDir: true,
         lib: {
           entry: "src/index.ts",

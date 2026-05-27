@@ -25,10 +25,12 @@
   },
   "dependencies": {
     "@halo-dev/api-client": "workspace:*",
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.1.1",
+    "semver": "^7.7.4"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9"
+    "@types/js-yaml": "^4.0.9",
+    "@types/semver": "^7.7.1"
   },
   "peerDependencies": {
     "@rsbuild/core": "^1.0.0 || ^2.0.0",
