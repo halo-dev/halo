@@ -129,9 +129,11 @@ $btn-themes: (
     color: inherit,
     border: 1px solid #d9d9d9,
     hover-bg: theme("colors.gray.100"),
+    active-bg: theme("colors.gray.200"),
     icon-color: theme("colors.secondary"),
     ghost-color: inherit,
     ghost-hover-bg: theme("colors.gray.100"),
+    ghost-active-bg: theme("colors.gray.200"),
     ghost-icon-color: theme("colors.secondary"),
   ),
   primary: (
@@ -139,9 +141,11 @@ $btn-themes: (
     color: #fff,
     border: none,
     hover-bg: theme("colors.primary"),
+    active-bg: theme("colors.primary"),
     icon-color: #fff,
     ghost-color: theme("colors.primary"),
     ghost-hover-bg: theme("colors.primary / 10%"),
+    ghost-active-bg: theme("colors.primary / 15%"),
     ghost-icon-color: theme("colors.primary"),
   ),
   secondary: (
@@ -149,9 +153,11 @@ $btn-themes: (
     color: #fff,
     border: none,
     hover-bg: theme("colors.secondary"),
+    active-bg: theme("colors.secondary"),
     icon-color: #fff,
     ghost-color: theme("colors.secondary"),
     ghost-hover-bg: theme("colors.secondary / 10%"),
+    ghost-active-bg: theme("colors.secondary / 15%"),
     ghost-icon-color: theme("colors.secondary"),
   ),
   danger: (
@@ -159,9 +165,11 @@ $btn-themes: (
     color: #fff,
     border: none,
     hover-bg: theme("colors.danger"),
+    active-bg: theme("colors.danger"),
     icon-color: #fff,
     ghost-color: theme("colors.danger"),
     ghost-hover-bg: theme("colors.danger / 10%"),
+    ghost-active-bg: theme("colors.danger / 15%"),
     ghost-icon-color: theme("colors.danger"),
   ),
 );
@@ -192,7 +200,7 @@ $btn-themes: (
     opacity: 0.9;
   }
 
-  &:active {
+  &:not(:disabled):not(.btn-loading):active {
     opacity: 1;
   }
 
@@ -204,7 +212,8 @@ $btn-themes: (
   &.btn-loading {
     cursor: not-allowed;
 
-    &:hover {
+    &:hover,
+    &:active {
       opacity: 1;
     }
   }
@@ -260,6 +269,10 @@ $btn-themes: (
       background-color: map.get($config, hover-bg) !important;
     }
 
+    &:not(:disabled):not(.btn-loading):active {
+      background-color: map.get($config, active-bg) !important;
+    }
+
     .btn-icon {
       color: map.get($config, icon-color);
     }
@@ -276,6 +289,10 @@ $btn-themes: (
 
       &:hover {
         background-color: map.get($config, ghost-hover-bg) !important;
+      }
+
+      &:not(:disabled):not(.btn-loading):active {
+        background-color: map.get($config, ghost-active-bg) !important;
       }
 
       .btn-icon {
