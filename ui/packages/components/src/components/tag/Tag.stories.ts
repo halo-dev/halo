@@ -1,63 +1,73 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
+import { IconSettings } from "@/icons/icons";
 import { VTag } from ".";
+import { VSpace } from "../space";
 
 const meta: Meta<typeof VTag> = {
-  title: "Tag",
+  title: "Components/Tag",
   component: VTag,
   tags: ["autodocs"],
   render: (args) => ({
-    components: { VTag },
+    components: { IconSettings, VTag },
     setup() {
       return { args };
     },
-    template: `<VTag v-bind="args">${args.default}<template v-if="${
-      "leftIcon" in args
-    }" #leftIcon>${args.leftIcon}</template></VTag>`,
+    template: `
+      <VTag
+        :theme="args.theme"
+        :rounded="args.rounded"
+      >
+        <template v-if="args.withIcon" #leftIcon>
+          <IconSettings />
+        </template>
+        {{ args.label }}
+      </VTag>
+    `,
   }),
   argTypes: {
-    default: {
-      control: { type: "text" },
-    },
     theme: {
       control: { type: "select" },
       options: ["default", "primary", "secondary", "danger"],
     },
+    rounded: {
+      control: { type: "boolean" },
+    },
+    withIcon: {
+      control: { type: "boolean" },
+    },
   },
   args: {
-    default: "Tag",
+    label: "默认",
     theme: "default",
+    rounded: false,
+    withIcon: false,
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof VTag>;
 
-export const Default: Story = {
-  args: {
-    theme: "default",
-  },
+export const Default: Story = {};
+
+export const Themes: Story = {
+  render: () => ({
+    components: { VSpace, VTag },
+    template: `
+      <VSpace spacing="sm">
+        <VTag>草稿</VTag>
+        <VTag theme="primary">已发布</VTag>
+        <VTag theme="secondary">置顶</VTag>
+        <VTag theme="danger">审核失败</VTag>
+      </VSpace>
+    `,
+  }),
 };
 
-export const Primary: Story = {
+export const RoundedWithIcon: Story = {
   args: {
+    label: "系统设置",
     theme: "primary",
-  },
-};
-
-export const Secondary: Story = {
-  args: {
-    theme: "secondary",
-  },
-};
-
-export const Danger: Story = {
-  args: {
-    theme: "danger",
-  },
-};
-
-export const Icon: Story = {
-  args: {
-    leftIcon: `<IconSettings />`,
+    rounded: true,
+    withIcon: true,
   },
 };

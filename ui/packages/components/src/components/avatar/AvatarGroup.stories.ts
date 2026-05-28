@@ -2,39 +2,52 @@ import type { Meta, StoryObj } from "@storybook/vue3-vite";
 import { VAvatar, VAvatarGroup } from ".";
 
 const meta: Meta<typeof VAvatarGroup> = {
-  title: "AvatarGroup",
+  title: "Components/AvatarGroup",
   component: VAvatarGroup,
   tags: ["autodocs"],
   render: (args) => ({
-    components: { VAvatarGroup, VAvatar },
+    components: { VAvatar, VAvatarGroup },
     setup() {
-      return { args };
+      const members = ["Halo Admin", "Plugin QA", "Theme Lead", "Docs Owner"];
+      return { args, members };
     },
-    template: `<VAvatarGroup v-bind="args">
-      <VAvatar src="https://avatar.iran.liara.run/public?id=1" />
-      <VAvatar src="https://avatar.iran.liara.run/public?id=2" />
-      <VAvatar src="https://avatar.iran.liara.run/public?id=3" />
-      <VAvatar src="https://avatar.iran.liara.run/public?id=4" />
-    </VAvatarGroup>`,
+    template: `
+      <VAvatarGroup
+        :size="args.size"
+        :circle="args.circle"
+        :width="args.width"
+        :height="args.height"
+      >
+        <VAvatar v-for="member in members" :key="member" :alt="member" />
+      </VAvatarGroup>
+    `,
   }),
   argTypes: {
     size: {
       control: { type: "select" },
       options: ["lg", "md", "sm", "xs"],
-      defaultValue: "md",
     },
+  },
+  args: {
+    size: "md",
+    circle: true,
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof VAvatarGroup>;
 
-export const Default: Story = {
-  args: {},
+export const Default: Story = {};
+
+export const Square: Story = {
+  args: {
+    circle: false,
+  },
 };
 
-export const Circle: Story = {
+export const SmallTeam: Story = {
   args: {
+    size: "sm",
     circle: true,
   },
 };
