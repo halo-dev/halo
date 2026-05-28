@@ -1,66 +1,91 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
-import { ref } from "vue";
+import { shallowRef } from "vue";
 import { IconArrowLeft, IconArrowRight } from "@/icons/icons";
 import { VModal } from ".";
 import { VButton } from "../button";
 import { VSpace } from "../space";
 
 const meta: Meta<typeof VModal> = {
-  title: "Modal",
+  title: "Components/Modal",
   component: VModal,
   tags: ["autodocs"],
   render: (args) => ({
-    components: { VModal, VButton, VSpace, IconArrowLeft, IconArrowRight },
+    components: { IconArrowLeft, IconArrowRight, VButton, VModal, VSpace },
     setup() {
-      const modal = ref();
-      return { args, modal };
+      const visible = shallowRef(false);
+      return { args, visible };
     },
     template: `
-      <VButton type="secondary" @click="args.visible = true">打开</VButton>
+      <VButton type="primary" @click="visible = true">打开预览</VButton>
       <VModal
-        ref="modal"
-        v-if="args.visible"
-        :fullscreen="args.fullscreen"
+        v-model:visible="visible"
         :title="args.title"
         :width="args.width"
-        :mount-to-body="true"
-        :layerClosable="true"
-        @close="args.visible = false"
+        :height="args.height"
+        :fullscreen="args.fullscreen"
+        :centered="args.centered"
+        :layer-closable="args.layerClosable"
       >
         <template #actions>
-          <span>
-            <IconArrowLeft role="button" />
-          </span>
-
-          <span>
-            <IconArrowRight role="button" />
-          </span>
+          <button class="inline-flex h-7 w-7 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100">
+            <IconArrowLeft />
+          </button>
+          <button class="inline-flex h-7 w-7 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100">
+            <IconArrowRight />
+          </button>
         </template>
-        <div class="flex flex-col">
-          <img class="w-full" src="https://ryanc.cc/avatar" />
-          <img class="w-full" src="https://ryanc.cc/avatar" />
-          <img class="w-full" src="https://www.halo.run/logo" />
-        </div>
+
+        <article class="space-y-4">
+          <div>
+            <div class="text-xs font-medium uppercase text-gray-400">文章预览</div>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">Halo 主题开发工作流</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">
+              这是一段用于预览弹窗排版的正文内容，展示标题、正文和操作区在中等宽度下的布局。
+            </p>
+          </div>
+          <div class="rounded bg-gray-50 p-4 text-sm text-gray-600">
+            当前预览不会改变文章状态，关闭弹窗后可以继续编辑草稿。
+          </div>
+        </article>
 
         <template #footer>
-          <VSpace>
-            <VButton loading type="primary" @click="args.visible = false"
-              >确定
-            </VButton>
-            <VButton @click="modal.close()">取消</VButton>
+          <VSpace spacing="sm">
+            <VButton type="primary" @click="visible = false">确认发布</VButton>
+            <VButton @click="visible = false">关闭</VButton>
           </VSpace>
         </template>
       </VModal>
     `,
   }),
+  argTypes: {
+    centered: {
+      control: { type: "boolean" },
+    },
+    fullscreen: {
+      control: { type: "boolean" },
+    },
+    layerClosable: {
+      control: { type: "boolean" },
+    },
+  },
   args: {
-    visible: false,
+    title: "预览文章",
+    width: 640,
+    centered: true,
+    fullscreen: false,
+    layerClosable: true,
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof VModal>;
 
-export const Default: Story = {
-  args: {},
+export const Default: Story = {};
+
+export const Fullscreen: Story = {
+  args: {
+    title: "全屏编辑",
+    fullscreen: true,
+    centered: false,
+  },
 };
