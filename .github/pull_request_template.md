@@ -15,7 +15,6 @@
 请选择一个主要类型：
 Select one primary type:
 -->
-
 - [ ] Feature
 - [ ] Bug fix
 - [ ] Improvement
