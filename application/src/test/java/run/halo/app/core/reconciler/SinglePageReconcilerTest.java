@@ -7,6 +7,7 @@ import static run.halo.app.content.TestPost.snapshotV1;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.*;
 import run.halo.app.core.counter.CounterService;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
@@ -104,6 +106,61 @@ class SinglePageReconcilerTest {
         SinglePage value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
+    }
+
+    @Test
+    void shouldRegenerateExcerptWhenAutoGenerateBecomesTrue() {
+        // https://github.com/halo-dev/halo/issues/10039
+        String name = "page-A";
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+
+        SinglePage page = pageV1();
+        page.getSpec().setHeadSnapshot("page-A-head-snapshot");
+        page.getSpec().setReleaseSnapshot(page.getSpec().getHeadSnapshot());
+
+        // simulate a previous state where autoGenerate was false
+        var oldCacheKey = "old-checksum:false";
+        page.getMetadata().setAnnotations(new HashMap<>());
+        page.getMetadata().getAnnotations().put(Constant.CONTENT_CHECKSUM_ANNO, oldCacheKey);
+
+        // now switch to autoGenerate=true
+        var excerpt = new Post.Excerpt();
+        excerpt.setAutoGenerate(true);
+        page.getSpec().setExcerpt(excerpt);
+
+        // old excerpt that should be regenerated
+        page.getStatusOrDefault().setExcerpt("old-excerpt");
+
+        when(client.fetch(eq(SinglePage.class), eq(name))).thenReturn(Optional.of(page));
+        when(singlePageService.getContent(
+                        eq(page.getSpec().getReleaseSnapshot()),
+                        eq(page.getSpec().getBaseSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                        .snapshotName(page.getSpec().getHeadSnapshot())
+                        .raw("hello world")
+                        .content("<p>hello world</p>")
+                        .rawType("markdown")
+                        .build()));
+
+        Snapshot snapshotV1 = snapshotV1();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+        when(client.listAll(eq(Snapshot.class), any(), any())).thenReturn(List.of(snapshotV1, snapshotV2));
+
+        when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class))).thenReturn(Mono.empty());
+
+        ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
+        singlePageReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(3)).update(captor.capture());
+
+        SinglePage value = captor.getValue();
+        // should regenerate excerpt instead of returning cached old value
+        assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
+        // annotation should be updated with new cache key ending with :true
+        assertThat(value.getMetadata().getAnnotations().get(Constant.CONTENT_CHECKSUM_ANNO))
+                .endsWith(":true");
     }
 
     @Test
