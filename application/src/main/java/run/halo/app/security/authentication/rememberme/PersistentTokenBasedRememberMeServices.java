@@ -141,7 +141,8 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                 token.getSpec().getUsername(),
                                 token.getSpec().getSeries(),
                                 token.getSpec().getLastUsed());
-                        return this.tokenRepository.removeUserTokens(token.getSpec().getUsername())
+                        return this.tokenRepository
+                                .removeUserTokens(token.getSpec().getUsername())
                                 .then(Mono.error(new InvalidCookieException("Remember-me login has expired")));
                     }
                     return Mono.empty();
