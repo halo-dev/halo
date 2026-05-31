@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.*;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.notification.Subscription;
@@ -166,6 +167,62 @@ class PostReconcilerTest {
         verify(client, times(1)).update(captor.capture());
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
+    }
+
+    @Test
+    void shouldRegenerateExcerptWhenAutoGenerateBecomesTrue() {
+        // https://github.com/halo-dev/halo/issues/10039
+        String name = "post-A";
+        Post post = TestPost.postV1();
+        post.getSpec().setPublish(true);
+        post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+        post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
+
+        // simulate a previous state where autoGenerate was false
+        var oldCacheKey = "old-checksum:false";
+        post.getMetadata().setAnnotations(new HashMap<>());
+        post.getMetadata().getAnnotations().put(Constant.CONTENT_CHECKSUM_ANNO, oldCacheKey);
+
+        // now switch to autoGenerate=true
+        var excerpt = new Post.Excerpt();
+        excerpt.setAutoGenerate(true);
+        post.getSpec().setExcerpt(excerpt);
+
+        // old excerpt that should be regenerated
+        post.getStatusOrDefault().setExcerpt("old-excerpt");
+
+        when(client.fetch(eq(Post.class), eq(name))).thenReturn(Optional.of(post));
+        when(postService.getContent(
+                        eq(post.getSpec().getReleaseSnapshot()),
+                        eq(post.getSpec().getBaseSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                        .snapshotName(post.getSpec().getHeadSnapshot())
+                        .raw("hello world")
+                        .content("<p>hello world</p>")
+                        .rawType("markdown")
+                        .build()));
+
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV2.getMetadata().setLabels(new HashMap<>());
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+
+        when(extensionGetter.getEnabledExtension(eq(ExcerptGenerator.class))).thenReturn(Mono.empty());
+
+        when(client.listAll(eq(Snapshot.class), any(), any())).thenReturn(List.of(snapshotV1, snapshotV2));
+
+        ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+        postReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(1)).update(captor.capture());
+        Post value = captor.getValue();
+        // should regenerate excerpt instead of returning cached old value
+        assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
+        // annotation should be updated with new cache key ending with :true
+        assertThat(value.getMetadata().getAnnotations().get(Constant.CONTENT_CHECKSUM_ANNO))
+                .endsWith(":true");
     }
 
     @Nested

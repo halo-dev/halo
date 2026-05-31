@@ -371,13 +371,16 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
         var contentChecksum =
                 Hashing.sha256().hashString(content.getContent(), UTF_8).toString();
+        var excerpt = singlePage.getSpec().getExcerpt();
+        var isAutoGenerate = excerpt == null || excerpt.getAutoGenerate() == null || excerpt.getAutoGenerate();
+        var cacheKey = contentChecksum + ":" + isAutoGenerate;
         var annotations = MetadataUtil.nullSafeAnnotations(singlePage);
-        var oldChecksum = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);
-        if (Objects.equals(oldChecksum, contentChecksum)) {
+        var oldCacheKey = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);
+        if (Objects.equals(oldCacheKey, cacheKey)) {
             return singlePage.getStatusOrDefault().getExcerpt();
         }
         // update the checksum and generate new excerpt
-        annotations.put(Constant.CONTENT_CHECKSUM_ANNO, contentChecksum);
+        annotations.put(Constant.CONTENT_CHECKSUM_ANNO, cacheKey);
 
         var context = new ExcerptGenerator.Context()
                 .setRaw(content.getRaw())
