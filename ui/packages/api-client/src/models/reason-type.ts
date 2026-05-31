@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { ReasonTypeSpec } from './reason-type-spec';
 
 /**
- * {@link ReasonType ReasonType} is a custom extension that defines a type of reason.   <p>One {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.
+ * Reason type extension that defines the schema and display metadata for notification reasons.   <p>One {@link ReasonType ReasonType} can have multiple {@link Reason Reason}s to notify.
  */
 export interface ReasonType {
     'apiVersion': string;

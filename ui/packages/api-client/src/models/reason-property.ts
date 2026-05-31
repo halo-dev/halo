@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Attribute definition for reasons of a reason type.
+ */
 export interface ReasonProperty {
+    /**
+     * Human-readable description of the attribute.
+     */
     'description'?: string;
+    /**
+     * Attribute name.
+     */
     'name': string;
+    /**
+     * Whether the attribute may be absent from a reason.
+     */
     'optional'?: boolean;
+    /**
+     * Attribute value type, such as string, number, boolean, or object.
+     */
     'type': string;
 }
 

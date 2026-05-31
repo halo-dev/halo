@@ -17,7 +17,13 @@
 // @ts-ignore
 import type { SettingForm } from './setting-form';
 
+/**
+ * Collection of form groups that make up this setting definition.
+ */
 export interface SettingSpec {
+    /**
+     * Form groups rendered for this setting definition.
+     */
     'forms': Array<SettingForm>;
 }
 

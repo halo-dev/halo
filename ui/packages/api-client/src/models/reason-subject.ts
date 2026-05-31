@@ -14,11 +14,29 @@
 
 
 
+/**
+ * Resource subject associated with a notification reason.
+ */
 export interface ReasonSubject {
+    /**
+     * Subject API version.
+     */
     'apiVersion': string;
+    /**
+     * Subject kind.
+     */
     'kind': string;
+    /**
+     * Subject metadata.name.
+     */
     'name': string;
+    /**
+     * Human-readable subject title shown in notifications.
+     */
     'title': string;
+    /**
+     * URL that opens the subject.
+     */
     'url'?: string;
 }
 

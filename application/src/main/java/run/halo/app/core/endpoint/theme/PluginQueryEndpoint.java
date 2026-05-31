@@ -36,12 +36,12 @@ public class PluginQueryEndpoint implements CustomEndpoint {
                         "plugins/{name}/available",
                         this::availableByName,
                         builder -> builder.operationId("queryPluginAvailableByName")
-                                .description("Gets plugin available by name.")
+                                .description("Gets plugin available by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Plugin name")
+                                        .description("Plugin metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(Boolean.class)))
                 .build();

@@ -20,7 +20,7 @@ import run.halo.app.extension.GVK;
 import run.halo.app.infra.ConditionList;
 
 /**
- * A custom resource for Plugin.
+ * Plugin extension that describes an installed plugin and its runtime lifecycle state.
  *
  * @author guqing
  * @since 2.0.0
@@ -35,9 +35,11 @@ public class Plugin extends AbstractExtension {
 
     public static final String BUILT_IN_KEEPER_FINALIZER = "plugin.halo.run/built-in-keeper";
 
+    /** Desired plugin metadata, dependencies, configuration references, and enabled state. */
     @Schema(requiredMode = REQUIRED)
     private PluginSpec spec;
 
+    /** Observed plugin runtime state reported by the plugin manager. */
     private @Nullable PluginStatus status;
 
     /**
@@ -53,9 +55,11 @@ public class Plugin extends AbstractExtension {
         return status;
     }
 
+    /** Desired plugin metadata and configuration references. */
     @Data
     public static class PluginSpec {
 
+        /** Display name shown for the plugin. */
         private String displayName;
 
         /**
@@ -71,29 +75,40 @@ public class Plugin extends AbstractExtension {
                         + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
+        /** Plugin author metadata. */
         private PluginAuthor author;
 
+        /** Logo URL or attachment URI for the plugin. */
         private String logo;
 
+        /** Required plugin dependencies keyed by plugin name with version constraints as values. */
         private Map<String, String> pluginDependencies = new HashMap<>(4);
 
+        /** Plugin homepage URL. */
         private String homepage;
 
+        /** Source repository URL. */
         private String repo;
 
+        /** Issue tracker URL. */
         private String issues;
 
+        /** Human-readable plugin description. */
         private String description;
 
+        /** Licenses declared by the plugin. */
         private List<License> license;
 
         /** SemVer format. */
         private String requires = "*";
 
+        /** Whether the plugin should be enabled. */
         private Boolean enabled = false;
 
+        /** Setting metadata.name used to render the plugin configuration form. */
         private String settingName;
 
+        /** ConfigMap metadata.name storing plugin configuration values. */
         private String configMapName;
     }
 
@@ -103,28 +118,39 @@ public class Plugin extends AbstractExtension {
      */
     @Data
     public static class License {
+        /** License name or identifier. */
         private String name;
+
+        /** URL to the license text. */
         private String url;
     }
 
+    /** Observed plugin lifecycle and runtime asset state. */
     @Data
     public static class PluginStatus {
 
+        /** Current plugin lifecycle phase. */
         private Phase phase;
 
+        /** Reconciliation conditions for the plugin. */
         private ConditionList conditions;
 
+        /** Last time the plugin started successfully. */
         private Instant lastStartTime;
 
+        /** Last PF4J probe state observed for the plugin. */
         private PluginState lastProbeState;
 
+        /** JavaScript bundle entry path served for the plugin UI. */
         private String entry;
 
+        /** Stylesheet bundle path served for the plugin UI. */
         private String stylesheet;
 
+        /** Resolved logo URL or attachment URI for the plugin. */
         private String logo;
 
-        @Schema(description = "Load location of the plugin, often a path.")
+        /** URI location where the plugin artifact was loaded from. */
         private URI loadLocation;
 
         public static ConditionList nullSafeConditions(PluginStatus status) {
@@ -150,13 +176,16 @@ public class Plugin extends AbstractExtension {
         ;
     }
 
+    /** Plugin author metadata. */
     @Data
     @ToString
     public static class PluginAuthor {
 
+        /** Author display name. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
 
+        /** Author website URL. */
         private String website;
     }
 }

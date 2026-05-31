@@ -47,6 +47,8 @@ public class SignUpData {
     @NotBlank
     private String confirmPassword;
 
+    private Boolean agreedToTerms;
+
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @Constraint(validatedBy = {SignUpDataConstraintValidator.class})

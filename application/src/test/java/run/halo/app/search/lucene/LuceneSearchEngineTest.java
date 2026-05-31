@@ -144,6 +144,20 @@ class LuceneSearchEngineTest {
         assertEquals("<fake-tag>fake</fake-tag>-content", gotHaloDoc.getContent());
     }
 
+    @Test
+    void shouldNotThrowExceptionWhenKeywordContainsLeadingWildcard() {
+        this.searchEngine.addOrUpdate(List.of(createFakeHaloDoc()));
+
+        var option = new SearchOption();
+        option.setLimit(10);
+
+        option.setKeyword("*");
+        assertDoesNotThrow(() -> this.searchEngine.search(option));
+
+        option.setKeyword("*fake");
+        assertDoesNotThrow(() -> this.searchEngine.search(option));
+    }
+
     void runConcurrently(Runnable runnable) throws ExecutionException, InterruptedException, TimeoutException {
         var executorService = Executors.newFixedThreadPool(10);
         var futures = IntStream.of(0, 10)

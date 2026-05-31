@@ -41,8 +41,8 @@ import type { UpgradeFromUriRequest } from '../models';
 export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Change the running state of a plugin by name.
-         * @param {string} name 
+         * Change the running state of a plugin by metadata.name.
+         * @param {string} name metadata.name of the plugin whose running state will be changed.
          * @param {PluginRunningStateRequest} pluginRunningStateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -163,7 +163,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Fetch converted json config of plugin by configured configMapName.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -204,7 +204,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Fetch setting of plugin.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose setting will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -245,9 +245,9 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Install a plugin by uploading a Jar file.
-         * @param {File} [file] 
-         * @param {string} [presetName] Plugin preset name. We will find the plugin from plugin presets
-         * @param {InstallPluginSourceEnum} [source] Install source. Default is file.
+         * @param {File} [file] Plugin JAR file.
+         * @param {string} [presetName] Plugin preset name. Halo finds the plugin from plugin presets.
+         * @param {InstallPluginSourceEnum} [source] Install source. Defaults to file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -349,7 +349,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Keyword of plugin name or description
+         * @param {string} [keyword] Keyword of plugin display name or description
          * @param {boolean} [enabled] Whether the plugin is enabled
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -415,8 +415,8 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             };
         },
         /**
-         * Reload a plugin by name.
-         * @param {string} name 
+         * Reload a plugin by metadata.name.
+         * @param {string} name metadata.name of the plugin to reload.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -457,7 +457,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Reset the configMap of plugin setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose setting config will be reset.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -498,7 +498,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Update the config of plugin setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose JSON config will be updated.
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -545,10 +545,10 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Upgrade a plugin by uploading a Jar file
-         * @param {string} name 
-         * @param {File} [file] 
-         * @param {string} [presetName] Plugin preset name. We will find the plugin from plugin presets
-         * @param {UpgradePluginSourceEnum} [source] Install source. Default is file.
+         * @param {string} name metadata.name of the plugin to upgrade.
+         * @param {File} [file] Plugin JAR file.
+         * @param {string} [presetName] Plugin preset name. Halo finds the plugin from plugin presets.
+         * @param {UpgradePluginSourceEnum} [source] Install source. Defaults to file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -605,7 +605,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
         },
         /**
          * Upgrade a plugin from uri.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin to upgrade.
          * @param {UpgradeFromUriRequest} upgradeFromUriRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -660,8 +660,8 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
     const localVarAxiosParamCreator = PluginV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Change the running state of a plugin by name.
-         * @param {string} name 
+         * Change the running state of a plugin by metadata.name.
+         * @param {string} name metadata.name of the plugin whose running state will be changed.
          * @param {PluginRunningStateRequest} pluginRunningStateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -696,7 +696,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Fetch converted json config of plugin by configured configMapName.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -708,7 +708,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Fetch setting of plugin.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose setting will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -720,9 +720,9 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Install a plugin by uploading a Jar file.
-         * @param {File} [file] 
-         * @param {string} [presetName] Plugin preset name. We will find the plugin from plugin presets
-         * @param {InstallPluginSourceEnum} [source] Install source. Default is file.
+         * @param {File} [file] Plugin JAR file.
+         * @param {string} [presetName] Plugin preset name. Halo finds the plugin from plugin presets.
+         * @param {InstallPluginSourceEnum} [source] Install source. Defaults to file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -751,7 +751,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
          * @param {Array<string>} [fieldSelector] Field selector. e.g.: metadata.name&#x3D;&#x3D;halo
          * @param {Array<string>} [sort] Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
-         * @param {string} [keyword] Keyword of plugin name or description
+         * @param {string} [keyword] Keyword of plugin display name or description
          * @param {boolean} [enabled] Whether the plugin is enabled
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -763,8 +763,8 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Reload a plugin by name.
-         * @param {string} name 
+         * Reload a plugin by metadata.name.
+         * @param {string} name metadata.name of the plugin to reload.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -776,7 +776,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Reset the configMap of plugin setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose setting config will be reset.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -788,7 +788,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Update the config of plugin setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin whose JSON config will be updated.
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -801,14 +801,14 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Upgrade a plugin by uploading a Jar file
-         * @param {string} name 
-         * @param {File} [file] 
-         * @param {string} [presetName] Plugin preset name. We will find the plugin from plugin presets
-         * @param {UpgradePluginSourceEnum} [source] Install source. Default is file.
+         * @param {string} name metadata.name of the plugin to upgrade.
+         * @param {File} [file] Plugin JAR file.
+         * @param {string} [presetName] Plugin preset name. Halo finds the plugin from plugin presets.
+         * @param {UpgradePluginSourceEnum} [source] Install source. Defaults to file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async upgradePlugin(name: string, file?: File, presetName?: string, source?: UpgradePluginSourceEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async upgradePlugin(name: string, file?: File, presetName?: string, source?: UpgradePluginSourceEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.upgradePlugin(name, file, presetName, source, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PluginV1alpha1ConsoleApi.upgradePlugin']?.[localVarOperationServerIndex]?.url;
@@ -816,7 +816,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
         },
         /**
          * Upgrade a plugin from uri.
-         * @param {string} name 
+         * @param {string} name metadata.name of the plugin to upgrade.
          * @param {UpgradeFromUriRequest} upgradeFromUriRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -837,7 +837,7 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
     const localVarFp = PluginV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Change the running state of a plugin by name.
+         * Change the running state of a plugin by metadata.name.
          * @param {PluginV1alpha1ConsoleApiChangePluginRunningStateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -907,7 +907,7 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
             return localVarFp.listPlugins(requestParameters.page, requestParameters.size, requestParameters.labelSelector, requestParameters.fieldSelector, requestParameters.sort, requestParameters.keyword, requestParameters.enabled, options).then((request) => request(axios, basePath));
         },
         /**
-         * Reload a plugin by name.
+         * Reload a plugin by metadata.name.
          * @param {PluginV1alpha1ConsoleApiReloadPluginRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -939,7 +939,7 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        upgradePlugin(requestParameters: PluginV1alpha1ConsoleApiUpgradePluginRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        upgradePlugin(requestParameters: PluginV1alpha1ConsoleApiUpgradePluginRequest, options?: RawAxiosRequestConfig): AxiosPromise<Plugin> {
             return localVarFp.upgradePlugin(requestParameters.name, requestParameters.file, requestParameters.presetName, requestParameters.source, options).then((request) => request(axios, basePath));
         },
         /**
@@ -958,6 +958,9 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
  * Request parameters for changePluginRunningState operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiChangePluginRunningStateRequest {
+    /**
+     * metadata.name of the plugin whose running state will be changed.
+     */
     readonly name: string
 
     readonly pluginRunningStateRequest: PluginRunningStateRequest
@@ -967,6 +970,9 @@ export interface PluginV1alpha1ConsoleApiChangePluginRunningStateRequest {
  * Request parameters for fetchPluginJsonConfig operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest {
+    /**
+     * metadata.name of the plugin whose JSON config will be fetched.
+     */
     readonly name: string
 }
 
@@ -974,6 +980,9 @@ export interface PluginV1alpha1ConsoleApiFetchPluginJsonConfigRequest {
  * Request parameters for fetchPluginSetting operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiFetchPluginSettingRequest {
+    /**
+     * metadata.name of the plugin whose setting will be fetched.
+     */
     readonly name: string
 }
 
@@ -981,15 +990,18 @@ export interface PluginV1alpha1ConsoleApiFetchPluginSettingRequest {
  * Request parameters for installPlugin operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiInstallPluginRequest {
+    /**
+     * Plugin JAR file.
+     */
     readonly file?: File
 
     /**
-     * Plugin preset name. We will find the plugin from plugin presets
+     * Plugin preset name. Halo finds the plugin from plugin presets.
      */
     readonly presetName?: string
 
     /**
-     * Install source. Default is file.
+     * Install source. Defaults to file.
      */
     readonly source?: InstallPluginSourceEnum
 }
@@ -1031,7 +1043,7 @@ export interface PluginV1alpha1ConsoleApiListPluginsRequest {
     readonly sort?: Array<string>
 
     /**
-     * Keyword of plugin name or description
+     * Keyword of plugin display name or description
      */
     readonly keyword?: string
 
@@ -1045,6 +1057,9 @@ export interface PluginV1alpha1ConsoleApiListPluginsRequest {
  * Request parameters for reloadPlugin operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiReloadPluginRequest {
+    /**
+     * metadata.name of the plugin to reload.
+     */
     readonly name: string
 }
 
@@ -1052,6 +1067,9 @@ export interface PluginV1alpha1ConsoleApiReloadPluginRequest {
  * Request parameters for resetPluginConfig operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiResetPluginConfigRequest {
+    /**
+     * metadata.name of the plugin whose setting config will be reset.
+     */
     readonly name: string
 }
 
@@ -1059,6 +1077,9 @@ export interface PluginV1alpha1ConsoleApiResetPluginConfigRequest {
  * Request parameters for updatePluginJsonConfig operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest {
+    /**
+     * metadata.name of the plugin whose JSON config will be updated.
+     */
     readonly name: string
 
     readonly body: object
@@ -1068,17 +1089,23 @@ export interface PluginV1alpha1ConsoleApiUpdatePluginJsonConfigRequest {
  * Request parameters for upgradePlugin operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiUpgradePluginRequest {
+    /**
+     * metadata.name of the plugin to upgrade.
+     */
     readonly name: string
 
+    /**
+     * Plugin JAR file.
+     */
     readonly file?: File
 
     /**
-     * Plugin preset name. We will find the plugin from plugin presets
+     * Plugin preset name. Halo finds the plugin from plugin presets.
      */
     readonly presetName?: string
 
     /**
-     * Install source. Default is file.
+     * Install source. Defaults to file.
      */
     readonly source?: UpgradePluginSourceEnum
 }
@@ -1087,6 +1114,9 @@ export interface PluginV1alpha1ConsoleApiUpgradePluginRequest {
  * Request parameters for upgradePluginFromUri operation in PluginV1alpha1ConsoleApi.
  */
 export interface PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest {
+    /**
+     * metadata.name of the plugin to upgrade.
+     */
     readonly name: string
 
     readonly upgradeFromUriRequest: UpgradeFromUriRequest
@@ -1097,7 +1127,7 @@ export interface PluginV1alpha1ConsoleApiUpgradePluginFromUriRequest {
  */
 export class PluginV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Change the running state of a plugin by name.
+     * Change the running state of a plugin by metadata.name.
      * @param {PluginV1alpha1ConsoleApiChangePluginRunningStateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1175,7 +1205,7 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Reload a plugin by name.
+     * Reload a plugin by metadata.name.
      * @param {PluginV1alpha1ConsoleApiReloadPluginRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

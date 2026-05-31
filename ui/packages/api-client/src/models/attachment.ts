@@ -23,6 +23,9 @@ import type { AttachmentStatus } from './attachment-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Attachment extension that describes an uploaded file and its resolved access URLs.
+ */
 export interface Attachment {
     'apiVersion': string;
     'kind': string;

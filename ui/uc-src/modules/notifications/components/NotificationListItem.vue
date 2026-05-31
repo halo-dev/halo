@@ -15,8 +15,13 @@ const props = withDefaults(
   defineProps<{
     notification: Notification;
     isSelected: boolean;
+    isSelectMode?: boolean;
+    isChecked?: boolean;
   }>(),
-  {}
+  {
+    isSelectMode: false,
+    isChecked: false,
+  }
 );
 
 const { currentUser } = stores.currentUser();
@@ -86,25 +91,53 @@ const content = computed(() => {
 <template>
   <div
     class="group relative flex cursor-pointer flex-col gap-2 p-4"
-    :class="{ 'bg-gray-50': isSelected }"
+    :class="{ 'bg-gray-50': isSelected || isChecked }"
   >
     <div
-      v-if="isSelected"
+      v-if="isSelected || isChecked"
       class="absolute inset-y-0 left-0 w-0.5 bg-primary"
     ></div>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <!-- Checkbox shown in batch select mode -->
       <div
-        class="truncate text-sm"
-        :class="{ 'font-semibold': notification.spec?.unread && !isRead }"
+        v-if="isSelectMode"
+        class="flex h-4 w-4 flex-none items-center justify-center rounded border transition-colors"
+        :class="
+          isChecked
+            ? 'border-primary bg-primary'
+            : 'border-gray-300 bg-white'
+        "
       >
-        {{ notification.spec?.title }}
+        <svg
+          v-if="isChecked"
+          class="h-3 w-3 text-white"
+          viewBox="0 0 12 12"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2 6l3 3 5-5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </div>
-      <VStatusDot
-        v-if="notification.metadata.deletionTimestamp"
-        v-tooltip="$t('core.common.status.deleting')"
-        state="warning"
-        animate
-      />
+      <div class="flex min-w-0 flex-1 items-center justify-between">
+        <div
+          class="truncate text-sm"
+          :class="{ 'font-semibold': notification.spec?.unread && !isRead }"
+        >
+          {{ notification.spec?.title }}
+        </div>
+        <VStatusDot
+          v-if="notification.metadata.deletionTimestamp"
+          v-tooltip="$t('core.common.status.deleting')"
+          state="warning"
+          animate
+        />
+      </div>
     </div>
     <div
       v-if="notification.spec?.htmlContent"
@@ -116,7 +149,8 @@ const content = computed(() => {
       <div class="text-xs text-gray-600">
         {{ utils.date.timeAgo(notification.metadata.creationTimestamp) }}
       </div>
-      <div class="hidden space-x-2 group-hover:block">
+      <!-- Action buttons: hidden in batch select mode -->
+      <div v-if="!isSelectMode" class="hidden space-x-2 group-hover:block">
         <span
           v-if="notification.spec?.unread && !isRead"
           class="text-sm text-gray-600 hover:text-gray-900"

@@ -14,10 +14,25 @@
 
 
 
+/**
+ * Reason type metadata used by notification preference UI.
+ */
 export interface ReasonTypeInfo {
+    /**
+     * description of the reason type
+     */
     'description'?: string;
+    /**
+     * display name of the reason type
+     */
     'displayName'?: string;
-    'name'?: string;
+    /**
+     * reason type <code>metadata.name</code>
+     */
+    'name': string;
+    /**
+     * UI permissions required to manage this reason type
+     */
     'uiPermissions'?: Array<string>;
 }
 

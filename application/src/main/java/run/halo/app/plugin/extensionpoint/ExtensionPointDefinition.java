@@ -10,9 +10,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * Extension point definition. An {@link ExtensionPointDefinition} is a concept used in <code>Halo</code> to allow for
- * the dynamic extension of system. It defines a location within <code>Halo</code> where additional functionality can be
- * added through the use of plugins or extensions.
+ * Extension point definition that advertises where plugins can contribute implementations.
  *
  * @author guqing
  * @since 2.4.0
@@ -28,22 +26,29 @@ import run.halo.app.extension.GVK;
         plural = "extensionpointdefinitions")
 public class ExtensionPointDefinition extends AbstractExtension {
 
+    /** Desired extension point metadata and registration behavior. */
     @Schema(requiredMode = REQUIRED)
     private ExtensionPointSpec spec;
 
+    /** Desired extension point metadata. */
     @Data
     public static class ExtensionPointSpec {
+        /** Fully qualified Java class name of the extension point interface. */
         @Schema(requiredMode = REQUIRED)
         private String className;
 
+        /** Display name shown for the extension point. */
         @Schema(requiredMode = REQUIRED)
         private String displayName;
 
+        /** Registration mode used when loading implementations for this extension point. */
         @Schema(requiredMode = REQUIRED)
         private ExtensionPointType type;
 
+        /** Human-readable description of what this extension point allows plugins to provide. */
         private String description;
 
+        /** Icon URL, class, or identifier shown for the extension point. */
         private String icon;
     }
 

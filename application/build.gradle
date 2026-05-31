@@ -184,6 +184,9 @@ tasks.named('forkedSpringBootRun') {
 }
 
 tasks.named('generateOpenApiDocs') {
+    notCompatibleWithConfigurationCache(
+        'Task generates OpenAPI docs from a running server and is not compatible with configuration cache'
+    )
     outputs.upToDateWhen {
         false
     }
@@ -258,5 +261,11 @@ spotless {
     sql {
         target 'src/**/*.sql'
         dbeaver()
+    }
+    format 'webResources', {
+        target 'src/main/resources/templates/**/*.html',
+            'src/main/resources/static/styles/**/*.css',
+            'src/main/resources/static/js/**/*.js'
+        prettier().config(['tabWidth': 2, 'printWidth': 120])
     }
 }

@@ -7,7 +7,6 @@ import {
   type PluginV1alpha1ConsoleApiListPluginsRequest,
 } from "@halo-dev/api-client";
 import {
-  Dialog,
   IconAddCircle,
   IconPlug,
   IconRefreshLine,
@@ -26,7 +25,7 @@ import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
-import { computed, onMounted, provide, ref, watch } from "vue";
+import { computed, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import PluginInstallationModal from "./components/PluginInstallationModal.vue";
 import PluginListItem from "./components/PluginListItem.vue";
@@ -116,29 +115,6 @@ const handleCheckAllChange = (e: Event) => {
 
 const { handleChangeStatusInBatch, handleUninstallInBatch } =
   usePluginBatchOperations(selectedNames);
-
-// handle remote download url from route
-const routeRemoteDownloadUrl = useRouteQuery<string | null>(
-  "remote-download-url"
-);
-onMounted(() => {
-  if (routeRemoteDownloadUrl.value) {
-    Dialog.warning({
-      title: t("core.plugin.operations.remote_download.title"),
-      description: t("core.plugin.operations.remote_download.description", {
-        url: routeRemoteDownloadUrl.value,
-      }),
-      confirmText: t("core.common.buttons.download"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm() {
-        pluginInstallationModalVisible.value = true;
-      },
-      onCancel() {
-        routeRemoteDownloadUrl.value = null;
-      },
-    });
-  }
-});
 </script>
 <template>
   <PluginInstallationModal
@@ -270,16 +246,17 @@ onMounted(() => {
                 ]"
               />
               <div class="flex flex-row gap-2">
-                <div
+                <button
+                  v-tooltip="$t('core.common.buttons.refresh')"
+                  type="button"
                   class="group cursor-pointer rounded p-1 hover:bg-gray-200"
                   @click="refetch()"
                 >
                   <IconRefreshLine
-                    v-tooltip="$t('core.common.buttons.refresh')"
                     :class="{ 'animate-spin text-gray-900': isFetching }"
                     class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                   />
-                </div>
+                </button>
               </div>
             </VSpace>
           </div>

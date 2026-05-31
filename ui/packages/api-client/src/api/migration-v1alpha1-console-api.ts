@@ -29,8 +29,8 @@ import type { BackupFile } from '../models';
 export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
-         * @param {string} name Backup name.
+         * Download a file from the specified backup as an octet-stream attachment.
+         * @param {string} name Backup metadata.name.
          * @param {string} filename Backup filename.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -112,9 +112,9 @@ export const MigrationV1alpha1ConsoleApiAxiosParamCreator = function (configurat
         },
         /**
          * Restore backup by uploading file or providing download link or backup name.
-         * @param {string} [backupName] Backup metadata name.
+         * @param {string} [backupName] Backup &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {string} [downloadUrl] Remote backup HTTP URL.
-         * @param {File} [file] 
+         * @param {File} [file] Backup file.
          * @param {string} [filename] Filename of backup file in backups root.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -181,8 +181,8 @@ export const MigrationV1alpha1ConsoleApiFp = function(configuration?: Configurat
     const localVarAxiosParamCreator = MigrationV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * 
-         * @param {string} name Backup name.
+         * Download a file from the specified backup as an octet-stream attachment.
+         * @param {string} name Backup metadata.name.
          * @param {string} filename Backup filename.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -206,14 +206,14 @@ export const MigrationV1alpha1ConsoleApiFp = function(configuration?: Configurat
         },
         /**
          * Restore backup by uploading file or providing download link or backup name.
-         * @param {string} [backupName] Backup metadata name.
+         * @param {string} [backupName] Backup &lt;code&gt;metadata.name&lt;/code&gt;.
          * @param {string} [downloadUrl] Remote backup HTTP URL.
-         * @param {File} [file] 
+         * @param {File} [file] Backup file.
          * @param {string} [filename] Filename of backup file in backups root.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async restoreBackup(backupName?: string, downloadUrl?: string, file?: File, filename?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async restoreBackup(backupName?: string, downloadUrl?: string, file?: File, filename?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.restoreBackup(backupName, downloadUrl, file, filename, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MigrationV1alpha1ConsoleApi.restoreBackup']?.[localVarOperationServerIndex]?.url;
@@ -229,7 +229,7 @@ export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Conf
     const localVarFp = MigrationV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * 
+         * Download a file from the specified backup as an octet-stream attachment.
          * @param {MigrationV1alpha1ConsoleApiDownloadBackupsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -251,7 +251,7 @@ export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        restoreBackup(requestParameters: MigrationV1alpha1ConsoleApiRestoreBackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        restoreBackup(requestParameters: MigrationV1alpha1ConsoleApiRestoreBackupRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<string> {
             return localVarFp.restoreBackup(requestParameters.backupName, requestParameters.downloadUrl, requestParameters.file, requestParameters.filename, options).then((request) => request(axios, basePath));
         },
     };
@@ -262,7 +262,7 @@ export const MigrationV1alpha1ConsoleApiFactory = function (configuration?: Conf
  */
 export interface MigrationV1alpha1ConsoleApiDownloadBackupsRequest {
     /**
-     * Backup name.
+     * Backup metadata.name.
      */
     readonly name: string
 
@@ -277,7 +277,7 @@ export interface MigrationV1alpha1ConsoleApiDownloadBackupsRequest {
  */
 export interface MigrationV1alpha1ConsoleApiRestoreBackupRequest {
     /**
-     * Backup metadata name.
+     * Backup &lt;code&gt;metadata.name&lt;/code&gt;.
      */
     readonly backupName?: string
 
@@ -286,6 +286,9 @@ export interface MigrationV1alpha1ConsoleApiRestoreBackupRequest {
      */
     readonly downloadUrl?: string
 
+    /**
+     * Backup file.
+     */
     readonly file?: File
 
     /**
@@ -299,7 +302,7 @@ export interface MigrationV1alpha1ConsoleApiRestoreBackupRequest {
  */
 export class MigrationV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * 
+     * Download a file from the specified backup as an octet-stream attachment.
      * @param {MigrationV1alpha1ConsoleApiDownloadBackupsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

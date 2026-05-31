@@ -48,20 +48,20 @@
     "test:unit:ui": "vp test --watch --ui",
     "test:unit:watch": "vp test --watch",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "floating-vue": "^5.2.2"
   },
   "devDependencies": {
-    "@storybook/addon-docs": "^10.0.8",
-    "@storybook/addon-links": "^10.0.8",
-    "@storybook/testing-library": "^0.0.14-next.2",
-    "@storybook/vue3-vite": "^10.0.8",
-    "eslint-plugin-storybook": "10.0.8",
+    "@storybook/addon-docs": "^10.4.1",
+    "@storybook/addon-links": "^10.4.1",
+    "@storybook/testing-library": "^0.2.2",
+    "@storybook/vue3-vite": "^10.4.1",
+    "eslint-plugin-storybook": "10.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^10.0.8"
+    "storybook": "^10.4.1"
   },
   "peerDependencies": {
     "vue": "^3.5.x",

@@ -17,28 +17,82 @@
 // @ts-ignore
 import type { Excerpt } from './excerpt';
 
+/**
+ * Desired post content, publication, taxonomy, and rendering configuration.
+ */
 export interface PostSpec {
+    /**
+     * Whether new comments are allowed for this post.
+     */
     'allowComment': boolean;
+    /**
+     * Base Snapshot metadata.name used to reconstruct raw and rendered content from patches.
+     */
     'baseSnapshot'?: string;
+    /**
+     * Category metadata.name values associated with the post.
+     */
     'categories'?: Array<string>;
+    /**
+     * Cover image URL or attachment URI of the post.
+     */
     'cover'?: string;
+    /**
+     * Whether the post is logically deleted and should be treated as recycled.
+     */
     'deleted': boolean;
     'excerpt': Excerpt;
+    /**
+     * Snapshot metadata.name containing the latest editable draft content.
+     */
     'headSnapshot'?: string;
+    /**
+     * HTML meta tag attribute maps injected into the rendered post page head.
+     */
     'htmlMetas'?: Array<{ [key: string]: string; }>;
+    /**
+     * User metadata.name of the post owner.
+     */
     'owner'?: string;
+    /**
+     * Whether the post should be pinned ahead of normal post ordering.
+     */
     'pinned': boolean;
+    /**
+     * Sorting priority. Higher values sort before lower values where priority ordering is applied.
+     */
     'priority': number;
+    /**
+     * Desired publish state. False keeps the post as a draft or moves it back to draft.
+     */
     'publish': boolean;
+    /**
+     * Time when the post was published or is scheduled to be published.
+     */
     'publishTime'?: string;
     /**
-     * 文章引用到的已发布的内容，用于主题端显示.
+     * Snapshot metadata.name selected as the published content version.
      */
     'releaseSnapshot'?: string;
+    /**
+     * URL slug used to build the post permalink.
+     */
     'slug': string;
+    /**
+     * Tag metadata.name values associated with the post.
+     */
     'tags'?: Array<string>;
+    /**
+     * Theme template used to render this post.
+     */
     'template'?: string;
+    /**
+     * Display title of the post.
+     */
     'title': string;
+    /**
+     * Visibility used by theme-side and public REST queries; anonymous clients only receive PUBLIC posts.
+     */
     'visible': PostSpecVisibleEnum;
 }
 

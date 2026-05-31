@@ -4,7 +4,6 @@ import { useThemeStore } from "@console/stores/theme";
 import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import {
-  Dialog,
   IconExchange,
   IconEye,
   IconListSettings,
@@ -19,7 +18,6 @@ import {
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import { useRouteQuery } from "@vueuse/router";
 import { cloneDeep } from "es-toolkit";
 import { storeToRefs } from "pinia";
 import {
@@ -171,27 +169,6 @@ onMounted(() => {
 
 watch([() => route.name, () => route.params], async () => {
   handleTriggerTabChange();
-});
-
-// handle remote download url from route
-const remoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
-onMounted(() => {
-  if (remoteDownloadUrl.value) {
-    Dialog.warning({
-      title: t("core.theme.operations.remote_download.title"),
-      description: t("core.theme.operations.remote_download.description", {
-        url: remoteDownloadUrl.value,
-      }),
-      confirmText: t("core.common.buttons.download"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm() {
-        themesModal.value = true;
-      },
-      onCancel() {
-        remoteDownloadUrl.value = null;
-      },
-    });
-  }
 });
 </script>
 <template>

@@ -5,7 +5,8 @@
     "src/**/__tests__/*",
     "uc-src/**/__tests__/*",
     "console-src/**/__tests__/*",
-    "packages/**/*"
+    "packages/**/*",
+    "src/vite/**/*"
   ],
   "compilerOptions": {
     "baseUrl": ".",

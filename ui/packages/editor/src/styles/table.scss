@@ -279,6 +279,22 @@
       }
     }
 
+    .row-resize-handle {
+      position: absolute;
+      left: 0;
+      right: -2px;
+      bottom: -2px;
+      z-index: 2;
+      height: 4px;
+      background-color: transparent;
+      cursor: row-resize;
+
+      &:hover,
+      &.active {
+        background-color: $tableResizeHandleBgColor;
+      }
+    }
+
     .grip-table {
       &::after {
         box-sizing: content-box;
@@ -314,6 +330,12 @@
       width: 4px;
       background-color: $tableResizeHandleBgColor;
       cursor: col-resize;
+    }
+
+    &.table-row-resizing,
+    &.table-row-resizing * {
+      cursor: row-resize !important;
+      user-select: none;
     }
   }
 }

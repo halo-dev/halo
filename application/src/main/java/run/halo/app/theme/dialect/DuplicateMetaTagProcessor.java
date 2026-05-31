@@ -27,6 +27,11 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
     static final Pattern META_PATTERN = Pattern.compile("<meta[^>]+?name=\"([^\"]+)\"[^>]*>\\n*");
+    /**
+     * These meta tags have well-known multiple-tag semantics. theme-color uses multiple candidates, often selected by
+     * media queries, and robots can express combined crawler directives across separate meta tags.
+     */
+    private static final Set<String> REPEATABLE_META_NAMES = Set.of("theme-color", "robots");
 
     @Override
     public Mono<Void> process(ITemplateContext context, IModel model, IElementModelStructureHandler structureHandler) {
@@ -44,6 +49,9 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
                 while (matcher.find()) {
                     String tagLine = matcher.group(0);
                     String nameAttribute = matcher.group(1);
+                    if (shouldKeepRepeatedMeta(nameAttribute)) {
+                        continue;
+                    }
                     // create a new text node to replace the original text node
                     // replace multiple line breaks with one line break
                     IText metaTagNode = context.getModelFactory().createText(tagLine.replaceAll("\\n+", "\n"));
@@ -60,6 +68,10 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
                 if ("meta".equals(tag.getElementCompleteName())) {
                     var attribute = tag.getAttribute("name");
                     if (attribute != null) {
+                        if (shouldKeepRepeatedMeta(attribute.getValue())) {
+                            otherModel.add(indexedModel);
+                            continue;
+                        }
                         uniqueMetaTags.put(attribute.getValue(), indexedModel);
                         continue;
                     }
@@ -77,6 +89,10 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
         model.reset();
         model.addModel(newModel);
         return Mono.empty();
+    }
+
+    private static boolean shouldKeepRepeatedMeta(String name) {
+        return REPEATABLE_META_NAMES.contains(name.toLowerCase(Locale.ROOT));
     }
 
     record IndexedModel(int index, ITemplateEvent templateEvent) {}

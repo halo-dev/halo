@@ -60,6 +60,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.AgreementNotAcceptedException;
 import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.EmailAlreadyTakenException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
@@ -400,6 +401,56 @@ class UserServiceImplTest {
                         assertTrue(e.getMessage().contains("registration is not allowed"));
                     })
                     .verify();
+        }
+
+        @Test
+        void signUpWhenAgreementNotAccepted() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole("fake-role");
+            userSetting.setRequiredAgreementPages(List.of("privacy-policy"));
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
+
+            var signUpData = createSignUpData("fake-user", "fake-password");
+            signUpData.setAgreedToTerms(false);
+
+            userService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .expectError(AgreementNotAcceptedException.class)
+                    .verify();
+        }
+
+        @Test
+        void signUpWhenAgreementAccepted() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole("fake-role");
+            userSetting.setRequiredAgreementPages(List.of("privacy-policy"));
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP), eq(SystemSetting.User.class)))
+                    .thenReturn(Mono.just(userSetting));
+            when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
+            when(client.fetch(eq(User.class), eq("fake-user"))).thenReturn(Mono.empty());
+
+            User fakeUser = createFakeUser("fake-user", "fake-password");
+            var signUpData = createSignUpData("fake-user", "fake-password");
+            signUpData.setAgreedToTerms(true);
+
+            when(client.fetch(eq(Role.class), anyString())).thenReturn(Mono.just(new Role()));
+            when(client.create(any(User.class))).thenReturn(Mono.just(fakeUser));
+            UserServiceImpl spyUserService = spy(userService);
+            doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"), anySet());
+            when(extensionGetter.getExtensions(UserPreCreatingHandler.class)).thenReturn(Flux.empty());
+            when(extensionGetter.getExtensions(UserPostCreatingHandler.class)).thenReturn(Flux.empty());
+
+            spyUserService
+                    .signUp(signUpData)
+                    .as(StepVerifier::create)
+                    .consumeNextWith(user -> {
+                        assertThat(user.getMetadata().getName()).isEqualTo("fake-user");
+                    })
+                    .verifyComplete();
         }
 
         @Test

@@ -18,15 +18,15 @@
 import type { InterestReasonSubject } from './interest-reason-subject';
 
 /**
- * The reason to be interested in
+ * Reason selector that decides which notifications match this subscription.
  */
 export interface InterestReason {
     /**
-     * The expression to be interested in
+     * Optional expression used to match reasons more flexibly than subject matching.
      */
     'expression'?: string;
     /**
-     * The name of the reason definition to be interested in
+     * ReasonType metadata.name this subscription is interested in.
      */
     'reasonType': string;
     'subject': InterestReasonSubject;

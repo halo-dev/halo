@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Notifier selection for one reason type.
+ */
 export interface ReasonTypeNotifierRequest {
-    'notifiers'?: Array<string>;
-    'reasonType'?: string;
+    /**
+     * <code>metadata.name</code> values of enabled notifiers.
+     */
+    'notifiers': Array<string>;
+    /**
+     * <code>metadata.name</code> of the reason type.
+     */
+    'reasonType': string;
 }
 

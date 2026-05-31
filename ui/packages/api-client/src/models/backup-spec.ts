@@ -14,10 +14,16 @@
 
 
 
+/**
+ * Desired backup options.
+ */
 export interface BackupSpec {
+    /**
+     * Time after which the generated backup should be considered expired.
+     */
     'expiresAt'?: string;
     /**
-     * Backup file format. Currently, only zip format is supported.
+     * Backup file format. Currently, only zip is supported.
      */
     'format'?: string;
 }

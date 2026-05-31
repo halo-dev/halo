@@ -118,6 +118,30 @@ class PostQueryEndpointTest {
     }
 
     @Test
+    public void testGetPostNavigationByNameWithScopeCategory() {
+        Metadata metadata = new Metadata();
+        metadata.setName("test");
+        NavigationPostVo navigation = NavigationPostVo.builder()
+                .next(ListedPostVo.builder().metadata(metadata).build())
+                .build();
+        when(postFinder.cursorByCategory(anyString())).thenReturn(Mono.just(navigation));
+
+        webClient
+                .get()
+                .uri("/posts/{name}/navigation?scope=category", "test")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.next.metadata.name")
+                .isEqualTo("test");
+
+        verify(postFinder).cursorByCategory(anyString());
+    }
+
+    @Test
     void groupVersion() {
         GroupVersion groupVersion = endpoint.groupVersion();
         assertThat(groupVersion.toString()).isEqualTo("api.content.halo.run/v1alpha1");

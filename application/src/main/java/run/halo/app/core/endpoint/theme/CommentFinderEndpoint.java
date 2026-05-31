@@ -89,6 +89,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the comment to reply to.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -112,6 +113,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                             .tag(tag)
                             .parameter(parameterBuilder()
                                     .name("name")
+                                    .description("metadata.name of the comment to fetch.")
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
@@ -124,6 +126,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                             .tag(tag)
                             .parameter(parameterBuilder()
                                     .name("name")
+                                    .description("metadata.name of the comment whose replies will be listed.")
                                     .in(ParameterIn.PATH)
                                     .required(true)
                                     .implementation(String.class))
@@ -240,12 +243,13 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             this.exchange = request.exchange();
         }
 
-        @Schema(description = "The comment subject group.")
+        /** The comment subject group. */
         public String getGroup() {
             return queryParams.getFirst("group");
         }
 
-        @Schema(requiredMode = REQUIRED, description = "The comment subject version.")
+        /** The comment subject version. */
+        @Schema(requiredMode = REQUIRED)
         public String getVersion() {
             return emptyToNull(queryParams.getFirst("version"));
         }
@@ -255,7 +259,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
          *
          * @return comment subject ref kind
          */
-        @Schema(requiredMode = REQUIRED, description = "The comment subject kind.")
+        @Schema(requiredMode = REQUIRED)
         public String getKind() {
             String kind = emptyToNull(queryParams.getFirst("kind"));
             if (kind == null) {
@@ -269,7 +273,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
          *
          * @return comment subject ref name
          */
-        @Schema(requiredMode = REQUIRED, description = "The comment subject name.")
+        @Schema(requiredMode = REQUIRED)
         public String getName() {
             String name = emptyToNull(queryParams.getFirst("name"));
             if (name == null) {
@@ -278,32 +282,28 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return name;
         }
 
-        @Schema(description = "Whether to include replies. Default is false.", defaultValue = "false")
+        /** Whether to include replies. Defaults to false. */
+        @Schema(defaultValue = "false")
         public Boolean getWithReplies() {
             var withReplies = queryParams.getFirst("withReplies");
             return StringUtils.isNotBlank(withReplies) && Boolean.parseBoolean(withReplies);
         }
 
-        @Schema(
-                description = "Reply size of the comment, default is 10, only works when " + "withReplies is true.",
-                defaultValue = "10")
+        /** Reply size of the comment. Defaults to 10 and only works when withReplies is true. */
+        @Schema(defaultValue = "10")
         public int getReplySize() {
             var replySize = queryParams.getFirst("replySize");
             return StringUtils.isNotBlank(replySize) ? Integer.parseInt(replySize) : 10;
         }
 
+        /**
+         * Sort property and direction of the list result, like field,asc or field,desc. Supported fields:
+         * creationTimestamp.
+         */
         @ArraySchema(
                 uniqueItems = true,
-                arraySchema =
-                        @Schema(
-                                name = "sort",
-                                description = "Sort property and direction of the list result. Supported fields: "
-                                        + "creationTimestamp"),
-                schema =
-                        @Schema(
-                                description = "like field,asc or field,desc",
-                                implementation = String.class,
-                                example = "creationTimestamp,desc"))
+                arraySchema = @Schema(name = "sort"),
+                schema = @Schema(implementation = String.class, example = "creationTimestamp,desc"))
         public Sort getSort() {
             return SortResolver.defaultInstance.resolve(exchange);
         }
@@ -348,7 +348,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .parameter(parameterBuilder()
                             .in(ParameterIn.QUERY)
                             .name("name")
-                            .description("The comment subject name.")
+                            .description("The comment subject metadata.name.")
                             .required(true)
                             .implementation(String.class))
                     .parameter(parameterBuilder()

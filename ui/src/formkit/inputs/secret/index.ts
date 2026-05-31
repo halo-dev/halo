@@ -8,7 +8,7 @@ export const secret = createInput(
   defineAsyncComponent(() => import("./SecretSelect.vue")),
   {
     type: "input",
-    props: ["requiredKeys"],
+    props: ["requiredKeys", "descriptionPreset"],
     features: [initialValue, secretFeature],
   }
 );
@@ -17,6 +17,7 @@ declare module "@formkit/inputs" {
   export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
     secret: {
       type: "secret";
+      descriptionPreset?: string;
       requiredKeys?: RequiredKey[];
     };
   }

@@ -83,9 +83,10 @@ public class MigrationEndpoint implements CustomEndpoint {
                         },
                         builder -> builder.tag(tag)
                                 .operationId("DownloadBackups")
+                                .description("Download a file from the specified backup as an octet-stream attachment.")
                                 .parameter(parameterBuilder()
                                         .name("name")
-                                        .description("Backup name.")
+                                        .description("Backup metadata.name.")
                                         .required(true)
                                         .in(ParameterIn.PATH))
                                 .parameter(parameterBuilder()
@@ -93,6 +94,7 @@ public class MigrationEndpoint implements CustomEndpoint {
                                         .description("Backup filename.")
                                         .required(true)
                                         .in(ParameterIn.PATH))
+                                .response(responseBuilder().description("Backup file downloaded successfully."))
                                 .build())
                 .POST(
                         "/restorations",
@@ -115,6 +117,9 @@ public class MigrationEndpoint implements CustomEndpoint {
                                         .content(contentBuilder()
                                                 .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                                 .schema(schemaBuilder().implementation(RestoreRequest.class))))
+                                .response(responseBuilder()
+                                        .description("Backup restored successfully.")
+                                        .implementation(String.class))
                                 .build())
                 .build();
     }
@@ -162,6 +167,7 @@ public class MigrationEndpoint implements CustomEndpoint {
                 """)));
     }
 
+    /** Multipart payload for restoring a backup. */
     @Schema(types = "object")
     public static class RestoreRequest {
         private final MultiValueMap<String, Part> multipart;
@@ -170,7 +176,8 @@ public class MigrationEndpoint implements CustomEndpoint {
             this.multipart = multipart;
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, name = "file", description = "Backup file.")
+        /** Backup file. */
+        @Schema(requiredMode = NOT_REQUIRED, name = "file")
         public Optional<FilePart> getFile() {
             var part = multipart.getFirst("file");
             if (part instanceof FilePart filePart) {
@@ -179,9 +186,8 @@ public class MigrationEndpoint implements CustomEndpoint {
             return Optional.empty();
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, name = "filename", description = """
-            Filename of backup file in backups root.\
-            """)
+        /** Filename of backup file in backups root. */
+        @Schema(requiredMode = NOT_REQUIRED, name = "filename")
         public Optional<String> getFilename() {
             var part = multipart.getFirst("filename");
             if (part instanceof FormFieldPart filenamePart) {
@@ -190,7 +196,8 @@ public class MigrationEndpoint implements CustomEndpoint {
             return Optional.empty();
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, name = "downloadUrl", description = "Remote backup HTTP URL.")
+        /** Remote backup HTTP URL. */
+        @Schema(requiredMode = NOT_REQUIRED, name = "downloadUrl")
         public Optional<String> getDownloadUrl() {
             var part = multipart.getFirst("downloadUrl");
             if (part instanceof FormFieldPart downloadUrlPart) {
@@ -199,7 +206,8 @@ public class MigrationEndpoint implements CustomEndpoint {
             return Optional.empty();
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, name = "backupName", description = "Backup metadata name.")
+        /** Backup {@code metadata.name}. */
+        @Schema(requiredMode = NOT_REQUIRED, name = "backupName")
         public Optional<String> getBackupName() {
             var part = multipart.getFirst("backupName");
             if (part instanceof FormFieldPart backupNamePart) {

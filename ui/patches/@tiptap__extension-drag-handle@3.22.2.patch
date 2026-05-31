@@ -1,5 +1,21 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 061c150c72c1e340b8103dfa09a3335342c96ea7..bffd3363858cba60339db7528b66cf7273b410dd 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -506,6 +506,11 @@ function dragHandler(event, editor, nestedOptions, dragContext) {
+   });
+   wrapper.style.position = "absolute";
+   wrapper.style.top = "-10000px";
++  wrapper.style.paddingLeft = "12px";
++  wrapper.style.paddingTop = "12px";
++  const firstElement = view.nodeDOM(ranges[0].$from.pos);
++  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
++  wrapper.style.left = `${firstElementLeft}px`;
+   document.body.append(wrapper);
+   event.dataTransfer.clearData();
+   const wrapperRect = wrapper.getBoundingClientRect();
 diff --git a/dist/index.js b/dist/index.js
-index 066e4c8d30bfea266587dad460f42ae06def26ad..908545d0ee4e5d56500af2ed53726b9b56cf6c4f 100644
+index 066e4c8d30bfea266587dad460f42ae06def26ad..d956719fc331d6e85f5db9cbd5e431600b40d5e4 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
@@ -16,7 +32,19 @@ index 066e4c8d30bfea266587dad460f42ae06def26ad..908545d0ee4e5d56500af2ed53726b9b
  
  // src/helpers/dragHandler.ts
  import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
-@@ -528,18 +522,10 @@ var getOuterNode = (doc, pos) => {
+@@ -478,6 +472,11 @@ function dragHandler(event, editor, nestedOptions, dragContext) {
+   });
+   wrapper.style.position = "absolute";
+   wrapper.style.top = "-10000px";
++  wrapper.style.paddingLeft = "12px";
++  wrapper.style.paddingTop = "12px";
++  const firstElement = view.nodeDOM(ranges[0].$from.pos);
++  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
++  wrapper.style.left = `${firstElementLeft}px`;
+   document.body.append(wrapper);
+   event.dataTransfer.clearData();
+   const wrapperRect = wrapper.getBoundingClientRect();
+@@ -528,18 +527,10 @@ var getOuterNode = (doc, pos) => {
  
  // src/drag-handle-plugin.ts
  var getRelativePos = (state, absolutePos) => {
@@ -37,7 +65,7 @@ index 066e4c8d30bfea266587dad460f42ae06def26ad..908545d0ee4e5d56500af2ed53726b9b
  };
  var getOuterDomNode = (view, domNode) => {
    let tmpDomNode = domNode;
-@@ -664,17 +650,10 @@ var DragHandlePlugin = ({
+@@ -664,17 +655,10 @@ var DragHandlePlugin = ({
              return value;
            }
            if (tr.docChanged && currentNodePos !== -1 && element) {

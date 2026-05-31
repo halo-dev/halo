@@ -3,7 +3,6 @@ package run.halo.app.core.extension.attachment;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.attachment.Attachment.KIND;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
+/** Attachment extension that describes an uploaded file and its resolved access URLs. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -22,49 +22,52 @@ public class Attachment extends AbstractExtension {
 
     public static final String KIND = "Attachment";
 
+    /** Desired attachment metadata, storage references, and classification fields. */
     @Schema(requiredMode = REQUIRED)
     private AttachmentSpec spec;
 
+    /** Observed attachment access URLs and generated thumbnails. */
     private AttachmentStatus status;
 
+    /** Desired attachment metadata and storage placement. */
     @Data
     public static class AttachmentSpec {
 
-        @Schema(description = "Display name of attachment")
+        /** Display name shown for the attachment. */
         private String displayName;
 
-        @Schema(description = "Group name")
+        /** Attachment group metadata.name this attachment belongs to. */
         private String groupName;
 
-        @Schema(description = "Policy name")
+        /** Storage policy metadata.name used to store this attachment. */
         private String policyName;
 
-        @Schema(description = "Name of User who uploads the attachment")
+        /** User metadata.name of the uploader. */
         private String ownerName;
 
-        @Schema(description = "Media type of attachment")
+        /** Media type detected or supplied for the attachment, such as image/png. */
         @Nullable
         private String mediaType;
 
-        @Schema(description = "Size of attachment. Unit is Byte", minimum = "0")
+        /** Size of the attachment in bytes. */
+        @Schema(minimum = "0")
         private Long size;
 
-        @ArraySchema(
-                arraySchema = @Schema(description = "Tags of attachment"),
-                schema = @Schema(description = "Tag name"))
+        /** Free-form tags assigned to the attachment. */
         private Set<String> tags;
     }
 
+    /** Observed attachment access state. */
     @Data
     public static class AttachmentStatus {
 
-        @Schema(description = """
-            Permalink of attachment.
-            If it is in local storage, the public URL will be set.
-            If it is in s3 storage, the Object URL will be set.
-            """)
+        /**
+         * Public permalink for the attachment. Local storage usually exposes a public URL, while object storage may
+         * expose the object URL.
+         */
         private String permalink;
 
+        /** Generated thumbnail URLs keyed by thumbnail size name. */
         @Nullable
         private Map<String, String> thumbnails;
     }

@@ -74,6 +74,13 @@ public class SecurityProperties {
     @Data
     public static class RememberMeOptions {
         private Duration tokenValidity = Duration.ofDays(14);
+
+        /**
+         * Minimum interval between token rotations. Requests arriving within this duration after the last rotation will
+         * reuse the existing token instead of generating a new one, reducing unnecessary rotations and preventing
+         * false-positive cookie theft detection from stale cookies on other devices.
+         */
+        private Duration rotationCooldown = Duration.ofMinutes(5);
     }
 
     @Data
