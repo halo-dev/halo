@@ -1,5 +1,6 @@
 package run.halo.app.theme.config;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,9 @@ import org.springframework.web.reactive.resource.ResourceResolverChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.theme.ThemeScreenshots;
 
 @Component
 public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
@@ -39,6 +42,12 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             cacheControl = CacheControl.empty();
         }
         var useLastModified = resourcesProperties.getCache().isUseLastModified();
+        registry.addResourceHandler("/themes/{themeName}/screenshot.{extension}")
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new ThemeScreenshotResourceResolver(themeRootGetter.get()));
         registry.addResourceHandler("/themes/{themeName}/assets/{*resourcePaths}")
                 .setCacheControl(cacheControl)
                 .setUseLastModified(useLastModified)
@@ -85,6 +94,53 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
                 return Mono.empty();
             }
             return Mono.just(location);
+        }
+
+        @Override
+        protected Mono<String> resolveUrlPathInternal(
+                String resourceUrlPath, List<? extends Resource> locations, ResourceResolverChain chain) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /** Theme screenshot resource resolver. The resolver only exposes supported screenshot files from the theme root. */
+    private static class ThemeScreenshotResourceResolver extends AbstractResourceResolver {
+
+        private final Path themeRoot;
+
+        private ThemeScreenshotResourceResolver(Path themeRoot) {
+            this.themeRoot = themeRoot;
+        }
+
+        @Override
+        protected Mono<Resource> resolveResourceInternal(
+                ServerWebExchange exchange,
+                String requestPath,
+                List<? extends Resource> locations,
+                ResourceResolverChain chain) {
+            if (exchange == null) {
+                return Mono.empty();
+            }
+            Map<String, String> requiredAttribute =
+                    exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            var themeName = requiredAttribute.get("themeName");
+            var extension = requiredAttribute.get("extension");
+            var filename = "screenshot." + extension;
+
+            if (StringUtils.isAnyBlank(themeName, extension) || !ThemeScreenshots.isSupportedFilename(filename)) {
+                return Mono.empty();
+            }
+
+            var screenshotPath = themeRoot.resolve(themeName).resolve(filename);
+            try {
+                FileUtils.checkDirectoryTraversal(themeRoot, screenshotPath);
+            } catch (AccessDeniedException e) {
+                return Mono.empty();
+            }
+            if (!Files.isRegularFile(screenshotPath) || !Files.isReadable(screenshotPath)) {
+                return Mono.empty();
+            }
+            return Mono.just(new FileSystemResource(screenshotPath));
         }
 
         @Override

@@ -104,6 +104,9 @@ public class Theme extends AbstractExtension {
 
         /** Whether the theme appears to be a local development workspace. */
         private Boolean inDevelopment;
+
+        /** Resolved preview screenshot URL served from the theme root. */
+        private String screenshot;
     }
 
     /**
