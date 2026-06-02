@@ -76,11 +76,11 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 
 关于三个版本的详细对比，请参考[版本对比](https://www.lxware.cn/halo)。
 
-## 生态
+# Halo 应用生态
 
-可访问 [官方应用市场](https://www.halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看适用于 Halo 2.x 的主题和插件。
-
-官方应用市场已支持开发者入驻、创建应用并提交审核，欢迎社区开发者入驻，[了解详情](https://www.halo.run/archives/halo-app-store-developer-onboarding-app-creation)。
+* **应用市场**：提供丰富的站点主题与功能插件，[立即访问](https://www.halo.run/store/apps)
+* **成为开发者**：支持自主发布并管理应用，[了解详情](https://www.halo.run/archives/halo-app-store-developer-onboarding-app-creation)
+* [halo-sigs/awesome-halo](https://github.com/halo-sigs/awesome-halo)
 
 ## 许可证
 
