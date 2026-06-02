@@ -76,7 +76,7 @@ docker run -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.2
 
 关于三个版本的详细对比，请参考[版本对比](https://www.lxware.cn/halo)。
 
-# Halo 应用生态
+## 应用生态
 
 * **应用市场**：提供丰富的站点主题与功能插件，[立即访问](https://www.halo.run/store/apps)
 * **成为开发者**：支持自主发布并管理应用，[了解详情](https://www.halo.run/archives/halo-app-store-developer-onboarding-app-creation)
