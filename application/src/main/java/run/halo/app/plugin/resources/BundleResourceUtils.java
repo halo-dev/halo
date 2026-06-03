@@ -79,6 +79,15 @@ public abstract class BundleResourceUtils {
         return selectBundleLocation(resourceLoader);
     }
 
+    /**
+     * Selects the bundle location for the given resource loader.
+     *
+     * <p>A location is considered available when the plugin provides at least one known UI bundle resource in that
+     * directory, either {@value #JS_BUNDLE} or {@value #CSS_BUNDLE}.
+     *
+     * @param resourceLoader the resource loader to use
+     * @return the selected bundle location, or {@code null} if no location is available
+     */
     public static @Nullable String selectBundleLocation(DefaultResourceLoader resourceLoader) {
         Assert.notNull(resourceLoader, "Resource loader must not be null");
         for (String location : BUNDLE_LOCATIONS) {

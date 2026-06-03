@@ -33,6 +33,10 @@ function getRequiresMinVersion(requires: string | undefined) {
   try {
     return minVersion(normalizedRequires);
   } catch {
+    console.warn(
+      `[ui-plugin-bundler-kit] Invalid semver range in plugin manifest "spec.requires": "${requires}". ` +
+        `Falling back to "${CONSOLE_BUNDLE_LOCATION}" bundle location.`
+    );
     return;
   }
 }
