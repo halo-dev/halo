@@ -313,6 +313,7 @@ class PersistentTokenBasedRememberMeServicesTest {
             var device = createTestDevice("test-series");
             when(tokenRepository.getTokenForSeries(eq("test-series"))).thenReturn(Mono.just(storedToken));
             when(deviceService.resolveCurrentDevice(exchange)).thenReturn(Mono.just(device));
+            when(tokenRepository.removeUserTokens(eq("test-user"))).thenReturn(Mono.empty());
             // Override the default 14-day max age to a shorter duration
             when(rememberMeCookieResolver.getCookieMaxAge()).thenReturn(Duration.ofSeconds(60));
 
@@ -321,6 +322,8 @@ class PersistentTokenBasedRememberMeServicesTest {
                             .block())
                     .isInstanceOf(InvalidCookieException.class)
                     .hasMessage("Remember-me login has expired");
+
+            verify(tokenRepository).removeUserTokens(eq("test-user"));
         }
 
         @Test

@@ -48,6 +48,8 @@ public class PreviewRouterFunction {
 
     private final ViewNameResolver viewNameResolver;
 
+    private final PostViewNameResolver postViewNameResolver;
+
     private final PostService postService;
 
     private final SinglePageConversionService singlePageConversionService;
@@ -79,12 +81,11 @@ public class PreviewRouterFunction {
                 // Check permissions before throwing this exception
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Post not found.")))
                 .flatMap(postVo -> {
-                    String template = postVo.getSpec().getTemplate();
                     Map<String, Object> model = ModelMapUtils.postModel(postVo);
                     // Mark as preview mode for downstream view processing
                     request.exchange().getAttributes().put(HaloTrackerProcessor.SKIP_TRACKER, Boolean.TRUE);
-                    return viewNameResolver
-                            .resolveViewNameOrDefault(request, template, DefaultTemplateEnum.POST.getValue())
+                    return postViewNameResolver
+                            .resolveViewNameOrDefault(request, postVo)
                             .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
                 });
     }
