@@ -6,10 +6,13 @@ import {
   type RsbuildMode,
 } from "@rsbuild/core";
 import { pluginVue } from "@rsbuild/plugin-vue";
-import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
+import { DEFAULT_OUT_DIR_PROD, getDefaultOutDirDev } from "./constants/build";
 import { GLOBALS } from "./constants/externals";
 import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { getHaloPluginManifest } from "./utils/halo-plugin";
+import {
+  getHaloPluginBundleLocation,
+  getHaloPluginManifest,
+} from "./utils/halo-plugin";
 
 export interface RsBuildUserConfig {
   /**
@@ -27,11 +30,14 @@ export interface RsBuildUserConfig {
 
 function createRsbuildPresetsConfig(manifestPath: string) {
   const manifest = getHaloPluginManifest(manifestPath);
+  const bundleLocation = getHaloPluginBundleLocation(manifest);
 
   return defineConfig(({ envMode }) => {
     const isProduction = envMode === "production";
 
-    const outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
+    const outDir = isProduction
+      ? DEFAULT_OUT_DIR_PROD
+      : getDefaultOutDirDev(bundleLocation);
 
     return {
       mode: (envMode as RsbuildMode) || "production",
@@ -72,7 +78,7 @@ function createRsbuildPresetsConfig(manifestPath: string) {
             },
           },
           output: {
-            publicPath: `/plugins/${manifest.metadata.name}/assets/console/`,
+            publicPath: `/plugins/${manifest.metadata.name}/assets/${bundleLocation}/`,
             library: {
               type: "window",
               export: "default",
