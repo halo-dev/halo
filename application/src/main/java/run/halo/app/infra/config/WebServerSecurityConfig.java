@@ -56,6 +56,7 @@ public class WebServerSecurityConfig {
                 HttpMethod.GET,
                 "/ui-assets/**",
                 "/themes/{themeName}/assets/{*resourcePaths}",
+                "/themes/{themeName}/screenshot.{extension}",
                 "/plugins/{pluginName}/assets/**",
                 "/webjars/**",
                 "/js/**",

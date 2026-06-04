@@ -269,6 +269,71 @@ class ThemeReconcilerTest {
         assertThat(themeUpdateCaptor.getValue().getStatus().getInDevelopment()).isTrue();
     }
 
+    @Test
+    void shouldResolveThemeScreenshotWhenSupportedFileExists() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-screenshot");
+        Files.createDirectories(testWorkDir.resolve("theme-test"));
+        Files.writeString(testWorkDir.resolve("theme-test").resolve("screenshot.png"), "fake screenshot");
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        assertThat(themeUpdateCaptor.getValue().getStatus().getScreenshot())
+                .isEqualTo("/themes/theme-test/screenshot.png");
+    }
+
+    @Test
+    void shouldResolveThemeScreenshotByDeterministicPriority() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-screenshot-priority");
+        Files.createDirectories(testWorkDir.resolve("theme-test"));
+        Files.writeString(testWorkDir.resolve("theme-test").resolve("screenshot.webp"), "fake webp");
+        Files.writeString(testWorkDir.resolve("theme-test").resolve("screenshot.jpg"), "fake jpg");
+        Files.writeString(testWorkDir.resolve("theme-test").resolve("screenshot.jpeg"), "fake jpeg");
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        assertThat(themeUpdateCaptor.getValue().getStatus().getScreenshot())
+                .isEqualTo("/themes/theme-test/screenshot.jpeg");
+    }
+
+    @Test
+    void shouldClearThemeScreenshotWhenSupportedFileDoesNotExist() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-missing-screenshot");
+        Files.createDirectories(testWorkDir.resolve("theme-test"));
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        var status = new Theme.ThemeStatus();
+        status.setScreenshot("/themes/theme-test/screenshot.png");
+        theme.setStatus(status);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        assertThat(themeUpdateCaptor.getValue().getStatus().getScreenshot()).isNull();
+    }
+
     private Theme fakeTheme() {
         Theme theme = new Theme();
         Metadata metadata = new Metadata();

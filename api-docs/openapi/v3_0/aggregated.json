@@ -23404,6 +23404,10 @@
               "FAILED",
               "UNKNOWN"
             ]
+          },
+          "screenshot": {
+            "type": "string",
+            "description": "Resolved preview screenshot URL served from the theme root."
           }
         },
         "description": "Observed theme lifecycle and installation state."
