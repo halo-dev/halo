@@ -49,6 +49,7 @@ import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.theme.TemplateEngineManager;
+import run.halo.app.theme.ThemeScreenshots;
 import run.halo.app.theme.service.ThemeUtils;
 
 /**
@@ -160,6 +161,9 @@ class ThemeReconciler implements Reconciler<Request> {
         var themePath = themeRoot.get().resolve(name);
         status.setLocation(themePath.toAbsolutePath().toString());
         status.setInDevelopment(hasLocalDevelopmentIndicators(themePath));
+        status.setScreenshot(ThemeScreenshots.findScreenshot(themePath)
+                .map(screenshot -> ThemeScreenshots.buildScreenshotUrl(name, screenshot))
+                .orElse(null));
 
         status.setPhase(Theme.ThemePhase.READY);
         var conditionBuilder = Condition.builder()

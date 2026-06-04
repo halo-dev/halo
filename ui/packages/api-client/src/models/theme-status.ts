@@ -37,6 +37,10 @@ export interface ThemeStatus {
      * Current theme lifecycle phase.
      */
     'phase'?: ThemeStatusPhaseEnum;
+    /**
+     * Resolved preview screenshot URL served from the theme root.
+     */
+    'screenshot'?: string;
 }
 
 export const ThemeStatusPhaseEnum = {
