@@ -9,6 +9,11 @@ import { loadStyle } from "@/utils/load-style";
 
 export type Platform = "console" | "uc";
 
+export interface LoadedPluginModule {
+  name: string;
+  module: PluginModule;
+}
+
 export function setupCoreModules({
   app,
   router,
@@ -32,48 +37,65 @@ export function setupCoreModules({
   }
 }
 
-export async function setupPluginModules({
+export async function loadEnabledPluginModules(): Promise<
+  LoadedPluginModule[]
+> {
+  await loadPluginBundle();
+
+  const enabledPlugins = window["enabledPlugins"] as {
+    name: string;
+    value: string;
+  }[];
+
+  return (enabledPlugins || [])
+    .map((plugin) => {
+      const module = window[plugin.name] as PluginModule | undefined;
+      if (!module) {
+        return;
+      }
+      return {
+        name: plugin.name,
+        module,
+      };
+    })
+    .filter((plugin): plugin is LoadedPluginModule => !!plugin);
+}
+
+export function setupPluginModules({
   app,
   router,
   platform,
+  modules,
 }: {
   app: App;
   router: Router;
   platform: Platform;
+  modules: LoadedPluginModule[];
 }) {
-  try {
-    await loadPluginBundle();
-
-    const enabledPlugins = window["enabledPlugins"] as {
-      name: string;
-      value: string;
-    }[];
-
-    for (const plugin of enabledPlugins || []) {
-      const module = window[plugin.name];
-      if (!module) {
-        continue;
-      }
-      initJsModule({
-        app,
-        router,
-        platform,
-        name: plugin.name,
-        jsModule: module,
-        core: false,
-      });
-    }
-
-    await loadPluginStyles();
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message.includes("style")
-        ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
-        : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
-
-    console.error(message, error);
-    Toast.error(message);
+  for (const plugin of modules) {
+    initJsModule({
+      app,
+      router,
+      platform,
+      name: plugin.name,
+      jsModule: plugin.module,
+      core: false,
+    });
   }
+}
+
+export async function setupPluginStyles() {
+  await loadPluginStyles();
+}
+
+export function notifyPluginLoadError(error: unknown) {
+  const message =
+    error instanceof Error && error.message.includes("style")
+      ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
+      : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
+
+  console.error(message, error);
+  Toast.error(message);
 }
 
 async function loadPluginBundle() {

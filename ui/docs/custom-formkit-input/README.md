@@ -101,6 +101,36 @@ const postName = ref("");
   label: 底部菜单组
 ```
 
+## 插件扩展 FormKit 输入组件
+
+插件可以通过 UI 入口中的 `formkit.inputs` 注册自己的 FormKit 输入类型。注册后的类型可以在插件的 FormKit Schema 中通过 `$formkit` 使用，并会走 FormKit 的输入生命周期。
+
+```ts
+import { createInput } from "@formkit/vue";
+import { definePlugin } from "@halo-dev/ui-shared";
+import { defineAsyncComponent } from "vue";
+
+export default definePlugin({
+  formkit: {
+    inputs: {
+      myPluginInput: createInput(
+        defineAsyncComponent(() => import("./MyPluginInput.vue"))
+      ),
+    },
+  },
+});
+```
+
+```yaml
+- $formkit: myPluginInput
+  name: customField
+  label: 自定义字段
+```
+
+`formkit.inputs` 仅支持同步对象。如果输入组件需要懒加载，可以在输入定义内部使用 `defineAsyncComponent`。
+
+如果插件注册的输入类型名称与 Halo 内置类型或更早加载的插件类型重复，Halo 会保留已有类型，跳过冲突的插件类型并在控制台输出警告。建议插件使用带插件标识的类型名称，例如 `myPluginInput`，以降低冲突概率。
+
 ### select
 
 select 是一个选择器类型的输入组件，使用者可以从一批待选数据中选择一个或多个选项。它支持单选、多选操作，并且支持静态数据及远程动态数据加载等多种方式。
