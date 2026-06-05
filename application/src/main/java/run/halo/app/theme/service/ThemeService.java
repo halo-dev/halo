@@ -1,8 +1,10 @@
 package run.halo.app.theme.service;
 
 import org.reactivestreams.Publisher;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
@@ -17,6 +19,16 @@ public interface ThemeService {
     Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content);
 
     Mono<Theme> reloadTheme(String name);
+
+    Flux<DataBuffer> uglifyJsBundle();
+
+    Flux<DataBuffer> uglifyCssBundle();
+
+    Mono<String> generateBundleVersion();
+
+    Mono<Resource> getJsBundle(String version);
+
+    Mono<Resource> getCssBundle(String version);
 
     Mono<ConfigMap> resetSettingConfig(String name);
 

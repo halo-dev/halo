@@ -2317,6 +2317,26 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css": {
+      "get": {
+        "description": "Fetch CSS bundle of the activated theme.",
+        "operationId": "fetchThemeCssBundle",
+        "responses": {},
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js": {
+      "get": {
+        "description": "Fetch JS bundle of the activated theme.",
+        "operationId": "fetchThemeJsBundle",
+        "responses": {},
+        "tags": [
+          "ThemeV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/themes/-/install-from-uri": {
       "post": {
         "description": "Install a theme from uri.",
@@ -6853,6 +6873,10 @@
               "$ref": "#/components/schemas/Condition"
             }
           },
+          "entry": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI JavaScript entry URL served from the theme root."
+          },
           "inDevelopment": {
             "type": "boolean",
             "description": "Whether the theme appears to be a local development workspace."
@@ -6873,6 +6897,10 @@
           "screenshot": {
             "type": "string",
             "description": "Resolved preview screenshot URL served from the theme root."
+          },
+          "stylesheet": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI stylesheet URL served from the theme root."
           }
         },
         "description": "Observed theme lifecycle and installation state."

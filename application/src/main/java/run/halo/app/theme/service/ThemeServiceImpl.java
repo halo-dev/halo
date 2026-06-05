@@ -1,5 +1,7 @@
 package run.halo.app.theme.service;
 
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
@@ -7,7 +9,10 @@ import static run.halo.app.theme.service.ThemeUtils.loadThemeManifest;
 import static run.halo.app.theme.service.ThemeUtils.locateThemeManifest;
 import static run.halo.app.theme.service.ThemeUtils.unzipThemeTo;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -15,24 +20,30 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -55,11 +66,11 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
+import run.halo.app.theme.ThemeUiResources;
 
 @Slf4j
 @Service
-@AllArgsConstructor
-public class ThemeServiceImpl implements ThemeService {
+public class ThemeServiceImpl implements ThemeService, InitializingBean, DisposableBean {
 
     private final ReactiveExtensionClient client;
 
@@ -71,7 +82,28 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final SystemConfigFetcher systemConfigFetcher;
 
+    private final BundleCache jsBundleCache;
+
+    private final BundleCache cssBundleCache;
+
+    private Path tempDir;
+
     private final Scheduler scheduler = Schedulers.boundedElastic();
+
+    public ThemeServiceImpl(
+            ReactiveExtensionClient client,
+            ThemeRootGetter themeRoot,
+            HaloProperties haloProperties,
+            SystemVersionSupplier systemVersionSupplier,
+            SystemConfigFetcher systemConfigFetcher) {
+        this.client = client;
+        this.themeRoot = themeRoot;
+        this.haloProperties = haloProperties;
+        this.systemVersionSupplier = systemVersionSupplier;
+        this.systemConfigFetcher = systemConfigFetcher;
+        this.jsBundleCache = new BundleCache(".js");
+        this.cssBundleCache = new BundleCache(".css");
+    }
 
     @Override
     public Mono<Void> installPresetTheme() {
@@ -239,6 +271,68 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public Flux<DataBuffer> uglifyJsBundle() {
+        var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
+        return fetchActivatedThemeBundle(ThemeUiResources.JS_BUNDLE)
+                .flatMapMany(bundle -> {
+                    var themeName = bundle.theme().getMetadata().getName();
+                    var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                            ("// Generated from theme " + themeName + "\n").getBytes(StandardCharsets.UTF_8)));
+                    var content = DataBufferUtils.read(bundle.resource(), dataBufferFactory, StreamUtils.BUFFER_SIZE);
+                    var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap(
+                            ("\n" + enabledThemesScript(bundle.theme())).getBytes(StandardCharsets.UTF_8)));
+                    return Flux.concat(head, content, tail);
+                })
+                .switchIfEmpty(Mono.fromSupplier(
+                        () -> dataBufferFactory.wrap(emptyEnabledThemesScript().getBytes(StandardCharsets.UTF_8))));
+    }
+
+    @Override
+    public Flux<DataBuffer> uglifyCssBundle() {
+        var dataBufferFactory = DefaultDataBufferFactory.sharedInstance;
+        return fetchActivatedThemeBundle(ThemeUiResources.CSS_BUNDLE).flatMapMany(bundle -> {
+            var themeName = bundle.theme().getMetadata().getName();
+            var head = Mono.<DataBuffer>fromSupplier(() -> dataBufferFactory.wrap(
+                    ("/* Generated from theme " + themeName + " */\n").getBytes(StandardCharsets.UTF_8)));
+            var content = DataBufferUtils.read(bundle.resource(), dataBufferFactory, StreamUtils.BUFFER_SIZE);
+            var tail = Mono.fromSupplier(() -> dataBufferFactory.wrap("\n".getBytes(StandardCharsets.UTF_8)));
+            return Flux.concat(head, content, tail);
+        });
+    }
+
+    private Mono<ThemeBundle> fetchActivatedThemeBundle(String bundleName) {
+        return fetchActivatedTheme()
+                .flatMap(theme ->
+                        getBundleResource(theme, bundleName).map(resource -> new ThemeBundle(theme, resource)));
+    }
+
+    private Mono<Resource> getBundleResource(Theme theme, String bundleName) {
+        return Mono.fromSupplier(() -> ThemeUiResources.getBundleResource(
+                themeRoot.get(), theme.getMetadata().getName(), bundleName));
+    }
+
+    @Override
+    public Mono<String> generateBundleVersion() {
+        return fetchActivatedTheme()
+                .map(theme -> theme.getMetadata().getName()
+                        + ':'
+                        + Objects.toString(theme.getSpec().getVersion(), ""))
+                .defaultIfEmpty(StringUtils.EMPTY)
+                .map(Hashing.sha256()::hashUnencodedChars)
+                .map(HashCode::toString);
+    }
+
+    @Override
+    public Mono<Resource> getJsBundle(String version) {
+        return jsBundleCache.computeIfAbsent(version, this.uglifyJsBundle());
+    }
+
+    @Override
+    public Mono<Resource> getCssBundle(String version) {
+        return cssBundleCache.computeIfAbsent(version, this.uglifyCssBundle());
+    }
+
+    @Override
     public Mono<ConfigMap> resetSettingConfig(String name) {
         return client.fetch(Theme.class, name)
                 .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
@@ -305,6 +399,22 @@ public class ThemeServiceImpl implements ThemeService {
 
     private Path getThemePath(Theme theme) {
         return themeRoot.get().resolve(theme.getMetadata().getName());
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.tempDir = Files.createTempDirectory("halo-theme-bundle");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (this.tempDir != null) {
+            FileSystemUtils.deleteRecursively(this.tempDir);
+        }
+    }
+
+    void setTempDir(Path tempDir) {
+        this.tempDir = tempDir;
     }
 
     private Predicate<Unstructured> hasSettingsYaml(Theme theme) {
@@ -377,5 +487,112 @@ public class ThemeServiceImpl implements ThemeService {
         if (updatingMeta.getAnnotations() != null) {
             existingMeta.getAnnotations().putAll(updatingMeta.getAnnotations());
         }
+    }
+
+    private static String enabledThemesScript(Theme theme) {
+        var themeName = theme.getMetadata().getName();
+        var moduleName = ThemeUiResources.buildModuleName(themeName);
+        return """
+            this.enabledThemes = [{"name":"%s","themeName":"%s","version":"%s"}]\
+            """.formatted(
+                        moduleName, themeName, Objects.toString(theme.getSpec().getVersion(), ""));
+    }
+
+    private static String emptyEnabledThemesScript() {
+        return "this.enabledThemes = []";
+    }
+
+    private record ThemeBundle(Theme theme, Resource resource) {}
+
+    class BundleCache {
+
+        private final String suffix;
+
+        private final AtomicBoolean writing = new AtomicBoolean();
+
+        private volatile Resource resource;
+
+        BundleCache(String suffix) {
+            this.suffix = suffix;
+        }
+
+        Mono<Resource> computeIfAbsent(String version, Publisher<DataBuffer> content) {
+            var filename = buildBundleFilename(version, suffix);
+            if (isResourceMatch(resource, filename)) {
+                return Mono.just(resource);
+            }
+            return generateBundleVersion().flatMap(newVersion -> {
+                var newFilename = buildBundleFilename(newVersion, suffix);
+                if (isResourceMatch(this.resource, newFilename)) {
+                    return Mono.just(resource);
+                }
+                if (writing.compareAndSet(false, true)) {
+                    return Mono.justOrEmpty(this.resource)
+                            .filter(res -> isResourceMatch(res, newFilename))
+                            .switchIfEmpty(Mono.using(
+                                            () -> {
+                                                if (!Files.exists(tempDir)) {
+                                                    Files.createDirectories(tempDir);
+                                                }
+                                                return tempDir.resolve(newFilename);
+                                            },
+                                            path -> DataBufferUtils.write(content, path, CREATE, TRUNCATE_EXISTING)
+                                                    .then(Mono.<Resource>fromSupplier(
+                                                            () -> new FileSystemResource(path))),
+                                            path -> {
+                                                if (shouldCleanUp(path)) {
+                                                    cleanUp(this.resource);
+                                                }
+                                            })
+                                    .subscribeOn(scheduler)
+                                    .doOnNext(newResource -> this.resource = newResource))
+                            .doFinally(signalType -> writing.set(false));
+                }
+                return Mono.defer(() -> {
+                            if (this.writing.get()) {
+                                log.debug("Waiting for the theme bundle file {} to be written", filename);
+                                return Mono.empty();
+                            }
+                            log.debug("Waited the theme bundle file {} to be written", filename);
+                            return Mono.just(this.resource);
+                        })
+                        .repeatWhenEmpty(100, count -> count.delayElements(Duration.ofMillis(100)));
+            });
+        }
+
+        private boolean shouldCleanUp(Path newPath) {
+            if (this.resource == null || !this.resource.exists()) {
+                return false;
+            }
+            try {
+                var oldPath = this.resource.getFile().toPath();
+                return !oldPath.equals(newPath);
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        private static void cleanUp(Resource resource) {
+            if (resource instanceof WritableResource wr && wr.isWritable() && wr.isFile()) {
+                try {
+                    Files.deleteIfExists(wr.getFile().toPath());
+                } catch (IOException e) {
+                    log.warn("Failed to delete old theme bundle file {}", wr.getFilename(), e);
+                }
+            }
+        }
+
+        private static boolean isResourceMatch(Resource resource, String filename) {
+            return resource != null
+                    && resource.exists()
+                    && resource.isFile()
+                    && Objects.equals(filename, resource.getFilename());
+        }
+    }
+
+    private static String buildBundleFilename(String v, String suffix) {
+        Assert.notNull(v, "Version must not be null");
+        Assert.notNull(suffix, "Suffix must not be null");
+        return v + suffix;
     }
 }

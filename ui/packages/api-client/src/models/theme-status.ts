@@ -26,6 +26,10 @@ export interface ThemeStatus {
      */
     'conditions'?: Array<Condition>;
     /**
+     * Resolved Console/User Center UI JavaScript entry URL served from the theme root.
+     */
+    'entry'?: string;
+    /**
      * Whether the theme appears to be a local development workspace.
      */
     'inDevelopment'?: boolean;
@@ -41,6 +45,10 @@ export interface ThemeStatus {
      * Resolved preview screenshot URL served from the theme root.
      */
     'screenshot'?: string;
+    /**
+     * Resolved Console/User Center UI stylesheet URL served from the theme root.
+     */
+    'stylesheet'?: string;
 }
 
 export const ThemeStatusPhaseEnum = {

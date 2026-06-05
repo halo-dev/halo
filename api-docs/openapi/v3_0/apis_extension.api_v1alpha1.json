@@ -14629,6 +14629,10 @@
               "$ref": "#/components/schemas/Condition"
             }
           },
+          "entry": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI JavaScript entry URL served from the theme root."
+          },
           "inDevelopment": {
             "type": "boolean",
             "description": "Whether the theme appears to be a local development workspace."
@@ -14649,6 +14653,10 @@
           "screenshot": {
             "type": "string",
             "description": "Resolved preview screenshot URL served from the theme root."
+          },
+          "stylesheet": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI stylesheet URL served from the theme root."
           }
         },
         "description": "Observed theme lifecycle and installation state."

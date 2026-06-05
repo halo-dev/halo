@@ -1,5 +1,6 @@
 package run.halo.app.theme.endpoint;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -24,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivestreams.Publisher;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -72,6 +74,9 @@ class ThemeEndpointTest {
 
     @Mock
     private SettingConfigService settingConfigService;
+
+    @Mock
+    private WebProperties webProperties;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -285,6 +290,75 @@ class ThemeEndpointTest {
                 .isOk()
                 .expectBody(Theme.class)
                 .isEqualTo(theme);
+    }
+
+    @Test
+    void fetchThemeJsBundleShouldRedirectToVersionedUrl() {
+        when(themeService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
+
+        webTestClient
+                .get()
+                .uri("/themes/-/bundle.js")
+                .exchange()
+                .expectStatus()
+                .isTemporaryRedirect()
+                .expectHeader()
+                .location("/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js?v=fake-version");
+    }
+
+    @Test
+    void fetchThemeJsBundleShouldServeResource() throws IOException {
+        var bundle = tmpHaloWorkDir.resolve("bundle.js");
+        Files.writeString(bundle, "this.enabledThemes = []");
+        when(themeService.getJsBundle("fake-version")).thenReturn(Mono.just(new FileSystemResource(bundle)));
+
+        webTestClient
+                .get()
+                .uri("/themes/-/bundle.js?v=fake-version")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.valueOf("text/javascript"))
+                .expectBody(String.class)
+                .isEqualTo("this.enabledThemes = []");
+    }
+
+    @Test
+    void fetchThemeCssBundleShouldServeResource() throws IOException {
+        var bundle = tmpHaloWorkDir.resolve("bundle.css");
+        Files.writeString(bundle, ".fake {}");
+        when(themeService.getCssBundle("fake-version")).thenReturn(Mono.just(new FileSystemResource(bundle)));
+
+        webTestClient
+                .get()
+                .uri("/themes/-/bundle.css?v=fake-version")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .contentType(MediaType.valueOf("text/css"))
+                .expectBody(String.class)
+                .isEqualTo(".fake {}");
+    }
+
+    @Test
+    void fetchThemeCssBundleShouldServeEmptyResource() throws IOException {
+        var bundle = tmpHaloWorkDir.resolve("bundle.css");
+        Files.writeString(bundle, "");
+        when(themeService.getCssBundle("fake-version")).thenReturn(Mono.just(new FileSystemResource(bundle)));
+
+        webTestClient
+                .get()
+                .uri("/themes/-/bundle.css?v=fake-version")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(result -> {
+                    var body = result.getResponseBody();
+                    assertThat(body == null ? new byte[0] : body).isEmpty();
+                });
     }
 
     @Test

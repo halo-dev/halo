@@ -50,6 +50,7 @@ import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.theme.TemplateEngineManager;
 import run.halo.app.theme.ThemeScreenshots;
+import run.halo.app.theme.ThemeUiResources;
 import run.halo.app.theme.service.ThemeUtils;
 
 /**
@@ -164,6 +165,8 @@ class ThemeReconciler implements Reconciler<Request> {
         status.setScreenshot(ThemeScreenshots.findScreenshot(themePath)
                 .map(screenshot -> ThemeScreenshots.buildScreenshotUrl(name, screenshot))
                 .orElse(null));
+        status.setEntry(buildUiAssetUrlIfReadable(theme, ThemeUiResources.JS_BUNDLE));
+        status.setStylesheet(buildUiAssetUrlIfReadable(theme, ThemeUiResources.CSS_BUNDLE));
 
         status.setPhase(Theme.ThemePhase.READY);
         var conditionBuilder = Condition.builder()
@@ -191,6 +194,16 @@ class ThemeReconciler implements Reconciler<Request> {
 
     private static boolean hasLocalDevelopmentIndicators(Path themePath) {
         return LOCAL_DEVELOPMENT_INDICATORS.stream().anyMatch(indicator -> Files.exists(themePath.resolve(indicator)));
+    }
+
+    private String buildUiAssetUrlIfReadable(Theme theme, String resourceName) {
+        var name = theme.getMetadata().getName();
+        var resource = ThemeUiResources.getBundleResource(themeRoot.get(), name, resourceName);
+        if (resource == null) {
+            return null;
+        }
+        return ThemeUiResources.buildAssetUrl(
+                name, resourceName, theme.getSpec().getVersion());
     }
 
     private void themeSettingDefaultConfig(Theme theme) {

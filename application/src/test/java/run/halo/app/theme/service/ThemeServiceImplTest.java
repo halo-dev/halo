@@ -1,5 +1,6 @@
 package run.halo.app.theme.service;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,6 +85,7 @@ class ThemeServiceImplTest {
         lenient().when(themeRoot.get()).thenReturn(tmpDir.resolve("themes"));
         // init the folder
         Files.createDirectory(themeRoot.get());
+        themeService.setTempDir(tmpDir.resolve("bundles"));
 
         lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("0.0.0"));
     }
@@ -125,6 +127,15 @@ class ThemeServiceImplTest {
 
     Flux<DataBuffer> content(Path path) {
         return DataBufferUtils.read(path, DefaultDataBufferFactory.sharedInstance, StreamUtils.BUFFER_SIZE);
+    }
+
+    Mono<String> joinToString(Flux<DataBuffer> content) {
+        return DataBufferUtils.join(content).map(dataBuffer -> {
+            var bytes = new byte[dataBuffer.readableByteCount()];
+            dataBuffer.read(bytes);
+            DataBufferUtils.release(dataBuffer);
+            return new String(bytes, UTF_8);
+        });
     }
 
     @Nested
@@ -384,6 +395,80 @@ class ThemeServiceImplTest {
         verify(client, times(1)).fetch(eq(ConfigMap.class), eq("fake-config"));
 
         verify(client, times(1)).update(any(ConfigMap.class));
+    }
+
+    @Test
+    void shouldUglifyActivatedThemeJsBundleOnly() throws IOException {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("active");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+                .thenReturn(Mono.just(themeSetting));
+        var activeTheme = createTheme(theme -> {
+            theme.getMetadata().setName("active");
+            theme.getSpec().setVersion("1.0.0");
+        });
+        when(client.fetch(Theme.class, "active")).thenReturn(Mono.just(activeTheme));
+        Files.createDirectories(themeRoot.get().resolve("active").resolve("ui"));
+        Files.writeString(themeRoot.get().resolve("active").resolve("ui").resolve("main.js"), "active js");
+        Files.createDirectories(themeRoot.get().resolve("inactive").resolve("ui"));
+        Files.writeString(themeRoot.get().resolve("inactive").resolve("ui").resolve("main.js"), "inactive js");
+
+        StepVerifier.create(joinToString(themeService.uglifyJsBundle()))
+                .assertNext(bundle -> assertThat(bundle)
+                        .contains("// Generated from theme active")
+                        .contains("active js")
+                        .contains("""
+                            this.enabledThemes = [{"name":"theme:active","themeName":"active","version":"1.0.0"}]\
+                            """)
+                        .doesNotContain("inactive js"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldUglifyActivatedThemeCssBundleOnly() throws IOException {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("active");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+                .thenReturn(Mono.just(themeSetting));
+        var activeTheme = createTheme(theme -> theme.getMetadata().setName("active"));
+        when(client.fetch(Theme.class, "active")).thenReturn(Mono.just(activeTheme));
+        Files.createDirectories(themeRoot.get().resolve("active").resolve("ui"));
+        Files.writeString(themeRoot.get().resolve("active").resolve("ui").resolve("style.css"), "active css");
+        Files.createDirectories(themeRoot.get().resolve("inactive").resolve("ui"));
+        Files.writeString(themeRoot.get().resolve("inactive").resolve("ui").resolve("style.css"), "inactive css");
+
+        StepVerifier.create(joinToString(themeService.uglifyCssBundle()))
+                .assertNext(bundle -> assertThat(bundle)
+                        .contains("/* Generated from theme active */")
+                        .contains("active css")
+                        .doesNotContain("inactive css"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnEmptySuccessfulBundlesWhenActivatedThemeHasNoBundleFiles() throws IOException {
+        var themeSetting = new SystemSetting.Theme();
+        themeSetting.setActive("active");
+        when(systemConfigFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class))
+                .thenReturn(Mono.just(themeSetting));
+        var activeTheme = createTheme(theme -> theme.getMetadata().setName("active"));
+        when(client.fetch(Theme.class, "active")).thenReturn(Mono.just(activeTheme));
+        Files.createDirectories(themeRoot.get().resolve("active"));
+
+        StepVerifier.create(joinToString(themeService.uglifyJsBundle()))
+                .expectNext("this.enabledThemes = []")
+                .verifyComplete();
+        StepVerifier.create(themeService.uglifyCssBundle()).verifyComplete();
+        StepVerifier.create(themeService.getJsBundle("ignored"))
+                .assertNext(resource -> {
+                    try {
+                        assertThat(Files.readString(resource.getFile().toPath()))
+                                .isEqualTo("this.enabledThemes = []");
+                    } catch (IOException e) {
+                        throw new AssertionError(e);
+                    }
+                })
+                .verifyComplete();
     }
 
     @Test

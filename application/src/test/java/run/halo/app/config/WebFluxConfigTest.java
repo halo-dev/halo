@@ -220,6 +220,75 @@ class WebFluxConfigTest {
         }
 
         @Test
+        void shouldServeThemeUiAssetWithoutAuthentication() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui"));
+            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("main.js"), "fake theme ui");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui/assets/main.js")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(
+                            result -> assertArrayEquals("fake theme ui".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldServeThemeUiChunkAsset() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui").resolve("chunks"));
+            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("chunks").resolve("view.js"), "fake chunk");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui/assets/chunks/view.js")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(result -> assertArrayEquals("fake chunk".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldKeepThemePublicAssetRouteUnchanged() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR.resolve("templates").resolve("assets"));
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui"));
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("templates").resolve("assets").resolve("main.css"), "public asset");
+            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("main.css"), "ui asset");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/assets/main.css")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(result -> assertArrayEquals("public asset".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldRespond404WhenThemeUiResourceNotFound() {
+            webClient
+                    .get()
+                    .uri("/themes/missing-theme/ui/assets/main.js")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
+        }
+
+        @Test
+        void shouldRejectThemeUiResourceDirectoryTraversal() {
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui/assets/%2E%2E/theme.yaml")
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError();
+        }
+
+        @Test
         void shouldServeThemeScreenshotWithoutAuthentication() throws Exception {
             Files.createDirectories(TEST_THEME_DIR);
             Files.writeString(TEST_THEME_DIR.resolve("screenshot.png"), "fake screenshot");

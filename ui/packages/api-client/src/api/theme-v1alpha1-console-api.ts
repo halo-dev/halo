@@ -117,6 +117,80 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
             };
         },
         /**
+         * Fetch CSS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeCssBundle: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Fetch JS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeJsBundle: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Fetch converted json config of theme by configured configMapName.
          * @param {string} name metadata.name of the theme whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
@@ -642,6 +716,28 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Fetch CSS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fetchThemeCssBundle(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fetchThemeCssBundle(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemeV1alpha1ConsoleApi.fetchThemeCssBundle']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Fetch JS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fetchThemeJsBundle(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fetchThemeJsBundle(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemeV1alpha1ConsoleApi.fetchThemeJsBundle']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Fetch converted json config of theme by configured configMapName.
          * @param {string} name metadata.name of the theme whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
@@ -804,6 +900,22 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
          */
         fetchActivatedTheme(options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
             return localVarFp.fetchActivatedTheme(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetch CSS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeCssBundle(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.fetchThemeCssBundle(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Fetch JS bundle of the activated theme.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fetchThemeJsBundle(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.fetchThemeJsBundle(options).then((request) => request(axios, basePath));
         },
         /**
          * Fetch converted json config of theme by configured configMapName.
@@ -1063,6 +1175,24 @@ export class ThemeV1alpha1ConsoleApi extends BaseAPI {
      */
     public fetchActivatedTheme(options?: RawAxiosRequestConfig) {
         return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchActivatedTheme(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetch CSS bundle of the activated theme.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public fetchThemeCssBundle(options?: RawAxiosRequestConfig) {
+        return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchThemeCssBundle(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Fetch JS bundle of the activated theme.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public fetchThemeJsBundle(options?: RawAxiosRequestConfig) {
+        return ThemeV1alpha1ConsoleApiFp(this.configuration).fetchThemeJsBundle(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -9,6 +9,17 @@ import { loadStyle } from "@/utils/load-style";
 
 export type Platform = "console" | "uc";
 
+type EnabledPlugin = {
+  name: string;
+  value: string;
+};
+
+type EnabledTheme = {
+  name: string;
+  themeName: string;
+  version: string;
+};
+
 export function setupCoreModules({
   app,
   router,
@@ -44,10 +55,7 @@ export async function setupPluginModules({
   try {
     await loadPluginBundle();
 
-    const enabledPlugins = window["enabledPlugins"] as {
-      name: string;
-      value: string;
-    }[];
+    const enabledPlugins = window["enabledPlugins"] as EnabledPlugin[];
 
     for (const plugin of enabledPlugins || []) {
       const module = window[plugin.name];
@@ -64,7 +72,27 @@ export async function setupPluginModules({
       });
     }
 
+    await loadThemeBundle();
+
+    const enabledThemes = window["enabledThemes"] as EnabledTheme[];
+
+    for (const theme of enabledThemes || []) {
+      const module = window[theme.name];
+      if (!module) {
+        continue;
+      }
+      initJsModule({
+        app,
+        router,
+        platform,
+        name: theme.name,
+        jsModule: module,
+        core: false,
+      });
+    }
+
     await loadPluginStyles();
+    await loadThemeStyles();
   } catch (error) {
     const message =
       error instanceof Error && error.message.includes("style")
@@ -83,9 +111,22 @@ async function loadPluginBundle() {
   await load();
 }
 
+async function loadThemeBundle() {
+  const { load } = useScriptTag(
+    `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js?t=${Date.now()}`
+  );
+  await load();
+}
+
 async function loadPluginStyles() {
   await loadStyle(
     `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?t=${Date.now()}`
+  );
+}
+
+async function loadThemeStyles() {
+  await loadStyle(
+    `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css?t=${Date.now()}`
   );
 }
 

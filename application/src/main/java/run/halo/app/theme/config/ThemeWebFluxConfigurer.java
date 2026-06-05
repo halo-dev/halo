@@ -15,6 +15,7 @@ import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.resource.AbstractResourceResolver;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.reactive.resource.ResourceResolverChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -22,6 +23,7 @@ import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.theme.ThemeScreenshots;
+import run.halo.app.theme.ThemeUiResources;
 
 @Component
 public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
@@ -48,6 +50,12 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
                 .resourceChain(true)
                 .addResolver(new EncodedResourceResolver())
                 .addResolver(new ThemeScreenshotResourceResolver(themeRootGetter.get()));
+        registry.addResourceHandler("/themes/{themeName}/ui/assets/{*resourcePaths}")
+                .setCacheControl(cacheControl)
+                .setUseLastModified(useLastModified)
+                .resourceChain(true)
+                .addResolver(new EncodedResourceResolver())
+                .addResolver(new ThemeUiResourceResolver(themeRootGetter.get()));
         registry.addResourceHandler("/themes/{themeName}/assets/{*resourcePaths}")
                 .setCacheControl(cacheControl)
                 .setUseLastModified(useLastModified)
@@ -94,6 +102,45 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
                 return Mono.empty();
             }
             return Mono.just(location);
+        }
+
+        @Override
+        protected Mono<String> resolveUrlPathInternal(
+                String resourceUrlPath, List<? extends Resource> locations, ResourceResolverChain chain) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class ThemeUiResourceResolver extends AbstractResourceResolver {
+
+        private final Path themeRoot;
+
+        private ThemeUiResourceResolver(Path themeRoot) {
+            this.themeRoot = themeRoot;
+        }
+
+        @Override
+        protected Mono<Resource> resolveResourceInternal(
+                ServerWebExchange exchange,
+                String requestPath,
+                List<? extends Resource> locations,
+                ResourceResolverChain chain) {
+            if (exchange == null) {
+                return Mono.empty();
+            }
+            Map<String, String> requiredAttribute =
+                    exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            var themeName = requiredAttribute.get("themeName");
+            var resourcePaths = requiredAttribute.get("resourcePaths");
+            if (StringUtils.isAnyBlank(themeName, resourcePaths)) {
+                return Mono.empty();
+            }
+            var resource = ThemeUiResources.getResource(themeRoot, themeName, resourcePaths);
+            if (resource == null) {
+                return Mono.error(
+                        new NoResourceFoundException(exchange.getRequest().getURI(), resourcePaths));
+            }
+            return Mono.just(resource);
         }
 
         @Override
