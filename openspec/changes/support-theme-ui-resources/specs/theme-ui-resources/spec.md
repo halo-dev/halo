@@ -2,17 +2,17 @@
 
 ### Requirement: Theme UI static assets
 
-Halo SHALL serve root-level theme UI resources from `/themes/{name}/ui/assets/**`.
+Halo SHALL serve theme UI plugin build output from `/themes/{name}/ui-plugin/assets/**`.
 
 #### Scenario: Serve theme UI asset
 
-- **WHEN** an installed theme named `earth` provides a readable resource at `ui/main.js`
-- **THEN** Halo SHALL make it available at `/themes/earth/ui/assets/main.js`
+- **WHEN** an installed theme named `earth` provides a readable resource at `ui-plugin/dist/main.js`
+- **THEN** Halo SHALL make it available at `/themes/earth/ui-plugin/assets/main.js`
 
 #### Scenario: Serve theme UI chunk asset
 
-- **WHEN** an installed theme named `earth` provides a readable resource at `ui/chunks/view.js`
-- **THEN** Halo SHALL make it available at `/themes/earth/ui/assets/chunks/view.js`
+- **WHEN** an installed theme named `earth` provides a readable resource at `ui-plugin/dist/chunks/view.js`
+- **THEN** Halo SHALL make it available at `/themes/earth/ui-plugin/assets/chunks/view.js`
 
 #### Scenario: Preserve public-site theme asset route
 
@@ -32,14 +32,14 @@ Halo SHALL report theme UI bundle URLs on `Theme.status` when bundle entry files
 #### Scenario: Theme provides JS entry
 
 - **WHEN** the Theme reconciler reconciles an installed Theme named `earth`
-- **AND** the directory for `earth` contains a readable `ui/main.js`
-- **THEN** the reconciled Theme status SHALL set `entry` to a URL for `/themes/earth/ui/assets/main.js`
+- **AND** the directory for `earth` contains a readable `ui-plugin/dist/main.js`
+- **THEN** the reconciled Theme status SHALL set `entry` to a URL for `/themes/earth/ui-plugin/assets/main.js`
 
 #### Scenario: Theme provides stylesheet
 
 - **WHEN** the Theme reconciler reconciles an installed Theme named `earth`
-- **AND** the directory for `earth` contains a readable `ui/style.css`
-- **THEN** the reconciled Theme status SHALL set `stylesheet` to a URL for `/themes/earth/ui/assets/style.css`
+- **AND** the directory for `earth` contains a readable `ui-plugin/dist/style.css`
+- **THEN** the reconciled Theme status SHALL set `stylesheet` to a URL for `/themes/earth/ui-plugin/assets/style.css`
 
 #### Scenario: Theme status bundle URL includes version
 
@@ -50,7 +50,7 @@ Halo SHALL report theme UI bundle URLs on `Theme.status` when bundle entry files
 #### Scenario: Theme omits UI bundle files
 
 - **WHEN** the Theme reconciler reconciles an installed Theme
-- **AND** the theme root does not contain readable `ui/main.js` or `ui/style.css`
+- **AND** the theme root does not contain readable `ui-plugin/dist/main.js` or `ui-plugin/dist/style.css`
 - **THEN** the reconciled Theme status SHALL NOT expose missing UI bundle URLs
 
 ### Requirement: UI plugin bundle loading
@@ -82,24 +82,24 @@ started plugin UI bundles and only the activated theme's UI bundle.
 - **WHEN** Halo serves the aggregated UI plugin JS bundle
 - **THEN** the bundle SHALL set `this.enabledUiPlugins`
 - **AND** started plugins SHALL be reported with type `plugin`
-- **AND** the activated theme SHALL be reported with type `theme` only when it provides `ui/main.js`
+- **AND** the activated theme SHALL be reported with type `theme` only when it provides `ui-plugin/dist/main.js`
 
 #### Scenario: Activated theme provides UI bundle
 
 - **WHEN** the activated Theme is `earth`
-- **AND** `earth` provides `ui/main.js`
+- **AND** `earth` provides `ui-plugin/dist/main.js`
 - **THEN** Console and UC startup SHALL load the `earth` JS bundle
 - **AND** the frontend SHALL register the module as `theme:earth`
 
 #### Scenario: Inactive theme provides UI bundle
 
 - **WHEN** the activated Theme is `earth`
-- **AND** another installed Theme named `mars` provides `ui/main.js`
+- **AND** another installed Theme named `mars` provides `ui-plugin/dist/main.js`
 - **THEN** Console and UC startup SHALL NOT load or register the `mars` UI bundle
 
 #### Scenario: Activated theme has no UI bundle
 
-- **WHEN** the activated Theme does not provide `ui/main.js` or `ui/style.css`
+- **WHEN** the activated Theme does not provide `ui-plugin/dist/main.js` or `ui-plugin/dist/style.css`
 - **THEN** Console and UC startup SHALL continue without a theme-provided UI module
 
 ### Requirement: Theme UI module contract

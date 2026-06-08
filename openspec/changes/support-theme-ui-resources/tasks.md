@@ -1,13 +1,16 @@
 ## 1. Backend Theme UI Resources
 
-- [x] 1.1 Add shared theme UI resource lookup for `ui/main.js`, `ui/style.css`, and arbitrary `ui/**` resources.
-- [x] 1.2 Serve `/themes/{name}/ui/assets/**` from `{themeRoot}/{name}/ui/**` with directory traversal protection.
+- [x] 1.1 Add shared theme UI resource lookup for `ui-plugin/dist/main.js`, `ui-plugin/dist/style.css`, and arbitrary
+      `ui-plugin/dist/**` resources.
+- [x] 1.2 Serve `/themes/{name}/ui-plugin/assets/**` from `{themeRoot}/{name}/ui-plugin/dist/**` with directory
+      traversal protection.
 - [x] 1.3 Keep `/themes/{name}/assets/**` behavior unchanged for `templates/assets/**`.
 
 ## 2. Theme Status
 
 - [x] 2.1 Add optional `entry` and `stylesheet` fields to `Theme.status`.
-- [x] 2.2 Populate theme status bundle URLs from readable `ui/main.js` and `ui/style.css`.
+- [x] 2.2 Populate theme status bundle URLs from readable `ui-plugin/dist/main.js` and
+      `ui-plugin/dist/style.css`.
 - [x] 2.3 Include theme version cache parameters on status URLs when the theme version is available.
 - [x] 2.4 Regenerate OpenAPI docs and the UI API client after the `Theme.status` schema update.
 

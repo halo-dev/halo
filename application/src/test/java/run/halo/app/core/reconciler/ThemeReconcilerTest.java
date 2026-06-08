@@ -338,9 +338,22 @@ class ThemeReconcilerTest {
     void shouldResolveThemeUiBundleUrlsWhenBundleFilesExist() throws IOException {
         when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
         var testWorkDir = tempDirectory.resolve("reconcile-theme-ui");
-        Files.createDirectories(testWorkDir.resolve("theme-test").resolve("ui"));
-        Files.writeString(testWorkDir.resolve("theme-test").resolve("ui").resolve("main.js"), "fake js");
-        Files.writeString(testWorkDir.resolve("theme-test").resolve("ui").resolve("style.css"), "fake css");
+        Files.createDirectories(
+                testWorkDir.resolve("theme-test").resolve("ui-plugin").resolve("dist"));
+        Files.writeString(
+                testWorkDir
+                        .resolve("theme-test")
+                        .resolve("ui-plugin")
+                        .resolve("dist")
+                        .resolve("main.js"),
+                "fake js");
+        Files.writeString(
+                testWorkDir
+                        .resolve("theme-test")
+                        .resolve("ui-plugin")
+                        .resolve("dist")
+                        .resolve("style.css"),
+                "fake css");
         when(themeRoot.get()).thenReturn(testWorkDir);
         var theme = fakeTheme();
         theme.setStatus(null);
@@ -354,8 +367,8 @@ class ThemeReconcilerTest {
 
         verify(extensionClient).update(themeUpdateCaptor.capture());
         var status = themeUpdateCaptor.getValue().getStatus();
-        assertThat(status.getEntry()).isEqualTo("/themes/theme-test/ui/assets/main.js?v=1.2.3");
-        assertThat(status.getStylesheet()).isEqualTo("/themes/theme-test/ui/assets/style.css?v=1.2.3");
+        assertThat(status.getEntry()).isEqualTo("/themes/theme-test/ui-plugin/assets/main.js?v=1.2.3");
+        assertThat(status.getStylesheet()).isEqualTo("/themes/theme-test/ui-plugin/assets/style.css?v=1.2.3");
     }
 
     @Test
@@ -366,8 +379,8 @@ class ThemeReconcilerTest {
         when(themeRoot.get()).thenReturn(testWorkDir);
         var theme = fakeTheme();
         var status = new Theme.ThemeStatus();
-        status.setEntry("/themes/theme-test/ui/assets/main.js?v=1.2.3");
-        status.setStylesheet("/themes/theme-test/ui/assets/style.css?v=1.2.3");
+        status.setEntry("/themes/theme-test/ui-plugin/assets/main.js?v=1.2.3");
+        status.setStylesheet("/themes/theme-test/ui-plugin/assets/style.css?v=1.2.3");
         theme.setStatus(status);
         theme.getSpec().setVersion("1.2.3");
         theme.getSpec().setRequires(">=2.3.0");

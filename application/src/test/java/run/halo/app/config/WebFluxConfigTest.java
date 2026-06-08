@@ -221,12 +221,13 @@ class WebFluxConfigTest {
 
         @Test
         void shouldServeThemeUiAssetWithoutAuthentication() throws Exception {
-            Files.createDirectories(TEST_THEME_DIR.resolve("ui"));
-            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("main.js"), "fake theme ui");
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui-plugin").resolve("dist"));
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("main.js"), "fake theme ui");
 
             webClient
                     .get()
-                    .uri("/themes/fake-theme/ui/assets/main.js")
+                    .uri("/themes/fake-theme/ui-plugin/assets/main.js")
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -237,12 +238,19 @@ class WebFluxConfigTest {
 
         @Test
         void shouldServeThemeUiChunkAsset() throws Exception {
-            Files.createDirectories(TEST_THEME_DIR.resolve("ui").resolve("chunks"));
-            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("chunks").resolve("view.js"), "fake chunk");
+            Files.createDirectories(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("chunks"));
+            Files.writeString(
+                    TEST_THEME_DIR
+                            .resolve("ui-plugin")
+                            .resolve("dist")
+                            .resolve("chunks")
+                            .resolve("view.js"),
+                    "fake chunk");
 
             webClient
                     .get()
-                    .uri("/themes/fake-theme/ui/assets/chunks/view.js")
+                    .uri("/themes/fake-theme/ui-plugin/assets/chunks/view.js")
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -253,10 +261,11 @@ class WebFluxConfigTest {
         @Test
         void shouldKeepThemePublicAssetRouteUnchanged() throws Exception {
             Files.createDirectories(TEST_THEME_DIR.resolve("templates").resolve("assets"));
-            Files.createDirectories(TEST_THEME_DIR.resolve("ui"));
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui-plugin").resolve("dist"));
             Files.writeString(
                     TEST_THEME_DIR.resolve("templates").resolve("assets").resolve("main.css"), "public asset");
-            Files.writeString(TEST_THEME_DIR.resolve("ui").resolve("main.css"), "ui asset");
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("main.css"), "ui asset");
 
             webClient
                     .get()
@@ -272,7 +281,7 @@ class WebFluxConfigTest {
         void shouldRespond404WhenThemeUiResourceNotFound() {
             webClient
                     .get()
-                    .uri("/themes/missing-theme/ui/assets/main.js")
+                    .uri("/themes/missing-theme/ui-plugin/assets/main.js")
                     .exchange()
                     .expectStatus()
                     .isNotFound();
@@ -282,7 +291,7 @@ class WebFluxConfigTest {
         void shouldRejectThemeUiResourceDirectoryTraversal() {
             webClient
                     .get()
-                    .uri("/themes/fake-theme/ui/assets/%2E%2E/theme.yaml")
+                    .uri("/themes/fake-theme/ui-plugin/assets/%2E%2E/theme.yaml")
                     .exchange()
                     .expectStatus()
                     .is4xxClientError();

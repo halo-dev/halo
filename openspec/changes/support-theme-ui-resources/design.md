@@ -13,11 +13,11 @@ UI is part of the active theme runtime, so only the activated theme should be lo
 
 **Goals:**
 
-- Let themes package Console/UC UI bundles in a root-level `ui/` directory.
+- Let themes package Console/UC UI bundle build output in `ui-plugin/dist/`.
 - Serve theme UI resources from a route that does not collide with existing theme public-site assets.
 - Load only the activated theme's UI bundle during Console and UC startup.
 - Reuse the existing `PluginModule` frontend module shape.
-- Support dynamic chunks and other emitted assets by serving the entire `ui/**` resource tree.
+- Support dynamic chunks and other emitted assets by serving the entire `ui-plugin/dist/**` resource tree.
 
 **Non-Goals:**
 
@@ -30,32 +30,32 @@ UI is part of the active theme runtime, so only the activated theme should be lo
 
 ## Decisions
 
-### Theme UI resources live in root-level `ui`
+### Theme UI resources live in `ui-plugin/dist`
 
-Theme packages will place UI extension resources under the theme root:
+Theme packages will place UI extension build output under the theme root:
 
 ```text
-ui/main.js
-ui/style.css
-ui/chunks/*.js
-ui/assets/*
+ui-plugin/dist/main.js
+ui-plugin/dist/style.css
+ui-plugin/dist/chunks/*.js
+ui-plugin/dist/assets/*
 ```
 
-This mirrors the preferred plugin bundle directory while avoiding the theme `templates/assets/**` directory used by
-public-site templates.
+The `ui-plugin/` directory may contain a full frontend project (`package.json`, `src/`, build config), while Halo only
+reads the `dist/` output. This avoids confusing the theme's public-site UI and assets with Console/UC UI plugin bundles.
 
-### Theme UI static resources use `/themes/{name}/ui/assets/**`
+### Theme UI static resources use `/themes/{name}/ui-plugin/assets/**`
 
-Halo will serve root-level theme UI files through:
+Halo will serve theme UI plugin build output through:
 
 ```text
-/themes/{name}/ui/assets/{*resource}
+/themes/{name}/ui-plugin/assets/{*resource}
 ```
 
 The route resolves to:
 
 ```text
-{themeRoot}/{name}/ui/{resource}
+{themeRoot}/{name}/ui-plugin/dist/{resource}
 ```
 
 This keeps the route stable for dynamic imports and emitted assets without occupying `/themes/{name}/assets/**`.
@@ -99,8 +99,8 @@ future theme-specific extension points a stable lookup key for the current theme
 `Theme.status.entry` and `Theme.status.stylesheet` will point to:
 
 ```text
-/themes/{name}/ui/assets/main.js?v={version}
-/themes/{name}/ui/assets/style.css?v={version}
+/themes/{name}/ui-plugin/assets/main.js?v={version}
+/themes/{name}/ui-plugin/assets/style.css?v={version}
 ```
 
 Only existing readable files should be reported. Missing `main.js` or `style.css` should leave the corresponding field
@@ -117,17 +117,18 @@ active theme's routes, components, and extension points is out of scope.
   and enables stable chunk URLs, but it means frontend code should not contain secrets. API authorization remains the real
   permission boundary.
 - A theme can provide only JS or only CSS. Reporting and loading should handle either file independently.
-- Dynamic chunks require the theme bundler public path to match `/themes/{name}/ui/assets/`. Runtime support can land
-  before the bundler-kit update, but documentation should make the expected public path clear.
+- Dynamic chunks require the theme bundler public path to match `/themes/{name}/ui-plugin/assets/`. Runtime support can
+  land before the bundler-kit update, but documentation should make the expected public path clear.
 - Activation without reload can leave stale modules in memory. Mitigation: keep page reload as the supported activation
   behavior for theme UI bundles.
 
 ## Migration Plan
 
-No data migration is required. Existing themes continue to work because the new `ui/` directory and routes are additive.
+No data migration is required. Existing themes continue to work because the new `ui-plugin/dist/` directory and routes
+are additive.
 
-Theme authors can adopt the capability by packaging a root-level `ui/` directory and setting the bundler public path to
-`/themes/{themeName}/ui/assets/`.
+Theme authors can adopt the capability by packaging UI plugin build output into `ui-plugin/dist/` and setting the
+bundler public path to `/themes/{themeName}/ui-plugin/assets/`.
 
 Rollback is straightforward: reverting the runtime loading and route changes leaves existing public-site theme resources
 unchanged.

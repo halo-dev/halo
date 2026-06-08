@@ -178,6 +178,25 @@ class UiPluginBundleServiceImplTest {
         verify(pluginManager, never()).startedPlugins();
     }
 
+    @Test
+    void shouldGenerateRandomBundleVersionWhenActivatedThemeInDevelopment() {
+        var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        uiPluginBundleService.setClock(clock);
+        var activeTheme = prepareActiveTheme("active", "1.0.0");
+        var status = new Theme.ThemeStatus();
+        status.setInDevelopment(true);
+        activeTheme.setStatus(status);
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme));
+
+        uiPluginBundleService
+                .generateBundleVersion()
+                .as(StepVerifier::create)
+                .expectNext(String.valueOf(clock.instant().toEpochMilli()))
+                .verifyComplete();
+
+        verify(pluginManager, never()).startedPlugins();
+    }
+
     private PluginWrapper mockStartedPlugin(String pluginId, String resourceRoot) {
         var pluginWrapper = mock(PluginWrapper.class);
         var descriptor = mock(PluginDescriptor.class);
@@ -203,7 +222,7 @@ class UiPluginBundleServiceImplTest {
     }
 
     private void writeThemeUiFile(String themeName, String filename, String content) throws IOException {
-        var uiPath = themeRoot.get().resolve(themeName).resolve("ui");
+        var uiPath = themeRoot.get().resolve(themeName).resolve("ui-plugin").resolve("dist");
         Files.createDirectories(uiPath);
         Files.writeString(uiPath.resolve(filename), content);
     }

@@ -105,21 +105,39 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     @Override
     public Mono<String> generateBundleVersion() {
         if (pluginManager.isDevelopment()) {
-            return Mono.just(String.valueOf(clock.instant().toEpochMilli()));
+            return currentBundleVersion();
         }
-        var pluginVersion = Flux.fromIterable(pluginManager.startedPlugins())
-                .sort(Comparator.comparing(PluginWrapper::getPluginId))
-                .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
-                .collect(Collectors.joining());
-        var themeVersion = themeService
-                .fetchActivatedTheme()
-                .map(theme -> "theme:" + theme.getMetadata().getName() + ':'
-                        + Objects.toString(theme.getSpec().getVersion(), ""))
-                .defaultIfEmpty("");
-        return Mono.zip(pluginVersion, themeVersion)
-                .map(tuple -> tuple.getT1() + tuple.getT2())
-                .map(Hashing.sha256()::hashUnencodedChars)
-                .map(HashCode::toString);
+        var activatedTheme = themeService.fetchActivatedTheme().cache();
+        return activatedTheme
+                .filter(UiPluginBundleServiceImpl::isThemeInDevelopment)
+                .flatMap(theme -> currentBundleVersion())
+                .switchIfEmpty(stableBundleVersion(activatedTheme));
+    }
+
+    private Mono<String> currentBundleVersion() {
+        return Mono.just(String.valueOf(clock.instant().toEpochMilli()));
+    }
+
+    private Mono<String> stableBundleVersion(Mono<Theme> activatedTheme) {
+        return Mono.defer(() -> {
+            var pluginVersion = Flux.fromIterable(pluginManager.startedPlugins())
+                    .sort(Comparator.comparing(PluginWrapper::getPluginId))
+                    .map(pw -> pw.getPluginId() + ':' + pw.getDescriptor().getVersion())
+                    .collect(Collectors.joining());
+            var themeVersion = activatedTheme
+                    .map(theme -> "theme:" + theme.getMetadata().getName() + ':'
+                            + Objects.toString(theme.getSpec().getVersion(), ""))
+                    .defaultIfEmpty("");
+            return Mono.zip(pluginVersion, themeVersion)
+                    .map(tuple -> tuple.getT1() + tuple.getT2())
+                    .map(Hashing.sha256()::hashUnencodedChars)
+                    .map(HashCode::toString);
+        });
+    }
+
+    private static boolean isThemeInDevelopment(Theme theme) {
+        var status = theme.getStatus();
+        return status != null && Boolean.TRUE.equals(status.getInDevelopment());
     }
 
     @Override

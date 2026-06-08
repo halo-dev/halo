@@ -50,7 +50,7 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
                 .resourceChain(true)
                 .addResolver(new EncodedResourceResolver())
                 .addResolver(new ThemeScreenshotResourceResolver(themeRootGetter.get()));
-        registry.addResourceHandler("/themes/{themeName}/ui/assets/{*resourcePaths}")
+        registry.addResourceHandler("/themes/{themeName}/ui-plugin/assets/{*resourcePaths}")
                 .setCacheControl(cacheControl)
                 .setUseLastModified(useLastModified)
                 .resourceChain(true)

@@ -12,7 +12,8 @@ import run.halo.app.infra.utils.FileUtils;
 
 public final class ThemeUiResources {
 
-    public static final String UI_LOCATION = "ui";
+    public static final String UI_LOCATION = "ui-plugin";
+    public static final String DIST_LOCATION = "dist";
     public static final String JS_BUNDLE = "main.js";
     public static final String CSS_BUNDLE = "style.css";
     public static final String MODULE_NAME_PREFIX = "theme:";
@@ -38,6 +39,7 @@ public final class ThemeUiResources {
         var uiRoot = themeRoot
                 .resolve(themeName)
                 .resolve(UI_LOCATION)
+                .resolve(DIST_LOCATION)
                 .toAbsolutePath()
                 .normalize();
         var resourcePathToCheck =
@@ -58,7 +60,7 @@ public final class ThemeUiResources {
         Assert.hasText(themeName, "Theme name must not be blank");
         Assert.hasText(resourceName, "Resource name must not be blank");
 
-        var builder = UriComponentsBuilder.fromPath("/themes/{themeName}/ui/assets/{resourceName}");
+        var builder = UriComponentsBuilder.fromPath("/themes/{themeName}/ui-plugin/assets/{resourceName}");
         if (StringUtils.hasText(version)) {
             builder.queryParam("v", version);
         }

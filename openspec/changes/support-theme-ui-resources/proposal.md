@@ -10,9 +10,11 @@ runtime loading scoped to the currently activated theme.
 
 ## What Changes
 
-- Allow installed themes to package UI extension resources under a root-level `ui/` directory.
-- Serve theme UI static resources from `/themes/{name}/ui/assets/**`, resolving files from `{themeRoot}/{name}/ui/**`.
-- Expose `Theme.status.entry` and `Theme.status.stylesheet` when `ui/main.js` or `ui/style.css` exists.
+- Allow installed themes to package UI extension build output under `ui-plugin/dist/`.
+- Serve theme UI static resources from `/themes/{name}/ui-plugin/assets/**`, resolving files from
+  `{themeRoot}/{name}/ui-plugin/dist/**`.
+- Expose `Theme.status.entry` and `Theme.status.stylesheet` when `ui-plugin/dist/main.js` or
+  `ui-plugin/dist/style.css` exists.
 - Load started plugin UI bundles and the activated theme UI bundle from a single `ui-plugins` aggregate endpoint during
   Console and UC startup.
 - Register the activated theme module using the frontend module name `theme:{themeName}`.
