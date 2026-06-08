@@ -173,7 +173,7 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             }
             Map<String, String> requiredAttribute =
                     exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            var themeName = requiredAttribute.get("themeName");
+            var themeName = requiredAttribute.get(THEME_NAME_VARIABLE);
             var extension = requiredAttribute.get("extension");
             var filename = "screenshot." + extension;
 
