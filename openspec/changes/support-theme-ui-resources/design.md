@@ -60,19 +60,22 @@ The route resolves to:
 
 This keeps the route stable for dynamic imports and emitted assets without occupying `/themes/{name}/assets/**`.
 
-### Runtime loading is active-theme only
+### Runtime loading is active-theme only through the UI plugin bundle
 
-Console and UC startup will load the activated theme's bundle only. Inactive themes may have UI static files available by
-name, but they are not registered or executed unless the theme is activated and the page loads the active theme bundle.
+Console and UC startup will load one aggregated UI plugin bundle that includes started plugin bundles and, if present,
+the activated theme's bundle. Inactive themes may have UI static files available by name, but they are not registered or
+executed unless the theme is activated and the aggregated bundle includes it.
 
 This keeps installed themes from injecting Console/UC routes, components, or extension points while they are not active.
 
-The active-theme bundle endpoints will be:
+The primary aggregated bundle endpoints will be:
 
 ```text
-/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js
-/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css
+/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js
+/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css
 ```
+
+The existing plugin bundle endpoints remain as compatibility aliases for the same aggregated content.
 
 ### One bundle serves both Console and UC
 
@@ -84,7 +87,7 @@ Themes will use the same `PluginModule` shape as plugins. A single theme UI bund
 - `extensionPoints`.
 
 Console and UC already select platform-specific routes from the same module shape, so a separate theme module contract is
-unnecessary.
+unnecessary. The aggregated bundle exposes module metadata through `this.enabledUiPlugins`.
 
 ### Frontend registration uses `theme:{themeName}`
 

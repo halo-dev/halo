@@ -11,36 +11,30 @@
 - [x] 2.3 Include theme version cache parameters on status URLs when the theme version is available.
 - [x] 2.4 Regenerate OpenAPI docs and the UI API client after the `Theme.status` schema update.
 
-## 3. Active Theme Bundle Loading
+## 3. UI Plugin Bundle Loading
 
-- [x] 3.1 Add active-theme JS and CSS bundle endpoints under the Console API route.
-- [x] 3.2 Resolve active theme bundles only from the currently activated theme.
-- [x] 3.3 Return empty successful bundles when no active theme bundle file exists so Console/UC startup is not blocked.
-- [x] 3.4 Generate bundle metadata that lets the frontend register the module as `theme:{themeName}`.
+- [x] 3.1 Add aggregated UI plugin JS and CSS bundle endpoints under the Console API route.
+- [x] 3.2 Include started plugin bundles and only the currently activated theme bundle.
+- [x] 3.3 Keep the existing plugin bundle endpoints as compatibility aliases for the aggregated bundle.
+- [x] 3.4 Generate `enabledUiPlugins` metadata that distinguishes `plugin` and `theme` entries.
 
 ## 4. Frontend Startup
 
-- [x] 4.1 Load the active theme JS bundle after plugin modules are loaded.
+- [x] 4.1 Load the aggregated UI plugin JS bundle.
 - [x] 4.2 Register the active theme module as `theme:{themeName}` using the existing module initialization path.
-- [x] 4.3 Load the active theme CSS bundle without failing startup when the bundle is empty or missing.
+- [x] 4.3 Load the aggregated UI plugin CSS bundle without failing startup when the bundle is empty or missing.
 - [x] 4.4 Ensure theme activation entry points reload the page when the active theme can change.
 
 ## 5. Tests
 
 - [x] 5.1 Add backend tests for theme UI static resource serving, missing resources, and traversal rejection.
 - [x] 5.2 Add reconciler tests for `Theme.status.entry` and `Theme.status.stylesheet`.
-- [x] 5.3 Add endpoint tests for active theme JS/CSS bundle loading and empty-bundle behavior.
-- [x] 5.4 Add frontend tests for active theme module registration and startup error handling.
+- [x] 5.3 Add service and endpoint tests for aggregated UI plugin JS/CSS bundle loading and alias behavior.
+- [x] 5.4 Add frontend tests for UI plugin module registration and startup error handling.
 
-## 6. Follow-up PRs
+## 6. Validation
 
-- [ ] 6.1 Add `theme:self:tabs:create` or other theme detail extension points after runtime loading is stable.
-- [ ] 6.2 Extend `ui-plugin-bundler-kit` or add theme-specific build helpers for `/themes/{name}/ui/assets/`.
-- [ ] 6.3 Document theme UI bundle packaging, public path requirements, and activation reload behavior.
-
-## 7. Validation
-
-- [x] 7.1 Run `./gradlew spotlessApply`.
-- [x] 7.2 Run focused backend tests for theme resource routing, reconciliation, and bundle endpoints.
-- [x] 7.3 Run `pnpm -C ui typecheck && pnpm -C ui lint` after frontend changes.
-- [x] 7.4 Run `openspec validate support-theme-ui-resources --strict`.
+- [x] 6.1 Run `./gradlew spotlessApply`.
+- [x] 6.2 Run focused backend tests for theme resource routing, reconciliation, and bundle endpoints.
+- [x] 6.3 Run `pnpm -C ui typecheck && pnpm -C ui lint` after frontend changes.
+- [x] 6.4 Run `openspec validate support-theme-ui-resources --strict`.

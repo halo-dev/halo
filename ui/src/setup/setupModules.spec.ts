@@ -5,8 +5,7 @@ import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
-  loadEnabledPluginModules,
-  loadEnabledThemeModules,
+  loadEnabledUiPluginModules,
   notifyPluginLoadError,
   setupPluginModules,
   setupPluginStyles,
@@ -44,8 +43,7 @@ describe("setupPluginModules", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
-    delete (window as unknown as Record<string, unknown>).enabledPlugins;
-    delete (window as unknown as Record<string, unknown>).enabledThemes;
+    delete (window as unknown as Record<string, unknown>).enabledUiPlugins;
     delete (window as unknown as Record<string, unknown>)["plugin-one"];
     delete (window as unknown as Record<string, unknown>)["theme:earth"];
   });
@@ -69,17 +67,18 @@ describe("setupPluginModules", () => {
     };
     mocks.useScriptTag.mockImplementation((src: string) => ({
       load: vi.fn(async () => {
-        if (src.includes("/plugins/-/bundle.js")) {
-          (window as unknown as Record<string, unknown>).enabledPlugins = [
-            { name: "plugin-one", value: "1.0.0" },
+        if (src.includes("/ui-plugins/-/bundle.js")) {
+          (window as unknown as Record<string, unknown>).enabledUiPlugins = [
+            { name: "plugin-one", type: "plugin", version: "1.0.0" },
+            {
+              name: "theme:earth",
+              type: "theme",
+              themeName: "earth",
+              version: "1.0.0",
+            },
           ];
           (window as unknown as Record<string, unknown>)["plugin-one"] =
             pluginModule;
-        }
-        if (src.includes("/themes/-/bundle.js")) {
-          (window as unknown as Record<string, unknown>).enabledThemes = [
-            { name: "theme:earth", themeName: "earth", version: "1.0.0" },
-          ];
           (window as unknown as Record<string, unknown>)["theme:earth"] =
             themeModule;
         }
@@ -93,14 +92,13 @@ describe("setupPluginModules", () => {
       removeRoute: vi.fn(),
     } as unknown as Router;
 
-    const pluginModules = await loadEnabledPluginModules();
-    const themeModules = await loadEnabledThemeModules();
+    const uiPluginModules = await loadEnabledUiPluginModules();
 
     setupPluginModules({
       app,
       router,
       platform: "console",
-      modules: [...pluginModules, ...themeModules],
+      modules: uiPluginModules,
     });
     await setupPluginStyles();
 
@@ -110,23 +108,17 @@ describe("setupPluginModules", () => {
     expect(router.addRoute).toHaveBeenCalledWith(pluginRoute);
     expect(router.addRoute).toHaveBeenCalledWith(themeRoute);
     expect(mocks.loadStyle).toHaveBeenCalledWith(
-      expect.stringContaining("/plugins/-/bundle.css")
-    );
-    expect(mocks.loadStyle).toHaveBeenCalledWith(
-      expect.stringContaining("/themes/-/bundle.css")
+      expect.stringContaining("/ui-plugins/-/bundle.css")
     );
   });
 
   it("keeps startup errors contained when theme style loading fails", async () => {
     mocks.useScriptTag.mockImplementation(() => ({
       load: vi.fn(async () => {
-        (window as unknown as Record<string, unknown>).enabledPlugins = [];
-        (window as unknown as Record<string, unknown>).enabledThemes = [];
+        (window as unknown as Record<string, unknown>).enabledUiPlugins = [];
       }),
     }));
-    mocks.loadStyle
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error("style failed"));
+    mocks.loadStyle.mockRejectedValueOnce(new Error("style failed"));
 
     await expect(setupPluginStyles()).rejects.toThrow("style failed");
     notifyPluginLoadError(new Error("style failed"));

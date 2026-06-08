@@ -2742,7 +2742,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css": {
       "get": {
-        "description": "Merge all CSS bundles of enabled plugins into one.",
+        "description": "Compatibility alias for the UI plugin CSS bundle.",
         "operationId": "fetchCssBundle",
         "responses": {
           "default": {
@@ -2763,7 +2763,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js": {
       "get": {
-        "description": "Merge all JS bundles of enabled plugins into one.",
+        "description": "Compatibility alias for the UI plugin JS bundle.",
         "operationId": "fetchJsBundle",
         "responses": {
           "default": {
@@ -4450,26 +4450,6 @@
         ]
       }
     },
-    "/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css": {
-      "get": {
-        "description": "Fetch CSS bundle of the activated theme.",
-        "operationId": "fetchThemeCssBundle",
-        "responses": {},
-        "tags": [
-          "ThemeV1alpha1Console"
-        ]
-      }
-    },
-    "/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js": {
-      "get": {
-        "description": "Fetch JS bundle of the activated theme.",
-        "operationId": "fetchThemeJsBundle",
-        "responses": {},
-        "tags": [
-          "ThemeV1alpha1Console"
-        ]
-      }
-    },
     "/apis/api.console.halo.run/v1alpha1/themes/-/install-from-uri": {
       "post": {
         "description": "Install a theme from uri.",
@@ -4832,6 +4812,48 @@
         },
         "tags": [
           "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css": {
+      "get": {
+        "description": "Merge CSS bundles of enabled plugins and the activated theme into one.",
+        "operationId": "fetchUiPluginCssBundle",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js": {
+      "get": {
+        "description": "Merge JS bundles of enabled plugins and the activated theme into one.",
+        "operationId": "fetchUiPluginJsBundle",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
         ]
       }
     },

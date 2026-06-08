@@ -53,19 +53,36 @@ Halo SHALL report theme UI bundle URLs on `Theme.status` when bundle entry files
 - **AND** the theme root does not contain readable `ui/main.js` or `ui/style.css`
 - **THEN** the reconciled Theme status SHALL NOT expose missing UI bundle URLs
 
-### Requirement: Active theme UI bundle loading
+### Requirement: UI plugin bundle loading
 
-Halo SHALL load only the activated theme's UI bundle during Console and UC startup.
+Halo SHALL load one aggregated UI plugin bundle during Console and UC startup. The aggregated bundle SHALL include
+started plugin UI bundles and only the activated theme's UI bundle.
 
-#### Scenario: Fetch active theme JS bundle
+#### Scenario: Fetch aggregated UI plugin JS bundle
 
-- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js`
-- **THEN** Halo SHALL resolve the JS bundle from the activated theme only
+- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js`
+- **THEN** Halo SHALL resolve JS bundles from started plugins
+- **AND** Halo SHALL resolve the JS bundle from the activated theme only
 
-#### Scenario: Fetch active theme CSS bundle
+#### Scenario: Fetch aggregated UI plugin CSS bundle
 
-- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css`
-- **THEN** Halo SHALL resolve the CSS bundle from the activated theme only
+- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css`
+- **THEN** Halo SHALL resolve CSS bundles from started plugins
+- **AND** Halo SHALL resolve the CSS bundle from the activated theme only
+
+#### Scenario: Preserve plugin bundle aliases
+
+- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js`
+- **THEN** Halo SHALL return the same JS bundle content as the UI plugin JS bundle endpoint
+- **WHEN** a client requests `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css`
+- **THEN** Halo SHALL return the same CSS bundle content as the UI plugin CSS bundle endpoint
+
+#### Scenario: Report UI plugin metadata
+
+- **WHEN** Halo serves the aggregated UI plugin JS bundle
+- **THEN** the bundle SHALL set `this.enabledUiPlugins`
+- **AND** started plugins SHALL be reported with type `plugin`
+- **AND** the activated theme SHALL be reported with type `theme` only when it provides `ui/main.js`
 
 #### Scenario: Activated theme provides UI bundle
 

@@ -13,7 +13,8 @@ runtime loading scoped to the currently activated theme.
 - Allow installed themes to package UI extension resources under a root-level `ui/` directory.
 - Serve theme UI static resources from `/themes/{name}/ui/assets/**`, resolving files from `{themeRoot}/{name}/ui/**`.
 - Expose `Theme.status.entry` and `Theme.status.stylesheet` when `ui/main.js` or `ui/style.css` exists.
-- Load only the activated theme's UI bundle during Console and UC startup.
+- Load started plugin UI bundles and the activated theme UI bundle from a single `ui-plugins` aggregate endpoint during
+  Console and UC startup.
 - Register the activated theme module using the frontend module name `theme:{themeName}`.
 - Reuse the existing `PluginModule` frontend shape: `routes`, `ucRoutes`, `components`, and `extensionPoints`.
 
@@ -30,9 +31,10 @@ None.
 ## Impact
 
 - API model: adds optional `Theme.status.entry` and `Theme.status.stylesheet` fields.
-- Backend: updates theme reconciliation, active theme bundle endpoints, and static theme UI resource handling.
+- Backend: updates theme reconciliation, aggregated UI plugin bundle endpoints, and static theme UI resource handling.
 - Security: adds a theme UI static resource route similar to plugin asset routes; API authorization remains unchanged.
-- UI: updates startup module loading to load and register the activated theme module after plugin modules.
+- UI: updates startup module loading to load and register started plugin modules and the activated theme module from the
+  aggregated bundle.
 - OpenAPI/UI client: requires regenerating OpenAPI docs and the generated UI API client after `Theme.status` changes.
 - Tooling/docs: theme-aware bundler output and developer documentation can land in follow-up PRs.
 - Dependencies/database: no new dependencies and no database migration.

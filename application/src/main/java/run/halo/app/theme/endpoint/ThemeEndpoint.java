@@ -11,34 +11,25 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -69,7 +60,7 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Slf4j
 @Component
-public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
+public class ThemeEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
@@ -85,12 +76,6 @@ public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
 
     private final SettingConfigService settingConfigService;
 
-    private final WebProperties webProperties;
-
-    private boolean useLastModified;
-
-    private CacheControl bundleCacheControl = CacheControl.empty();
-
     public ThemeEndpoint(
             ReactiveExtensionClient client,
             ThemeRootGetter themeRoot,
@@ -98,8 +83,7 @@ public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
             TemplateEngineManager templateEngineManager,
             SystemConfigFetcher systemEnvironmentFetcher,
             ReactiveUrlDataBufferFetcher urlDataBufferFetcher,
-            SettingConfigService settingConfigService,
-            WebProperties webProperties) {
+            SettingConfigService settingConfigService) {
         this.client = client;
         this.themeRoot = themeRoot;
         this.themeService = themeService;
@@ -107,7 +91,6 @@ public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
         this.systemEnvironmentFetcher = systemEnvironmentFetcher;
         this.urlDataBufferFetcher = urlDataBufferFetcher;
         this.settingConfigService = settingConfigService;
-        this.webProperties = webProperties;
     }
 
     @Override
@@ -262,18 +245,6 @@ public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .response(responseBuilder().implementation(Theme.class)))
                 .GET(
-                        "themes/-/bundle.js",
-                        this::fetchJsBundle,
-                        builder -> builder.operationId("fetchThemeJsBundle")
-                                .description("Fetch JS bundle of the activated theme.")
-                                .tag(tag))
-                .GET(
-                        "themes/-/bundle.css",
-                        this::fetchCssBundle,
-                        builder -> builder.operationId("fetchThemeCssBundle")
-                                .description("Fetch CSS bundle of the activated theme.")
-                                .tag(tag))
-                .GET(
                         "themes/{name}/setting",
                         this::fetchThemeSetting,
                         builder -> builder.operationId("fetchThemeSetting")
@@ -300,63 +271,6 @@ public class ThemeEndpoint implements CustomEndpoint, InitializingBean {
                                         .implementation(String.class))
                                 .response(responseBuilder().implementation(Object.class)))
                 .build();
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        var cache = this.webProperties.getResources().getCache();
-        this.useLastModified = cache.isUseLastModified();
-        var cacheControl = cache.getCachecontrol().toHttpCacheControl();
-        if (cacheControl != null) {
-            this.bundleCacheControl = cacheControl;
-        }
-    }
-
-    private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
-        return request.queryParam("v")
-                .map(version -> themeService
-                        .getJsBundle(version)
-                        .flatMap(jsRes ->
-                                bundleResponse(request, jsRes, "bundle.js", MediaType.valueOf("text/javascript"))))
-                .orElseGet(() -> themeService
-                        .generateBundleVersion()
-                        .flatMap(version -> ServerResponse.temporaryRedirect(buildBundleUri("js", version))
-                                .cacheControl(CacheControl.noStore())
-                                .build()));
-    }
-
-    private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
-        return request.queryParam("v")
-                .map(version -> themeService
-                        .getCssBundle(version)
-                        .flatMap(
-                                cssRes -> bundleResponse(request, cssRes, "bundle.css", MediaType.valueOf("text/css"))))
-                .orElseGet(() -> themeService
-                        .generateBundleVersion()
-                        .flatMap(version -> ServerResponse.temporaryRedirect(buildBundleUri("css", version))
-                                .cacheControl(CacheControl.noStore())
-                                .build()));
-    }
-
-    private Mono<ServerResponse> bundleResponse(
-            ServerRequest request, Resource resource, String filename, MediaType mediaType) {
-        var bodyBuilder = ServerResponse.ok().cacheControl(bundleCacheControl).contentType(mediaType);
-        if (useLastModified) {
-            try {
-                var lastModified = Instant.ofEpochMilli(resource.lastModified());
-                bodyBuilder = bodyBuilder.lastModified(lastModified);
-            } catch (IOException e) {
-                if (e instanceof FileNotFoundException) {
-                    return Mono.error(new NoResourceFoundException(request.uri(), filename));
-                }
-                return Mono.error(e);
-            }
-        }
-        return bodyBuilder.body(BodyInserters.fromResource(resource));
-    }
-
-    URI buildBundleUri(String type, String version) {
-        return URI.create("/apis/api.console.halo.run/v1alpha1/themes/-/bundle." + type + "?v=" + version);
     }
 
     private Mono<ServerResponse> fetchThemeJsonConfig(ServerRequest request) {

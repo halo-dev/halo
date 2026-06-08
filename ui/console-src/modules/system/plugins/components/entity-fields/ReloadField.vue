@@ -11,10 +11,17 @@ const props = withDefaults(
 );
 
 const enabledJsModulesInfo =
-  (window["enabledPlugins"] as { name: string; version: string }[]) || [];
+  (window["enabledUiPlugins"] as {
+    name: string;
+    type: "plugin" | "theme";
+    version: string;
+  }[]) || [];
 
 const currentJsModuleInfo = enabledJsModulesInfo.find((jsModuleInfo) => {
-  return jsModuleInfo.name === props.plugin.metadata.name;
+  return (
+    jsModuleInfo.type === "plugin" &&
+    jsModuleInfo.name === props.plugin.metadata.name
+  );
 });
 
 const needsReloadWindow = computed(() => {

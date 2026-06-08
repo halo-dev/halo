@@ -11,21 +11,24 @@ export type Platform = "console" | "uc";
 
 type EnabledPlugin = {
   name: string;
-  value: string;
+  type: "plugin";
+  version: string;
 };
 
 type EnabledTheme = {
   name: string;
+  type: "theme";
   themeName: string;
   version: string;
 };
 
+type EnabledUiPlugin = EnabledPlugin | EnabledTheme;
+
 export interface LoadedPluginModule {
   name: string;
+  type: EnabledUiPlugin["type"];
   module: PluginModule;
 }
-
-export type LoadedThemeModule = LoadedPluginModule;
 
 export function setupCoreModules({
   app,
@@ -50,44 +53,26 @@ export function setupCoreModules({
   }
 }
 
-export async function loadEnabledPluginModules(): Promise<
+export async function loadEnabledUiPluginModules(): Promise<
   LoadedPluginModule[]
 > {
-  await loadPluginBundle();
+  await loadUiPluginBundle();
 
-  const enabledPlugins = window["enabledPlugins"] as EnabledPlugin[];
+  const enabledUiPlugins = window["enabledUiPlugins"] as EnabledUiPlugin[];
 
-  return (enabledPlugins || [])
-    .map((plugin) => {
-      const module = window[plugin.name] as PluginModule | undefined;
+  return (enabledUiPlugins || [])
+    .map((uiPlugin) => {
+      const module = window[uiPlugin.name] as PluginModule | undefined;
       if (!module) {
         return;
       }
       return {
-        name: plugin.name,
+        name: uiPlugin.name,
+        type: uiPlugin.type,
         module,
       };
     })
-    .filter((plugin): plugin is LoadedPluginModule => !!plugin);
-}
-
-export async function loadEnabledThemeModules(): Promise<LoadedThemeModule[]> {
-  await loadThemeBundle();
-
-  const enabledThemes = window["enabledThemes"] as EnabledTheme[];
-
-  return (enabledThemes || [])
-    .map((theme) => {
-      const module = window[theme.name] as PluginModule | undefined;
-      if (!module) {
-        return;
-      }
-      return {
-        name: theme.name,
-        module,
-      };
-    })
-    .filter((theme): theme is LoadedThemeModule => !!theme);
+    .filter((uiPlugin): uiPlugin is LoadedPluginModule => !!uiPlugin);
 }
 
 export function setupPluginModules({
@@ -114,8 +99,7 @@ export function setupPluginModules({
 }
 
 export async function setupPluginStyles() {
-  await loadPluginStyles();
-  await loadThemeStyles();
+  await loadUiPluginStyles();
 }
 
 export function notifyPluginLoadError(error: unknown) {
@@ -128,29 +112,16 @@ export function notifyPluginLoadError(error: unknown) {
   Toast.error(message);
 }
 
-async function loadPluginBundle() {
+async function loadUiPluginBundle() {
   const { load } = useScriptTag(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?t=${Date.now()}`
   );
   await load();
 }
 
-async function loadThemeBundle() {
-  const { load } = useScriptTag(
-    `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.js?t=${Date.now()}`
-  );
-  await load();
-}
-
-async function loadPluginStyles() {
+async function loadUiPluginStyles() {
   await loadStyle(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?t=${Date.now()}`
-  );
-}
-
-async function loadThemeStyles() {
-  await loadStyle(
-    `/apis/api.console.halo.run/v1alpha1/themes/-/bundle.css?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?t=${Date.now()}`
   );
 }
 
