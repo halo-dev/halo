@@ -23,6 +23,7 @@ import {
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
+import { useFuse } from "@vueuse/integrations/useFuse";
 import { useRouteQuery } from "@vueuse/router";
 import type { Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
@@ -50,13 +51,12 @@ function handleClearFilters() {
 }
 
 const { data, isLoading, isFetching, refetch } = useQuery({
-  queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
+  queryKey: ["plugins", selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
     return await paginate<PluginV1alpha1ConsoleApiListPluginsRequest, Plugin>(
       (params) => consoleApiClient.plugin.plugin.listPlugins(params),
       {
         size: 1000,
-        keyword: keyword.value,
         enabled: selectedEnabledValue.value
           ? JSON.parse(selectedEnabledValue.value)
           : undefined,
@@ -89,6 +89,17 @@ const { data, isLoading, isFetching, refetch } = useQuery({
   },
 });
 
+const { results } = useFuse(
+  keyword,
+  computed(() => data.value || []),
+  {
+    fuseOptions: {
+      keys: ["metadata.name", "spec.displayName", "spec.description"],
+    },
+    matchAllWhenSearchEmpty: true,
+  }
+);
+
 // selection
 const selectedNames = ref<string[]>([]);
 provide<Ref<string[]>>("selectedNames", selectedNames);
@@ -97,7 +108,7 @@ const checkedAll = ref(false);
 watch(
   () => selectedNames.value,
   (value) => {
-    checkedAll.value = value.length === data.value?.length;
+    checkedAll.value = value.length === results.value?.length;
   }
 );
 
@@ -105,8 +116,8 @@ const handleCheckAllChange = (e: Event) => {
   const { checked } = e.target as HTMLInputElement;
   if (checked) {
     selectedNames.value =
-      data.value?.map((plugin) => {
-        return plugin.metadata.name;
+      results.value?.map((plugin) => {
+        return plugin.item.metadata.name;
       }) || [];
   } else {
     selectedNames.value.length = 0;
@@ -173,7 +184,11 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
               />
             </div>
             <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
-              <SearchInput v-if="!selectedNames.length" v-model="keyword" />
+              <SearchInput
+                v-if="!selectedNames.length"
+                v-model="keyword"
+                sync
+              />
               <VSpace v-else>
                 <VButton @click="handleChangeStatusInBatch(true)">
                   {{ $t("core.common.buttons.activate") }}
@@ -265,7 +280,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
 
       <VLoading v-if="isLoading" />
 
-      <Transition v-else-if="!data?.length" appear name="fade">
+      <Transition v-else-if="!results?.length" appear name="fade">
         <VEmpty
           :message="$t('core.plugin.empty.message')"
           :title="$t('core.plugin.empty.title')"
@@ -293,10 +308,10 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
       <Transition v-else appear name="fade">
         <VEntityContainer>
           <PluginListItem
-            v-for="plugin in data"
-            :key="plugin.metadata.name"
-            :plugin="plugin"
-            :is-selected="selectedNames.includes(plugin.metadata.name)"
+            v-for="result in results"
+            :key="result.item.metadata.name"
+            :plugin="result.item"
+            :is-selected="selectedNames.includes(result.item.metadata.name)"
           />
         </VEntityContainer>
       </Transition>
@@ -306,7 +321,7 @@ const { handleChangeStatusInBatch, handleUninstallInBatch } =
           <span class="text-sm text-gray-500">
             {{
               $t("core.components.pagination.total_label", {
-                total: data?.length,
+                total: results?.length,
               })
             }}
           </span>
