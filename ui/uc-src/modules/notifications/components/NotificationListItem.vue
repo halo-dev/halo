@@ -103,9 +103,7 @@ const content = computed(() => {
         v-if="isSelectMode"
         class="flex h-4 w-4 flex-none items-center justify-center rounded border transition-colors"
         :class="
-          isChecked
-            ? 'border-primary bg-primary'
-            : 'border-gray-300 bg-white'
+          isChecked ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
         "
       >
         <svg
