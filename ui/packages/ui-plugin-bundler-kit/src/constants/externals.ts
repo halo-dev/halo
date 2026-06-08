@@ -9,6 +9,7 @@ const GLOBALS = {
   "@halo-dev/components": "HaloComponents",
   "@halo-dev/api-client": "HaloApiClient",
   "@halo-dev/richtext-editor": "RichTextEditor",
+  "@formkit/vue": "FormKitVue",
   axios: "axios",
 };
 
