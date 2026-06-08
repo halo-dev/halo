@@ -5,19 +5,39 @@ import {
   UserConfig,
   UserConfigFnObject,
 } from "vite";
-import { DEFAULT_OUT_DIR_PROD, getDefaultOutDirDev } from "./constants/build";
+import {
+  DEFAULT_OUT_DIR_PROD,
+  DEFAULT_THEME_OUT_DIR,
+  getDefaultOutDirDev,
+} from "./constants/build";
 import { EXTERNALS, GLOBALS } from "./constants/externals";
-import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
+import {
+  DEFAULT_PLUGIN_MANIFEST_PATH,
+  DEFAULT_THEME_MANIFEST_PATH,
+} from "./constants/halo-plugin";
 import {
   getHaloPluginBundleLocation,
   getHaloPluginManifest,
+  getHaloThemeAssetPublicPath,
+  getHaloThemeManifest,
+  getHaloThemeModuleName,
+  getManifestName,
 } from "./utils/halo-plugin";
+
+type Provider = "plugin" | "theme";
 
 export interface ViteUserConfig {
   /**
-   * Halo plugin manifest path.
+   * UI plugin provider type.
    *
-   * @default "../src/main/resources/plugin.yaml"
+   * @default "plugin"
+   */
+  provider?: "plugin" | "theme";
+
+  /**
+   * Halo plugin or theme manifest path.
+   *
+   * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
 
@@ -27,25 +47,26 @@ export interface ViteUserConfig {
   vite: UserConfig | UserConfigFnObject;
 }
 
-function createVitePresetsConfig(manifestPath: string) {
-  const manifest = getHaloPluginManifest(manifestPath);
-  const bundleLocation = getHaloPluginBundleLocation(manifest);
+function createVitePresetsConfig(provider: Provider, manifestPath: string) {
+  const defaults =
+    provider === "theme"
+      ? getThemeProviderDefaults(manifestPath)
+      : getPluginProviderDefaults(manifestPath);
 
   return defineConfig(({ mode }) => {
     const isProduction = mode === "production";
 
     return {
       mode: mode || "production",
+      base: defaults.base,
       plugins: [Vue()],
       define: { "process.env.NODE_ENV": "'production'" },
       build: {
-        outDir: isProduction
-          ? DEFAULT_OUT_DIR_PROD
-          : getDefaultOutDirDev(bundleLocation),
+        outDir: isProduction ? defaults.outDir.prod : defaults.outDir.dev,
         emptyOutDir: true,
         lib: {
           entry: "src/index.ts",
-          name: manifest.metadata.name,
+          name: defaults.moduleName,
           formats: ["iife"],
           fileName: () => "main.js",
           cssFileName: "style",
@@ -60,6 +81,46 @@ function createVitePresetsConfig(manifestPath: string) {
       },
     };
   });
+}
+
+function getPluginProviderDefaults(manifestPath: string) {
+  const manifest = getHaloPluginManifest(manifestPath);
+  const bundleLocation = getHaloPluginBundleLocation(manifest);
+
+  return {
+    moduleName: getManifestName(manifest),
+    outDir: {
+      prod: DEFAULT_OUT_DIR_PROD,
+      dev: getDefaultOutDirDev(bundleLocation),
+    },
+    base: undefined,
+  };
+}
+
+function getThemeProviderDefaults(manifestPath: string) {
+  const manifest = getHaloThemeManifest(manifestPath);
+
+  return {
+    moduleName: getHaloThemeModuleName(manifest),
+    outDir: {
+      prod: DEFAULT_THEME_OUT_DIR,
+      dev: DEFAULT_THEME_OUT_DIR,
+    },
+    base: getHaloThemeAssetPublicPath(manifest),
+  };
+}
+
+function getProvider(config?: ViteUserConfig): Provider {
+  return config?.provider || "plugin";
+}
+
+function getManifestPath(provider: Provider, config?: ViteUserConfig) {
+  if (config?.manifestPath) {
+    return config.manifestPath;
+  }
+  return provider === "theme"
+    ? DEFAULT_THEME_MANIFEST_PATH
+    : DEFAULT_PLUGIN_MANIFEST_PATH;
 }
 
 /**
@@ -77,8 +138,10 @@ function createVitePresetsConfig(manifestPath: string) {
  * ```
  */
 export function viteConfig(config?: ViteUserConfig) {
+  const provider = getProvider(config);
   const presetsConfigFn = createVitePresetsConfig(
-    config?.manifestPath || DEFAULT_MANIFEST_PATH
+    provider,
+    getManifestPath(provider, config)
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);

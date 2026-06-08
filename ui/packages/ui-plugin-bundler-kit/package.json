@@ -21,6 +21,7 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
+    "test:unit": "vp test --run",
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
