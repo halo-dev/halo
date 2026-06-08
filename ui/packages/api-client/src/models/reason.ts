@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { ReasonSpec } from './reason-spec';
 
 /**
- * {@link Reason Reason} is a custom extension that defines a reason for a notification, It represents an instance of a  {@link ReasonType ReasonType}.   <p>It can be understood as an event that triggers a notification.
+ * Reason extension that represents one notification event instance of a {@link ReasonType ReasonType}.   <p>It can be understood as an event that triggers a notification.
  */
 export interface Reason {
     'apiVersion': string;

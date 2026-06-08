@@ -1,13 +1,19 @@
 package run.halo.app.config;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import org.hamcrest.core.StringStartsWith;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,6 +28,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.filter.reactive.ServerWebExchangeContextFilter;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -38,7 +45,9 @@ import run.halo.app.core.user.service.RoleService;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "halo.work-dir=${java.io.tmpdir}/halo-next-test")
 @Import({
     WebFluxConfigTest.WebSocketSupportTest.TestWebSocketConfiguration.class,
     WebFluxConfigTest.ServerWebExchangeContextFilterTest.TestConfig.class,
@@ -46,6 +55,9 @@ import run.halo.app.extension.Metadata;
 })
 @AutoConfigureWebTestClient
 class WebFluxConfigTest {
+
+    private static final Path TEST_WORK_DIR = Paths.get(System.getProperty("java.io.tmpdir"), "halo-next-test");
+    private static final Path TEST_THEME_DIR = TEST_WORK_DIR.resolve("themes").resolve("fake-theme");
 
     @Autowired
     WebTestClient webClient;
@@ -192,6 +204,11 @@ class WebFluxConfigTest {
     @Nested
     class StaticResourcesTest {
 
+        @AfterEach
+        void cleanUp() throws Exception {
+            FileSystemUtils.deleteRecursively(TEST_THEME_DIR);
+        }
+
         @Test
         void shouldRespond404WhenThemeResourceNotFound() {
             webClient
@@ -200,6 +217,133 @@ class WebFluxConfigTest {
                     .exchange()
                     .expectStatus()
                     .isNotFound();
+        }
+
+        @Test
+        void shouldServeThemeUiAssetWithoutAuthentication() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui-plugin").resolve("dist"));
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("main.js"), "fake theme ui");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui-plugin/assets/main.js")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(
+                            result -> assertArrayEquals("fake theme ui".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldServeThemeUiChunkAsset() throws Exception {
+            Files.createDirectories(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("chunks"));
+            Files.writeString(
+                    TEST_THEME_DIR
+                            .resolve("ui-plugin")
+                            .resolve("dist")
+                            .resolve("chunks")
+                            .resolve("view.js"),
+                    "fake chunk");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui-plugin/assets/chunks/view.js")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(result -> assertArrayEquals("fake chunk".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldKeepThemePublicAssetRouteUnchanged() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR.resolve("templates").resolve("assets"));
+            Files.createDirectories(TEST_THEME_DIR.resolve("ui-plugin").resolve("dist"));
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("templates").resolve("assets").resolve("main.css"), "public asset");
+            Files.writeString(
+                    TEST_THEME_DIR.resolve("ui-plugin").resolve("dist").resolve("main.css"), "ui asset");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/assets/main.css")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(result -> assertArrayEquals("public asset".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldRespond404WhenThemeUiResourceNotFound() {
+            webClient
+                    .get()
+                    .uri("/themes/missing-theme/ui-plugin/assets/main.js")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
+        }
+
+        @Test
+        void shouldRejectThemeUiResourceDirectoryTraversal() {
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/ui-plugin/assets/%2E%2E/theme.yaml")
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError();
+        }
+
+        @Test
+        void shouldServeThemeScreenshotWithoutAuthentication() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR);
+            Files.writeString(TEST_THEME_DIR.resolve("screenshot.png"), "fake screenshot");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/screenshot.png")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .consumeWith(
+                            result -> assertArrayEquals("fake screenshot".getBytes(UTF_8), result.getResponseBody()));
+        }
+
+        @Test
+        void shouldRespond404WhenThemeScreenshotExtensionIsUnsupported() throws Exception {
+            Files.createDirectories(TEST_THEME_DIR);
+            Files.writeString(TEST_THEME_DIR.resolve("screenshot.gif"), "fake screenshot");
+
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/screenshot.gif")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
+        }
+
+        @Test
+        void shouldRespond404WhenThemeScreenshotDoesNotExist() {
+            webClient
+                    .get()
+                    .uri("/themes/fake-theme/screenshot.png")
+                    .exchange()
+                    .expectStatus()
+                    .isNotFound();
+        }
+
+        @Test
+        void shouldRejectThemeScreenshotDirectoryTraversal() {
+            webClient
+                    .get()
+                    .uri("/themes/%2E%2E/screenshot.png")
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError();
         }
     }
 

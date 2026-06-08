@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -58,7 +57,6 @@ import run.halo.app.infra.utils.VersionUtils;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class ThemeServiceImpl implements ThemeService {
 
     private final ReactiveExtensionClient client;
@@ -72,6 +70,19 @@ public class ThemeServiceImpl implements ThemeService {
     private final SystemConfigFetcher systemConfigFetcher;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
+
+    public ThemeServiceImpl(
+            ReactiveExtensionClient client,
+            ThemeRootGetter themeRoot,
+            HaloProperties haloProperties,
+            SystemVersionSupplier systemVersionSupplier,
+            SystemConfigFetcher systemConfigFetcher) {
+        this.client = client;
+        this.themeRoot = themeRoot;
+        this.haloProperties = haloProperties;
+        this.systemVersionSupplier = systemVersionSupplier;
+        this.systemConfigFetcher = systemConfigFetcher;
+    }
 
     @Override
     public Mono<Void> installPresetTheme() {

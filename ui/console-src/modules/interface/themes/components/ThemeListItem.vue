@@ -43,6 +43,9 @@ const emit = defineEmits<{
 
 const { theme } = toRefs(props);
 
+const screenshot = computed(() => theme.value.status?.screenshot);
+const logo = computed(() => theme.value.spec.logo);
+
 const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
 
 const {
@@ -151,16 +154,29 @@ const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
     <div class="col-span-2">
       <div class="relative block">
         <div class="aspect-h-9 aspect-w-16">
+          <div v-if="screenshot" class="overflow-hidden rounded bg-gray-100">
+            <img
+              class="h-full w-full object-cover"
+              :src="screenshot"
+              :alt="theme.spec.displayName"
+            />
+          </div>
           <div
+            v-else
             class="transform-gpu rounded-none bg-cover bg-center bg-no-repeat sm:rounded"
             :style="{
-              backgroundImage: `url(${theme.spec.logo})`,
+              backgroundImage: logo ? `url(${logo})` : undefined,
             }"
           >
             <div
               class="flex h-full w-full items-center justify-center rounded-none backdrop-blur-3xl sm:rounded"
             >
-              <img class="h-16 w-16 rounded" :src="theme.spec.logo" />
+              <img
+                v-if="logo"
+                class="h-16 w-16 rounded"
+                :src="logo"
+                :alt="theme.spec.displayName"
+              />
             </div>
           </div>
         </div>

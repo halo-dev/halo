@@ -9,6 +9,27 @@ import { loadStyle } from "@/utils/load-style";
 
 export type Platform = "console" | "uc";
 
+type EnabledPlugin = {
+  name: string;
+  type: "plugin";
+  version: string;
+};
+
+type EnabledTheme = {
+  name: string;
+  type: "theme";
+  themeName: string;
+  version: string;
+};
+
+type EnabledUiPlugin = EnabledPlugin | EnabledTheme;
+
+export interface LoadedPluginModule {
+  name: string;
+  type: EnabledUiPlugin["type"];
+  module: PluginModule;
+}
+
 export function setupCoreModules({
   app,
   router,
@@ -32,60 +53,75 @@ export function setupCoreModules({
   }
 }
 
-export async function setupPluginModules({
+export async function loadEnabledUiPluginModules(): Promise<
+  LoadedPluginModule[]
+> {
+  await loadUiPluginBundle();
+
+  const enabledUiPlugins = window["enabledUiPlugins"] as EnabledUiPlugin[];
+
+  return (enabledUiPlugins || [])
+    .map((uiPlugin) => {
+      const module = window[uiPlugin.name] as PluginModule | undefined;
+      if (!module) {
+        return;
+      }
+      return {
+        name: uiPlugin.name,
+        type: uiPlugin.type,
+        module,
+      };
+    })
+    .filter((uiPlugin): uiPlugin is LoadedPluginModule => !!uiPlugin);
+}
+
+export function setupPluginModules({
   app,
   router,
   platform,
+  modules,
 }: {
   app: App;
   router: Router;
   platform: Platform;
+  modules: LoadedPluginModule[];
 }) {
-  try {
-    await loadPluginBundle();
-
-    const enabledPlugins = window["enabledPlugins"] as {
-      name: string;
-      value: string;
-    }[];
-
-    for (const plugin of enabledPlugins || []) {
-      const module = window[plugin.name];
-      if (!module) {
-        continue;
-      }
-      initJsModule({
-        app,
-        router,
-        platform,
-        name: plugin.name,
-        jsModule: module,
-        core: false,
-      });
-    }
-
-    await loadPluginStyles();
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message.includes("style")
-        ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
-        : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
-
-    console.error(message, error);
-    Toast.error(message);
+  for (const plugin of modules) {
+    initJsModule({
+      app,
+      router,
+      platform,
+      name: plugin.name,
+      jsModule: plugin.module,
+      core: false,
+    });
   }
 }
 
-async function loadPluginBundle() {
+export async function setupPluginStyles() {
+  await loadUiPluginStyles();
+}
+
+export function notifyPluginLoadError(error: unknown) {
+  const message =
+    error instanceof Error && error.message.includes("style")
+      ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
+      : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
+
+  console.error(message, error);
+  Toast.error(message);
+}
+
+async function loadUiPluginBundle() {
   const { load } = useScriptTag(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?t=${Date.now()}`
   );
   await load();
 }
 
-async function loadPluginStyles() {
+async function loadUiPluginStyles() {
   await loadStyle(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?t=${Date.now()}`
   );
 }
 

@@ -15,13 +15,19 @@
 
 
 /**
- * The subject name of reason type to be interested in
+ * Subject selector used by a subscription interest reason.
  */
 export interface InterestReasonSubject {
+    /**
+     * Subject API version.
+     */
     'apiVersion': string;
+    /**
+     * Subject kind.
+     */
     'kind': string;
     /**
-     * if name is not specified, it presents all subjects of the specified reason type and custom resources
+     * Subject metadata.name. If omitted, all subjects of the selected kind and API version are matched.
      */
     'name'?: string;
 }

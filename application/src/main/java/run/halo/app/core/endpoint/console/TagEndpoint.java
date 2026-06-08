@@ -28,7 +28,7 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.SortableRequest;
 
 /**
- * post tag endpoint.
+ * Console endpoint for listing post tags.
  *
  * @author LIlGG
  */
@@ -45,7 +45,7 @@ public class TagEndpoint implements CustomEndpoint {
         return SpringdocRouteBuilder.route()
                 .GET("tags", this::listTag, builder -> {
                     builder.operationId("ListPostTags")
-                            .description("List Post Tags.")
+                            .description("List post tags with pagination, sorting, and keyword filtering.")
                             .tag(tag)
                             .response(responseBuilder().implementation(ListResult.generateGenericClass(Tag.class)));
                     TagQuery.buildParameters(builder);
@@ -87,7 +87,7 @@ public class TagEndpoint implements CustomEndpoint {
                     .parameter(parameterBuilder()
                             .in(ParameterIn.QUERY)
                             .name("keyword")
-                            .description("Post tags filtered by keyword.")
+                            .description("Keyword used to match the tag display name or slug.")
                             .implementation(String.class)
                             .required(false));
         }

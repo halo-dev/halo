@@ -54,12 +54,12 @@ public class SinglePageQueryEndpoint implements CustomEndpoint {
                         "singlepages/{name}",
                         this::getByName,
                         builder -> builder.operationId("querySinglePageByName")
-                                .description("Gets single page by name")
+                                .description("Gets single page by metadata.name")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("SinglePage name")
+                                        .description("SinglePage metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(SinglePageVo.class)))
                 .build();

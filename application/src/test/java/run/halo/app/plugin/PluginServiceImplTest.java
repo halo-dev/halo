@@ -20,6 +20,8 @@ import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -46,8 +49,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
@@ -298,6 +304,40 @@ class PluginServiceImplTest {
                 .verifyComplete();
     }
 
+    @Test
+    void shouldPreferUiBundlesWhenAggregatingPluginBundles() throws IOException {
+        var plugin = mockStartedPlugin("fake-plugin", "plugin-for-ui-assets");
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
+
+        toString(pluginService.uglifyJsBundle())
+                .as(StepVerifier::create)
+                .assertNext(content -> assertThat(content)
+                        .contains("console.log(\"ui\");")
+                        .doesNotContain("console.log(\"console\");"))
+                .verifyComplete();
+
+        toString(pluginService.uglifyCssBundle())
+                .as(StepVerifier::create)
+                .assertNext(content -> assertThat(content).contains(".ui").doesNotContain(".console"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFallBackToConsoleBundlesWhenUiIsMissing() throws IOException {
+        var plugin = mockStartedPlugin("fake-plugin", "plugin-for-console-assets");
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
+
+        toString(pluginService.uglifyJsBundle())
+                .as(StepVerifier::create)
+                .assertNext(content -> assertThat(content).contains("console.log(\"console-only\");"))
+                .verifyComplete();
+
+        toString(pluginService.uglifyCssBundle())
+                .as(StepVerifier::create)
+                .assertNext(content -> assertThat(content).contains(".console-only"))
+                .verifyComplete();
+    }
+
     @Nested
     class PluginStateChangeTest {
 
@@ -492,5 +532,29 @@ class PluginServiceImplTest {
         plugin.setStatus(new Plugin.PluginStatus());
         pluginConsumer.accept(plugin);
         return plugin;
+    }
+
+    private PluginWrapper mockStartedPlugin(String pluginId, String resourceRoot) throws IOException {
+        var pluginWrapper = mock(PluginWrapper.class);
+        var descriptor = mock(PluginDescriptor.class);
+        var pluginRoot = ResourceUtils.getURL("classpath:plugin/" + resourceRoot + "/");
+        var classLoader = new URLClassLoader(new URL[] {pluginRoot});
+        when(pluginWrapper.getPluginId()).thenReturn(pluginId);
+        lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
+        lenient().when(pluginWrapper.getDescriptor()).thenReturn(descriptor);
+        lenient().when(descriptor.getVersion()).thenReturn("1.0.0");
+        when(pluginManager.getPlugin(pluginId)).thenReturn(pluginWrapper);
+        return pluginWrapper;
+    }
+
+    private Mono<String> toString(Flux<DataBuffer> dataBuffers) {
+        return dataBuffers
+                .map(dataBuffer -> {
+                    var bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+                    return new String(bytes, UTF_8);
+                })
+                .collect(Collectors.joining());
     }
 }

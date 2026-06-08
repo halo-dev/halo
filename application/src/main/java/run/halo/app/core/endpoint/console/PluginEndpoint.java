@@ -71,6 +71,7 @@ import run.halo.app.extension.router.SortableRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.plugin.PluginService;
+import run.halo.app.plugin.UiPluginBundleService;
 import tools.jackson.databind.node.ObjectNode;
 
 @Slf4j
@@ -80,6 +81,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     private final ReactiveExtensionClient client;
 
     private final PluginService pluginService;
+
+    private final UiPluginBundleService uiPluginBundleService;
 
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
@@ -96,11 +99,13 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
     public PluginEndpoint(
             ReactiveExtensionClient client,
             PluginService pluginService,
+            UiPluginBundleService uiPluginBundleService,
             ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher,
             SettingConfigService settingConfigService,
             WebProperties webProperties) {
         this.client = client;
         this.pluginService = pluginService;
+        this.uiPluginBundleService = uiPluginBundleService;
         this.reactiveUrlDataBufferFetcher = reactiveUrlDataBufferFetcher;
         this.settingConfigService = settingConfigService;
         this.webProperties = webProperties;
@@ -144,6 +149,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
+                                        .description("metadata.name of the plugin to upgrade.")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -160,13 +166,15 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin to upgrade.")
                                         .in(ParameterIn.PATH)
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
                                         .content(contentBuilder()
                                                 .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                                                .schema(schemaBuilder().implementation(InstallRequest.class)))))
+                                                .schema(schemaBuilder().implementation(InstallRequest.class))))
+                                .response(responseBuilder().implementation(Plugin.class)))
                 .PUT(
                         "plugins/{name}/json-config",
                         this::updatePluginJsonConfig,
@@ -175,6 +183,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin whose JSON config will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -194,6 +203,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin whose setting config will be reset.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -202,10 +212,11 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         "plugins/{name}/reload",
                         this::reload,
                         builder -> builder.operationId("reloadPlugin")
-                                .description("Reload a plugin by name.")
+                                .description("Reload a plugin by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin to reload.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -214,10 +225,11 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         "plugins/{name}/plugin-state",
                         this::changePluginRunningState,
                         builder -> builder.operationId("ChangePluginRunningState")
-                                .description("Change the running state of a plugin by name.")
+                                .description("Change the running state of a plugin by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin whose running state will be changed.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -242,6 +254,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin whose setting will be fetched.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -254,6 +267,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the plugin whose JSON config will be fetched.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -262,14 +276,14 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                         "plugins/-/bundle.js",
                         this::fetchJsBundle,
                         builder -> builder.operationId("fetchJsBundle")
-                                .description("Merge all JS bundles of enabled plugins into one.")
+                                .description("Compatibility alias for the UI plugin JS bundle.")
                                 .tag(tag)
                                 .response(responseBuilder().implementation(String.class)))
                 .GET(
                         "plugins/-/bundle.css",
                         this::fetchCssBundle,
                         builder -> builder.operationId("fetchCssBundle")
-                                .description("Merge all CSS bundles of enabled plugins into one.")
+                                .description("Compatibility alias for the UI plugin CSS bundle.")
                                 .tag(tag)
                                 .response(responseBuilder().implementation(String.class)))
                 .build();
@@ -324,17 +338,23 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
         }
     }
 
+    /** Payload for changing a plugin running state. */
     @Data
     @Schema(name = "PluginRunningStateRequest")
     static class RunningStateRequest {
+        /** Whether the plugin should be enabled. */
+        @Schema(requiredMode = REQUIRED)
         private boolean enable;
+
+        /** Whether to change the state asynchronously. */
+        @Schema(defaultValue = "false")
         private boolean async;
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
         var versionOption = request.queryParam("v");
         return versionOption
-                .map(s -> pluginService.getJsBundle(s).flatMap(jsRes -> {
+                .map(s -> uiPluginBundleService.getJsBundle(s).flatMap(jsRes -> {
                     var bodyBuilder = ServerResponse.ok()
                             .cacheControl(bundleCacheControl)
                             .contentType(MediaType.valueOf("text/javascript"));
@@ -351,7 +371,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     }
                     return bodyBuilder.body(BodyInserters.fromResource(jsRes));
                 }))
-                .orElseGet(() -> pluginService
+                .orElseGet(() -> uiPluginBundleService
                         .generateBundleVersion()
                         .flatMap(version -> ServerResponse.temporaryRedirect(buildJsBundleUri("js", version))
                                 .cacheControl(CacheControl.noStore())
@@ -360,7 +380,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
 
     private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
         return request.queryParam("v")
-                .map(s -> pluginService.getCssBundle(s).flatMap(cssRes -> {
+                .map(s -> uiPluginBundleService.getCssBundle(s).flatMap(cssRes -> {
                     var bodyBuilder = ServerResponse.ok()
                             .cacheControl(bundleCacheControl)
                             .contentType(MediaType.valueOf("text/css"));
@@ -377,7 +397,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                     }
                     return bodyBuilder.body(BodyInserters.fromResource(cssRes));
                 }))
-                .orElseGet(() -> pluginService
+                .orElseGet(() -> uiPluginBundleService
                         .generateBundleVersion()
                         .flatMap(version -> ServerResponse.temporaryRedirect(buildJsBundleUri("css", version))
                                 .cacheControl(CacheControl.noStore())
@@ -408,9 +428,19 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                 .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin));
     }
 
+    /**
+     * Payload for installing a plugin from a remote URI.
+     *
+     * @param uri remote URI of the plugin JAR file
+     */
     public record InstallFromUriRequest(
             @Schema(requiredMode = REQUIRED) URI uri) {}
 
+    /**
+     * Payload for upgrading a plugin from a remote URI.
+     *
+     * @param uri remote URI of the plugin JAR file
+     */
     public record UpgradeFromUriRequest(
             @Schema(requiredMode = REQUIRED) URI uri) {}
 
@@ -539,12 +569,14 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             super(request.exchange());
         }
 
-        @Schema(name = "keyword", description = "Keyword of plugin name or description")
+        /** Keyword of plugin display name or description. */
+        @Schema(name = "keyword")
         public String getKeyword() {
             return queryParams.getFirst("keyword");
         }
 
-        @Schema(name = "enabled", description = "Whether the plugin is enabled")
+        /** Whether the plugin is enabled. */
+        @Schema(name = "enabled")
         public Boolean getEnabled() {
             var enabled = queryParams.getFirst("enabled");
             return enabled == null ? null : getSharedInstance().convert(enabled, Boolean.class);
@@ -585,7 +617,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             builder.parameter(parameterBuilder()
                             .in(ParameterIn.QUERY)
                             .name("keyword")
-                            .description("Keyword of plugin name or description")
+                            .description("Keyword of plugin display name or description")
                             .implementation(String.class)
                             .required(false))
                     .parameter(parameterBuilder()
@@ -605,6 +637,7 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
                 .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }
 
+    /** Multipart payload for installing a plugin. */
     @Schema(name = "PluginInstallRequest", types = "object")
     public static class InstallRequest {
 
@@ -614,7 +647,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             this.multipartData = multipartData;
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, description = "Plugin Jar file.")
+        /** Plugin JAR file. */
+        @Schema(requiredMode = NOT_REQUIRED)
         public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (part == null) {
@@ -629,9 +663,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             return file;
         }
 
-        @Schema(
-                requiredMode = NOT_REQUIRED,
-                description = "Plugin preset name. We will find the plugin from plugin presets")
+        /** Plugin preset name. Halo finds the plugin from plugin presets. */
+        @Schema(requiredMode = NOT_REQUIRED)
         public Mono<String> getPresetName() {
             var part = multipartData.getFirst("presetName");
             if (part == null) {
@@ -646,7 +679,8 @@ public class PluginEndpoint implements CustomEndpoint, InitializingBean {
             return Mono.just(presetName.value());
         }
 
-        @Schema(requiredMode = NOT_REQUIRED, description = "Install source. Default is file.")
+        /** Install source. Defaults to file. */
+        @Schema(requiredMode = NOT_REQUIRED)
         public Mono<InstallSource> getSource() {
             var part = multipartData.getFirst("source");
             if (part == null) {

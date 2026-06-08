@@ -42,7 +42,6 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -76,6 +75,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
+import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
  * Plugin reconciler.
@@ -509,22 +509,29 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         }
 
         log.info("Resolving main.js and style.css for plugin {}", pluginName);
-        var p = pluginManager.getPlugin(pluginName);
-        var classLoader = p.getPluginClassLoader();
-        var resLoader = new DefaultResourceLoader(classLoader);
-        var entryRes = resLoader.getResource("classpath:console/main.js");
-        var cssRes = resLoader.getResource("classpath:console/style.css");
-        if (entryRes.exists()) {
+        var resourceLoader = BundleResourceUtils.getResourceLoader(pluginManager, pluginName);
+        if (resourceLoader == null) {
+            return null;
+        }
+        var bundleLocation = BundleResourceUtils.selectBundleLocation(resourceLoader);
+        if (bundleLocation == null) {
+            return null;
+        }
+        var entryRes =
+                BundleResourceUtils.getBundleResource(resourceLoader, bundleLocation, BundleResourceUtils.JS_BUNDLE);
+        var cssRes =
+                BundleResourceUtils.getBundleResource(resourceLoader, bundleLocation, BundleResourceUtils.CSS_BUNDLE);
+        if (entryRes != null && entryRes.exists()) {
             var entry = UriComponentsBuilder.newInstance()
-                    .pathSegment("plugins", pluginName, "assets", "console", "main.js")
+                    .pathSegment("plugins", pluginName, "assets", bundleLocation, BundleResourceUtils.JS_BUNDLE)
                     .queryParam("version", pluginVersion)
                     .build(true)
                     .toString();
             status.setEntry(entry);
         }
-        if (cssRes.exists()) {
+        if (cssRes != null && cssRes.exists()) {
             var stylesheet = UriComponentsBuilder.newInstance()
-                    .pathSegment("plugins", pluginName, "assets", "console", "style.css")
+                    .pathSegment("plugins", pluginName, "assets", bundleLocation, BundleResourceUtils.CSS_BUNDLE)
                     .queryParam("version", pluginVersion)
                     .build(true)
                     .toString();

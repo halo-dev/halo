@@ -15,11 +15,20 @@
 
 
 /**
- * Contributor from user.
+ * User summary for a content owner or contributor.
  */
 export interface Contributor {
+    /**
+     * User avatar URL.
+     */
     'avatar'?: string;
+    /**
+     * User display name.
+     */
     'displayName'?: string;
+    /**
+     * User metadata name.
+     */
     'name'?: string;
 }
 

@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { UserConnectionSpec } from './user-connection-spec';
 
 /**
- * User connection extension.
+ * User connection extension that links a Halo user to an external OAuth2 account.
  */
 export interface UserConnection {
     'apiVersion': string;

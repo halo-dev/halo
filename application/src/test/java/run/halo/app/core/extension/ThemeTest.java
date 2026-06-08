@@ -74,6 +74,22 @@ class ThemeTest {
     }
 
     @Test
+    void themeStatusScreenshot() throws JSONException {
+        Theme theme = new Theme();
+        Theme.ThemeStatus status = new Theme.ThemeStatus();
+        status.setScreenshot("/themes/test-theme/screenshot.png");
+        theme.setStatus(status);
+
+        JSONAssert.assertEquals("""
+                {
+                    "status": {
+                        "screenshot": "/themes/test-theme/screenshot.png"
+                    }
+                }
+                """, JsonUtils.objectToJson(theme), false);
+    }
+
+    @Test
     void themeCustomTemplate() throws JSONException {
         String themeYaml = """
             apiVersion: theme.halo.run/v1alpha1

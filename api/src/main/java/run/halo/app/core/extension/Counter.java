@@ -7,7 +7,7 @@ import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
 
 /**
- * A counter for number of requests by extension resource name.
+ * Counter extension that stores aggregate interaction counts for a resource.
  *
  * @author guqing
  * @since 2.0.0
@@ -17,14 +17,19 @@ import run.halo.app.extension.Metadata;
 @EqualsAndHashCode(callSuper = true)
 public class Counter extends AbstractExtension {
 
+    /** Number of visits recorded for the resource. */
     private Integer visit;
 
+    /** Number of upvotes recorded for the resource. */
     private Integer upvote;
 
+    /** Number of downvotes recorded for the resource. */
     private Integer downvote;
 
+    /** Total number of comments recorded for the resource. */
     private Integer totalComment;
 
+    /** Number of approved comments recorded for the resource. */
     private Integer approvedComment;
 
     public static Counter emptyCounter(String name) {

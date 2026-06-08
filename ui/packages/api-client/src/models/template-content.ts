@@ -14,9 +14,21 @@
 
 
 
+/**
+ * Notification template content.
+ */
 export interface TemplateContent {
+    /**
+     * HTML body rendered for notification channels that support HTML.
+     */
     'htmlBody'?: string;
+    /**
+     * Plain text or source body rendered for notification channels that do not use HTML.
+     */
     'rawBody'?: string;
+    /**
+     * Rendered notification title.
+     */
     'title': string;
 }
 

@@ -28,7 +28,7 @@ export const NotifierV1alpha1UcApiAxiosParamCreator = function (configuration?: 
     return {
         /**
          * Fetch receiver config of notifier
-         * @param {string} name Notifier name
+         * @param {string} name Notifier metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -69,7 +69,7 @@ export const NotifierV1alpha1UcApiAxiosParamCreator = function (configuration?: 
         },
         /**
          * Save receiver config of notifier
-         * @param {string} name Notifier name
+         * @param {string} name Notifier metadata.name
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -125,7 +125,7 @@ export const NotifierV1alpha1UcApiFp = function(configuration?: Configuration) {
     return {
         /**
          * Fetch receiver config of notifier
-         * @param {string} name Notifier name
+         * @param {string} name Notifier metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -137,7 +137,7 @@ export const NotifierV1alpha1UcApiFp = function(configuration?: Configuration) {
         },
         /**
          * Save receiver config of notifier
-         * @param {string} name Notifier name
+         * @param {string} name Notifier metadata.name
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -183,7 +183,7 @@ export const NotifierV1alpha1UcApiFactory = function (configuration?: Configurat
  */
 export interface NotifierV1alpha1UcApiFetchReceiverConfigRequest {
     /**
-     * Notifier name
+     * Notifier metadata.name
      */
     readonly name: string
 }
@@ -193,7 +193,7 @@ export interface NotifierV1alpha1UcApiFetchReceiverConfigRequest {
  */
 export interface NotifierV1alpha1UcApiSaveReceiverConfigRequest {
     /**
-     * Notifier name
+     * Notifier metadata.name
      */
     readonly name: string
 

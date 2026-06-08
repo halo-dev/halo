@@ -14,11 +14,29 @@
 
 
 
+/**
+ * Desired plugin-provided extension implementation metadata.
+ */
 export interface ExtensionSpec {
+    /**
+     * Fully qualified Java class name of the implementation.
+     */
     'className': string;
+    /**
+     * Human-readable description of what this implementation does.
+     */
     'description'?: string;
+    /**
+     * Display name shown for the implementation.
+     */
     'displayName': string;
+    /**
+     * ExtensionPointDefinition metadata.name this implementation contributes to.
+     */
     'extensionPointName': string;
+    /**
+     * Icon URL, class, or identifier shown for the implementation.
+     */
     'icon'?: string;
 }
 

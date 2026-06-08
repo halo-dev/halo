@@ -29,6 +29,9 @@ const props = defineProps({
 });
 
 const currentValue = computed(() => props.context._value);
+const descriptionPreset = computed(
+  () => props.context.descriptionPreset as string | undefined
+);
 const requiredKeys = computed(
   () => props.context.requiredKeys as RequiredKey[]
 );
@@ -204,6 +207,7 @@ const missingKeys = computed(() => {
 
   <SecretCreationModal
     v-if="creationModalVisible"
+    :description-preset="descriptionPreset"
     :required-keys="requiredKeys"
     @close="creationModalVisible = false"
     @created="onCreated"
@@ -219,6 +223,7 @@ const missingKeys = computed(() => {
   <SecretListModal
     v-if="listModalVisible"
     :selected-secret-name="currentValue"
+    :description-preset="descriptionPreset"
     :required-keys="requiredKeys"
     @select="onSelect"
     @close="onListModalClose"

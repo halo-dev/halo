@@ -17,6 +17,9 @@
 // @ts-ignore
 import type { FileReverseProxyProvider } from './file-reverse-proxy-provider';
 
+/**
+ * A path mapping from a public request path to a file provider.
+ */
 export interface ReverseProxyRule {
     'file'?: FileReverseProxyProvider;
     'path'?: string;

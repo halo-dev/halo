@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -61,7 +60,6 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ThemeEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
@@ -77,6 +75,23 @@ public class ThemeEndpoint implements CustomEndpoint {
     private final ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 
     private final SettingConfigService settingConfigService;
+
+    public ThemeEndpoint(
+            ReactiveExtensionClient client,
+            ThemeRootGetter themeRoot,
+            ThemeService themeService,
+            TemplateEngineManager templateEngineManager,
+            SystemConfigFetcher systemEnvironmentFetcher,
+            ReactiveUrlDataBufferFetcher urlDataBufferFetcher,
+            SettingConfigService settingConfigService) {
+        this.client = client;
+        this.themeRoot = themeRoot;
+        this.themeService = themeService;
+        this.templateEngineManager = templateEngineManager;
+        this.systemEnvironmentFetcher = systemEnvironmentFetcher;
+        this.urlDataBufferFetcher = urlDataBufferFetcher;
+        this.settingConfigService = settingConfigService;
+    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -116,6 +131,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
+                                        .description("metadata.name of the theme to upgrade.")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
@@ -132,12 +148,14 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
+                                        .description("metadata.name of the theme to upgrade.")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)
                                         .content(contentBuilder()
                                                 .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                                 .schema(schemaBuilder().implementation(UpgradeRequest.class))))
+                                .response(responseBuilder().implementation(Theme.class))
                                 .build())
                 .PUT(
                         "themes/{name}/reload",
@@ -147,6 +165,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme to reload.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -159,6 +178,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme whose setting config will be reset.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -171,6 +191,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme whose JSON config will be updated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -186,10 +207,11 @@ public class ThemeEndpoint implements CustomEndpoint {
                         "themes/{name}/activation",
                         this::activateTheme,
                         builder -> builder.operationId("activateTheme")
-                                .description("Activate a theme by name.")
+                                .description("Activate a theme by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme to activate.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -202,6 +224,8 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme whose template cache will be "
+                                                + "invalidated.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -228,6 +252,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme whose setting will be fetched.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -240,6 +265,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .name("name")
+                                        .description("metadata.name of the theme whose JSON config will be fetched.")
                                         .in(ParameterIn.PATH)
                                         .required(true)
                                         .implementation(String.class))
@@ -392,12 +418,20 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
     }
 
+    /** Multipart payload for upgrading a theme. */
+    @Schema(types = "object")
     public interface IUpgradeRequest {
 
-        @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
+        /** Theme zip file. */
+        @Schema(requiredMode = REQUIRED)
         FilePart getFile();
     }
 
+    /**
+     * Payload for upgrading a theme from a remote URI.
+     *
+     * @param uri remote URI of the theme ZIP file
+     */
     public record UpgradeFromUriRequest(
             @Schema(requiredMode = REQUIRED) URI uri) {}
 
@@ -475,6 +509,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .bodyValue(theme));
     }
 
+    /** Multipart payload for installing a theme. */
     @Schema(name = "ThemeInstallRequest", types = "object")
     public static class InstallRequest {
 
@@ -485,7 +520,8 @@ public class ThemeEndpoint implements CustomEndpoint {
             this.multipartData = multipartData;
         }
 
-        @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
+        /** Theme zip file. */
+        @Schema(requiredMode = REQUIRED)
         FilePart getFile() {
             Part part = multipartData.getFirst("file");
             if (!(part instanceof FilePart file)) {
@@ -498,6 +534,11 @@ public class ThemeEndpoint implements CustomEndpoint {
         }
     }
 
+    /**
+     * Payload for installing a theme from a remote URI.
+     *
+     * @param uri remote URI of the theme ZIP file
+     */
     public record InstallFromUriRequest(
             @Schema(requiredMode = REQUIRED) URI uri) {}
 

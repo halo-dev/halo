@@ -20,28 +20,55 @@ import type { ConfigMapRef } from './config-map-ref';
 // @ts-ignore
 import type { SettingRef } from './setting-ref';
 
+/**
+ * Authentication provider metadata and endpoint configuration.
+ */
 export interface AuthProviderSpec {
     /**
      * Auth type: form or oauth2.
      */
     'authType': AuthProviderSpecAuthTypeEnum;
     /**
-     * Authentication url of the auth provider
+     * URL that starts the authentication flow.
      */
     'authenticationUrl': string;
+    /**
+     * URL that starts account binding for an already signed-in user.
+     */
     'bindingUrl'?: string;
     'configMapRef'?: ConfigMapRef;
+    /**
+     * Human-readable description of the provider.
+     */
     'description'?: string;
     /**
-     * Display name of the auth provider
+     * Display name shown on sign-in and account binding screens.
      */
     'displayName': string;
+    /**
+     * Help page URL for users who need sign-in assistance.
+     */
     'helpPage'?: string;
+    /**
+     * Logo URL or attachment URI for the provider.
+     */
     'logo'?: string;
+    /**
+     * HTTP method used when starting the authentication flow.
+     */
     'method'?: string;
+    /**
+     * Whether the provider supports remember-me during sign-in.
+     */
     'rememberMeSupport'?: boolean;
     'settingRef'?: SettingRef;
+    /**
+     * URL that unbinds the external account from the current user.
+     */
     'unbindUrl'?: string;
+    /**
+     * Provider website URL.
+     */
     'website'?: string;
 }
 

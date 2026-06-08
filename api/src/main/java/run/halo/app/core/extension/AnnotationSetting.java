@@ -12,6 +12,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupKind;
 
+/** Annotation setting extension that defines dynamic annotation forms for a target extension kind. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -21,14 +22,18 @@ public class AnnotationSetting extends AbstractExtension {
 
     public static final String KIND = "AnnotationSetting";
 
+    /** Desired target resource kind and annotation form schema. */
     @Schema(requiredMode = REQUIRED)
     private AnnotationSettingSpec spec;
 
+    /** Desired annotation form configuration for a target resource kind. */
     @Data
     public static class AnnotationSettingSpec {
+        /** Target extension group and kind this annotation setting applies to. */
         @Schema(requiredMode = REQUIRED)
         private GroupKind targetRef;
 
+        /** FormKit-compatible schema used to render annotation fields. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private List<Object> formSchema;
     }

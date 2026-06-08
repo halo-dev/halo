@@ -142,12 +142,12 @@ tasks.named('jacocoTestReport', JacocoReport) {
 
 tasks.register('downloadPluginPresets', Download) {
     def presetPluginUrls = [
-        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.1.1/plugin-comment-widget-3.1.1.jar'               : 'plugin-comment-widget.jar',
+        'https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.1.2/plugin-comment-widget-3.1.2.jar'               : 'plugin-comment-widget.jar',
         'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.1/plugin-search-widget-1.7.1.jar'                 : 'plugin-search-widget.jar',
         'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.3.0/plugin-sitemap-1.3.0.jar'                             : 'plugin-sitemap.jar',
         'https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar'                                   : 'plugin-feed.jar',
-        'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.3.0/plugin-shiki-1.3.0.jar'                                : 'plugin-shiki.jar',
-        'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.8.1/plugin-editor-hyperlink-card-1.8.1.jar': 'plugin-editor-hyperlink-card.jar',
+        'https://github.com/halo-sigs/plugin-shiki/releases/download/v1.3.2/plugin-shiki-1.3.2.jar'                                : 'plugin-shiki.jar',
+        'https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.9.1/plugin-editor-hyperlink-card-1.9.1.jar': 'plugin-editor-hyperlink-card.jar',
 
         // Currently, plugin-app-store is not open source, so we need to download it from the official website.
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
@@ -261,5 +261,11 @@ spotless {
     sql {
         target 'src/**/*.sql'
         dbeaver()
+    }
+    format 'webResources', {
+        target 'src/main/resources/templates/**/*.html',
+            'src/main/resources/static/styles/**/*.css',
+            'src/main/resources/static/js/**/*.js'
+        prettier().config(['tabWidth': 2, 'printWidth': 120])
     }
 }

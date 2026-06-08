@@ -24,7 +24,7 @@ import type { UserSpec } from './user-spec';
 import type { UserStatus } from './user-status';
 
 /**
- * The extension represents user details of Halo.
+ * User extension that stores profile, authentication, and account state for a Halo user.
  */
 export interface User {
     'apiVersion': string;

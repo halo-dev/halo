@@ -17,9 +17,21 @@
 // @ts-ignore
 import type { NotifierSettingRef } from './notifier-setting-ref';
 
+/**
+ * Desired notifier descriptor metadata and configuration references.
+ */
 export interface NotifierDescriptorSpec {
+    /**
+     * Human-readable description of what the notifier sends.
+     */
     'description'?: string;
+    /**
+     * Display name shown for the notifier.
+     */
     'displayName': string;
+    /**
+     * Extension name of the notifier implementation.
+     */
     'notifierExtName': string;
     'receiverSettingRef'?: NotifierSettingRef;
     'senderSettingRef'?: NotifierSettingRef;

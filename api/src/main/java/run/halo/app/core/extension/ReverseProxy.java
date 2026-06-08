@@ -23,9 +23,12 @@ import run.halo.app.extension.GVK;
         plural = "reverseproxies",
         singular = "reverseproxy")
 public class ReverseProxy extends AbstractExtension {
+    /** Path mapping rules served by this reverse proxy resource. */
     private List<ReverseProxyRule> rules;
 
+    /** A path mapping from a public request path to a file provider. */
     public record ReverseProxyRule(String path, FileReverseProxyProvider file) {}
 
+    /** File provider that resolves a request to a plugin or theme file location. */
     public record FileReverseProxyProvider(String directory, String filename) {}
 }

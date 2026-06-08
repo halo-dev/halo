@@ -24,9 +24,12 @@ import type { SinglePage } from './single-page';
 import type { Stats } from './stats';
 
 /**
- * A chunk of items.
+ * Single page list item with resolved contributors, owner, and counters.
  */
 export interface ListedSinglePage {
+    /**
+     * Users that have contributed to the single page content snapshots.
+     */
     'contributors': Array<Contributor>;
     'owner': Contributor;
     'page': SinglePage;

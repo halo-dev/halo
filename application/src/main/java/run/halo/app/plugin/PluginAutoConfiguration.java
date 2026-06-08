@@ -1,6 +1,8 @@
 package run.halo.app.plugin;
 
-import static run.halo.app.plugin.resources.BundleResourceUtils.getJsBundleResource;
+import static run.halo.app.plugin.resources.BundleResourceUtils.CONSOLE_BUNDLE_LOCATION;
+import static run.halo.app.plugin.resources.BundleResourceUtils.UI_BUNDLE_LOCATION;
+import static run.halo.app.plugin.resources.BundleResourceUtils.getBundleResource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,10 +16,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemVersionSupplier;
@@ -57,30 +61,44 @@ public class PluginAutoConfiguration {
             PluginManager pluginManager, WebProperties webProperties) {
         var cacheProperties = webProperties.getResources().getCache();
         return RouterFunctions.route()
-                .GET("/plugins/{name}/assets/console/{*resource}", request -> {
-                    String pluginName = request.pathVariable("name");
-                    String fileName = request.pathVariable("resource");
-
-                    var jsBundle = getJsBundleResource(pluginManager, pluginName, fileName);
-                    if (jsBundle == null || !jsBundle.exists()) {
-                        return ServerResponse.notFound().build();
-                    }
-                    var useLastModified = cacheProperties.isUseLastModified();
-                    var bodyBuilder = ServerResponse.ok()
-                            .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
-                    try {
-                        if (useLastModified) {
-                            var lastModified = Instant.ofEpochMilli(jsBundle.lastModified());
-                            return request.checkNotModified(lastModified)
-                                    .switchIfEmpty(Mono.defer(() -> bodyBuilder
-                                            .lastModified(lastModified)
-                                            .body(BodyInserters.fromResource(jsBundle))));
-                        }
-                        return bodyBuilder.body(BodyInserters.fromResource(jsBundle));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .GET(
+                        "/plugins/{name}/assets/ui/{*resource}",
+                        request -> getResourceResponse(pluginManager, cacheProperties, UI_BUNDLE_LOCATION, request))
+                .GET(
+                        "/plugins/{name}/assets/console/{*resource}",
+                        request ->
+                                getResourceResponse(pluginManager, cacheProperties, CONSOLE_BUNDLE_LOCATION, request))
                 .build();
+    }
+
+    private Mono<ServerResponse> getResourceResponse(
+            PluginManager pluginManager,
+            WebProperties.Resources.Cache cacheProperties,
+            String bundleLocation,
+            ServerRequest request) {
+        String pluginName = request.pathVariable("name");
+        String fileName = request.pathVariable("resource");
+
+        var resource = getBundleResource(pluginManager, pluginName, bundleLocation, fileName);
+        if (resource == null || !resource.exists()) {
+            return ServerResponse.notFound().build();
+        }
+        var useLastModified = cacheProperties.isUseLastModified();
+        var cacheControl = cacheProperties.getCachecontrol().toHttpCacheControl();
+        if (cacheControl == null) {
+            cacheControl = CacheControl.empty();
+        }
+        var bodyBuilder = ServerResponse.ok().cacheControl(cacheControl);
+        try {
+            if (useLastModified) {
+                var lastModified = Instant.ofEpochMilli(resource.lastModified());
+                return request.checkNotModified(lastModified)
+                        .switchIfEmpty(Mono.defer(() ->
+                                bodyBuilder.lastModified(lastModified).body(BodyInserters.fromResource(resource))));
+            }
+            return bodyBuilder.body(BodyInserters.fromResource(resource));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

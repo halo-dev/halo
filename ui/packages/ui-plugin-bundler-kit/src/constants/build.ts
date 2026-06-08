@@ -1,4 +1,15 @@
 const DEFAULT_OUT_DIR_DEV = "../build/resources/main/console";
+const DEFAULT_OUT_DIR_DEV_BASE = "../build/resources/main";
 const DEFAULT_OUT_DIR_PROD = "./build/dist";
+const DEFAULT_THEME_OUT_DIR = "dist";
 
-export { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD };
+function getDefaultOutDirDev(bundleLocation: string) {
+  return `${DEFAULT_OUT_DIR_DEV_BASE}/${bundleLocation}`;
+}
+
+export {
+  DEFAULT_OUT_DIR_DEV,
+  DEFAULT_OUT_DIR_PROD,
+  DEFAULT_THEME_OUT_DIR,
+  getDefaultOutDirDev,
+};

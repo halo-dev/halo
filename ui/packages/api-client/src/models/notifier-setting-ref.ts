@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Reference to a notifier setting form group.
+ */
 export interface NotifierSettingRef {
+    /**
+     * Setting form group name.
+     */
     'group': string;
+    /**
+     * Setting metadata.name.
+     */
     'name': string;
 }
 

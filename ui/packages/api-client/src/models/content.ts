@@ -14,9 +14,21 @@
 
 
 
+/**
+ * Full content payload reconstructed from a content snapshot.
+ */
 export interface Content {
+    /**
+     * Rendered HTML or normalized content derived from raw.
+     */
     'content': string;
+    /**
+     * Source text stored by the editor.
+     */
     'raw': string;
+    /**
+     * Editor/source format of the raw content, for example HTML or Markdown.
+     */
     'rawType': string;
 }
 

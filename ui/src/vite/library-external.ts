@@ -87,6 +87,11 @@ export const setupLibraryExternal = (command?: string) => {
       dest: "ui-shared",
       rename: `ui-shared.[hash].js`,
     },
+    {
+      src: "./node_modules/@formkit/vue/dist/index.iife.js",
+      dest: "formkit-vue",
+      rename: `formkit-vue.[hash].js`,
+    },
     // TODO: Remove this in the future, only for compatibility.
     {
       src: "./node_modules/@halo-dev/console-shared/index.js",

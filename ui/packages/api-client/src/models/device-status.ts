@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Parsed browser and operating system details for display.
+ */
 export interface DeviceStatus {
+    /**
+     * Browser name parsed from the user agent.
+     */
     'browser'?: string;
+    /**
+     * Operating system name parsed from the user agent.
+     */
     'os'?: string;
 }
 

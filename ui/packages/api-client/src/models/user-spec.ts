@@ -14,18 +14,57 @@
 
 
 
+/**
+ * Desired user profile and authentication settings.
+ */
 export interface UserSpec {
+    /**
+     * Avatar URL or attachment URI for the user.
+     */
     'avatar'?: string;
+    /**
+     * User biography shown on profile surfaces.
+     */
     'bio'?: string;
+    /**
+     * Whether the user account is disabled.
+     */
     'disabled'?: boolean;
+    /**
+     * Display name shown for the user.
+     */
     'displayName': string;
+    /**
+     * Email address used for sign-in and notifications.
+     */
     'email': string;
+    /**
+     * Whether the email address has been verified.
+     */
     'emailVerified'?: boolean;
+    /**
+     * Maximum number of login history entries retained for this user.
+     */
     'loginHistoryLimit'?: number;
+    /**
+     * Password hash or encoded password value.
+     */
     'password'?: string;
+    /**
+     * Phone number associated with the user.
+     */
     'phone'?: string;
+    /**
+     * Time when the user registered.
+     */
     'registeredAt'?: string;
+    /**
+     * Encrypted TOTP secret used for two-factor authentication.
+     */
     'totpEncryptedSecret'?: string;
+    /**
+     * Whether two-factor authentication is enabled for this user.
+     */
     'twoFactorAuthEnabled'?: boolean;
 }
 

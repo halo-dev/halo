@@ -17,10 +17,38 @@
 // @ts-ignore
 import type { Condition } from './condition';
 
+/**
+ * Observed theme lifecycle and installation state.
+ */
 export interface ThemeStatus {
+    /**
+     * Reconciliation conditions for the theme.
+     */
     'conditions'?: Array<Condition>;
+    /**
+     * Resolved Console/User Center UI JavaScript entry URL served from the theme root.
+     */
+    'entry'?: string;
+    /**
+     * Whether the theme appears to be a local development workspace.
+     */
+    'inDevelopment'?: boolean;
+    /**
+     * Local filesystem location where the theme is loaded from.
+     */
     'location'?: string;
+    /**
+     * Current theme lifecycle phase.
+     */
     'phase'?: ThemeStatusPhaseEnum;
+    /**
+     * Resolved preview screenshot URL served from the theme root.
+     */
+    'screenshot'?: string;
+    /**
+     * Resolved Console/User Center UI stylesheet URL served from the theme root.
+     */
+    'stylesheet'?: string;
 }
 
 export const ThemeStatusPhaseEnum = {

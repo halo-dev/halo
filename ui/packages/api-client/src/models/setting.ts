@@ -21,7 +21,7 @@ import type { Metadata } from './metadata';
 import type { SettingSpec } from './setting-spec';
 
 /**
- * {@link Setting Setting} is a custom extension to generate forms based on configuration.
+ * Setting extension that describes one or more configuration forms and their schema.
  */
 export interface Setting {
     'apiVersion': string;

@@ -10,8 +10,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
- * {@link Notification} is a custom extension that used to store notification information for inner use, it's on-site
- * notification.
+ * Notification extension that stores an on-site notification delivered to a Halo user.
  *
  * <p>Supports the following operations:
  *
@@ -36,28 +35,37 @@ import run.halo.app.extension.GVK;
         singular = "notification")
 public class Notification extends AbstractExtension {
 
+    /** Desired notification recipient, content, and read state. */
     @Schema
     private NotificationSpec spec;
 
+    /** Notification content and read state for one recipient. */
     @Data
     public static class NotificationSpec {
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "The name of user")
+        /** User metadata.name that receives the notification. */
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String recipient;
 
-        @Schema(requiredMode = REQUIRED, minLength = 1, description = "The name of reason")
+        /** Reason metadata.name that generated this notification. */
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String reason;
 
+        /** Notification title shown in the notification center. */
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String title;
 
+        /** Plain text or source notification content. */
         @Schema(requiredMode = REQUIRED)
         private String rawContent;
 
+        /** HTML notification content. */
         @Schema(requiredMode = REQUIRED)
         private String htmlContent;
 
+        /** Whether the recipient has not read the notification yet. */
         private boolean unread;
 
+        /** Last time the recipient marked this notification as read. */
         private Instant lastReadAt;
     }
 }

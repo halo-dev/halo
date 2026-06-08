@@ -24,7 +24,7 @@ import type { PluginSpec } from './plugin-spec';
 import type { PluginStatus } from './plugin-status';
 
 /**
- * A custom resource for Plugin.
+ * Plugin extension that describes an installed plugin and its runtime lifecycle state.
  */
 export interface Plugin {
     'apiVersion': string;

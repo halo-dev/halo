@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Reference to a setting definition used by this provider.
+ */
 export interface SettingRef {
+    /**
+     * Setting form group name.
+     */
     'group': string;
+    /**
+     * Setting metadata.name.
+     */
     'name': string;
 }
 

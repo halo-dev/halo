@@ -14,13 +14,16 @@
 
 
 
+/**
+ * Observed attachment group aggregate state.
+ */
 export interface GroupStatus {
     /**
-     * Total of attachments under the current group
+     * Total number of attachments under the group.
      */
     'totalAttachments'?: number;
     /**
-     * Update timestamp of the group
+     * Last time the group aggregate state was updated.
      */
     'updateTimestamp'?: string;
 }
