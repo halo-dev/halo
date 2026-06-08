@@ -81,9 +81,10 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
         var pluginBundles = Flux.fromIterable(startedPlugins)
                 .sort(Comparator.comparing(PluginWrapper::getPluginId))
                 .flatMapSequential(plugin -> readPluginBundle(plugin, BundleResourceUtils.JS_BUNDLE, true));
-        var themeBundle = fetchActivatedThemeBundle(ThemeUiResources.JS_BUNDLE)
-                .flatMapMany(bundle -> readThemeBundle(bundle, true));
-        var enabledUiPlugins = fetchActivatedThemeBundle(ThemeUiResources.JS_BUNDLE)
+        var activatedThemeBundle =
+                fetchActivatedThemeBundle(ThemeUiResources.JS_BUNDLE).cache();
+        var themeBundle = activatedThemeBundle.flatMapMany(bundle -> readThemeBundle(bundle, true));
+        var enabledUiPlugins = activatedThemeBundle
                 .map(ThemeBundle::theme)
                 .map(theme -> enabledUiPluginsScript(startedPlugins, theme))
                 .defaultIfEmpty(enabledUiPluginsScript(startedPlugins, null))

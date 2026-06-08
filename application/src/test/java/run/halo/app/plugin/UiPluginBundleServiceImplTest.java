@@ -86,6 +86,32 @@ class UiPluginBundleServiceImplTest {
     }
 
     @Test
+    void shouldResolveActivatedThemeOnceForJsBundle() throws IOException {
+        var plugin = mockStartedPlugin("fake-plugin", "plugin-for-ui-assets");
+        when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
+        var activeTheme = prepareActiveTheme("active", "1.0.0");
+        var anotherTheme = prepareActiveTheme("another", "2.0.0");
+        when(themeService.fetchActivatedTheme()).thenReturn(Mono.just(activeTheme), Mono.just(anotherTheme));
+        writeThemeUiFile("active", "main.js", "console.log(\"active\");");
+        writeThemeUiFile("another", "main.js", "console.log(\"another\");");
+
+        toString(uiPluginBundleService.uglifyJsBundle())
+                .as(StepVerifier::create)
+                .assertNext(content -> assertThat(content)
+                        .contains("// Generated from theme active")
+                        .contains("console.log(\"active\");")
+                        .contains("""
+                            {"name":"theme:active","type":"theme","themeName":"active","version":"1.0.0"}\
+                            """)
+                        .doesNotContain("// Generated from theme another")
+                        .doesNotContain("console.log(\"another\");")
+                        .doesNotContain("theme:another"))
+                .verifyComplete();
+
+        verify(themeService).fetchActivatedTheme();
+    }
+
+    @Test
     void shouldAggregateStartedPluginsAndActivatedThemeCssBundles() throws IOException {
         var plugin = mockStartedPlugin("fake-plugin", "plugin-for-ui-assets");
         when(pluginManager.startedPlugins()).thenReturn(List.of(plugin));
