@@ -88,7 +88,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             };
         },
         /**
-         * Merge all CSS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin CSS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -125,7 +125,7 @@ export const PluginV1alpha1ConsoleApiAxiosParamCreator = function (configuration
             };
         },
         /**
-         * Merge all JS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin JS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -673,7 +673,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Merge all CSS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin CSS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -684,7 +684,7 @@ export const PluginV1alpha1ConsoleApiFp = function(configuration?: Configuration
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Merge all JS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin JS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -846,7 +846,7 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
             return localVarFp.changePluginRunningState(requestParameters.name, requestParameters.pluginRunningStateRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Merge all CSS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin CSS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -854,7 +854,7 @@ export const PluginV1alpha1ConsoleApiFactory = function (configuration?: Configu
             return localVarFp.fetchCssBundle(options).then((request) => request(axios, basePath));
         },
         /**
-         * Merge all JS bundles of enabled plugins into one.
+         * Compatibility alias for the UI plugin JS bundle.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1137,7 +1137,7 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Merge all CSS bundles of enabled plugins into one.
+     * Compatibility alias for the UI plugin CSS bundle.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -1146,7 +1146,7 @@ export class PluginV1alpha1ConsoleApi extends BaseAPI {
     }
 
     /**
-     * Merge all JS bundles of enabled plugins into one.
+     * Compatibility alias for the UI plugin JS bundle.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */

@@ -9,8 +9,24 @@ import { loadStyle } from "@/utils/load-style";
 
 export type Platform = "console" | "uc";
 
+type EnabledPlugin = {
+  name: string;
+  type: "plugin";
+  version: string;
+};
+
+type EnabledTheme = {
+  name: string;
+  type: "theme";
+  themeName: string;
+  version: string;
+};
+
+type EnabledUiPlugin = EnabledPlugin | EnabledTheme;
+
 export interface LoadedPluginModule {
   name: string;
+  type: EnabledUiPlugin["type"];
   module: PluginModule;
 }
 
@@ -37,28 +53,26 @@ export function setupCoreModules({
   }
 }
 
-export async function loadEnabledPluginModules(): Promise<
+export async function loadEnabledUiPluginModules(): Promise<
   LoadedPluginModule[]
 > {
-  await loadPluginBundle();
+  await loadUiPluginBundle();
 
-  const enabledPlugins = window["enabledPlugins"] as {
-    name: string;
-    value: string;
-  }[];
+  const enabledUiPlugins = window["enabledUiPlugins"] as EnabledUiPlugin[];
 
-  return (enabledPlugins || [])
-    .map((plugin) => {
-      const module = window[plugin.name] as PluginModule | undefined;
+  return (enabledUiPlugins || [])
+    .map((uiPlugin) => {
+      const module = window[uiPlugin.name] as PluginModule | undefined;
       if (!module) {
         return;
       }
       return {
-        name: plugin.name,
+        name: uiPlugin.name,
+        type: uiPlugin.type,
         module,
       };
     })
-    .filter((plugin): plugin is LoadedPluginModule => !!plugin);
+    .filter((uiPlugin): uiPlugin is LoadedPluginModule => !!uiPlugin);
 }
 
 export function setupPluginModules({
@@ -85,7 +99,7 @@ export function setupPluginModules({
 }
 
 export async function setupPluginStyles() {
-  await loadPluginStyles();
+  await loadUiPluginStyles();
 }
 
 export function notifyPluginLoadError(error: unknown) {
@@ -98,16 +112,16 @@ export function notifyPluginLoadError(error: unknown) {
   Toast.error(message);
 }
 
-async function loadPluginBundle() {
+async function loadUiPluginBundle() {
   const { load } = useScriptTag(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?t=${Date.now()}`
   );
   await load();
 }
 
-async function loadPluginStyles() {
+async function loadUiPluginStyles() {
   await loadStyle(
-    `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?t=${Date.now()}`
+    `/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css?t=${Date.now()}`
   );
 }
 

@@ -74,6 +74,7 @@ api/theme-v1alpha1-api.ts
 api/theme-v1alpha1-console-api.ts
 api/thumbnail-v1alpha1-public-api.ts
 api/two-factor-auth-v1alpha1-uc-api.ts
+api/ui-plugin-v1alpha1-console-api.ts
 api/user-connection-v1alpha1-api.ts
 api/user-connection-v1alpha1-uc-api.ts
 api/user-preference-v1alpha1-uc-api.ts

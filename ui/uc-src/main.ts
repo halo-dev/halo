@@ -13,7 +13,7 @@ import {
   type SetupComponentsOptions,
 } from "@/setup/setupComponents";
 import {
-  loadEnabledPluginModules,
+  loadEnabledUiPluginModules,
   notifyPluginLoadError,
   setupCoreModules,
   setupPluginModules,
@@ -47,7 +47,7 @@ await initApp();
 async function initApp() {
   let pluginBundleLoaded = false;
   let pluginModulesInitialized = false;
-  let pluginModules: LoadedPluginModule[] = [];
+  let uiPluginModules: LoadedPluginModule[] = [];
 
   try {
     setupCoreModules({ app, router, platform: "uc", modules });
@@ -68,7 +68,7 @@ async function initApp() {
     await setupUserPermissions(app);
 
     try {
-      pluginModules = await loadEnabledPluginModules();
+      uiPluginModules = await loadEnabledUiPluginModules();
       pluginBundleLoaded = true;
     } catch (e) {
       notifyPluginLoadError(e);
@@ -76,7 +76,7 @@ async function initApp() {
 
     setupAppComponents({
       formkitInputs: collectPluginFormKitInputs(
-        pluginModules,
+        uiPluginModules.filter((module) => module.type === "plugin"),
         builtinFormKitInputs
       ),
     });
@@ -86,7 +86,7 @@ async function initApp() {
         app,
         router,
         platform: "uc",
-        modules: pluginModules,
+        modules: uiPluginModules,
       });
       pluginModulesInitialized = true;
     } catch (e) {

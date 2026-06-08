@@ -54,6 +54,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.PluginService;
+import run.halo.app.plugin.UiPluginBundleService;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -67,6 +68,9 @@ class PluginEndpointTest {
 
     @Mock
     PluginService pluginService;
+
+    @Mock
+    UiPluginBundleService uiPluginBundleService;
 
     @Mock
     SettingConfigService settingConfigService;
@@ -360,7 +364,7 @@ class PluginEndpointTest {
 
         @Test
         void shouldBeRedirectedWhileFetchingBundleJsWithoutVersion() {
-            when(pluginService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
+            when(uiPluginBundleService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
             webClient
                     .get()
                     .uri("/plugins/-/bundle.js")
@@ -375,7 +379,7 @@ class PluginEndpointTest {
 
         @Test
         void shouldBeRedirectedWhileFetchingBundleCssWithoutVersion() {
-            when(pluginService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
+            when(uiPluginBundleService.generateBundleVersion()).thenReturn(Mono.just("fake-version"));
             webClient
                     .get()
                     .uri("/plugins/-/bundle.css")
@@ -396,7 +400,7 @@ class PluginEndpointTest {
             cachecontrol.setNoCache(true);
             endpoint.afterPropertiesSet();
 
-            when(pluginService.getCssBundle("fake-version"))
+            when(uiPluginBundleService.getCssBundle("fake-version"))
                     .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
             webClient
                     .get()
@@ -422,7 +426,7 @@ class PluginEndpointTest {
             cachecontrol.setNoStore(true);
             endpoint.afterPropertiesSet();
 
-            when(pluginService.getJsBundle("fake-version"))
+            when(uiPluginBundleService.getJsBundle("fake-version"))
                     .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
             webClient
                     .get()
@@ -442,7 +446,7 @@ class PluginEndpointTest {
 
         @Test
         void shouldFetchBundleCss() {
-            when(pluginService.getCssBundle("fake-version"))
+            when(uiPluginBundleService.getCssBundle("fake-version"))
                     .thenReturn(Mono.fromSupplier(() -> mockResource("fake-css")));
             webClient
                     .get()
@@ -462,7 +466,7 @@ class PluginEndpointTest {
 
         @Test
         void shouldFetchBundleJs() {
-            when(pluginService.getJsBundle("fake-version"))
+            when(uiPluginBundleService.getJsBundle("fake-version"))
                     .thenReturn(Mono.fromSupplier(() -> mockResource("fake-js")));
             webClient
                     .get()

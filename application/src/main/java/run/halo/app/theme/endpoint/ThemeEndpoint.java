@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.operation.Builder;
@@ -61,7 +60,6 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
 public class ThemeEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
@@ -77,6 +75,23 @@ public class ThemeEndpoint implements CustomEndpoint {
     private final ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 
     private final SettingConfigService settingConfigService;
+
+    public ThemeEndpoint(
+            ReactiveExtensionClient client,
+            ThemeRootGetter themeRoot,
+            ThemeService themeService,
+            TemplateEngineManager templateEngineManager,
+            SystemConfigFetcher systemEnvironmentFetcher,
+            ReactiveUrlDataBufferFetcher urlDataBufferFetcher,
+            SettingConfigService settingConfigService) {
+        this.client = client;
+        this.themeRoot = themeRoot;
+        this.themeService = themeService;
+        this.templateEngineManager = templateEngineManager;
+        this.systemEnvironmentFetcher = systemEnvironmentFetcher;
+        this.urlDataBufferFetcher = urlDataBufferFetcher;
+        this.settingConfigService = settingConfigService;
+    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {

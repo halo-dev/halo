@@ -2742,7 +2742,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css": {
       "get": {
-        "description": "Merge all CSS bundles of enabled plugins into one.",
+        "description": "Compatibility alias for the UI plugin CSS bundle.",
         "operationId": "fetchCssBundle",
         "responses": {
           "default": {
@@ -2763,7 +2763,7 @@
     },
     "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js": {
       "get": {
-        "description": "Merge all JS bundles of enabled plugins into one.",
+        "description": "Compatibility alias for the UI plugin JS bundle.",
         "operationId": "fetchJsBundle",
         "responses": {
           "default": {
@@ -4812,6 +4812,48 @@
         },
         "tags": [
           "ThemeV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.css": {
+      "get": {
+        "description": "Merge CSS bundles of enabled plugins and the activated theme into one.",
+        "operationId": "fetchUiPluginCssBundle",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js": {
+      "get": {
+        "description": "Merge JS bundles of enabled plugins and the activated theme into one.",
+        "operationId": "fetchUiPluginJsBundle",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "UiPluginV1alpha1Console"
         ]
       }
     },
@@ -23388,6 +23430,10 @@
               "$ref": "#/components/schemas/Condition"
             }
           },
+          "entry": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI JavaScript entry URL served from the theme root."
+          },
           "inDevelopment": {
             "type": "boolean",
             "description": "Whether the theme appears to be a local development workspace."
@@ -23408,6 +23454,10 @@
           "screenshot": {
             "type": "string",
             "description": "Resolved preview screenshot URL served from the theme root."
+          },
+          "stylesheet": {
+            "type": "string",
+            "description": "Resolved Console/User Center UI stylesheet URL served from the theme root."
           }
         },
         "description": "Observed theme lifecycle and installation state."

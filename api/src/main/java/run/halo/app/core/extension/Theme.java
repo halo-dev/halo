@@ -107,6 +107,12 @@ public class Theme extends AbstractExtension {
 
         /** Resolved preview screenshot URL served from the theme root. */
         private String screenshot;
+
+        /** Resolved Console/User Center UI JavaScript entry URL served from the theme root. */
+        private String entry;
+
+        /** Resolved Console/User Center UI stylesheet URL served from the theme root. */
+        private String stylesheet;
     }
 
     /**
