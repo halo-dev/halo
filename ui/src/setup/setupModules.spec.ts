@@ -4,7 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
-import { setupPluginModules } from "./setupModules";
+import {
+  loadEnabledPluginModules,
+  loadEnabledThemeModules,
+  notifyPluginLoadError,
+  setupPluginModules,
+  setupPluginStyles,
+} from "./setupModules";
 
 const mocks = vi.hoisted(() => ({
   loadStyle: vi.fn(),
@@ -87,7 +93,16 @@ describe("setupPluginModules", () => {
       removeRoute: vi.fn(),
     } as unknown as Router;
 
-    await setupPluginModules({ app, router, platform: "console" });
+    const pluginModules = await loadEnabledPluginModules();
+    const themeModules = await loadEnabledThemeModules();
+
+    setupPluginModules({
+      app,
+      router,
+      platform: "console",
+      modules: [...pluginModules, ...themeModules],
+    });
+    await setupPluginStyles();
 
     const store = usePluginModuleStore();
     expect(store.pluginModuleMap["plugin-one"]).toBe(pluginModule);
@@ -112,16 +127,9 @@ describe("setupPluginModules", () => {
     mocks.loadStyle
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error("style failed"));
-    const app = { component: vi.fn() } as unknown as App;
-    const router = {
-      getRoutes: vi.fn(() => []),
-      addRoute: vi.fn(),
-      removeRoute: vi.fn(),
-    } as unknown as Router;
 
-    await expect(
-      setupPluginModules({ app, router, platform: "console" })
-    ).resolves.toBeUndefined();
+    await expect(setupPluginStyles()).rejects.toThrow("style failed");
+    notifyPluginLoadError(new Error("style failed"));
 
     expect(mocks.toastError).toHaveBeenCalledWith(
       "core.plugin.loader.toast.style_load_failed"

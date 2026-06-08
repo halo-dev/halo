@@ -20,6 +20,13 @@ type EnabledTheme = {
   version: string;
 };
 
+export interface LoadedPluginModule {
+  name: string;
+  module: PluginModule;
+}
+
+export type LoadedThemeModule = LoadedPluginModule;
+
 export function setupCoreModules({
   app,
   router,
@@ -43,65 +50,82 @@ export function setupCoreModules({
   }
 }
 
-export async function setupPluginModules({
+export async function loadEnabledPluginModules(): Promise<
+  LoadedPluginModule[]
+> {
+  await loadPluginBundle();
+
+  const enabledPlugins = window["enabledPlugins"] as EnabledPlugin[];
+
+  return (enabledPlugins || [])
+    .map((plugin) => {
+      const module = window[plugin.name] as PluginModule | undefined;
+      if (!module) {
+        return;
+      }
+      return {
+        name: plugin.name,
+        module,
+      };
+    })
+    .filter((plugin): plugin is LoadedPluginModule => !!plugin);
+}
+
+export async function loadEnabledThemeModules(): Promise<LoadedThemeModule[]> {
+  await loadThemeBundle();
+
+  const enabledThemes = window["enabledThemes"] as EnabledTheme[];
+
+  return (enabledThemes || [])
+    .map((theme) => {
+      const module = window[theme.name] as PluginModule | undefined;
+      if (!module) {
+        return;
+      }
+      return {
+        name: theme.name,
+        module,
+      };
+    })
+    .filter((theme): theme is LoadedThemeModule => !!theme);
+}
+
+export function setupPluginModules({
   app,
   router,
   platform,
+  modules,
 }: {
   app: App;
   router: Router;
   platform: Platform;
+  modules: LoadedPluginModule[];
 }) {
-  try {
-    await loadPluginBundle();
-
-    const enabledPlugins = window["enabledPlugins"] as EnabledPlugin[];
-
-    for (const plugin of enabledPlugins || []) {
-      const module = window[plugin.name];
-      if (!module) {
-        continue;
-      }
-      initJsModule({
-        app,
-        router,
-        platform,
-        name: plugin.name,
-        jsModule: module,
-        core: false,
-      });
-    }
-
-    await loadThemeBundle();
-
-    const enabledThemes = window["enabledThemes"] as EnabledTheme[];
-
-    for (const theme of enabledThemes || []) {
-      const module = window[theme.name];
-      if (!module) {
-        continue;
-      }
-      initJsModule({
-        app,
-        router,
-        platform,
-        name: theme.name,
-        jsModule: module,
-        core: false,
-      });
-    }
-
-    await loadPluginStyles();
-    await loadThemeStyles();
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message.includes("style")
-        ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
-        : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
-
-    console.error(message, error);
-    Toast.error(message);
+  for (const plugin of modules) {
+    initJsModule({
+      app,
+      router,
+      platform,
+      name: plugin.name,
+      jsModule: plugin.module,
+      core: false,
+    });
   }
+}
+
+export async function setupPluginStyles() {
+  await loadPluginStyles();
+  await loadThemeStyles();
+}
+
+export function notifyPluginLoadError(error: unknown) {
+  const message =
+    error instanceof Error && error.message.includes("style")
+      ? i18n.global.t("core.plugin.loader.toast.style_load_failed")
+      : i18n.global.t("core.plugin.loader.toast.entry_load_failed");
+
+  console.error(message, error);
+  Toast.error(message);
 }
 
 async function loadPluginBundle() {
