@@ -289,7 +289,8 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
     }
 
     private Mono<Resource> getBundleResource(String pluginName, String bundleName) {
-        return Mono.fromSupplier(() -> BundleResourceUtils.getJsBundleResource(pluginManager, pluginName, bundleName))
+        return Mono.fromSupplier(
+                        () -> BundleResourceUtils.getSelectedBundleResource(pluginManager, pluginName, bundleName))
                 .filter(Resource::isReadable);
     }
 

@@ -1,9 +1,11 @@
 package run.halo.app.core.endpoint.console;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -107,15 +109,44 @@ public class TrackerEndpoint implements CustomEndpoint {
                 .then(ServerResponse.ok().build());
     }
 
-    public record VoteRequest(String group, String plural, String name) {}
+    /**
+     * Payload for voting on an extension resource.
+     *
+     * @param group API group of the extension resource
+     * @param plural plural name of the extension resource
+     * @param name extension resource {@code metadata.name}
+     */
+    public record VoteRequest(
+            @Schema(requiredMode = REQUIRED) String group,
 
+            @Schema(requiredMode = REQUIRED) String plural,
+
+            @Schema(requiredMode = REQUIRED) String name) {}
+
+    /**
+     * Payload for counting a visit to an extension resource.
+     *
+     * @param group API group of the extension resource
+     * @param plural plural name of the extension resource
+     * @param name extension resource {@code metadata.name}
+     * @param hostname visitor host name
+     * @param screen visitor screen size or display descriptor
+     * @param language visitor browser language
+     * @param referrer referrer URL of the visit
+     */
     public record CounterRequest(
             String group,
-            String plural,
-            String name,
+
+            @Schema(requiredMode = REQUIRED) String plural,
+
+            @Schema(requiredMode = REQUIRED) String name,
+
             String hostname,
+
             String screen,
+
             String language,
+
             String referrer) {
         /** Construct counter request. group and session uid can be empty. */
         public CounterRequest {

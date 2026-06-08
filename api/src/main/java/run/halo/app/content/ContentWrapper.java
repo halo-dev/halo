@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -7,15 +8,25 @@ import org.springframework.util.Assert;
 import run.halo.app.core.extension.content.Snapshot;
 
 /**
+ * Full content reconstructed from a content snapshot and its base snapshot.
+ *
  * @author guqing
  * @since 2.0.0
  */
+@Schema(description = "Full content reconstructed from a content snapshot and its base snapshot.")
 @Data
 @Builder
 public class ContentWrapper {
+    @Schema(description = "Name of the snapshot used to build this content.")
     private String snapshotName;
+
+    @Schema(description = "Source text stored by the editor.")
     private String raw;
+
+    @Schema(description = "Rendered HTML or normalized content derived from raw.")
     private String content;
+
+    @Schema(description = "Editor/source format of the raw content, for example HTML or Markdown.")
     private String rawType;
 
     public static ContentWrapper patchSnapshot(Snapshot patchSnapshot, Snapshot baseSnapshot) {

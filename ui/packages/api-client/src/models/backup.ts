@@ -23,6 +23,9 @@ import type { BackupStatus } from './backup-status';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Backup metadata and runtime state for an exported Halo data package.
+ */
 export interface Backup {
     'apiVersion': string;
     'kind': string;

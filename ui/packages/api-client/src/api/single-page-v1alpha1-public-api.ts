@@ -31,8 +31,8 @@ import type { SinglePageVo } from '../models';
 export const SinglePageV1alpha1PublicApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Gets single page by name
-         * @param {string} name SinglePage name
+         * Gets single page by metadata.name
+         * @param {string} name SinglePage metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -143,8 +143,8 @@ export const SinglePageV1alpha1PublicApiFp = function(configuration?: Configurat
     const localVarAxiosParamCreator = SinglePageV1alpha1PublicApiAxiosParamCreator(configuration)
     return {
         /**
-         * Gets single page by name
-         * @param {string} name SinglePage name
+         * Gets single page by metadata.name
+         * @param {string} name SinglePage metadata.name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -180,7 +180,7 @@ export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Conf
     const localVarFp = SinglePageV1alpha1PublicApiFp(configuration)
     return {
         /**
-         * Gets single page by name
+         * Gets single page by metadata.name
          * @param {SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -205,7 +205,7 @@ export const SinglePageV1alpha1PublicApiFactory = function (configuration?: Conf
  */
 export interface SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest {
     /**
-     * SinglePage name
+     * SinglePage metadata.name
      */
     readonly name: string
 }
@@ -245,7 +245,7 @@ export interface SinglePageV1alpha1PublicApiQuerySinglePagesRequest {
  */
 export class SinglePageV1alpha1PublicApi extends BaseAPI {
     /**
-     * Gets single page by name
+     * Gets single page by metadata.name
      * @param {SinglePageV1alpha1PublicApiQuerySinglePageByNameRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

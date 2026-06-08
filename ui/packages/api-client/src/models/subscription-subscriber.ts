@@ -15,9 +15,12 @@
 
 
 /**
- * The subscriber to be notified
+ * Subscriber that receives notifications.
  */
 export interface SubscriptionSubscriber {
+    /**
+     * User metadata.name of the subscriber.
+     */
     'name': string;
 }
 

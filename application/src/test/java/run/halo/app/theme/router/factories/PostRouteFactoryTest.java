@@ -28,7 +28,6 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.*;
@@ -46,7 +45,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
     private PostFinder postFinder;
 
     @Mock
-    private ViewNameResolver viewNameResolver;
+    private PostViewNameResolver postViewNameResolver;
 
     @Mock
     private ReactiveExtensionClient client;
@@ -83,7 +82,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
         when(client.fetch(eq(Post.class), eq("fake-name"))).thenReturn(Mono.just(post));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
+        when(postViewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(PostVo.class)))
                 .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
         when(predicateResolver.getPredicate()).thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
 

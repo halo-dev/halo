@@ -52,24 +52,24 @@ public class PostQueryEndpoint implements CustomEndpoint {
                         "posts/{name}",
                         this::getPostByName,
                         builder -> builder.operationId("queryPostByName")
-                                .description("Gets a post by name.")
+                                .description("Gets a post by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Post name")
+                                        .description("Post metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(PostVo.class)))
                 .GET(
                         "posts/{name}/navigation",
                         this::getPostNavigationByName,
                         builder -> builder.operationId("queryPostNavigationByName")
-                                .description("Gets a post navigation by name.")
+                                .description("Gets a post navigation by metadata.name.")
                                 .tag(tag)
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Post name")
+                                        .description("Post metadata.name")
                                         .required(true))
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.QUERY)

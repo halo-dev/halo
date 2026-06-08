@@ -21,6 +21,7 @@ public class ConfigMap extends AbstractExtension {
 
     public static final String KIND = "ConfigMap";
 
+    /** String key-value configuration entries consumed by Halo or plugins. */
     @Nullable
     private Map<String, String> data;
 

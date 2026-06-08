@@ -1,8 +1,8 @@
 <!--  Thanks for sending a pull request!  Here are some tips for you:
 1. 如果这是你的第一次，请阅读我们的贡献指南：<https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md>。
 1. If this is your first time, please read our contributor guidelines: <https://github.com/halo-dev/halo/blob/main/CONTRIBUTING.md>.
-2. 请根据你解决问题的类型为 Pull Request 添加合适的标签。
-2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request.
+2. 请在下方勾选 Pull Request 类型，便于维护者分类。
+2. Please select the pull request type below to help maintainers classify it.
 3. 请确保你已经添加并运行了适当的测试。
 3. Ensure you have added or ran the appropriate tests for your PR.
 4. 如果你的 PR 使用了 LLM 生成代码，请在 PR 中添加相应的说明，我们不反对使用 LLM 辅助开发，但希望你能够先对生成的代码进行审查。
@@ -12,24 +12,14 @@
 #### What type of PR is this?
 
 <!--
-添加其中一个类别：
-Add one of the following kinds:
-
-/kind bug
-/kind cleanup
-/kind documentation
-/kind feature
-/kind improvement
-
-适当添加其中一个或多个类别（可选）：
-Optionally add one or more of the following kinds if applicable:
-
-/kind api-change
-/kind deprecation
-/kind failing-test
-/kind flake
-/kind regression
+请选择一个主要类型：
+Select one primary type:
 -->
+- [ ] Feature
+- [ ] Bug fix
+- [ ] Improvement
+- [ ] Cleanup
+- [ ] Documentation
 
 #### What this PR does / why we need it:
 

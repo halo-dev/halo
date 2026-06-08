@@ -14,14 +14,29 @@
 
 
 
+/**
+ * Persistent remember-me token values for a user and browser series.
+ */
 export interface RememberMeTokenSpec {
+    /**
+     * Last time this remember-me token was used successfully.
+     */
     'lastUsed'?: string;
     /**
      * The previous token value, stored when the token is rotated. Used to accept recently-rotated tokens within a  grace period to prevent false-positive cookie theft detection during concurrent requests.
      */
     'previousTokenValue'?: string;
+    /**
+     * Browser series identifier used by Spring Security remember-me authentication.
+     */
     'series': string;
+    /**
+     * Current remember-me token value expected from the browser cookie.
+     */
     'tokenValue': string;
+    /**
+     * User metadata.name that owns this remember-me token.
+     */
     'username': string;
 }
 

@@ -23,6 +23,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.RememberMeToken;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.SecurityConstant;
 import run.halo.app.security.device.DeviceService;
@@ -40,9 +41,9 @@ import run.halo.app.security.device.DeviceService;
  * <p>User management such as changing passwords, removing users and setting user status should be combined with
  * maintenance of the user's persistent tokens.
  *
- * <p>Note that while this class will use the date a token was created to check whether a presented cookie is older than
- * the configured <tt>tokenValiditySeconds</tt> property and deny authentication in this case, it will not delete these
- * tokens from storage. A suitable batch process should be run periodically to remove expired tokens from the database.
+ * <p>When a presented cookie is older than the configured <tt>tokenValiditySeconds</tt> property, authentication will
+ * be denied and the expired token will be removed from storage immediately. A suitable batch process may also be run
+ * periodically to remove any remaining expired tokens from the database.
  *
  * @author guqing
  * @see <a
@@ -60,12 +61,6 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     public static final int DEFAULT_TOKEN_LENGTH = 16;
 
-    /**
-     * Grace period during which the previous token value is still accepted after rotation. This prevents false-positive
-     * cookie theft detection when concurrent requests race on token rotation.
-     */
-    private static final Duration TOKEN_GRACE_PERIOD = Duration.ofSeconds(10);
-
     private final SecureRandom random;
 
     private final int seriesLength = DEFAULT_SERIES_LENGTH;
@@ -76,6 +71,8 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
 
     private final DeviceService deviceService;
 
+    private final Duration rotationCooldown;
+
     private Clock clock = Clock.systemUTC();
 
     public PersistentTokenBasedRememberMeServices(
@@ -84,11 +81,13 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
             RememberMeCookieResolver rememberMeCookieResolver,
             PersistentRememberMeTokenRepository tokenRepository,
             LoginParameterRequestCache parameterRequestCache,
-            DeviceService deviceService) {
+            DeviceService deviceService,
+            HaloProperties haloProperties) {
         super(cookieSignatureKeyResolver, userDetailsService, rememberMeCookieResolver, parameterRequestCache);
         this.random = new SecureRandom();
         this.tokenRepository = tokenRepository;
         this.deviceService = deviceService;
+        this.rotationCooldown = haloProperties.getSecurity().getRememberMe().getRotationCooldown();
         setParameterName(SecurityConstant.REMEMBER_ME_PARAMETER_NAME);
     }
 
@@ -100,16 +99,29 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
         }
         var presentedSeries = cookieTokens[0];
         var presentedToken = cookieTokens[1];
+        log.debug("Processing remember-me auto-login for series '{}'", presentedSeries);
         return this.tokenRepository
                 .getTokenForSeries(presentedSeries)
-                .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
-                        "No persistent token found for series id: " + presentedSeries)))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.debug("No remember-me token found for series '{}'", presentedSeries);
+                    return new RememberMeAuthenticationException(
+                            "No persistent token found for series id: " + presentedSeries);
+                }))
+                .doOnNext(token -> log.debug(
+                        "Found remember-me token for user '{}', series '{}', lastUsed={}, tokenMatch={}",
+                        token.getSpec().getUsername(),
+                        token.getSpec().getSeries(),
+                        token.getSpec().getLastUsed(),
+                        Objects.equals(token.getSpec().getTokenValue(), presentedToken)))
                 .delayUntil(token -> validateDevice(exchange, token))
                 .delayUntil(token -> {
                     if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
                         if (isTokenStolen(token, presentedToken)) {
-                            log.error(
-                                    "Possible cookie theft detected for user '{}', series '{}'",
+                            log.warn(
+                                    "Cookie theft detected for user '{}', series '{}': "
+                                            + "presentedToken does not match stored token "
+                                            + "and is outside cooldown or does not match previous token. "
+                                            + "Removing all tokens for this user.",
                                     token.getSpec().getUsername(),
                                     token.getSpec().getSeries());
                             return this.tokenRepository
@@ -119,12 +131,19 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                                 Implies previous cookie theft attack.""")));
                         }
                         log.debug(
-                                "Token mismatch but within grace period for user '{}', series '{}'",
+                                "Previous remember-me token accepted for user '{}', series '{}'",
                                 token.getSpec().getUsername(),
                                 token.getSpec().getSeries());
                     }
                     if (isTokenExpired(token)) {
-                        return Mono.error(new InvalidCookieException("Remember-me login has expired"));
+                        log.warn(
+                                "Remember-me token expired for user '{}', series '{}', lastUsed={}, removing all user tokens",
+                                token.getSpec().getUsername(),
+                                token.getSpec().getSeries(),
+                                token.getSpec().getLastUsed());
+                        return this.tokenRepository
+                                .removeUserTokens(token.getSpec().getUsername())
+                                .then(Mono.error(new InvalidCookieException("Remember-me login has expired")));
                     }
                     return Mono.empty();
                 })
@@ -132,48 +151,85 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                     if (!Objects.equals(token.getSpec().getTokenValue(), presentedToken)) {
                         return Mono.just(token);
                     }
+                    if (isRecentlyRotated(token)) {
+                        log.debug(
+                                "Skipping remember-me token rotation for user '{}', series '{}': "
+                                        + "last rotated {} ago, cooldown is {}",
+                                token.getSpec().getUsername(),
+                                token.getSpec().getSeries(),
+                                Duration.between(token.getSpec().getLastUsed(), clock.instant()),
+                                rotationCooldown);
+                        return Mono.just(token);
+                    }
                     log.debug(
-                            "Token value will be rotated for series '{}'",
+                            "Rotating remember-me token for user '{}', series '{}'",
+                            token.getSpec().getUsername(),
                             token.getSpec().getSeries());
                     token.getSpec().setPreviousTokenValue(presentedToken);
                     token.getSpec().setTokenValue(generateTokenData());
                     token.getSpec().setLastUsed(clock.instant());
                     return tokenRepository
                             .updateToken(token)
-                            .doOnNext(updated -> {
-                                log.debug(
-                                        "Remember me token {} rotated successfully",
-                                        updated.getSpec().getSeries());
-                                addCookie(updated, exchange);
-                            })
-                            .onErrorResume(
-                                    OptimisticLockingFailureException.class,
-                                    e -> tokenRepository
-                                            .getTokenForSeries(presentedSeries)
-                                            .doOnNext(fresh -> addCookie(fresh, exchange))
-                                            .defaultIfEmpty(token));
+                            .doOnNext(updated -> log.debug(
+                                    "Remember-me token rotated successfully for user '{}', series '{}'",
+                                    updated.getSpec().getUsername(),
+                                    updated.getSpec().getSeries()))
+                            .onErrorResume(OptimisticLockingFailureException.class, e -> {
+                                log.warn(
+                                        "Optimistic locking failure during token rotation "
+                                                + "for user '{}', series '{}', "
+                                                + "falling back to fresh token",
+                                        token.getSpec().getUsername(),
+                                        token.getSpec().getSeries());
+                                return tokenRepository
+                                        .getTokenForSeries(presentedSeries)
+                                        .defaultIfEmpty(token);
+                            });
                 })
+                .doOnNext(token -> addCookie(token, exchange))
                 .flatMap(t -> getUserDetailsService().findByUsername(t.getSpec().getUsername()));
     }
 
     private Mono<Void> validateDevice(ServerWebExchange exchange, RememberMeToken token) {
         return deviceService
                 .resolveCurrentDevice(exchange)
-                .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
-                        "Unable to determine device for remember-me authentication")))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.debug(
+                            "Remember-me device validation failed for user '{}', series '{}': "
+                                    + "no device cookie found",
+                            token.getSpec().getUsername(),
+                            token.getSpec().getSeries());
+                    return new RememberMeAuthenticationException(
+                            "Unable to determine device for remember-me authentication");
+                }))
                 .filter(d -> Objects.equals(
                         d.getSpec().getRememberMeSeriesId(), token.getSpec().getSeries()))
-                .switchIfEmpty(Mono.error(() -> new RememberMeAuthenticationException(
-                        "Remember-me series ID does not match current device's series ID")))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.warn(
+                            "Remember-me device validation failed for user '{}', series '{}': "
+                                    + "device series ID does not match token series",
+                            token.getSpec().getUsername(),
+                            token.getSpec().getSeries());
+                    return new RememberMeAuthenticationException(
+                            "Remember-me series ID does not match current device's series ID");
+                }))
                 .then();
     }
 
     private boolean isTokenStolen(RememberMeToken token, String presentedToken) {
-        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
-                .orElseGet(() -> token.getMetadata().getCreationTimestamp());
-        var now = clock.instant();
-        return now.isAfter(lastUsed.plus(TOKEN_GRACE_PERIOD))
-                || !Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue());
+        // If the presented token matches the previous token value, the request is from a device
+        // that missed the last rotation (e.g., response lost, connection closed). Accept it
+        // within the rotation cooldown window — beyond that, a legitimate device should have
+        // retried and received the updated cookie by now.
+        if (Objects.equals(presentedToken, token.getSpec().getPreviousTokenValue())) {
+            var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
+                    .orElseGet(() -> token.getMetadata().getCreationTimestamp());
+            return clock.instant().isAfter(lastUsed.plus(rotationCooldown));
+        }
+        // Presented token matches neither current nor previous — treat as stolen regardless
+        // of grace period. A legitimate device would have either the current token or the
+        // previous token value from the most recent rotation.
+        return true;
     }
 
     private boolean isTokenExpired(RememberMeToken token) {
@@ -184,13 +240,24 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
     }
 
     /**
+     * Returns true if the token was rotated within the configured cooldown period. When true, the caller should skip
+     * rotation to avoid unnecessary churn that can cause false-positive cookie theft detection for other devices
+     * holding a slightly stale cookie.
+     */
+    private boolean isRecentlyRotated(RememberMeToken token) {
+        var lastUsed = Optional.ofNullable(token.getSpec().getLastUsed())
+                .orElseGet(() -> token.getMetadata().getCreationTimestamp());
+        return clock.instant().isBefore(lastUsed.plus(rotationCooldown));
+    }
+
+    /**
      * Creates a new persistent login token with a new series number, stores the data in the persistent token repository
      * and adds the corresponding cookie to the response.
      */
     @Override
     protected Mono<Void> onLoginSuccess(ServerWebExchange exchange, Authentication successfulAuthentication) {
         var username = successfulAuthentication.getName();
-        log.debug("Creating new persistent login for user {}", username);
+        log.debug("Creating new remember-me persistent login for user '{}'", username);
         var t = new RememberMeToken();
         t.setMetadata(new Metadata());
         t.setSpec(new RememberMeToken.Spec());
@@ -205,11 +272,13 @@ public class PersistentTokenBasedRememberMeServices extends TokenBasedRememberMe
                 .createNewToken(t)
                 .doOnNext(created -> {
                     log.debug(
-                            "Remember-me token {} created successfully",
+                            "Remember-me token created for user '{}', series '{}'",
+                            username,
                             created.getSpec().getSeries());
                     addCookie(created, exchange);
                 })
-                .doOnError(e -> log.error("Remember-me token {} could not be created", seriesId, e))
+                .doOnError(e -> log.error(
+                        "Remember-me token could not be created for user '{}', series '{}'", username, seriesId, e))
                 .onErrorComplete()
                 .then();
     }

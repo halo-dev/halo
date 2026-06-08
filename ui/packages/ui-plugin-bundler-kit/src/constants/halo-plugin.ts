@@ -1,3 +1,9 @@
-const DEFAULT_MANIFEST_PATH = "../src/main/resources/plugin.yaml";
+const DEFAULT_PLUGIN_MANIFEST_PATH = "../src/main/resources/plugin.yaml";
+const DEFAULT_THEME_MANIFEST_PATH = "../theme.yaml";
+const DEFAULT_MANIFEST_PATH = DEFAULT_PLUGIN_MANIFEST_PATH;
 
-export { DEFAULT_MANIFEST_PATH };
+export {
+  DEFAULT_MANIFEST_PATH,
+  DEFAULT_PLUGIN_MANIFEST_PATH,
+  DEFAULT_THEME_MANIFEST_PATH,
+};

@@ -14,8 +14,17 @@
 
 
 
+/**
+ * Desired storage policy template metadata.
+ */
 export interface PolicyTemplateSpec {
+    /**
+     * Display name shown for the storage policy template.
+     */
     'displayName'?: string;
+    /**
+     * Setting metadata.name used to render configuration fields for policies created from this template.
+     */
     'settingName': string;
 }
 

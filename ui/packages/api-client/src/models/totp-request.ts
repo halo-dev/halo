@@ -14,10 +14,25 @@
 
 
 
+/**
+ * TOTP configuration payload.
+ */
 export interface TotpRequest {
+    /**
+     * TOTP code generated from the new secret.
+     */
     'code': string;
+    /**
+     * Current TOTP code, required when replacing an existing TOTP authenticator.
+     */
     'currentTotpCode'?: string;
+    /**
+     * Current password of the authenticated user.
+     */
     'password': string;
+    /**
+     * Raw TOTP secret returned by the auth-link endpoint.
+     */
     'secret': string;
 }
 

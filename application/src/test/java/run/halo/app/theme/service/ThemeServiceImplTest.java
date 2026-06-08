@@ -1,5 +1,6 @@
 package run.halo.app.theme.service;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -125,6 +126,15 @@ class ThemeServiceImplTest {
 
     Flux<DataBuffer> content(Path path) {
         return DataBufferUtils.read(path, DefaultDataBufferFactory.sharedInstance, StreamUtils.BUFFER_SIZE);
+    }
+
+    Mono<String> joinToString(Flux<DataBuffer> content) {
+        return DataBufferUtils.join(content).map(dataBuffer -> {
+            var bytes = new byte[dataBuffer.readableByteCount()];
+            dataBuffer.read(bytes);
+            DataBufferUtils.release(dataBuffer);
+            return new String(bytes, UTF_8);
+        });
     }
 
     @Nested

@@ -15,23 +15,23 @@
 
 
 /**
- * The creator info of the comment. This {@link CommentEmailOwner CommentEmailOwner} is only applicable to the user who is allowed to  comment without logging in.
+ * Guest/email owner information used when a comment is not owned by a Halo user.
  */
 export interface CommentEmailOwner {
     /**
-     * avatar for comment owner
+     * Avatar URL of the guest commenter.
      */
     'avatar'?: string;
     /**
-     * display name for comment owner
+     * Display name of the guest commenter.
      */
-    'displayName'?: string;
+    'displayName': string;
     /**
-     * email for comment owner
+     * Email address of the guest commenter. It is used as the owner name when present.
      */
     'email'?: string;
     /**
-     * website for comment owner
+     * Website URL of the guest commenter.
      */
     'website'?: string;
 }

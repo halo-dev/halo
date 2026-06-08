@@ -14,9 +14,21 @@
 
 
 
+/**
+ * A single form group in a setting definition.
+ */
 export interface SettingForm {
+    /**
+     * FormKit-compatible schema used to render the form fields.
+     */
     'formSchema': Array<object>;
+    /**
+     * Stable form group name used to store submitted values.
+     */
     'group': string;
+    /**
+     * Display label shown for this form group.
+     */
     'label'?: string;
 }
 

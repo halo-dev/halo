@@ -1,3 +1,4 @@
+import type { FormKitLibrary } from "@formkit/core";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
 import { vClosePopper, VLoading, vTooltip } from "@halo-dev/components";
 import { defineAsyncComponent, type App } from "vue";
@@ -8,13 +9,25 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import SearchInput from "@/components/input/SearchInput.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
 import FormKitConfig from "@/formkit/formkit.config";
+import { builtinFormKitInputs } from "@/formkit/inputs";
 
-export function setupComponents(app: App) {
+export interface SetupComponentsOptions {
+  formkitInputs?: FormKitLibrary;
+}
+
+export function setupComponents(
+  app: App,
+  options: SetupComponentsOptions = {}
+) {
   app.use(VueGridLayout);
   app.use(
     FormKit,
     defaultConfig({
       ...FormKitConfig,
+      inputs: {
+        ...options.formkitInputs,
+        ...builtinFormKitInputs,
+      },
     })
   );
 

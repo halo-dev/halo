@@ -1,17 +1,17 @@
 # @halo-dev/ui-plugin-bundler-kit
 
-A frontend build toolkit for Halo plugin development, supporting both Vite and Rsbuild build systems.
+A frontend build toolkit for Halo UI plugin development, supporting both Vite and Rsbuild build systems.
 
 ## Introduction
 
-`@halo-dev/ui-plugin-bundler-kit` is a frontend build configuration toolkit specifically designed for Halo plugin development. It provides pre-configured build settings to help developers quickly set up and build frontend interfaces for Halo plugins.
+`@halo-dev/ui-plugin-bundler-kit` is a frontend build configuration toolkit specifically designed for Halo UI plugin development. It provides pre-configured build settings to help developers quickly set up and build frontend interfaces for Halo plugins and theme-provided UI plugins.
 
 ### Key Features
 
 - 🚀 **Ready to Use** - Provides pre-configured Vite and Rsbuild build settings
 - 📦 **Multi-Build Tool Support** - Supports both Vite and Rsbuild
 - 🔧 **Flexible Configuration** - Supports custom build configurations
-- 🎯 **Halo Optimized** - External dependencies and global variables optimized for Halo plugin development
+- 🎯 **Halo Optimized** - External dependencies and global variables optimized for Halo UI plugin development
 - 📁 **Smart Output** - Automatically selects output directory based on environment
 
 ## Installation
@@ -45,12 +45,13 @@ npm install @rsbuild/core
 
 ### Vite Configuration
 
-Create or update `vite.config.ts` file in your project root:
+Create or update `vite.config.ts` file in your UI plugin project root:
 
 ```typescript
 import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
 
 export default viteConfig({
+  // provider defaults to "plugin"
   vite: {
     // Your custom Vite configuration
     plugins: [
@@ -65,12 +66,13 @@ export default viteConfig({
 
 ### Rsbuild Configuration
 
-Create or update `rsbuild.config.ts` file in your project root:
+Create or update `rsbuild.config.ts` file in your UI plugin project root:
 
 ```typescript
 import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
 
 export default rsbuildConfig({
+  // provider defaults to "plugin"
   rsbuild: {
     // Your custom Rsbuild configuration
     plugins: [
@@ -83,9 +85,46 @@ export default rsbuildConfig({
 
 > **Note**: Vue plugin is pre-configured, no need to add it manually.
 
+### Theme UI Plugin Configuration
+
+For theme-provided Console/User Center UI plugins, place the frontend project under the theme's `ui-plugin/` directory:
+
+```text
+theme-root/
+├── theme.yaml
+└── ui-plugin/
+    ├── package.json
+    ├── src/index.ts
+    └── vite.config.ts
+```
+
+Vite:
+
+```typescript
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+
+export default viteConfig({
+  provider: "theme",
+  vite: {},
+});
+```
+
+Rsbuild:
+
+```typescript
+import { rsbuildConfig } from "@halo-dev/ui-plugin-bundler-kit";
+
+export default rsbuildConfig({
+  provider: "theme",
+  rsbuild: {},
+});
+```
+
+The theme provider reads `../theme.yaml`, outputs to `dist`, registers the module as `theme:{metadata.name}`, and configures assets for `/themes/{metadata.name}/ui-plugin/assets/`. Halo reads only `ui-plugin/dist/**` from the theme package.
+
 ### Legacy Configuration (Deprecated)
 
-> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated. Please use `viteConfig` or `rsbuildConfig` instead.
+> ⚠️ **Note**: The `HaloUIPluginBundlerKit` function is deprecated. Please use `viteConfig` or `rsbuildConfig` instead. It does not support `provider: "theme"`.
 
 ```typescript
 import { HaloUIPluginBundlerKit } from "@halo-dev/ui-plugin-bundler-kit";
@@ -106,8 +145,14 @@ export default {
 ```typescript
 interface ViteUserConfig {
   /**
-   * Halo plugin manifest file path
-   * @default "../src/main/resources/plugin.yaml"
+   * UI plugin provider type
+   * @default "plugin"
+   */
+  provider?: "plugin" | "theme";
+
+  /**
+   * Halo plugin or theme manifest file path
+   * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
 
@@ -123,8 +168,14 @@ interface ViteUserConfig {
 ```typescript
 interface RsBuildUserConfig {
   /**
-   * Halo plugin manifest file path
-   * @default "../src/main/resources/plugin.yaml"
+   * UI plugin provider type
+   * @default "plugin"
+   */
+  provider?: "plugin" | "theme";
+
+  /**
+   * Halo plugin or theme manifest file path
+   * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
 
@@ -216,6 +267,20 @@ export default viteConfig({
 });
 ```
 
+### Custom Theme Manifest Path
+
+```typescript
+import { viteConfig } from "@halo-dev/ui-plugin-bundler-kit";
+
+export default viteConfig({
+  provider: "theme",
+  manifestPath: "../custom-theme.yaml",
+  vite: {
+    // Other configurations...
+  },
+});
+```
+
 ## Development Scripts
 
 Recommended scripts to add to your `package.json`:
@@ -242,10 +307,17 @@ For Rsbuild:
 
 ## Build Output
 
-> Relative to the root directory of the Halo plugin project
+> Relative to the UI plugin project root
 
-- **Development**: `build/resources/main/console`
-- **Production**: `ui/build/dist`
+Plugin provider:
+
+- **Development**: `../build/resources/main/ui` or `../build/resources/main/console`
+- **Production**: `./build/dist`
+
+Theme provider:
+
+- **Development**: `dist`
+- **Production**: `dist`
 
 > **Note**: The production build output directory of `HaloUIPluginBundlerKit` is still `src/main/resources/console` to ensure compatibility.
 

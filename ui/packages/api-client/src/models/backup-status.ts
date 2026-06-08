@@ -14,19 +14,37 @@
 
 
 
+/**
+ * Observed backup execution state.
+ */
 export interface BackupStatus {
+    /**
+     * Time when backup execution finished, regardless of success or failure.
+     */
     'completionTimestamp'?: string;
+    /**
+     * Human-readable failure message for a failed backup.
+     */
     'failureMessage'?: string;
+    /**
+     * Stable failure reason code for a failed backup.
+     */
     'failureReason'?: string;
     /**
-     * Name of backup file.
+     * Name of the generated backup file.
      */
     'filename'?: string;
+    /**
+     * Current backup execution phase.
+     */
     'phase'?: BackupStatusPhaseEnum;
     /**
-     * Size of backup file. Data unit: byte
+     * Size of the generated backup file in bytes.
      */
     'size'?: number;
+    /**
+     * Time when backup execution started.
+     */
     'startTimestamp'?: string;
 }
 

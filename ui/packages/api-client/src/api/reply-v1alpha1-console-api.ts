@@ -29,8 +29,8 @@ import type { ListedReplyList } from '../models';
 export const ReplyV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * List replies.
-         * @param {string} commentName Replies filtered by commentName.
+         * List replies for a comment with pagination, sorting, labels, and field selectors.
+         * @param {string} commentName Metadata name of the comment whose replies should be listed.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -107,8 +107,8 @@ export const ReplyV1alpha1ConsoleApiFp = function(configuration?: Configuration)
     const localVarAxiosParamCreator = ReplyV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * List replies.
-         * @param {string} commentName Replies filtered by commentName.
+         * List replies for a comment with pagination, sorting, labels, and field selectors.
+         * @param {string} commentName Metadata name of the comment whose replies should be listed.
          * @param {number} [page] Page number. Default is 0.
          * @param {number} [size] Size number. Default is 0.
          * @param {Array<string>} [labelSelector] Label selector. e.g.: hidden!&#x3D;true
@@ -133,7 +133,7 @@ export const ReplyV1alpha1ConsoleApiFactory = function (configuration?: Configur
     const localVarFp = ReplyV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * List replies.
+         * List replies for a comment with pagination, sorting, labels, and field selectors.
          * @param {ReplyV1alpha1ConsoleApiListRepliesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -149,7 +149,7 @@ export const ReplyV1alpha1ConsoleApiFactory = function (configuration?: Configur
  */
 export interface ReplyV1alpha1ConsoleApiListRepliesRequest {
     /**
-     * Replies filtered by commentName.
+     * Metadata name of the comment whose replies should be listed.
      */
     readonly commentName: string
 
@@ -184,7 +184,7 @@ export interface ReplyV1alpha1ConsoleApiListRepliesRequest {
  */
 export class ReplyV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * List replies.
+     * List replies for a comment with pagination, sorting, labels, and field selectors.
      * @param {ReplyV1alpha1ConsoleApiListRepliesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -15,6 +15,8 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
+ * Role extension that defines RBAC policy rules for users and other subjects.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -37,6 +39,7 @@ public class Role extends AbstractExtension {
     public static final String VERSION = "v1alpha1";
     public static final String KIND = "Role";
 
+    /** Policy rules granted by this role. */
     @Schema(requiredMode = REQUIRED)
     List<PolicyRule> rules;
 
@@ -77,7 +80,7 @@ public class Role extends AbstractExtension {
          */
         final String[] nonResourceURLs;
 
-        /** about who the rule applies to or which namespace the rule applies to. */
+        /** Verbs allowed by this rule, such as get, list, create, update, patch, or delete. */
         final String[] verbs;
 
         public PolicyRule() {
@@ -127,14 +130,19 @@ public class Role extends AbstractExtension {
         }
 
         public static class Builder {
+            /** API groups to apply to the built policy rule. */
             String[] apiGroups;
 
+            /** Resources to apply to the built policy rule. */
             String[] resources;
 
+            /** Resource names to apply to the built policy rule. */
             String[] resourceNames;
 
+            /** Non-resource URLs to apply to the built policy rule. */
             String[] nonResourceURLs;
 
+            /** Verbs to allow in the built policy rule. */
             String[] verbs;
 
             public Builder apiGroups(String... apiGroups) {

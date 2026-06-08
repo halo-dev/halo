@@ -7,7 +7,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { UseImage } from "@vueuse/components";
-import { toRefs } from "vue";
+import { computed, toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 
 const props = withDefaults(
@@ -26,20 +26,24 @@ const emit = defineEmits<{
 
 const { theme } = toRefs(props);
 
+const previewImage = computed(
+  () => theme.value.status?.screenshot || theme.value.spec.logo
+);
+
 const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
 </script>
 
 <template>
   <VEntity :is-selected="isSelected">
     <template #start>
-      <VEntityField v-if="theme.spec.logo">
+      <VEntityField v-if="previewImage">
         <template #description>
           <div class="w-20">
             <div
               class="group aspect-h-3 aspect-w-4 block w-full overflow-hidden rounded border bg-gray-100"
             >
               <UseImage
-                :src="theme.spec.logo"
+                :src="previewImage"
                 :alt="theme.spec.displayName"
                 class="pointer-events-none object-cover group-hover:opacity-75"
               >
@@ -79,7 +83,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
     </template>
 
     <template #dropdownItems>
-      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme()">
+      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme(true)">
         {{ $t("core.common.buttons.activate") }}
       </VDropdownItem>
       <VDropdownItem @click="emit('open-settings')">

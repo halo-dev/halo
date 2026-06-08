@@ -46,7 +46,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Notifier name")
+                                        .description("Notifier metadata.name")
                                         .required(true))
                                 .response(responseBuilder().implementation(Object.class)))
                 .POST(
@@ -58,7 +58,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
                                 .parameter(parameterBuilder()
                                         .in(ParameterIn.PATH)
                                         .name("name")
-                                        .description("Notifier name")
+                                        .description("Notifier metadata.name")
                                         .required(true))
                                 .requestBody(requestBodyBuilder()
                                         .required(true)

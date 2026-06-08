@@ -14,9 +14,12 @@
 
 
 
+/**
+ * Desired attachment group metadata.
+ */
 export interface GroupSpec {
     /**
-     * Display name of group
+     * Display name shown for the attachment group.
      */
     'displayName': string;
 }

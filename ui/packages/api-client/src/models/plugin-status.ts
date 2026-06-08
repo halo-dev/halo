@@ -17,17 +17,41 @@
 // @ts-ignore
 import type { Condition } from './condition';
 
+/**
+ * Observed plugin lifecycle and runtime asset state.
+ */
 export interface PluginStatus {
+    /**
+     * Reconciliation conditions for the plugin.
+     */
     'conditions'?: Array<Condition>;
+    /**
+     * JavaScript bundle entry path served for the plugin UI.
+     */
     'entry'?: string;
+    /**
+     * Last PF4J probe state observed for the plugin.
+     */
     'lastProbeState'?: PluginStatusLastProbeStateEnum;
+    /**
+     * Last time the plugin started successfully.
+     */
     'lastStartTime'?: string;
     /**
-     * Load location of the plugin, often a path.
+     * URI location where the plugin artifact was loaded from.
      */
     'loadLocation'?: string;
+    /**
+     * Resolved logo URL or attachment URI for the plugin.
+     */
     'logo'?: string;
+    /**
+     * Current plugin lifecycle phase.
+     */
     'phase'?: PluginStatusPhaseEnum;
+    /**
+     * Stylesheet bundle path served for the plugin UI.
+     */
     'stylesheet'?: string;
 }
 

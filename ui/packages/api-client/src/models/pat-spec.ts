@@ -14,16 +14,49 @@
 
 
 
+/**
+ * Desired personal access token settings and lifecycle flags.
+ */
 export interface PatSpec {
+    /**
+     * Optional human-readable description of how the token is used.
+     */
     'description'?: string;
+    /**
+     * Time when the token expires. A null value means the token does not expire by time.
+     */
     'expiresAt'?: string;
+    /**
+     * Last time the token was used successfully.
+     */
     'lastUsed'?: string;
+    /**
+     * Display name chosen by the token owner.
+     */
     'name': string;
+    /**
+     * Whether the token has been manually revoked.
+     */
     'revoked'?: boolean;
+    /**
+     * Time when the token was revoked.
+     */
     'revokesAt'?: string;
+    /**
+     * Role names granted to this token.
+     */
     'roles'?: Array<string>;
+    /**
+     * Scope strings granted to this token.
+     */
     'scopes'?: Array<string>;
+    /**
+     * Stable token identifier stored separately from the secret token value.
+     */
     'tokenId': string;
+    /**
+     * User metadata.name that owns this token.
+     */
     'username': string;
 }
 

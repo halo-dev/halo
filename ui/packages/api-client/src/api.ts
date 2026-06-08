@@ -86,6 +86,7 @@ export * from './api/theme-v1alpha1-api';
 export * from './api/theme-v1alpha1-console-api';
 export * from './api/thumbnail-v1alpha1-public-api';
 export * from './api/two-factor-auth-v1alpha1-uc-api';
+export * from './api/ui-plugin-v1alpha1-console-api';
 export * from './api/user-connection-v1alpha1-api';
 export * from './api/user-connection-v1alpha1-uc-api';
 export * from './api/user-preference-v1alpha1-uc-api';

@@ -9,22 +9,32 @@ import lombok.experimental.Accessors;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.MetadataOperator;
 
+/**
+ * Lightweight snapshot representation returned by content snapshot list endpoints.
+ *
+ * @author guqing
+ * @since 2.0.0
+ */
+@Schema(description = "Content snapshot list item with metadata and display-oriented snapshot fields.")
 @Data
 @Accessors(chain = true)
 public class ListedSnapshotDto {
-    @Schema(requiredMode = REQUIRED)
+    @Schema(
+            description = "Snapshot metadata, including name, labels, annotations, version, and timestamps.",
+            requiredMode = REQUIRED)
     private MetadataOperator metadata;
 
-    @Schema(requiredMode = REQUIRED)
+    @Schema(description = "Snapshot fields shown in the console snapshot list.", requiredMode = REQUIRED)
     private Spec spec;
 
     @Data
     @Accessors(chain = true)
-    @Schema(name = "ListedSnapshotSpec")
+    @Schema(name = "ListedSnapshotSpec", description = "Display fields for a content snapshot list item.")
     public static class Spec {
-        @Schema(requiredMode = REQUIRED)
+        @Schema(description = "User name of the snapshot owner.", requiredMode = REQUIRED)
         private String owner;
 
+        /** Last modification time of the snapshot content. */
         private Instant modifyTime;
     }
 

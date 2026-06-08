@@ -14,17 +14,20 @@
 
 
 
+/**
+ * Desired storage policy configuration.
+ */
 export interface PolicySpec {
     /**
-     * Reference name of ConfigMap extension
+     * ConfigMap metadata.name storing configuration values for this policy.
      */
     'configMapName'?: string;
     /**
-     * Display name of policy
+     * Display name shown for the storage policy.
      */
     'displayName': string;
     /**
-     * Reference name of PolicyTemplate
+     * PolicyTemplate metadata.name that provides the storage implementation.
      */
     'templateName': string;
 }

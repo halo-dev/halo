@@ -284,7 +284,7 @@ class PluginReconcilerTest {
                     .thenReturn(null)
                     // get setting extension
                     .thenReturn(mockPluginWrapperForSetting())
-                    .thenReturn(mockPluginWrapperForStaticResources())
+                    .thenReturn(mockPluginWrapperForStaticResources("ui"))
                     // before starting
                     .thenReturn(mockPluginWrapper(PluginState.STARTED))
                     // sync plugin state
@@ -304,10 +304,10 @@ class PluginReconcilerTest {
                     "/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
                     fakePlugin.getStatus().getLogo());
             assertEquals(
-                    "/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                    "/plugins/fake-plugin/assets/ui/main.js?version=1.2.3",
                     fakePlugin.getStatus().getEntry());
             assertEquals(
-                    "/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                    "/plugins/fake-plugin/assets/ui/style.css?version=1.2.3",
                     fakePlugin.getStatus().getStylesheet());
             assertEquals(Plugin.Phase.STARTED, fakePlugin.getStatus().getPhase());
             assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
@@ -390,6 +390,42 @@ class PluginReconcilerTest {
             verify(client).create(any(ReverseProxy.class));
         }
 
+        @Test
+        void shouldNotSetEntryOrStylesheetWhenNoStaticResources() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                spec.setSettingName(settingName);
+                spec.setConfigMapName(configMapName);
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name))
+                    // loading plugin
+                    .thenReturn(null)
+                    // get setting extension
+                    .thenReturn(mockPluginWrapperForSetting())
+                    // resolving static resources (no bundles at all)
+                    .thenReturn(mockPluginWrapperForNoStaticResources())
+                    // before starting
+                    .thenReturn(mockPluginWrapper(PluginState.STARTED))
+                    // sync plugin state
+                    .thenReturn(mockPluginWrapper(PluginState.STARTED));
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertNull(fakePlugin.getStatus().getEntry());
+            assertNull(fakePlugin.getStatus().getStylesheet());
+            assertEquals(Plugin.Phase.STARTED, fakePlugin.getStatus().getPhase());
+
+            verify(pluginManager, times(5)).getPlugin(name);
+            verify(client).update(fakePlugin);
+        }
+
         PluginWrapper mockPluginWrapperForSetting() throws IOException {
             var pluginWrapper = mock(PluginWrapper.class);
 
@@ -401,11 +437,25 @@ class PluginReconcilerTest {
         }
 
         PluginWrapper mockPluginWrapperForStaticResources() {
+            return mockPluginWrapperForStaticResources("console");
+        }
+
+        PluginWrapper mockPluginWrapperForStaticResources(String location) {
             // check
             var pluginWrapper = mock(PluginWrapper.class);
             var pluginClassLoader = mock(ClassLoader.class);
-            when(pluginClassLoader.getResource("console/main.js")).thenReturn(mock(URL.class));
-            when(pluginClassLoader.getResource("console/style.css")).thenReturn(mock(URL.class));
+            lenient().when(pluginClassLoader.getResource(location + "/main.js")).thenReturn(mock(URL.class));
+            lenient()
+                    .when(pluginClassLoader.getResource(location + "/style.css"))
+                    .thenReturn(mock(URL.class));
+            when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
+            lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
+            return pluginWrapper;
+        }
+
+        PluginWrapper mockPluginWrapperForNoStaticResources() {
+            var pluginWrapper = mock(PluginWrapper.class);
+            var pluginClassLoader = mock(ClassLoader.class);
             when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
             lenient().when(pluginWrapper.getDescriptor()).thenReturn(new DefaultPluginDescriptor());
             return pluginWrapper;

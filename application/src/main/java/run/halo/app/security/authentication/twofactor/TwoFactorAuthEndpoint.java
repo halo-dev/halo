@@ -1,10 +1,12 @@
 package run.halo.app.security.authentication.twofactor;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -112,6 +114,8 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
                                         this::deleteTotp,
                                         builder -> builder.operationId("DeleteTotp")
                                                 .tag(tag)
+                                                .description("Delete the current user's configured TOTP authenticator "
+                                                        + "after password verification.")
                                                 .requestBody(
                                                         requestBodyBuilder().implementation(PasswordRequest.class))
                                                 .response(
@@ -149,12 +153,16 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         return ServerResponse.ok().body(twoFactorAuthSettings, TwoFactorAuthSettings.class);
     }
 
+    /** Password verification payload for changing two-factor authentication settings. */
     @Data
     public static class PasswordRequest {
 
+        /** Current password of the authenticated user. */
+        @Schema(requiredMode = REQUIRED)
         @NotBlank
         private String password;
 
+        /** Current TOTP code, required when TOTP has already been configured. */
         private String totpCode;
     }
 
@@ -206,12 +214,16 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         return ServerResponse.ok().body(authLinkResponse, TotpAuthLinkResponse.class);
     }
 
+    /** TOTP provisioning data for configuring an authenticator app. */
     @Data
     public static class TotpAuthLinkResponse {
 
-        /** QR Code with base64 encoded. */
+        /** otpauth URI that can be encoded as a QR code. */
+        @Schema(requiredMode = REQUIRED)
         private URI authLink;
 
+        /** Raw TOTP secret for manual authenticator setup. */
+        @Schema(requiredMode = REQUIRED)
         private String rawSecret;
     }
 
@@ -252,18 +264,26 @@ public class TwoFactorAuthEndpoint implements CustomEndpoint {
         return Mono.empty();
     }
 
+    /** TOTP configuration payload. */
     @Data
     public static class TotpRequest {
 
+        /** Raw TOTP secret returned by the auth-link endpoint. */
+        @Schema(requiredMode = REQUIRED)
         @NotBlank
         private String secret;
 
+        /** TOTP code generated from the new secret. */
+        @Schema(requiredMode = REQUIRED)
         @NotNull
         private String code;
 
+        /** Current password of the authenticated user. */
+        @Schema(requiredMode = REQUIRED)
         @NotBlank
         private String password;
 
+        /** Current TOTP code, required when replacing an existing TOTP authenticator. */
         private String currentTotpCode;
     }
 

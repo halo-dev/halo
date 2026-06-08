@@ -20,6 +20,9 @@ import type { MenuSpec } from './menu-spec';
 // @ts-ignore
 import type { Metadata } from './metadata';
 
+/**
+ * Menu extension that groups ordered menu items for theme navigation.
+ */
 export interface Menu {
     'apiVersion': string;
     'kind': string;

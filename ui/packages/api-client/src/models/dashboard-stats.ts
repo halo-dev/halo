@@ -14,12 +14,33 @@
 
 
 
+/**
+ * Dashboard statistics for the console overview.
+ */
 export interface DashboardStats {
-    'approvedComments'?: number;
-    'comments'?: number;
-    'posts'?: number;
-    'upvotes'?: number;
-    'users'?: number;
-    'visits'?: number;
+    /**
+     * Approved comment count.
+     */
+    'approvedComments': number;
+    /**
+     * Total comment count.
+     */
+    'comments': number;
+    /**
+     * Total non-deleted post count.
+     */
+    'posts': number;
+    /**
+     * Total upvote count.
+     */
+    'upvotes': number;
+    /**
+     * Total user count.
+     */
+    'users': number;
+    /**
+     * Total visit count.
+     */
+    'visits': number;
 }
 

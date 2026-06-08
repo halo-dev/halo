@@ -6,16 +6,39 @@ import {
   type RsbuildMode,
 } from "@rsbuild/core";
 import { pluginVue } from "@rsbuild/plugin-vue";
-import { DEFAULT_OUT_DIR_DEV, DEFAULT_OUT_DIR_PROD } from "./constants/build";
+import {
+  DEFAULT_OUT_DIR_PROD,
+  DEFAULT_THEME_OUT_DIR,
+  getDefaultOutDirDev,
+} from "./constants/build";
 import { GLOBALS } from "./constants/externals";
-import { DEFAULT_MANIFEST_PATH } from "./constants/halo-plugin";
-import { getHaloPluginManifest } from "./utils/halo-plugin";
+import {
+  DEFAULT_PLUGIN_MANIFEST_PATH,
+  DEFAULT_THEME_MANIFEST_PATH,
+} from "./constants/halo-plugin";
+import {
+  getHaloPluginBundleLocation,
+  getHaloPluginManifest,
+  getHaloThemeAssetPublicPath,
+  getHaloThemeManifest,
+  getHaloThemeModuleName,
+  getManifestName,
+} from "./utils/halo-plugin";
+
+type Provider = "plugin" | "theme";
 
 export interface RsBuildUserConfig {
   /**
-   * Halo plugin manifest path.
+   * UI plugin provider type.
    *
-   * @default "../src/main/resources/plugin.yaml"
+   * @default "plugin"
+   */
+  provider?: "plugin" | "theme";
+
+  /**
+   * Halo plugin or theme manifest path.
+   *
+   * @default "../src/main/resources/plugin.yaml" for plugins, "../theme.yaml" for themes
    */
   manifestPath?: string;
 
@@ -25,13 +48,16 @@ export interface RsBuildUserConfig {
   rsbuild: RsbuildConfig | ((env: ConfigParams) => RsbuildConfig);
 }
 
-function createRsbuildPresetsConfig(manifestPath: string) {
-  const manifest = getHaloPluginManifest(manifestPath);
+function createRsbuildPresetsConfig(provider: Provider, manifestPath: string) {
+  const defaults =
+    provider === "theme"
+      ? getThemeProviderDefaults(manifestPath)
+      : getPluginProviderDefaults(manifestPath);
 
   return defineConfig(({ envMode }) => {
     const isProduction = envMode === "production";
 
-    const outDir = isProduction ? DEFAULT_OUT_DIR_PROD : DEFAULT_OUT_DIR_DEV;
+    const outDir = isProduction ? defaults.outDir.prod : defaults.outDir.dev;
 
     return {
       mode: (envMode as RsbuildMode) || "production",
@@ -72,11 +98,11 @@ function createRsbuildPresetsConfig(manifestPath: string) {
             },
           },
           output: {
-            publicPath: `/plugins/${manifest.metadata.name}/assets/console/`,
+            publicPath: defaults.publicPath,
             library: {
               type: "window",
               export: "default",
-              name: manifest.metadata.name,
+              name: defaults.moduleName,
             },
             globalObject: "window",
             iife: true,
@@ -113,6 +139,46 @@ function createRsbuildPresetsConfig(manifestPath: string) {
   });
 }
 
+function getPluginProviderDefaults(manifestPath: string) {
+  const manifest = getHaloPluginManifest(manifestPath);
+  const bundleLocation = getHaloPluginBundleLocation(manifest);
+
+  return {
+    moduleName: getManifestName(manifest),
+    outDir: {
+      prod: DEFAULT_OUT_DIR_PROD,
+      dev: getDefaultOutDirDev(bundleLocation),
+    },
+    publicPath: `/plugins/${getManifestName(manifest)}/assets/${bundleLocation}/`,
+  };
+}
+
+function getThemeProviderDefaults(manifestPath: string) {
+  const manifest = getHaloThemeManifest(manifestPath);
+
+  return {
+    moduleName: getHaloThemeModuleName(manifest),
+    outDir: {
+      prod: DEFAULT_THEME_OUT_DIR,
+      dev: DEFAULT_THEME_OUT_DIR,
+    },
+    publicPath: getHaloThemeAssetPublicPath(manifest),
+  };
+}
+
+function getProvider(config?: RsBuildUserConfig): Provider {
+  return config?.provider || "plugin";
+}
+
+function getManifestPath(provider: Provider, config?: RsBuildUserConfig) {
+  if (config?.manifestPath) {
+    return config.manifestPath;
+  }
+  return provider === "theme"
+    ? DEFAULT_THEME_MANIFEST_PATH
+    : DEFAULT_PLUGIN_MANIFEST_PATH;
+}
+
 /**
  * Rsbuild config for Halo UI Plugin.
  *
@@ -132,8 +198,10 @@ function createRsbuildPresetsConfig(manifestPath: string) {
 export function rsbuildConfig(
   config?: RsBuildUserConfig
 ): (env: ConfigParams) => RsbuildConfig {
+  const provider = getProvider(config);
   const presetsConfigFn = createRsbuildPresetsConfig(
-    config?.manifestPath || DEFAULT_MANIFEST_PATH
+    provider,
+    getManifestPath(provider, config)
   );
   return defineConfig((env) => {
     const presetsConfig = presetsConfigFn(env);

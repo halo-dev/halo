@@ -15,6 +15,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
+/** Menu item extension that describes a navigable item and its resolved rendering state. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -23,20 +24,23 @@ public class MenuItem extends AbstractExtension {
 
     public static final String REQUEST_TO_UPDATE_ANNO = "halo.run/request-to-update";
 
-    @Schema(description = "The spec of menu item.", requiredMode = REQUIRED)
+    /** Desired menu item configuration, including label, URL, ordering, children, and target resource. */
+    @Schema(requiredMode = REQUIRED)
     @Nullable
     private MenuItemSpec spec;
 
-    @Schema(description = "The status of menu item.")
+    /** Resolved display values calculated from the desired configuration and target resource. */
     @Nullable
     private MenuItemStatus status;
 
+    /** HTML anchor target used when opening this menu item. */
     public enum Target {
         BLANK("_blank"),
         SELF("_self"),
         PARENT("_parent"),
         TOP("_top");
 
+        /** HTML target attribute value. */
         private final String value;
 
         @JsonCreator
@@ -50,40 +54,40 @@ public class MenuItem extends AbstractExtension {
         }
     }
 
+    /** Desired menu item configuration. */
     @Data
     public static class MenuItemSpec {
 
-        @Schema(description = "The display name of menu item.")
+        /** Display name shown for the menu item. */
         private String displayName;
 
-        @Schema(description = "The href of this menu item.")
+        /** Direct URL used by the menu item. */
         private String href;
 
-        @Schema(description = "The <a> target attribute of this menu item.")
+        /** HTML anchor target used by the menu item. */
         private Target target;
 
-        @Schema(description = "The priority is for ordering.")
+        /** Sorting priority. Higher values sort before lower values where priority ordering is applied. */
         private Integer priority;
 
-        @ArraySchema(
-                uniqueItems = true,
-                arraySchema = @Schema(description = "Children of this menu item"),
-                schema = @Schema(description = "The name of menu item child"))
+        /** Child MenuItem metadata.name values shown under this item. */
+        @ArraySchema(uniqueItems = true)
         private LinkedHashSet<String> children;
 
-        @Schema(description = "Target reference. Like Category, Tag, Post or SinglePage")
+        /** Target extension reference, such as a Category, Tag, Post, or SinglePage. */
         @Nullable
         private Ref targetRef;
     }
 
+    /** Resolved menu item values used for rendering. */
     @Data
     public static class MenuItemStatus {
 
-        @Schema(description = "Calculated Display name of menu item.")
+        /** Calculated display name after resolving targetRef, falling back to spec.displayName. */
         @Nullable
         private String displayName;
 
-        @Schema(description = "Calculated href of manu item.")
+        /** Calculated href after resolving targetRef, falling back to spec.href. */
         @Nullable
         private String href;
     }

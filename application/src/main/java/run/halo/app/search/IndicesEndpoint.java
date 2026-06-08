@@ -1,5 +1,7 @@
 package run.halo.app.search;
 
+import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +35,10 @@ public class IndicesEndpoint implements CustomEndpoint {
                         this::rebuildIndices,
                         builder -> builder.operationId("RebuildAllIndices")
                                 .tag(tag)
-                                .description("Rebuild all indices"))
+                                .description("Submit a request to rebuild all search indices.")
+                                .response(responseBuilder()
+                                        .responseCode("202")
+                                        .description("Accepted, rebuild request has been submitted.")))
                 .build();
     }
 

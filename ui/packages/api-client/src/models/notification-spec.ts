@@ -14,19 +14,37 @@
 
 
 
+/**
+ * Notification content and read state for one recipient.
+ */
 export interface NotificationSpec {
+    /**
+     * HTML notification content.
+     */
     'htmlContent': string;
+    /**
+     * Last time the recipient marked this notification as read.
+     */
     'lastReadAt'?: string;
+    /**
+     * Plain text or source notification content.
+     */
     'rawContent': string;
     /**
-     * The name of reason
+     * Reason metadata.name that generated this notification.
      */
     'reason': string;
     /**
-     * The name of user
+     * User metadata.name that receives the notification.
      */
     'recipient': string;
+    /**
+     * Notification title shown in the notification center.
+     */
     'title': string;
+    /**
+     * Whether the recipient has not read the notification yet.
+     */
     'unread'?: boolean;
 }
 

@@ -20,9 +20,18 @@ import type { ReasonAttributes } from './reason-attributes';
 // @ts-ignore
 import type { ReasonSubject } from './reason-subject';
 
+/**
+ * Notification reason data used to render and dispatch notifications.
+ */
 export interface ReasonSpec {
     'attributes'?: ReasonAttributes;
+    /**
+     * User metadata.name or system actor that created the reason.
+     */
     'author': string;
+    /**
+     * ReasonType metadata.name that defines this reason.
+     */
     'reasonType': string;
     'subject': ReasonSubject;
 }

@@ -7,7 +7,7 @@ import {
 } from "@halo-dev/api-client";
 import {
   Dialog,
-  IconCheckboxCircle,
+  IconClose,
   IconDeleteBin,
   IconNotificationBadgeLine,
   Toast,
@@ -25,6 +25,9 @@ import { chunk } from "es-toolkit";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import RiCheckDoubleLine from "~icons/ri/check-double-line";
+import RiCheckboxMultipleFill from "~icons/ri/checkbox-multiple-fill";
+import RiCheckboxMultipleLine from "~icons/ri/checkbox-multiple-line";
 import NotificationContent from "./components/NotificationContent.vue";
 import NotificationListItem from "./components/NotificationListItem.vue";
 
@@ -306,29 +309,42 @@ function handleMarkAllAsRead() {
               <!-- Normal mode actions -->
               <template v-if="!isSelectMode">
                 <button
-                  v-if="activeTab === 'unread'"
-                  class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
-                  :disabled="!notifications?.length"
-                  @click="handleMarkAllAsRead"
-                >
-                  <IconCheckboxCircle
-                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                  />
-                </button>
-                <button
-                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  v-tooltip="
+                    $t('core.uc_notification.operations.select_mode.tooltip')
+                  "
+                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
                   :disabled="!notifications?.length"
                   @click="toggleSelectMode"
                 >
-                  {{ $t("core.uc_notification.operations.select_mode.button") }}
+                  <RiCheckboxMultipleLine
+                    class="size-4 text-gray-600 group-hover:text-gray-900"
+                  />
                 </button>
                 <button
-                  class="group flex h-7 w-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  v-if="activeTab === 'unread'"
+                  v-tooltip="
+                    $t(
+                      'core.uc_notification.operations.mark_all_as_read.tooltip'
+                    )
+                  "
+                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  :disabled="!notifications?.length"
+                  @click="handleMarkAllAsRead"
+                >
+                  <RiCheckDoubleLine
+                    class="size-4 text-gray-600 group-hover:text-gray-900"
+                  />
+                </button>
+                <button
+                  v-tooltip="
+                    $t('core.uc_notification.operations.delete_all.tooltip')
+                  "
+                  class="group flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
                   :disabled="!notifications?.length"
                   @click="handleDeleteNotifications"
                 >
                   <IconDeleteBin
-                    class="h-4 w-4 text-gray-600 group-hover:text-red-600"
+                    class="size-4 text-gray-600 group-hover:text-red-600"
                   />
                 </button>
               </template>
@@ -336,28 +352,42 @@ function handleMarkAllAsRead() {
               <!-- Select mode actions -->
               <template v-else>
                 <button
-                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200"
+                  v-tooltip="
+                    $t('core.uc_notification.operations.select_all.tooltip')
+                  "
+                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
                   @click="handleSelectAll"
                 >
-                  {{ $t("core.uc_notification.operations.select_all.button") }}
+                  <RiCheckboxMultipleFill
+                    class="size-4 text-gray-600 group-hover:text-gray-900"
+                  />
                 </button>
                 <button
-                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
+                  v-tooltip="
+                    $t(
+                      'core.uc_notification.operations.delete_selected.tooltip'
+                    )
+                  "
+                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
                   :disabled="selectedNames.size === 0"
                   @click="handleDeleteSelected"
                 >
-                  {{
-                    $t(
-                      "core.uc_notification.operations.delete_selected.button",
-                      { count: selectedNames.size }
-                    )
-                  }}
+                  <IconDeleteBin
+                    class="size-4 text-gray-600 group-hover:text-red-600"
+                  />
                 </button>
                 <button
-                  class="flex h-7 cursor-pointer items-center justify-center rounded px-2 text-xs text-gray-600 hover:bg-gray-200"
+                  v-tooltip="
+                    $t(
+                      'core.uc_notification.operations.exit_select_mode.tooltip'
+                    )
+                  "
+                  class="flex size-7 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200 disabled:pointer-events-none disabled:opacity-70"
                   @click="toggleSelectMode"
                 >
-                  {{ $t("core.common.buttons.close") }}
+                  <IconClose
+                    class="size-4 text-gray-600 group-hover:text-gray-900"
+                  />
                 </button>
               </template>
             </div>

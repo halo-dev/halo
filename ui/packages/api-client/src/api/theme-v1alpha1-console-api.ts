@@ -39,8 +39,8 @@ import type { UpgradeFromUriRequest } from '../models';
 export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Activate a theme by name.
-         * @param {string} name 
+         * Activate a theme by metadata.name.
+         * @param {string} name metadata.name of the theme to activate.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -118,7 +118,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Fetch converted json config of theme by configured configMapName.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -159,7 +159,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Fetch setting of theme.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose setting will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -280,7 +280,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Invalidate theme template cache.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose template cache will be invalidated.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -383,7 +383,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Reload theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme to reload.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -424,7 +424,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Reset the configMap of theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose setting config will be reset.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -465,7 +465,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Update the configMap of theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose JSON config will be updated.
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -512,8 +512,8 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Upgrade theme
-         * @param {string} name 
-         * @param {File} file 
+         * @param {string} name metadata.name of the theme to upgrade.
+         * @param {File} file Theme zip file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -564,7 +564,7 @@ export const ThemeV1alpha1ConsoleApiAxiosParamCreator = function (configuration?
         },
         /**
          * Upgrade a theme from uri.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme to upgrade.
          * @param {UpgradeFromUriRequest} upgradeFromUriRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -619,8 +619,8 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
     const localVarAxiosParamCreator = ThemeV1alpha1ConsoleApiAxiosParamCreator(configuration)
     return {
         /**
-         * Activate a theme by name.
-         * @param {string} name 
+         * Activate a theme by metadata.name.
+         * @param {string} name metadata.name of the theme to activate.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -643,7 +643,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Fetch converted json config of theme by configured configMapName.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose JSON config will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -655,7 +655,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Fetch setting of theme.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose setting will be fetched.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -690,7 +690,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Invalidate theme template cache.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose template cache will be invalidated.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -718,7 +718,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Reload theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme to reload.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -730,7 +730,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Reset the configMap of theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose setting config will be reset.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -742,7 +742,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Update the configMap of theme setting.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme whose JSON config will be updated.
          * @param {object} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -755,12 +755,12 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Upgrade theme
-         * @param {string} name 
-         * @param {File} file 
+         * @param {string} name metadata.name of the theme to upgrade.
+         * @param {File} file Theme zip file.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async upgradeTheme(name: string, file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async upgradeTheme(name: string, file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.upgradeTheme(name, file, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ThemeV1alpha1ConsoleApi.upgradeTheme']?.[localVarOperationServerIndex]?.url;
@@ -768,7 +768,7 @@ export const ThemeV1alpha1ConsoleApiFp = function(configuration?: Configuration)
         },
         /**
          * Upgrade a theme from uri.
-         * @param {string} name 
+         * @param {string} name metadata.name of the theme to upgrade.
          * @param {UpgradeFromUriRequest} upgradeFromUriRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -789,7 +789,7 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
     const localVarFp = ThemeV1alpha1ConsoleApiFp(configuration)
     return {
         /**
-         * Activate a theme by name.
+         * Activate a theme by metadata.name.
          * @param {ThemeV1alpha1ConsoleApiActivateThemeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -891,7 +891,7 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        upgradeTheme(requestParameters: ThemeV1alpha1ConsoleApiUpgradeThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        upgradeTheme(requestParameters: ThemeV1alpha1ConsoleApiUpgradeThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
             return localVarFp.upgradeTheme(requestParameters.name, requestParameters.file, options).then((request) => request(axios, basePath));
         },
         /**
@@ -910,6 +910,9 @@ export const ThemeV1alpha1ConsoleApiFactory = function (configuration?: Configur
  * Request parameters for activateTheme operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiActivateThemeRequest {
+    /**
+     * metadata.name of the theme to activate.
+     */
     readonly name: string
 }
 
@@ -917,6 +920,9 @@ export interface ThemeV1alpha1ConsoleApiActivateThemeRequest {
  * Request parameters for fetchThemeJsonConfig operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest {
+    /**
+     * metadata.name of the theme whose JSON config will be fetched.
+     */
     readonly name: string
 }
 
@@ -924,6 +930,9 @@ export interface ThemeV1alpha1ConsoleApiFetchThemeJsonConfigRequest {
  * Request parameters for fetchThemeSetting operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiFetchThemeSettingRequest {
+    /**
+     * metadata.name of the theme whose setting will be fetched.
+     */
     readonly name: string
 }
 
@@ -938,6 +947,9 @@ export interface ThemeV1alpha1ConsoleApiInstallThemeFromUriRequest {
  * Request parameters for invalidateCache operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiInvalidateCacheRequest {
+    /**
+     * metadata.name of the theme whose template cache will be invalidated.
+     */
     readonly name: string
 }
 
@@ -975,6 +987,9 @@ export interface ThemeV1alpha1ConsoleApiListThemesRequest {
  * Request parameters for reload operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiReloadRequest {
+    /**
+     * metadata.name of the theme to reload.
+     */
     readonly name: string
 }
 
@@ -982,6 +997,9 @@ export interface ThemeV1alpha1ConsoleApiReloadRequest {
  * Request parameters for resetThemeConfig operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiResetThemeConfigRequest {
+    /**
+     * metadata.name of the theme whose setting config will be reset.
+     */
     readonly name: string
 }
 
@@ -989,6 +1007,9 @@ export interface ThemeV1alpha1ConsoleApiResetThemeConfigRequest {
  * Request parameters for updateThemeJsonConfig operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest {
+    /**
+     * metadata.name of the theme whose JSON config will be updated.
+     */
     readonly name: string
 
     readonly body: object
@@ -998,8 +1019,14 @@ export interface ThemeV1alpha1ConsoleApiUpdateThemeJsonConfigRequest {
  * Request parameters for upgradeTheme operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiUpgradeThemeRequest {
+    /**
+     * metadata.name of the theme to upgrade.
+     */
     readonly name: string
 
+    /**
+     * Theme zip file.
+     */
     readonly file: File
 }
 
@@ -1007,6 +1034,9 @@ export interface ThemeV1alpha1ConsoleApiUpgradeThemeRequest {
  * Request parameters for upgradeThemeFromUri operation in ThemeV1alpha1ConsoleApi.
  */
 export interface ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest {
+    /**
+     * metadata.name of the theme to upgrade.
+     */
     readonly name: string
 
     readonly upgradeFromUriRequest: UpgradeFromUriRequest
@@ -1017,7 +1047,7 @@ export interface ThemeV1alpha1ConsoleApiUpgradeThemeFromUriRequest {
  */
 export class ThemeV1alpha1ConsoleApi extends BaseAPI {
     /**
-     * Activate a theme by name.
+     * Activate a theme by metadata.name.
      * @param {ThemeV1alpha1ConsoleApiActivateThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

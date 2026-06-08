@@ -58,6 +58,7 @@
 - `secret`: 用于选择或者管理密钥（Secret）
   - 参数
     1. requiredKeys：用于确认所需密钥的字段名称，数组类型，每个元素包含 `key` 和 `help` 两个属性。
+    2. descriptionPreset：创建密钥时的备注预设。打开创建弹窗时会预填为 `备注预设 - 当前时间`，用户可编辑后保存。
 - `select`: 自定义的选择器组件，用于在备选项中选择一个或多个选项
   - 参数
     1. `options`：静态数据源。当 `action` 或 `remote` 存在时，此参数无效。
@@ -99,6 +100,36 @@ const postName = ref("");
   name: menus
   label: 底部菜单组
 ```
+
+## 插件扩展 FormKit 输入组件
+
+插件可以通过 UI 入口中的 `formkit.inputs` 注册自己的 FormKit 输入类型。注册后的类型可以在插件的 FormKit Schema 中通过 `$formkit` 使用，并会走 FormKit 的输入生命周期。
+
+```ts
+import { createInput } from "@formkit/vue";
+import { definePlugin } from "@halo-dev/ui-shared";
+import { defineAsyncComponent } from "vue";
+
+export default definePlugin({
+  formkit: {
+    inputs: {
+      myPluginInput: createInput(
+        defineAsyncComponent(() => import("./MyPluginInput.vue"))
+      ),
+    },
+  },
+});
+```
+
+```yaml
+- $formkit: myPluginInput
+  name: customField
+  label: 自定义字段
+```
+
+`formkit.inputs` 仅支持同步对象。如果输入组件需要懒加载，可以在输入定义内部使用 `defineAsyncComponent`。
+
+如果插件注册的输入类型名称与 Halo 内置类型或更早加载的插件类型重复，Halo 会保留已有类型，跳过冲突的插件类型并在控制台输出警告。建议插件使用带插件标识的类型名称，例如 `myPluginInput`，以降低冲突概率。
 
 ### select
 
