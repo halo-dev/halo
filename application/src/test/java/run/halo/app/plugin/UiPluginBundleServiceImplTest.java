@@ -165,7 +165,7 @@ class UiPluginBundleServiceImplTest {
 
     @Test
     void shouldGenerateRandomBundleVersionInDevelopment() {
-        var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        var clock = Clock.fixed(Instant.parse("2026-06-08T00:00:00Z"), ZoneId.systemDefault());
         uiPluginBundleService.setClock(clock);
         when(pluginManager.isDevelopment()).thenReturn(true);
 
@@ -180,7 +180,7 @@ class UiPluginBundleServiceImplTest {
 
     @Test
     void shouldGenerateRandomBundleVersionWhenActivatedThemeInDevelopment() {
-        var clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        var clock = Clock.fixed(Instant.parse("2026-06-08T00:00:00Z"), ZoneId.systemDefault());
         uiPluginBundleService.setClock(clock);
         var activeTheme = prepareActiveTheme("active", "1.0.0");
         var status = new Theme.ThemeStatus();

@@ -28,6 +28,9 @@ import run.halo.app.theme.ThemeUiResources;
 @Component
 public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
 
+    private static final String THEME_NAME_VARIABLE = "themeName";
+    private static final String RESOURCE_PATHS_VARIABLE = "resourcePaths";
+
     private final ThemeRootGetter themeRootGetter;
 
     private final WebProperties.Resources resourcesProperties;
@@ -88,8 +91,8 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             }
             Map<String, String> requiredAttribute =
                     exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            var themeName = requiredAttribute.get("themeName");
-            var resourcePaths = requiredAttribute.get("resourcePaths");
+            var themeName = requiredAttribute.get(THEME_NAME_VARIABLE);
+            var resourcePaths = requiredAttribute.get(RESOURCE_PATHS_VARIABLE);
 
             if (StringUtils.isAnyBlank(themeName, resourcePaths)) {
                 return Mono.empty();
@@ -130,8 +133,8 @@ public class ThemeWebFluxConfigurer implements WebFluxConfigurer {
             }
             Map<String, String> requiredAttribute =
                     exchange.getRequiredAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            var themeName = requiredAttribute.get("themeName");
-            var resourcePaths = requiredAttribute.get("resourcePaths");
+            var themeName = requiredAttribute.get(THEME_NAME_VARIABLE);
+            var resourcePaths = requiredAttribute.get(RESOURCE_PATHS_VARIABLE);
             if (StringUtils.isAnyBlank(themeName, resourcePaths)) {
                 return Mono.empty();
             }

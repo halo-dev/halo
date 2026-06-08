@@ -17,6 +17,7 @@ public final class ThemeUiResources {
     public static final String JS_BUNDLE = "main.js";
     public static final String CSS_BUNDLE = "style.css";
     public static final String MODULE_NAME_PREFIX = "theme:";
+    private static final String THEME_NAME_REQUIRED = "Theme name must not be blank";
 
     private ThemeUiResources() {}
 
@@ -26,7 +27,7 @@ public final class ThemeUiResources {
 
     public static @Nullable Resource getResource(Path themeRoot, String themeName, String resourcePath) {
         Assert.notNull(themeRoot, "Theme root must not be null");
-        Assert.hasText(themeName, "Theme name must not be blank");
+        Assert.hasText(themeName, THEME_NAME_REQUIRED);
         Assert.hasText(resourcePath, "Resource path must not be blank");
 
         var cleanedResourcePath = StringUtils.cleanPath(resourcePath);
@@ -52,12 +53,12 @@ public final class ThemeUiResources {
     }
 
     public static String buildModuleName(String themeName) {
-        Assert.hasText(themeName, "Theme name must not be blank");
+        Assert.hasText(themeName, THEME_NAME_REQUIRED);
         return MODULE_NAME_PREFIX + themeName;
     }
 
     public static String buildAssetUrl(String themeName, String resourceName, @Nullable String version) {
-        Assert.hasText(themeName, "Theme name must not be blank");
+        Assert.hasText(themeName, THEME_NAME_REQUIRED);
         Assert.hasText(resourceName, "Resource name must not be blank");
 
         var builder = UriComponentsBuilder.fromPath("/themes/{themeName}/ui-plugin/assets/{resourceName}");

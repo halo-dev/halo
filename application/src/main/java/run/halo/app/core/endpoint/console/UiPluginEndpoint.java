@@ -103,10 +103,9 @@ public class UiPluginEndpoint implements CustomEndpoint, InitializingBean {
             try {
                 var lastModified = Instant.ofEpochMilli(resource.lastModified());
                 bodyBuilder = bodyBuilder.lastModified(lastModified);
+            } catch (FileNotFoundException e) {
+                return Mono.error(new NoResourceFoundException(request.uri(), filename));
             } catch (IOException e) {
-                if (e instanceof FileNotFoundException) {
-                    return Mono.error(new NoResourceFoundException(request.uri(), filename));
-                }
                 return Mono.error(e);
             }
         }

@@ -151,6 +151,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
     }
 
     @Override
+    @SuppressWarnings("java:S5443")
     public void afterPropertiesSet() throws Exception {
         this.tempDir = Files.createTempDirectory("halo-ui-plugin-bundle");
     }
@@ -253,43 +254,55 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
             if (isResourceMatch(resource, filename)) {
                 return Mono.just(resource);
             }
-            return generateBundleVersion().flatMap(newVersion -> {
-                var newFilename = buildBundleFilename(newVersion, suffix);
-                if (isResourceMatch(this.resource, newFilename)) {
-                    return Mono.just(resource);
-                }
-                if (writing.compareAndSet(false, true)) {
-                    return Mono.justOrEmpty(this.resource)
-                            .filter(res -> isResourceMatch(res, newFilename))
-                            .switchIfEmpty(Mono.using(
-                                            () -> {
-                                                if (!Files.exists(tempDir)) {
-                                                    Files.createDirectories(tempDir);
-                                                }
-                                                return tempDir.resolve(newFilename);
-                                            },
-                                            path -> DataBufferUtils.write(content, path, CREATE, TRUNCATE_EXISTING)
-                                                    .then(Mono.<Resource>fromSupplier(
-                                                            () -> new FileSystemResource(path))),
-                                            path -> {
-                                                if (shouldCleanUp(path)) {
-                                                    cleanUp(this.resource);
-                                                }
-                                            })
-                                    .subscribeOn(scheduler)
-                                    .doOnNext(newResource -> this.resource = newResource))
-                            .doFinally(signalType -> writing.set(false));
-                }
-                return Mono.defer(() -> {
-                            if (this.writing.get()) {
-                                log.debug("Waiting for the UI plugin bundle file {} to be written", filename);
-                                return Mono.empty();
-                            }
-                            log.debug("Waited the UI plugin bundle file {} to be written", filename);
-                            return Mono.just(this.resource);
-                        })
-                        .repeatWhenEmpty(100, count -> count.delayElements(Duration.ofMillis(100)));
-            });
+            return generateBundleVersion()
+                    .map(newVersion -> buildBundleFilename(newVersion, suffix))
+                    .flatMap(newFilename -> computeByFilename(filename, newFilename, content));
+        }
+
+        private Mono<Resource> computeByFilename(
+                String requestedFilename, String newFilename, Publisher<DataBuffer> content) {
+            if (isResourceMatch(this.resource, newFilename)) {
+                return Mono.just(resource);
+            }
+            if (writing.compareAndSet(false, true)) {
+                return writeBundle(newFilename, content).doFinally(signalType -> writing.set(false));
+            }
+            return waitForBundle(requestedFilename);
+        }
+
+        private Mono<Resource> writeBundle(String newFilename, Publisher<DataBuffer> content) {
+            return Mono.justOrEmpty(this.resource)
+                    .filter(res -> isResourceMatch(res, newFilename))
+                    .switchIfEmpty(Mono.using(
+                                    () -> bundlePath(newFilename),
+                                    path -> DataBufferUtils.write(content, path, CREATE, TRUNCATE_EXISTING)
+                                            .then(Mono.<Resource>fromSupplier(() -> new FileSystemResource(path))),
+                                    path -> {
+                                        if (shouldCleanUp(path)) {
+                                            cleanUp(this.resource);
+                                        }
+                                    })
+                            .subscribeOn(scheduler)
+                            .doOnNext(newResource -> this.resource = newResource));
+        }
+
+        private Path bundlePath(String filename) throws IOException {
+            if (!Files.exists(tempDir)) {
+                Files.createDirectories(tempDir);
+            }
+            return tempDir.resolve(filename);
+        }
+
+        private Mono<Resource> waitForBundle(String filename) {
+            return Mono.defer(() -> {
+                        if (this.writing.get()) {
+                            log.debug("Waiting for the UI plugin bundle file {} to be written", filename);
+                            return Mono.empty();
+                        }
+                        log.debug("Waited the UI plugin bundle file {} to be written", filename);
+                        return Mono.just(this.resource);
+                    })
+                    .repeatWhenEmpty(100, count -> count.delayElements(Duration.ofMillis(100)));
         }
 
         private boolean shouldCleanUp(Path newPath) {
