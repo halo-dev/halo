@@ -5,10 +5,9 @@ import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import {
-  loadEnabledUiPluginModules,
   notifyPluginLoadError,
-  setupPluginModules,
   setupPluginStyles,
+  setupUiPluginRuntime,
 } from "./setupModules";
 
 const mocks = vi.hoisted(() => ({
@@ -59,12 +58,30 @@ describe("setupPluginModules", () => {
       name: "ThemeRoute",
       component: {},
     } as RouteRecordRaw;
+    const pluginInput = {
+      type: "input",
+      schema: [],
+    };
+    const themeInput = {
+      type: "input",
+      schema: [],
+    };
     const pluginModule: PluginModule = {
+      formkit: {
+        inputs: {
+          "plugin-input": pluginInput,
+        },
+      },
       routes: [pluginRoute],
-    };
+    } as PluginModule;
     const themeModule: PluginModule = {
+      formkit: {
+        inputs: {
+          "theme-input": themeInput,
+        },
+      },
       routes: [themeRoute],
-    };
+    } as PluginModule;
     mocks.useScriptTag.mockImplementation((src: string) => ({
       load: vi.fn(async () => {
         if (src.includes("/ui-plugins/-/bundle.js")) {
@@ -91,20 +108,24 @@ describe("setupPluginModules", () => {
       addRoute: vi.fn(),
       removeRoute: vi.fn(),
     } as unknown as Router;
+    const setupComponents = vi.fn();
 
-    const uiPluginModules = await loadEnabledUiPluginModules();
-
-    setupPluginModules({
+    await setupUiPluginRuntime({
       app,
       router,
       platform: "console",
-      modules: uiPluginModules,
+      setupComponents,
+      registeredFormKitInputs: {},
     });
-    await setupPluginStyles();
 
     const store = usePluginModuleStore();
     expect(store.pluginModuleMap["plugin-one"]).toBe(pluginModule);
     expect(store.pluginModuleMap["theme:earth"]).toBe(themeModule);
+    expect(setupComponents).toHaveBeenCalledWith({
+      formkitInputs: {
+        "plugin-input": pluginInput,
+      },
+    });
     expect(router.addRoute).toHaveBeenCalledWith(pluginRoute);
     expect(router.addRoute).toHaveBeenCalledWith(themeRoute);
     expect(mocks.loadStyle).toHaveBeenCalledWith(

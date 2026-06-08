@@ -1,11 +1,14 @@
+import type { FormKitLibrary } from "@formkit/core";
 import { Toast } from "@halo-dev/components";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/ui-shared";
 import { useScriptTag } from "@vueuse/core";
 import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
+import { collectPluginFormKitInputs } from "@/formkit/plugin-inputs";
 import { i18n } from "@/locales";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { loadStyle } from "@/utils/load-style";
+import type { SetupComponentsOptions } from "./setupComponents";
 
 export type Platform = "console" | "uc";
 
@@ -28,6 +31,60 @@ export interface LoadedPluginModule {
   name: string;
   type: EnabledUiPlugin["type"];
   module: PluginModule;
+}
+
+export async function setupUiPluginRuntime({
+  app,
+  router,
+  platform,
+  setupComponents,
+  registeredFormKitInputs,
+}: {
+  app: App;
+  router: Router;
+  platform: Platform;
+  setupComponents: (options?: SetupComponentsOptions) => void;
+  registeredFormKitInputs: FormKitLibrary;
+}) {
+  let pluginBundleLoaded = false;
+  let pluginModulesInitialized = false;
+  let uiPluginModules: LoadedPluginModule[] = [];
+
+  try {
+    uiPluginModules = await loadEnabledUiPluginModules();
+    pluginBundleLoaded = true;
+  } catch (e) {
+    notifyPluginLoadError(e);
+  }
+
+  setupComponents({
+    formkitInputs: collectPluginFormKitInputs(
+      uiPluginModules.filter((module) => module.type === "plugin"),
+      registeredFormKitInputs
+    ),
+  });
+
+  try {
+    setupPluginModules({
+      app,
+      router,
+      platform,
+      modules: uiPluginModules,
+    });
+    pluginModulesInitialized = true;
+  } catch (e) {
+    notifyPluginLoadError(e);
+  }
+
+  if (pluginBundleLoaded && pluginModulesInitialized) {
+    try {
+      await setupPluginStyles();
+    } catch (e) {
+      notifyPluginLoadError(e);
+    }
+  }
+
+  return uiPluginModules;
 }
 
 export function setupCoreModules({
