@@ -5,12 +5,9 @@ import jakarta.annotation.PreDestroy;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.comparator.Comparators;
@@ -41,19 +38,21 @@ class MenuTreeCache implements Watcher {
 
     private final ReactiveExtensionClient client;
 
-    private final CacheManager cacheManager;
-
-    private final AtomicReference<Mono<List<MenuVo>>> loading = new AtomicReference<>();
-
     private final AtomicLong invalidationVersion = new AtomicLong();
+
+    private final Mono<VersionedMenuTree> menuTree;
 
     private volatile boolean disposed;
 
     private Runnable disposeHook;
 
-    MenuTreeCache(ReactiveExtensionClient client, CacheManager cacheManager) {
+    MenuTreeCache(ReactiveExtensionClient client) {
         this.client = client;
-        this.cacheManager = cacheManager;
+        this.menuTree = Mono.defer(() -> {
+                    var version = invalidationVersion.get();
+                    return loadMenuTree().map(menuTree -> new VersionedMenuTree(version, List.copyOf(menuTree)));
+                })
+                .cacheInvalidateIf(cached -> cached.version() != invalidationVersion.get());
     }
 
     @PostConstruct
@@ -74,13 +73,11 @@ class MenuTreeCache implements Watcher {
     }
 
     Flux<MenuVo> listAsTree() {
-        return Mono.defer(this::getOrLoad).flatMapMany(Flux::fromIterable);
+        return menuTree.map(VersionedMenuTree::menuTree).flatMapMany(Flux::fromIterable);
     }
 
     void evict() {
         invalidationVersion.incrementAndGet();
-        loading.set(null);
-        menuCache().ifPresent(cache -> cache.evictIfPresent(CACHE_KEY));
         log.debug("Evicted {} cache", CACHE_NAME);
     }
 
@@ -120,38 +117,6 @@ class MenuTreeCache implements Watcher {
     @Override
     public boolean isDisposed() {
         return disposed;
-    }
-
-    private Mono<List<MenuVo>> getOrLoad() {
-        var cachedMenuTree = getCachedMenuTree();
-        if (cachedMenuTree != null) {
-            return Mono.just(cachedMenuTree);
-        }
-        var existingLoading = loading.get();
-        if (existingLoading != null) {
-            return existingLoading;
-        }
-        var currentVersion = invalidationVersion.get();
-        var newLoading = newLoading(currentVersion);
-        if (loading.compareAndSet(null, newLoading)) {
-            return newLoading;
-        }
-        var currentLoading = loading.get();
-        return currentLoading == null ? getOrLoad() : currentLoading;
-    }
-
-    private Mono<List<MenuVo>> newLoading(long version) {
-        var loadingRef = new AtomicReference<Mono<List<MenuVo>>>();
-        var mono = loadMenuTree()
-                .doOnNext(menuTree -> {
-                    if (invalidationVersion.get() == version) {
-                        putCachedMenuTree(menuTree);
-                    }
-                })
-                .doFinally(signalType -> loading.compareAndSet(loadingRef.get(), null))
-                .cache();
-        loadingRef.set(mono);
-        return mono;
     }
 
     private Mono<List<MenuVo>> loadMenuTree() {
@@ -195,25 +160,6 @@ class MenuTreeCache implements Watcher {
     private boolean menuItemTreeChanged(MenuItem oldMenuItem, MenuItem newMenuItem) {
         return !Objects.equals(oldMenuItem.getSpec(), newMenuItem.getSpec())
                 || !Objects.equals(oldMenuItem.getStatus(), newMenuItem.getStatus());
-    }
-
-    private Optional<Cache> menuCache() {
-        return Optional.ofNullable(cacheManager.getCache(CACHE_NAME));
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<MenuVo> getCachedMenuTree() {
-        return menuCache()
-                .map(cache -> cache.get(CACHE_KEY))
-                .map(Cache.ValueWrapper::get)
-                .filter(List.class::isInstance)
-                .map(List.class::cast)
-                .map(list -> (List<MenuVo>) list)
-                .orElse(null);
-    }
-
-    private void putCachedMenuTree(List<MenuVo> menuTree) {
-        menuCache().ifPresent(cache -> cache.put(CACHE_KEY, List.copyOf(menuTree)));
     }
 
     static List<MenuItemVo> listToTree(Collection<MenuItemVo> list) {
@@ -261,4 +207,6 @@ class MenuTreeCache implements Watcher {
         });
         return nameIdentityMap.values();
     }
+
+    private record VersionedMenuTree(long version, List<MenuVo> menuTree) {}
 }

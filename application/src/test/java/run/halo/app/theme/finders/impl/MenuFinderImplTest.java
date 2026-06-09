@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -49,7 +48,7 @@ class MenuFinderImplTest {
 
     @BeforeEach
     void setUp() {
-        menuTreeCache = new MenuTreeCache(client, new ConcurrentMapCacheManager());
+        menuTreeCache = new MenuTreeCache(client);
         menuFinder = new MenuFinderImpl(menuTreeCache, environmentFetcher);
     }
 
