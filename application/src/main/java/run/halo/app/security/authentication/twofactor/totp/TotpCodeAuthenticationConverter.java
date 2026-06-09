@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
 import run.halo.app.security.authentication.exception.TwoFactorAuthException;
 import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
@@ -63,7 +62,7 @@ public class TotpCodeAuthenticationConverter implements ServerAuthenticationConv
     private Function<Authentication, Mono<Authentication>> createRateLimiter(ServerWebExchange exchange) {
         return auth -> exchange.getSession()
                 .map(session -> "totp-validation-" + session.getId())
-                .defaultIfEmpty("totp-validation-" + IpAddressUtils.getClientIp(exchange.getRequest()))
+                .switchIfEmpty(Mono.error(() -> new TwoFactorAuthException("Session required for TOTP validation.")))
                 .flatMap(key -> {
                     var rateLimiter = rateLimiterRegistry.rateLimiter(key, "totp-validation");
                     if (log.isDebugEnabled()) {

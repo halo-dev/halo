@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,9 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -50,23 +46,12 @@ class TotpCodeAuthenticationConverterTest {
 
     MultiValueMap<String, String> formData;
 
-    MultiValueMap<String, HttpCookie> cookies;
-
-    HttpHeaders headers;
-
     TwoFactorAuthentication twoFactorAuthentication;
 
     @BeforeEach
     void setUp() {
         formData = new LinkedMultiValueMap<>();
-        cookies = new LinkedMultiValueMap<>();
-        headers = new HttpHeaders();
 
-        var request = mock(ServerHttpRequest.class);
-        lenient().when(request.getCookies()).thenReturn(cookies);
-        lenient().when(request.getHeaders()).thenReturn(headers);
-
-        lenient().when(exchange.getRequest()).thenReturn(request);
         lenient().when(exchange.getFormData()).thenReturn(Mono.just(formData));
         lenient().when(exchange.getSession()).thenReturn(Mono.just(webSession));
 
@@ -161,7 +146,7 @@ class TotpCodeAuthenticationConverterTest {
     }
 
     @Test
-    void shouldDeriveRateLimitKeyFromSessionIdWhenSessionAvailable() {
+    void shouldDeriveRateLimitKeyFromSessionId() {
         formData.add("code", "123456");
         when(webSession.getId()).thenReturn("test-session-id-xyz");
 
@@ -173,29 +158,12 @@ class TotpCodeAuthenticationConverterTest {
     }
 
     @Test
-    void shouldFallBackToClientIpKeyWhenSessionUnavailable() {
+    void shouldRejectWhenSessionUnavailable() {
         formData.add("code", "123456");
-        // No active WebSession — session resolution returns empty.
-        when(exchange.getSession()).thenReturn(Mono.empty());
-        headers.add("X-Forwarded-For", "203.0.113.42");
-
-        StepVerifier.create(runConvert()).expectNextCount(1).verifyComplete();
-
-        var keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(rateLimiterRegistry).rateLimiter(keyCaptor.capture(), eq("totp-validation"));
-        assertEquals("totp-validation-203.0.113.42", keyCaptor.getValue());
-    }
-
-    @Test
-    void shouldFallBackToUnknownKeyWhenNoSessionNoIpHeader() {
-        formData.add("code", "123456");
-        // No active WebSession, no IP headers — IpAddressUtils returns "unknown".
         when(exchange.getSession()).thenReturn(Mono.empty());
 
-        StepVerifier.create(runConvert()).expectNextCount(1).verifyComplete();
-
-        var keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(rateLimiterRegistry).rateLimiter(keyCaptor.capture(), eq("totp-validation"));
-        assertEquals("totp-validation-unknown", keyCaptor.getValue());
+        StepVerifier.create(runConvert())
+                .expectError(TwoFactorAuthException.class)
+                .verify();
     }
 }
