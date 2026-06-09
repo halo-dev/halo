@@ -209,13 +209,19 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
 
     private static String enabledUiPluginsScript(Iterable<PluginWrapper> plugins, Theme theme) {
         var sb = new StringBuilder("this.enabledUiPlugins = [");
+        var enabledPlugins = new StringBuilder("this.enabledPlugins = [");
         var first = true;
         for (var plugin : plugins) {
             if (!first) {
                 sb.append(',');
+                enabledPlugins.append(',');
             }
             sb.append("""
                 {"name":"%s","type":"plugin","version":"%s"}\
+                """.formatted(plugin.getPluginId(), plugin.getDescriptor().getVersion()));
+            enabledPlugins.append(
+                    """
+                {"name":"%s","version":"%s"}\
                 """.formatted(plugin.getPluginId(), plugin.getDescriptor().getVersion()));
             first = false;
         }
@@ -232,6 +238,8 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
                             Objects.toString(theme.getSpec().getVersion(), "")));
         }
         sb.append(']');
+        enabledPlugins.append(']');
+        sb.append(';').append(enabledPlugins);
         return sb.toString();
     }
 
