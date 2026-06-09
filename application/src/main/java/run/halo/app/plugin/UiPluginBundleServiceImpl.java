@@ -209,6 +209,7 @@ public class UiPluginBundleServiceImpl implements UiPluginBundleService, Initial
 
     private static String enabledUiPluginsScript(Iterable<PluginWrapper> plugins, Theme theme) {
         var sb = new StringBuilder("this.enabledUiPlugins = [");
+        // Keep enabledPlugins temporarily for compatibility. It will be removed in a future release.
         var enabledPlugins = new StringBuilder("this.enabledPlugins = [");
         var first = true;
         for (var plugin : plugins) {
