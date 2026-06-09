@@ -2,12 +2,12 @@ package run.halo.app.security.authentication.twofactor;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
@@ -29,15 +29,23 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final ServerRequestCache serverRequestCache;
 
+    private final RateLimiterRegistry rateLimiterRegistry;
+
+    private final TotpAuthenticationFailureHandler failureHandler;
+
     public TwoFactorAuthSecurityConfigurer(
             ServerSecurityContextRepository securityContextRepository,
             TotpAuthService totpAuthService,
             LoginHandlerEnhancer loginHandlerEnhancer,
-            ServerRequestCache serverRequestCache) {
+            ServerRequestCache serverRequestCache,
+            RateLimiterRegistry rateLimiterRegistry,
+            TotpAuthenticationFailureHandler failureHandler) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
         this.serverRequestCache = serverRequestCache;
+        this.rateLimiterRegistry = rateLimiterRegistry;
+        this.failureHandler = failureHandler;
     }
 
     @Override
@@ -46,11 +54,10 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
         var filter = new AuthenticationWebFilter(authManager);
         filter.setRequiresAuthenticationMatcher(pathMatchers(HttpMethod.POST, "/challenges/two-factor/totp"));
         filter.setSecurityContextRepository(securityContextRepository);
-        filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter());
+        filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter(rateLimiterRegistry));
         filter.setAuthenticationSuccessHandler(
                 new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache));
-        filter.setAuthenticationFailureHandler(
-                new RedirectServerAuthenticationFailureHandler("/challenges/two-factor/totp?error"));
+        filter.setAuthenticationFailureHandler(failureHandler);
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
 }
