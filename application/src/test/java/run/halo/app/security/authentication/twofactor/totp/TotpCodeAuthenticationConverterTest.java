@@ -26,6 +26,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.security.authentication.exception.TooManyRequestsException;
@@ -40,6 +41,9 @@ class TotpCodeAuthenticationConverterTest {
 
     @Mock
     RateLimiterRegistry rateLimiterRegistry;
+
+    @Mock
+    WebSession webSession;
 
     @InjectMocks
     TotpCodeAuthenticationConverter converter;
@@ -64,6 +68,7 @@ class TotpCodeAuthenticationConverterTest {
 
         lenient().when(exchange.getRequest()).thenReturn(request);
         lenient().when(exchange.getFormData()).thenReturn(Mono.just(formData));
+        lenient().when(exchange.getSession()).thenReturn(Mono.just(webSession));
 
         // Default rate limiter that always permits — individual tests override.
         lenient()
@@ -156,21 +161,22 @@ class TotpCodeAuthenticationConverterTest {
     }
 
     @Test
-    void shouldDeriveRateLimitKeyFromSessionCookieWhenPresent() {
+    void shouldDeriveRateLimitKeyFromSessionIdWhenSessionAvailable() {
         formData.add("code", "123456");
-        cookies.add("SESSION", new HttpCookie("SESSION", "session-token-abc"));
+        when(webSession.getId()).thenReturn("test-session-id-xyz");
 
         StepVerifier.create(runConvert()).expectNextCount(1).verifyComplete();
 
         var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(rateLimiterRegistry).rateLimiter(keyCaptor.capture(), eq("totp-validation"));
-        assertEquals("totp-validation-session-token-abc", keyCaptor.getValue());
+        assertEquals("totp-validation-test-session-id-xyz", keyCaptor.getValue());
     }
 
     @Test
-    void shouldFallBackToClientIpKeyWhenSessionCookieMissing() {
+    void shouldFallBackToClientIpKeyWhenSessionUnavailable() {
         formData.add("code", "123456");
-        // cookies left empty — no SESSION cookie.
+        // No active WebSession — session resolution returns empty.
+        when(exchange.getSession()).thenReturn(Mono.empty());
         headers.add("X-Forwarded-For", "203.0.113.42");
 
         StepVerifier.create(runConvert()).expectNextCount(1).verifyComplete();
@@ -183,7 +189,8 @@ class TotpCodeAuthenticationConverterTest {
     @Test
     void shouldFallBackToUnknownKeyWhenNoSessionNoIpHeader() {
         formData.add("code", "123456");
-        // cookies + headers both empty — IpAddressUtils returns "unknown".
+        // No active WebSession, no IP headers — IpAddressUtils returns "unknown".
+        when(exchange.getSession()).thenReturn(Mono.empty());
 
         StepVerifier.create(runConvert()).expectNextCount(1).verifyComplete();
 

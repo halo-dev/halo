@@ -100,11 +100,11 @@ resilience4j.ratelimiter:
     authentication:
       limitForPeriod: 3
       limitRefreshPeriod: 1m
-      timeoutDuration: 0
+      timeoutDuration: 0s
     totp-validation:
       limitForPeriod: 5
       limitRefreshPeriod: 5m
-      timeoutDuration: 0
+      timeoutDuration: 0s
     comment-creation:
       limitForPeriod: 10
       limitRefreshPeriod: 1m

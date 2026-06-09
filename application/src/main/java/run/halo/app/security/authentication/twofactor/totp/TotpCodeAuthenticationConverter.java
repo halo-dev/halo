@@ -3,6 +3,8 @@ package run.halo.app.security.authentication.twofactor.totp;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
+import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -20,6 +22,7 @@ import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
  *
  * @author johnniang
  */
+@Slf4j
 public class TotpCodeAuthenticationConverter implements ServerAuthenticationConverter {
 
     private final String codeParameter = "code";
@@ -38,10 +41,8 @@ public class TotpCodeAuthenticationConverter implements ServerAuthenticationConv
                 .filter(TwoFactorAuthentication.class::isInstance)
                 .switchIfEmpty(Mono.error(() -> new TwoFactorAuthException("MFA Authentication required.")))
                 .flatMap(authentication -> exchange.getFormData())
-                // Explicit <Authentication> type witness anchors the chain through
-                // transformDeferred(RateLimiterOperator<T>) so that onErrorMap below
-                // resolves correctly — mirrors LoginAuthenticationConverter's
-                // .<Authentication>flatMap pattern.
+                // .<Authentication>handle extracts creds from form data,
+                // then .flatMap applies the session-based rate limiter.
                 .<Authentication>handle((formData, sink) -> {
                     var codeStr = formData.getFirst(codeParameter);
                     if (StringUtils.isBlank(codeStr)) {
@@ -55,16 +56,26 @@ public class TotpCodeAuthenticationConverter implements ServerAuthenticationConv
                         sink.error(new TwoFactorAuthException("Invalid code parameter " + codeStr + '.'));
                     }
                 })
-                .transformDeferred(createRateLimiter(exchange))
+                .flatMap(createRateLimiter(exchange))
                 .onErrorMap(RequestNotPermitted.class, TooManyRequestsException::new);
     }
 
-    private <T> RateLimiterOperator<T> createRateLimiter(ServerWebExchange exchange) {
-        var sessionCookie = exchange.getRequest().getCookies().getFirst("SESSION");
-        var key = "totp-validation-"
-                + (sessionCookie != null
-                        ? sessionCookie.getValue()
-                        : IpAddressUtils.getClientIp(exchange.getRequest()));
-        return RateLimiterOperator.of(rateLimiterRegistry.rateLimiter(key, "totp-validation"));
+    private Function<Authentication, Mono<Authentication>> createRateLimiter(ServerWebExchange exchange) {
+        return auth -> exchange.getSession()
+                .map(session -> "totp-validation-" + session.getId())
+                .defaultIfEmpty("totp-validation-" + IpAddressUtils.getClientIp(exchange.getRequest()))
+                .flatMap(key -> {
+                    var rateLimiter = rateLimiterRegistry.rateLimiter(key, "totp-validation");
+                    if (log.isDebugEnabled()) {
+                        var metrics = rateLimiter.getMetrics();
+                        log.debug(
+                                "TOTP validation with Rate Limiter: {}, available permissions: {}, "
+                                        + "number of waiting threads: {}",
+                                rateLimiter,
+                                metrics.getAvailablePermissions(),
+                                metrics.getNumberOfWaitingThreads());
+                    }
+                    return Mono.just(auth).transformDeferred(RateLimiterOperator.of(rateLimiter));
+                });
     }
 }
