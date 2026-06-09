@@ -7,7 +7,14 @@
   method="post"
 >
   <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
-    <strong th:text="#{form.messages.invalidError}"></strong>
+    <strong
+      th:if="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.rateLimitError}"
+    ></strong>
+    <strong
+      th:unless="${#strings.equals(param.error[0], 'rate-limit-exceeded')}"
+      th:text="#{form.messages.invalidError}"
+    ></strong>
   </div>
   <div class="form-item">
     <label for="code" th:text="#{form.code.label}"></label>

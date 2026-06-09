@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
@@ -32,17 +31,21 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
 
     private final RateLimiterRegistry rateLimiterRegistry;
 
+    private final TotpAuthenticationFailureHandler failureHandler;
+
     public TwoFactorAuthSecurityConfigurer(
             ServerSecurityContextRepository securityContextRepository,
             TotpAuthService totpAuthService,
             LoginHandlerEnhancer loginHandlerEnhancer,
             ServerRequestCache serverRequestCache,
-            RateLimiterRegistry rateLimiterRegistry) {
+            RateLimiterRegistry rateLimiterRegistry,
+            TotpAuthenticationFailureHandler failureHandler) {
         this.securityContextRepository = securityContextRepository;
         this.totpAuthService = totpAuthService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
         this.serverRequestCache = serverRequestCache;
         this.rateLimiterRegistry = rateLimiterRegistry;
+        this.failureHandler = failureHandler;
     }
 
     @Override
@@ -54,8 +57,7 @@ public class TwoFactorAuthSecurityConfigurer implements SecurityConfigurer {
         filter.setServerAuthenticationConverter(new TotpCodeAuthenticationConverter(rateLimiterRegistry));
         filter.setAuthenticationSuccessHandler(
                 new TotpAuthenticationSuccessHandler(loginHandlerEnhancer, serverRequestCache));
-        filter.setAuthenticationFailureHandler(
-                new RedirectServerAuthenticationFailureHandler("/challenges/two-factor/totp?error"));
+        filter.setAuthenticationFailureHandler(failureHandler);
         http.addFilterAt(filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
 }
