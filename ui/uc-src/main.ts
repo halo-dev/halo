@@ -5,21 +5,13 @@ import { createPinia } from "pinia";
 import "@/setup/setupStyles";
 import { createApp } from "vue";
 import { builtinFormKitInputs } from "@/formkit/inputs";
-import { collectPluginFormKitInputs } from "@/formkit/plugin-inputs";
 import { setLanguage, setupI18n } from "@/locales";
 import { setupApiClient } from "@/setup/setupApiClient";
 import {
   setupComponents,
   type SetupComponentsOptions,
 } from "@/setup/setupComponents";
-import {
-  loadEnabledUiPluginModules,
-  notifyPluginLoadError,
-  setupCoreModules,
-  setupPluginModules,
-  setupPluginStyles,
-  type LoadedPluginModule,
-} from "@/setup/setupModules";
+import { setupCoreModules, setupUiPluginRuntime } from "@/setup/setupModules";
 import "core-js/es/object/has-own";
 import { setupUserPermissions } from "@/setup/setupUserPermissions";
 import { setupVueQuery } from "@/setup/setupVueQuery";
@@ -45,10 +37,6 @@ function setupAppComponents(options?: SetupComponentsOptions) {
 await initApp();
 
 async function initApp() {
-  let pluginBundleLoaded = false;
-  let pluginModulesInitialized = false;
-  let uiPluginModules: LoadedPluginModule[] = [];
-
   try {
     setupCoreModules({ app, router, platform: "uc", modules });
 
@@ -67,39 +55,13 @@ async function initApp() {
 
     await setupUserPermissions(app);
 
-    try {
-      uiPluginModules = await loadEnabledUiPluginModules();
-      pluginBundleLoaded = true;
-    } catch (e) {
-      notifyPluginLoadError(e);
-    }
-
-    setupAppComponents({
-      formkitInputs: collectPluginFormKitInputs(
-        uiPluginModules.filter((module) => module.type === "plugin"),
-        builtinFormKitInputs
-      ),
+    await setupUiPluginRuntime({
+      app,
+      router,
+      platform: "uc",
+      setupComponents: setupAppComponents,
+      registeredFormKitInputs: builtinFormKitInputs,
     });
-
-    try {
-      setupPluginModules({
-        app,
-        router,
-        platform: "uc",
-        modules: uiPluginModules,
-      });
-      pluginModulesInitialized = true;
-    } catch (e) {
-      notifyPluginLoadError(e);
-    }
-
-    if (pluginBundleLoaded && pluginModulesInitialized) {
-      try {
-        await setupPluginStyles();
-      } catch (e) {
-        notifyPluginLoadError(e);
-      }
-    }
   } catch (error) {
     console.error("Failed to init app", error);
   } finally {
