@@ -132,7 +132,9 @@ class MigrationServiceImpl implements MigrationService, InitializingBean {
                 sink.error(new ServerWebInputException("Current backup is not downloadable."));
                 return;
             }
-            var backupFile = getBackupsRoot().resolve(status.getFilename());
+            var backupsRoot = getBackupsRoot();
+            var backupFile = backupsRoot.resolve(status.getFilename());
+            checkDirectoryTraversal(backupsRoot, backupFile);
             var resource = new FileSystemResource(backupFile);
             if (!resource.exists()) {
                 sink.error(new NotFoundException(
