@@ -16,12 +16,8 @@ const DEV_SERVER_PORT = 3000;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const command = process.env.VP_COMMAND;
 const isBuild = command === "build";
-const isTest = command === "test";
 
 export default defineConfig({
-  experimental: {
-    bundledDev: !isTest,
-  },
   plugins: [
     Vue(),
     VueJsx(),
