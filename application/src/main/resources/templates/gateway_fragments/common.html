@@ -154,6 +154,10 @@
       const rememberMeCheckbox = document.getElementById("remember-me");
       const socialAuthProviders = document.querySelectorAll(".social-auth-provider-form");
 
+      if (!rememberMeCheckbox) {
+        return;
+      }
+
       rememberMeCheckbox.addEventListener("change", function (e) {
         const rememberMe = e.target.checked;
 
