@@ -81,6 +81,9 @@ class UiPluginBundleServiceImplTest {
                         .contains("""
                             this.enabledUiPlugins = [{"name":"fake-plugin","type":"plugin","version":"1.0.0"},{"name":"theme:active","type":"theme","themeName":"active","version":"1.0.0"}]\
                             """)
+                        .contains("""
+                            this.enabledPlugins = [{"name":"fake-plugin","version":"1.0.0"}]\
+                            """)
                         .doesNotContain("console.log(\"inactive\");"))
                 .verifyComplete();
     }
@@ -140,8 +143,11 @@ class UiPluginBundleServiceImplTest {
 
         toString(uiPluginBundleService.uglifyJsBundle())
                 .as(StepVerifier::create)
-                .assertNext(content -> assertThat(content).contains("""
+                .assertNext(content ->
+                        assertThat(content).contains("""
                             this.enabledUiPlugins = [{"name":"fake-plugin","type":"plugin","version":"1.0.0"}]\
+                            """).contains("""
+                            this.enabledPlugins = [{"name":"fake-plugin","version":"1.0.0"}]\
                             """).doesNotContain("theme:active"))
                 .verifyComplete();
     }
