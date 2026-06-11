@@ -4,15 +4,13 @@ import MultipleOverflow from "./MultipleOverflow.vue";
 import MultipleOverflowItem from "./MultipleOverflowItem.vue";
 import MultipleSelect from "./MultipleSelect.vue";
 import MultipleSelectSearchInput from "./MultipleSelectSearchInput.vue";
+import type { SelectOption } from "./types";
 
 const props = withDefaults(
   defineProps<{
     sortable: boolean;
     placeholder?: string;
-    selectedOptions: Array<{
-      label: string;
-      value: string;
-    }>;
+    selectedOptions: SelectOption[];
     searchable: boolean;
   }>(),
   {
@@ -23,15 +21,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: "search", value: string): void;
   (event: "blur", value: FocusEvent): void;
-  (
-    event: "deleteItem",
-    index: number,
-    option?: {
-      label: string;
-      value: string;
-    }
-  ): void;
-  (event: "sort", value: Array<{ label: string; value: string }>): void;
+  (event: "deleteItem", index: number, option?: SelectOption): void;
+  (event: "sort", value: SelectOption[]): void;
 }>();
 
 const inputRef = ref();

@@ -7,43 +7,23 @@ import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 import { watch } from "vue";
 import MultipleOverflowItem from "./MultipleOverflowItem.vue";
 import MultipleSelectItem from "./MultipleSelectItem.vue";
+import type { SelectOption } from "./types";
 
 const props = defineProps<{
-  selectedOptions: Array<{
-    label: string;
-    value: string;
-  }>;
+  selectedOptions: SelectOption[];
   sortable: boolean;
 }>();
 
 const emit = defineEmits<{
-  (
-    event: "deleteItem",
-    index: number,
-    option?: {
-      label: string;
-      value: string;
-    }
-  ): void;
-  (event: "sort", value: Array<{ label: string; value: string }>): void;
+  (event: "deleteItem", index: number, option?: SelectOption): void;
+  (event: "sort", value: SelectOption[]): void;
 }>();
 
-const [parent, options] = useDragAndDrop<{
-  label: string;
-  value: string;
-}>(props.selectedOptions, {
+const [parent, options] = useDragAndDrop<SelectOption>(props.selectedOptions, {
   disabled: !props.sortable,
   sortable: true,
   handleEnd: (
-    data:
-      | NodeDragEventData<{
-          label: string;
-          value: string;
-        }>
-      | NodeTouchEventData<{
-          label: string;
-          value: string;
-        }>
+    data: NodeDragEventData<SelectOption> | NodeTouchEventData<SelectOption>
   ) => {
     const nodeData = data.targetData.node.data;
     const dragBeforeIndex = props.selectedOptions.findIndex(

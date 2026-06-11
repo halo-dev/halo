@@ -5,23 +5,18 @@ import { useEventListener, type UseScrollReturn } from "@vueuse/core";
 import { computed, ref, watch } from "vue";
 import { isFalse } from "./isFalse";
 import SelectOptionItem from "./SelectOptionItem.vue";
+import type { SelectOption } from "./types";
 
 const props = defineProps<{
-  options: Array<Record<string, unknown> & { label: string; value: string }>;
-  selectedOptions?: Array<{
-    label: string;
-    value: string;
-  }>;
+  options: SelectOption[];
+  selectedOptions?: SelectOption[];
   multiple: boolean;
   maxCount: number;
   nextLoading: boolean;
 }>();
 
 const emit = defineEmits<{
-  (
-    event: "selected",
-    value: Record<string, unknown> & { label: string; value: string }
-  ): void;
+  (event: "selected", value: SelectOption): void;
   (event: "loadMore"): void;
 }>();
 
@@ -118,9 +113,7 @@ const reachMaximumLimit = computed(() => {
   return false;
 });
 
-const isDisabled = (
-  option: Record<string, unknown> & { label: string; value: string }
-) => {
+const isDisabled = (option: SelectOption) => {
   const attrs = option.attrs as Record<string, unknown>;
   return (
     (reachMaximumLimit.value &&

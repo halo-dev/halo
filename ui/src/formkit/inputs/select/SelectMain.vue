@@ -17,9 +17,17 @@ import {
   type PropType,
 } from "vue";
 import { isFalse } from "./isFalse";
+import { mapItemsToSelectOptions } from "./option-utils";
 import SelectContainer from "./SelectContainer.vue";
+import type {
+  SelectActionRequest,
+  SelectOption,
+  SelectRemoteOption,
+  SelectRemoteRequest,
+  SelectResponse,
+} from "./types";
 
-export interface SelectProps {
+interface SelectProps {
   /**
    * URL for asynchronous requests.
    */
@@ -89,87 +97,6 @@ export interface SelectProps {
   autoSelect?: boolean;
 }
 
-export interface SelectResponse {
-  options: Array<
-    Record<string, unknown> & {
-      label: string;
-      value: string;
-    }
-  >;
-
-  page: number;
-
-  size: number;
-
-  total: number;
-}
-
-export interface SelectRemoteRequest {
-  keyword: string;
-  page: number;
-  size: number;
-}
-
-export interface SelectRemoteOption {
-  search: ({
-    keyword,
-    page,
-    size,
-  }: SelectRemoteRequest) => Promise<SelectResponse>;
-
-  findOptionsByValues: (values: string[]) => Promise<
-    Array<{
-      label: string;
-      value: string;
-    }>
-  >;
-}
-
-export interface SelectActionRequest {
-  method?: "GET" | "POST";
-
-  /**
-   * Parses the returned data from the request.
-   */
-  parseData?: (data: unknown) => SelectResponse;
-
-  /**
-   * Field name for the page number in the request parameters, default is `page`.
-   */
-  pageField?: PropertyPath;
-
-  /**
-   * Field name for size, default is `size`.
-   */
-  sizeField?: PropertyPath;
-
-  /**
-   * Field name for total, default is `total`.
-   */
-  totalField?: PropertyPath;
-
-  /**
-   * Field name for items, default is `items`.
-   */
-  itemsField?: PropertyPath;
-
-  /**
-   * Field name for label, default is `label`.
-   */
-  labelField?: PropertyPath;
-
-  /**
-   * Field name for value, default is `value`.
-   */
-  valueField?: PropertyPath;
-
-  /**
-   * When using value to query detailed information, the default query
-   * parameter key for fieldSelector is `metadata.name`.
-   */
-  fieldSelectorKey?: PropertyPath;
-}
-
 const props = defineProps({
   context: {
     type: Object as PropType<FormKitFrameworkContext>,
@@ -177,22 +104,8 @@ const props = defineProps({
   },
 });
 
-const options = shallowRef<
-  | Array<
-      Record<string, unknown> & {
-        label: string;
-        value: string;
-      }
-    >
-  | undefined
->(undefined);
-const selectOptions = shallowRef<
-  | Array<{
-      label: string;
-      value: string;
-    }>
-  | undefined
->(undefined);
+const options = shallowRef<SelectOption[] | undefined>(undefined);
+const selectOptions = shallowRef<SelectOption[] | undefined>(undefined);
 
 const selectProps: SelectProps = shallowReactive({
   multiple: false,
@@ -222,6 +135,8 @@ const initSelectProps = () => {
       fieldSelectorKey: "metadata.name",
       pageField: "page",
       sizeField: "size",
+      iconField: undefined,
+      descriptionField: undefined,
       parseData: undefined,
     },
     ...(nodeProps.requestOption ?? {}),
@@ -249,9 +164,7 @@ const total = ref(0);
 const searchKeyword = ref("");
 const noNeedFetchOptions = ref(false);
 // be no need to fetch options when total is less than or equal to size, cache all options
-const cacheAllOptions = ref<
-  Array<{ label: string; value: string }> | undefined
->(undefined);
+const cacheAllOptions = ref<SelectOption[] | undefined>(undefined);
 
 const requestOptions = async (
   searchParams: SelectRemoteRequest
@@ -290,7 +203,7 @@ const parseSelectResponse = (data: object): SelectResponse | undefined => {
   if (parseData) {
     return parseData(data);
   }
-  const { labelField, valueField, itemsField } = selectProps.requestOption;
+  const { itemsField } = selectProps.requestOption;
   if (!has(data, itemsField as PropertyPath)) {
     console.error(
       `itemsField: ${itemsField?.toString()} not found in response data.`
@@ -299,46 +212,11 @@ const parseSelectResponse = (data: object): SelectResponse | undefined => {
   }
   const items = get(data, itemsField as PropertyPath);
   return {
-    options: formatOptionsData(
-      items,
-      labelField as PropertyPath,
-      valueField as PropertyPath
-    ),
+    options: mapItemsToSelectOptions(items, selectProps.requestOption),
     page: get(data, selectProps.requestOption.pageField as PropertyPath, "1"),
     size: get(data, selectProps.requestOption.sizeField as PropertyPath, "20"),
     total: get(data, selectProps.requestOption.totalField as PropertyPath, "0"),
   };
-};
-
-const formatOptionsData = (
-  items: Array<object>,
-  labelField: PropertyPath,
-  valueField: PropertyPath
-) => {
-  if (!items) {
-    console.warn(
-      "Select options: data items are empty, please check the itemsField."
-    );
-    return [];
-  }
-  return items.map((item) => {
-    if (!has(item, labelField as PropertyPath)) {
-      console.error(
-        `labelField: ${labelField?.toString()} not found in response data items.`
-      );
-      return { label: "", value: "" };
-    }
-    if (!has(item, valueField as PropertyPath)) {
-      console.error(
-        `valueField: ${valueField?.toString()} not found in response data items.`
-      );
-      return { label: "", value: "" };
-    }
-    return {
-      label: get(item, labelField),
-      value: get(item, valueField),
-    };
-  });
 };
 
 /**
@@ -347,13 +225,7 @@ const formatOptionsData = (
  * If the selected value is found in the current options, it will be converted to a label and value format.
  * If the selected value is not found in the current options, the `mapUnresolvedOptions` method will be used.
  */
-const fetchSelectedOptions = async (): Promise<
-  | Array<{
-      label: string;
-      value: string;
-    }>
-  | undefined
-> => {
+const fetchSelectedOptions = async (): Promise<SelectOption[] | undefined> => {
   const node = props.context.node;
   const value = node.value;
 
@@ -414,12 +286,7 @@ const fetchSelectedOptions = async (): Promise<
  */
 const mapUnresolvedOptions = async (
   unmappedSelectValues: string[]
-): Promise<
-  Array<{
-    label: string;
-    value: string;
-  }>
-> => {
+): Promise<SelectOption[]> => {
   if (!isRemote.value) {
     if (selectProps.allowCreate) {
       // TODO: Add mapped values to options
@@ -433,12 +300,7 @@ const mapUnresolvedOptions = async (
   }
 
   // Asynchronous request for options, fetch label and value via API.
-  let mappedOptions:
-    | Array<{
-        label: string;
-        value: string;
-      }>
-    | undefined = undefined;
+  let mappedOptions: SelectOption[] | undefined = undefined;
   if (noNeedFetchOptions.value) {
     mappedOptions = cacheAllOptions.value?.filter((option) =>
       unmappedSelectValues.includes(option.value)
@@ -480,7 +342,7 @@ const mapUnresolvedOptions = async (
 
 const fetchRemoteMappedOptions = async (
   unmappedSelectValues: string[]
-): Promise<Array<{ label: string; value: string }>> => {
+): Promise<SelectOption[]> => {
   const requestConfig: AxiosRequestConfig = {
     method: selectProps.requestOption?.method || "GET",
     url: selectProps.action,
@@ -527,12 +389,7 @@ onMounted(async () => {
   }
 });
 
-const getAutoSelectedOption = ():
-  | {
-      label: string;
-      value: string;
-    }
-  | undefined => {
+const getAutoSelectedOption = (): SelectOption | undefined => {
   if (!options.value || options.value.length === 0) {
     return;
   }
@@ -611,7 +468,7 @@ watch(
   }
 );
 
-const handleUpdate = async (value: Array<{ label: string; value: string }>) => {
+const handleUpdate = async (value: SelectOption[]) => {
   const oldSelectValue = selectOptions.value;
   if (
     oldSelectValue &&
@@ -620,18 +477,12 @@ const handleUpdate = async (value: Array<{ label: string; value: string }>) => {
   ) {
     return;
   }
-  const newValue = value.map((item) => {
-    return {
-      label: item.label,
-      value: item.value,
-    };
-  });
-  handleSetNodeValue(newValue);
+  handleSetNodeValue(value);
   await props.context.node.settled;
-  props.context.attrs.onChange?.(newValue);
+  props.context.attrs.onChange?.(value);
 };
 
-const handleSetNodeValue = (value: Array<{ label: string; value: string }>) => {
+const handleSetNodeValue = (value: SelectOption[]) => {
   const values = value.map((item) => item.value);
   selectOptions.value = value;
   if (selectProps.multiple) {
@@ -655,17 +506,18 @@ const fetchOptions = async (
   }
   // If the total number of options is less than the page size, no more requests are made.
   if (noNeedFetchOptions.value) {
-    const { results } = useFuse<{
-      label: string;
-      value: string;
-    }>(tempKeyword, cacheAllOptions.value || [], {
-      fuseOptions: {
-        keys: ["label", "value"],
-        threshold: 0,
-        ignoreLocation: true,
-      },
-      matchAllWhenSearchEmpty: true,
-    });
+    const { results } = useFuse<SelectOption>(
+      tempKeyword,
+      cacheAllOptions.value || [],
+      {
+        fuseOptions: {
+          keys: ["label", "value"],
+          threshold: 0,
+          ignoreLocation: true,
+        },
+        matchAllWhenSearchEmpty: true,
+      }
+    );
     const filterOptions = results.value?.map((fuseItem) => fuseItem.item) || [];
     return {
       options: filterOptions || [],
