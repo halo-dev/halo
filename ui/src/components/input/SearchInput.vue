@@ -33,9 +33,9 @@ function onKeywordChange() {
   }
 }
 
-function onInput(value?: string) {
+function onInput(value?: unknown) {
   if (props.sync) {
-    emit("update:modelValue", value || "");
+    emit("update:modelValue", (value || "") as string);
   }
 }
 </script>
