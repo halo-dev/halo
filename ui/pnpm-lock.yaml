@@ -72,32 +72,32 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       '@formkit/addons':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/core':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/drag-and-drop':
         specifier: ^0.1.6
         version: 0.1.6
       '@formkit/i18n':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/inputs':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/themes':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/utils':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/validation':
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: ^2.1.0
+        version: 2.1.0
       '@formkit/vue':
-        specifier: ^1.7.2
-        version: 1.7.2(vue@3.5.34(typescript@5.9.3))
+        specifier: ^2.1.0
+        version: 2.1.0(vue@3.5.34(typescript@5.9.3))
       '@halo-dev/api-client':
         specifier: workspace:*
         version: link:packages/api-client
@@ -481,19 +481,19 @@ importers:
     devDependencies:
       '@storybook/addon-docs':
         specifier: ^10.4.1
-        version: 10.4.1(@types/react@18.2.41)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)
+        version: 10.4.1(@types/react@18.2.41)(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)
       '@storybook/addon-links':
         specifier: ^10.4.1
-        version: 10.4.1(@types/react@18.2.41)(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))
+        version: 10.4.1(@types/react@18.2.41)(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))
       '@storybook/testing-library':
         specifier: ^0.2.2
         version: 0.2.2
       '@storybook/vue3-vite':
         specifier: ^10.4.1
-        version: 10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))(webpack@5.99.9)
+        version: 10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(vue@3.5.34(typescript@5.9.3))(webpack@5.99.9)
       eslint-plugin-storybook:
         specifier: 10.4.1
-        version: 10.4.1(eslint@9.39.1(jiti@2.6.1))(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(typescript@5.9.3)
+        version: 10.4.1(eslint@9.39.1(jiti@2.6.1))(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(typescript@5.9.3)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -502,7 +502,7 @@ importers:
         version: 18.2.0(react@18.2.0)
       storybook:
         specifier: ^10.4.1
-        version: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
 
   packages/console-shared: {}
 
@@ -1144,44 +1144,44 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
-  '@formkit/addons@1.7.2':
-    resolution: {integrity: sha512-GkW5LEst3NX1pKc3rDJyQe6XQPF257AORuamHVlB3kWrV31i9AY/RyjUo80bve2qBGnt+wVwpBmOyWv0wg7O/w==}
+  '@formkit/addons@2.1.0':
+    resolution: {integrity: sha512-ufFwhPNGLbqacy7RvMaTgHl3f0Dsgg1gCFDSb2tZooICHepxbVhUNp4Y06bV1rjf+JQLLKyf9OgKbVJjwK7YLQ==}
 
   '@formkit/auto-animate@0.9.0':
     resolution: {integrity: sha512-VhP4zEAacXS3dfTpJpJ88QdLqMTcabMg0jwpOSxZ/VzfQVfl3GkZSCZThhGC5uhq/TxPHPzW0dzr4H9Bb1OgKA==}
 
-  '@formkit/core@1.7.2':
-    resolution: {integrity: sha512-XDRVqkDtOziU3z44hdvgWEqGpiv6nTNeCmP8cnESKkr24a4keQuEwmfDVvibYV0ywyTMg6ylp2lyklCYeRHykQ==}
+  '@formkit/core@2.1.0':
+    resolution: {integrity: sha512-ifP8sRoH0ekwBVbu+u83zWGP+596Hg4ji2kBLiYKkPpM7oLJYg7ZSmQtj9PVn9hcFYQwUL5zA6VsZx6JwOl3pQ==}
 
-  '@formkit/dev@1.7.2':
-    resolution: {integrity: sha512-W38xbbFS4h4LTV22kUC6ZbPHBmlM2lVbAz5PSYU3SPaNc4FeXp4GTe4GzLEmcS82B+5L1zbSOgGB43kWZts7wA==}
+  '@formkit/dev@2.1.0':
+    resolution: {integrity: sha512-V30OsLcRFdmKsES0IEyHgnWnSlMQ6vymqYlShIr2H9Zskaqsg4soZ9ePnahwkj7aW3JR5drDy0JC9HhdcPJApQ==}
 
   '@formkit/drag-and-drop@0.1.6':
     resolution: {integrity: sha512-wZyxvk7WTbQ12q8ZGvLoYner1ktBOUf+lCblJT3P0LyqpjGCKTfQMKJtwToKQzJgTbhvow4LBu+yP92Mux321w==}
 
-  '@formkit/i18n@1.7.2':
-    resolution: {integrity: sha512-Zs6f+rtP2j2Nnt1HkNrL85WU6rtS1l1Q0BAQjCMGQPsbrppiL7/TZ5bNIrVm0DTntLgG3firDS7bNWAxPSwerQ==}
+  '@formkit/i18n@2.1.0':
+    resolution: {integrity: sha512-Z4Telo6Cl8hmnD55PzKh+RjP+Iqfrctfx0ZYqyaIR94D3Y9o0nQURLmhsaGsCoTMcD5fekcgCgINWmuQ0JRSbg==}
 
-  '@formkit/inputs@1.7.2':
-    resolution: {integrity: sha512-4xs7RJN8EFGctTCNRXBTvor2O8RvuEEK3q2Hl/RMU5lhhn5tmck90fkkeAr9o+rWRoSNiV8XgbLQArQ/B1IYPw==}
+  '@formkit/inputs@2.1.0':
+    resolution: {integrity: sha512-Rk8ICP+1Co3wokcQ0eC8FWST41QCePIUKsEj0Cmzq/7eGgXtt1pqkQgxDfNDZCy78Lv3Cxutfzhx+a7yCwMekg==}
 
-  '@formkit/observer@1.7.2':
-    resolution: {integrity: sha512-KUr5mcu2SAeHOOK1FaMyFigtA8hkHLsUkaPFWpTC81j79o1AUjJppmfPaX6PbtlHLeMs2Zq8Qhp6VAhi7D2WJg==}
+  '@formkit/observer@2.1.0':
+    resolution: {integrity: sha512-LRQHTRgs0Ens+Pv90gATXoywbMo3LrshPrxwgJRo64wQtreptzCWzyCCPuKp1L5rXox87D5rqAZ1zIo+XzG6QA==}
 
-  '@formkit/rules@1.7.2':
-    resolution: {integrity: sha512-2e5qKlXzmL9LAetncFp7xkHEX/UAJsU3bo1iL3idloH3HALf5fIdg3lgOKwCNDMdLjbfiKJ6lVwFaeFfFpcDKw==}
+  '@formkit/rules@2.1.0':
+    resolution: {integrity: sha512-6DOa2iIYYnM2Pf359LtFfY5RLbNNPR97g+zSywLgIQEJ8HsYaaKIfLTs8x3Ktv9O6qg9B/EnJDFikNbnUKd2FQ==}
 
-  '@formkit/themes@1.7.2':
-    resolution: {integrity: sha512-AaZHy7l9D44Ya3cQRqZ8RIpaTTsCjTB1gX13NlpqYSs6yG0yBTmJ7L7kW60bOGdhs/vmIwSel578EBwz98nybQ==}
+  '@formkit/themes@2.1.0':
+    resolution: {integrity: sha512-LyP1vygx+tbbWydSPYfMAEUBnaIlSHvoLB2wjvNMpbRTea03hjFwXT9MX/O8TDtmjd489/LltBPtjmswTbOdGg==}
 
-  '@formkit/utils@1.7.2':
-    resolution: {integrity: sha512-bBF6alUBOqFfJHjVB95Vck0hp36vlw4QfFJxGfTO6BX68AEaFzzzabtpwfy0DbcHtwHh4Yn7l/rOWGxXEve+QQ==}
+  '@formkit/utils@2.1.0':
+    resolution: {integrity: sha512-yPGg0Uj0jp0N5h6AL+flJMRWksoZPtPu96Slb6i4GKraRKeJG6PbwCutWg9j6UiWqTsNX42Bz0Zsh9s6UxdziA==}
 
-  '@formkit/validation@1.7.2':
-    resolution: {integrity: sha512-JJsLP7AI/++VujdwtBeUcPhCqY3FXSKZ7hajT7Ow5Feab7JLqVPjxVMFbXDgEOLjq0ex1NX/I+EQHfm5sqMRsA==}
+  '@formkit/validation@2.1.0':
+    resolution: {integrity: sha512-l/d9ni7Fr+ISyuQDDaCJxXa3ypOdLGwHri8K2r6t52HAy5aX5RnVDpchfdencbSKfdygNc36b5gBPzgoZ4B2uw==}
 
-  '@formkit/vue@1.7.2':
-    resolution: {integrity: sha512-jrvXl2ZhS6X5klTbP4N5zc0Dg37AjbAf8SCVoz7mfligVkmwrrF4SN3waMBcH+n9gqT+vrkOYb6bQXdvjUdnCQ==}
+  '@formkit/vue@2.1.0':
+    resolution: {integrity: sha512-DwHUy36LbsGhqfYZThe79p0qCvbOrsK4af2FZMwlpWmj/Y9BCV2KJXSxGaZK9E0SMEGR6bbglA8Q4BpuaqzrpA==}
     peerDependencies:
       vue: ^3.4.0
 
@@ -7970,71 +7970,71 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
-  '@formkit/addons@1.7.2':
+  '@formkit/addons@2.1.0':
     dependencies:
       '@formkit/auto-animate': 0.9.0
-      '@formkit/core': 1.7.2
-      '@formkit/inputs': 1.7.2
-      '@formkit/utils': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/inputs': 2.1.0
+      '@formkit/utils': 2.1.0
 
   '@formkit/auto-animate@0.9.0': {}
 
-  '@formkit/core@1.7.2':
+  '@formkit/core@2.1.0':
     dependencies:
-      '@formkit/utils': 1.7.2
+      '@formkit/utils': 2.1.0
 
-  '@formkit/dev@1.7.2':
+  '@formkit/dev@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/utils': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/utils': 2.1.0
 
   '@formkit/drag-and-drop@0.1.6': {}
 
-  '@formkit/i18n@1.7.2':
+  '@formkit/i18n@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/utils': 1.7.2
-      '@formkit/validation': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/utils': 2.1.0
+      '@formkit/validation': 2.1.0
 
-  '@formkit/inputs@1.7.2':
+  '@formkit/inputs@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/utils': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/utils': 2.1.0
 
-  '@formkit/observer@1.7.2':
+  '@formkit/observer@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/utils': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/utils': 2.1.0
 
-  '@formkit/rules@1.7.2':
+  '@formkit/rules@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/utils': 1.7.2
-      '@formkit/validation': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/utils': 2.1.0
+      '@formkit/validation': 2.1.0
 
-  '@formkit/themes@1.7.2':
+  '@formkit/themes@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
+      '@formkit/core': 2.1.0
 
-  '@formkit/utils@1.7.2': {}
+  '@formkit/utils@2.1.0': {}
 
-  '@formkit/validation@1.7.2':
+  '@formkit/validation@2.1.0':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/observer': 1.7.2
-      '@formkit/utils': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/observer': 2.1.0
+      '@formkit/utils': 2.1.0
 
-  '@formkit/vue@1.7.2(vue@3.5.34(typescript@5.9.3))':
+  '@formkit/vue@2.1.0(vue@3.5.34(typescript@5.9.3))':
     dependencies:
-      '@formkit/core': 1.7.2
-      '@formkit/dev': 1.7.2
-      '@formkit/i18n': 1.7.2
-      '@formkit/inputs': 1.7.2
-      '@formkit/observer': 1.7.2
-      '@formkit/rules': 1.7.2
-      '@formkit/themes': 1.7.2
-      '@formkit/utils': 1.7.2
-      '@formkit/validation': 1.7.2
+      '@formkit/core': 2.1.0
+      '@formkit/dev': 2.1.0
+      '@formkit/i18n': 2.1.0
+      '@formkit/inputs': 2.1.0
+      '@formkit/observer': 2.1.0
+      '@formkit/rules': 2.1.0
+      '@formkit/themes': 2.1.0
+      '@formkit/utils': 2.1.0
+      '@formkit/validation': 2.1.0
       vue: 3.5.34(typescript@5.9.3)
 
   '@he-tree/dnd-utils@0.1.0-alpha.4':
@@ -8928,6 +8928,14 @@ snapshots:
       - '@emnapi/runtime'
     optional: true
 
+  '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
+    dependencies:
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+    optional: true
+
   '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.9':
     optional: true
 
@@ -9118,15 +9126,15 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@storybook/addon-docs@10.4.1(@types/react@18.2.41)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)':
+  '@storybook/addon-docs@10.4.1(@types/react@18.2.41)(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)':
     dependencies:
       '@mdx-js/react': 3.1.1(@types/react@18.2.41)(react@18.2.0)
-      '@storybook/csf-plugin': 10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)
+      '@storybook/csf-plugin': 10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)
       '@storybook/icons': 2.0.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@storybook/react-dom-shim': 10.4.1(@types/react@18.2.41)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))
+      '@storybook/react-dom-shim': 10.4.1(@types/react@18.2.41)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
       ts-dedent: 2.2.0
     optionalDependencies:
       '@types/react': 18.2.41
@@ -9137,32 +9145,32 @@ snapshots:
       - vite
       - webpack
 
-  '@storybook/addon-links@10.4.1(@types/react@18.2.41)(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))':
+  '@storybook/addon-links@10.4.1(@types/react@18.2.41)(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
     optionalDependencies:
       '@types/react': 18.2.41
       react: 18.2.0
 
-  '@storybook/builder-vite@10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)':
+  '@storybook/builder-vite@10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)':
     dependencies:
-      '@storybook/csf-plugin': 10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      '@storybook/csf-plugin': 10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
       ts-dedent: 2.2.0
-      vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)'
+      vite: 8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - esbuild
       - rollup
       - webpack
 
-  '@storybook/csf-plugin@10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)':
+  '@storybook/csf-plugin@10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)':
     dependencies:
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
       unplugin: 2.3.11
     optionalDependencies:
       rollup: 4.43.0
-      vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)'
+      vite: 8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2)
       webpack: 5.99.9
 
   '@storybook/global@5.0.0': {}
@@ -9172,11 +9180,11 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@storybook/react-dom-shim@10.4.1(@types/react@18.2.41)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))':
+  '@storybook/react-dom-shim@10.4.1(@types/react@18.2.41)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))':
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
     optionalDependencies:
       '@types/react': 18.2.41
 
@@ -9186,14 +9194,14 @@ snapshots:
       '@testing-library/user-event': 14.6.1(@testing-library/dom@9.3.4)
       ts-dedent: 2.2.0
 
-  '@storybook/vue3-vite@10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))(webpack@5.99.9)':
+  '@storybook/vue3-vite@10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(vue@3.5.34(typescript@5.9.3))(webpack@5.99.9)':
     dependencies:
-      '@storybook/builder-vite': 10.4.1(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(webpack@5.99.9)
-      '@storybook/vue3': 10.4.1(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))
+      '@storybook/builder-vite': 10.4.1(rollup@4.43.0)(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(webpack@5.99.9)
+      '@storybook/vue3': 10.4.1(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))
       magic-string: 0.30.21
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
       typescript: 5.9.3
-      vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)'
+      vite: 8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2)
       vue-component-meta: 2.2.12(typescript@5.9.3)
       vue-docgen-api: 4.75.1(vue@3.5.34(typescript@5.9.3))
     transitivePeerDependencies:
@@ -9202,10 +9210,10 @@ snapshots:
       - vue
       - webpack
 
-  '@storybook/vue3@10.4.1(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))':
+  '@storybook/vue3@10.4.1(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(vue@3.5.34(typescript@5.9.3))':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
       type-fest: 2.19.0
       vue: 3.5.34(typescript@5.9.3)
       vue-component-type-helpers: 3.3.2
@@ -10059,6 +10067,49 @@ snapshots:
       - unrun
       - utf-8-validate
       - yaml
+
+  '@voidzero-dev/vite-plus-test@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      '@types/chai': 5.2.3
+      '@voidzero-dev/vite-plus-core': 0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)
+      es-module-lexer: 1.7.0
+      obug: 2.1.2
+      pixelmatch: 7.2.0
+      pngjs: 7.0.0
+      sirv: 3.0.2
+      std-env: 4.1.0
+      tinybench: 2.9.0
+      tinyexec: 1.2.4
+      tinyglobby: 0.2.17
+      vite: 8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2)
+      ws: 8.21.0
+    optionalDependencies:
+      '@types/node': 24.11.0
+      '@vitest/ui': 4.0.13(@voidzero-dev/vite-plus-test@0.1.24)
+      jsdom: 27.2.0
+    transitivePeerDependencies:
+      - '@arethetypeswrong/core'
+      - '@tsdown/css'
+      - '@tsdown/exe'
+      - '@vitejs/devtools'
+      - bufferutil
+      - esbuild
+      - jiti
+      - less
+      - publint
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - typescript
+      - unplugin-unused
+      - unrun
+      - utf-8-validate
+      - yaml
+    optional: true
 
   '@voidzero-dev/vite-plus-win32-arm64-msvc@0.1.24':
     optional: true
@@ -11312,11 +11363,11 @@ snapshots:
       '@types/eslint': 8.56.10
       eslint-config-prettier: 10.1.5(eslint@9.39.1(jiti@2.6.1))
 
-  eslint-plugin-storybook@10.4.1(eslint@9.39.1(jiti@2.6.1))(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)))(typescript@5.9.3):
+  eslint-plugin-storybook@10.4.1(eslint@9.39.1(jiti@2.6.1))(storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 8.60.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.1(jiti@2.6.1)
-      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))
+      storybook: 10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -12609,6 +12660,32 @@ snapshots:
       '@oxfmt/binding-win32-x64-msvc': 0.52.0
       vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)
 
+  oxfmt@0.52.0(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)):
+    dependencies:
+      tinypool: 2.1.0
+    optionalDependencies:
+      '@oxfmt/binding-android-arm-eabi': 0.52.0
+      '@oxfmt/binding-android-arm64': 0.52.0
+      '@oxfmt/binding-darwin-arm64': 0.52.0
+      '@oxfmt/binding-darwin-x64': 0.52.0
+      '@oxfmt/binding-freebsd-x64': 0.52.0
+      '@oxfmt/binding-linux-arm-gnueabihf': 0.52.0
+      '@oxfmt/binding-linux-arm-musleabihf': 0.52.0
+      '@oxfmt/binding-linux-arm64-gnu': 0.52.0
+      '@oxfmt/binding-linux-arm64-musl': 0.52.0
+      '@oxfmt/binding-linux-ppc64-gnu': 0.52.0
+      '@oxfmt/binding-linux-riscv64-gnu': 0.52.0
+      '@oxfmt/binding-linux-riscv64-musl': 0.52.0
+      '@oxfmt/binding-linux-s390x-gnu': 0.52.0
+      '@oxfmt/binding-linux-x64-gnu': 0.52.0
+      '@oxfmt/binding-linux-x64-musl': 0.52.0
+      '@oxfmt/binding-openharmony-arm64': 0.52.0
+      '@oxfmt/binding-win32-arm64-msvc': 0.52.0
+      '@oxfmt/binding-win32-ia32-msvc': 0.52.0
+      '@oxfmt/binding-win32-x64-msvc': 0.52.0
+      vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)
+    optional: true
+
   oxlint-tsgolint@0.23.0:
     optionalDependencies:
       '@oxlint-tsgolint/darwin-arm64': 0.23.0
@@ -12641,6 +12718,31 @@ snapshots:
       '@oxlint/binding-win32-x64-msvc': 1.67.0
       oxlint-tsgolint: 0.23.0
       vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)
+
+  oxlint@1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)):
+    optionalDependencies:
+      '@oxlint/binding-android-arm-eabi': 1.67.0
+      '@oxlint/binding-android-arm64': 1.67.0
+      '@oxlint/binding-darwin-arm64': 1.67.0
+      '@oxlint/binding-darwin-x64': 1.67.0
+      '@oxlint/binding-freebsd-x64': 1.67.0
+      '@oxlint/binding-linux-arm-gnueabihf': 1.67.0
+      '@oxlint/binding-linux-arm-musleabihf': 1.67.0
+      '@oxlint/binding-linux-arm64-gnu': 1.67.0
+      '@oxlint/binding-linux-arm64-musl': 1.67.0
+      '@oxlint/binding-linux-ppc64-gnu': 1.67.0
+      '@oxlint/binding-linux-riscv64-gnu': 1.67.0
+      '@oxlint/binding-linux-riscv64-musl': 1.67.0
+      '@oxlint/binding-linux-s390x-gnu': 1.67.0
+      '@oxlint/binding-linux-x64-gnu': 1.67.0
+      '@oxlint/binding-linux-x64-musl': 1.67.0
+      '@oxlint/binding-openharmony-arm64': 1.67.0
+      '@oxlint/binding-win32-arm64-msvc': 1.67.0
+      '@oxlint/binding-win32-ia32-msvc': 1.67.0
+      '@oxlint/binding-win32-x64-msvc': 1.67.0
+      oxlint-tsgolint: 0.23.0
+      vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)
+    optional: true
 
   p-limit@2.3.0:
     dependencies:
@@ -13230,6 +13332,30 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
+  rolldown@1.0.0-rc.9(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2):
+    dependencies:
+      '@oxc-project/types': 0.115.0
+      '@rolldown/pluginutils': 1.0.0-rc.9
+    optionalDependencies:
+      '@rolldown/binding-android-arm64': 1.0.0-rc.9
+      '@rolldown/binding-darwin-arm64': 1.0.0-rc.9
+      '@rolldown/binding-darwin-x64': 1.0.0-rc.9
+      '@rolldown/binding-freebsd-x64': 1.0.0-rc.9
+      '@rolldown/binding-linux-arm-gnueabihf': 1.0.0-rc.9
+      '@rolldown/binding-linux-arm64-gnu': 1.0.0-rc.9
+      '@rolldown/binding-linux-arm64-musl': 1.0.0-rc.9
+      '@rolldown/binding-linux-ppc64-gnu': 1.0.0-rc.9
+      '@rolldown/binding-linux-s390x-gnu': 1.0.0-rc.9
+      '@rolldown/binding-linux-x64-gnu': 1.0.0-rc.9
+      '@rolldown/binding-linux-x64-musl': 1.0.0-rc.9
+      '@rolldown/binding-openharmony-arm64': 1.0.0-rc.9
+      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.9(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+      '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.9
+      '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.9
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+
   rollup-plugin-gzip@4.1.1(rollup@4.43.0):
     dependencies:
       rollup: 4.43.0
@@ -13573,7 +13699,7 @@ snapshots:
     dependencies:
       internal-slot: 1.0.6
 
-  storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)):
+  storybook@10.4.1(@testing-library/dom@9.3.4)(@types/react@18.2.41)(prettier@3.6.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)):
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/icons': 2.0.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -13593,7 +13719,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.2.41
       prettier: 3.6.2
-      vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)
+      vite-plus: 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)
     transitivePeerDependencies:
       - '@testing-library/dom'
       - bufferutil
@@ -14104,6 +14230,57 @@ snapshots:
       - vite
       - yaml
 
+  vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2):
+    dependencies:
+      '@oxc-project/types': 0.133.0
+      '@oxlint/plugins': 1.61.0
+      '@voidzero-dev/vite-plus-core': 0.1.24(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(yaml@2.8.2)
+      '@voidzero-dev/vite-plus-test': 0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2)
+      oxfmt: 0.52.0(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
+      oxlint: 1.67.0(oxlint-tsgolint@0.23.0)(vite-plus@0.1.24(@types/node@24.11.0)(@vitest/ui@4.0.13(@voidzero-dev/vite-plus-test@0.1.24))(jiti@2.6.1)(jsdom@27.2.0)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(typescript@5.9.3)(vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2))(yaml@2.8.2))
+      oxlint-tsgolint: 0.23.0
+    optionalDependencies:
+      '@voidzero-dev/vite-plus-darwin-arm64': 0.1.24
+      '@voidzero-dev/vite-plus-darwin-x64': 0.1.24
+      '@voidzero-dev/vite-plus-linux-arm64-gnu': 0.1.24
+      '@voidzero-dev/vite-plus-linux-arm64-musl': 0.1.24
+      '@voidzero-dev/vite-plus-linux-x64-gnu': 0.1.24
+      '@voidzero-dev/vite-plus-linux-x64-musl': 0.1.24
+      '@voidzero-dev/vite-plus-win32-arm64-msvc': 0.1.24
+      '@voidzero-dev/vite-plus-win32-x64-msvc': 0.1.24
+    transitivePeerDependencies:
+      - '@arethetypeswrong/core'
+      - '@edge-runtime/vm'
+      - '@opentelemetry/api'
+      - '@tsdown/css'
+      - '@tsdown/exe'
+      - '@types/node'
+      - '@vitejs/devtools'
+      - '@vitest/coverage-istanbul'
+      - '@vitest/coverage-v8'
+      - '@vitest/ui'
+      - bufferutil
+      - esbuild
+      - happy-dom
+      - jiti
+      - jsdom
+      - less
+      - publint
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - svelte
+      - terser
+      - tsx
+      - typescript
+      - unplugin-unused
+      - unrun
+      - utf-8-validate
+      - vite
+      - yaml
+    optional: true
+
   vite@8.0.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2):
     dependencies:
       '@oxc-project/runtime': 0.115.0
@@ -14111,6 +14288,27 @@ snapshots:
       picomatch: 4.0.4
       postcss: 8.5.14
       rolldown: 1.0.0-rc.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 24.11.0
+      fsevents: 2.3.3
+      jiti: 2.6.1
+      less: 4.2.0
+      sass: 1.93.3
+      sass-embedded: 1.93.3
+      terser: 5.37.0
+      yaml: 2.8.2
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
+
+  vite@8.0.0(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@24.11.0)(jiti@2.6.1)(less@4.2.0)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.37.0)(yaml@2.8.2):
+    dependencies:
+      '@oxc-project/runtime': 0.115.0
+      lightningcss: 1.32.0
+      picomatch: 4.0.4
+      postcss: 8.5.14
+      rolldown: 1.0.0-rc.9(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
       tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 24.11.0
