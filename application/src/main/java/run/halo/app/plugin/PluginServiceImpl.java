@@ -6,9 +6,11 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.pf4j.PluginState.STARTED;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
+import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -71,6 +74,7 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     private static final String PRESET_LOCATION_PREFIX = "classpath:/presets/plugins/";
     private static final String PRESETS_LOCATION_PATTERN = PRESET_LOCATION_PREFIX + "*.jar";
+    private static final String PRESET_OPTIONS_LOCATION = PRESET_LOCATION_PREFIX + "presets.json";
 
     private final ReactiveExtensionClient client;
 
@@ -116,11 +120,12 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
 
     @Override
     public Mono<Void> installPresetPlugins() {
-        return getPresetJars()
-                .flatMap(path -> this.install(path)
+        return getPresetPlugins()
+                .flatMap(preset -> this.install(preset.path())
                         .onErrorResume(PluginAlreadyExistsException.class, e -> Mono.empty())
-                        .flatMap(plugin -> FileUtils.deleteFileSilently(path).thenReturn(plugin)))
-                .flatMap(this::enablePlugin)
+                        .flatMap(plugin ->
+                                FileUtils.deleteFileSilently(preset.path()).thenReturn(plugin))
+                        .flatMap(plugin -> preset.autoEnable() ? enablePlugin(plugin) : Mono.just(plugin)))
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
     }
@@ -488,9 +493,10 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
         }
     }
 
-    private Flux<Path> getPresetJars() {
+    private Flux<PresetPlugin> getPresetPlugins() {
         var resolver = new PathMatchingResourcePatternResolver();
         try {
+            var presetPluginOptions = loadPresetPluginOptions(resolver);
             var resources = resolver.getResources(PRESETS_LOCATION_PATTERN);
             return Flux.fromArray(resources).mapNotNull(resource -> {
                 var filename = resource.getFilename();
@@ -499,11 +505,34 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                 }
                 var path = tempDir.resolve(filename);
                 FileUtils.copyResource(resource, path);
-                return path;
+                return new PresetPlugin(
+                        path,
+                        presetPluginOptions
+                                .getOrDefault(filename, new PresetPluginOptions(null))
+                                .autoEnableOrDefault());
             });
         } catch (IOException e) {
             log.debug("Failed to load preset plugins: {}", e.getMessage());
             return Flux.empty();
+        }
+    }
+
+    private Map<String, PresetPluginOptions> loadPresetPluginOptions(PathMatchingResourcePatternResolver resolver)
+            throws IOException {
+        var resource = resolver.getResource(PRESET_OPTIONS_LOCATION);
+        if (!resource.exists()) {
+            return Map.of();
+        }
+        var json = resource.getContentAsString(StandardCharsets.UTF_8);
+        return Json.mapper().readValue(json, new TypeReference<>() {});
+    }
+
+    private record PresetPlugin(Path path, boolean autoEnable) {}
+
+    private record PresetPluginOptions(Boolean autoEnable) {
+
+        boolean autoEnableOrDefault() {
+            return autoEnable == null || autoEnable;
         }
     }
 
