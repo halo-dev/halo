@@ -180,7 +180,7 @@ tasks.register('downloadPluginPresets', Download) {
         [
             url       : 'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err',
             filename  : 'appstore.jar',
-            autoEnable: false,
+            autoEnable: true,
         ],
     ]
     def presetPluginUrls = presetPlugins.collectEntries { [it.url, it.filename] }
