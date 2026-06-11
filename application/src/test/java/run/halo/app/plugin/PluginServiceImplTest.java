@@ -36,12 +36,14 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -302,6 +304,67 @@ class PluginServiceImplTest {
                 .as(StepVerifier::create)
                 .expectNext("plugin-1", "plugin-2")
                 .verifyComplete();
+    }
+
+    @Nested
+    class PresetPluginInstallTest {
+
+        @TempDir
+        Path tempDir;
+
+        Path presetOptionsPath;
+
+        @BeforeEach
+        void setUp() throws IOException, URISyntaxException {
+            presetOptionsPath = Paths.get(ResourceUtils.getURL("classpath:presets/plugins/fake-plugin.jar")
+                            .toURI())
+                    .getParent()
+                    .resolve("presets.json");
+            pluginService.setTempDir(tempDir);
+            lenient().when(systemVersionSupplier.get()).thenReturn(Version.parse("2.0.0"));
+            lenient().when(pluginsRootGetter.get()).thenReturn(tempDir.resolve("plugins"));
+        }
+
+        @AfterEach
+        void tearDown() throws IOException {
+            Files.deleteIfExists(presetOptionsPath);
+        }
+
+        @Test
+        void shouldAutoEnablePresetPluginByDefault() {
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.empty());
+            when(client.create(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+            when(client.update(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+
+            pluginService.installPresetPlugins().as(StepVerifier::create).verifyComplete();
+
+            var captor = ArgumentCaptor.forClass(Plugin.class);
+            verify(client).update(captor.capture());
+            assertTrue(captor.getValue().getSpec().getEnabled());
+        }
+
+        @Test
+        void shouldInstallPresetPluginWithoutAutoEnable() throws IOException {
+            Files.writeString(presetOptionsPath, """
+                    {
+                      "fake-plugin.jar": {
+                        "autoEnable": false
+                      }
+                    }
+                    """);
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.empty());
+            when(client.create(isA(Plugin.class)))
+                    .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, Plugin.class)));
+
+            pluginService.installPresetPlugins().as(StepVerifier::create).verifyComplete();
+
+            var captor = ArgumentCaptor.forClass(Plugin.class);
+            verify(client).create(captor.capture());
+            verify(client, never()).update(isA(Plugin.class));
+            assertFalse(captor.getValue().getSpec().getEnabled());
+        }
     }
 
     @Test
