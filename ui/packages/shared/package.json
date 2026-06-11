@@ -48,7 +48,7 @@
     "vue-router": "^5.0.x"
   },
   "inlinedDependencies": {
-    "@formkit/core": "1.7.2",
+    "@formkit/core": "2.1.0",
     "dayjs": "1.11.19",
     "mitt": "3.0.1",
     "uuid": "13.0.0"
