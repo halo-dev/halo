@@ -3,15 +3,14 @@ import { VEmpty, VLoading } from "@halo-dev/components";
 import { useTimeout } from "@vueuse/shared";
 import { computed, watch } from "vue";
 import { i18n } from "@/locales";
+import { isSelectOptionMatched } from "./option-utils";
 import SelectOption from "./SelectOption.vue";
+import type { SelectOption as SelectOptionType } from "./types";
 
 const props = defineProps<{
-  options?: Array<Record<string, unknown> & { label: string; value: string }>;
+  options?: SelectOptionType[];
   keyword?: string;
-  selectedOptions?: Array<{
-    label: string;
-    value: string;
-  }>;
+  selectedOptions?: SelectOptionType[];
   multiple: boolean;
   loading: boolean;
   nextLoading: boolean;
@@ -21,10 +20,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (
-    event: "selected",
-    value: Record<string, unknown> & { label: string; value: string }
-  ): void;
+  (event: "selected", value: SelectOptionType): void;
   (event: "loadMore"): void;
 }>();
 
@@ -42,14 +38,9 @@ const filterOptions = computed(() => {
     return props.options;
   }
 
-  const options = props.options.filter((option) => {
-    if (option.label) {
-      return option.label
-        .toLocaleLowerCase()
-        .includes(keyword.toLocaleLowerCase());
-    }
-    return false;
-  });
+  const options = props.options.filter((option) =>
+    isSelectOptionMatched(option, keyword)
+  );
 
   if (props.allowCreate) {
     const hasKeyword = options.some((option) => {

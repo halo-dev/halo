@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import SelectSearchInput from "./SelectSearchInput.vue";
+import type { SelectOption } from "./types";
 
 const props = defineProps<{
   placeholder?: string;
-  selectedOptions: Array<{
-    label: string;
-    value: string;
-  }>;
+  selectedOptions: SelectOption[];
   isDropdownVisible: boolean;
   searchable: boolean;
 }>();

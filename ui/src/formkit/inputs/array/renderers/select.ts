@@ -3,39 +3,10 @@ import { axiosInstance } from "@halo-dev/api-client";
 import type { AxiosRequestConfig } from "axios";
 import { get, has } from "es-toolkit/compat";
 import type { PropertyPath } from "lodash-es";
+import { mapItemsToSelectOptions } from "../../select/option-utils";
+import type { SelectOption } from "../../select/types";
 import { findOptions } from "./helpers/findOption";
 import type { LabelValueResult } from "./types";
-
-const formatOptionsData = (
-  items: Array<object>,
-  labelField: PropertyPath,
-  valueField: PropertyPath
-): Array<{ label: string; value: unknown }> | undefined => {
-  if (!items) {
-    console.warn(
-      "Select options: data items are empty, please check the itemsField."
-    );
-    return [];
-  }
-  return items.map((item) => {
-    if (!has(item, labelField as PropertyPath)) {
-      console.error(
-        `labelField: ${labelField?.toString()} not found in response data items.`
-      );
-      return { label: "", value: "" };
-    }
-    if (!has(item, valueField as PropertyPath)) {
-      console.error(
-        `valueField: ${valueField?.toString()} not found in response data items.`
-      );
-      return { label: "", value: "" };
-    }
-    return {
-      label: get(item, labelField),
-      value: get(item, valueField),
-    };
-  });
-};
 
 /**
  * Parse action remote select response data
@@ -43,13 +14,13 @@ const formatOptionsData = (
 const parseActionRemoteSelectResponse = (
   node: FormKitNode<unknown>,
   data: unknown
-): Array<{ label: string; value: unknown }> | undefined => {
+): SelectOption[] | undefined => {
   const { requestOption } = node.props;
   const { parseData } = requestOption;
   if (parseData) {
     return parseData(data);
   }
-  const { labelField, valueField, itemsField } = requestOption;
+  const { itemsField } = requestOption;
   if (!has(data, itemsField as PropertyPath)) {
     console.error(
       `itemsField: ${itemsField?.toString()} not found in response data.`
@@ -57,11 +28,7 @@ const parseActionRemoteSelectResponse = (
     return;
   }
   const items = get(data, itemsField as PropertyPath);
-  return formatOptionsData(
-    items,
-    labelField as PropertyPath,
-    valueField as PropertyPath
-  );
+  return mapItemsToSelectOptions(items, requestOption);
 };
 
 /**
@@ -70,7 +37,7 @@ const parseActionRemoteSelectResponse = (
 const fetchRemoteMappedOptions = async (
   node: FormKitNode<unknown>,
   unmappedSelectValues: unknown[]
-): Promise<Array<{ label: string; value: unknown }> | undefined> => {
+): Promise<SelectOption[] | undefined> => {
   const { requestOption, action } = node.props;
   if (!requestOption || !action) {
     return;

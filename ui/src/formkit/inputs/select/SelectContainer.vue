@@ -15,6 +15,7 @@ import {
 import MultipleSelectSelector from "./MultipleSelectSelector.vue";
 import SelectDropdownContainer from "./SelectDropdownContainer.vue";
 import SelectSelector from "./SelectSelector.vue";
+import type { SelectOption } from "./types";
 
 const props = defineProps({
   multiple: {
@@ -38,14 +39,7 @@ const props = defineProps({
     default: "",
   },
   options: {
-    type: Array as PropType<
-      Array<
-        Record<string, unknown> & {
-          label: string;
-          value: string;
-        }
-      >
-    >,
+    type: Array as PropType<SelectOption[]>,
     required: false,
     default: () => [],
   },
@@ -58,12 +52,7 @@ const props = defineProps({
     default: false,
   },
   selected: {
-    type: Array as PropType<
-      Array<{
-        label: string;
-        value: string;
-      }>
-    >,
+    type: Array as PropType<SelectOption[]>,
     required: false,
     default: () => [],
   },
@@ -86,7 +75,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (event: "update", value: Array<{ label: string; value: string }>): void;
+  (event: "update", value: SelectOption[]): void;
   (event: "search", value: string, e?: Event): void;
   (event: "loadMore"): void;
 }>();
@@ -129,12 +118,7 @@ const observer = new ResizeObserver(() => {
   window.dispatchEvent(new Event("resize"));
 });
 
-const handleOptionSelect = (
-  option: Record<string, unknown> & {
-    label: string;
-    value: string;
-  }
-) => {
+const handleOptionSelect = (option: SelectOption) => {
   if (!props.multiple) {
     selectedOptions.value = [option];
     isDropdownVisible.value = false;
@@ -231,9 +215,7 @@ const clearAllSelectedOptions = () => {
   clearInputValue();
 };
 
-const handleSortSelectedOptions = (
-  options: Array<{ label: string; value: string }>
-) => {
+const handleSortSelectedOptions = (options: SelectOption[]) => {
   emit("update", options);
 };
 </script>
