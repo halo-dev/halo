@@ -32,7 +32,7 @@
 ## 5. Validation
 
 - [x] 5.1 Run the relevant frontend unit tests.
-- [ ] 5.2 Run `pnpm -C ui typecheck`.
+- [x] 5.2 Run `pnpm -C ui typecheck`.
   - Attempted with `npx --yes pnpm@10.30.3 -C ui typecheck`; it currently fails on the pre-existing `ui/src/components/input/SearchInput.vue:52` callback type mismatch.
 - [x] 5.3 Run `pnpm -C ui lint`.
 - [x] 5.4 Run `openspec validate enhance-formkit-select-options --strict`.
