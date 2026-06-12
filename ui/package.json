@@ -15,8 +15,7 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && vp run --parallel --filter @halo-dev/* typecheck",
     "lint": "eslint . --max-warnings=0 -f html -o build/lint-result/index.html",
     "format": "vp fmt",
-    "format:check": "vp fmt --check",
-    "publish:packages": "npm publish -ws --access public"
+    "format:check": "vp fmt --check"
   },
   "dependencies": {
     "@ckpack/vue-color": "^1.6.0",
