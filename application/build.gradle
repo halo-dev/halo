@@ -178,7 +178,7 @@ tasks.register('downloadPluginPresets', Download) {
         // Please see https://github.com/halo-dev/plugin-app-store/issues/55
         // https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o
         [
-            url       : 'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-qafgml3o/assets/app-release-qafgml3o-wt4v7err',
+            url       : 'https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-1tbawcta/assets/app-release-1tbawcta-gkb19umt',
             filename  : 'appstore.jar',
             autoEnable: true,
         ],
