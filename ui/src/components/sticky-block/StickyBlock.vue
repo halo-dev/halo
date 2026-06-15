@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useEventListener } from "@vueuse/core";
-import { onMounted, ref } from "vue";
+import { useEventListener, useResizeObserver } from "@vueuse/core";
+import { computed, onMounted, ref, shallowRef } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -12,7 +12,8 @@ const props = withDefaults(
 );
 
 const stickyBlock = ref<HTMLElement | null>(null);
-const isSticky = ref(false);
+const resizeTarget = computed(() => stickyBlock.value?.parentElement);
+const isSticky = shallowRef(false);
 
 function computeSticky() {
   if (!stickyBlock.value) return;
@@ -30,6 +31,8 @@ onMounted(() => {
 });
 
 useEventListener("scroll", computeSticky);
+useEventListener("resize", computeSticky);
+useResizeObserver(resizeTarget, computeSticky);
 </script>
 
 <template>
