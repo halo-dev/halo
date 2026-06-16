@@ -484,6 +484,8 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             pluginVersion = String.valueOf(clock.instant().toEpochMilli());
         }
         var status = plugin.statusNonNull();
+        status.setEntry(null);
+        status.setStylesheet(null);
         var specLogo = plugin.getSpec().getLogo();
         if (StringUtils.isNotBlank(specLogo)) {
             log.info("Resolving logo resource for plugin {}", pluginName);

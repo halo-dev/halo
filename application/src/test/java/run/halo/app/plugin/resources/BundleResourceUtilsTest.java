@@ -8,6 +8,7 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.pf4j.PluginClassLoader;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ResourceUtils;
 import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
@@ -104,6 +106,28 @@ class BundleResourceUtilsTest {
                 BundleResourceUtils.getSelectedBundleResource(pluginManager, "fake-plugin", "style.css");
         assertThat(cssBundleResource).isNotNull();
         assertThat(cssBundleResource.getURL().toString()).isEqualTo("file://ui/style.css");
+    }
+
+    @Test
+    void shouldIgnoreParentClassLoaderResourcesWhenSelectingBundleLocation() throws IOException {
+        var dependencyRoot = ResourceUtils.getURL("classpath:plugin/plugin-for-ui-assets/");
+        var pluginRoot = ResourceUtils.getURL("classpath:plugin/plugin-for-console-assets/");
+        var dependencyClassLoader = new URLClassLoader(new URL[] {dependencyRoot}, null);
+        var pluginClassLoader = new URLClassLoader(new URL[] {pluginRoot}, dependencyClassLoader);
+        var pluginWrapper = Mockito.mock(PluginWrapper.class);
+        lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
+        lenient().when(pluginManager.getPlugin(eq("console-plugin"))).thenReturn(pluginWrapper);
+
+        assertThat(BundleResourceUtils.getBundleResource(
+                        pluginManager, "console-plugin", BundleResourceUtils.UI_BUNDLE_LOCATION, "main.js"))
+                .isNull();
+        assertThat(BundleResourceUtils.selectBundleLocation(pluginManager, "console-plugin"))
+                .isEqualTo(BundleResourceUtils.CONSOLE_BUNDLE_LOCATION);
+
+        var jsBundleResource =
+                BundleResourceUtils.getSelectedBundleResource(pluginManager, "console-plugin", "main.js");
+        assertThat(jsBundleResource).isNotNull();
+        assertThat(jsBundleResource.getURL().toString()).contains("plugin-for-console-assets/console/main.js");
     }
 
     @Test

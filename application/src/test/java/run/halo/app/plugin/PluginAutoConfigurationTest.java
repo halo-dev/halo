@@ -84,6 +84,33 @@ class PluginAutoConfigurationTest {
     }
 
     @Test
+    void shouldNotServeAssetsFromParentClassLoader() throws IOException {
+        var pluginWrapper = mock(PluginWrapper.class);
+        var dependencyRoot = ResourceUtils.getURL("classpath:plugin/plugin-for-ui-assets/");
+        var pluginRoot = ResourceUtils.getURL("classpath:plugin/plugin-for-console-assets/");
+        var dependencyClassLoader = new URLClassLoader(new URL[] {dependencyRoot}, null);
+        var classLoader = new URLClassLoader(new URL[] {pluginRoot}, dependencyClassLoader);
+        lenient().when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
+        lenient().when(pluginManager.getPlugin("fake-plugin")).thenReturn(pluginWrapper);
+
+        webClient
+                .get()
+                .uri("/plugins/fake-plugin/assets/ui/main.js")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+
+        webClient
+                .get()
+                .uri("/plugins/fake-plugin/assets/console/main.js")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("console.log(\"console-only\");"));
+    }
+
+    @Test
     void shouldReturnNotFoundWhenPluginIsMissing() {
         webClient
                 .get()
