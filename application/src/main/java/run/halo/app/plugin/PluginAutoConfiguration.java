@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -54,6 +55,11 @@ public class PluginAutoConfiguration {
             PluginsRootGetter pluginsRootGetter)
             throws FileNotFoundException, URISyntaxException {
         return new HaloPluginManager(context, pluginProperties, systemVersionSupplier, pluginsRootGetter);
+    }
+
+    @Bean
+    public ScheduledTaskHolder pluginScheduledTaskHolder(SpringPluginManager pluginManager) {
+        return new PluginScheduledTaskHolder(pluginManager);
     }
 
     @Bean
