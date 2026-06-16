@@ -1,11 +1,20 @@
 package run.halo.app.plugin.resources;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.jspecify.annotations.Nullable;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.DescriptiveResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.PathUtils;
@@ -126,6 +135,66 @@ public abstract class BundleResourceUtils {
         if (plugin == null) {
             return null;
         }
-        return new DefaultResourceLoader(plugin.getPluginClassLoader());
+        return new PluginResourceLoader(plugin.getPluginClassLoader());
+    }
+
+    private static class PluginResourceLoader extends DefaultResourceLoader {
+        private final ClassLoader pluginClassLoader;
+
+        PluginResourceLoader(ClassLoader pluginClassLoader) {
+            super(pluginClassLoader);
+            this.pluginClassLoader = pluginClassLoader;
+        }
+
+        @Override
+        public Resource getResource(String location) {
+            if (location.startsWith(ResourceLoader.CLASSPATH_URL_PREFIX)) {
+                return getResourceByPath(location.substring(ResourceLoader.CLASSPATH_URL_PREFIX.length()));
+            }
+            return super.getResource(location);
+        }
+
+        @Override
+        protected Resource getResourceByPath(String path) {
+            var resource = getOwnClasspathResource(path);
+            return resource == null ? super.getResourceByPath(path) : resource;
+        }
+
+        private @Nullable Resource getOwnClasspathResource(String path) {
+            if (!(pluginClassLoader instanceof URLClassLoader urlClassLoader)) {
+                return null;
+            }
+            var urls = urlClassLoader.getURLs();
+            if (urls == null || urls.length == 0) {
+                return null;
+            }
+            var resourcePath = StringUtils.trimLeadingCharacter(path, '/');
+            for (URL url : urls) {
+                var resource = getResourceFromClasspathUrl(url, resourcePath);
+                if (resource.exists()) {
+                    return resource;
+                }
+            }
+            return new DescriptiveResource("Plugin resource [" + resourcePath + "] does not exist");
+        }
+
+        private Resource getResourceFromClasspathUrl(URL classpathUrl, String resourcePath) {
+            try {
+                if (ResourceUtils.isJarURL(classpathUrl)) {
+                    return new UrlResource(new URL(classpathUrl, resourcePath));
+                }
+                if (ResourceUtils.isFileURL(classpathUrl)) {
+                    Path path = Path.of(classpathUrl.toURI());
+                    if (Files.isDirectory(path)) {
+                        return new FileSystemResource(path.resolve(resourcePath));
+                    }
+                    return new UrlResource(new URL("jar:" + classpathUrl.toExternalForm() + "!/" + resourcePath));
+                }
+                return new UrlResource(new URL(classpathUrl, resourcePath));
+            } catch (Exception e) {
+                return new DescriptiveResource(
+                        "Plugin resource [" + resourcePath + "] from [" + classpathUrl + "] is invalid");
+            }
+        }
     }
 }

@@ -241,6 +241,8 @@ class PluginReconcilerTest {
                 spec.setSettingName(settingName);
                 spec.setConfigMapName(configMapName);
             });
+            fakePlugin.getStatus().setEntry("/plugins/fake-plugin/assets/ui/main.js?version=1.2.3");
+            fakePlugin.getStatus().setStylesheet("/plugins/fake-plugin/assets/ui/style.css?version=1.2.3");
 
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
