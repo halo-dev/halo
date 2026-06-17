@@ -88,22 +88,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var exactMatch = subjectPrefix + reasonSubject.getName();
 
         // Subject query: exact name match OR wildcard (no name) subscriptions.
-        var subjectListOptions = new ListOptions();
-        var subjectFieldQuery = and(
-                isNull("metadata.deletionTimestamp"),
-                equal("spec.reason.reasonType", reasonType),
-                or(equal("spec.reason.subject", exactMatch), equal("spec.reason.subject", subjectPrefix)));
-        subjectListOptions.setFieldSelector(FieldSelector.of(subjectFieldQuery));
+        var subjectListOptions = ListOptions.builder()
+                .fieldQuery(and(
+                        isNull("metadata.deletionTimestamp"),
+                        equal("spec.reason.reasonType", reasonType),
+                        or(equal("spec.reason.subject", exactMatch), equal("spec.reason.subject", subjectPrefix))))
+                .build();
 
         var subjectFlux = paginatedOperator.list(Subscription.class, subjectListOptions);
 
         // Expression query: subscriptions that use expression-based matching.
-        var exprListOptions = new ListOptions();
-        var exprFieldQuery = and(
-                isNull("metadata.deletionTimestamp"),
-                equal("spec.reason.reasonType", reasonType),
-                not(isNull("spec.reason.expression")));
-        exprListOptions.setFieldSelector(FieldSelector.of(exprFieldQuery));
+        var exprListOptions = ListOptions.builder()
+                .fieldQuery(and(
+                        isNull("metadata.deletionTimestamp"),
+                        equal("spec.reason.reasonType", reasonType),
+                        not(isNull("spec.reason.expression"))))
+                .build();
 
         return subjectFlux.concatWith(paginatedOperator.list(Subscription.class, exprListOptions));
     }

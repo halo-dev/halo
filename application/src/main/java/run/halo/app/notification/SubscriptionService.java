@@ -29,7 +29,7 @@ public interface SubscriptionService {
      * @param reasonType the reason type to match
      * @param reasonSubject the reason's subject used to build the subject filter
      * @return a paginated flux of matching subscriptions
-     * @since 2.27.0
+     * @since 2.25.3
      */
     Flux<Subscription> listByPerPage(String reasonType, Reason.Subject reasonSubject);
 
