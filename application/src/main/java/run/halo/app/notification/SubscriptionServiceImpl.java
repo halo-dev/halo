@@ -11,6 +11,7 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -79,6 +80,32 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.reason.reasonType", reasonType));
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
         return paginatedOperator.list(Subscription.class, listOptions);
+    }
+
+    @Override
+    public Flux<Subscription> listByPerPage(String reasonType, Reason.Subject reasonSubject) {
+        var subjectPrefix = reasonSubject.getKind() + "#" + reasonSubject.getApiVersion() + "/";
+        var exactMatch = subjectPrefix + reasonSubject.getName();
+
+        // Subject query: exact name match OR wildcard (no name) subscriptions.
+        var subjectListOptions = new ListOptions();
+        var subjectFieldQuery = and(
+                isNull("metadata.deletionTimestamp"),
+                equal("spec.reason.reasonType", reasonType),
+                or(equal("spec.reason.subject", exactMatch), equal("spec.reason.subject", subjectPrefix)));
+        subjectListOptions.setFieldSelector(FieldSelector.of(subjectFieldQuery));
+
+        var subjectFlux = paginatedOperator.list(Subscription.class, subjectListOptions);
+
+        // Expression query: subscriptions that use expression-based matching.
+        var exprListOptions = new ListOptions();
+        var exprFieldQuery = and(
+                isNull("metadata.deletionTimestamp"),
+                equal("spec.reason.reasonType", reasonType),
+                not(isNull("spec.reason.expression")));
+        exprListOptions.setFieldSelector(FieldSelector.of(exprFieldQuery));
+
+        return subjectFlux.concatWith(paginatedOperator.list(Subscription.class, exprListOptions));
     }
 
     private Mono<Subscription> attemptToDelete(String subscriptionName) {

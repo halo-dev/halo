@@ -1,6 +1,7 @@
 package run.halo.app.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,7 +59,8 @@ class RecipientResolverImplTest {
         reasonAttributes.put("owner", "guqing");
         reason.getSpec().setAttributes(reasonAttributes);
 
-        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription1, subscription2));
+        when(subscriptionService.listByPerPage(anyString(), any(Reason.Subject.class)))
+                .thenReturn(Flux.just(subscription1, subscription2));
 
         recipientResolver
                 .resolve(reason)
@@ -66,7 +68,7 @@ class RecipientResolverImplTest {
                 .expectNext(new Subscriber(UserIdentity.of("guqing"), "guqing-subscription"))
                 .verifyComplete();
 
-        verify(subscriptionService).listByPerPage(anyString());
+        verify(subscriptionService).listByPerPage(anyString(), any(Reason.Subject.class));
     }
 
     @Test
@@ -75,7 +77,8 @@ class RecipientResolverImplTest {
         subscriber.setName("test");
         Subscription subscription = createSubscription(subscriber);
 
-        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription));
+        when(subscriptionService.listByPerPage(anyString(), any(Reason.Subject.class)))
+                .thenReturn(Flux.just(subscription));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -91,7 +94,7 @@ class RecipientResolverImplTest {
                 .expectNext(new Subscriber(UserIdentity.of("test"), "fake-subscription"))
                 .verifyComplete();
 
-        verify(subscriptionService).listByPerPage(anyString());
+        verify(subscriptionService).listByPerPage(anyString(), any(Reason.Subject.class));
     }
 
     @Test
@@ -108,7 +111,8 @@ class RecipientResolverImplTest {
         subscription2.getSpec().getReason().setSubject(null);
         subscription2.getSpec().getReason().setExpression("props.owner == 'guqing'");
 
-        when(subscriptionService.listByPerPage(anyString())).thenReturn(Flux.just(subscription1, subscription2));
+        when(subscriptionService.listByPerPage(anyString(), any(Reason.Subject.class)))
+                .thenReturn(Flux.just(subscription1, subscription2));
 
         var reason = new Reason();
         reason.setSpec(new Reason.Spec());
@@ -127,7 +131,7 @@ class RecipientResolverImplTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-        verify(subscriptionService).listByPerPage(anyString());
+        verify(subscriptionService).listByPerPage(anyString(), any(Reason.Subject.class));
     }
 
     @Test
