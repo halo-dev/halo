@@ -75,14 +75,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Flux<Subscription> listByPerPage(String reasonType) {
-        final var listOptions = new ListOptions();
-        var fieldQuery = and(isNull("metadata.deletionTimestamp"), equal("spec.reason.reasonType", reasonType));
-        listOptions.setFieldSelector(FieldSelector.of(fieldQuery));
-        return paginatedOperator.list(Subscription.class, listOptions);
-    }
-
-    @Override
     public Flux<Subscription> listByPerPage(String reasonType, Reason.Subject reasonSubject) {
         var subjectPrefix = reasonSubject.getKind() + "#" + reasonSubject.getApiVersion() + "/";
         var exactMatch = subjectPrefix + reasonSubject.getName();

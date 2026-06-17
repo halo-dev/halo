@@ -9,13 +9,6 @@ import run.halo.app.extension.ListOptions;
 public interface SubscriptionService {
 
     /**
-     * List subscriptions by page one by one.only consume one page then next page will be loaded.
-     *
-     * <p>Note that: result can not be used to delete the subscription, it is only used to query the subscription.
-     */
-    Flux<Subscription> listByPerPage(String reasonType);
-
-    /**
      * List subscriptions by reasonType with subject-based filtering to avoid pulling all subscriptions for a reason
      * type into memory.
      *
