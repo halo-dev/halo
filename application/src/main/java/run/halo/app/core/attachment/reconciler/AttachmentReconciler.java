@@ -66,6 +66,7 @@ class AttachmentReconciler implements Reconciler<Request> {
                             .map(map -> map.keySet().stream()
                                     .collect(Collectors.toMap(
                                             Enum::name, k -> map.get(k).toString())))
+                            .filter(map -> !map.isEmpty())
                             .blockOptional(Duration.ofSeconds(10))
                             .orElse(null);
                     attachment.getStatus().setThumbnails(thumbnails);

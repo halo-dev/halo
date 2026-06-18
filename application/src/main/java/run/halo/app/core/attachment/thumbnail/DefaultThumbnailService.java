@@ -22,6 +22,7 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Implementation of {@link ThumbnailService}.
@@ -43,9 +44,13 @@ class DefaultThumbnailService implements ThumbnailService {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
-    public DefaultThumbnailService(ReactiveExtensionClient client, ExternalUrlSupplier externalUrlSupplier) {
+    private final HaloProperties haloProperties;
+
+    public DefaultThumbnailService(
+            ReactiveExtensionClient client, ExternalUrlSupplier externalUrlSupplier, HaloProperties haloProperties) {
         this.client = client;
         this.externalUrlSupplier = externalUrlSupplier;
+        this.haloProperties = haloProperties;
         this.thumbnailCache = Caffeine.newBuilder()
                 // TODO make it configurable
                 .maximumSize(10_000)
@@ -95,6 +100,9 @@ class DefaultThumbnailService implements ThumbnailService {
 
     @Override
     public Mono<Map<ThumbnailSize, URI>> get(URI permalink) {
+        if (isThumbnailDisabled()) {
+            return Mono.just(EMPTY_THUMBNAILS);
+        }
         var encodedPermalink = URI.create(permalink.toASCIIString());
         if (!encodedPermalink.isAbsolute()) {
             // build permalinks
@@ -130,5 +138,9 @@ class DefaultThumbnailService implements ThumbnailService {
                         return EMPTY_THUMBNAILS;
                     }));
         });
+    }
+
+    private boolean isThumbnailDisabled() {
+        return haloProperties.getAttachment().getThumbnail().isDisabled();
     }
 }

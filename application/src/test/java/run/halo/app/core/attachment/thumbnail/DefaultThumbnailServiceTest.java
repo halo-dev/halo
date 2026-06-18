@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,8 @@ import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.properties.AttachmentProperties;
+import run.halo.app.infra.properties.HaloProperties;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultThumbnailServiceTest {
@@ -33,8 +36,19 @@ class DefaultThumbnailServiceTest {
     @Mock
     ExternalUrlSupplier externalUrlSupplier;
 
+    @Mock
+    HaloProperties haloProperties;
+
     @InjectMocks
     DefaultThumbnailService thumbnailService;
+
+    AttachmentProperties attachmentProperties;
+
+    @BeforeEach
+    void setUp() {
+        attachmentProperties = new AttachmentProperties();
+        when(haloProperties.getAttachment()).thenReturn(attachmentProperties);
+    }
 
     @Test
     void shouldGetThumbnailDirectlyIfPermalinkIsRelative() {
@@ -42,6 +56,16 @@ class DefaultThumbnailServiceTest {
                 .get(URI.create("/images/fake.png"), ThumbnailSize.M)
                 .as(StepVerifier::create)
                 .expectNext(URI.create("/images/fake.png?width=800"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldGetEmptyThumbnailIfThumbnailIsDisabled() {
+        attachmentProperties.getThumbnail().setDisabled(true);
+
+        thumbnailService
+                .get(URI.create("/images/fake.png"), ThumbnailSize.M)
+                .as(StepVerifier::create)
                 .verifyComplete();
     }
 
