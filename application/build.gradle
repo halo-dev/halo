@@ -231,6 +231,18 @@ tasks.named('generateOpenApiDocs') {
     }
 }
 
+tasks.named('forkedSpringBootRun') {
+    notCompatibleWithConfigurationCache(
+        'JavaExecFork holds references to Task objects (OpenApiGeneratorTask, BootRun), which are not serializable'
+    )
+}
+
+tasks.named('forkedSpringBootStop') {
+    notCompatibleWithConfigurationCache(
+        'ExecJoin holds a reference to JavaExecFork (a Task), which is not serializable'
+    )
+}
+
 def branchProvider = providers.exec { commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD' }
 .standardOutput
 .asText
