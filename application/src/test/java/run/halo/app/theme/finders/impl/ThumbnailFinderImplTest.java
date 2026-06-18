@@ -52,4 +52,16 @@ class ThumbnailFinderImplTest {
 
         verify(thumbnailService).get(any(), any());
     }
+
+    @Test
+    void shouldReturnOriginalUriIfNoThumbnailFound() {
+        when(thumbnailService.get(any(), any())).thenReturn(Mono.empty());
+        thumbnailFinder
+                .gen("/test.jpg", "l")
+                .as(StepVerifier::create)
+                .expectNext("/test.jpg")
+                .verifyComplete();
+
+        verify(thumbnailService).get(any(), any());
+    }
 }

@@ -39,6 +39,8 @@ import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.properties.AttachmentProperties;
+import run.halo.app.infra.properties.HaloProperties;
 
 @ExtendWith(MockitoExtension.class)
 class LocalAttachmentUploadHandlerTest {
@@ -55,8 +57,13 @@ class LocalAttachmentUploadHandlerTest {
     @Mock
     LocalThumbnailService localThumbnailService;
 
+    @Mock
+    HaloProperties haloProperties;
+
     @TempDir
     Path attachmentRoot;
+
+    AttachmentProperties attachmentProperties;
 
     static Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
 
@@ -64,6 +71,8 @@ class LocalAttachmentUploadHandlerTest {
     void setUp() {
         uploadHandler.setClock(clock);
         lenient().when(externalUrlSupplier.get()).thenReturn(URI.create("/"));
+        attachmentProperties = new AttachmentProperties();
+        lenient().when(haloProperties.getAttachment()).thenReturn(attachmentProperties);
     }
 
     public static Stream<Arguments> testUploadWithRenameStrategy() {
@@ -192,6 +201,33 @@ class LocalAttachmentUploadHandlerTest {
                     assertion.accept(attachment);
                     assertNotNull(attachment.getStatus().getPermalink());
                     assertNotNull(attachment.getStatus().getThumbnails());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldNotSetThumbnailsIfThumbnailIsDisabled() {
+        attachmentProperties.getThumbnail().setDisabled(true);
+
+        var dataBufferFactory = new DefaultDataBufferFactory();
+        var dataBuffer = dataBufferFactory.allocateBuffer(1024);
+        dataBuffer.write("fake content".getBytes(StandardCharsets.UTF_8));
+        var content = Flux.<DataBuffer>just(dataBuffer);
+
+        var policy = new Policy();
+        var policySpec = new Policy.PolicySpec();
+        policy.setSpec(policySpec);
+        policySpec.setTemplateName("local");
+
+        var uploadOption = UploadOption.from("halo.png", content, MediaType.IMAGE_PNG, policy, null);
+
+        when(attachmentRootGetter.get()).thenReturn(attachmentRoot);
+        uploadHandler
+                .upload(uploadOption)
+                .as(StepVerifier::create)
+                .assertNext(attachment -> {
+                    assertNotNull(attachment.getStatus().getPermalink());
+                    assertNull(attachment.getStatus().getThumbnails());
                 })
                 .verifyComplete();
     }

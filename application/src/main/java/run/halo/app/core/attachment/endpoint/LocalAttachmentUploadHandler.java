@@ -53,6 +53,7 @@ import run.halo.app.infra.FileCategoryMatcher;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.exception.FileSizeExceededException;
 import run.halo.app.infra.exception.FileTypeNotAllowedException;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.FileTypeDetectUtils;
 import run.halo.app.infra.utils.HaloUtils;
@@ -68,6 +69,8 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     private final AttachmentRootGetter attachmentDirGetter;
 
     private final LocalThumbnailService localThumbnailService;
+
+    private final HaloProperties haloProperties;
 
     private Clock clock = Clock.systemUTC();
 
@@ -275,6 +278,9 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     }
 
     private Map<ThumbnailSize, URI> doGetThumbnailLinks(Attachment attachment) {
+        if (isThumbnailDisabled()) {
+            return Map.of();
+        }
         if (attachment.getStatus() == null
                 || !StringUtils.hasText(attachment.getStatus().getPermalink())) {
             return Map.of();
@@ -297,6 +303,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
         }
         var permalinkUri = URI.create(attachment.getStatus().getPermalink());
         return ThumbnailUtils.buildSrcsetMap(permalinkUri);
+    }
+
+    private boolean isThumbnailDisabled() {
+        return haloProperties.getAttachment().getThumbnail().isDisabled();
     }
 
     private void deleteAttachmentFile(Path attachmentPath) {
