@@ -1,16 +1,16 @@
 packages:
   - packages/**
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
-  vite-plus: ^0.1.24
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.0
+  vitest: 4.1.9
+  vite-plus: 0.2.0
 overrides:
   vite: "catalog:"
+  vite-plus: "catalog:"
   vitest: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
-    - vitest
   allowedVersions:
     vite: "*"
-    vitest: "*"
+    vite-plus: 0.2.0

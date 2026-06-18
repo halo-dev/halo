@@ -127,7 +127,7 @@
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/eslint-plugin": "^1.4.3",
-    "@vitest/ui": "^4.0.13",
+    "@vitest/ui": "4.1.9",
     "@vue/compiler-sfc": "^3.5.27",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
@@ -172,7 +172,7 @@
     "defaults"
   ],
   "engines": {
-    "node": "^24.0.0"
+    "node": ">=24.11.0"
   },
   "packageManager": "pnpm@10.30.3",
   "pnpm": {

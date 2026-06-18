@@ -2,8 +2,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { ConfigParams, RsbuildConfig } from "@rsbuild/core";
-import type { ConfigEnv, UserConfig } from "vite";
-import { afterEach, describe, expect, it } from "vitest";
+import type { ConfigEnv, UserConfig } from "vite-plus";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { rsbuildConfig } from "../rsbuild";
 import { viteConfig } from "../vite";
 

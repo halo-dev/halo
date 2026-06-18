@@ -16,7 +16,7 @@ const config: StorybookConfig = {
   },
 
   async viteFinal(config) {
-    const { mergeConfig } = await import("vite");
+    const { mergeConfig } = await import("vite-plus");
 
     return mergeConfig(config, {
       assetsInclude: ["/sb-preview/runtime.js"],

@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { Plugin } from "vite";
-import { afterEach, describe, expect, it } from "vitest";
+import type { Plugin } from "vite-plus";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { HaloUIPluginBundlerKit } from "../legacy";
 
 const originalCwd = process.cwd();

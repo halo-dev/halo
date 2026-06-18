@@ -1,6 +1,6 @@
 import type { PluginModule } from "@halo-dev/ui-shared";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import type { App } from "vue";
 import type { Router, RouteRecordRaw } from "vue-router";
 import { usePluginModuleStore } from "@/stores/plugin";
