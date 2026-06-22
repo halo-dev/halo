@@ -87,7 +87,7 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                             return connectionService
                                     .updateUserConnectionIfPresent(registrationId, oauth2User)
                                     .switchIfEmpty(Mono.defer(
-                                            () -> Mono.justOrEmpty(exchange.getAttribute(PRE_AUTHENTICATION))
+                                            () -> Mono.justOrEmpty((Object) exchange.getAttribute(PRE_AUTHENTICATION))
                                                     .filter(Authentication.class::isInstance)
                                                     .cast(Authentication.class)
                                                     .filter(authenticationTrustResolver::isAuthenticated)
