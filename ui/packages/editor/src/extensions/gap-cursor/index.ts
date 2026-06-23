@@ -114,6 +114,7 @@ export const ExtensionGapCursor = Extension.create({
               const { selection, tr } = state;
               if (
                 selection instanceof TextSelection &&
+                selection.$from.depth === 1 &&
                 isActive(state, "paragraph") &&
                 isEmpty(selection.$from.parent) &&
                 selection.empty
@@ -329,8 +330,12 @@ const arrowGapCursor = (
     if (!$found) {
       return;
     }
-    tr.setSelection(new GapCursorSelection($found));
-    return $found;
+    const $mapped = tr.doc.resolve(tr.mapping.map($found.pos, dir));
+    if (!GapCursorSelection.valid($mapped)) {
+      return;
+    }
+    tr.setSelection(new GapCursorSelection($mapped));
+    return $mapped;
   };
 };
 
