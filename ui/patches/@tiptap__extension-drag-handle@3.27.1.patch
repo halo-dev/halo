@@ -1,8 +1,8 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 061c150c72c1e340b8103dfa09a3335342c96ea7..bffd3363858cba60339db7528b66cf7273b410dd 100644
+index 172bf58dd5e1c8eef4d8f426e78dbb7821f0206b..bd2e0768eab0af788892739bf7ad6242d60a03dd 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
-@@ -506,6 +506,11 @@ function dragHandler(event, editor, nestedOptions, dragContext) {
+@@ -537,6 +537,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
    });
    wrapper.style.position = "absolute";
    wrapper.style.top = "-10000px";
@@ -15,7 +15,7 @@ index 061c150c72c1e340b8103dfa09a3335342c96ea7..bffd3363858cba60339db7528b66cf72
    event.dataTransfer.clearData();
    const wrapperRect = wrapper.getBoundingClientRect();
 diff --git a/dist/index.js b/dist/index.js
-index 066e4c8d30bfea266587dad460f42ae06def26ad..d956719fc331d6e85f5db9cbd5e431600b40d5e4 100644
+index 72cde4382cedc0e3580f471825f47154b1cef48a..9a0269fb40516e8507ecf0fecdfd6f54f895f5fc 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
@@ -32,7 +32,7 @@ index 066e4c8d30bfea266587dad460f42ae06def26ad..d956719fc331d6e85f5db9cbd5e43160
  
  // src/helpers/dragHandler.ts
  import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
-@@ -478,6 +472,11 @@ function dragHandler(event, editor, nestedOptions, dragContext) {
+@@ -509,6 +503,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
    });
    wrapper.style.position = "absolute";
    wrapper.style.top = "-10000px";
@@ -44,7 +44,7 @@ index 066e4c8d30bfea266587dad460f42ae06def26ad..d956719fc331d6e85f5db9cbd5e43160
    document.body.append(wrapper);
    event.dataTransfer.clearData();
    const wrapperRect = wrapper.getBoundingClientRect();
-@@ -528,18 +527,10 @@ var getOuterNode = (doc, pos) => {
+@@ -607,23 +606,10 @@ var getOuterNode = (doc, pos) => {
  
  // src/drag-handle-plugin.ts
  var getRelativePos = (state, absolutePos) => {
@@ -60,12 +60,17 @@ index 066e4c8d30bfea266587dad460f42ae06def26ad..d956719fc331d6e85f5db9cbd5e43160
 -  if (!ystate) {
 -    return -1;
 -  }
--  return relativePositionToAbsolutePosition(ystate.doc, ystate.type, relativePos, ystate.binding.mapping) || 0;
+-  return relativePositionToAbsolutePosition(
+-    ystate.doc,
+-    ystate.type,
+-    relativePos,
+-    ystate.binding.mapping
+-  ) || 0;
 +  return -1;
  };
  var getOuterDomNode = (view, domNode) => {
    let tmpDomNode = domNode;
-@@ -664,17 +655,10 @@ var DragHandlePlugin = ({
+@@ -803,17 +789,10 @@ var DragHandlePlugin = ({
              return value;
            }
            if (tr.docChanged && currentNodePos !== -1 && element) {
