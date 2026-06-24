@@ -108,7 +108,7 @@ const handlePublishClick = () => {
 // because currently there may be errors caused by changes in version due to asynchronous processing.
 const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
-const handleSave = async () => {
+const syncAnnotations = async () => {
   annotationsFormRef.value?.handleSubmit();
   await nextTick();
 
@@ -116,13 +116,21 @@ const handleSave = async () => {
     annotationsFormRef.value || {};
 
   if (customFormInvalid || specFormInvalid) {
-    return;
+    return false;
   }
 
   formState.value.metadata.annotations = {
     ...annotations,
     ...customAnnotations,
   };
+
+  return true;
+};
+
+const handleSave = async () => {
+  if (!(await syncAnnotations())) {
+    return;
+  }
 
   if (props.onlyEmit) {
     emit("saved", formState.value);
@@ -153,6 +161,10 @@ const handleSave = async () => {
 };
 
 const handlePublish = async () => {
+  if (!(await syncAnnotations())) {
+    return;
+  }
+
   if (props.onlyEmit) {
     emit("published", formState.value);
     modal.value?.close();
