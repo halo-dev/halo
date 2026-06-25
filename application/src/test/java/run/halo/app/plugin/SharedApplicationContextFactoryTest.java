@@ -23,5 +23,6 @@ class SharedApplicationContextFactoryTest {
     void createSharedApplicationContext() {
         var sharedContext = SharedApplicationContextFactory.create(applicationContext);
         assertNotNull(sharedContext);
+        assertNotNull(sharedContext.getBeanProvider(PluginRuntimeInspector.class).getIfUnique());
     }
 }

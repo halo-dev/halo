@@ -91,6 +91,10 @@ public enum SharedApplicationContextFactory {
         rootContext
                 .getBeanProvider(SystemInfoGetter.class)
                 .ifUnique(systemInfoGetter -> beanFactory.registerSingleton("systemInfoGetter", systemInfoGetter));
+        rootContext
+                .getBeanProvider(PluginRuntimeInspector.class)
+                .ifUnique(pluginRuntimeInspector ->
+                        beanFactory.registerSingleton("pluginRuntimeInspector", pluginRuntimeInspector));
         // TODO add more shared instance here
 
         sharedContext.refresh();
