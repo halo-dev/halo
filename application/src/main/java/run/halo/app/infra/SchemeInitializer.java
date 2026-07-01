@@ -252,6 +252,10 @@ class SchemeInitializer implements SmartLifecycle {
                     .indexFunc(category -> Optional.ofNullable(category.getSpec())
                             .map(CategorySpec::getPriority)
                             .orElse(0)));
+            indexSpecs.add(IndexSpecs.<Category, String>single("spec.parent", String.class)
+                    .indexFunc(category -> Optional.ofNullable(category.getSpec())
+                            .map(CategorySpec::getParent)
+                            .orElse(null)));
             indexSpecs.add(IndexSpecs.<Category, String>multi("spec.children", String.class)
                     .indexFunc(category -> Optional.ofNullable(category.getSpec())
                             .map(CategorySpec::getChildren)

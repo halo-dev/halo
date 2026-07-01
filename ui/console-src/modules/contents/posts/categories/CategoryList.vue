@@ -16,7 +16,11 @@ import { ref } from "vue";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import { usePostCategory } from "./composables/use-post-category";
-import { convertTreeToCategories, resetCategoriesTreePriority } from "./utils";
+import {
+  convertTreeToCategories,
+  createCategoryPatch,
+  resetCategoriesTreePriority,
+} from "./utils";
 
 const creationModal = ref(false);
 
@@ -32,23 +36,21 @@ async function handleUpdateInBatch() {
   const categoriesToUpdate = convertTreeToCategories(categoriesTreeToUpdate);
   try {
     batchUpdating.value = true;
-    const promises = categoriesToUpdate.map((category) =>
-      coreApiClient.content.category.patchCategory({
-        name: category.metadata.name,
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/spec/children",
-            value: category.spec.children || [],
-          },
-          {
-            op: "add",
-            path: "/spec/priority",
-            value: category.spec.priority || 0,
-          },
-        ],
-      })
+    const originalParentMap = new Map(
+      categories.value?.map((category) => [
+        category.metadata.name,
+        category.spec.parent,
+      ])
     );
+    const promises = categoriesToUpdate.map((category) => {
+      return coreApiClient.content.category.patchCategory({
+        name: category.metadata.name,
+        jsonPatchInner: createCategoryPatch(
+          category,
+          originalParentMap.get(category.metadata.name)
+        ),
+      });
+    });
     await Promise.all(promises);
   } catch (e) {
     console.error("Failed to update categories", e);

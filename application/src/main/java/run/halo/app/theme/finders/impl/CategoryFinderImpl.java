@@ -125,21 +125,52 @@ public class CategoryFinderImpl implements CategoryFinder {
                 .map(CategoryTreeVo::from)
                 .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(), Function.identity()));
 
-        nameIdentityMap.forEach((nameKey, value) -> {
-            List<String> children = value.getSpec().getChildren();
-            if (children == null) {
-                return;
-            }
-            for (String child : children) {
-                CategoryTreeVo childNode = nameIdentityMap.get(child);
-                if (childNode != null) {
-                    childNode.setParentName(nameKey);
-                }
-            }
-        });
+        populateParentName(nameIdentityMap);
         var tree = listToTree(nameIdentityMap.values(), name);
         recomputePostCount(tree);
         return tree;
+    }
+
+    static void populateParentName(Map<String, CategoryTreeVo> nameIdentityMap) {
+        Map<String, String> parentMap = nameIdentityMap.entrySet().stream()
+                .filter(entry -> hasValidParent(entry.getValue(), nameIdentityMap))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> entry.getValue().getSpec().getParent()));
+        Set<String> cyclicNames = cyclicNames(parentMap);
+        nameIdentityMap.forEach((name, value) -> {
+            var parentName = parentMap.get(name);
+            value.setParentName(parentName == null || cyclicNames.contains(name) ? null : parentName);
+        });
+    }
+
+    private static boolean hasValidParent(CategoryTreeVo category, Map<String, CategoryTreeVo> nameIdentityMap) {
+        var categoryName = category.getMetadata().getName();
+        var spec = category.getSpec();
+        if (spec == null) {
+            return false;
+        }
+        var parentName = spec.getParent();
+        return StringUtils.isNotBlank(parentName)
+                && !StringUtils.equals(parentName, categoryName)
+                && nameIdentityMap.containsKey(parentName);
+    }
+
+    private static Set<String> cyclicNames(Map<String, String> parentMap) {
+        Set<String> cyclicNames = new HashSet<>();
+        for (String name : parentMap.keySet()) {
+            var path = new ArrayList<String>();
+            var visiting = new HashSet<String>();
+            String current = name;
+            while (StringUtils.isNotBlank(current) && parentMap.containsKey(current)) {
+                if (!visiting.add(current)) {
+                    cyclicNames.addAll(path.subList(path.indexOf(current), path.size()));
+                    break;
+                }
+                path.add(current);
+                current = parentMap.get(current);
+            }
+        }
+        return cyclicNames;
     }
 
     private static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String name) {

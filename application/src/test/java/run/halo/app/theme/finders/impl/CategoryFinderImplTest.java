@@ -146,6 +146,33 @@ class CategoryFinderImplTest {
         assertThat(treeVos.get(0).getChildren().get(1).getMetadata().getName()).isEqualTo("C");
     }
 
+    @Test
+    void listAsTreeTreatsInvalidParentsAsRoots() {
+        var root = category("root", null);
+        var missingParent = category("missing-parent", "missing");
+        var selfParent = category("self-parent", "self-parent");
+        var cyclicA = category("cyclic-a", "cyclic-b");
+        var cyclicB = category("cyclic-b", "cyclic-a");
+        var validChildOfCyclicRoot = category("child", "cyclic-a");
+
+        when(client.listAll(eq(Category.class), any(ListOptions.class), any(Sort.class)))
+                .thenReturn(Flux.fromIterable(
+                        List.of(root, missingParent, selfParent, cyclicA, cyclicB, validChildOfCyclicRoot)));
+
+        var treeVos = categoryFinder.listAsTree().collectList().block();
+
+        assertThat(treeVos.stream().map(vo -> vo.getMetadata().getName()).toList())
+                .containsExactly("root", "missing-parent", "self-parent", "cyclic-a", "cyclic-b");
+        var cyclicANode = treeVos.stream()
+                .filter(vo -> vo.getMetadata().getName().equals("cyclic-a"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cyclicANode.getParentName()).isNull();
+        assertThat(cyclicANode.getChildren())
+                .extracting(child -> child.getMetadata().getName())
+                .containsExactly("child");
+    }
+
     /**
      * Test for {@link CategoryFinderImpl#listAsTree()}.
      *
@@ -210,6 +237,7 @@ class CategoryFinderImplTest {
             var file = ResourceUtils.getFile("classpath:categories/independent-post-count.json");
             var json = Files.readString(file.toPath());
             categories = JsonUtils.jsonToObject(json, new TypeReference<>() {});
+            populateParentReferences(categories);
         }
 
         @Test
@@ -334,30 +362,37 @@ class CategoryFinderImplTest {
 
         Category e = category();
         e.getMetadata().setName("E");
+        e.getSpec().setParent("D");
         e.getSpec().setChildren(List.of("A", "C"));
 
         Category a = category();
         a.getMetadata().setName("A");
+        a.getSpec().setParent("E");
         a.getSpec().setChildren(List.of("B"));
 
         Category b = category();
         b.getMetadata().setName("B");
+        b.getSpec().setParent("A");
         b.getSpec().setChildren(null);
 
         Category c = category();
         c.getMetadata().setName("C");
+        c.getSpec().setParent("E");
         c.getSpec().setChildren(null);
 
         Category g = category();
         g.getMetadata().setName("G");
+        g.getSpec().setParent("D");
         g.getSpec().setChildren(null);
 
         Category f = category();
         f.getMetadata().setName("F");
+        f.getSpec().setParent("D");
         f.getSpec().setChildren(List.of("H"));
 
         Category h = category();
         h.getMetadata().setName("H");
+        h.getSpec().setParent("F");
         h.getSpec().setChildren(null);
         return List.of(d, e, a, b, c, g, f, h);
     }
@@ -414,6 +449,32 @@ class CategoryFinderImplTest {
         categorySpec.setChildren(List.of("C1", "C2"));
         category.setSpec(categorySpec);
         return category;
+    }
+
+    private Category category(String name, String parentName) {
+        var category = category();
+        category.getMetadata().setName(name);
+        category.getSpec().setDisplayName(name);
+        category.getSpec().setParent(parentName);
+        category.getSpec().setChildren(null);
+        return category;
+    }
+
+    private static void populateParentReferences(List<Category> categories) {
+        var categoryMap = categories.stream()
+                .collect(Collectors.toMap(category -> category.getMetadata().getName(), Function.identity()));
+        for (Category parent : categories) {
+            var children = parent.getSpec().getChildren();
+            if (children == null) {
+                continue;
+            }
+            for (String childName : children) {
+                var child = categoryMap.get(childName);
+                if (child != null) {
+                    child.getSpec().setParent(parent.getMetadata().getName());
+                }
+            }
+        }
     }
 
     private List<Category> moreCategories() {
@@ -586,6 +647,8 @@ class CategoryFinderImplTest {
                }
             ]
             """;
-        return JsonUtils.jsonToObject(s, new TypeReference<>() {});
+        List<Category> categories = JsonUtils.jsonToObject(s, new TypeReference<>() {});
+        populateParentReferences(categories);
+        return categories;
     }
 }
