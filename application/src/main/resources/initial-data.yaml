@@ -176,6 +176,7 @@ metadata:
 spec:
   displayName: 首页
   href: /
+  menuName: primary
   children: []
   priority: 0
 ---
@@ -187,6 +188,7 @@ metadata:
 spec:
   displayName: "文章"
   href: "/archives"
+  menuName: primary
   children: []
   priority: 1
 ---
@@ -198,6 +200,7 @@ metadata:
 spec:
   displayName: "默认分类"
   href: "/categories/default"
+  menuName: primary
   children: []
   priority: 2
   targetRef:
@@ -214,6 +217,7 @@ metadata:
 spec:
   displayName: "关于"
   href: "/about"
+  menuName: primary
   children: []
   priority: 3
   targetRef:

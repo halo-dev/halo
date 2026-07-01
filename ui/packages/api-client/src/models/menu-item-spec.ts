@@ -22,7 +22,8 @@ import type { Ref } from './ref';
  */
 export interface MenuItemSpec {
     /**
-     * Child MenuItem metadata.name values shown under this item.
+     * Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.
+     * @deprecated
      */
     'children'?: Array<string>;
     /**
@@ -33,6 +34,14 @@ export interface MenuItemSpec {
      * Direct URL used by the menu item.
      */
     'href'?: string;
+    /**
+     * Owning Menu metadata.name. Optional for compatibility with legacy raw payloads.
+     */
+    'menuName'?: string;
+    /**
+     * Parent MenuItem metadata.name in the same menu. Root items leave this unset.
+     */
+    'parent'?: string;
     /**
      * Sorting priority. Higher values sort before lower values where priority ordering is applied.
      */

@@ -23,7 +23,8 @@ export interface MenuSpec {
      */
     'displayName': string;
     /**
-     * Ordered MenuItem metadata.name values included in this menu.
+     * Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.
+     * @deprecated
      */
     'menuItems'?: Array<string>;
 }

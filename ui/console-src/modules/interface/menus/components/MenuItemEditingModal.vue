@@ -8,14 +8,17 @@ import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
+import { buildMenuItemsTree } from "../utils";
 
 const props = withDefaults(
   defineProps<{
     menu: Menu;
+    menuItems?: MenuItem[];
     parentMenuItem?: MenuItem;
     menuItem?: MenuItem;
   }>(),
   {
+    menuItems: () => [],
     parentMenuItem: undefined,
     menuItem: undefined,
   }
@@ -35,7 +38,7 @@ const formState = ref<MenuItem>({
     displayName: "",
     href: "",
     target: "_self",
-    children: [],
+    menuName: props.menu.metadata.name,
     priority: 0,
   },
   apiVersion: "v1alpha1",
@@ -72,6 +75,11 @@ const handleSaveMenuItem = async () => {
 
   try {
     saving.value = true;
+    formState.value.spec.menuName = props.menu.metadata.name;
+    if (!isUpdateMode) {
+      formState.value.spec.parent = selectedParentMenuItem.value || undefined;
+      formState.value.spec.priority = siblingCount.value;
+    }
 
     const menuItemRef = menuItemRefs.find(
       (ref) => ref.ref?.kind === selectedRefKind.value
@@ -97,28 +105,6 @@ const handleSaveMenuItem = async () => {
       const { data } = await coreApiClient.menuItem.createMenuItem({
         menuItem: formState.value,
       });
-
-      // if parent menu item is selected, add the new menu item to the parent menu item
-      if (selectedParentMenuItem.value) {
-        const { data: parentMenuItem } =
-          await coreApiClient.menuItem.getMenuItem({
-            name: selectedParentMenuItem.value,
-          });
-
-        await coreApiClient.menuItem.patchMenuItem({
-          name: selectedParentMenuItem.value,
-          jsonPatchInner: [
-            {
-              op: "add",
-              path: "/spec/children",
-              value: [
-                ...(parentMenuItem.spec.children || []),
-                data.metadata.name,
-              ],
-            },
-          ],
-        });
-      }
 
       emit("saved", data);
     }
@@ -205,6 +191,80 @@ const selectedRef = computed(() => {
 const selectedRefKind = ref<string>();
 const selectedRefName = ref<string>("");
 
+const excludedParentNames = computed(() => {
+  const excludedNames = new Set<string>();
+  const currentName = props.menuItem?.metadata.name;
+  if (!currentName) {
+    return excludedNames;
+  }
+
+  excludedNames.add(currentName);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    props.menuItems.forEach((menuItem) => {
+      if (
+        menuItem.spec.parent &&
+        excludedNames.has(menuItem.spec.parent) &&
+        !excludedNames.has(menuItem.metadata.name)
+      ) {
+        excludedNames.add(menuItem.metadata.name);
+        changed = true;
+      }
+    });
+  }
+  return excludedNames;
+});
+
+const parentMenuItemOptions = computed(() => {
+  const emptyOption = {
+    label: t("core.menu.menu_item_editing_modal.fields.parent.placeholder"),
+    value: "",
+  };
+  const options = props.menuItems
+    .filter(
+      (menuItem) => !excludedParentNames.value.has(menuItem.metadata.name)
+    )
+    .map((menuItem) => {
+      return {
+        label:
+          menuItem.status?.displayName ||
+          menuItem.spec.displayName ||
+          menuItem.metadata.name,
+        value: menuItem.metadata.name,
+      };
+    });
+  return [emptyOption, ...options];
+});
+
+const menuTreeItems = computed(() => buildMenuItemsTree(props.menuItems));
+
+const siblingCount = computed(() => {
+  if (!selectedParentMenuItem.value) {
+    return menuTreeItems.value.length;
+  }
+  const parent = findMenuTreeItem(
+    menuTreeItems.value,
+    selectedParentMenuItem.value
+  );
+  return parent?.children.length || 0;
+});
+
+function findMenuTreeItem(
+  menuItems: ReturnType<typeof buildMenuItemsTree>,
+  name: string
+) {
+  for (const menuItem of menuItems) {
+    if (menuItem.metadata.name === name) {
+      return menuItem;
+    }
+    const child = findMenuTreeItem(menuItem.children, name);
+    if (child) {
+      return child;
+    }
+  }
+}
+
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
@@ -222,7 +282,8 @@ onMounted(() => {
     }
   }
 
-  selectedParentMenuItem.value = props.parentMenuItem?.metadata.name || "";
+  selectedParentMenuItem.value =
+    props.parentMenuItem?.metadata.name || props.menuItem?.spec.parent || "";
 
   setFocus("displayNameInput");
 });
@@ -258,9 +319,8 @@ onMounted(() => {
                   'core.menu.menu_item_editing_modal.fields.parent.placeholder'
                 )
               "
-              type="menuItemSelect"
-              :clearable="true"
-              :menu-items="menu.spec.menuItems || []"
+              type="select"
+              :options="parentMenuItemOptions"
             />
 
             <FormKit

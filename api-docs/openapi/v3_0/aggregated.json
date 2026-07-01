@@ -18977,11 +18977,13 @@
         "type": "object",
         "properties": {
           "children": {
-            "uniqueItems": true,
             "type": "array",
-            "description": "Child MenuItem metadata.name values shown under this item.",
+            "description": "Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
+            "deprecated": true,
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Legacy child MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
+              "deprecated": true
             }
           },
           "displayName": {
@@ -18991,6 +18993,14 @@
           "href": {
             "type": "string",
             "description": "Direct URL used by the menu item."
+          },
+          "menuName": {
+            "type": "string",
+            "description": "Owning Menu metadata.name. Optional for compatibility with legacy raw payloads."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent MenuItem metadata.name in the same menu. Root items leave this unset."
           },
           "priority": {
             "type": "integer",
@@ -19128,11 +19138,13 @@
             "description": "Display name shown for the menu."
           },
           "menuItems": {
-            "uniqueItems": true,
             "type": "array",
-            "description": "Ordered MenuItem metadata.name values included in this menu.",
+            "description": "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
+            "deprecated": true,
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from MenuItem.spec.menuName and MenuItem.spec.parent.",
+              "deprecated": true
             }
           }
         },

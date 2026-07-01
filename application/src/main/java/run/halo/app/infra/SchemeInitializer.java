@@ -138,6 +138,14 @@ class SchemeInitializer implements SmartLifecycle {
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
         schemeManager.register(MenuItem.class, indexSpecs -> {
+            indexSpecs.add(IndexSpecs.<MenuItem, String>single("spec.menuName", String.class)
+                    .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
+                            .map(MenuItem.MenuItemSpec::getMenuName)
+                            .orElse(null)));
+            indexSpecs.add(IndexSpecs.<MenuItem, String>single("spec.parent", String.class)
+                    .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
+                            .map(MenuItem.MenuItemSpec::getParent)
+                            .orElse(null)));
             indexSpecs.add(IndexSpecs.<MenuItem, String>single("spec.targetRef", String.class)
                     .indexFunc(menuItem -> Optional.ofNullable(menuItem.getSpec())
                             .map(MenuItem.MenuItemSpec::getTargetRef)

@@ -30,6 +30,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { buildMenuItemHierarchyPatch, resolveClonedParentName } from "../utils";
 import MenuEditingModal from "./MenuEditingModal.vue";
 
 interface SystemMenuConfig {
@@ -86,6 +87,38 @@ const {
   },
 });
 
+const { data: menuItemCounts, refetch: refetchMenuItemCounts } = useQuery<
+  Record<string, number>
+>({
+  queryKey: ["menu-item-counts"],
+  queryFn: async () => {
+    const items = await paginate<
+      MenuItemV1alpha1ApiListMenuItemRequest,
+      MenuItem
+    >((params) => coreApiClient.menuItem.listMenuItem(params), {
+      size: 1000,
+    });
+
+    return items.reduce<Record<string, number>>((counts, item) => {
+      const menuName = item.spec.menuName;
+      if (menuName) {
+        counts[menuName] = (counts[menuName] || 0) + 1;
+      }
+      return counts;
+    }, {});
+  },
+});
+
+async function listMenuItemsByMenuName(menuName: string) {
+  return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
+    (params) => coreApiClient.menuItem.listMenuItem(params),
+    {
+      fieldSelector: [`spec.menuName=${menuName}`],
+      size: 1000,
+    }
+  );
+}
+
 const menuQuery = useRouteQuery("menu");
 const handleSelect = (menu: Menu) => {
   emit("update:selectedMenu", menu);
@@ -102,28 +135,27 @@ const handleCloneMenu = async (menu: Menu) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
-        let newMenuItemNames: string[] = [];
+        const originalItems = await listMenuItemsByMenuName(menu.metadata.name);
 
-        if (menu.spec.menuItems?.length) {
-          const menuItemNames = menu.spec.menuItems.filter(Boolean);
+        const newMenu = cloneDeep(menu);
+        newMenu.metadata.name = "";
+        newMenu.metadata.generateName = "menu-";
+        newMenu.spec.menuItems = [];
 
-          const originalItems = await paginate<
-            MenuItemV1alpha1ApiListMenuItemRequest,
-            MenuItem
-          >((params) => coreApiClient.menuItem.listMenuItem(params), {
-            fieldSelector: [`name=(${menuItemNames.join(",")})`],
-            size: 1000,
-          });
+        const { data: createdMenu } = await coreApiClient.menu.createMenu({
+          menu: newMenu,
+        });
 
+        if (originalItems.length) {
           const oldToNewNameMap = new Map<string, string>();
 
           const createNewItemPromises = originalItems.map((originalItem) => {
             const newItem = cloneDeep(originalItem);
             newItem.metadata.name = "";
-            newItem.metadata.generateName = "menuitem-";
-            if (newItem.spec.children) {
-              newItem.spec.children = [];
-            }
+            newItem.metadata.generateName = "menu-item-";
+            newItem.spec.menuName = createdMenu.metadata.name;
+            newItem.spec.parent = undefined;
+            newItem.spec.children = undefined;
             return coreApiClient.menuItem
               .createMenuItem({ menuItem: newItem })
               .then((res) => {
@@ -139,49 +171,36 @@ const handleCloneMenu = async (menu: Menu) => {
 
           const patchPromises: Promise<unknown>[] = [];
           for (const originalItem of originalItems) {
-            if (
-              originalItem.spec.children &&
-              originalItem.spec.children.length > 0
-            ) {
-              const newChildren = originalItem.spec.children
-                .map((childName) => oldToNewNameMap.get(childName))
-                .filter(Boolean) as string[];
-
-              if (newChildren.length > 0) {
-                const newName = oldToNewNameMap.get(originalItem.metadata.name);
-                if (newName) {
-                  patchPromises.push(
-                    coreApiClient.menuItem.patchMenuItem({
-                      name: newName,
-                      jsonPatchInner: [
-                        {
-                          op: "replace",
-                          path: "/spec/children",
-                          value: newChildren,
-                        },
-                      ],
-                    })
-                  );
-                }
-              }
+            const newName = oldToNewNameMap.get(originalItem.metadata.name);
+            const clonedParentName = resolveClonedParentName(
+              originalItem,
+              oldToNewNameMap
+            );
+            if (newName) {
+              patchPromises.push(
+                coreApiClient.menuItem.patchMenuItem({
+                  name: newName,
+                  jsonPatchInner: buildMenuItemHierarchyPatch(
+                    {
+                      ...originalItem,
+                      spec: {
+                        ...originalItem.spec,
+                        menuName: createdMenu.metadata.name,
+                        parent: clonedParentName,
+                      },
+                    },
+                    createdMenu.metadata.name
+                  ),
+                })
+              );
             }
           }
           await Promise.all(patchPromises);
-
-          newMenuItemNames = menu.spec.menuItems
-            .map((name) => oldToNewNameMap.get(name))
-            .filter(Boolean) as string[];
         }
-
-        const newMenu = cloneDeep(menu);
-        newMenu.metadata.name = "";
-        newMenu.metadata.generateName = "menu-";
-        newMenu.spec.menuItems = newMenuItemNames;
-
-        await coreApiClient.menu.createMenu({ menu: newMenu });
 
         Toast.success(t("core.common.toast.copy_success"));
         await refetch();
+        await refetchMenuItemCounts();
       } catch (e) {
         console.error("Failed to clone menu", e);
         Toast.error((e as Error).message);
@@ -203,15 +222,12 @@ const handleDeleteMenu = async (menu: Menu) => {
           name: menu.metadata.name,
         });
 
-        const deleteItemsPromises = menu.spec.menuItems?.map((item) =>
+        const menuItems = await listMenuItemsByMenuName(menu.metadata.name);
+        const deleteItemsPromises = menuItems.map((item) =>
           coreApiClient.menuItem.deleteMenuItem({
-            name: item,
+            name: item.metadata.name,
           })
         );
-
-        if (!deleteItemsPromises) {
-          return;
-        }
 
         await Promise.all(deleteItemsPromises);
 
@@ -220,6 +236,7 @@ const handleDeleteMenu = async (menu: Menu) => {
         console.error("Failed to delete menu", e);
       } finally {
         await refetch();
+        await refetchMenuItemCounts();
       }
     },
   });
@@ -308,7 +325,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
               :title="menu.spec?.displayName"
               :description="
                 $t('core.menu.list.fields.items_count', {
-                  count: menu.spec.menuItems?.length || 0,
+                  count: menuItemCounts?.[menu.metadata.name] || 0,
                 })
               "
             >

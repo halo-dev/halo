@@ -33,6 +33,7 @@ import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuList from "./components/MenuList.vue";
 import type { MenuTreeItem } from "./utils";
 import {
+  buildMenuItemHierarchyPatch,
   buildMenuItemsTree,
   convertMenuTreeItemToMenuItem,
   convertTreeToMenuItems,
@@ -56,16 +57,14 @@ const {
 } = useQuery<MenuItem[]>({
   queryKey: ["menu-items", selectedMenu],
   queryFn: async () => {
-    if (!selectedMenu.value?.spec.menuItems) {
+    if (!selectedMenu.value?.metadata.name) {
       return [];
     }
-
-    const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
 
     return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
       (params) => coreApiClient.menuItem.listMenuItem(params),
       {
-        fieldSelector: [`name=(${menuItemNames.join(",")})`],
+        fieldSelector: [`spec.menuName=${selectedMenu.value.metadata.name}`],
         size: 1000,
       }
     );
@@ -104,28 +103,12 @@ const onMenuItemEditingModalClose = () => {
   menuItemEditingModal.value = false;
 };
 
-const onMenuItemSaved = async (menuItem: MenuItem) => {
+const onMenuItemSaved = async () => {
   if (!selectedMenu.value) {
     return;
   }
 
-  // update menu items
-  await coreApiClient.menu.patchMenu({
-    name: selectedMenu.value.metadata.name,
-    jsonPatchInner: [
-      {
-        op: "add",
-        path: "/spec/menuItems",
-        value: Array.from(
-          new Set([
-            ...(selectedMenu.value.spec.menuItems || []),
-            menuItem.metadata.name,
-          ])
-        ),
-      },
-    ],
-  });
-
+  await queryClient.invalidateQueries({ queryKey: ["menu-item-counts"] });
   await queryClient.invalidateQueries({ queryKey: ["menus"] });
   await refetch();
 };
@@ -137,25 +120,32 @@ async function handleUpdateInBatch() {
     return;
   }
 
+  const selectedMenuName = selectedMenu.value?.metadata.name;
+  if (!selectedMenuName) {
+    return;
+  }
+
   const menuTreeItemsToUpdate = resetMenuItemsTreePriority(menuTreeItems.value);
-  const menuItemsToUpdate = convertTreeToMenuItems(menuTreeItemsToUpdate);
+  const menuItemsToUpdate = convertTreeToMenuItems(
+    menuTreeItemsToUpdate,
+    selectedMenuName
+  );
+  const previousParentNameMap = new Map(
+    menuItems.value?.map((menuItem) => [
+      menuItem.metadata.name,
+      menuItem.spec.parent,
+    ])
+  );
   try {
     batchUpdating.value = true;
     const promises = menuItemsToUpdate.map((menuItem) =>
       coreApiClient.menuItem.patchMenuItem({
         name: menuItem.metadata.name,
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/spec/priority",
-            value: menuItem.spec.priority || 0,
-          },
-          {
-            op: "add",
-            path: "/spec/children",
-            value: menuItem.spec.children || [],
-          },
-        ],
+        jsonPatchInner: buildMenuItemHierarchyPatch(
+          menuItem,
+          selectedMenuName,
+          previousParentNameMap.get(menuItem.metadata.name)
+        ),
       })
     );
     await Promise.all(promises);
@@ -193,22 +183,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       await refetch();
 
-      // update items under menu
-      await coreApiClient.menu.patchMenu({
-        name: selectedMenu.value?.metadata.name as string,
-        jsonPatchInner: [
-          {
-            op: "add",
-            path: "/spec/menuItems",
-            value:
-              selectedMenu.value?.spec.menuItems?.filter(
-                (name) =>
-                  ![menuItem.metadata.name, ...childrenNames].includes(name)
-              ) || [],
-          },
-        ],
-      });
-
+      await queryClient.invalidateQueries({ queryKey: ["menu-item-counts"] });
       await queryClient.invalidateQueries({ queryKey: ["menus"] });
 
       Toast.success(t("core.common.toast.delete_success"));
@@ -241,6 +216,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
   <MenuItemEditingModal
     v-if="menuItemEditingModal && selectedMenu"
     :menu-item="selectedMenuItem"
+    :menu-items="menuItems || []"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
     @close="onMenuItemEditingModalClose"
