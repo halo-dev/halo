@@ -19,7 +19,8 @@
  */
 export interface CategorySpec {
     /**
-     * Child Category metadata.name values.
+     * Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.
+     * @deprecated
      */
     'children'?: Array<string>;
     /**
@@ -38,6 +39,10 @@ export interface CategorySpec {
      * Hides this root category tree and its posts from theme-side lists. Permalinks remain accessible, and only  root categories are expected to set this flag.
      */
     'hideFromList'?: boolean;
+    /**
+     * Parent Category metadata.name. Root categories leave this unset.
+     */
+    'parent'?: string;
     /**
      * Theme template used for posts in this category when the post does not specify its own spec.template.
      */

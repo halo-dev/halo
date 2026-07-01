@@ -31,6 +31,7 @@ public class Category extends AbstractExtension {
 
     public static final String KIND = "Category";
     public static final String LAST_HIDDEN_STATE_ANNO = "content.halo.run/last-hidden-state";
+    public static final String HIERARCHY_MIGRATED_LABEL = "content.halo.run/category-hierarchy-migrated";
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Category.class);
 
@@ -78,7 +79,21 @@ public class Category extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
-        /** Child Category metadata.name values. */
+        /** Parent Category metadata.name. Root categories leave this unset. */
+        @Schema(description = "Parent Category metadata.name. Root categories leave this unset.")
+        private @Nullable String parent;
+
+        /**
+         * Child Category metadata.name values.
+         *
+         * @deprecated since 2.26.0, use {@link #parent} instead.
+         */
+        @SuppressWarnings("java:S1133")
+        @Deprecated(since = "2.26.0")
+        @Schema(
+                deprecated = true,
+                description = "Legacy child Category metadata.name values. Category hierarchy is now sourced from "
+                        + "Category.spec.parent.")
         private @Nullable List<String> children;
 
         /**

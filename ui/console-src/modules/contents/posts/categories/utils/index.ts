@@ -1,4 +1,4 @@
-import type { Category } from "@halo-dev/api-client";
+import type { Category, JsonPatchInner } from "@halo-dev/api-client";
 import { cloneDeep } from "es-toolkit";
 
 export interface CategoryTreeNode extends Category {
@@ -11,35 +11,72 @@ export function buildCategoriesTree(
   const categoriesToUpdate = cloneDeep(categories);
 
   const categoriesMap: Record<string, CategoryTreeNode> = {};
-  const parentMap: Record<string, string> = {};
 
   categoriesToUpdate.forEach((category) => {
     categoriesMap[category.metadata.name] = {
       ...category,
       children: [],
     } as CategoryTreeNode;
-
-    if (category.spec.children) {
-      category.spec.children.forEach((child) => {
-        parentMap[child] = category.metadata.name;
-      });
-    }
   });
 
-  categoriesToUpdate.forEach((category) => {
+  const parentMap = validParentMap(categoriesMap);
+  const cyclicNames = getCyclicNames(parentMap);
+
+  Object.values(categoriesMap).forEach((category) => {
     const parentName = parentMap[category.metadata.name];
-    if (parentName && categoriesMap[parentName]) {
-      categoriesMap[parentName].children.push(
-        categoriesMap[category.metadata.name]
-      );
+    if (parentName && !cyclicNames.has(category.metadata.name)) {
+      categoriesMap[parentName].children.push(category);
     }
   });
 
-  const categoriesTree = Object.values(categoriesMap).filter(
-    (node) => parentMap[node.metadata.name] === undefined
-  );
+  const categoriesTree = Object.values(categoriesMap).filter((node) => {
+    return (
+      !parentMap[node.metadata.name] || cyclicNames.has(node.metadata.name)
+    );
+  });
 
   return sortCategoriesTree(categoriesTree);
+}
+
+function validParentMap(categoriesMap: Record<string, CategoryTreeNode>) {
+  const parentMap: Record<string, string> = {};
+
+  Object.values(categoriesMap).forEach((category) => {
+    const parentName = category.spec.parent;
+    const categoryName = category.metadata.name;
+    if (
+      parentName &&
+      parentName !== categoryName &&
+      categoriesMap[parentName]
+    ) {
+      parentMap[categoryName] = parentName;
+    }
+  });
+
+  return parentMap;
+}
+
+function getCyclicNames(parentMap: Record<string, string>) {
+  const cyclicNames = new Set<string>();
+
+  Object.keys(parentMap).forEach((name) => {
+    const path: string[] = [];
+    const visiting = new Set<string>();
+    let current: string | undefined = name;
+    while (current && parentMap[current]) {
+      if (visiting.has(current)) {
+        path.slice(path.indexOf(current)).forEach((item) => {
+          cyclicNames.add(item);
+        });
+        break;
+      }
+      visiting.add(current);
+      path.push(current);
+      current = parentMap[current];
+    }
+  });
+
+  return cyclicNames;
 }
 
 export function sortCategoriesTree(
@@ -82,23 +119,33 @@ export function convertTreeToCategories(categoriesTree: CategoryTreeNode[]) {
   const categories: Category[] = [];
   const categoriesMap = new Map<string, Category>();
 
-  const convertCategory = (node: CategoryTreeNode | undefined) => {
+  const convertCategory = (
+    node: CategoryTreeNode | undefined,
+    parentName?: string
+  ) => {
     if (!node) {
       return;
     }
 
     const children = node.children || [];
-
-    categoriesMap.set(node.metadata.name, {
-      ...node,
+    const { children: _, ...categoryWithoutChildren } = node;
+    const category = {
+      ...categoryWithoutChildren,
       spec: {
-        ...node.spec,
-        children: children.map((child) => child.metadata.name),
+        ...categoryWithoutChildren.spec,
       },
-    });
+    };
+
+    if (parentName) {
+      category.spec.parent = parentName;
+    } else {
+      delete category.spec.parent;
+    }
+
+    categoriesMap.set(node.metadata.name, category);
 
     children.forEach((child) => {
-      convertCategory(child);
+      convertCategory(child, node.metadata.name);
     });
   };
 
@@ -116,17 +163,42 @@ export function convertTreeToCategories(categoriesTree: CategoryTreeNode[]) {
 export function convertCategoryTreeToCategory(
   categoryTree: CategoryTreeNode
 ): Category {
-  const childNames = categoryTree.children.map((child) => child.metadata.name);
-
   const { children: _, ...categoryWithoutChildren } = categoryTree;
 
   return {
     ...categoryWithoutChildren,
     spec: {
       ...categoryTree.spec,
-      children: childNames,
     },
   };
+}
+
+export function createCategoryPatch(
+  category: Category,
+  originalParentName?: string
+): JsonPatchInner[] {
+  const jsonPatchInner: JsonPatchInner[] = [];
+
+  if (category.spec.parent) {
+    jsonPatchInner.push({
+      op: "add",
+      path: "/spec/parent",
+      value: category.spec.parent,
+    });
+  } else if (originalParentName) {
+    jsonPatchInner.push({
+      op: "remove",
+      path: "/spec/parent",
+    });
+  }
+
+  jsonPatchInner.push({
+    op: "add",
+    path: "/spec/priority",
+    value: category.spec.priority || 0,
+  });
+
+  return jsonPatchInner;
 }
 
 export const getCategoryPath = (

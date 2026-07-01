@@ -49,7 +49,6 @@ const formState = ref<Category>({
     template: "",
     postTemplate: "",
     priority: 0,
-    children: [],
     preventParentPostCascadeQuery: false,
   },
   status: {},
@@ -60,7 +59,7 @@ const formState = ref<Category>({
     generateName: "category-",
   },
 });
-const selectedParentCategory = ref();
+const selectedParentCategory = ref<string>();
 const saving = ref(false);
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const keepAddingSubmit = ref(false);
@@ -96,42 +95,18 @@ const handleSaveCategory = async () => {
         category: formState.value,
       });
     } else {
-      // Gets parent category, calculates priority and updates it.
-      let parentCategory: Category | undefined = undefined;
-
-      if (selectedParentCategory.value) {
-        const { data } = await coreApiClient.content.category.getCategory({
-          name: selectedParentCategory.value,
-        });
-        parentCategory = data;
+      const parentName = selectedParentCategory.value || undefined;
+      if (parentName) {
+        formState.value.spec.parent = parentName;
+      } else {
+        delete formState.value.spec.parent;
       }
 
-      formState.value.spec.priority = parentCategory?.spec.children
-        ? parentCategory.spec.children.length + 1
-        : 0;
+      formState.value.spec.priority = await getNextPriority(parentName);
 
-      const { data: createdCategory } =
-        await coreApiClient.content.category.createCategory({
-          category: formState.value,
-        });
-
-      if (parentCategory) {
-        await coreApiClient.content.category.patchCategory({
-          name: selectedParentCategory.value,
-          jsonPatchInner: [
-            {
-              op: "add",
-              path: "/spec/children",
-              value: Array.from(
-                new Set([
-                  ...(parentCategory.spec.children || []),
-                  createdCategory.metadata.name,
-                ])
-              ),
-            },
-          ],
-        });
-      }
+      await coreApiClient.content.category.createCategory({
+        category: formState.value,
+      });
     }
 
     if (keepAddingSubmit.value) {
@@ -154,6 +129,20 @@ const handleSubmit = (keepAdding = false) => {
   keepAddingSubmit.value = keepAdding;
   submitForm("category-form");
 };
+
+async function getNextPriority(parentName?: string) {
+  const { data } = await coreApiClient.content.category.listCategory({
+    page: 1,
+    size: 1000,
+  });
+
+  return data.items.filter((category) => {
+    if (parentName) {
+      return category.spec.parent === parentName;
+    }
+    return !category.spec.parent;
+  }).length;
+}
 
 onMounted(() => {
   if (props.category) {

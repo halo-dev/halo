@@ -160,7 +160,7 @@ const handleOpenCreateByParentModal = () => {
 
     <CategoryEditingModal
       v-if="editingModal"
-      :is-child-level-category="isChildLevel"
+      :is-child-level-category="isChildLevel || !!selectedParentCategory"
       :category="selectedCategory"
       :parent-category="selectedParentCategory"
       @close="onEditingModalClose"

@@ -5,6 +5,7 @@ import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -83,18 +84,17 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         if (isHiddenStateChanged(category)) {
             publishHiddenStateChangeEvent(category);
         }
-        var children = category.getSpec().getChildren();
-        if (CollectionUtils.isEmpty(children)) {
-            return;
-        }
-        for (String childName : children) {
-            client.fetch(Category.class, childName).ifPresent(child -> {
-                child.getSpec().setHideFromList(hidden);
-                if (isHiddenStateChanged(child)) {
-                    publishHiddenStateChangeEvent(child);
-                }
-                client.update(child);
-            });
+        var descendants = categoryService
+                .listDescendants(category.getMetadata().getName())
+                .collectList()
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElse(List.of());
+        for (Category child : descendants) {
+            child.getSpec().setHideFromList(hidden);
+            if (isHiddenStateChanged(child)) {
+                publishHiddenStateChangeEvent(child);
+            }
+            client.update(child);
         }
     }
 

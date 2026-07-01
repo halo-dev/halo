@@ -3884,9 +3884,12 @@
         "properties": {
           "children": {
             "type": "array",
-            "description": "Child Category metadata.name values.",
+            "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.",
+            "deprecated": true,
             "items": {
-              "type": "string"
+              "type": "string",
+              "description": "Legacy child Category metadata.name values. Category hierarchy is now sourced from Category.spec.parent.",
+              "deprecated": true
             }
           },
           "cover": {
@@ -3905,6 +3908,10 @@
           "hideFromList": {
             "type": "boolean",
             "description": "Hides this root category tree and its posts from theme-side lists. Permalinks remain accessible, and only\n root categories are expected to set this flag."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent Category metadata.name. Root categories leave this unset."
           },
           "postTemplate": {
             "maxLength": 255,

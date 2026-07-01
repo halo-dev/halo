@@ -270,8 +270,9 @@ const handleCreateCategory = async () => {
         description: "",
         cover: "",
         template: "",
-        priority: categories.value?.length || 0 + 1,
-        children: [],
+        priority:
+          categories.value?.filter((category) => !category.spec.parent)
+            .length || 0,
       },
       apiVersion: "content.halo.run/v1alpha1",
       kind: "Category",

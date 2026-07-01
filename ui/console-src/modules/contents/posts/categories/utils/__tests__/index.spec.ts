@@ -4,6 +4,7 @@ import {
   buildCategoriesTree,
   convertCategoryTreeToCategory,
   convertTreeToCategories,
+  createCategoryPatch,
   getCategoryPath,
   resetCategoriesTreePriority,
   sortCategoriesTree,
@@ -13,7 +14,7 @@ import {
 function createMockCategory(
   name: string,
   priority = 0,
-  children: string[] = []
+  parent?: string
 ): Category {
   return {
     metadata: {
@@ -32,7 +33,7 @@ function createMockCategory(
       cover: "",
       template: "",
       priority: priority,
-      children: children,
+      ...(parent ? { parent } : {}),
     },
   };
 }
@@ -59,7 +60,7 @@ function createMockCategoryTreeNode(
       cover: "",
       template: "",
       priority: priority,
-      children: children.map((child) => child.metadata.name),
+      children: [],
     },
     children: children,
   };
@@ -69,11 +70,11 @@ describe("buildCategoriesTree", () => {
   it("should convert flat category array to tree structure", () => {
     // Prepare test data
     const categories: Category[] = [
-      createMockCategory("parent1", 0, ["child1", "child2"]),
-      createMockCategory("child1", 0),
-      createMockCategory("child2", 1),
-      createMockCategory("parent2", 1, ["child3"]),
-      createMockCategory("child3", 0),
+      createMockCategory("parent1", 0),
+      createMockCategory("child1", 0, "parent1"),
+      createMockCategory("child2", 1, "parent1"),
+      createMockCategory("parent2", 1),
+      createMockCategory("child3", 0, "parent2"),
     ];
 
     // Execute test
@@ -110,10 +111,10 @@ describe("buildCategoriesTree", () => {
 
   it("should handle multi-level nested category structure", () => {
     const categories: Category[] = [
-      createMockCategory("root", 0, ["level1"]),
-      createMockCategory("level1", 0, ["level2"]),
-      createMockCategory("level2", 0, ["level3"]),
-      createMockCategory("level3", 0),
+      createMockCategory("root", 0),
+      createMockCategory("level1", 0, "root"),
+      createMockCategory("level2", 0, "level1"),
+      createMockCategory("level3", 0, "level2"),
     ];
 
     const result = buildCategoriesTree(categories);
@@ -125,6 +126,30 @@ describe("buildCategoriesTree", () => {
     expect(result[0].children[0].children[0].children[0].metadata.name).toBe(
       "level3"
     );
+  });
+
+  it("should treat missing, self, and cyclic parents as roots", () => {
+    const categories: Category[] = [
+      createMockCategory("root", 0),
+      createMockCategory("missing-parent", 1, "missing"),
+      createMockCategory("self-parent", 2, "self-parent"),
+      createMockCategory("cyclic-a", 3, "cyclic-b"),
+      createMockCategory("cyclic-b", 4, "cyclic-a"),
+      createMockCategory("child", 0, "cyclic-a"),
+    ];
+
+    const result = buildCategoriesTree(categories);
+
+    expect(result.map((category) => category.metadata.name)).toEqual([
+      "root",
+      "missing-parent",
+      "self-parent",
+      "cyclic-a",
+      "cyclic-b",
+    ]);
+    expect(
+      result[3].children.map((category) => category.metadata.name)
+    ).toEqual(["child"]);
   });
 });
 
@@ -212,19 +237,16 @@ describe("convertTreeToCategories", () => {
 
     expect(result.length).toBe(3);
 
-    // Verify parent node
     const parentCategory = result.find((c) => c.metadata.name === "parent");
     expect(parentCategory).toBeDefined();
-    expect(parentCategory?.spec.children).toContain("child1");
-    expect(parentCategory?.spec.children).toContain("child2");
+    expect(parentCategory?.spec.parent).toBeUndefined();
 
-    // Verify child nodes
     const child1Category = result.find((c) => c.metadata.name === "child1");
     const child2Category = result.find((c) => c.metadata.name === "child2");
     expect(child1Category).toBeDefined();
     expect(child2Category).toBeDefined();
-    expect(child1Category?.spec.children).toEqual([]);
-    expect(child2Category?.spec.children).toEqual([]);
+    expect(child1Category?.spec.parent).toBe("parent");
+    expect(child2Category?.spec.parent).toBe("parent");
   });
 
   it("should handle multi-level nested structure", () => {
@@ -243,15 +265,77 @@ describe("convertTreeToCategories", () => {
     const level2Category = result.find((c) => c.metadata.name === "level2");
     const level3Category = result.find((c) => c.metadata.name === "level3");
 
-    expect(rootCategory?.spec.children).toContain("level1");
-    expect(level1Category?.spec.children).toContain("level2");
-    expect(level2Category?.spec.children).toContain("level3");
-    expect(level3Category?.spec.children).toEqual([]);
+    expect(rootCategory?.spec.parent).toBeUndefined();
+    expect(level1Category?.spec.parent).toBe("root");
+    expect(level2Category?.spec.parent).toBe("level1");
+    expect(level3Category?.spec.parent).toBe("level2");
   });
 
   it("should handle empty array input", () => {
     const result = convertTreeToCategories([]);
     expect(result).toEqual([]);
+  });
+
+  it("should remove parent when a child node is moved to root", () => {
+    const node = createMockCategoryTreeNode("node", 0);
+    node.spec.parent = "old-parent";
+
+    const result = convertTreeToCategories([node]);
+
+    expect(result[0].spec.parent).toBeUndefined();
+  });
+});
+
+describe("createCategoryPatch", () => {
+  it("should add parent and priority for a child category", () => {
+    const category = createMockCategory("child", 3, "parent");
+
+    const result = createCategoryPatch(category, "old-parent");
+
+    expect(result).toEqual([
+      {
+        op: "add",
+        path: "/spec/parent",
+        value: "parent",
+      },
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 3,
+      },
+    ]);
+  });
+
+  it("should remove parent when a category is moved to root", () => {
+    const category = createMockCategory("child", 2);
+
+    const result = createCategoryPatch(category, "old-parent");
+
+    expect(result).toEqual([
+      {
+        op: "remove",
+        path: "/spec/parent",
+      },
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 2,
+      },
+    ]);
+  });
+
+  it("should not remove parent for an unchanged root category", () => {
+    const category = createMockCategory("root", 0);
+
+    const result = createCategoryPatch(category);
+
+    expect(result).toEqual([
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 0,
+      },
+    ]);
   });
 });
 
@@ -264,9 +348,7 @@ describe("convertCategoryTreeToCategory", () => {
     const result = convertCategoryTreeToCategory(parent);
 
     expect(result.metadata.name).toBe("parent");
-    expect(result.spec.children).toContain("child1");
-    expect(result.spec.children).toContain("child2");
-    expect(result.spec.children?.length).toBe(2);
+    expect(result.spec.children).toEqual([]);
     // eslint-disable-next-line
     expect((result as any).children).toBeUndefined();
   });
