@@ -23,6 +23,11 @@ import run.halo.app.extension.Ref;
 public class MenuItem extends AbstractExtension {
 
     public static final String REQUEST_TO_UPDATE_ANNO = "halo.run/request-to-update";
+    public static final String HIERARCHY_MIGRATED_LABEL = "halo.run/menu-item-hierarchy-migrated";
+    public static final String ORIGINAL_MENU_ITEM_ANNO = "halo.run/original-menu-item-name";
+    public static final String MIGRATION_MENU_NAME_ANNO = "halo.run/menu-item-migration-menu-name";
+    public static final String MIGRATION_PARENT_NAME_ANNO = "halo.run/menu-item-migration-parent-name";
+    public static final String MIGRATION_PATH_ANNO = "halo.run/menu-item-migration-path";
 
     /** Desired menu item configuration, including label, URL, ordering, children, and target resource. */
     @Schema(requiredMode = REQUIRED)
@@ -70,7 +75,27 @@ public class MenuItem extends AbstractExtension {
         /** Sorting priority. Higher values sort before lower values where priority ordering is applied. */
         private Integer priority;
 
-        /** Child MenuItem metadata.name values shown under this item. */
+        /** Owning Menu metadata.name. */
+        @Schema(description = "Owning Menu metadata.name. Optional for compatibility with legacy raw payloads.")
+        @Nullable
+        private String menuName;
+
+        /** Parent MenuItem metadata.name in the same menu. Root items leave this unset. */
+        @Schema(description = "Parent MenuItem metadata.name in the same menu. Root items leave this unset.")
+        @Nullable
+        private String parent;
+
+        /**
+         * Child MenuItem metadata.name values shown under this item.
+         *
+         * @deprecated since 2.26.0, use {@link #menuName} and {@link #parent} instead.
+         */
+        @SuppressWarnings("java:S1133")
+        @Deprecated(since = "2.26.0")
+        @Schema(
+                deprecated = true,
+                description = "Legacy child MenuItem names. Menu hierarchy is now sourced from "
+                        + "MenuItem.spec.menuName and MenuItem.spec.parent.")
         @ArraySchema(uniqueItems = true)
         private LinkedHashSet<String> children;
 

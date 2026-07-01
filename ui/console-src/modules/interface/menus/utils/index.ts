@@ -1,4 +1,4 @@
-import type { MenuItem } from "@halo-dev/api-client";
+import type { JsonPatchInner, MenuItem } from "@halo-dev/api-client";
 import { cloneDeep } from "es-toolkit";
 
 export interface MenuTreeItem extends MenuItem {
@@ -14,30 +14,48 @@ export function buildMenuItemsTree(menuItems: MenuItem[]): MenuTreeItem[] {
   const menuItemsToUpdate = cloneDeep(menuItems);
 
   const menuItemsMap: Record<string, MenuTreeItem> = {};
-  const parentMap: Record<string, string> = {};
 
   menuItemsToUpdate.forEach((menuItem) => {
     menuItemsMap[menuItem.metadata.name] = {
       ...menuItem,
       children: [],
     };
-    (menuItem.spec.children as string[]).forEach((child) => {
-      parentMap[child] = menuItem.metadata.name;
-    });
   });
 
   Object.values(menuItemsMap).forEach((menuTreeItem) => {
-    const parentName = parentMap[menuTreeItem.metadata.name];
-    if (parentName && menuItemsMap[parentName]) {
-      menuItemsMap[parentName].children.push(menuTreeItem);
+    const parentName = menuTreeItem.spec.parent;
+    if (hasValidParent(menuTreeItem, menuItemsMap)) {
+      menuItemsMap[parentName as string].children.push(menuTreeItem);
     }
   });
 
   const menuTreeItems = Object.values(menuItemsMap).filter(
-    (node) => parentMap[node.metadata.name] === undefined
+    (node) => !hasValidParent(node, menuItemsMap)
   );
 
   return sortMenuItemsTree(menuTreeItems);
+}
+
+function hasValidParent(
+  menuTreeItem: MenuTreeItem,
+  menuItemsMap: Record<string, MenuTreeItem>
+) {
+  const parentName = menuTreeItem.spec.parent;
+  if (!parentName || parentName === menuTreeItem.metadata.name) {
+    return false;
+  }
+  if (!menuItemsMap[parentName]) {
+    return false;
+  }
+
+  let ancestorName: string | undefined = parentName;
+  while (ancestorName) {
+    if (ancestorName === menuTreeItem.metadata.name) {
+      return false;
+    }
+    ancestorName = menuItemsMap[ancestorName]?.spec.parent;
+  }
+  return true;
 }
 
 /**
@@ -93,24 +111,31 @@ export function resetMenuItemsTreePriority(
  *
  * @param menuTreeItems
  */
-export function convertTreeToMenuItems(menuTreeItems: MenuTreeItem[]) {
+export function convertTreeToMenuItems(
+  menuTreeItems: MenuTreeItem[],
+  menuName?: string
+) {
   const menuItems: MenuItem[] = [];
   const menuItemsMap = new Map<string, MenuItem>();
-  const convertMenuItem = (node: MenuTreeItem | undefined) => {
+  const convertMenuItem = (
+    node: MenuTreeItem | undefined,
+    parentName?: string
+  ) => {
     if (!node) {
       return;
     }
     const children = node.children || [];
-    const { ...rest } = node;
+    const { children: _, ...rest } = node;
     menuItemsMap.set(node.metadata.name, {
       ...rest,
       spec: {
         ...node.spec,
-        children: children.map((child) => child.metadata.name),
+        menuName: menuName || node.spec.menuName,
+        parent: parentName,
       },
     });
     children.forEach((child) => {
-      convertMenuItem(child);
+      convertMenuItem(child, node.metadata.name);
     });
   };
   menuTreeItems.forEach((node) => {
@@ -147,15 +172,56 @@ export function getChildrenNames(menuTreeItem: MenuTreeItem): string[] {
 export function convertMenuTreeItemToMenuItem(
   menuTreeItem: MenuTreeItem
 ): MenuItem {
-  const childNames = (menuTreeItem.children || []).map(
-    (child) => child.metadata.name
-  );
-  const { ...rest } = menuTreeItem;
+  const { children: _, ...rest } = menuTreeItem;
   return {
     ...rest,
     spec: {
       ...menuTreeItem.spec,
-      children: childNames,
     },
   };
+}
+
+export function resolveClonedParentName(
+  menuItem: MenuItem,
+  oldToNewNameMap: Map<string, string>
+) {
+  const parentName = menuItem.spec.parent;
+  if (!parentName) {
+    return undefined;
+  }
+  return oldToNewNameMap.get(parentName);
+}
+
+export function buildMenuItemHierarchyPatch(
+  menuItem: MenuItem,
+  menuName: string,
+  previousParentName?: string
+): JsonPatchInner[] {
+  const patch: JsonPatchInner[] = [
+    {
+      op: "add",
+      path: "/spec/priority",
+      value: menuItem.spec.priority ?? 0,
+    },
+    {
+      op: "add",
+      path: "/spec/menuName",
+      value: menuName,
+    },
+  ];
+
+  if (menuItem.spec.parent) {
+    patch.push({
+      op: "add",
+      path: "/spec/parent",
+      value: menuItem.spec.parent,
+    });
+  } else if (previousParentName) {
+    patch.push({
+      op: "remove",
+      path: "/spec/parent",
+    });
+  }
+
+  return patch;
 }

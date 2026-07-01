@@ -2,11 +2,13 @@ import type { MenuItem } from "@halo-dev/api-client";
 import { describe, expect, it } from "vite-plus/test";
 import type { MenuTreeItem } from "../index";
 import {
+  buildMenuItemHierarchyPatch,
   buildMenuItemsTree,
   convertMenuTreeItemToMenuItem,
   convertTreeToMenuItems,
   getChildrenNames,
   resetMenuItemsTreePriority,
+  resolveClonedParentName,
   sortMenuItemsTree,
 } from "../index";
 
@@ -15,10 +17,8 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "文章分类",
       href: "https://ryanc.cc/categories",
-      children: [
-        "caeef383-3828-4039-9114-6f9ad3b4a37e",
-        "ded1943d-9fdb-4563-83ee-2f04364872e0",
-      ],
+      menuName: "primary",
+      children: [],
       priority: 1,
     },
     apiVersion: "v1alpha1",
@@ -33,6 +33,8 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Halo",
       href: "https://ryanc.cc/categories/halo",
+      menuName: "primary",
+      parent: "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
       children: [],
       priority: 0,
     },
@@ -48,7 +50,9 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Java",
       href: "https://ryanc.cc/categories/java",
-      children: ["96b636bb-3e4a-44d1-8ea7-f9da9e876f45"],
+      menuName: "primary",
+      parent: "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      children: [],
       priority: 1,
     },
     apiVersion: "v1alpha1",
@@ -63,6 +67,8 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Spring Boot",
       href: "https://ryanc.cc/categories/spring-boot",
+      menuName: "primary",
+      parent: "ded1943d-9fdb-4563-83ee-2f04364872e0",
       children: [],
       priority: 0,
     },
@@ -78,6 +84,7 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "首页",
       href: "https://ryanc.cc/",
+      menuName: "primary",
       children: [],
       priority: 0,
     },
@@ -92,11 +99,6 @@ const rawMenuItems: MenuItem[] = [
 ];
 
 describe("buildMenuItemsTree", () => {
-  it("should match snapshot", () => {
-    const tree = buildMenuItemsTree(rawMenuItems);
-    expect(tree).toMatchSnapshot();
-  });
-
   it("should be sorted correctly and children at top level", () => {
     const menuItems = buildMenuItemsTree(rawMenuItems);
     expect(menuItems[0].spec.priority).toBe(0);
@@ -116,12 +118,70 @@ describe("buildMenuItemsTree", () => {
   it("should handle empty input", () => {
     expect(buildMenuItemsTree([])).toEqual([]);
   });
+
+  it("should render invalid parents as roots", () => {
+    const roots = buildMenuItemsTree([
+      {
+        ...rawMenuItems[0],
+        metadata: { ...rawMenuItems[0].metadata, name: "root" },
+        spec: { ...rawMenuItems[0].spec, parent: "missing", priority: 0 },
+      },
+      {
+        ...rawMenuItems[1],
+        metadata: { ...rawMenuItems[1].metadata, name: "child" },
+        spec: { ...rawMenuItems[1].spec, parent: "root", priority: 0 },
+      },
+      {
+        ...rawMenuItems[2],
+        metadata: { ...rawMenuItems[2].metadata, name: "self" },
+        spec: { ...rawMenuItems[2].spec, parent: "self", priority: 1 },
+      },
+      {
+        ...rawMenuItems[3],
+        metadata: { ...rawMenuItems[3].metadata, name: "outside" },
+        spec: { ...rawMenuItems[3].spec, parent: "other", priority: 2 },
+      },
+    ]);
+    const root = roots.find((item) => item.metadata.name === "root");
+
+    expect(roots.map((item) => item.metadata.name)).toEqual([
+      "root",
+      "self",
+      "outside",
+    ]);
+    expect(root?.children[0].metadata.name).toBe("child");
+  });
 });
 
 describe("convertTreeToMenuItems", () => {
-  it("will match snapshot", function () {
+  it("should flatten tree with parent references", function () {
     const menuTreeItems = buildMenuItemsTree(rawMenuItems);
-    expect(convertTreeToMenuItems(menuTreeItems)).toMatchSnapshot();
+    const items = convertTreeToMenuItems(menuTreeItems, "primary");
+    expect(
+      items.map((item) => [
+        item.metadata.name,
+        item.spec.menuName,
+        item.spec.parent,
+      ])
+    ).toEqual([
+      ["411a3639-bf0d-4266-9cfb-14184259dab5", "primary", undefined],
+      ["40e4ba86-5c7e-43c2-b4c0-cee376d26564", "primary", undefined],
+      [
+        "caeef383-3828-4039-9114-6f9ad3b4a37e",
+        "primary",
+        "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      ],
+      [
+        "ded1943d-9fdb-4563-83ee-2f04364872e0",
+        "primary",
+        "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      ],
+      [
+        "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+        "primary",
+        "ded1943d-9fdb-4563-83ee-2f04364872e0",
+      ],
+    ]);
   });
   it("should handle empty input", () => {
     expect(convertTreeToMenuItems([])).toEqual([]);
@@ -129,7 +189,7 @@ describe("convertTreeToMenuItems", () => {
 });
 
 describe("sortMenuItemsTree", () => {
-  it("will match snapshot", () => {
+  it("should sort nested items by priority", () => {
     const tree: MenuTreeItem[] = [
       {
         apiVersion: "v1alpha1",
@@ -178,15 +238,25 @@ describe("sortMenuItemsTree", () => {
         ],
       },
     ];
-    expect(sortMenuItemsTree(tree)).toMatchSnapshot();
+    const sorted = sortMenuItemsTree(tree);
+    expect(sorted[0].children.map((child) => child.spec.displayName)).toEqual([
+      "Java",
+      "Halo",
+    ]);
   });
 });
 
 describe("resetMenuItemsTreePriority", () => {
-  it("should match snapshot", function () {
-    expect(
-      resetMenuItemsTreePriority(buildMenuItemsTree(rawMenuItems))
-    ).toMatchSnapshot();
+  it("should reset priorities by sibling order", function () {
+    const menuTreeItems = resetMenuItemsTreePriority(
+      buildMenuItemsTree(rawMenuItems)
+    );
+
+    expect(menuTreeItems.map((item) => item.spec.priority)).toEqual([0, 1]);
+    expect(menuTreeItems[1].children.map((item) => item.spec.priority)).toEqual(
+      [0, 1]
+    );
+    expect(menuTreeItems[1].children[1].children[0].spec.priority).toBe(0);
   });
 });
 
@@ -223,24 +293,13 @@ describe("getChildrenNames", () => {
 });
 
 describe("convertMenuTreeItemToMenuItem", () => {
-  it("should match snapshot", () => {
-    const menuTreeItems = buildMenuItemsTree(rawMenuItems);
-    expect(convertMenuTreeItemToMenuItem(menuTreeItems[1])).toMatchSnapshot();
-    expect(
-      convertMenuTreeItemToMenuItem(menuTreeItems[1].children[1])
-    ).toMatchSnapshot();
-  });
   it("should return correct MenuItem", () => {
     const menuTreeItems = buildMenuItemsTree(rawMenuItems);
-    expect(
-      convertMenuTreeItemToMenuItem(menuTreeItems[1]).spec.displayName
-    ).toBe("文章分类");
-    expect(
-      convertMenuTreeItemToMenuItem(menuTreeItems[1]).spec.children
-    ).toStrictEqual([
-      "caeef383-3828-4039-9114-6f9ad3b4a37e",
-      "ded1943d-9fdb-4563-83ee-2f04364872e0",
-    ]);
+    const menuItem = convertMenuTreeItemToMenuItem(menuTreeItems[1]);
+
+    expect("children" in menuItem).toBe(false);
+    expect(menuItem.spec.displayName).toBe("文章分类");
+    expect(menuItem.spec.children).toStrictEqual([]);
   });
   it("should handle node with empty children", () => {
     const node: MenuTreeItem = {
@@ -259,6 +318,99 @@ describe("convertMenuTreeItemToMenuItem", () => {
       },
       children: [],
     };
-    expect(convertMenuTreeItemToMenuItem(node)).toMatchSnapshot();
+    expect("children" in convertMenuTreeItemToMenuItem(node)).toBe(false);
+  });
+});
+
+describe("resolveClonedParentName", () => {
+  it("should resolve cloned parent names", () => {
+    const oldToNewNameMap = new Map<string, string>([
+      ["40e4ba86-5c7e-43c2-b4c0-cee376d26564", "new-parent"],
+    ]);
+
+    expect(resolveClonedParentName(rawMenuItems[1], oldToNewNameMap)).toBe(
+      "new-parent"
+    );
+    expect(resolveClonedParentName(rawMenuItems[0], oldToNewNameMap)).toBe(
+      undefined
+    );
+  });
+});
+
+describe("buildMenuItemHierarchyPatch", () => {
+  it("should add parent when menu item has a parent", () => {
+    expect(
+      buildMenuItemHierarchyPatch(rawMenuItems[1], "primary")
+    ).toStrictEqual([
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 0,
+      },
+      {
+        op: "add",
+        path: "/spec/menuName",
+        value: "primary",
+      },
+      {
+        op: "add",
+        path: "/spec/parent",
+        value: "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      },
+    ]);
+  });
+
+  it("should remove parent when existing child moves to root", () => {
+    expect(
+      buildMenuItemHierarchyPatch(
+        {
+          ...rawMenuItems[1],
+          spec: {
+            ...rawMenuItems[1].spec,
+            parent: undefined,
+          },
+        },
+        "primary",
+        "old-parent"
+      )
+    ).toStrictEqual([
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 0,
+      },
+      {
+        op: "add",
+        path: "/spec/menuName",
+        value: "primary",
+      },
+      {
+        op: "remove",
+        path: "/spec/parent",
+      },
+    ]);
+  });
+
+  it("should skip parent operation when root item stays root", () => {
+    const patch = buildMenuItemHierarchyPatch(rawMenuItems[0], "primary");
+
+    expect(patch).toStrictEqual([
+      {
+        op: "add",
+        path: "/spec/priority",
+        value: 1,
+      },
+      {
+        op: "add",
+        path: "/spec/menuName",
+        value: "primary",
+      },
+    ]);
+    expect(patch).not.toContainEqual(
+      expect.objectContaining({
+        path: "/spec/parent",
+        value: null,
+      })
+    );
   });
 });

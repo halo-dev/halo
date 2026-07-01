@@ -2,16 +2,18 @@ package run.halo.app.theme.finders.impl;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.index.query.Queries;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
@@ -35,63 +37,56 @@ public class MenuFinderImpl implements MenuFinder {
 
     @Override
     public Mono<MenuVo> getByName(String name) {
-        return listAsTree()
-                .filter(menu -> menu.getMetadata().getName().equals(name))
-                .next()
+        return client.fetch(Menu.class, name)
+                .flatMap(this::withMenuItems)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Menu with name " + name + " not found")));
     }
 
     @Override
     public Mono<MenuVo> getPrimary() {
-        return listAsTree()
+        return listAllMenus()
                 .collectList()
-                .flatMap(menuVos -> {
-                    if (CollectionUtils.isEmpty(menuVos)) {
+                .flatMap(menus -> {
+                    if (CollectionUtils.isEmpty(menus)) {
                         return Mono.empty();
                     }
                     return environmentFetcher
                             .fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
                             .map(SystemSetting.Menu::getPrimary)
-                            .map(primaryConfig -> menuVos.stream()
-                                    .filter(menuVo ->
-                                            menuVo.getMetadata().getName().equals(primaryConfig))
+                            .map(primaryConfig -> menus.stream()
+                                    .filter(menu -> menu.getMetadata().getName().equals(primaryConfig))
                                     .findAny()
-                                    .orElse(menuVos.get(0)))
-                            .defaultIfEmpty(menuVos.get(0));
+                                    .orElse(menus.get(0)))
+                            .defaultIfEmpty(menus.get(0));
                 })
+                .flatMap(this::withMenuItems)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("No primary menu found")));
     }
 
+    Flux<Menu> listAllMenus() {
+        return client.listAll(Menu.class, ListOptions.builder().build(), Sort.unsorted());
+    }
+
     Flux<MenuVo> listAll() {
-        return client.list(Menu.class, null, null).map(MenuVo::from);
+        return listAllMenus().map(MenuVo::from);
     }
 
     Flux<MenuVo> listAsTree() {
-        return listAllMenuItem()
+        return listAllMenus().flatMap(this::withMenuItems);
+    }
+
+    Mono<MenuVo> withMenuItems(Menu menu) {
+        return listMenuItemsByMenuName(menu.getMetadata().getName())
                 .collectList()
-                .map(MenuFinderImpl::populateParentName)
-                .flatMapMany(menuItemVos -> {
-                    List<MenuItemVo> treeList = listToTree(menuItemVos);
-                    Map<String, MenuItemVo> nameItemRootNodeMap = treeList.stream()
-                            .collect(Collectors.toMap(item -> item.getMetadata().getName(), Function.identity()));
-                    return listAll().map(menuVo -> {
-                        LinkedHashSet<String> menuItemNames = menuVo.getSpec().getMenuItems();
-                        if (menuItemNames == null) {
-                            return menuVo.withMenuItems(List.of());
-                        }
-                        List<MenuItemVo> menuItems = menuItemNames.stream()
-                                .map(nameItemRootNodeMap::get)
-                                .filter(Objects::nonNull)
-                                .sorted(defaultTreeNodeComparator())
-                                .toList();
-                        return menuVo.withMenuItems(menuItems);
-                    });
-                });
+                .map(MenuFinderImpl::listToTree)
+                .map(menuItems -> MenuVo.from(menu).withMenuItems(menuItems));
     }
 
     static List<MenuItemVo> listToTree(Collection<MenuItemVo> list) {
+        Map<String, MenuItemVo> nameIdentityMap = list.stream()
+                .collect(Collectors.toMap(menuItem -> menuItem.getMetadata().getName(), v -> v));
         Map<String, List<MenuItemVo>> parentNameIdentityMap = list.stream()
-                .filter(menuItemVo -> menuItemVo.getParentName() != null)
+                .filter(menuItemVo -> hasValidParent(menuItemVo, nameIdentityMap))
                 .collect(Collectors.groupingBy(MenuItemVo::getParentName));
 
         list.forEach(node -> {
@@ -103,40 +98,53 @@ public class MenuFinderImpl implements MenuFinder {
             node.setChildren(children);
         });
 
-        return list.stream().filter(v -> v.getParentName() == null).collect(Collectors.toList());
+        return list.stream()
+                .filter(v -> !hasValidParent(v, nameIdentityMap))
+                .sorted(defaultTreeNodeComparator())
+                .toList();
     }
 
-    Flux<MenuItemVo> listAllMenuItem() {
-        return client.list(MenuItem.class, null, null).map(MenuItemVo::from);
+    private static boolean hasValidParent(MenuItemVo menuItem, Map<String, MenuItemVo> nameIdentityMap) {
+        var parentName = menuItem.getParentName();
+        if (parentName == null
+                || Objects.equals(parentName, menuItem.getMetadata().getName())) {
+            return false;
+        }
+        if (!nameIdentityMap.containsKey(parentName)) {
+            return false;
+        }
+        var ancestorName = parentName;
+        while (ancestorName != null) {
+            if (Objects.equals(ancestorName, menuItem.getMetadata().getName())) {
+                return false;
+            }
+            var ancestor = nameIdentityMap.get(ancestorName);
+            if (ancestor == null) {
+                return true;
+            }
+            ancestorName = ancestor.getParentName();
+        }
+        return true;
+    }
+
+    Flux<MenuItemVo> listMenuItemsByMenuName(String menuName) {
+        var listOptions = ListOptions.builder()
+                .andQuery(Queries.equal("spec.menuName", menuName))
+                .build();
+        return client.listAll(MenuItem.class, listOptions, Sort.unsorted()).map(MenuItemVo::from);
     }
 
     static Comparator<MenuItemVo> defaultTreeNodeComparator() {
-        Function<MenuItemVo, Integer> priority = menuItem -> menuItem.getSpec().getPriority();
-        Function<MenuItemVo, Instant> createTime =
+        java.util.function.Function<MenuItemVo, Integer> priority = menuItem -> Optional.ofNullable(menuItem.getSpec())
+                .map(MenuItem.MenuItemSpec::getPriority)
+                .orElse(0);
+        java.util.function.Function<MenuItemVo, Instant> createTime =
                 menuItem -> menuItem.getMetadata().getCreationTimestamp();
-        Function<MenuItemVo, String> name = menuItem -> menuItem.getMetadata().getName();
+        java.util.function.Function<MenuItemVo, String> name =
+                menuItem -> menuItem.getMetadata().getName();
 
         return Comparator.comparing(priority)
                 .thenComparing(createTime, Comparators.nullsLow())
                 .thenComparing(name);
-    }
-
-    static Collection<MenuItemVo> populateParentName(List<MenuItemVo> menuItemVos) {
-        Map<String, MenuItemVo> nameIdentityMap = menuItemVos.stream()
-                .collect(Collectors.toMap(menuItem -> menuItem.getMetadata().getName(), Function.identity()));
-
-        nameIdentityMap.forEach((name, value) -> {
-            LinkedHashSet<String> children = value.getSpec().getChildren();
-            if (children == null) {
-                return;
-            }
-            for (String child : children) {
-                MenuItemVo childNode = nameIdentityMap.get(child);
-                if (childNode != null) {
-                    childNode.setParentName(name);
-                }
-            }
-        });
-        return nameIdentityMap.values();
     }
 }
