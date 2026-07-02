@@ -127,7 +127,7 @@
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/eslint-plugin": "^1.4.3",
-    "@vitest/ui": "4.1.9",
+    "@vitest/ui": "catalog:",
     "@vue/compiler-sfc": "^3.5.27",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
@@ -174,25 +174,5 @@
   "engines": {
     "node": ">=24.11.0"
   },
-  "packageManager": "pnpm@10.30.3",
-  "pnpm": {
-    "overrides": {
-      "@lezer/javascript": "1.5.4",
-      "prosemirror-model": "1.25.1",
-      "prosemirror-transform": "1.10.4",
-      "prosemirror-view": "1.40.0"
-    },
-    "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "@openapitools/openapi-generator-cli",
-      "@parcel/watcher",
-      "@tailwindcss/oxide",
-      "core-js",
-      "esbuild",
-      "vue-demi"
-    ],
-    "patchedDependencies": {
-      "@tiptap/extension-drag-handle@3.27.1": "patches/@tiptap__extension-drag-handle@3.27.1.patch"
-    }
-  }
+  "packageManager": "pnpm@10.30.3"
 }
