@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.Metadata;
@@ -55,18 +56,20 @@ class MenuItemHierarchyMigrationTest {
         var child = menuItem("child", children("grandchild"));
         var grandchild = menuItem("grandchild", null);
 
-        var summary = migration
-                .migrate(List.of(menu("primary", children("root"))), List.of(root, child, grandchild))
-                .block();
-
-        assertThat(summary.getUpdated()).isEqualTo(3);
-        assertThat(root.getSpec().getMenuName()).isEqualTo("primary");
-        assertThat(root.getSpec().getParent()).isNull();
-        assertThat(child.getSpec().getMenuName()).isEqualTo("primary");
-        assertThat(child.getSpec().getParent()).isEqualTo("root");
-        assertThat(grandchild.getSpec().getParent()).isEqualTo("child");
-        assertThat(root.getSpec().getChildren()).containsExactly("child");
-        assertThat(child.getMetadata().getLabels()).containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+        StepVerifier.create(
+                        migration.migrate(List.of(menu("primary", children("root"))), List.of(root, child, grandchild)))
+                .assertNext(summary -> {
+                    assertThat(summary.getUpdated()).isEqualTo(3);
+                    assertThat(root.getSpec().getMenuName()).isEqualTo("primary");
+                    assertThat(root.getSpec().getParent()).isNull();
+                    assertThat(child.getSpec().getMenuName()).isEqualTo("primary");
+                    assertThat(child.getSpec().getParent()).isEqualTo("root");
+                    assertThat(grandchild.getSpec().getParent()).isEqualTo("child");
+                    assertThat(root.getSpec().getChildren()).containsExactly("child");
+                    assertThat(child.getMetadata().getLabels())
+                            .containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -78,9 +81,10 @@ class MenuItemHierarchyMigrationTest {
         sameMenu.getSpec().setMenuName("primary");
         sameMenu.getSpec().setParent("keep-parent");
 
-        migration
-                .migrate(List.of(menu("primary", children("root", "same-menu"))), List.of(root, sameMenu))
-                .block();
+        StepVerifier.create(migration.migrate(
+                        List.of(menu("primary", children("root", "same-menu"))), List.of(root, sameMenu)))
+                .expectNextCount(1)
+                .verifyComplete();
 
         assertThat(root.getSpec().getMenuName()).isEqualTo("custom");
         assertThat(root.getSpec().getParent()).isEqualTo("keep-parent");
@@ -95,22 +99,22 @@ class MenuItemHierarchyMigrationTest {
     void shouldCloneSharedMenuItemAcrossMenus() {
         var shared = menuItem("shared", null);
 
-        var summary = migration
-                .migrate(
+        StepVerifier.create(migration.migrate(
                         List.of(
                                 menu("menu-a", children("shared"), "2022-08-05T04:19:37Z"),
                                 menu("menu-b", children("shared"), "2022-08-05T04:19:38Z")),
-                        List.of(shared))
-                .block();
-
-        assertThat(summary.getClonesCreated()).isEqualTo(1);
-        assertThat(shared.getSpec().getMenuName()).isEqualTo("menu-a");
-        assertThat(createdItems.get(0).getSpec().getMenuName()).isEqualTo("menu-b");
-        assertThat(createdItems.get(0).getMetadata().getAnnotations())
-                .containsEntry(MenuItem.ORIGINAL_MENU_ITEM_ANNO, "shared")
-                .containsEntry(MenuItem.MIGRATION_MENU_NAME_ANNO, "menu-b")
-                .containsEntry(MenuItem.MIGRATION_PARENT_NAME_ANNO, "")
-                .containsEntry(MenuItem.MIGRATION_PATH_ANNO, "[\"shared\"]");
+                        List.of(shared)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesCreated()).isEqualTo(1);
+                    assertThat(shared.getSpec().getMenuName()).isEqualTo("menu-a");
+                    assertThat(createdItems.get(0).getSpec().getMenuName()).isEqualTo("menu-b");
+                    assertThat(createdItems.get(0).getMetadata().getAnnotations())
+                            .containsEntry(MenuItem.ORIGINAL_MENU_ITEM_ANNO, "shared")
+                            .containsEntry(MenuItem.MIGRATION_MENU_NAME_ANNO, "menu-b")
+                            .containsEntry(MenuItem.MIGRATION_PARENT_NAME_ANNO, "")
+                            .containsEntry(MenuItem.MIGRATION_PATH_ANNO, "[\"shared\"]");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -120,25 +124,26 @@ class MenuItemHierarchyMigrationTest {
         var shared = menuItem("shared", children("leaf"));
         var leaf = menuItem("leaf", null);
 
-        var summary = migration
-                .migrate(List.of(menu("primary", children("root-a", "root-b"))), List.of(rootA, rootB, shared, leaf))
-                .block();
-
-        assertThat(summary.getClonesCreated()).isEqualTo(2);
-        assertThat(shared.getSpec().getParent()).isEqualTo("root-a");
-        var clonedShared = createdItems.stream()
-                .filter(item ->
-                        "shared".equals(item.getMetadata().getAnnotations().get(MenuItem.ORIGINAL_MENU_ITEM_ANNO)))
-                .findFirst()
-                .orElseThrow();
-        var clonedLeaf = createdItems.stream()
-                .filter(item ->
-                        "leaf".equals(item.getMetadata().getAnnotations().get(MenuItem.ORIGINAL_MENU_ITEM_ANNO)))
-                .findFirst()
-                .orElseThrow();
-        assertThat(clonedShared.getSpec().getParent()).isEqualTo("root-b");
-        assertThat(clonedLeaf.getSpec().getParent())
-                .isEqualTo(clonedShared.getMetadata().getName());
+        StepVerifier.create(migration.migrate(
+                        List.of(menu("primary", children("root-a", "root-b"))), List.of(rootA, rootB, shared, leaf)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesCreated()).isEqualTo(2);
+                    assertThat(shared.getSpec().getParent()).isEqualTo("root-a");
+                    var clonedShared = createdItems.stream()
+                            .filter(item -> "shared"
+                                    .equals(item.getMetadata().getAnnotations().get(MenuItem.ORIGINAL_MENU_ITEM_ANNO)))
+                            .findFirst()
+                            .orElseThrow();
+                    var clonedLeaf = createdItems.stream()
+                            .filter(item -> "leaf"
+                                    .equals(item.getMetadata().getAnnotations().get(MenuItem.ORIGINAL_MENU_ITEM_ANNO)))
+                            .findFirst()
+                            .orElseThrow();
+                    assertThat(clonedShared.getSpec().getParent()).isEqualTo("root-b");
+                    assertThat(clonedLeaf.getSpec().getParent())
+                            .isEqualTo(clonedShared.getMetadata().getName());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -149,15 +154,17 @@ class MenuItemHierarchyMigrationTest {
         var assignedOrphan = menuItem("assigned-orphan", null);
         assignedOrphan.getSpec().setMenuName("custom");
 
-        var summary = migration
-                .migrate(List.of(menu("primary", children("root"))), List.of(root, child, orphan, assignedOrphan))
-                .block();
-
-        assertThat(summary.getWarnings()).isEqualTo(2);
-        assertThat(child.getSpec().getMenuName()).isEqualTo("primary");
-        assertThat(orphan.getSpec().getMenuName()).isNull();
-        assertThat(orphan.getMetadata().getLabels()).isNull();
-        assertThat(assignedOrphan.getMetadata().getLabels()).containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+        StepVerifier.create(migration.migrate(
+                        List.of(menu("primary", children("root"))), List.of(root, child, orphan, assignedOrphan)))
+                .assertNext(summary -> {
+                    assertThat(summary.getWarnings()).isEqualTo(2);
+                    assertThat(child.getSpec().getMenuName()).isEqualTo("primary");
+                    assertThat(orphan.getSpec().getMenuName()).isNull();
+                    assertThat(orphan.getMetadata().getLabels()).isNull();
+                    assertThat(assignedOrphan.getMetadata().getLabels())
+                            .containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -174,17 +181,18 @@ class MenuItemHierarchyMigrationTest {
                 .getAnnotations()
                 .put(MenuItem.MIGRATION_PATH_ANNO, JsonUtils.objectToJson(List.of("shared")));
 
-        var summary = migration
-                .migrate(
+        StepVerifier.create(migration.migrate(
                         List.of(
                                 menu("menu-a", children("shared"), "2022-08-05T04:19:37Z"),
                                 menu("menu-b", children("shared"), "2022-08-05T04:19:38Z")),
-                        List.of(shared, existingClone))
-                .block();
-
-        assertThat(summary.getClonesReused()).isEqualTo(1);
-        assertThat(createdItems).isEmpty();
-        assertThat(existingClone.getMetadata().getLabels()).containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+                        List.of(shared, existingClone)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesReused()).isEqualTo(1);
+                    assertThat(createdItems).isEmpty();
+                    assertThat(existingClone.getMetadata().getLabels())
+                            .containsEntry(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+                })
+                .verifyComplete();
     }
 
     private Menu menu(String name, LinkedHashSet<String> itemNames) {
