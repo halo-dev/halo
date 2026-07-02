@@ -1,0 +1,12 @@
+<!doctype html>
+<html xmlns:th="https://www.thymeleaf.org" th:lang="${#locale.toLanguageTag}" th:fragment="html (head, content)">
+  <head>
+    <meta charset="UTF-8" />
+    <th:block th:replace="${head}" />
+  </head>
+  <body>
+    <header>Default theme header</header>
+    <th:block th:replace="${content}" />
+    <footer>Default theme footer</footer>
+  </body>
+</html>

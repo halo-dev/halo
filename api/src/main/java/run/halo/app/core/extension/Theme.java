@@ -113,6 +113,25 @@ public class Theme extends AbstractExtension {
 
         /** Resolved Console/User Center UI stylesheet URL served from the theme root. */
         private String stylesheet;
+
+        /** Observed page layout contract compatibility. */
+        private PageLayout pageLayout;
+
+        /** Page layout contract compatibility details. */
+        @Data
+        public static class PageLayout {
+            /** Compatibility state of the page layout contract. */
+            private PageLayoutState state;
+
+            /** Contract template path relative to the theme root. */
+            private String template;
+
+            /** Stable diagnostic reason. */
+            private String reason;
+
+            /** Human-readable diagnostic message. */
+            private String message;
+        }
     }
 
     /**
@@ -135,6 +154,12 @@ public class Theme extends AbstractExtension {
         READY,
         FAILED,
         UNKNOWN,
+    }
+
+    public enum PageLayoutState {
+        SUPPORTED,
+        MISSING,
+        INVALID,
     }
 
     /** Theme author metadata. */

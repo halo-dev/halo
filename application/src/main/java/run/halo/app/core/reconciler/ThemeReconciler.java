@@ -49,6 +49,7 @@ import run.halo.app.infra.utils.ReactiveUtils;
 import run.halo.app.infra.utils.SettingUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.theme.TemplateEngineManager;
+import run.halo.app.theme.ThemeLayoutCompatibilityChecker;
 import run.halo.app.theme.ThemeScreenshots;
 import run.halo.app.theme.ThemeUiResources;
 import run.halo.app.theme.service.ThemeUtils;
@@ -73,6 +74,7 @@ class ThemeReconciler implements Reconciler<Request> {
     private final ThemeRootGetter themeRoot;
     private final SystemVersionSupplier systemVersionSupplier;
     private final TemplateEngineManager templateEngineManager;
+    private final ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker;
 
     private RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
             .backOff(new FixedBackOff(300, 20))
@@ -167,6 +169,7 @@ class ThemeReconciler implements Reconciler<Request> {
                 .orElse(null));
         status.setEntry(buildUiAssetUrlIfReadable(theme, ThemeUiResources.JS_BUNDLE));
         status.setStylesheet(buildUiAssetUrlIfReadable(theme, ThemeUiResources.CSS_BUNDLE));
+        status.setPageLayout(themeLayoutCompatibilityChecker.check(themePath));
 
         status.setPhase(Theme.ThemePhase.READY);
         var conditionBuilder = Condition.builder()

@@ -123,6 +123,7 @@ export * from './notifier-descriptor-spec';
 export * from './notifier-info';
 export * from './notifier-setting-ref';
 export * from './owner-info';
+export * from './page-layout';
 export * from './password-request';
 export * from './pat-spec';
 export * from './personal-access-token';
