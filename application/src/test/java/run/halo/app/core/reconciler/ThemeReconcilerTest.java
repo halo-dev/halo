@@ -156,7 +156,7 @@ class ThemeReconcilerTest {
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
 
-        final ThemeReconciler themeReconciler = new ThemeReconciler(
+        final ThemeReconciler reconciler = new ThemeReconciler(
                 extensionClient,
                 themeRoot,
                 systemVersionSupplier,
@@ -184,7 +184,7 @@ class ThemeReconcilerTest {
                     return List.of();
                 });
 
-        themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
+        reconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
         String settingName = theme.getSpec().getSettingName();
         verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
@@ -224,14 +224,14 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler = new ThemeReconciler(
+        var reconciler = new ThemeReconciler(
                 extensionClient,
                 themeRoot,
                 systemVersionSupplier,
                 templateEngineManager,
                 themeLayoutCompatibilityChecker);
 
-        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+        reconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
 
         var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
         verify(extensionClient).update(themeUpdateCaptor.capture());
@@ -251,14 +251,14 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">=2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler = new ThemeReconciler(
+        var reconciler = new ThemeReconciler(
                 extensionClient,
                 themeRoot,
                 systemVersionSupplier,
                 templateEngineManager,
                 themeLayoutCompatibilityChecker);
         var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
-        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+        reconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
         verify(extensionClient).update(themeUpdateCaptor.capture());
         assertThat(themeUpdateCaptor.getValue().getStatus().getPhase()).isEqualTo(Theme.ThemePhase.READY);
         assertThat(themeUpdateCaptor.getValue().getStatus().getInDevelopment()).isFalse();
@@ -275,7 +275,7 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">=2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler = new ThemeReconciler(
+        var reconciler = new ThemeReconciler(
                 extensionClient,
                 themeRoot,
                 systemVersionSupplier,
@@ -283,7 +283,7 @@ class ThemeReconcilerTest {
                 themeLayoutCompatibilityChecker);
         var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
 
-        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+        reconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
 
         verify(extensionClient).update(themeUpdateCaptor.capture());
         assertThat(themeUpdateCaptor.getValue().getStatus().getInDevelopment()).isTrue();
