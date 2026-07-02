@@ -52,6 +52,7 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
+import run.halo.app.theme.ThemeLayoutCompatibilityChecker;
 
 /**
  * Tests for {@link ThemeReconciler}.
@@ -76,6 +77,9 @@ class ThemeReconcilerTest {
 
     @Mock
     private TemplateEngineManager templateEngineManager;
+
+    @Spy
+    private ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker = new ThemeLayoutCompatibilityChecker();
 
     @Spy
     RetryTemplate retryTemplate = new RetryTemplate(RetryPolicy.builder()
@@ -152,8 +156,12 @@ class ThemeReconcilerTest {
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         when(themeRoot.get()).thenReturn(testWorkDir);
 
-        final ThemeReconciler themeReconciler =
-                new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier, templateEngineManager);
+        final ThemeReconciler themeReconciler = new ThemeReconciler(
+                extensionClient,
+                themeRoot,
+                systemVersionSupplier,
+                templateEngineManager,
+                themeLayoutCompatibilityChecker);
 
         final int[] retryFlags = {0, 0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -216,8 +224,12 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler =
-                new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier, templateEngineManager);
+        var themeReconciler = new ThemeReconciler(
+                extensionClient,
+                themeRoot,
+                systemVersionSupplier,
+                templateEngineManager,
+                themeLayoutCompatibilityChecker);
 
         themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
 
@@ -239,8 +251,12 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">=2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler =
-                new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier, templateEngineManager);
+        var themeReconciler = new ThemeReconciler(
+                extensionClient,
+                themeRoot,
+                systemVersionSupplier,
+                templateEngineManager,
+                themeLayoutCompatibilityChecker);
         var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
         themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
         verify(extensionClient).update(themeUpdateCaptor.capture());
@@ -259,8 +275,12 @@ class ThemeReconcilerTest {
         theme.getSpec().setRequires(">=2.3.0");
         theme.getSpec().setSettingName(null);
         when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
-        var themeReconciler =
-                new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier, templateEngineManager);
+        var themeReconciler = new ThemeReconciler(
+                extensionClient,
+                themeRoot,
+                systemVersionSupplier,
+                templateEngineManager,
+                themeLayoutCompatibilityChecker);
         var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
 
         themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
@@ -393,6 +413,114 @@ class ThemeReconcilerTest {
         verify(extensionClient).update(themeUpdateCaptor.capture());
         assertThat(themeUpdateCaptor.getValue().getStatus().getEntry()).isNull();
         assertThat(themeUpdateCaptor.getValue().getStatus().getStylesheet()).isNull();
+    }
+
+    @Test
+    void shouldReportSupportedPageLayoutWhenCompatible() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-supported-layout");
+        var themePath = testWorkDir.resolve("theme-test");
+        Files.createDirectories(themePath.resolve("templates"));
+        Files.writeString(themePath.resolve("templates").resolve("layout.html"), """
+                <!doctype html>
+                <html xmlns:th="https://www.thymeleaf.org" th:fragment="html (head, content)">
+                  <head><th:block th:replace="${head}" /></head>
+                  <body><th:block th:replace="${content}" /></body>
+                </html>
+                """);
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        var status = themeUpdateCaptor.getValue().getStatus();
+        assertThat(status.getPhase()).isEqualTo(Theme.ThemePhase.READY);
+        assertThat(status.getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.SUPPORTED);
+        assertThat(status.getPageLayout().getTemplate()).isEqualTo("templates/layout.html");
+    }
+
+    @Test
+    void shouldReportMissingPageLayoutWithoutFailingTheme() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-missing-layout");
+        Files.createDirectories(testWorkDir.resolve("theme-test"));
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        var status = themeUpdateCaptor.getValue().getStatus();
+        assertThat(status.getPhase()).isEqualTo(Theme.ThemePhase.READY);
+        assertThat(status.getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.MISSING);
+        assertThat(status.getPageLayout().getReason()).isEqualTo("MissingLayoutTemplate");
+    }
+
+    @Test
+    void shouldReportInvalidPageLayoutWithoutFailingTheme() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-invalid-layout");
+        var themePath = testWorkDir.resolve("theme-test");
+        Files.createDirectories(themePath.resolve("templates"));
+        Files.writeString(themePath.resolve("templates").resolve("layout.html"), """
+                <!doctype html>
+                <html xmlns:th="https://www.thymeleaf.org" th:fragment="layout (head, content)">
+                  <body><th:block th:replace="${content}" /></body>
+                </html>
+                """);
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+        when(extensionClient.fetch(Theme.class, "theme-test")).thenReturn(Optional.of(theme));
+        var themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+
+        themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName()));
+
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        var status = themeUpdateCaptor.getValue().getStatus();
+        assertThat(status.getPhase()).isEqualTo(Theme.ThemePhase.READY);
+        assertThat(status.getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.INVALID);
+        assertThat(status.getPageLayout().getReason()).isEqualTo("UnsupportedLayoutFragment");
+    }
+
+    @Test
+    void shouldReevaluatePageLayoutStatusOnReconcile() throws IOException {
+        when(systemVersionSupplier.get()).thenReturn(Version.parse("2.3.0"));
+        var testWorkDir = tempDirectory.resolve("reconcile-layout-reload");
+        var themePath = testWorkDir.resolve("theme-test");
+        Files.createDirectories(themePath.resolve("templates"));
+        when(themeRoot.get()).thenReturn(testWorkDir);
+        var theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">=2.3.0");
+        theme.getSpec().setSettingName(null);
+
+        themeReconciler.reconcileStatus(theme);
+        assertThat(theme.getStatus().getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.MISSING);
+
+        Files.writeString(themePath.resolve("templates").resolve("layout.html"), """
+                <!doctype html>
+                <html xmlns:th="https://www.thymeleaf.org" th:fragment="html (head, content)">
+                  <head><th:block th:replace="${head}" /></head>
+                  <body><th:block th:replace="${content}" /></body>
+                </html>
+                """);
+
+        themeReconciler.reconcileStatus(theme);
+        assertThat(theme.getStatus().getPageLayout().getState()).isEqualTo(Theme.PageLayoutState.SUPPORTED);
     }
 
     private Theme fakeTheme() {

@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Condition } from './condition';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { PageLayout } from './page-layout';
 
 /**
  * Observed theme lifecycle and installation state.
@@ -37,6 +40,7 @@ export interface ThemeStatus {
      * Local filesystem location where the theme is loaded from.
      */
     'location'?: string;
+    'pageLayout'?: PageLayout;
     /**
      * Current theme lifecycle phase.
      */

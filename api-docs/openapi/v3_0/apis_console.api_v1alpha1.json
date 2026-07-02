@@ -5350,6 +5350,33 @@
         },
         "description": "Resolved owner summary for a comment or reply."
       },
+      "PageLayout": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable diagnostic message."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Stable diagnostic reason."
+          },
+          "state": {
+            "type": "string",
+            "description": "Compatibility state of the page layout contract.",
+            "enum": [
+              "SUPPORTED",
+              "MISSING",
+              "INVALID"
+            ]
+          },
+          "template": {
+            "type": "string",
+            "description": "Contract template path relative to the theme root."
+          }
+        },
+        "description": "Page layout contract compatibility details."
+      },
       "Plugin": {
         "required": [
           "apiVersion",
@@ -6906,6 +6933,9 @@
           "location": {
             "type": "string",
             "description": "Local filesystem location where the theme is loaded from."
+          },
+          "pageLayout": {
+            "$ref": "#/components/schemas/PageLayout"
           },
           "phase": {
             "type": "string",

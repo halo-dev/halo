@@ -17,6 +17,12 @@ import { useQueryClient } from "@tanstack/vue-query";
 import { computed, inject, markRaw, ref, toRefs, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useThemeLifeCycle } from "../composables/use-theme";
+import {
+  getPageLayout,
+  getPageLayoutDescriptionKey,
+  getPageLayoutDiagnostic,
+  getPageLayoutDotState,
+} from "../utils/page-layout";
 import MoreOperationItem from "./operation/MoreOperationItem.vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 
@@ -45,6 +51,22 @@ const { theme } = toRefs(props);
 
 const screenshot = computed(() => theme.value.status?.screenshot);
 const logo = computed(() => theme.value.spec.logo);
+const pageLayout = computed(() => getPageLayout(theme.value));
+const pageLayoutDotState = computed(() =>
+  getPageLayoutDotState(pageLayout.value?.state)
+);
+const pageLayoutTooltip = computed(() => {
+  const state = pageLayout.value?.state;
+  if (!state) {
+    return;
+  }
+  const description = t(getPageLayoutDescriptionKey(state));
+  const diagnostic = getPageLayoutDiagnostic(pageLayout.value);
+  if (state === "INVALID" && diagnostic) {
+    return `${description} ${diagnostic}`;
+  }
+  return description;
+});
 
 const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
 
@@ -213,6 +235,11 @@ const { data: operationItems } = useOperationItemExtensionPoint<Theme>(
               v-tooltip="$t('core.common.status.deleting')"
               state="warning"
               animate
+            />
+            <VStatusDot
+              v-if="pageLayoutTooltip"
+              v-tooltip="pageLayoutTooltip"
+              :state="pageLayoutDotState"
             />
           </div>
         </div>

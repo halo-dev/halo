@@ -16,6 +16,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 import run.halo.app.theme.engine.HaloTemplateEngine;
+import run.halo.app.theme.engine.PageLayoutTemplateResolver;
 import run.halo.app.theme.engine.PluginClassloaderTemplateResolver;
 import run.halo.app.theme.message.ThemeMessageResolver;
 
@@ -56,6 +57,8 @@ public class TemplateEngineManager {
 
     private final SystemVersionSupplier systemVersionSupplier;
 
+    private final ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker;
+
     public TemplateEngineManager(
             ThymeleafProperties thymeleafProperties,
             ExternalUrlSupplier externalUrlSupplier,
@@ -63,7 +66,8 @@ public class TemplateEngineManager {
             ObjectProvider<ITemplateResolver> templateResolvers,
             ObjectProvider<IDialect> dialects,
             ThemeResolver themeResolver,
-            SystemVersionSupplier systemVersionSupplier) {
+            SystemVersionSupplier systemVersionSupplier,
+            ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.pluginManager = pluginManager;
@@ -71,6 +75,7 @@ public class TemplateEngineManager {
         this.dialects = dialects;
         this.themeResolver = themeResolver;
         this.systemVersionSupplier = systemVersionSupplier;
+        this.themeLayoutCompatibilityChecker = themeLayoutCompatibilityChecker;
         engineCache = new ConcurrentLruCache<>(CACHE_SIZE_LIMIT, this::templateEngineGenerator);
     }
 
@@ -109,6 +114,8 @@ public class TemplateEngineManager {
         var mainResolver = haloTemplateResolver();
         mainResolver.setPrefix(cacheKey.context().getPath().resolve("templates") + "/");
         engine.addTemplateResolver(mainResolver);
+        var pageLayoutTemplateResolver = createPageLayoutTemplateResolver(cacheKey.context());
+        engine.addTemplateResolver(pageLayoutTemplateResolver);
         var pluginTemplateResolver = createPluginClassloaderTemplateResolver();
         engine.addTemplateResolver(pluginTemplateResolver);
         // replace StandardDialect with SpringStandardDialect
@@ -130,6 +137,19 @@ public class TemplateEngineManager {
         dialects.orderedStream().forEach(engine::addDialect);
 
         return engine;
+    }
+
+    private PageLayoutTemplateResolver createPageLayoutTemplateResolver(ThemeContext themeContext) {
+        var resolver = new PageLayoutTemplateResolver(
+                themeContext.getPath(), themeLayoutCompatibilityChecker.isSupported(themeContext.getPath()));
+        resolver.setPrefix(thymeleafProperties.getPrefix());
+        resolver.setSuffix(thymeleafProperties.getSuffix());
+        resolver.setTemplateMode(thymeleafProperties.getMode());
+        resolver.setOrder(0);
+        if (thymeleafProperties.getEncoding() != null) {
+            resolver.setCharacterEncoding(thymeleafProperties.getEncoding().name());
+        }
+        return resolver;
     }
 
     private PluginClassloaderTemplateResolver createPluginClassloaderTemplateResolver() {
