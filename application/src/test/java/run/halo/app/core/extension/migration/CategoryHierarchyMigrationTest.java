@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -44,19 +45,21 @@ class CategoryHierarchyMigrationTest {
         var anotherChild = category("C", "2024-01-03T00:00:00Z");
         var grandChild = category("D", "2024-01-04T00:00:00Z");
 
-        var summary = migration
+        migration
                 .migrate(List.of(parent, child, anotherChild, grandChild))
-                .block();
-
-        assertThat(child.getSpec().getParent()).isEqualTo("A");
-        assertThat(anotherChild.getSpec().getParent()).isEqualTo("A");
-        assertThat(grandChild.getSpec().getParent()).isEqualTo("B");
-        assertThat(parent.getSpec().getChildren()).containsExactly("B", "C");
-        assertThat(child.getSpec().getChildren()).containsExactly("D");
-        assertThat(summary.assignedParents()).isEqualTo(3);
-        assertThat(summary.updated()).isEqualTo(4);
-        assertThat(summary.failures()).isZero();
-        assertMigrationLabel(parent, child, anotherChild, grandChild);
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(child.getSpec().getParent()).isEqualTo("A");
+                    assertThat(anotherChild.getSpec().getParent()).isEqualTo("A");
+                    assertThat(grandChild.getSpec().getParent()).isEqualTo("B");
+                    assertThat(parent.getSpec().getChildren()).containsExactly("B", "C");
+                    assertThat(child.getSpec().getChildren()).containsExactly("D");
+                    assertThat(summary.assignedParents()).isEqualTo(3);
+                    assertThat(summary.updated()).isEqualTo(4);
+                    assertThat(summary.failures()).isZero();
+                    assertMigrationLabel(parent, child, anotherChild, grandChild);
+                })
+                .verifyComplete();
         verify(client, times(4)).update(any(Category.class));
     }
 
@@ -67,12 +70,16 @@ class CategoryHierarchyMigrationTest {
         var child = category("C", "2024-01-03T00:00:00Z");
         child.getSpec().setParent("B");
 
-        var summary = migration.migrate(List.of(parent, existingParent, child)).block();
-
-        assertThat(child.getSpec().getParent()).isEqualTo("B");
-        assertThat(summary.assignedParents()).isZero();
-        assertThat(summary.conflictingEdges()).isEqualTo(1);
-        assertMigrationLabel(parent, existingParent, child);
+        migration
+                .migrate(List.of(parent, existingParent, child))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(child.getSpec().getParent()).isEqualTo("B");
+                    assertThat(summary.assignedParents()).isZero();
+                    assertThat(summary.conflictingEdges()).isEqualTo(1);
+                    assertMigrationLabel(parent, existingParent, child);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -82,11 +89,15 @@ class CategoryHierarchyMigrationTest {
         child.getMetadata().setLabels(new HashMap<>());
         child.getMetadata().getLabels().put(Category.HIERARCHY_MIGRATED_LABEL, "true");
 
-        var summary = migration.migrate(List.of(parent, child)).block();
-
-        assertThat(child.getSpec().getParent()).isEqualTo("A");
-        assertThat(summary.assignedParents()).isEqualTo(1);
-        assertThat(summary.updated()).isEqualTo(2);
+        migration
+                .migrate(List.of(parent, child))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(child.getSpec().getParent()).isEqualTo("A");
+                    assertThat(summary.assignedParents()).isEqualTo(1);
+                    assertThat(summary.updated()).isEqualTo(2);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -99,22 +110,30 @@ class CategoryHierarchyMigrationTest {
         child.getMetadata().setLabels(new HashMap<>());
         child.getMetadata().getLabels().put(Category.HIERARCHY_MIGRATED_LABEL, "true");
 
-        var summary = migration.migrate(List.of(parent, child)).block();
-
-        assertThat(summary.assignedParents()).isZero();
-        assertThat(summary.updated()).isZero();
-        assertThat(summary.skipped()).isEqualTo(2);
+        migration
+                .migrate(List.of(parent, child))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(summary.assignedParents()).isZero();
+                    assertThat(summary.updated()).isZero();
+                    assertThat(summary.skipped()).isEqualTo(2);
+                })
+                .verifyComplete();
     }
 
     @Test
     void warnsAndContinuesForMissingLegacyChildReferences() {
         var parent = category("A", "2024-01-01T00:00:00Z", "missing");
 
-        var summary = migration.migrate(List.of(parent)).block();
-
-        assertThat(summary.missingReferences()).isEqualTo(1);
-        assertThat(summary.updated()).isEqualTo(1);
-        assertMigrationLabel(parent);
+        migration
+                .migrate(List.of(parent))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(summary.missingReferences()).isEqualTo(1);
+                    assertThat(summary.updated()).isEqualTo(1);
+                    assertMigrationLabel(parent);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -123,12 +142,15 @@ class CategoryHierarchyMigrationTest {
         var secondParent = category("B", "2024-01-02T00:00:00Z", "C");
         var child = category("C", "2024-01-03T00:00:00Z");
 
-        var summary =
-                migration.migrate(List.of(secondParent, child, firstParent)).block();
-
-        assertThat(child.getSpec().getParent()).isEqualTo("A");
-        assertThat(summary.assignedParents()).isEqualTo(1);
-        assertThat(summary.conflictingEdges()).isEqualTo(1);
+        migration
+                .migrate(List.of(secondParent, child, firstParent))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(child.getSpec().getParent()).isEqualTo("A");
+                    assertThat(summary.assignedParents()).isEqualTo(1);
+                    assertThat(summary.conflictingEdges()).isEqualTo(1);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -136,12 +158,16 @@ class CategoryHierarchyMigrationTest {
         var parent = category("A", "2024-01-01T00:00:00Z", "B");
         var child = category("B", "2024-01-02T00:00:00Z", "A");
 
-        var summary = migration.migrate(List.of(parent, child)).block();
-
-        assertThat(parent.getSpec().getParent()).isNull();
-        assertThat(child.getSpec().getParent()).isEqualTo("A");
-        assertThat(summary.assignedParents()).isEqualTo(1);
-        assertThat(summary.cyclicEdges()).isEqualTo(1);
+        migration
+                .migrate(List.of(parent, child))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(parent.getSpec().getParent()).isNull();
+                    assertThat(child.getSpec().getParent()).isEqualTo("A");
+                    assertThat(summary.assignedParents()).isEqualTo(1);
+                    assertThat(summary.cyclicEdges()).isEqualTo(1);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -150,13 +176,17 @@ class CategoryHierarchyMigrationTest {
         var child = category("B", "2024-01-02T00:00:00Z");
         doReturn(Mono.error(new RuntimeException("boom"))).when(client).update(same(child));
 
-        var summary = migration.migrate(List.of(parent, child)).block();
-
-        assertThat(child.getSpec().getParent()).isEqualTo("A");
-        assertThat(summary.assignedParents()).isEqualTo(1);
-        assertThat(summary.updated()).isEqualTo(1);
-        assertThat(summary.failures()).isEqualTo(1);
-        assertMigrationLabel(parent, child);
+        migration
+                .migrate(List.of(parent, child))
+                .as(StepVerifier::create)
+                .assertNext(summary -> {
+                    assertThat(child.getSpec().getParent()).isEqualTo("A");
+                    assertThat(summary.assignedParents()).isEqualTo(1);
+                    assertThat(summary.updated()).isEqualTo(1);
+                    assertThat(summary.failures()).isEqualTo(1);
+                    assertMigrationLabel(parent, child);
+                })
+                .verifyComplete();
         verify(client).update(parent);
         verify(client).update(child);
     }

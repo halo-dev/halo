@@ -27,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.content.CategoryService;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.*;
@@ -159,18 +160,25 @@ class CategoryFinderImplTest {
                 .thenReturn(Flux.fromIterable(
                         List.of(root, missingParent, selfParent, cyclicA, cyclicB, validChildOfCyclicRoot)));
 
-        var treeVos = categoryFinder.listAsTree().collectList().block();
-
-        assertThat(treeVos.stream().map(vo -> vo.getMetadata().getName()).toList())
-                .containsExactly("root", "missing-parent", "self-parent", "cyclic-a", "cyclic-b");
-        var cyclicANode = treeVos.stream()
-                .filter(vo -> vo.getMetadata().getName().equals("cyclic-a"))
-                .findFirst()
-                .orElseThrow();
-        assertThat(cyclicANode.getParentName()).isNull();
-        assertThat(cyclicANode.getChildren())
-                .extracting(child -> child.getMetadata().getName())
-                .containsExactly("child");
+        categoryFinder
+                .listAsTree()
+                .collectList()
+                .as(StepVerifier::create)
+                .assertNext(treeVos -> {
+                    assertThat(treeVos.stream()
+                                    .map(vo -> vo.getMetadata().getName())
+                                    .toList())
+                            .containsExactly("root", "missing-parent", "self-parent", "cyclic-a", "cyclic-b");
+                    var cyclicANode = treeVos.stream()
+                            .filter(vo -> vo.getMetadata().getName().equals("cyclic-a"))
+                            .findFirst()
+                            .orElseThrow();
+                    assertThat(cyclicANode.getParentName()).isNull();
+                    assertThat(cyclicANode.getChildren())
+                            .extracting(child -> child.getMetadata().getName())
+                            .containsExactly("child");
+                })
+                .verifyComplete();
     }
 
     /**
