@@ -23,7 +23,9 @@ import {
   IndexV1alpha1PublicApi,
   IndicesV1alpha1ConsoleApi,
   MenuItemV1alpha1Api,
+  MenuItemV1alpha1ConsoleApi,
   MenuV1alpha1Api,
+  MenuV1alpha1ConsoleApi,
   MenuV1alpha1PublicApi,
   MetricsV1alpha1PublicApi,
   MigrationV1alpha1ConsoleApi,
@@ -274,6 +276,8 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
   const baseURL = axiosInstance.defaults.baseURL;
 
   return {
+    menu: new MenuV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
+    menuItem: new MenuItemV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     user: new UserV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     system: new SystemV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
     migration: new MigrationV1alpha1ConsoleApi(

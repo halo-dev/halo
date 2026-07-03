@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import type {
+  Menu,
+  MenuItem,
+  MenuItemTreeNode,
+  Ref,
+} from "@halo-dev/api-client";
 import { coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
@@ -8,17 +13,17 @@ import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
-import { buildMenuItemsTree } from "../utils";
+import { flattenMenuItemTreeNodes } from "../utils";
 
 const props = withDefaults(
   defineProps<{
     menu: Menu;
-    menuItems?: MenuItem[];
+    menuItemTree?: MenuItemTreeNode[];
     parentMenuItem?: MenuItem;
     menuItem?: MenuItem;
   }>(),
   {
-    menuItems: () => [],
+    menuItemTree: () => [],
     parentMenuItem: undefined,
     menuItem: undefined,
   }
@@ -191,74 +196,44 @@ const selectedRef = computed(() => {
 const selectedRefKind = ref<string>();
 const selectedRefName = ref<string>("");
 
-const excludedParentNames = computed(() => {
-  const excludedNames = new Set<string>();
-  const currentName = props.menuItem?.metadata.name;
-  if (!currentName) {
-    return excludedNames;
-  }
-
-  excludedNames.add(currentName);
-  let changed = true;
-  while (changed) {
-    changed = false;
-    props.menuItems.forEach((menuItem) => {
-      if (
-        menuItem.spec.parent &&
-        excludedNames.has(menuItem.spec.parent) &&
-        !excludedNames.has(menuItem.metadata.name)
-      ) {
-        excludedNames.add(menuItem.metadata.name);
-        changed = true;
-      }
-    });
-  }
-  return excludedNames;
-});
-
 const parentMenuItemOptions = computed(() => {
   const emptyOption = {
     label: t("core.menu.menu_item_editing_modal.fields.parent.placeholder"),
     value: "",
   };
-  const options = props.menuItems
-    .filter(
-      (menuItem) => !excludedParentNames.value.has(menuItem.metadata.name)
-    )
-    .map((menuItem) => {
-      return {
-        label:
-          menuItem.status?.displayName ||
-          menuItem.spec.displayName ||
-          menuItem.metadata.name,
-        value: menuItem.metadata.name,
-      };
-    });
+  const options = flattenMenuItemTreeNodes(props.menuItemTree).map((node) => {
+    const menuItem = node.menuItem;
+    return {
+      label:
+        menuItem.status?.displayName ||
+        menuItem.spec.displayName ||
+        menuItem.metadata.name,
+      value: menuItem.metadata.name,
+    };
+  });
   return [emptyOption, ...options];
 });
 
-const menuTreeItems = computed(() => buildMenuItemsTree(props.menuItems));
-
 const siblingCount = computed(() => {
   if (!selectedParentMenuItem.value) {
-    return menuTreeItems.value.length;
+    return props.menuItemTree.length;
   }
-  const parent = findMenuTreeItem(
-    menuTreeItems.value,
+  const parent = findMenuItemTreeNode(
+    props.menuItemTree,
     selectedParentMenuItem.value
   );
   return parent?.children.length || 0;
 });
 
-function findMenuTreeItem(
-  menuItems: ReturnType<typeof buildMenuItemsTree>,
+function findMenuItemTreeNode(
+  nodes: MenuItemTreeNode[],
   name: string
-) {
-  for (const menuItem of menuItems) {
-    if (menuItem.metadata.name === name) {
-      return menuItem;
+): MenuItemTreeNode | undefined {
+  for (const node of nodes) {
+    if (node.menuItem.metadata.name === name) {
+      return node;
     }
-    const child = findMenuTreeItem(menuItem.children, name);
+    const child = findMenuItemTreeNode(node.children, name);
     if (child) {
       return child;
     }

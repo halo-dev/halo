@@ -30,7 +30,11 @@ import { useRouteQuery } from "@vueuse/router";
 import { cloneDeep } from "es-toolkit";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { buildMenuItemHierarchyPatch, resolveClonedParentName } from "../utils";
+import {
+  buildMenuItemHierarchyPatch,
+  findFallbackMenuAfterDelete,
+  resolveClonedParentName,
+} from "../utils";
 import MenuEditingModal from "./MenuEditingModal.vue";
 
 interface SystemMenuConfig {
@@ -49,7 +53,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:selectedMenu", menu: Menu): void;
+  (event: "update:selectedMenu", menu?: Menu): void;
 }>();
 
 const selectedMenuToUpdate = ref<Menu>();
@@ -119,10 +123,23 @@ async function listMenuItemsByMenuName(menuName: string) {
   );
 }
 
-const menuQuery = useRouteQuery("menu");
+const menuQuery = useRouteQuery<string | undefined>("menu");
 const handleSelect = (menu: Menu) => {
   emit("update:selectedMenu", menu);
   menuQuery.value = menu.metadata.name;
+};
+
+const handleSelectAfterDelete = (menu: Menu, menuList: Menu[]) => {
+  if (props.selectedMenu?.metadata.name !== menu.metadata.name) {
+    return;
+  }
+
+  const fallbackMenu = findFallbackMenuAfterDelete(
+    menuList,
+    menu.metadata.name
+  );
+  emit("update:selectedMenu", fallbackMenu);
+  menuQuery.value = fallbackMenu?.metadata.name;
 };
 
 const handleCloneMenu = async (menu: Menu) => {
@@ -217,25 +234,21 @@ const handleDeleteMenu = async (menu: Menu) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
+      let deleted = false;
       try {
-        await coreApiClient.menu.deleteMenu({
+        await consoleApiClient.menu.deleteMenu({
           name: menu.metadata.name,
         });
-
-        const menuItems = await listMenuItemsByMenuName(menu.metadata.name);
-        const deleteItemsPromises = menuItems.map((item) =>
-          coreApiClient.menuItem.deleteMenuItem({
-            name: item.metadata.name,
-          })
-        );
-
-        await Promise.all(deleteItemsPromises);
+        deleted = true;
 
         Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {
-        await refetch();
+        const { data } = await refetch();
+        if (deleted) {
+          handleSelectAfterDelete(menu, data || menus.value || []);
+        }
         await refetchMenuItemCounts();
       }
     },

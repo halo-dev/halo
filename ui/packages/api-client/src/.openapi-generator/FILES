@@ -25,7 +25,9 @@ api/group-v1alpha1-api.ts
 api/index-v1alpha1-public-api.ts
 api/indices-v1alpha1-console-api.ts
 api/menu-item-v1alpha1-api.ts
+api/menu-item-v1alpha1-console-api.ts
 api/menu-v1alpha1-api.ts
+api/menu-v1alpha1-console-api.ts
 api/menu-v1alpha1-public-api.ts
 api/metrics-v1alpha1-public-api.ts
 api/migration-v1alpha1-console-api.ts
@@ -188,8 +190,10 @@ models/listed-snapshot-spec.ts
 models/listed-user.ts
 models/mark-specified-request.ts
 models/menu-item-list.ts
+models/menu-item-position-request.ts
 models/menu-item-spec.ts
 models/menu-item-status.ts
+models/menu-item-tree-node.ts
 models/menu-item-vo.ts
 models/menu-item.ts
 models/menu-list.ts

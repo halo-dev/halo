@@ -1,10 +1,6 @@
 <script lang="ts" setup>
-import type {
-  Menu,
-  MenuItem,
-  MenuItemV1alpha1ApiListMenuItemRequest,
-} from "@halo-dev/api-client";
-import { coreApiClient, paginate } from "@halo-dev/api-client";
+import type { Menu, MenuItem, MenuItemTreeNode } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   Dialog,
   IconAddCircle,
@@ -27,64 +23,61 @@ import { utils } from "@halo-dev/ui-shared";
 import { Draggable } from "@he-tree/vue";
 import "@he-tree/vue/style/default.css";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { cloneDeep } from "es-toolkit";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuList from "./components/MenuList.vue";
-import type { MenuTreeItem } from "./utils";
 import {
-  buildMenuItemHierarchyPatch,
-  buildMenuItemsTree,
-  convertMenuTreeItemToMenuItem,
-  convertTreeToMenuItems,
-  getChildrenNames,
-  resetMenuItemsTreePriority,
+  buildMenuItemPositionRequest,
+  flattenMenuItemTreeNodes,
+  getMenuItemTreeNodeChildrenNames,
 } from "./utils";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
+const menuTreeItems = ref<MenuItemTreeNode[]>([]);
+const previousMenuTreeItems = ref<MenuItemTreeNode[]>([]);
 const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
 
 const {
-  data: menuItems,
+  data: menuItemTree,
   isLoading,
   refetch,
-} = useQuery<MenuItem[]>({
-  queryKey: ["menu-items", selectedMenu],
+} = useQuery<MenuItemTreeNode[]>({
+  queryKey: ["menu-item-tree", selectedMenu],
   queryFn: async () => {
-    if (!selectedMenu.value?.metadata.name) {
+    const menuName = selectedMenu.value?.metadata.name;
+    if (!menuName) {
       return [];
     }
 
-    return await paginate<MenuItemV1alpha1ApiListMenuItemRequest, MenuItem>(
-      (params) => coreApiClient.menuItem.listMenuItem(params),
-      {
-        fieldSelector: [`spec.menuName=${selectedMenu.value.metadata.name}`],
-        size: 1000,
-      }
-    );
+    const { data } = await consoleApiClient.menuItem.listMenuItemTree({
+      menuName,
+    });
+    return data;
   },
   onSuccess(data) {
-    menuTreeItems.value = buildMenuItemsTree(data);
+    menuTreeItems.value = data;
+    previousMenuTreeItems.value = cloneDeep(data);
   },
   refetchInterval(data) {
-    const deletingMenuItems = data?.filter(
-      (menuItem) => !!menuItem.metadata.deletionTimestamp
+    const deletingMenuItems = flattenMenuItemTreeNodes(data || []).filter(
+      (node) => !!node.menuItem.metadata.deletionTimestamp
     );
     return deletingMenuItems?.length ? 1000 : false;
   },
   enabled: computed(() => !!selectedMenu.value),
 });
 
-const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
+const handleOpenEditingModal = (node: MenuItemTreeNode) => {
   coreApiClient.menuItem
     .getMenuItem({
-      name: menuItem.metadata.name,
+      name: node.menuItem.metadata.name,
     })
     .then((response) => {
       selectedMenuItem.value = response.data;
@@ -92,8 +85,8 @@ const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
     });
 };
 
-const handleOpenCreateByParentModal = (menuItem: MenuTreeItem) => {
-  selectedParentMenuItem.value = convertMenuTreeItemToMenuItem(menuItem);
+const handleOpenCreateByParentModal = (node: MenuItemTreeNode) => {
+  selectedParentMenuItem.value = node.menuItem;
   menuItemEditingModal.value = true;
 };
 
@@ -113,10 +106,10 @@ const onMenuItemSaved = async () => {
   await refetch();
 };
 
-const batchUpdating = ref(false);
+const positionUpdating = ref(false);
 
-async function handleUpdateInBatch() {
-  if (batchUpdating.value) {
+async function handleUpdatePosition() {
+  if (positionUpdating.value) {
     return;
   }
 
@@ -125,40 +118,37 @@ async function handleUpdateInBatch() {
     return;
   }
 
-  const menuTreeItemsToUpdate = resetMenuItemsTreePriority(menuTreeItems.value);
-  const menuItemsToUpdate = convertTreeToMenuItems(
-    menuTreeItemsToUpdate,
-    selectedMenuName
+  const positionRequest = buildMenuItemPositionRequest(
+    previousMenuTreeItems.value,
+    menuTreeItems.value
   );
-  const previousParentNameMap = new Map(
-    menuItems.value?.map((menuItem) => [
-      menuItem.metadata.name,
-      menuItem.spec.parent,
-    ])
-  );
+  if (!positionRequest) {
+    previousMenuTreeItems.value = cloneDeep(menuTreeItems.value);
+    return;
+  }
+
   try {
-    batchUpdating.value = true;
-    const promises = menuItemsToUpdate.map((menuItem) =>
-      coreApiClient.menuItem.patchMenuItem({
-        name: menuItem.metadata.name,
-        jsonPatchInner: buildMenuItemHierarchyPatch(
-          menuItem,
-          selectedMenuName,
-          previousParentNameMap.get(menuItem.metadata.name)
-        ),
-      })
-    );
-    await Promise.all(promises);
+    positionUpdating.value = true;
+    const { data } = await consoleApiClient.menuItem.updateMenuItemPosition({
+      name: positionRequest.name,
+      menuItemPositionRequest: {
+        menuName: selectedMenuName,
+        parentName: positionRequest.parentName,
+        beforeName: positionRequest.beforeName,
+      },
+    });
+    menuTreeItems.value = data;
+    previousMenuTreeItems.value = cloneDeep(data);
   } catch (e) {
     console.error("Failed to update menu items", e);
+    await refetch();
   } finally {
     await queryClient.invalidateQueries({ queryKey: ["menus"] });
-    await refetch();
-    batchUpdating.value = false;
+    positionUpdating.value = false;
   }
 }
 
-const handleDelete = async (menuItem: MenuTreeItem) => {
+const handleDelete = async (node: MenuItemTreeNode) => {
   Dialog.info({
     title: t("core.menu.operations.delete_menu_item.title"),
     description: t("core.menu.operations.delete_menu_item.description"),
@@ -167,10 +157,10 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await coreApiClient.menuItem.deleteMenuItem({
-        name: menuItem.metadata.name,
+        name: node.menuItem.metadata.name,
       });
 
-      const childrenNames = getChildrenNames(menuItem);
+      const childrenNames = getMenuItemTreeNodeChildrenNames(node);
 
       if (childrenNames.length) {
         const deleteChildrenRequests = childrenNames.map((name) =>
@@ -202,8 +192,8 @@ const TargetRef = {
   Tag: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
 };
 
-function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
-  const { kind } = menuItem.spec.targetRef || {};
+function getMenuItemRefDisplayName(node: MenuItemTreeNode) {
+  const { kind } = node.menuItem.spec.targetRef || {};
 
   if (kind && TargetRef[kind]) {
     return TargetRef[kind];
@@ -216,7 +206,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
   <MenuItemEditingModal
     v-if="menuItemEditingModal && selectedMenu"
     :menu-item="selectedMenuItem"
-    :menu-items="menuItems || []"
+    :menu-item-tree="menuItemTree || []"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
     @close="onMenuItemEditingModalClose"
@@ -260,7 +250,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             </div>
           </template>
           <VLoading v-if="isLoading" />
-          <Transition v-else-if="!menuItems?.length" appear name="fade">
+          <Transition v-else-if="!menuItemTree?.length" appear name="fade">
             <VEmpty
               :message="$t('core.menu.menu_item_empty.message')"
               :title="$t('core.menu.menu_item_empty.title')"
@@ -288,12 +278,12 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             <Draggable
               v-model="menuTreeItems"
               :class="{
-                'cursor-progress opacity-60': batchUpdating,
+                'cursor-progress opacity-60': positionUpdating,
               }"
-              :disable-drag="batchUpdating"
+              :disable-drag="positionUpdating"
               trigger-class="drag-element"
               :indent="40"
-              @after-drop="handleUpdateInBatch"
+              @after-drop="handleUpdatePosition"
             >
               <template #default="{ node }">
                 <div
@@ -311,26 +301,29 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                         <span
                           class="truncate text-sm font-medium text-gray-900"
                         >
-                          {{ node.status.displayName }}
+                          {{
+                            node.menuItem.status?.displayName ||
+                            node.menuItem.spec.displayName
+                          }}
                         </span>
                         <VTag v-if="getMenuItemRefDisplayName(node)">
                           {{ getMenuItemRefDisplayName(node) }}
                         </VTag>
                       </div>
                       <a
-                        v-if="node.status?.href"
-                        :href="node.status?.href"
-                        :title="node.status?.href"
+                        v-if="node.menuItem.status?.href"
+                        :href="node.menuItem.status?.href"
+                        :title="node.menuItem.status?.href"
                         target="_blank"
                         class="truncate text-xs text-gray-500 group-hover:text-gray-900"
                       >
-                        {{ node.status.href }}
+                        {{ node.menuItem.status?.href }}
                       </a>
                     </div>
                   </div>
                   <div class="flex flex-none items-center gap-6">
                     <VStatusDot
-                      v-if="node.metadata.deletionTimestamp"
+                      v-if="node.menuItem.metadata.deletionTimestamp"
                       v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate

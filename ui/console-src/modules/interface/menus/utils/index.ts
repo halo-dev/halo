@@ -1,184 +1,198 @@
-import type { JsonPatchInner, MenuItem } from "@halo-dev/api-client";
-import { cloneDeep } from "es-toolkit";
+import type {
+  JsonPatchInner,
+  Menu,
+  MenuItem,
+  MenuItemTreeNode,
+} from "@halo-dev/api-client";
 
-export interface MenuTreeItem extends MenuItem {
-  children: MenuTreeItem[];
+export interface MenuItemMovePosition {
+  name: string;
+  parentName?: string;
+  beforeName?: string;
 }
 
-/**
- * Convert a flat array of menu items into a menu tree with children at the top level.
- *
- * @param menuItems
- */
-export function buildMenuItemsTree(menuItems: MenuItem[]): MenuTreeItem[] {
-  const menuItemsToUpdate = cloneDeep(menuItems);
-
-  const menuItemsMap: Record<string, MenuTreeItem> = {};
-
-  menuItemsToUpdate.forEach((menuItem) => {
-    menuItemsMap[menuItem.metadata.name] = {
-      ...menuItem,
-      children: [],
-    };
-  });
-
-  Object.values(menuItemsMap).forEach((menuTreeItem) => {
-    const parentName = menuTreeItem.spec.parent;
-    if (hasValidParent(menuTreeItem, menuItemsMap)) {
-      menuItemsMap[parentName as string].children.push(menuTreeItem);
-    }
-  });
-
-  const menuTreeItems = Object.values(menuItemsMap).filter(
-    (node) => !hasValidParent(node, menuItemsMap)
+export function findFallbackMenuAfterDelete(
+  menus: Menu[],
+  deletedName: string
+) {
+  return menus.find(
+    (menu) =>
+      menu.metadata.name !== deletedName && !menu.metadata.deletionTimestamp
   );
-
-  return sortMenuItemsTree(menuTreeItems);
 }
 
-function hasValidParent(
-  menuTreeItem: MenuTreeItem,
-  menuItemsMap: Record<string, MenuTreeItem>
-) {
-  const parentName = menuTreeItem.spec.parent;
-  if (!parentName || parentName === menuTreeItem.metadata.name) {
-    return false;
-  }
-  if (!menuItemsMap[parentName]) {
-    return false;
-  }
-
-  let ancestorName: string | undefined = parentName;
-  while (ancestorName) {
-    if (ancestorName === menuTreeItem.metadata.name) {
-      return false;
-    }
-    ancestorName = menuItemsMap[ancestorName]?.spec.parent;
-  }
-  return true;
+interface TreeNodePosition {
+  parentName?: string;
+  beforeName?: string;
 }
 
-/**
- * Sort a menu tree by priority.
- *
- * @param menuTreeItems
- */
-export function sortMenuItemsTree(
-  menuTreeItems: MenuTreeItem[]
-): MenuTreeItem[] {
-  return menuTreeItems
-    .sort((a, b) => {
-      const aPriority = a.spec.priority ?? 0;
-      const bPriority = b.spec.priority ?? 0;
-      if (aPriority < bPriority) {
-        return -1;
-      }
-      if (aPriority > bPriority) {
-        return 1;
-      }
-      return 0;
-    })
-    .map((menuTreeItem) => {
-      if (menuTreeItem.children.length) {
-        return {
-          ...menuTreeItem,
-          children: sortMenuItemsTree(menuTreeItem.children),
-        };
-      }
-      return menuTreeItem;
+export function flattenMenuItemTreeNodes(
+  tree: MenuItemTreeNode[]
+): MenuItemTreeNode[] {
+  const nodes: MenuItemTreeNode[] = [];
+
+  function collect(current: MenuItemTreeNode[]) {
+    current.forEach((node) => {
+      nodes.push(node);
+      collect(node.children);
     });
-}
-
-/**
- * Reset the menu tree item's priority.
- *
- * @param menuItems
- */
-export function resetMenuItemsTreePriority(
-  menuItems: MenuTreeItem[]
-): MenuTreeItem[] {
-  for (let i = 0; i < menuItems.length; i++) {
-    menuItems[i].spec.priority = i;
-    if (menuItems[i].children) {
-      resetMenuItemsTreePriority(menuItems[i].children);
-    }
   }
-  return menuItems;
+
+  collect(tree);
+  return nodes;
 }
 
-/**
- * Convert a menu tree items into a flat array of menu.
- *
- * @param menuTreeItems
- */
-export function convertTreeToMenuItems(
-  menuTreeItems: MenuTreeItem[],
-  menuName?: string
-) {
-  const menuItems: MenuItem[] = [];
-  const menuItemsMap = new Map<string, MenuItem>();
-  const convertMenuItem = (
-    node: MenuTreeItem | undefined,
-    parentName?: string
-  ) => {
-    if (!node) {
-      return;
-    }
-    const children = node.children || [];
-    const { children: _, ...rest } = node;
-    menuItemsMap.set(node.metadata.name, {
-      ...rest,
-      spec: {
-        ...node.spec,
-        menuName: menuName || node.spec.menuName,
-        parent: parentName,
-      },
-    });
-    children.forEach((child) => {
-      convertMenuItem(child, node.metadata.name);
-    });
-  };
-  menuTreeItems.forEach((node) => {
-    convertMenuItem(node);
-  });
-  menuItemsMap.forEach((node) => {
-    menuItems.push(node);
-  });
-  return menuItems;
-}
-
-export function getChildrenNames(menuTreeItem: MenuTreeItem): string[] {
+export function getMenuItemTreeNodeChildrenNames(
+  menuItemTreeNode: MenuItemTreeNode
+): string[] {
   const childrenNames: string[] = [];
 
-  function getChildrenNamesRecursive(menuTreeItem: MenuTreeItem) {
-    if (menuTreeItem.children) {
-      menuTreeItem.children.forEach((child) => {
-        childrenNames.push(child.metadata.name);
-        getChildrenNamesRecursive(child);
-      });
-    }
+  function collect(node: MenuItemTreeNode) {
+    node.children.forEach((child) => {
+      childrenNames.push(child.menuItem.metadata.name);
+      collect(child);
+    });
   }
 
-  getChildrenNamesRecursive(menuTreeItem);
-
+  collect(menuItemTreeNode);
   return childrenNames;
 }
 
-/**
- * Convert {@link MenuTreeItem} to {@link MenuItem} with flat children name array.
- *
- * @param menuTreeItem
- */
-export function convertMenuTreeItemToMenuItem(
-  menuTreeItem: MenuTreeItem
-): MenuItem {
-  const { children: _, ...rest } = menuTreeItem;
-  return {
-    ...rest,
-    spec: {
-      ...menuTreeItem.spec,
-    },
-  };
+export function buildMenuItemPositionRequest(
+  previousTree: MenuItemTreeNode[],
+  currentTree: MenuItemTreeNode[]
+): MenuItemMovePosition | undefined {
+  const previousPositions = flattenMenuItemTreePositions(previousTree);
+  const currentPositions = flattenMenuItemTreePositions(currentTree);
+  const candidates = Array.from(currentPositions.entries())
+    .filter(([name, position]) => {
+      const previousPosition = previousPositions.get(name);
+      if (!previousPosition) {
+        return false;
+      }
+      return (
+        previousPosition.parentName !== position.parentName ||
+        previousPosition.beforeName !== position.beforeName
+      );
+    })
+    .map(([name, position]) => ({ name, ...position }));
+
+  return candidates.find((candidate) =>
+    sameTreeAfterMove(previousTree, currentTree, candidate)
+  );
+}
+
+function flattenMenuItemTreePositions(tree: MenuItemTreeNode[]) {
+  const positions = new Map<string, TreeNodePosition>();
+
+  function collect(nodes: MenuItemTreeNode[], parentName?: string) {
+    nodes.forEach((node, index) => {
+      const name = node.menuItem.metadata.name;
+      positions.set(name, {
+        parentName,
+        beforeName: nodes[index + 1]?.menuItem.metadata.name,
+      });
+      collect(node.children, name);
+    });
+  }
+
+  collect(tree);
+  return positions;
+}
+
+function sameTreeAfterMove(
+  previousTree: MenuItemTreeNode[],
+  currentTree: MenuItemTreeNode[],
+  move: MenuItemMovePosition
+) {
+  const movedTree = cloneTree(previousTree);
+  const movedNode = detachNode(movedTree, move.name);
+  if (!movedNode) {
+    return false;
+  }
+  if (!insertNode(movedTree, movedNode, move.parentName, move.beforeName)) {
+    return false;
+  }
+  return sameTreeNames(movedTree, currentTree);
+}
+
+function cloneTree(tree: MenuItemTreeNode[]): MenuItemTreeNode[] {
+  return tree.map((node) => ({
+    menuItem: node.menuItem,
+    children: cloneTree(node.children),
+  }));
+}
+
+function detachNode(
+  nodes: MenuItemTreeNode[],
+  name: string
+): MenuItemTreeNode | undefined {
+  const index = nodes.findIndex((node) => node.menuItem.metadata.name === name);
+  if (index >= 0) {
+    return nodes.splice(index, 1)[0];
+  }
+
+  for (const node of nodes) {
+    const detached = detachNode(node.children, name);
+    if (detached) {
+      return detached;
+    }
+  }
+}
+
+function insertNode(
+  nodes: MenuItemTreeNode[],
+  movedNode: MenuItemTreeNode,
+  parentName?: string,
+  beforeName?: string
+) {
+  const siblings = parentName ? findNode(nodes, parentName)?.children : nodes;
+  if (!siblings) {
+    return false;
+  }
+
+  if (!beforeName) {
+    siblings.push(movedNode);
+    return true;
+  }
+
+  const index = siblings.findIndex(
+    (node) => node.menuItem.metadata.name === beforeName
+  );
+  if (index < 0) {
+    return false;
+  }
+  siblings.splice(index, 0, movedNode);
+  return true;
+}
+
+function findNode(
+  nodes: MenuItemTreeNode[],
+  name: string
+): MenuItemTreeNode | undefined {
+  for (const node of nodes) {
+    if (node.menuItem.metadata.name === name) {
+      return node;
+    }
+    const child = findNode(node.children, name);
+    if (child) {
+      return child;
+    }
+  }
+}
+
+function sameTreeNames(left: MenuItemTreeNode[], right: MenuItemTreeNode[]) {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((leftNode, index) => {
+    const rightNode = right[index];
+    return (
+      leftNode.menuItem.metadata.name === rightNode.menuItem.metadata.name &&
+      sameTreeNames(leftNode.children, rightNode.children)
+    );
+  });
 }
 
 export function resolveClonedParentName(

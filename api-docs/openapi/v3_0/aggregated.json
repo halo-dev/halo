@@ -2584,6 +2584,117 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/menuitems/-/tree": {
+      "get": {
+        "description": "List MenuItems as a canonical tree for console menu management.",
+        "operationId": "ListMenuItemTree",
+        "parameters": [
+          {
+            "description": "Menu metadata.name",
+            "in": "query",
+            "name": "menuName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MenuItemTreeNode"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MenuItemV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/menuitems/{name}/position": {
+      "put": {
+        "description": "Move a MenuItem within its owning Menu.",
+        "operationId": "UpdateMenuItemPosition",
+        "parameters": [
+          {
+            "description": "MenuItem metadata.name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/MenuItemPositionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MenuItemTreeNode"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MenuItemV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/menus/{name}": {
+      "delete": {
+        "description": "Delete a Menu and MenuItems owned by the Menu.",
+        "operationId": "DeleteMenu",
+        "parameters": [
+          {
+            "description": "Menu metadata.name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Menu"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "MenuV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config": {
       "get": {
         "description": "Fetch sender config of notifier",
@@ -18980,6 +19091,27 @@
           }
         }
       },
+      "MenuItemPositionRequest": {
+        "required": [
+          "menuName"
+        ],
+        "type": "object",
+        "properties": {
+          "beforeName": {
+            "type": "string",
+            "description": "target next sibling MenuItem metadata.name, or null to append"
+          },
+          "menuName": {
+            "type": "string",
+            "description": "selected Menu metadata.name"
+          },
+          "parentName": {
+            "type": "string",
+            "description": "target parent MenuItem metadata.name, or null for root"
+          }
+        },
+        "description": "Request to move a MenuItem within its owning Menu."
+      },
       "MenuItemSpec": {
         "type": "object",
         "properties": {
@@ -19043,6 +19175,25 @@
           }
         },
         "description": "Resolved menu item values used for rendering."
+      },
+      "MenuItemTreeNode": {
+        "required": [
+          "children",
+          "menuItem"
+        ],
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuItemTreeNode"
+            }
+          },
+          "menuItem": {
+            "$ref": "#/components/schemas/MenuItem"
+          }
+        },
+        "description": "Console MenuItem tree node."
       },
       "MenuItemVo": {
         "required": [
