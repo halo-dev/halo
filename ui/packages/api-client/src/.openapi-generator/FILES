@@ -11,6 +11,7 @@ api/auth-provider-v1alpha1-api.ts
 api/auth-provider-v1alpha1-console-api.ts
 api/backup-v1alpha1-api.ts
 api/category-v1alpha1-api.ts
+api/category-v1alpha1-console-api.ts
 api/category-v1alpha1-public-api.ts
 api/comment-v1alpha1-api.ts
 api/comment-v1alpha1-console-api.ts
@@ -103,8 +104,10 @@ models/backup-spec.ts
 models/backup-status.ts
 models/backup.ts
 models/category-list.ts
+models/category-position-request.ts
 models/category-spec.ts
 models/category-status.ts
+models/category-tree-node.ts
 models/category-vo-list.ts
 models/category-vo.ts
 models/category.ts

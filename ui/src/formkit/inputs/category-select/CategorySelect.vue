@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
-  convertTreeToCategories,
+  flattenCategoryTreeNodes,
+  getCategoryFromNode,
   type CategoryTreeNode,
 } from "@console/modules/contents/posts/categories/utils";
 import type { FormKitFrameworkContext } from "@formkit/core";
@@ -141,10 +142,11 @@ const selectedCategories = computed(() => {
 });
 
 const isSelected = (category: CategoryTreeNode | Category) => {
+  const categoryName = getCategoryFromNode(category).metadata.name;
   if (multiple.value) {
-    return (props.context._value || []).includes(category.metadata.name);
+    return (props.context._value || []).includes(categoryName);
   }
-  return props.context._value === category.metadata.name;
+  return props.context._value === categoryName;
 };
 
 provide<(category: CategoryTreeNode | Category) => boolean>(
@@ -153,23 +155,22 @@ provide<(category: CategoryTreeNode | Category) => boolean>(
 );
 
 const handleSelect = (category: CategoryTreeNode | Category) => {
+  const categoryName = getCategoryFromNode(category).metadata.name;
   if (multiple.value) {
     const currentValue = props.context._value || [];
-    if (currentValue.includes(category.metadata.name)) {
+    if (currentValue.includes(categoryName)) {
       props.context.node.input(
-        currentValue.filter((name: string) => name !== category.metadata.name)
+        currentValue.filter((name: string) => name !== categoryName)
       );
     } else {
-      props.context.node.input([...currentValue, category.metadata.name]);
+      props.context.node.input([...currentValue, categoryName]);
       text.value = "";
     }
     return;
   }
 
   props.context.node.input(
-    category.metadata.name === props.context._value
-      ? ""
-      : category.metadata.name
+    categoryName === props.context._value ? "" : categoryName
   );
 };
 
@@ -181,11 +182,14 @@ const handleKeydown = (e: KeyboardEvent) => {
 
     const categoryIndices = text.value
       ? searchResults.value
-      : convertTreeToCategories(categoriesTree.value);
+      : flattenCategoryTreeNodes(categoriesTree.value);
 
     const index = categoryIndices.findIndex(
       (category) =>
-        category.metadata.name === selectedCategory.value?.metadata.name
+        category.metadata.name ===
+        (selectedCategory.value
+          ? getCategoryFromNode(selectedCategory.value).metadata.name
+          : undefined)
     );
 
     if (index < searchResults.value.length - 1) {
@@ -199,11 +203,14 @@ const handleKeydown = (e: KeyboardEvent) => {
 
     const categoryIndices = text.value
       ? searchResults.value
-      : convertTreeToCategories(categoriesTree.value);
+      : flattenCategoryTreeNodes(categoriesTree.value);
 
     const index = categoryIndices.findIndex(
       (category) =>
-        category.metadata.name === selectedCategory.value?.metadata.name
+        category.metadata.name ===
+        (selectedCategory.value
+          ? getCategoryFromNode(selectedCategory.value).metadata.name
+          : undefined)
     );
     if (index > 0) {
       selectedCategory.value = categoryIndices[index - 1];
@@ -229,7 +236,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 const scrollToSelected = () => {
   const selectedNodeName = selectedCategory.value
-    ? selectedCategory.value?.metadata.name
+    ? getCategoryFromNode(selectedCategory.value).metadata.name
     : "create";
   const selectedNode = document.getElementById(`category-${selectedNodeName}`);
   if (selectedNode) {
@@ -380,7 +387,7 @@ const handleDelete = () => {
           <template v-else>
             <CategoryListItem
               v-for="category in categoriesTree"
-              :key="category.metadata.name"
+              :key="category.category.metadata.name"
               :category="category"
               @select="handleSelect"
             />

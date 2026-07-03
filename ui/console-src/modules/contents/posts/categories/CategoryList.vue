@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   IconBookRead,
@@ -16,47 +16,51 @@ import { ref } from "vue";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
 import { usePostCategory } from "./composables/use-post-category";
-import {
-  convertTreeToCategories,
-  createCategoryPatch,
-  resetCategoriesTreePriority,
-} from "./utils";
+import { buildCategoryPositionRequest } from "./utils";
 
 const creationModal = ref(false);
 
-const { categories, categoriesTree, isLoading, handleFetchCategories } =
-  usePostCategory();
+const {
+  categories,
+  categoriesTree,
+  previousCategoriesTree,
+  isLoading,
+  handleFetchCategories,
+  setCategoriesTree,
+} = usePostCategory();
 
-const batchUpdating = ref(false);
+const positionUpdating = ref(false);
 
-async function handleUpdateInBatch() {
-  const categoriesTreeToUpdate = resetCategoriesTreePriority(
+async function handleUpdatePosition() {
+  if (positionUpdating.value) {
+    return;
+  }
+
+  const positionRequest = buildCategoryPositionRequest(
+    previousCategoriesTree.value,
     categoriesTree.value
   );
-  const categoriesToUpdate = convertTreeToCategories(categoriesTreeToUpdate);
-  try {
-    batchUpdating.value = true;
-    const originalParentMap = new Map(
-      categories.value?.map((category) => [
-        category.metadata.name,
-        category.spec.parent,
-      ])
-    );
-    const promises = categoriesToUpdate.map((category) => {
-      return coreApiClient.content.category.patchCategory({
-        name: category.metadata.name,
-        jsonPatchInner: createCategoryPatch(
-          category,
-          originalParentMap.get(category.metadata.name)
-        ),
-      });
-    });
-    await Promise.all(promises);
-  } catch (e) {
-    console.error("Failed to update categories", e);
-  } finally {
+  if (!positionRequest) {
     await handleFetchCategories();
-    batchUpdating.value = false;
+    return;
+  }
+
+  try {
+    positionUpdating.value = true;
+    const { data } =
+      await consoleApiClient.content.category.updateCategoryPosition({
+        name: positionRequest.name,
+        categoryPositionRequest: {
+          parentName: positionRequest.parentName,
+          beforeName: positionRequest.beforeName,
+        },
+      });
+    setCategoriesTree(data);
+  } catch (e) {
+    console.error("Failed to update category position", e);
+    await handleFetchCategories();
+  } finally {
+    positionUpdating.value = false;
   }
 }
 </script>
@@ -128,12 +132,12 @@ async function handleUpdateInBatch() {
         <Draggable
           v-model="categoriesTree"
           :class="{
-            'cursor-progress opacity-60': batchUpdating,
+            'cursor-progress opacity-60': positionUpdating,
           }"
-          :disable-drag="batchUpdating"
+          :disable-drag="positionUpdating"
           trigger-class="drag-element"
           :indent="40"
-          @after-drop="handleUpdateInBatch"
+          @after-drop="handleUpdatePosition"
         >
           <template #default="{ node, stat }">
             <CategoryListItem
@@ -151,6 +155,10 @@ async function handleUpdateInBatch() {
   @apply divide-y divide-gray-100;
 }
 :deep(.he-tree-drag-placeholder) {
+  box-sizing: border-box;
   height: 60px;
+  width: 100%;
+  border: 1px dashed #00d9ff;
+  background: #ddf2f9;
 }
 </style>

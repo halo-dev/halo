@@ -2401,6 +2401,74 @@
         ]
       }
     },
+    "/apis/api.console.halo.run/v1alpha1/categories/-/tree": {
+      "get": {
+        "description": "List Categories as a canonical tree for console category management.",
+        "operationId": "ListCategoryTree",
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryTreeNode"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CategoryV1alpha1Console"
+        ]
+      }
+    },
+    "/apis/api.console.halo.run/v1alpha1/categories/{name}/position": {
+      "put": {
+        "description": "Move a Category within the Console category tree.",
+        "operationId": "UpdateCategoryPosition",
+        "parameters": [
+          {
+            "description": "Category metadata.name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "*/*": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryPositionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryTreeNode"
+                  }
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "CategoryV1alpha1Console"
+        ]
+      }
+    },
     "/apis/api.console.halo.run/v1alpha1/comments": {
       "get": {
         "description": "List comments with pagination, sorting, keyword, and commenter filters.",
@@ -16007,6 +16075,20 @@
           }
         }
       },
+      "CategoryPositionRequest": {
+        "type": "object",
+        "properties": {
+          "beforeName": {
+            "type": "string",
+            "description": "target next sibling Category metadata.name, or null to append"
+          },
+          "parentName": {
+            "type": "string",
+            "description": "target parent Category metadata.name, or null for root"
+          }
+        },
+        "description": "Request to move a Category in the Console category tree."
+      },
       "CategorySpec": {
         "required": [
           "displayName",
@@ -16093,6 +16175,25 @@
           }
         },
         "description": "Observed category state derived by content reconcilers."
+      },
+      "CategoryTreeNode": {
+        "required": [
+          "category",
+          "children"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTreeNode"
+            }
+          }
+        },
+        "description": "Console Category tree node."
       },
       "CategoryVo": {
         "required": [

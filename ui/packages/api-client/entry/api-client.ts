@@ -10,6 +10,7 @@ import {
   AuthProviderV1alpha1ConsoleApi,
   BackupV1alpha1Api,
   CategoryV1alpha1Api,
+  CategoryV1alpha1ConsoleApi,
   CategoryV1alpha1PublicApi,
   CommentV1alpha1Api,
   CommentV1alpha1ConsoleApi,
@@ -297,6 +298,11 @@ function createConsoleApiClient(axiosInstance: AxiosInstance) {
       ),
     },
     content: {
+      category: new CategoryV1alpha1ConsoleApi(
+        undefined,
+        baseURL,
+        axiosInstance
+      ),
       comment: new CommentV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
       reply: new ReplyV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
       indices: new IndicesV1alpha1ConsoleApi(undefined, baseURL, axiosInstance),
