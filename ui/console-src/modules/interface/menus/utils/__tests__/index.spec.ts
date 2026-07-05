@@ -1,11 +1,14 @@
 import type { Menu, MenuItem, MenuItemTreeNode } from "@halo-dev/api-client";
 import { describe, expect, it } from "vite-plus/test";
 import {
+  buildMenuItemParentMovePosition,
   buildMenuItemHierarchyPatch,
   buildMenuItemPositionRequest,
+  filterMenuItemTreeNodes,
   findFallbackMenuAfterDelete,
   flattenMenuItemTreeNodes,
   getMenuItemTreeNodeChildrenNames,
+  getSelectableParentMenuItemTreeNodes,
   resolveClonedParentName,
 } from "../index";
 
@@ -67,6 +70,58 @@ describe("getMenuItemTreeNodeChildrenNames", () => {
       "spring-boot",
     ]);
     expect(getMenuItemTreeNodeChildrenNames(tree[1].children[0])).toEqual([]);
+  });
+});
+
+describe("getSelectableParentMenuItemTreeNodes", () => {
+  it("should include all menu items when creating", () => {
+    expect(
+      getSelectableParentMenuItemTreeNodes(menuTree()).map(nodeName)
+    ).toEqual(["home", "categories", "halo", "java", "spring-boot"]);
+  });
+
+  it("should exclude the current item and descendants when editing", () => {
+    expect(
+      getSelectableParentMenuItemTreeNodes(menuTree(), "categories").map(
+        nodeName
+      )
+    ).toEqual(["home"]);
+  });
+});
+
+describe("filterMenuItemTreeNodes", () => {
+  it("should exclude matching menu items and their child subtrees", () => {
+    expect(
+      flattenMenuItemTreeNodes(
+        filterMenuItemTreeNodes(menuTree(), ["categories"])
+      ).map(nodeName)
+    ).toEqual(["home"]);
+  });
+});
+
+describe("buildMenuItemParentMovePosition", () => {
+  it("should return undefined when the parent is unchanged", () => {
+    expect(
+      buildMenuItemParentMovePosition("halo", "categories", "categories")
+    ).toBeUndefined();
+  });
+
+  it("should append the item to another parent when parent changes", () => {
+    expect(
+      buildMenuItemParentMovePosition("halo", "categories", "java")
+    ).toEqual({
+      name: "halo",
+      parentName: "java",
+      beforeName: undefined,
+    });
+  });
+
+  it("should move the item to root when selected parent is empty", () => {
+    expect(buildMenuItemParentMovePosition("halo", "categories", "")).toEqual({
+      name: "halo",
+      parentName: undefined,
+      beforeName: undefined,
+    });
   });
 });
 

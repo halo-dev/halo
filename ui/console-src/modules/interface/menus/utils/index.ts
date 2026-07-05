@@ -58,6 +58,61 @@ export function getMenuItemTreeNodeChildrenNames(
   return childrenNames;
 }
 
+export function getSelectableParentMenuItemTreeNodes(
+  tree: MenuItemTreeNode[],
+  currentMenuItemName?: string
+): MenuItemTreeNode[] {
+  return flattenMenuItemTreeNodes(
+    filterMenuItemTreeNodes(
+      tree,
+      currentMenuItemName ? [currentMenuItemName] : []
+    )
+  );
+}
+
+export function filterMenuItemTreeNodes(
+  tree: MenuItemTreeNode[],
+  excludedNames: string[] = []
+): MenuItemTreeNode[] {
+  const excludedNameSet = new Set(excludedNames.filter(Boolean));
+
+  function collect(nodes: MenuItemTreeNode[]): MenuItemTreeNode[] {
+    return nodes.flatMap((node) => {
+      if (excludedNameSet.has(node.menuItem.metadata.name)) {
+        return [];
+      }
+
+      return [
+        {
+          ...node,
+          children: collect(node.children),
+        },
+      ];
+    });
+  }
+
+  return collect(tree);
+}
+
+export function buildMenuItemParentMovePosition(
+  menuItemName: string,
+  previousParentName?: string,
+  selectedParentName?: string
+): MenuItemMovePosition | undefined {
+  const normalizedPreviousParentName = previousParentName || undefined;
+  const normalizedSelectedParentName = selectedParentName || undefined;
+
+  if (normalizedPreviousParentName === normalizedSelectedParentName) {
+    return undefined;
+  }
+
+  return {
+    name: menuItemName,
+    parentName: normalizedSelectedParentName,
+    beforeName: undefined,
+  };
+}
+
 export function buildMenuItemPositionRequest(
   previousTree: MenuItemTreeNode[],
   currentTree: MenuItemTreeNode[]

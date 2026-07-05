@@ -96,13 +96,26 @@ const onMenuItemEditingModalClose = () => {
   menuItemEditingModal.value = false;
 };
 
-const onMenuItemSaved = async () => {
+const onMenuItemSaved = async (
+  _menuItem: MenuItem,
+  updatedMenuItemTree?: MenuItemTreeNode[]
+) => {
   if (!selectedMenu.value) {
     return;
   }
 
   await queryClient.invalidateQueries({ queryKey: ["menu-item-counts"] });
   await queryClient.invalidateQueries({ queryKey: ["menus"] });
+  if (updatedMenuItemTree) {
+    queryClient.setQueryData(
+      ["menu-item-tree", selectedMenu],
+      updatedMenuItemTree
+    );
+    menuTreeItems.value = updatedMenuItemTree;
+    previousMenuTreeItems.value = cloneDeep(updatedMenuItemTree);
+    return;
+  }
+
   await refetch();
 };
 
