@@ -55,6 +55,61 @@ export function convertCategoryTreeToCategory(
   };
 }
 
+export function getSelectableParentCategoryTreeNodes(
+  tree: CategoryTreeNode[],
+  currentCategoryName?: string
+): CategoryTreeNode[] {
+  return flattenTreeNodes(
+    filterCategoryTreeNodes(
+      tree,
+      currentCategoryName ? [currentCategoryName] : []
+    )
+  );
+}
+
+export function filterCategoryTreeNodes(
+  tree: CategoryTreeNode[],
+  excludedNames: string[] = []
+): CategoryTreeNode[] {
+  const excludedNameSet = new Set(excludedNames.filter(Boolean));
+
+  function collect(nodes: CategoryTreeNode[]): CategoryTreeNode[] {
+    return nodes.flatMap((node) => {
+      if (excludedNameSet.has(node.category.metadata.name)) {
+        return [];
+      }
+
+      return [
+        {
+          ...node,
+          children: collect(node.children),
+        },
+      ];
+    });
+  }
+
+  return collect(tree);
+}
+
+export function buildCategoryParentMovePosition(
+  categoryName: string,
+  previousParentName?: string,
+  selectedParentName?: string
+): CategoryMovePosition | undefined {
+  const normalizedPreviousParentName = previousParentName || undefined;
+  const normalizedSelectedParentName = selectedParentName || undefined;
+
+  if (normalizedPreviousParentName === normalizedSelectedParentName) {
+    return undefined;
+  }
+
+  return {
+    name: categoryName,
+    parentName: normalizedSelectedParentName,
+    beforeName: undefined,
+  };
+}
+
 export function buildCategoryPositionRequest(
   previousTree: CategoryTreeNode[],
   currentTree: CategoryTreeNode[]
@@ -95,6 +150,20 @@ function flattenCategoryTreePositions(tree: CategoryTreeNode[]) {
 
   collect(tree);
   return positions;
+}
+
+function flattenTreeNodes(tree: CategoryTreeNode[]): CategoryTreeNode[] {
+  const nodes: CategoryTreeNode[] = [];
+
+  function collect(current: CategoryTreeNode[]) {
+    current.forEach((node) => {
+      nodes.push(node);
+      collect(node.children);
+    });
+  }
+
+  collect(tree);
+  return nodes;
 }
 
 function sameTreeAfterMove(

@@ -139,11 +139,8 @@ async function handleUpdatePosition() {
           :indent="40"
           @after-drop="handleUpdatePosition"
         >
-          <template #default="{ node, stat }">
-            <CategoryListItem
-              :category-tree-node="node"
-              :is-child-level="stat.level > 1"
-            />
+          <template #default="{ node }">
+            <CategoryListItem :category-tree-node="node" />
           </template>
         </Draggable>
       </Transition>

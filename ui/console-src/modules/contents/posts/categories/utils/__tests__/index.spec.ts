@@ -1,11 +1,14 @@
 import type { Category, CategoryTreeNode } from "@halo-dev/api-client";
 import { describe, expect, it } from "vitest";
 import {
+  buildCategoryParentMovePosition,
   buildCategoryPositionRequest,
   convertCategoryTreeToCategory,
+  filterCategoryTreeNodes,
   flattenCategoryTreeNodes,
   getCategoryFromNode,
   getCategoryPath,
+  getSelectableParentCategoryTreeNodes,
 } from "../index";
 
 describe("flattenCategoryTreeNodes", () => {
@@ -69,6 +72,73 @@ describe("getCategoryFromNode", () => {
 
     expect(getCategoryFromNode(category).metadata.name).toBe("plain");
     expect(getCategoryFromNode(treeNode).metadata.name).toBe("tree");
+  });
+});
+
+describe("getSelectableParentCategoryTreeNodes", () => {
+  it("should exclude the current category and its descendants", () => {
+    const tree = [
+      node("root", [node("child", [node("grandchild")])]),
+      node("sibling"),
+    ];
+
+    expect(
+      getSelectableParentCategoryTreeNodes(tree, "child").map(nodeName)
+    ).toEqual(["root", "sibling"]);
+  });
+
+  it("should include all categories when there is no current category", () => {
+    const tree = [node("root", [node("child")]), node("sibling")];
+
+    expect(getSelectableParentCategoryTreeNodes(tree).map(nodeName)).toEqual([
+      "root",
+      "child",
+      "sibling",
+    ]);
+  });
+});
+
+describe("filterCategoryTreeNodes", () => {
+  it("should exclude matching categories and their child subtrees", () => {
+    const tree = [
+      node("root", [node("child", [node("grandchild")])]),
+      node("sibling"),
+    ];
+
+    expect(
+      flattenCategoryTreeNodes(filterCategoryTreeNodes(tree, ["child"])).map(
+        categoryName
+      )
+    ).toEqual(["root", "sibling"]);
+  });
+});
+
+describe("buildCategoryParentMovePosition", () => {
+  it("should build a move request for moving a category under a parent", () => {
+    expect(buildCategoryParentMovePosition("child", undefined, "root")).toEqual(
+      {
+        name: "child",
+        parentName: "root",
+        beforeName: undefined,
+      }
+    );
+  });
+
+  it("should build a move request for moving a category to root", () => {
+    expect(buildCategoryParentMovePosition("child", "root", "")).toEqual({
+      name: "child",
+      parentName: undefined,
+      beforeName: undefined,
+    });
+  });
+
+  it("should return undefined when the parent is unchanged", () => {
+    expect(buildCategoryParentMovePosition("child", "root", "root")).toBe(
+      undefined
+    );
+    expect(buildCategoryParentMovePosition("root", undefined, "")).toBe(
+      undefined
+    );
   });
 });
 

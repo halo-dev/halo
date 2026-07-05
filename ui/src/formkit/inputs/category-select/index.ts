@@ -31,7 +31,7 @@ export const categorySelect: FormKitTypeDefinition = {
     messages(message("$message.value"))
   ),
   type: "input",
-  props: ["multiple"],
+  props: ["multiple", "excludedNames", "allowCreate"],
   library: {
     CategorySelect: defineAsyncComponent(() => import("./CategorySelect.vue")),
   },
@@ -43,6 +43,9 @@ declare module "@formkit/inputs" {
     categorySelect: {
       type: "categorySelect";
       value?: string | string[];
+      multiple?: boolean;
+      excludedNames?: string[];
+      allowCreate?: boolean;
     };
   }
 }
