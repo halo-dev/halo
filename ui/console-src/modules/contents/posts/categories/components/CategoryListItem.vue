@@ -21,15 +21,9 @@ import CategoryEditingModal from "./CategoryEditingModal.vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const props = withDefaults(
-  defineProps<{
-    isChildLevel?: boolean;
-    categoryTreeNode: CategoryTreeNode;
-  }>(),
-  {
-    isChildLevel: false,
-  }
-);
+const props = defineProps<{
+  categoryTreeNode: CategoryTreeNode;
+}>();
 
 const category = computed(() => props.categoryTreeNode.category);
 
@@ -161,7 +155,6 @@ const handleOpenCreateByParentModal = () => {
 
     <CategoryEditingModal
       v-if="editingModal"
-      :is-child-level-category="isChildLevel || !!selectedParentCategory"
       :category="selectedCategory"
       :parent-category="selectedParentCategory"
       @close="onEditingModalClose"
