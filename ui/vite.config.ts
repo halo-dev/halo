@@ -14,10 +14,8 @@ import { devPlugin } from "./src/vite/plugin-dev.ts";
 const DEV_SERVER_PORT = 3000;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const command = process.env.VP_COMMAND;
-const isBuild = command === "build";
 
-export default defineConfig({
+export default defineConfig(({ command, mode }) => ({
   plugins: [
     Vue(),
     VueJsx(),
@@ -33,7 +31,7 @@ export default defineConfig({
     VueI18n({
       include: [path.resolve(__dirname, "./src/locales/*.json")],
     }),
-    setupLibraryExternal(command),
+    setupLibraryExternal(mode === "test" ? "test" : command),
     devPlugin({ port: DEV_SERVER_PORT }),
   ],
   resolve: {
@@ -46,7 +44,7 @@ export default defineConfig({
   server: {
     port: DEV_SERVER_PORT,
     fs: {
-      strict: isBuild,
+      strict: command === "build",
     },
   },
   build: {
@@ -108,4 +106,4 @@ export default defineConfig({
       },
     ],
   },
-});
+}));

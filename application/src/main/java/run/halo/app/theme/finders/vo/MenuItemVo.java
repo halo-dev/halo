@@ -38,7 +38,7 @@ public class MenuItemVo implements VisualizableTreeNode<MenuItemVo>, ExtensionVo
         if (status != null && StringUtils.isNotBlank(status.getDisplayName())) {
             return status.getDisplayName();
         }
-        return spec.getDisplayName();
+        return spec == null ? null : spec.getDisplayName();
     }
 
     /**
@@ -54,6 +54,8 @@ public class MenuItemVo implements VisualizableTreeNode<MenuItemVo>, ExtensionVo
                 .spec(menuItem.getSpec())
                 .status(status)
                 .children(List.of())
+                .parentName(
+                        menuItem.getSpec() == null ? null : menuItem.getSpec().getParent())
                 .build();
     }
 

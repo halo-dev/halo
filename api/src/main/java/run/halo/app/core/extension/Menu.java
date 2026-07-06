@@ -32,6 +32,10 @@ public class Menu extends AbstractExtension {
         private String displayName;
 
         /** Ordered MenuItem metadata.name values included in this menu. */
+        @Schema(
+                deprecated = true,
+                description = "Legacy ordered root MenuItem names. Menu hierarchy is now sourced from "
+                        + "MenuItem.spec.menuName and MenuItem.spec.parent.")
         @ArraySchema(uniqueItems = true)
         private LinkedHashSet<String> menuItems;
     }

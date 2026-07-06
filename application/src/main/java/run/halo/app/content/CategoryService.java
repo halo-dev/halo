@@ -8,6 +8,8 @@ public interface CategoryService {
 
     Flux<Category> listChildren(String categoryName);
 
+    Flux<Category> listDescendants(String categoryName);
+
     Mono<Category> getParentByName(String categoryName);
 
     Mono<Boolean> isCategoryHidden(String categoryName);

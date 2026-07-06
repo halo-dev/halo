@@ -3,7 +3,7 @@ import useSlugify from "@console/composables/use-slugify";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { reset, submitForm, type FormKitNode } from "@formkit/core";
 import type { Category } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import {
   IconRefreshLine,
   Toast,
@@ -19,17 +19,16 @@ import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
+import { buildCategoryParentMovePosition } from "../utils";
 
 const props = withDefaults(
   defineProps<{
     category?: Category;
     parentCategory?: Category;
-    isChildLevelCategory?: boolean;
   }>(),
   {
     category: undefined,
     parentCategory: undefined,
-    isChildLevelCategory: false,
   }
 );
 
@@ -49,7 +48,6 @@ const formState = ref<Category>({
     template: "",
     postTemplate: "",
     priority: 0,
-    children: [],
     preventParentPostCascadeQuery: false,
   },
   status: {},
@@ -60,7 +58,10 @@ const formState = ref<Category>({
     generateName: "category-",
   },
 });
-const selectedParentCategory = ref();
+const selectedParentCategory = ref<string>(
+  props.parentCategory?.metadata.name || props.category?.spec.parent || ""
+);
+const originalParentCategory = ref<string>(props.category?.spec.parent || "");
 const saving = ref(false);
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const keepAddingSubmit = ref(false);
@@ -72,6 +73,16 @@ const modalTitle = props.category
   : t("core.post_category.editing_modal.titles.create");
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
+const excludedParentNames = computed(() => {
+  return props.category?.metadata.name ? [props.category.metadata.name] : [];
+});
+
+const isChildCategory = computed(() => !!selectedParentCategory.value);
+
+const refreshCategories = () => {
+  return queryClient.invalidateQueries({ queryKey: ["post-categories"] });
+};
 
 const handleSaveCategory = async () => {
   annotationsFormRef.value?.handleSubmit();
@@ -95,44 +106,45 @@ const handleSaveCategory = async () => {
         name: formState.value.metadata.name,
         category: formState.value,
       });
-    } else {
-      // Gets parent category, calculates priority and updates it.
-      let parentCategory: Category | undefined = undefined;
 
-      if (selectedParentCategory.value) {
-        const { data } = await coreApiClient.content.category.getCategory({
-          name: selectedParentCategory.value,
-        });
-        parentCategory = data;
-      }
+      const positionRequest = buildCategoryParentMovePosition(
+        formState.value.metadata.name,
+        originalParentCategory.value,
+        selectedParentCategory.value
+      );
 
-      formState.value.spec.priority = parentCategory?.spec.children
-        ? parentCategory.spec.children.length + 1
-        : 0;
-
-      const { data: createdCategory } =
-        await coreApiClient.content.category.createCategory({
-          category: formState.value,
-        });
-
-      if (parentCategory) {
-        await coreApiClient.content.category.patchCategory({
-          name: selectedParentCategory.value,
-          jsonPatchInner: [
-            {
-              op: "add",
-              path: "/spec/children",
-              value: Array.from(
-                new Set([
-                  ...(parentCategory.spec.children || []),
-                  createdCategory.metadata.name,
-                ])
-              ),
+      if (positionRequest) {
+        try {
+          await consoleApiClient.content.category.updateCategoryPosition({
+            name: positionRequest.name,
+            categoryPositionRequest: {
+              parentName: positionRequest.parentName,
+              beforeName: positionRequest.beforeName,
             },
-          ],
-        });
+          });
+        } catch (e) {
+          console.error("Failed to update category parent", e);
+          await refreshCategories();
+          Toast.error(t("core.common.toast.save_failed_and_retry"));
+          return;
+        }
       }
+    } else {
+      const parentName = selectedParentCategory.value || undefined;
+      if (parentName) {
+        formState.value.spec.parent = parentName;
+      } else {
+        delete formState.value.spec.parent;
+      }
+
+      formState.value.spec.priority = await getNextPriority(parentName);
+
+      await coreApiClient.content.category.createCategory({
+        category: formState.value,
+      });
     }
+
+    await refreshCategories();
 
     if (keepAddingSubmit.value) {
       reset("category-form");
@@ -140,11 +152,9 @@ const handleSaveCategory = async () => {
       modal.value?.close();
     }
 
-    queryClient.invalidateQueries({ queryKey: ["post-categories"] });
-
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
-    console.error("Failed to create category", e);
+    console.error("Failed to save category", e);
   } finally {
     saving.value = false;
   }
@@ -155,11 +165,24 @@ const handleSubmit = (keepAdding = false) => {
   submitForm("category-form");
 };
 
+async function getNextPriority(parentName?: string) {
+  const { data } = await coreApiClient.content.category.listCategory({
+    page: 1,
+    size: 1000,
+  });
+
+  return data.items.filter((category) => {
+    if (parentName) {
+      return category.spec.parent === parentName;
+    }
+    return !category.spec.parent;
+  }).length;
+}
+
 onMounted(() => {
   if (props.category) {
     formState.value = cloneDeep(props.category);
   }
-  selectedParentCategory.value = props.parentCategory?.metadata.name;
   setFocus("displayNameInput");
 });
 
@@ -232,9 +255,10 @@ async function slugUniqueValidation(node: FormKitNode) {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
-              v-if="!isUpdateMode"
               v-model="selectedParentCategory"
               type="categorySelect"
+              :excluded-names="excludedParentNames"
+              :allow-create="!isUpdateMode"
               :label="
                 $t('core.post_category.editing_modal.fields.parent.label')
               "
@@ -316,7 +340,7 @@ async function slugUniqueValidation(node: FormKitNode) {
             ></FormKit>
             <FormKit
               v-model="formState.spec.hideFromList"
-              :disabled="isChildLevelCategory"
+              :disabled="isChildCategory"
               :label="
                 $t(
                   'core.post_category.editing_modal.fields.hide_from_list.label'

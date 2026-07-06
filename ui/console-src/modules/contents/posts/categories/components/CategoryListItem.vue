@@ -11,9 +11,8 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import { utils } from "@halo-dev/ui-shared";
-import "@he-tree/vue/style/default.css";
 import { useQueryClient } from "@tanstack/vue-query";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import GridiconsLinkBreak from "~icons/gridicons/link-break";
 import { convertCategoryTreeToCategory, type CategoryTreeNode } from "../utils";
@@ -22,15 +21,11 @@ import CategoryEditingModal from "./CategoryEditingModal.vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const props = withDefaults(
-  defineProps<{
-    isChildLevel?: boolean;
-    categoryTreeNode: CategoryTreeNode;
-  }>(),
-  {
-    isChildLevel: false,
-  }
-);
+const props = defineProps<{
+  categoryTreeNode: CategoryTreeNode;
+}>();
+
+const category = computed(() => props.categoryTreeNode.category);
 
 const handleDelete = async () => {
   Dialog.warning({
@@ -42,7 +37,7 @@ const handleDelete = async () => {
     onConfirm: async () => {
       try {
         await coreApiClient.content.category.deleteCategory({
-          name: props.categoryTreeNode.metadata.name,
+          name: category.value.metadata.name,
         });
 
         Toast.success(t("core.common.toast.delete_success"));
@@ -94,34 +89,34 @@ const handleOpenCreateByParentModal = () => {
       <div class="flex flex-col gap-1">
         <div class="inline-flex items-center gap-2">
           <span class="truncate text-sm font-medium text-gray-900">
-            {{ categoryTreeNode.spec.displayName }}
+            {{ category.spec.displayName }}
           </span>
         </div>
         <a
-          v-if="categoryTreeNode.status?.permalink"
-          :href="categoryTreeNode.status?.permalink"
-          :title="categoryTreeNode.status?.permalink"
+          v-if="category.status?.permalink"
+          :href="category.status?.permalink"
+          :title="category.status?.permalink"
           target="_blank"
           class="truncate text-xs text-gray-500 group-hover:text-gray-900"
         >
-          {{ categoryTreeNode.status.permalink }}
+          {{ category.status.permalink }}
         </a>
       </div>
     </div>
     <div class="flex flex-none items-center gap-6">
       <VStatusDot
-        v-if="categoryTreeNode.metadata.deletionTimestamp"
+        v-if="category.metadata.deletionTimestamp"
         v-tooltip="$t('core.common.status.deleting')"
         state="warning"
         animate
       />
       <IconEyeOff
-        v-if="categoryTreeNode.spec.hideFromList"
+        v-if="category.spec.hideFromList"
         v-tooltip="$t('core.post_category.list.fields.hide_from_list')"
         class="cursor-pointer text-sm transition-all hover:text-blue-600"
       />
       <GridiconsLinkBreak
-        v-if="categoryTreeNode.spec.preventParentPostCascadeQuery"
+        v-if="category.spec.preventParentPostCascadeQuery"
         v-tooltip="
           $t('core.post_category.list.fields.prevent_parent_post_cascade_query')
         "
@@ -130,12 +125,12 @@ const handleOpenCreateByParentModal = () => {
       <span class="truncate text-xs text-gray-500">
         {{
           $t("core.common.fields.post_count", {
-            count: categoryTreeNode.status?.postCount || 0,
+            count: category.status?.postCount || 0,
           })
         }}
       </span>
       <span class="truncate text-xs tabular-nums text-gray-500">
-        {{ utils.date.format(categoryTreeNode.metadata.creationTimestamp) }}
+        {{ utils.date.format(category.metadata.creationTimestamp) }}
       </span>
       <VDropdown v-if="utils.permission.has(['system:posts:manage'])">
         <div
@@ -160,7 +155,6 @@ const handleOpenCreateByParentModal = () => {
 
     <CategoryEditingModal
       v-if="editingModal"
-      :is-child-level-category="isChildLevel"
       :category="selectedCategory"
       :parent-category="selectedParentCategory"
       @close="onEditingModalClose"

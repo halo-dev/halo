@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 import {
-  convertTreeToCategories,
+  filterCategoryTreeNodes,
+  flattenCategoryTreeNodes,
+  getCategoryFromNode,
   type CategoryTreeNode,
 } from "@console/modules/contents/posts/categories/utils";
 import type { FormKitFrameworkContext } from "@formkit/core";
@@ -46,7 +48,41 @@ const multiple = computed(() => {
 
 const { categories, categoriesTree, handleFetchCategories } = usePostCategory();
 
-provide<Ref<CategoryTreeNode[]>>("categoriesTree", categoriesTree);
+const excludedNames = computed(() => {
+  const names = props.context.excludedNames;
+  if (Array.isArray(names)) {
+    return names;
+  }
+  if (typeof names === "string") {
+    return names.split(",").map((name) => name.trim());
+  }
+  return [];
+});
+
+const filteredCategoriesTree = computed(() => {
+  return filterCategoryTreeNodes(categoriesTree.value, excludedNames.value);
+});
+
+const filteredCategories = computed(() => {
+  return flattenCategoryTreeNodes(filteredCategoriesTree.value);
+});
+
+const excludedNameSet = computed(() => {
+  return new Set(excludedNames.value.filter(Boolean));
+});
+
+const allowCreate = computed(() => {
+  const { allowCreate } = props.context;
+  if (allowCreate === undefined) {
+    return true;
+  }
+  if (typeof allowCreate === "boolean") {
+    return allowCreate;
+  }
+  return allowCreate === "true";
+});
+
+provide<Ref<CategoryTreeNode[]>>("categoriesTree", filteredCategoriesTree);
 
 const selectedCategory = ref<Category | CategoryTreeNode>();
 
@@ -81,7 +117,7 @@ let fuse: Fuse<Category> | undefined = undefined;
 
 const searchResults = computed(() => {
   if (!text.value) {
-    return categories.value;
+    return filteredCategories.value;
   }
   return fuse?.search(text.value).map((item) => item.item) || [];
 });
@@ -99,9 +135,9 @@ watch(
 );
 
 watch(
-  () => categories.value,
+  () => filteredCategories.value,
   () => {
-    fuse = new Fuse(categories.value || [], {
+    fuse = new Fuse(filteredCategories.value || [], {
       keys: ["spec.displayName", "spec.slug"],
       useExtendedSearch: true,
       threshold: 0.2,
@@ -109,7 +145,7 @@ watch(
     if (props.context) {
       // eslint-disable-next-line vue/no-mutating-props
       props.context.options =
-        categories.value?.map((category) => {
+        filteredCategories.value?.map((category) => {
           return {
             label: category.spec.displayName,
             value: category.metadata.name,
@@ -141,10 +177,11 @@ const selectedCategories = computed(() => {
 });
 
 const isSelected = (category: CategoryTreeNode | Category) => {
+  const categoryName = getCategoryFromNode(category).metadata.name;
   if (multiple.value) {
-    return (props.context._value || []).includes(category.metadata.name);
+    return (props.context._value || []).includes(categoryName);
   }
-  return props.context._value === category.metadata.name;
+  return props.context._value === categoryName;
 };
 
 provide<(category: CategoryTreeNode | Category) => boolean>(
@@ -153,23 +190,25 @@ provide<(category: CategoryTreeNode | Category) => boolean>(
 );
 
 const handleSelect = (category: CategoryTreeNode | Category) => {
+  const categoryName = getCategoryFromNode(category).metadata.name;
+  if (excludedNameSet.value.has(categoryName)) {
+    return;
+  }
   if (multiple.value) {
     const currentValue = props.context._value || [];
-    if (currentValue.includes(category.metadata.name)) {
+    if (currentValue.includes(categoryName)) {
       props.context.node.input(
-        currentValue.filter((name: string) => name !== category.metadata.name)
+        currentValue.filter((name: string) => name !== categoryName)
       );
     } else {
-      props.context.node.input([...currentValue, category.metadata.name]);
+      props.context.node.input([...currentValue, categoryName]);
       text.value = "";
     }
     return;
   }
 
   props.context.node.input(
-    category.metadata.name === props.context._value
-      ? ""
-      : category.metadata.name
+    categoryName === props.context._value ? "" : categoryName
   );
 };
 
@@ -181,14 +220,17 @@ const handleKeydown = (e: KeyboardEvent) => {
 
     const categoryIndices = text.value
       ? searchResults.value
-      : convertTreeToCategories(categoriesTree.value);
+      : flattenCategoryTreeNodes(filteredCategoriesTree.value);
 
     const index = categoryIndices.findIndex(
       (category) =>
-        category.metadata.name === selectedCategory.value?.metadata.name
+        category.metadata.name ===
+        (selectedCategory.value
+          ? getCategoryFromNode(selectedCategory.value).metadata.name
+          : undefined)
     );
 
-    if (index < searchResults.value.length - 1) {
+    if (index < categoryIndices.length - 1) {
       selectedCategory.value = categoryIndices[index + 1];
     }
     scrollToSelected();
@@ -199,11 +241,14 @@ const handleKeydown = (e: KeyboardEvent) => {
 
     const categoryIndices = text.value
       ? searchResults.value
-      : convertTreeToCategories(categoriesTree.value);
+      : flattenCategoryTreeNodes(filteredCategoriesTree.value);
 
     const index = categoryIndices.findIndex(
       (category) =>
-        category.metadata.name === selectedCategory.value?.metadata.name
+        category.metadata.name ===
+        (selectedCategory.value
+          ? getCategoryFromNode(selectedCategory.value).metadata.name
+          : undefined)
     );
     if (index > 0) {
       selectedCategory.value = categoryIndices[index - 1];
@@ -214,7 +259,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 
   if (e.key === "Enter") {
-    if (!selectedCategory.value && text.value) {
+    if (!selectedCategory.value && text.value && allowCreate.value) {
       handleCreateCategory();
       return;
     }
@@ -229,7 +274,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 const scrollToSelected = () => {
   const selectedNodeName = selectedCategory.value
-    ? selectedCategory.value?.metadata.name
+    ? getCategoryFromNode(selectedCategory.value).metadata.name
     : "create";
   const selectedNode = document.getElementById(`category-${selectedNodeName}`);
   if (selectedNode) {
@@ -244,7 +289,7 @@ const scrollToSelected = () => {
 const uid = new ShortUniqueId();
 
 const handleCreateCategory = async () => {
-  if (!utils.permission.has(["system:posts:manage"])) {
+  if (!allowCreate.value || !utils.permission.has(["system:posts:manage"])) {
     return;
   }
 
@@ -270,8 +315,9 @@ const handleCreateCategory = async () => {
         description: "",
         cover: "",
         template: "",
-        priority: categories.value?.length || 0 + 1,
-        children: [],
+        priority:
+          categories.value?.filter((category) => !category.spec.parent)
+            .length || 0,
       },
       apiVersion: "content.halo.run/v1alpha1",
       kind: "Category",
@@ -347,7 +393,7 @@ const handleDelete = () => {
       <div ref="popperRef" :class="context.classes['dropdown-wrapper']">
         <ul class="p-1">
           <HasPermission
-            v-if="text.trim()"
+            v-if="allowCreate && text.trim()"
             :permissions="['system:posts:manage']"
           >
             <li
@@ -378,8 +424,8 @@ const handleDelete = () => {
           </template>
           <template v-else>
             <CategoryListItem
-              v-for="category in categoriesTree"
-              :key="category.metadata.name"
+              v-for="category in filteredCategoriesTree"
+              :key="category.category.metadata.name"
               :category="category"
               @select="handleSelect"
             />
