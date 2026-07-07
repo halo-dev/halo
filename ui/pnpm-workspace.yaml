@@ -1,16 +1,33 @@
 packages:
   - packages/**
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.0
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.2
   vitest: 4.1.9
-  vite-plus: 0.2.0
+  vite-plus: 0.2.2
+  "@vitest/ui": 4.1.9
 overrides:
   vite: "catalog:"
   vite-plus: "catalog:"
   vitest: "catalog:"
+  "@lezer/javascript": 1.5.4
+  prosemirror-model: 1.25.1
+  prosemirror-transform: 1.10.4
+  prosemirror-view: 1.40.0
 peerDependencyRules:
   allowAny:
     - vite
+    - vitest
   allowedVersions:
     vite: "*"
     vite-plus: 0.2.0
+    vitest: "*"
+onlyBuiltDependencies:
+  - "@nestjs/core"
+  - "@openapitools/openapi-generator-cli"
+  - "@parcel/watcher"
+  - "@tailwindcss/oxide"
+  - core-js
+  - esbuild
+  - vue-demi
+patchedDependencies:
+  "@tiptap/extension-drag-handle@3.27.1": patches/@tiptap__extension-drag-handle@3.27.1.patch

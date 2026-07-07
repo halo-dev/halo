@@ -82,7 +82,8 @@
     "scroll-into-view-if-needed": "^3.1.0"
   },
   "devDependencies": {
-    "@types/linkifyjs": "^2.1.7"
+    "@types/linkifyjs": "^2.1.7",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "vue": "^3.5.x"

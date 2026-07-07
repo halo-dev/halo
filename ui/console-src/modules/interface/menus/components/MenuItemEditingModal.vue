@@ -1,6 +1,12 @@
 <script lang="ts" setup>
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
-import { coreApiClient } from "@halo-dev/api-client";
+import { createInput } from "@formkit/vue";
+import type {
+  Menu,
+  MenuItem,
+  MenuItemTreeNode,
+  Ref,
+} from "@halo-dev/api-client";
+import { consoleApiClient, coreApiClient } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { cloneDeep } from "es-toolkit";
 import { computed, nextTick, onMounted, ref } from "vue";
@@ -8,14 +14,24 @@ import { useI18n } from "vue-i18n";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
+import { buildMenuItemParentMovePosition } from "../utils";
+import MenuItemParentSelect from "./MenuItemParentSelect.vue";
+
+const menuItemParentSelectInput = createInput<string>(MenuItemParentSelect, {
+  type: "input",
+  props: ["menuItemTree", "excludedNames"],
+  forceTypeProp: "text",
+});
 
 const props = withDefaults(
   defineProps<{
     menu: Menu;
+    menuItemTree?: MenuItemTreeNode[];
     parentMenuItem?: MenuItem;
     menuItem?: MenuItem;
   }>(),
   {
+    menuItemTree: () => [],
     parentMenuItem: undefined,
     menuItem: undefined,
   }
@@ -23,19 +39,20 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: "close"): void;
-  (event: "saved", menuItem: MenuItem): void;
+  (event: "saved", menuItem: MenuItem, menuItemTree?: MenuItemTreeNode[]): void;
 }>();
 
 const { t } = useI18n();
 
 const modal = ref<InstanceType<typeof VModal> | null>(null);
 const selectedParentMenuItem = ref<string>("");
+const originalParentMenuItem = ref<string>("");
 const formState = ref<MenuItem>({
   spec: {
     displayName: "",
     href: "",
     target: "_self",
-    children: [],
+    menuName: props.menu.metadata.name,
     priority: 0,
   },
   apiVersion: "v1alpha1",
@@ -72,6 +89,11 @@ const handleSaveMenuItem = async () => {
 
   try {
     saving.value = true;
+    formState.value.spec.menuName = props.menu.metadata.name;
+    if (!isUpdateMode) {
+      formState.value.spec.parent = selectedParentMenuItem.value || undefined;
+      formState.value.spec.priority = siblingCount.value;
+    }
 
     const menuItemRef = menuItemRefs.find(
       (ref) => ref.ref?.kind === selectedRefKind.value
@@ -92,33 +114,38 @@ const handleSaveMenuItem = async () => {
         menuItem: formState.value,
       });
 
-      emit("saved", data);
+      const positionRequest = buildMenuItemParentMovePosition(
+        formState.value.metadata.name,
+        originalParentMenuItem.value,
+        selectedParentMenuItem.value
+      );
+
+      if (positionRequest) {
+        try {
+          const { data: menuItemTree } =
+            await consoleApiClient.menuItem.updateMenuItemPosition({
+              name: positionRequest.name,
+              menuItemPositionRequest: {
+                menuName: props.menu.metadata.name,
+                parentName: positionRequest.parentName,
+                beforeName: positionRequest.beforeName,
+              },
+            });
+
+          emit("saved", data, menuItemTree);
+        } catch (e) {
+          console.error("Failed to update menu item parent", e);
+          emit("saved", data);
+          Toast.error(t("core.common.toast.save_failed_and_retry"));
+          return;
+        }
+      } else {
+        emit("saved", data);
+      }
     } else {
       const { data } = await coreApiClient.menuItem.createMenuItem({
         menuItem: formState.value,
       });
-
-      // if parent menu item is selected, add the new menu item to the parent menu item
-      if (selectedParentMenuItem.value) {
-        const { data: parentMenuItem } =
-          await coreApiClient.menuItem.getMenuItem({
-            name: selectedParentMenuItem.value,
-          });
-
-        await coreApiClient.menuItem.patchMenuItem({
-          name: selectedParentMenuItem.value,
-          jsonPatchInner: [
-            {
-              op: "add",
-              path: "/spec/children",
-              value: [
-                ...(parentMenuItem.spec.children || []),
-                data.metadata.name,
-              ],
-            },
-          ],
-        });
-      }
 
       emit("saved", data);
     }
@@ -205,6 +232,36 @@ const selectedRef = computed(() => {
 const selectedRefKind = ref<string>();
 const selectedRefName = ref<string>("");
 
+const excludedParentNames = computed(() => {
+  return props.menuItem?.metadata.name ? [props.menuItem.metadata.name] : [];
+});
+
+const siblingCount = computed(() => {
+  if (!selectedParentMenuItem.value) {
+    return props.menuItemTree.length;
+  }
+  const parent = findMenuItemTreeNode(
+    props.menuItemTree,
+    selectedParentMenuItem.value
+  );
+  return parent?.children.length || 0;
+});
+
+function findMenuItemTreeNode(
+  nodes: MenuItemTreeNode[],
+  name: string
+): MenuItemTreeNode | undefined {
+  for (const node of nodes) {
+    if (node.menuItem.metadata.name === name) {
+      return node;
+    }
+    const child = findMenuItemTreeNode(node.children, name);
+    if (child) {
+      return child;
+    }
+  }
+}
+
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
@@ -222,7 +279,9 @@ onMounted(() => {
     }
   }
 
-  selectedParentMenuItem.value = props.parentMenuItem?.metadata.name || "";
+  selectedParentMenuItem.value =
+    props.parentMenuItem?.metadata.name || props.menuItem?.spec.parent || "";
+  originalParentMenuItem.value = props.menuItem?.spec.parent || "";
 
   setFocus("displayNameInput");
 });
@@ -248,19 +307,13 @@ onMounted(() => {
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
-              v-if="!isUpdateMode"
               v-model="selectedParentMenuItem"
               :label="
                 $t('core.menu.menu_item_editing_modal.fields.parent.label')
               "
-              :placeholder="
-                $t(
-                  'core.menu.menu_item_editing_modal.fields.parent.placeholder'
-                )
-              "
-              type="menuItemSelect"
-              :clearable="true"
-              :menu-items="menu.spec.menuItems || []"
+              :type="menuItemParentSelectInput"
+              :menu-item-tree="props.menuItemTree"
+              :excluded-names="excludedParentNames"
             />
 
             <FormKit
@@ -305,7 +358,9 @@ onMounted(() => {
               :placeholder="
                 $t(
                   'core.menu.menu_item_editing_modal.fields.ref_kind.placeholder',
-                  { label: selectedRef.label }
+                  {
+                    label: selectedRef.label,
+                  }
                 )
               "
               :label="selectedRef.label"

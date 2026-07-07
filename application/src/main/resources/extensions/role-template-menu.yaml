@@ -18,6 +18,12 @@ rules:
     resources: ["systemconfigs"]
     resourceNames: ["menu"]
     verbs: ["update"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["menuitems/position"]
+    verbs: ["update"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["menus"]
+    verbs: ["delete"]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -37,4 +43,7 @@ rules:
   - apiGroups: ["console.api.halo.run"]
     resources: ["systemconfigs"]
     resourceNames: ["menu"]
+    verbs: ["get"]
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["menuitems/tree"]
     verbs: ["get"]
