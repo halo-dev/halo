@@ -14,3 +14,6 @@ rules:
     resources:
       ["attachments", "attachments/upload", "attachments/upload-from-url"]
     verbs: ["create", "list"]
+  - apiGroups: ["uc.api.storage.halo.run"]
+    resources: ["attachments/match-permalinks"]
+    verbs: ["create"]

@@ -1,4 +1,5 @@
-import { Dialog, Toast } from "@halo-dev/components";
+import { Toast } from "@halo-dev/components";
+import { ref, type Ref } from "vue";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
 import {
@@ -6,16 +7,85 @@ import {
   containsFileClipboardIdentifier,
   handleFileEvent,
   isExternalAsset,
+  type MatchAttachmentPermalinks,
+  type UploadExternalUrl,
 } from "@/utils/upload";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
 
-export const ExtensionUpload = Extension.create({
+export interface ExtensionUploadOptions {
+  matchAttachmentPermalinks?: MatchAttachmentPermalinks;
+  uploadExternalUrl?: UploadExternalUrl;
+}
+
+export interface ExternalAssetPromptState {
+  visible: Ref<boolean>;
+  count: Ref<number>;
+  transferring: Ref<boolean>;
+}
+
+export interface ExtensionUploadStorage {
+  matchCache: Map<string, boolean>;
+  cacheVersion: Ref<number>;
+  externalAssetPrompt: ExternalAssetPromptState;
+  uploadExternalUrl?: UploadExternalUrl;
+  matchAttachmentPermalinks: (urls: string[]) => Promise<void>;
+  transferExternalAssets: () => Promise<void>;
+  dismissExternalAssetsPrompt: () => void;
+}
+
+export interface ExternalAssetNode {
+  node: PMNode;
+  pos: number;
+  index: number;
+  parent: PMNode | null;
+}
+
+export const ExtensionUpload = Extension.create<
+  ExtensionUploadOptions,
+  ExtensionUploadStorage
+>({
   name: "upload",
+
+  addOptions() {
+    return {
+      matchAttachmentPermalinks: undefined,
+      uploadExternalUrl: undefined,
+    };
+  },
+
+  addStorage() {
+    return {
+      matchCache: new Map<string, boolean>(),
+      cacheVersion: ref(0),
+      externalAssetPrompt: {
+        visible: ref(false),
+        count: ref(0),
+        transferring: ref(false),
+      },
+      uploadExternalUrl: undefined,
+      matchAttachmentPermalinks: async () => undefined,
+      transferExternalAssets: async () => undefined,
+      dismissExternalAssetsPrompt: () => undefined,
+    };
+  },
 
   addProseMirrorPlugins() {
     const { editor }: { editor: Editor } = this;
+    const storage = this.storage;
+
+    storage.uploadExternalUrl = this.options.uploadExternalUrl;
+    storage.matchAttachmentPermalinks = (urls) =>
+      matchAttachmentPermalinks(
+        this.options.matchAttachmentPermalinks,
+        storage,
+        urls
+      );
+    storage.transferExternalAssets = () =>
+      transferExternalAssets(editor, storage);
+    storage.dismissExternalAssetsPrompt = () =>
+      dismissExternalAssetsPrompt(storage);
 
     return [
       new Plugin({
@@ -30,24 +100,7 @@ export const ExtensionUpload = Extension.create({
               return false;
             }
 
-            const externalNodes = getAllExternalNodes(slice);
-            if (externalNodes.length > 0) {
-              Dialog.info({
-                title: i18n.global.t("editor.common.text.tip"),
-                description: i18n.global.t(
-                  "editor.extensions.upload.operations.transfer_in_batch.description"
-                ),
-                confirmText: i18n.global.t("editor.common.button.confirm"),
-                cancelText: i18n.global.t("editor.common.button.cancel"),
-                async onConfirm() {
-                  await batchUploadExternalLink(editor, externalNodes);
-
-                  Toast.success(
-                    i18n.global.t("editor.common.toast.save_success")
-                  );
-                },
-              });
-            }
+            void showExternalAssetPrompt(storage, getAllAssetNodes(slice));
 
             const types = event.clipboardData.types;
             if (!containsFileClipboardIdentifier(types)) {
@@ -138,30 +191,164 @@ function isExcelPasted(clipboardData: ClipboardEvent["clipboardData"]) {
   return false;
 }
 
-export function getAllExternalNodes(
-  slice: Slice
-): { node: PMNode; pos: number; index: number; parent: PMNode | null }[] {
-  const externalNodes: {
-    node: PMNode;
-    pos: number;
-    index: number;
-    parent: PMNode | null;
-  }[] = [];
+export function getAllExternalNodes(slice: Slice): ExternalAssetNode[] {
+  return getAllAssetNodes(slice).filter((nodeWithPos) =>
+    isExternalAsset(nodeWithPos.node.attrs.src)
+  );
+}
+
+export function getAllAssetNodes(slice: Slice): ExternalAssetNode[] {
+  const assetNodes: ExternalAssetNode[] = [];
   slice.content.descendants((node, pos, parent, index) => {
     if (
       [ExtensionAudio.name, ExtensionVideo.name, ExtensionImage.name].includes(
         node.type.name
       )
     ) {
-      if (isExternalAsset(node.attrs.src)) {
-        externalNodes.push({
-          node,
-          pos,
-          parent,
-          index,
-        });
-      }
+      assetNodes.push({
+        node,
+        pos,
+        parent,
+        index,
+      });
     }
   });
-  return externalNodes;
+  return assetNodes;
+}
+
+export function getAllAssetNodesFromDoc(editor: Editor): ExternalAssetNode[] {
+  const assetNodes: ExternalAssetNode[] = [];
+  editor.state.doc.descendants((node, pos, parent, index) => {
+    if (
+      [ExtensionAudio.name, ExtensionVideo.name, ExtensionImage.name].includes(
+        node.type.name
+      )
+    ) {
+      assetNodes.push({
+        node,
+        pos,
+        parent,
+        index,
+      });
+    }
+  });
+  return assetNodes;
+}
+
+export async function showExternalAssetPrompt(
+  storage: ExtensionUploadStorage,
+  nodes: ExternalAssetNode[]
+) {
+  if (!storage.uploadExternalUrl || !nodes.length) {
+    return;
+  }
+
+  try {
+    const externalNodes = await getUnmatchedExternalNodes(storage, nodes);
+    if (externalNodes.length) {
+      storage.externalAssetPrompt.count.value = externalNodes.length;
+      storage.externalAssetPrompt.visible.value = true;
+    }
+  } catch (error) {
+    console.error("Failed to match attachment permalinks:", error);
+  }
+}
+
+async function transferExternalAssets(
+  editor: Editor,
+  storage: ExtensionUploadStorage
+) {
+  if (!storage.uploadExternalUrl) {
+    dismissExternalAssetsPrompt(storage);
+    return;
+  }
+
+  storage.externalAssetPrompt.transferring.value = true;
+
+  try {
+    const externalNodes = await collectCurrentUnmatchedExternalNodes(
+      editor,
+      storage
+    );
+
+    if (!externalNodes.length) {
+      dismissExternalAssetsPrompt(storage);
+      return;
+    }
+
+    await batchUploadExternalLink(
+      editor,
+      externalNodes,
+      storage.uploadExternalUrl
+    );
+    dismissExternalAssetsPrompt(storage);
+    Toast.success(i18n.global.t("editor.common.toast.save_success"));
+  } catch (error) {
+    console.error("Failed to upload external assets:", error);
+  } finally {
+    storage.externalAssetPrompt.transferring.value = false;
+  }
+}
+
+export async function collectCurrentUnmatchedExternalNodes(
+  editor: Editor,
+  storage: ExtensionUploadStorage
+) {
+  return getUnmatchedExternalNodes(storage, getAllAssetNodesFromDoc(editor));
+}
+
+export async function getUnmatchedExternalNodes(
+  storage: ExtensionUploadStorage,
+  nodes: ExternalAssetNode[]
+) {
+  const externalNodes = nodes.filter((nodeWithPos) =>
+    isExternalAsset(nodeWithPos.node.attrs.src)
+  );
+
+  await storage.matchAttachmentPermalinks(
+    externalNodes.map((nodeWithPos) => nodeWithPos.node.attrs.src)
+  );
+
+  return externalNodes.filter((nodeWithPos) => {
+    const { src } = nodeWithPos.node.attrs;
+    return storage.matchCache.get(src) === false;
+  });
+}
+
+export async function matchAttachmentPermalinks(
+  matcher: MatchAttachmentPermalinks | undefined,
+  storage: ExtensionUploadStorage,
+  urls: string[]
+) {
+  const unmatchedUrls = [...new Set(urls)]
+    .filter((url) => typeof url === "string" && url)
+    .filter((url) => !storage.matchCache.has(url));
+
+  if (!unmatchedUrls.length) {
+    return;
+  }
+
+  if (!matcher) {
+    for (const url of unmatchedUrls) {
+      storage.matchCache.set(url, false);
+    }
+    storage.cacheVersion.value++;
+    return;
+  }
+
+  const results = await matcher(unmatchedUrls);
+  const resultMap = new Map(
+    results.map((result) => [result.url, result.matched])
+  );
+
+  for (const url of unmatchedUrls) {
+    storage.matchCache.set(url, resultMap.get(url) ?? false);
+  }
+
+  storage.cacheVersion.value++;
+}
+
+function dismissExternalAssetsPrompt(storage: ExtensionUploadStorage) {
+  storage.externalAssetPrompt.visible.value = false;
+  storage.externalAssetPrompt.count.value = 0;
 }

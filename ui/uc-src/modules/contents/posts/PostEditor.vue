@@ -479,6 +479,39 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   return data;
 }
 
+async function handleMatchAttachmentPermalinks(urls: string[]) {
+  if (!utils.permission.has(["uc:attachments:manage"])) {
+    return [];
+  }
+
+  const { data } =
+    await ucApiClient.storage.attachment.matchAttachmentPermalinksForUc({
+      attachmentPermalinkMatchRequest: {
+        urls,
+      },
+    });
+
+  return (data.items || []).map((item) => ({
+    url: item.url || "",
+    matched: item.matched || false,
+  }));
+}
+
+async function handleUploadExternalUrl(url: string) {
+  if (!utils.permission.has(["uc:attachments:manage"])) {
+    return;
+  }
+
+  const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc({
+    url,
+  });
+
+  return {
+    url: data.status?.permalink || "",
+    alt: data.spec.displayName,
+  };
+}
+
 // Keep session alive
 useSessionKeepAlive();
 </script>
@@ -540,6 +573,8 @@ useSessionKeepAlive();
       v-model:title="formState.spec.title"
       v-model:cover="formState.spec.cover"
       :upload-image="handleUploadImage"
+      :match-attachment-permalinks="handleMatchAttachmentPermalinks"
+      :upload-external-url="handleUploadExternalUrl"
       class="h-full"
       @update="handleSetContentCache"
     />

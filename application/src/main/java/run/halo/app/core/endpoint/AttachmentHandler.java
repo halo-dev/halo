@@ -23,8 +23,12 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.attachment.AttachmentPermalinkMatchList;
+import run.halo.app.core.attachment.AttachmentPermalinkMatchRequest;
+import run.halo.app.core.attachment.AttachmentPermalinkMatcher;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemSetting.Attachment.UploadOptions;
 
 @Slf4j
@@ -33,6 +37,10 @@ import run.halo.app.infra.SystemSetting.Attachment.UploadOptions;
 public class AttachmentHandler {
 
     private final AttachmentService attachmentService;
+
+    private final AttachmentPermalinkMatcher attachmentPermalinkMatcher;
+
+    private final ExternalUrlSupplier externalUrlSupplier;
 
     /**
      * Build OpenAPI doc of request and response for upload attachment endpoint.
@@ -45,6 +53,20 @@ public class AttachmentHandler {
                                 .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .schema(schemaBuilder().implementation(UploadForm.class))))
                 .response(responseBuilder().implementation(Attachment.class));
+    }
+
+    /**
+     * Build OpenAPI doc of request and response for matching Attachment permalinks.
+     *
+     * @param builder the operation builder
+     */
+    public void buildMatchPermalinksDoc(Builder builder) {
+        builder.requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder().implementation(AttachmentPermalinkMatchRequest.class))))
+                .response(responseBuilder().implementation(AttachmentPermalinkMatchList.class));
     }
 
     /**
@@ -99,6 +121,22 @@ public class AttachmentHandler {
                     .thenReturn(a));
         });
         return ServerResponse.ok().body(uploadAttachment, Attachment.class);
+    }
+
+    /**
+     * Handle Attachment permalink matching request.
+     *
+     * @param request the server request
+     * @return the server response
+     */
+    public Mono<ServerResponse> handleMatchPermalinks(ServerRequest request) {
+        var siteUrl = externalUrlSupplier.getURL(request.exchange().getRequest());
+        return request.bodyToMono(AttachmentPermalinkMatchRequest.class)
+                .flatMap(matchRequest -> attachmentPermalinkMatcher.match(matchRequest.urls(), siteUrl))
+                .map(AttachmentPermalinkMatchList::new)
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
     }
 
     /**

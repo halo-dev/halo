@@ -28,6 +28,9 @@ rules:
   - apiGroups: ["console.api.storage.halo.run"]
     resources: ["attachments/upload"]
     verbs: ["create"]
+  - apiGroups: ["console.api.storage.halo.run"]
+    resources: ["attachments/match-permalinks"]
+    verbs: ["create"]
 ---
 apiVersion: v1alpha1
 kind: "Role"

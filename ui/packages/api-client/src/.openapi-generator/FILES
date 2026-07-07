@@ -93,6 +93,9 @@ models/annotation-setting-list.ts
 models/annotation-setting-spec.ts
 models/annotation-setting.ts
 models/attachment-list.ts
+models/attachment-permalink-match-list.ts
+models/attachment-permalink-match-request.ts
+models/attachment-permalink-match-result.ts
 models/attachment-spec.ts
 models/attachment-status.ts
 models/attachment.ts

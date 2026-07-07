@@ -33,6 +33,8 @@ import {
   ToolboxItem,
   VueEditor,
   type Extensions,
+  type MatchAttachmentPermalinks,
+  type UploadExternalUrl,
 } from "@halo-dev/richtext-editor";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
@@ -74,6 +76,8 @@ const props = withDefaults(
       file: File,
       options?: AxiosRequestConfig
     ) => Promise<Attachment>;
+    matchAttachmentPermalinks?: MatchAttachmentPermalinks;
+    uploadExternalUrl?: UploadExternalUrl;
   }>(),
   {
     title: "",
@@ -81,6 +85,8 @@ const props = withDefaults(
     content: "",
     cover: undefined,
     uploadImage: undefined,
+    matchAttachmentPermalinks: undefined,
+    uploadExternalUrl: undefined,
   }
 );
 
@@ -265,6 +271,10 @@ onMounted(async () => {
         },
         audio: {
           uploadAudio: props.uploadImage,
+        },
+        upload: {
+          matchAttachmentPermalinks: props.matchAttachmentPermalinks,
+          uploadExternalUrl: props.uploadExternalUrl,
         },
         placeholder: {
           placeholder: t(

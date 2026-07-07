@@ -19,4 +19,6 @@ export {
   isListActive,
   isNodeContentEmpty,
   getCursorCoords,
+  type MatchAttachmentPermalinks,
+  type UploadExternalUrl,
 } from "./utils";

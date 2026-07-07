@@ -114,7 +114,7 @@
   "editor.extensions.upload.operations.replace.button": "Reemplazar",
   "editor.extensions.upload.operations.transfer.button": "Guardar localmente",
   "editor.extensions.upload.operations.transfer.tooltip": "Este recurso se detecta como recurso externo. Haz clic en este botón para guardarlo en la biblioteca de adjuntos.",
-  "editor.extensions.upload.operations.transfer_in_batch.description": "Se detectó un enlace externo. ¿Deseas subirlo automáticamente a la biblioteca de adjuntos?",
+  "editor.extensions.upload.operations.transfer_in_batch.description": "Se detectaron {count} recursos externos. Puedes guardarlos en la biblioteca de adjuntos.",
   "editor.extensions.font_size.title": "Tamaño de fuente",
   "editor.components.color_picker.more_color": "Más",
   "editor.common.alt": "Texto alternativo",

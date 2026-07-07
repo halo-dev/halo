@@ -114,7 +114,7 @@
   "editor.extensions.upload.operations.replace.button": "替换",
   "editor.extensions.upload.operations.transfer.button": "转存",
   "editor.extensions.upload.operations.transfer.tooltip": "检测到此资源为外部资源，点击此按钮以转存到附件库",
-  "editor.extensions.upload.operations.transfer_in_batch.description": "检测到外部链接，是否需要自动上传到附件库？",
+  "editor.extensions.upload.operations.transfer_in_batch.description": "检测到 {count} 个外部资源，可转存到附件库。",
   "editor.extensions.font_size.title": "字体大小",
   "editor.components.color_picker.more_color": "更多颜色",
   "editor.common.alt": "替代文本",

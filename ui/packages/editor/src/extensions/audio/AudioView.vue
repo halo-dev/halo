@@ -85,7 +85,7 @@ const handleUploadAbort = () => {
 };
 
 const { isExternalAsset, transferring, handleTransfer } =
-  useExternalAssetsTransfer(src, handleSetExternalLink);
+  useExternalAssetsTransfer(src, handleSetExternalLink, props.editor);
 
 const isPercentageWidth = computed(() => {
   return props.node?.attrs.width?.includes("%");

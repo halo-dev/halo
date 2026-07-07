@@ -47,6 +47,15 @@ class AttachmentConsoleEndpoint implements CustomEndpoint {
                                     .description("Upload attachment endpoint for console.");
                             this.attachmentHandler.buildDoc(builder);
                         })
+                .POST(
+                        path("/attachments/-/match-permalinks").and(contentType(MediaType.APPLICATION_JSON)),
+                        attachmentHandler::handleMatchPermalinks,
+                        builder -> {
+                            builder.operationId("matchAttachmentPermalinksForConsole")
+                                    .tag(tag)
+                                    .description("Match URL strings against Attachment permalinks for console.");
+                            this.attachmentHandler.buildMatchPermalinksDoc(builder);
+                        })
                 .build();
     }
 

@@ -1,4 +1,4 @@
-import { ucApiClient, type Attachment } from "@halo-dev/api-client";
+import type { Attachment } from "@halo-dev/api-client";
 import { utils } from "@halo-dev/ui-shared";
 import type { AxiosRequestConfig } from "axios";
 import { chunk } from "es-toolkit";
@@ -6,6 +6,24 @@ import { ExtensionAudio } from "@/extensions/audio";
 import { ExtensionImage } from "@/extensions/image";
 import { ExtensionVideo } from "@/extensions/video";
 import { Editor, PMNode } from "@/tiptap";
+
+export interface AttachmentPermalinkMatchResult {
+  url: string;
+  matched: boolean;
+}
+
+export interface ExternalAssetTransferResult {
+  url: string;
+  alt?: string;
+}
+
+export type MatchAttachmentPermalinks = (
+  urls: string[]
+) => Promise<AttachmentPermalinkMatchResult[]>;
+
+export type UploadExternalUrl = (
+  url: string
+) => Promise<ExternalAssetTransferResult | undefined>;
 
 export interface FileProps {
   file: File;
@@ -167,13 +185,25 @@ export function containsFileClipboardIdentifier(types: readonly string[]) {
 
 export async function batchUploadExternalLink(
   editor: Editor,
-  nodes: { node: PMNode; pos: number; index: number; parent: PMNode | null }[]
+  nodes: {
+    node: PMNode;
+    pos: number;
+    index: number;
+    parent: PMNode | null;
+  }[],
+  uploadExternalUrl?: UploadExternalUrl
 ) {
+  if (!uploadExternalUrl) {
+    return;
+  }
+
   const chunks = chunk(nodes, 5);
 
   for (const chunkNodes of chunks) {
     await Promise.all(
-      chunkNodes.map((node) => uploadExternalLink(editor, node))
+      chunkNodes.map((node) =>
+        uploadExternalLink(editor, node, uploadExternalUrl)
+      )
     );
   }
 }
@@ -185,7 +215,8 @@ export async function uploadExternalLink(
     pos: number;
     index: number;
     parent: PMNode | null;
-  }
+  },
+  uploadExternalUrl: UploadExternalUrl
 ) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
@@ -195,19 +226,17 @@ export async function uploadExternalLink(
   }
 
   try {
-    const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
-      {
-        url: src,
-      }
-    );
+    const attachment = await uploadExternalUrl(src);
 
-    const url = data.status?.permalink;
-    const name = data.spec.displayName;
+    if (!attachment?.url) {
+      return;
+    }
+
     const tr = editor.view.state.tr;
     tr.setNodeMarkup(pos, node.type, {
       ...node.attrs,
-      src: url,
-      name,
+      src: attachment.url,
+      name: attachment.alt,
     });
     editor.view.dispatch(tr);
   } catch (error) {
@@ -215,7 +244,10 @@ export async function uploadExternalLink(
   }
 }
 
-export function isExternalAsset(src: string) {
+export function isExternalAsset(
+  src: string,
+  localOrigin = globalThis.window?.location.origin || ""
+) {
   if (!src) {
     return false;
   }
@@ -229,8 +261,7 @@ export function isExternalAsset(src: string) {
     return false;
   }
 
-  const currentOrigin = window.location.origin;
-  if (src.startsWith(currentOrigin)) {
+  if (localOrigin && src.startsWith(localOrigin)) {
     return false;
   }
 

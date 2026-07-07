@@ -125,6 +125,16 @@ public class AttachmentUcEndpoint implements CustomEndpoint {
                                                 .schema(schemaBuilder().implementation(UploadFromUrlRequest.class))))
                                 .response(responseBuilder().implementation(Attachment.class))
                                 .build())
+                .POST(
+                        "/attachments/-/match-permalinks",
+                        contentType(MediaType.APPLICATION_JSON),
+                        attachmentHandler::handleMatchPermalinks,
+                        builder -> {
+                            builder.operationId("MatchAttachmentPermalinksForUc")
+                                    .description("Match URL strings against Attachment permalinks for user center.")
+                                    .tag(tag);
+                            this.attachmentHandler.buildMatchPermalinksDoc(builder);
+                        })
                 .GET("/attachments", this::listMyAttachments, builder -> {
                     builder.operationId("ListMyAttachments")
                             .description("List attachments of the current user uploaded.")

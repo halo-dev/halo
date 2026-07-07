@@ -1462,6 +1462,37 @@
         ]
       }
     },
+    "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/match-permalinks": {
+      "post": {
+        "description": "Match URL strings against Attachment permalinks for user center.",
+        "operationId": "MatchAttachmentPermalinksForUc",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachmentPermalinkMatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentPermalinkMatchList"
+                }
+              }
+            },
+            "description": "default response"
+          }
+        },
+        "tags": [
+          "AttachmentV1alpha1Uc"
+        ]
+      }
+    },
     "/apis/uc.api.storage.halo.run/v1alpha1/attachments/-/upload": {
       "post": {
         "description": "Upload attachment to user center storage.",
@@ -1693,6 +1724,45 @@
             "format": "int64"
           }
         }
+      },
+      "AttachmentPermalinkMatchList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttachmentPermalinkMatchResult"
+            }
+          }
+        },
+        "description": "Ordered Attachment permalink match results."
+      },
+      "AttachmentPermalinkMatchRequest": {
+        "required": [
+          "urls"
+        ],
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Request payload for matching URL strings against Attachment permalinks."
+      },
+      "AttachmentPermalinkMatchResult": {
+        "type": "object",
+        "properties": {
+          "matched": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "description": "Result for one Attachment permalink match input."
       },
       "AttachmentSpec": {
         "type": "object",

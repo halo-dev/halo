@@ -102,7 +102,7 @@ import {
   ExtensionUnderline,
   type ExtensionUnderlineOptions,
 } from "./underline";
-import { ExtensionUpload } from "./upload";
+import { ExtensionUpload, type ExtensionUploadOptions } from "./upload";
 import { ExtensionVideo, type ExtensionVideoOptions } from "./video";
 
 export interface ExtensionsKitOptions {
@@ -153,7 +153,7 @@ export interface ExtensionsKitOptions {
   textStyle: Partial<ExtensionTextStyleOptions> | false;
   trailingNode?: boolean;
   underline: Partial<ExtensionUnderlineOptions> | false;
-  upload?: boolean;
+  upload: Partial<ExtensionUploadOptions> | false;
   video: Partial<ExtensionVideoOptions> | false;
   listExtra: Partial<ExtensionOptions> | false;
   blockPosition: Partial<ExtensionBlockPositionOptions> | false;
@@ -401,7 +401,7 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
     }
 
     if (this.options.upload !== false) {
-      internalExtensions.push(ExtensionUpload);
+      internalExtensions.push(ExtensionUpload.configure(this.options.upload));
     }
 
     if (this.options.video !== false) {
