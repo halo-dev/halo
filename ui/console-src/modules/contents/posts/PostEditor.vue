@@ -455,9 +455,13 @@ useSaveKeybinding(handleSave);
 // Keep session alive
 useSessionKeepAlive();
 
+const canManageAttachments = computed(() =>
+  utils.permission.has(["system:attachments:manage"])
+);
+
 // Upload image
 async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
-  if (!utils.permission.has(["system:attachments:manage"])) {
+  if (!canManageAttachments.value) {
     return;
   }
 
@@ -472,7 +476,7 @@ async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
 }
 
 async function handleMatchAttachmentPermalinks(urls: string[]) {
-  if (!utils.permission.has(["system:attachments:manage"])) {
+  if (!canManageAttachments.value) {
     return [];
   }
 
@@ -492,7 +496,7 @@ async function handleMatchAttachmentPermalinks(urls: string[]) {
 }
 
 async function handleUploadExternalUrl(url: string) {
-  if (!utils.permission.has(["system:attachments:manage"])) {
+  if (!canManageAttachments.value) {
     return;
   }
 
@@ -597,8 +601,12 @@ async function handleUploadExternalUrl(url: string) {
       v-model:title="formState.post.spec.title"
       v-model:cover="formState.post.spec.cover"
       :upload-image="handleUploadImage"
-      :match-attachment-permalinks="handleMatchAttachmentPermalinks"
-      :upload-external-url="handleUploadExternalUrl"
+      :match-attachment-permalinks="
+        canManageAttachments ? handleMatchAttachmentPermalinks : undefined
+      "
+      :upload-external-url="
+        canManageAttachments ? handleUploadExternalUrl : undefined
+      "
       class="size-full"
       @update="handleSetContentCache"
     />
