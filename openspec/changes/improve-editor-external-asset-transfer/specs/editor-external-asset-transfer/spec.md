@@ -51,24 +51,17 @@ The default editor SHALL use Attachment permalink matching before prompting user
 - **THEN** the editor SHALL treat the resource as an existing Halo attachment
 - **AND** the editor SHALL NOT show an external resource transfer prompt for that URL
 
-#### Scenario: True external media receives non-blocking prompt
+#### Scenario: True external media receives paste confirmation dialog
 
 - **WHEN** a user with attachment upload permission pastes an image, audio, or video URL that does not match any Attachment permalink
-- **THEN** the editor SHALL allow the paste to complete immediately
-- **AND** the editor SHALL show a non-blocking prompt that indicates external resources were detected
-- **AND** the prompt SHALL provide a transfer action
+- **THEN** the editor SHALL show the existing paste-time external resource transfer confirmation dialog
+- **AND** the dialog SHALL transfer only the unmatched external media resources when confirmed
 
 #### Scenario: User without upload permission receives no transfer prompt
 
 - **WHEN** a user without attachment upload permission pastes an unmatched external media URL
 - **THEN** the editor SHALL NOT call the permalink matching API
 - **AND** the editor SHALL NOT show an upload or transfer prompt
-
-#### Scenario: Transfer action rescans current document
-
-- **WHEN** a user chooses to transfer unmatched external media resources from the non-blocking prompt
-- **THEN** the editor SHALL rescan the current document for matching media URLs before applying node updates
-- **AND** the editor SHALL NOT rely on paste-time slice positions for the transfer update
 
 #### Scenario: Explicit per-resource transfer only appears for unmatched external media
 

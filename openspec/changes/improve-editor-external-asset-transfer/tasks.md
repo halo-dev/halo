@@ -19,15 +19,15 @@
 - [x] 3.2 Update Console post and single-page editor hosts to provide Console matching and URL-transfer behavior when `system:attachments:manage` is available.
 - [x] 3.3 Update UC post editor host to provide UC matching and URL-transfer behavior when `uc:attachments:manage` is available.
 - [x] 3.4 Replace synchronous external media detection with an async candidate matching flow that caches editor-session URL match results.
-- [x] 3.5 Remove the paste-time blocking `Dialog.info` transfer prompt and add a non-blocking editor prompt with i18n strings for detected unmatched external resources.
-- [x] 3.6 Implement prompt transfer action by rescanning the current editor document for unmatched candidate URLs before updating media nodes.
+- [x] 3.5 Keep the paste-time `Dialog.info` transfer prompt, but show it only after permalink matching leaves unmatched external resources.
+- [x] 3.6 Keep Dialog confirmation transfer scoped to the unmatched external resources from the pasted rich-text slice.
 - [x] 3.7 Update per-resource transfer button visibility to hide for URLs matched by Attachment permalink and remain available for unmatched external media when upload permission exists.
-- [x] 3.8 Add focused frontend tests for matched Attachment URLs, unmatched external URLs, users without upload permission, non-blocking prompt behavior, and rescan-before-transfer behavior.
+- [x] 3.8 Add focused frontend tests for matched Attachment URLs, unmatched external URLs, users without upload permission, and Dialog gating behavior.
 
 ## 4. Validation
 
 - [x] 4.1 Run focused backend tests for the new matching service and endpoints.
-- [x] 4.2 Run focused frontend unit tests for editor external resource matching and prompt behavior.
+- [x] 4.2 Run focused frontend unit tests for editor external resource matching and Dialog gating behavior.
 - [x] 4.3 Run `./gradlew spotlessCheck`.
 - [x] 4.4 Run `pnpm -C ui typecheck && pnpm -C ui lint`.
 - [x] 4.5 Run `openspec validate improve-editor-external-asset-transfer --strict`.

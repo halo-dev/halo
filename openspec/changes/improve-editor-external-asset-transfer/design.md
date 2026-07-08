@@ -17,7 +17,7 @@ The backend already stores Attachment access URLs in `Attachment.status.permalin
 - Treat a media URL as an existing Halo attachment when it matches `Attachment.status.permalink`.
 - Accept both relative and absolute input strings in the matching API.
 - Reject unsupported browser-local protocols such as `data:`, `blob:`, and `file:`.
-- Replace the paste-time blocking transfer dialog with a non-blocking editor prompt.
+- Keep the existing paste-time transfer confirmation dialog, but suppress it for URLs matched as existing Attachments.
 - Keep explicit transfer actions for true external media resources.
 - Keep Console and UC editor behavior aligned with their respective upload permissions.
 
@@ -67,11 +67,11 @@ The backend already stores Attachment access URLs in `Attachment.status.permalin
 
    Alternative considered: keep the synchronous `isExternalAsset()` check and only add domain handling. That preserves the false-positive problem for object storage permalinks.
 
-6. Replace the blocking dialog with a non-blocking editor prompt.
+6. Preserve the paste-time transfer confirmation dialog.
 
-   Pasting should complete immediately. If unmatched external resources remain, the editor should show a small advisory prompt with the count and a transfer action. When the user chooses to transfer, the editor should rescan the current document for the candidate URLs before updating nodes, because paste-time slice positions can become stale after async checks or user edits.
+   Pasting should keep the existing `Dialog.info` confirmation behavior for true external resources. The async matching step should run before showing the dialog so Attachment permalinks backed by third-party storage domains do not trigger the prompt.
 
-   Alternative considered: keep `Dialog.info` but suppress it for matched Attachment permalinks. That fixes false positives but leaves the intrusive UX for true external resources.
+   Alternative considered: replace the dialog with a non-blocking editor prompt. That broader UI change is deferred so this change can focus on permalink recognition.
 
 7. Keep transfer execution permission-aware.
 
@@ -84,16 +84,15 @@ The backend already stores Attachment access URLs in `Attachment.status.permalin
 - Matching many URLs could add extra backend queries -> deduplicate inputs, batch with an `in` query where possible, and keep a reasonable request limit.
 - URL normalization could become too broad -> limit normalization to exact original, same-site absolute to relative, and relative to configured external URL.
 - Permission behavior could diverge between Console and UC -> implement shared service logic and separate thin endpoints guarded by their existing upload permissions.
-- Non-blocking prompts need state in the editor -> keep state local to the upload extension and avoid introducing global stores for this prompt.
-- A URL may be uploaded after a failed match -> cache only for the editor session and allow explicit refresh through future paste/rescan actions.
+- A URL may be uploaded after a failed match -> cache only for the editor session and allow future paste actions to refresh stale results.
 
 ## Migration Plan
 
 1. Add backend request/response DTOs, shared matching service logic, UC and Console routes, OpenAPI metadata, and authorization coverage.
 2. Regenerate OpenAPI docs and the UI API client.
 3. Add editor matching and transfer callbacks/options so Console and UC hosts call the correct API clients.
-4. Replace paste-time `Dialog.info` with a non-blocking editor prompt and document-rescan transfer flow.
-5. Update i18n strings and focused backend/frontend tests.
+4. Update paste-time `Dialog.info` gating to use Attachment permalink matching.
+5. Update focused backend/frontend tests.
 
 Rollback is code-level only. No stored data migration is introduced.
 

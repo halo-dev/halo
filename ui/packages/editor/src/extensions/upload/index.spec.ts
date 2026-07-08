@@ -1,19 +1,30 @@
-import { describe, expect, it, vi } from "vitest";
+import { Dialog } from "@halo-dev/components";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import type { Editor, PMNode } from "@/tiptap";
 import type { MatchAttachmentPermalinks, UploadExternalUrl } from "@/utils";
 import {
-  collectCurrentUnmatchedExternalNodes,
   getUnmatchedExternalNodes,
   matchAttachmentPermalinks,
-  scanExternalAssets,
-  showExternalAssetPrompt,
-  summarizeExternalAssetNodes,
+  showExternalAssetTransferDialog,
   type ExtensionUploadStorage,
   type ExternalAssetNode,
 } from "./index";
 
+vi.mock("@halo-dev/components", () => ({
+  Dialog: {
+    info: vi.fn(),
+  },
+  Toast: {
+    success: vi.fn(),
+  },
+}));
+
 describe("ExtensionUpload external asset matching", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("keeps matched Attachment URLs out of unmatched external nodes", async () => {
     const matcher = vi.fn<MatchAttachmentPermalinks>(async (urls) =>
       urls.map((url) => ({
@@ -45,7 +56,7 @@ describe("ExtensionUpload external asset matching", () => {
     );
   });
 
-  it("does not show a prompt when URL transfer is unavailable", async () => {
+  it("does not show a dialog when URL transfer is unavailable", async () => {
     const matcher = vi.fn<MatchAttachmentPermalinks>(async (urls) =>
       urls.map((url) => ({
         url,
@@ -54,15 +65,15 @@ describe("ExtensionUpload external asset matching", () => {
     );
     const storage = createStorage(matcher);
 
-    await showExternalAssetPrompt(storage, [
+    await showExternalAssetTransferDialog(editorWithNodes([]), storage, [
       assetNode("https://remote.example.com/new.png"),
     ]);
 
     expect(matcher).not.toHaveBeenCalled();
-    expect(storage.externalAssetPrompt.visible.value).toBe(false);
+    expect(Dialog.info).not.toHaveBeenCalled();
   });
 
-  it("updates the toolbar prompt without uploading immediately", async () => {
+  it("shows the paste dialog for unmatched external resources without uploading immediately", async () => {
     const uploadExternalUrl = vi.fn<UploadExternalUrl>();
     const storage = createStorage(
       async (urls) =>
@@ -73,26 +84,37 @@ describe("ExtensionUpload external asset matching", () => {
       uploadExternalUrl
     );
 
-    await showExternalAssetPrompt(storage, [
+    await showExternalAssetTransferDialog(editorWithNodes([]), storage, [
       assetNode("https://remote.example.com/new.png"),
     ]);
 
-    expect(storage.externalAssetPrompt.visible.value).toBe(true);
-    expect(storage.externalAssetPrompt.count.value).toBe(1);
-    expect(storage.externalAssetPrompt.items.value).toEqual([
-      {
-        url: "https://remote.example.com/new.png",
-        count: 1,
-      },
-    ]);
+    expect(Dialog.info).toHaveBeenCalledTimes(1);
     expect(uploadExternalUrl).not.toHaveBeenCalled();
   });
 
-  it("scans current document external nodes for the toolbar", async () => {
-    const editor = editorWithDynamicNodes(() => [
-      assetNode("https://remote.example.com/current.png"),
-      assetNode("https://remote.example.com/current.png"),
-      assetNode("/upload/local.png"),
+  it("does not show the paste dialog for matched Attachment URLs", async () => {
+    const storage = createStorage(
+      async (urls) =>
+        urls.map((url) => ({
+          url,
+          matched: true,
+        })),
+      vi.fn()
+    );
+
+    await showExternalAssetTransferDialog(editorWithNodes([]), storage, [
+      assetNode("https://cdn.example.com/owned.png"),
+    ]);
+
+    expect(Dialog.info).not.toHaveBeenCalled();
+  });
+
+  it("passes unmatched resources to the dialog confirmation transfer", async () => {
+    const uploadExternalUrl = vi.fn<UploadExternalUrl>(async (url) => ({
+      url: `/upload/${url.split("/").pop()}`,
+    }));
+    const editor = editorWithNodes([
+      assetNode("https://remote.example.com/new.png"),
     ]);
     const storage = createStorage(
       async (urls) =>
@@ -100,63 +122,22 @@ describe("ExtensionUpload external asset matching", () => {
           url,
           matched: false,
         })),
-      vi.fn()
+      uploadExternalUrl
     );
 
-    const items = await scanExternalAssets(editor, storage);
-
-    expect(items).toEqual([
-      {
-        url: "https://remote.example.com/current.png",
-        count: 2,
-      },
+    await showExternalAssetTransferDialog(editor, storage, [
+      assetNode("https://remote.example.com/new.png"),
     ]);
-    expect(storage.externalAssetPrompt.visible.value).toBe(true);
-    expect(storage.externalAssetPrompt.count.value).toBe(2);
-  });
 
-  it("summarizes repeated external resources for display", () => {
-    expect(
-      summarizeExternalAssetNodes([
-        assetNode("https://remote.example.com/a.png"),
-        assetNode("https://remote.example.com/a.png"),
-        assetNode("https://remote.example.com/b.png"),
-      ])
-    ).toEqual([
-      {
-        url: "https://remote.example.com/a.png",
-        count: 2,
-      },
-      {
-        url: "https://remote.example.com/b.png",
-        count: 1,
-      },
-    ]);
-  });
+    const dialogOptions = vi.mocked(Dialog.info).mock.calls[0]?.[0];
+    if (!dialogOptions) {
+      throw new Error("Expected transfer dialog to be shown.");
+    }
+    await dialogOptions.onConfirm?.();
 
-  it("collects unmatched external nodes from the current document before transfer", async () => {
-    let nodes = [assetNode("https://remote.example.com/pasted.png")];
-    const editor = editorWithDynamicNodes(() => nodes);
-    const storage = createStorage(
-      async (urls) =>
-        urls.map((url) => ({
-          url,
-          matched: false,
-        })),
-      vi.fn()
+    expect(uploadExternalUrl).toHaveBeenCalledWith(
+      "https://remote.example.com/new.png"
     );
-
-    await showExternalAssetPrompt(storage, nodes);
-    nodes = [assetNode("https://remote.example.com/current.png")];
-
-    const unmatched = await collectCurrentUnmatchedExternalNodes(
-      editor,
-      storage
-    );
-
-    expect(unmatched.map((node) => node.node.attrs.src)).toEqual([
-      "https://remote.example.com/current.png",
-    ]);
   });
 });
 
@@ -167,19 +148,9 @@ function createStorage(
   const storage = {
     matchCache: new Map<string, boolean>(),
     cacheVersion: ref(0),
-    externalAssetPrompt: {
-      visible: ref(false),
-      count: ref(0),
-      items: ref([]),
-      scanning: ref(false),
-      transferring: ref(false),
-    },
     uploadExternalUrl,
     matchAttachmentPermalinks: async (urls: string[]) =>
       matchAttachmentPermalinks(matcher, storage, urls),
-    scanExternalAssets: async () => [],
-    transferExternalAssets: async () => undefined,
-    dismissExternalAssetsPrompt: () => undefined,
   } as ExtensionUploadStorage;
 
   return storage;
@@ -201,9 +172,12 @@ function assetNode(src: string): ExternalAssetNode {
   };
 }
 
-function editorWithDynamicNodes(getNodes: () => ExternalAssetNode[]) {
+function editorWithNodes(nodes: ExternalAssetNode[]) {
   return {
     state: {
+      tr: {
+        setNodeMarkup: vi.fn(),
+      },
       doc: {
         descendants(
           callback: (
@@ -213,11 +187,22 @@ function editorWithDynamicNodes(getNodes: () => ExternalAssetNode[]) {
             index: number
           ) => void
         ) {
-          getNodes().forEach((nodeWithPos, index) => {
+          nodes.forEach((nodeWithPos, index) => {
             callback(nodeWithPos.node, index, null, index);
           });
         },
       },
+      selection: {
+        from: 0,
+      },
+    },
+    view: {
+      state: {
+        tr: {
+          setNodeMarkup: vi.fn(),
+        },
+      },
+      dispatch: vi.fn(),
     },
   } as unknown as Editor;
 }
