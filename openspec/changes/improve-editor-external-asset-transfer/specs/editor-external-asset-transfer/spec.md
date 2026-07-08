@@ -22,9 +22,9 @@ The system SHALL provide upload-authorized APIs that match input URL strings aga
 - **THEN** the system SHALL attempt to match each input against `Attachment.status.permalink`
 - **AND** the system SHALL NOT require inputs to be valid `java.net.URL` absolute URLs
 
-#### Scenario: Match API rejects unsupported local protocols
+#### Scenario: Match API rejects unsupported absolute protocols
 
-- **WHEN** any input URL uses a non-matchable local protocol such as `data:`, `blob:`, or `file:`
+- **WHEN** any input URL uses a non-HTTP(S) absolute protocol such as `data:`, `blob:`, `file:`, `ftp:`, or `mailto:`
 - **THEN** the system SHALL reject the request with a client error
 - **AND** the system SHALL NOT return partial match results
 

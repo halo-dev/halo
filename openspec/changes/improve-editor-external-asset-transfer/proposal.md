@@ -5,7 +5,7 @@ The default editor currently treats any pasted media URL outside the current sit
 ## What Changes
 
 - Add an attachment permalink matching API that accepts URL-like strings and reports whether each input matches an existing `Attachment.status.permalink`.
-- Validate that unsupported local browser protocols such as `data:`, `blob:`, and `file:` are rejected by the matching API instead of being treated as matchable resources.
+- Validate that non-HTTP(S) absolute URL protocols such as `data:`, `blob:`, `file:`, and `ftp:` are rejected by the matching API instead of being treated as matchable resources.
 - Use the permalink matching API in the default editor before surfacing transfer prompts for pasted image, audio, or video resources.
 - Keep the existing paste-time transfer confirmation dialog, but show it only for unmatched external resources.
 - Keep explicit per-resource transfer actions available for true external resources.

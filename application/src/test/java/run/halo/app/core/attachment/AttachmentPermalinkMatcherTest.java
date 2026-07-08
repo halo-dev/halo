@@ -89,6 +89,18 @@ class AttachmentPermalinkMatcherTest {
                         URI.create("https://www.halo.run").toURL()))
                 .isInstanceOf(ServerWebInputException.class)
                 .hasMessageContaining("Unsupported URL protocol");
+
+        assertThatThrownBy(() -> matcher.match(
+                        List.of("ftp://example.com/halo.png"),
+                        URI.create("https://www.halo.run").toURL()))
+                .isInstanceOf(ServerWebInputException.class)
+                .hasMessageContaining("Unsupported URL protocol");
+
+        assertThatThrownBy(() -> matcher.match(
+                        List.of("mailto:test@example.com"),
+                        URI.create("https://www.halo.run").toURL()))
+                .isInstanceOf(ServerWebInputException.class)
+                .hasMessageContaining("Unsupported URL protocol");
     }
 
     @Test

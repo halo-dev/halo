@@ -23,7 +23,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class AttachmentPermalinkMatcher {
 
-    private static final Set<String> UNSUPPORTED_PROTOCOLS = Set.of("data", "blob", "file");
+    private static final Set<String> SUPPORTED_ABSOLUTE_URI_SCHEMES = Set.of("http", "https");
 
     private final ReactiveExtensionClient client;
 
@@ -56,20 +56,21 @@ public class AttachmentPermalinkMatcher {
             throw new ServerWebInputException("url must not be blank.");
         }
         var value = url.strip();
-        if (hasUnsupportedProtocol(value)) {
-            throw new ServerWebInputException("Unsupported URL protocol: " + value);
-        }
-
-        var permalinks = new LinkedHashSet<String>();
-        permalinks.add(value);
 
         URI valueUri;
         try {
             valueUri = URI.create(value);
         } catch (IllegalArgumentException e) {
+            var permalinks = new LinkedHashSet<String>();
+            permalinks.add(value);
             return new Candidate(url, permalinks);
         }
+        if (isUnsupportedAbsoluteUri(valueUri)) {
+            throw new ServerWebInputException("Unsupported URL protocol: " + value);
+        }
 
+        var permalinks = new LinkedHashSet<String>();
+        permalinks.add(value);
         var siteUri = URI.create(siteUrl.toString());
         if (valueUri.isAbsolute()) {
             if (sameAuthority(siteUri, valueUri)) {
@@ -81,17 +82,12 @@ public class AttachmentPermalinkMatcher {
         return new Candidate(url, permalinks);
     }
 
-    private static boolean hasUnsupportedProtocol(String value) {
-        var colonIndex = value.indexOf(':');
-        if (colonIndex <= 0) {
+    private static boolean isUnsupportedAbsoluteUri(URI uri) {
+        if (!uri.isAbsolute()) {
             return false;
         }
-        var slashIndex = value.indexOf('/');
-        if (slashIndex >= 0 && slashIndex < colonIndex) {
-            return false;
-        }
-        var protocol = value.substring(0, colonIndex).toLowerCase(Locale.ROOT);
-        return UNSUPPORTED_PROTOCOLS.contains(protocol);
+        var scheme = uri.getScheme().toLowerCase(Locale.ROOT);
+        return !SUPPORTED_ABSOLUTE_URI_SCHEMES.contains(scheme);
     }
 
     private static boolean sameAuthority(URI siteUri, URI valueUri) {

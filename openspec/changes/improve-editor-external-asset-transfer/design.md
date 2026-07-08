@@ -16,7 +16,7 @@ The backend already stores Attachment access URLs in `Attachment.status.permalin
 - Add upload-authorized Attachment permalink matching APIs for URL-like strings.
 - Treat a media URL as an existing Halo attachment when it matches `Attachment.status.permalink`.
 - Accept both relative and absolute input strings in the matching API.
-- Reject unsupported browser-local protocols such as `data:`, `blob:`, and `file:`.
+- Reject non-HTTP(S) absolute URL protocols such as `data:`, `blob:`, `file:`, and `ftp:`.
 - Keep the existing paste-time transfer confirmation dialog, but suppress it for URLs matched as existing Attachments.
 - Keep explicit transfer actions for true external media resources.
 - Keep Console and UC editor behavior aligned with their respective upload permissions.
@@ -55,9 +55,9 @@ The backend already stores Attachment access URLs in `Attachment.status.permalin
 
    Alternative considered: treat all configured object-storage domains as local. That would classify unrelated files on the same domain as Halo attachments.
 
-4. Accept URL-like strings, but reject non-matchable protocols.
+4. Accept URL-like strings, but reject non-HTTP(S) absolute protocols.
 
-   The request DTO should use strings, not `java.net.URL`, so relative URLs are accepted. Empty values and browser-local protocols such as `data:`, `blob:`, and `file:` are request errors. If any input is invalid, reject the whole request with `400` so frontend callers filter obvious local resources before calling the endpoint.
+   The request DTO should use strings, not `java.net.URL`, so relative URLs are accepted. Empty values and absolute URL strings whose protocol is not `http` or `https` are request errors. If any input is invalid, reject the whole request with `400` so frontend callers filter obvious local resources before calling the endpoint.
 
    Alternative considered: return per-item errors. That makes the endpoint behave like a generic URL classifier, which is broader than this matching operation.
 

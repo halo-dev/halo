@@ -1,10 +1,10 @@
 ## 1. Backend Permalink Matching
 
 - [x] 1.1 Add request and response DTOs for `POST /attachments/-/match-permalinks`, using string URL inputs and ordered boolean results.
-- [x] 1.2 Implement shared matching service logic that deduplicates inputs, rejects blank and unsupported local-protocol values, builds exact and narrow canonical permalink candidates, and queries `Attachment.status.permalink`.
+- [x] 1.2 Implement shared matching service logic that deduplicates inputs, rejects blank and non-HTTP(S) absolute URL values, builds exact and narrow canonical permalink candidates, and queries `Attachment.status.permalink`.
 - [x] 1.3 Add UC attachment route for `POST /attachments/-/match-permalinks` guarded by the UC attachment upload/management permission path.
 - [x] 1.4 Add Console attachment route for `POST /attachments/-/match-permalinks` guarded by the Console/system attachment upload/management permission path.
-- [x] 1.5 Add backend tests for ordered results, no metadata leakage, relative URL matching, absolute URL matching, relative/absolute canonical variants, blank input rejection, unsupported protocol rejection, and unauthorized access.
+- [x] 1.5 Add backend tests for ordered results, no metadata leakage, relative URL matching, absolute URL matching, relative/absolute canonical variants, blank input rejection, unsupported absolute protocol rejection, and unauthorized access.
 
 ## 2. API Client
 
