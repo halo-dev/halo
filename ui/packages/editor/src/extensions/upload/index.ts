@@ -1,7 +1,9 @@
 import { Toast } from "@halo-dev/components";
-import { ref, type Ref } from "vue";
+import { markRaw, ref, type Ref } from "vue";
+import ExternalAssetTransferToolbarItem from "@/components/upload/ExternalAssetTransferToolbarItem.vue";
 import { i18n } from "@/locales";
 import { Editor, Extension, Plugin, PluginKey, PMNode, Slice } from "@/tiptap";
+import type { ExtensionOptions } from "@/types";
 import {
   batchUploadExternalLink,
   containsFileClipboardIdentifier,
@@ -14,14 +16,21 @@ import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
 
-export interface ExtensionUploadOptions {
+export interface ExtensionUploadOptions extends ExtensionOptions {
   matchAttachmentPermalinks?: MatchAttachmentPermalinks;
   uploadExternalUrl?: UploadExternalUrl;
+}
+
+export interface ExternalAssetItem {
+  url: string;
+  count: number;
 }
 
 export interface ExternalAssetPromptState {
   visible: Ref<boolean>;
   count: Ref<number>;
+  items: Ref<ExternalAssetItem[]>;
+  scanning: Ref<boolean>;
   transferring: Ref<boolean>;
 }
 
@@ -31,6 +40,7 @@ export interface ExtensionUploadStorage {
   externalAssetPrompt: ExternalAssetPromptState;
   uploadExternalUrl?: UploadExternalUrl;
   matchAttachmentPermalinks: (urls: string[]) => Promise<void>;
+  scanExternalAssets: () => Promise<ExternalAssetItem[]>;
   transferExternalAssets: () => Promise<void>;
   dismissExternalAssetsPrompt: () => void;
 }
@@ -50,8 +60,26 @@ export const ExtensionUpload = Extension.create<
 
   addOptions() {
     return {
+      ...this.parent?.(),
       matchAttachmentPermalinks: undefined,
       uploadExternalUrl: undefined,
+      getToolbarItems({ editor }) {
+        const storage = (editor.storage as { upload?: ExtensionUploadStorage })
+          .upload;
+
+        if (!storage?.uploadExternalUrl) {
+          return [];
+        }
+
+        return {
+          priority: 26,
+          component: markRaw(ExternalAssetTransferToolbarItem),
+          props: {
+            editor,
+            isActive: false,
+          },
+        };
+      },
     };
   },
 
@@ -62,10 +90,13 @@ export const ExtensionUpload = Extension.create<
       externalAssetPrompt: {
         visible: ref(false),
         count: ref(0),
+        items: ref([]),
+        scanning: ref(false),
         transferring: ref(false),
       },
       uploadExternalUrl: undefined,
       matchAttachmentPermalinks: async () => undefined,
+      scanExternalAssets: async () => [],
       transferExternalAssets: async () => undefined,
       dismissExternalAssetsPrompt: () => undefined,
     };
@@ -82,6 +113,7 @@ export const ExtensionUpload = Extension.create<
         storage,
         urls
       );
+    storage.scanExternalAssets = () => scanExternalAssets(editor, storage);
     storage.transferExternalAssets = () =>
       transferExternalAssets(editor, storage);
     storage.dismissExternalAssetsPrompt = () =>
@@ -246,11 +278,36 @@ export async function showExternalAssetPrompt(
   try {
     const externalNodes = await getUnmatchedExternalNodes(storage, nodes);
     if (externalNodes.length) {
-      storage.externalAssetPrompt.count.value = externalNodes.length;
-      storage.externalAssetPrompt.visible.value = true;
+      updateExternalAssetsPrompt(storage, externalNodes);
     }
   } catch (error) {
     console.error("Failed to match attachment permalinks:", error);
+  }
+}
+
+export async function scanExternalAssets(
+  editor: Editor,
+  storage: ExtensionUploadStorage
+) {
+  if (!storage.uploadExternalUrl) {
+    dismissExternalAssetsPrompt(storage);
+    return [];
+  }
+
+  storage.externalAssetPrompt.scanning.value = true;
+
+  try {
+    const externalNodes = await collectCurrentUnmatchedExternalNodes(
+      editor,
+      storage
+    );
+    updateExternalAssetsPrompt(storage, externalNodes);
+    return storage.externalAssetPrompt.items.value;
+  } catch (error) {
+    console.error("Failed to scan external assets:", error);
+    return [];
+  } finally {
+    storage.externalAssetPrompt.scanning.value = false;
   }
 }
 
@@ -276,6 +333,7 @@ async function transferExternalAssets(
       return;
     }
 
+    updateExternalAssetsPrompt(storage, externalNodes);
     await batchUploadExternalLink(
       editor,
       externalNodes,
@@ -348,7 +406,40 @@ export async function matchAttachmentPermalinks(
   storage.cacheVersion.value++;
 }
 
+export function summarizeExternalAssetNodes(
+  nodes: ExternalAssetNode[]
+): ExternalAssetItem[] {
+  const itemMap = new Map<string, ExternalAssetItem>();
+
+  for (const nodeWithPos of nodes) {
+    const { src } = nodeWithPos.node.attrs;
+    const item = itemMap.get(src);
+
+    if (item) {
+      item.count++;
+      continue;
+    }
+
+    itemMap.set(src, {
+      url: src,
+      count: 1,
+    });
+  }
+
+  return [...itemMap.values()];
+}
+
+function updateExternalAssetsPrompt(
+  storage: ExtensionUploadStorage,
+  nodes: ExternalAssetNode[]
+) {
+  storage.externalAssetPrompt.items.value = summarizeExternalAssetNodes(nodes);
+  storage.externalAssetPrompt.count.value = nodes.length;
+  storage.externalAssetPrompt.visible.value = nodes.length > 0;
+}
+
 function dismissExternalAssetsPrompt(storage: ExtensionUploadStorage) {
   storage.externalAssetPrompt.visible.value = false;
   storage.externalAssetPrompt.count.value = 0;
+  storage.externalAssetPrompt.items.value = [];
 }

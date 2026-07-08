@@ -6,7 +6,9 @@ import {
   collectCurrentUnmatchedExternalNodes,
   getUnmatchedExternalNodes,
   matchAttachmentPermalinks,
+  scanExternalAssets,
   showExternalAssetPrompt,
+  summarizeExternalAssetNodes,
   type ExtensionUploadStorage,
   type ExternalAssetNode,
 } from "./index";
@@ -60,7 +62,7 @@ describe("ExtensionUpload external asset matching", () => {
     expect(storage.externalAssetPrompt.visible.value).toBe(false);
   });
 
-  it("shows a non-blocking prompt without uploading immediately", async () => {
+  it("updates the toolbar prompt without uploading immediately", async () => {
     const uploadExternalUrl = vi.fn<UploadExternalUrl>();
     const storage = createStorage(
       async (urls) =>
@@ -77,7 +79,59 @@ describe("ExtensionUpload external asset matching", () => {
 
     expect(storage.externalAssetPrompt.visible.value).toBe(true);
     expect(storage.externalAssetPrompt.count.value).toBe(1);
+    expect(storage.externalAssetPrompt.items.value).toEqual([
+      {
+        url: "https://remote.example.com/new.png",
+        count: 1,
+      },
+    ]);
     expect(uploadExternalUrl).not.toHaveBeenCalled();
+  });
+
+  it("scans current document external nodes for the toolbar", async () => {
+    const editor = editorWithDynamicNodes(() => [
+      assetNode("https://remote.example.com/current.png"),
+      assetNode("https://remote.example.com/current.png"),
+      assetNode("/upload/local.png"),
+    ]);
+    const storage = createStorage(
+      async (urls) =>
+        urls.map((url) => ({
+          url,
+          matched: false,
+        })),
+      vi.fn()
+    );
+
+    const items = await scanExternalAssets(editor, storage);
+
+    expect(items).toEqual([
+      {
+        url: "https://remote.example.com/current.png",
+        count: 2,
+      },
+    ]);
+    expect(storage.externalAssetPrompt.visible.value).toBe(true);
+    expect(storage.externalAssetPrompt.count.value).toBe(2);
+  });
+
+  it("summarizes repeated external resources for display", () => {
+    expect(
+      summarizeExternalAssetNodes([
+        assetNode("https://remote.example.com/a.png"),
+        assetNode("https://remote.example.com/a.png"),
+        assetNode("https://remote.example.com/b.png"),
+      ])
+    ).toEqual([
+      {
+        url: "https://remote.example.com/a.png",
+        count: 2,
+      },
+      {
+        url: "https://remote.example.com/b.png",
+        count: 1,
+      },
+    ]);
   });
 
   it("collects unmatched external nodes from the current document before transfer", async () => {
@@ -116,11 +170,14 @@ function createStorage(
     externalAssetPrompt: {
       visible: ref(false),
       count: ref(0),
+      items: ref([]),
+      scanning: ref(false),
       transferring: ref(false),
     },
     uploadExternalUrl,
     matchAttachmentPermalinks: async (urls: string[]) =>
       matchAttachmentPermalinks(matcher, storage, urls),
+    scanExternalAssets: async () => [],
     transferExternalAssets: async () => undefined,
     dismissExternalAssetsPrompt: () => undefined,
   } as ExtensionUploadStorage;
