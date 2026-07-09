@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { Attachment } from "@halo-dev/api-client";
 import { Toast, VButton, VDropdown, VDropdownItem } from "@halo-dev/components";
 import {
   utils,
@@ -7,15 +6,15 @@ import {
   type AttachmentSimple,
 } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
-import type { AxiosRequestConfig } from "axios";
 import { ref } from "vue";
 import { i18n } from "@/locales";
+import type { UploadFile } from "@/utils/upload";
 import Input from "../base/Input.vue";
 
 const props = defineProps<{
   originalLink?: string;
   accept?: string;
-  upload: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>;
+  upload: UploadFile;
 }>();
 
 const emit = defineEmits<{
@@ -49,6 +48,9 @@ onInputChange((files) => {
   props
     .upload?.(file)
     .then((attachment) => {
+      if (!attachment) {
+        return;
+      }
       emit("change", utils.attachment.convertToSimple(attachment));
     })
     .catch((e: Error) => {

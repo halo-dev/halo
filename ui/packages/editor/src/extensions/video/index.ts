@@ -1,5 +1,3 @@
-import type { Attachment } from "@halo-dev/api-client";
-import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import LucideCaptions from "~icons/lucide/captions";
@@ -33,6 +31,7 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { UploadFile } from "@/utils/upload";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
@@ -51,10 +50,7 @@ declare module "@/tiptap" {
 export const VIDEO_BUBBLE_MENU_KEY = new PluginKey("videoBubbleMenu");
 
 export type ExtensionVideoOptions = ExtensionOptions & {
-  uploadVideo?: (
-    file: File,
-    options?: AxiosRequestConfig
-  ) => Promise<Attachment>;
+  uploadVideo?: UploadFile;
 };
 
 export const ExtensionVideo = Node.create<ExtensionVideoOptions>({

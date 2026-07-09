@@ -12,18 +12,19 @@ export interface AttachmentPermalinkMatchResult {
   matched: boolean;
 }
 
-export interface ExternalAssetTransferResult {
-  url: string;
-  alt?: string;
-}
-
 export type MatchAttachmentPermalinks = (
   urls: string[]
 ) => Promise<AttachmentPermalinkMatchResult[]>;
 
-export type UploadExternalUrl = (
-  url: string
-) => Promise<ExternalAssetTransferResult | undefined>;
+export type Upload = (
+  fileOrUrl: File | string,
+  options?: AxiosRequestConfig
+) => Promise<Attachment | undefined>;
+
+export type UploadFile = (
+  file: File,
+  options?: AxiosRequestConfig
+) => Promise<Attachment | undefined>;
 
 export interface FileProps {
   file: File;
@@ -137,7 +138,7 @@ export interface UploadFetchResponse {
  */
 export const uploadFile = async (
   file: File,
-  upload: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>,
+  upload: UploadFile,
   uploadResponse: UploadFetchResponse
 ) => {
   const { signal } = uploadResponse.controller;
@@ -191,9 +192,9 @@ export async function batchUploadExternalLink(
     index: number;
     parent: PMNode | null;
   }[],
-  uploadExternalUrl?: UploadExternalUrl
+  upload?: Upload
 ) {
-  if (!uploadExternalUrl) {
+  if (!upload) {
     return;
   }
 
@@ -201,9 +202,7 @@ export async function batchUploadExternalLink(
 
   for (const chunkNodes of chunks) {
     await Promise.all(
-      chunkNodes.map((node) =>
-        uploadExternalLink(editor, node, uploadExternalUrl)
-      )
+      chunkNodes.map((node) => uploadExternalLink(editor, node, upload))
     );
   }
 }
@@ -216,7 +215,7 @@ export async function uploadExternalLink(
     index: number;
     parent: PMNode | null;
   },
-  uploadExternalUrl: UploadExternalUrl
+  upload: Upload
 ) {
   const { node, pos } = nodeWithPos;
   const { src } = node.attrs;
@@ -226,8 +225,13 @@ export async function uploadExternalLink(
   }
 
   try {
-    const attachment = await uploadExternalUrl(src);
+    const uploadedAttachment = await upload(src);
 
+    if (!uploadedAttachment) {
+      return;
+    }
+
+    const attachment = utils.attachment.convertToSimple(uploadedAttachment);
     if (!attachment?.url) {
       return;
     }

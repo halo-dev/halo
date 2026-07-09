@@ -20,5 +20,6 @@ export {
   isNodeContentEmpty,
   getCursorCoords,
   type MatchAttachmentPermalinks,
-  type UploadExternalUrl,
+  type Upload,
+  type UploadFile,
 } from "./utils";

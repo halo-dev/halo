@@ -1,7 +1,5 @@
-import type { Attachment } from "@halo-dev/api-client";
 import type { ImageOptions } from "@tiptap/extension-image";
 import TiptapImage from "@tiptap/extension-image";
-import type { AxiosRequestConfig } from "axios";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import MingcuteBookmarkEditLine from "~icons/mingcute/bookmark-edit-line";
@@ -32,6 +30,7 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { UploadFile } from "@/utils/upload";
 import { ExtensionFigure } from "../figure";
 import { ExtensionFigureCaption } from "../figure/figure-caption";
 import { ExtensionParagraph } from "../paragraph";
@@ -46,10 +45,7 @@ export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
 
 export type ExtensionImageOptions = ExtensionOptions &
   Partial<ImageOptions> & {
-    uploadImage?: (
-      file: File,
-      options?: AxiosRequestConfig
-    ) => Promise<Attachment>;
+    uploadImage?: UploadFile;
   };
 
 export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({

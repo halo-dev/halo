@@ -8,7 +8,7 @@ import {
   handleFileEvent,
   isExternalAsset,
   type MatchAttachmentPermalinks,
-  type UploadExternalUrl,
+  type Upload,
 } from "@/utils/upload";
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
@@ -16,13 +16,13 @@ import { ExtensionVideo } from "../video";
 
 export interface ExtensionUploadOptions {
   matchAttachmentPermalinks?: MatchAttachmentPermalinks;
-  uploadExternalUrl?: UploadExternalUrl;
+  upload?: Upload;
 }
 
 export interface ExtensionUploadStorage {
   matchCache: Map<string, boolean>;
   cacheVersion: Ref<number>;
-  uploadExternalUrl?: UploadExternalUrl;
+  upload?: Upload;
   matchAttachmentPermalinks: (urls: string[]) => Promise<void>;
 }
 
@@ -42,7 +42,7 @@ export const ExtensionUpload = Extension.create<
   addOptions() {
     return {
       matchAttachmentPermalinks: undefined,
-      uploadExternalUrl: undefined,
+      upload: undefined,
     };
   },
 
@@ -50,7 +50,7 @@ export const ExtensionUpload = Extension.create<
     return {
       matchCache: new Map<string, boolean>(),
       cacheVersion: ref(0),
-      uploadExternalUrl: undefined,
+      upload: undefined,
       matchAttachmentPermalinks: async () => undefined,
     };
   },
@@ -59,7 +59,7 @@ export const ExtensionUpload = Extension.create<
     const { editor }: { editor: Editor } = this;
     const storage = this.storage;
 
-    storage.uploadExternalUrl = this.options.uploadExternalUrl;
+    storage.upload = this.options.upload;
     storage.matchAttachmentPermalinks = (urls) =>
       matchAttachmentPermalinks(
         this.options.matchAttachmentPermalinks,
@@ -205,12 +205,12 @@ export async function showExternalAssetTransferDialog(
   storage: ExtensionUploadStorage,
   nodes: ExternalAssetNode[]
 ) {
-  if (!storage.uploadExternalUrl || !nodes.length) {
+  if (!storage.upload || !nodes.length) {
     return;
   }
 
   try {
-    const uploadExternalUrl = storage.uploadExternalUrl;
+    const upload = storage.upload;
     const externalNodes = await getUnmatchedExternalNodes(storage, nodes);
     if (externalNodes.length) {
       Dialog.info({
@@ -222,11 +222,7 @@ export async function showExternalAssetTransferDialog(
         confirmText: i18n.global.t("editor.common.button.confirm"),
         cancelText: i18n.global.t("editor.common.button.cancel"),
         async onConfirm() {
-          await batchUploadExternalLink(
-            editor,
-            externalNodes,
-            uploadExternalUrl
-          );
+          await batchUploadExternalLink(editor, externalNodes, upload);
 
           Toast.success(i18n.global.t("editor.common.toast.save_success"));
         },

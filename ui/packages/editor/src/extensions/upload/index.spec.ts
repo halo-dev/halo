@@ -1,8 +1,9 @@
+import type { Attachment } from "@halo-dev/api-client";
 import { Dialog } from "@halo-dev/components";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import type { Editor, PMNode } from "@/tiptap";
-import type { MatchAttachmentPermalinks, UploadExternalUrl } from "@/utils";
+import type { MatchAttachmentPermalinks, Upload } from "@/utils";
 import {
   getUnmatchedExternalNodes,
   matchAttachmentPermalinks,
@@ -74,14 +75,14 @@ describe("ExtensionUpload external asset matching", () => {
   });
 
   it("shows the paste dialog for unmatched external resources without uploading immediately", async () => {
-    const uploadExternalUrl = vi.fn<UploadExternalUrl>();
+    const upload = vi.fn<Upload>();
     const storage = createStorage(
       async (urls) =>
         urls.map((url) => ({
           url,
           matched: false,
         })),
-      uploadExternalUrl
+      upload
     );
 
     await showExternalAssetTransferDialog(editorWithNodes([]), storage, [
@@ -89,7 +90,7 @@ describe("ExtensionUpload external asset matching", () => {
     ]);
 
     expect(Dialog.info).toHaveBeenCalledTimes(1);
-    expect(uploadExternalUrl).not.toHaveBeenCalled();
+    expect(upload).not.toHaveBeenCalled();
   });
 
   it("does not show the paste dialog for matched Attachment URLs", async () => {
@@ -110,9 +111,9 @@ describe("ExtensionUpload external asset matching", () => {
   });
 
   it("passes unmatched resources to the dialog confirmation transfer", async () => {
-    const uploadExternalUrl = vi.fn<UploadExternalUrl>(async (url) => ({
-      url: `/upload/${url.split("/").pop()}`,
-    }));
+    const upload = vi.fn<Upload>(async (url) =>
+      attachment(`/upload/${String(url).split("/").pop()}`, "Uploaded asset")
+    );
     const editor = editorWithNodes([
       assetNode("https://remote.example.com/new.png"),
     ]);
@@ -122,7 +123,7 @@ describe("ExtensionUpload external asset matching", () => {
           url,
           matched: false,
         })),
-      uploadExternalUrl
+      upload
     );
 
     await showExternalAssetTransferDialog(editor, storage, [
@@ -135,20 +136,23 @@ describe("ExtensionUpload external asset matching", () => {
     }
     await dialogOptions.onConfirm?.();
 
-    expect(uploadExternalUrl).toHaveBeenCalledWith(
-      "https://remote.example.com/new.png"
+    expect(upload).toHaveBeenCalledWith("https://remote.example.com/new.png");
+    expect(editor.view.state.tr.setNodeMarkup).toHaveBeenCalledWith(
+      0,
+      expect.anything(),
+      expect.objectContaining({
+        src: "/upload/new.png",
+        name: "Uploaded asset",
+      })
     );
   });
 });
 
-function createStorage(
-  matcher?: MatchAttachmentPermalinks,
-  uploadExternalUrl?: UploadExternalUrl
-) {
+function createStorage(matcher?: MatchAttachmentPermalinks, upload?: Upload) {
   const storage = {
     matchCache: new Map<string, boolean>(),
     cacheVersion: ref(0),
-    uploadExternalUrl,
+    upload,
     matchAttachmentPermalinks: async (urls: string[]) =>
       matchAttachmentPermalinks(matcher, storage, urls),
   } as ExtensionUploadStorage;
@@ -169,6 +173,22 @@ function assetNode(src: string): ExternalAssetNode {
     pos: 0,
     index: 0,
     parent: null,
+  };
+}
+
+function attachment(permalink: string, displayName: string): Attachment {
+  return {
+    apiVersion: "storage.halo.run/v1alpha1",
+    kind: "Attachment",
+    metadata: {
+      name: displayName,
+    },
+    spec: {
+      displayName,
+    },
+    status: {
+      permalink,
+    },
   };
 }
 

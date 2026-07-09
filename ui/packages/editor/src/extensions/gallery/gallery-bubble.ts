@@ -1,18 +1,14 @@
-import type { Attachment } from "@halo-dev/api-client";
-import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImagePlus from "~icons/mdi/image-plus";
 import { i18n } from "@/locales";
 import { Extension } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
+import type { UploadFile } from "@/utils/upload";
 import { GALLERY_BUBBLE_MENU_KEY } from ".";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 
 export type ExtensionGalleryBubbleOptions = ExtensionOptions & {
-  uploadImage?: (
-    file: File,
-    options?: AxiosRequestConfig
-  ) => Promise<Attachment>;
+  uploadImage?: UploadFile;
 };
 
 export const ExtensionGalleryBubble =

@@ -1,5 +1,3 @@
-import type { Attachment } from "@halo-dev/api-client";
-import type { AxiosRequestConfig } from "axios";
 import { markRaw } from "vue";
 import MdiImagePlus from "~icons/mdi/image-plus";
 import MingcutePhotoAlbumLine from "~icons/mingcute/photo-album-line";
@@ -18,6 +16,7 @@ import {
 import type { EditorState } from "@/tiptap/pm";
 import type { ExtensionOptions, NodeBubbleMenuType } from "@/types";
 import { deleteNode } from "@/utils";
+import type { UploadFile } from "@/utils/upload";
 import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGap from "./BubbleItemGap.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
@@ -45,10 +44,7 @@ export type ExtensionGalleryOptions = ExtensionOptions & {
   gap?: number;
   allowBase64: boolean;
   HTMLAttributes: Record<string, unknown>;
-  uploadImage?: (
-    file: File,
-    options?: AxiosRequestConfig
-  ) => Promise<Attachment>;
+  uploadImage?: UploadFile;
 };
 
 export const ExtensionGallery = Node.create<

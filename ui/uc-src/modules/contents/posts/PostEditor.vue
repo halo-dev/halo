@@ -468,19 +468,24 @@ const canManageAttachments = computed(() =>
   utils.permission.has(["uc:attachments:manage"])
 );
 
-// Upload image
-async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
+async function handleUpload(
+  fileOrUrl: File | string,
+  options?: AxiosRequestConfig
+) {
   if (!canManageAttachments.value) {
     return;
   }
 
   const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc(
-    {
-      file,
-    },
+    typeof fileOrUrl === "string" ? { url: fileOrUrl } : { file: fileOrUrl },
     options
   );
   return data;
+}
+
+// Kept for third-party editor providers that still consume the legacy prop.
+function handleUploadImage(file: File, options?: AxiosRequestConfig) {
+  return handleUpload(file, options);
 }
 
 async function handleMatchAttachmentPermalinks(urls: string[]) {
@@ -499,21 +504,6 @@ async function handleMatchAttachmentPermalinks(urls: string[]) {
     url: item.url || "",
     matched: item.matched || false,
   }));
-}
-
-async function handleUploadExternalUrl(url: string) {
-  if (!canManageAttachments.value) {
-    return;
-  }
-
-  const { data } = await ucApiClient.storage.attachment.uploadAttachmentForUc({
-    url,
-  });
-
-  return {
-    url: data.status?.permalink || "",
-    alt: data.spec.displayName,
-  };
 }
 
 // Keep session alive
@@ -576,12 +566,10 @@ useSessionKeepAlive();
       v-model:content="content.content"
       v-model:title="formState.spec.title"
       v-model:cover="formState.spec.cover"
+      :upload="canManageAttachments ? handleUpload : undefined"
       :upload-image="handleUploadImage"
       :match-attachment-permalinks="
         canManageAttachments ? handleMatchAttachmentPermalinks : undefined
-      "
-      :upload-external-url="
-        canManageAttachments ? handleUploadExternalUrl : undefined
       "
       class="h-full"
       @update="handleSetContentCache"

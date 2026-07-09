@@ -1,5 +1,5 @@
 import { Toast } from "@halo-dev/components";
-import { stores, type AttachmentSimple } from "@halo-dev/ui-shared";
+import { stores, utils, type AttachmentSimple } from "@halo-dev/ui-shared";
 import { computed, ref, watch, type Ref } from "vue";
 import type { ExtensionUploadStorage } from "@/extensions/upload";
 import { i18n } from "@/locales";
@@ -20,7 +20,7 @@ export function useExternalAssetsTransfer(
   watch(
     src,
     (value) => {
-      if (!value || !uploadStorage.value?.uploadExternalUrl) {
+      if (!value || !uploadStorage.value?.upload) {
         return;
       }
       if (
@@ -45,7 +45,7 @@ export function useExternalAssetsTransfer(
   const isExternalAsset = computed(() => {
     const storage = uploadStorage.value;
 
-    if (!src.value || !storage?.uploadExternalUrl) {
+    if (!src.value || !storage?.upload) {
       return false;
     }
 
@@ -66,7 +66,7 @@ export function useExternalAssetsTransfer(
 
   async function handleTransfer() {
     const storage = uploadStorage.value;
-    if (!src.value || !storage?.uploadExternalUrl) {
+    if (!src.value || !storage?.upload) {
       return;
     }
 
@@ -78,7 +78,12 @@ export function useExternalAssetsTransfer(
         return;
       }
 
-      const attachment = await storage.uploadExternalUrl(src.value);
+      const uploadedAttachment = await storage.upload(src.value);
+      if (!uploadedAttachment) {
+        return;
+      }
+
+      const attachment = utils.attachment.convertToSimple(uploadedAttachment);
       if (!attachment?.url) {
         return;
       }

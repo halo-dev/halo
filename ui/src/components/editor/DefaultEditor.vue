@@ -34,7 +34,8 @@ import {
   VueEditor,
   type Extensions,
   type MatchAttachmentPermalinks,
-  type UploadExternalUrl,
+  type Upload,
+  type UploadFile,
 } from "@halo-dev/richtext-editor";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { useDebounceFn, useFileDialog, useLocalStorage } from "@vueuse/core";
@@ -76,8 +77,8 @@ const props = withDefaults(
       file: File,
       options?: AxiosRequestConfig
     ) => Promise<Attachment>;
+    upload?: Upload;
     matchAttachmentPermalinks?: MatchAttachmentPermalinks;
-    uploadExternalUrl?: UploadExternalUrl;
   }>(),
   {
     title: "",
@@ -85,8 +86,8 @@ const props = withDefaults(
     content: "",
     cover: undefined,
     uploadImage: undefined,
+    upload: undefined,
     matchAttachmentPermalinks: undefined,
-    uploadExternalUrl: undefined,
   }
 );
 
@@ -232,6 +233,17 @@ const customExtensions = [
 
 const isInitialized = ref(false);
 
+const uploadFile: UploadFile | undefined =
+  props.upload || props.uploadImage
+    ? async (file, options) => {
+        if (props.upload) {
+          return props.upload(file, options);
+        }
+
+        return props.uploadImage?.(file, options);
+      }
+    : undefined;
+
 onMounted(async () => {
   const extensionsFromPlugins: Extensions = [];
 
@@ -261,20 +273,20 @@ onMounted(async () => {
     extensions: [
       ExtensionsKit.configure({
         image: {
-          uploadImage: props.uploadImage,
+          uploadImage: uploadFile,
         },
         gallery: {
-          uploadImage: props.uploadImage,
+          uploadImage: uploadFile,
         },
         video: {
-          uploadVideo: props.uploadImage,
+          uploadVideo: uploadFile,
         },
         audio: {
-          uploadAudio: props.uploadImage,
+          uploadAudio: uploadFile,
         },
         upload: {
           matchAttachmentPermalinks: props.matchAttachmentPermalinks,
-          uploadExternalUrl: props.uploadExternalUrl,
+          upload: props.upload,
         },
         placeholder: {
           placeholder: t(
@@ -366,15 +378,20 @@ onCoverInputChange((files) => {
   if (!file) {
     return;
   }
-  props
-    .uploadImage?.(file, {
-      onUploadProgress: (progress) => {
-        uploadProgress.value = Math.round(
-          (progress.loaded * 100) / (progress.total || 1)
-        );
-      },
-    })
+  if (!uploadFile) {
+    return;
+  }
+  uploadFile(file, {
+    onUploadProgress: (progress) => {
+      uploadProgress.value = Math.round(
+        (progress.loaded * 100) / (progress.total || 1)
+      );
+    },
+  })
     .then((attachment) => {
+      if (!attachment) {
+        return;
+      }
       emit("update:cover", attachment.status?.permalink);
     })
     .catch((e: Error) => {

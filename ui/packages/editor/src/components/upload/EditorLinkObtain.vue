@@ -7,11 +7,10 @@ import {
   type AttachmentSimple,
 } from "@halo-dev/ui-shared";
 import { useFileDialog } from "@vueuse/core";
-import type { AxiosRequestConfig } from "axios";
 import { onUnmounted, ref, watch } from "vue";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { uploadFile } from "@/utils/upload";
+import { uploadFile, type UploadFile } from "@/utils/upload";
 import Input from "../base/Input.vue";
 
 const props = withDefaults(
@@ -19,10 +18,7 @@ const props = withDefaults(
     editor: Editor;
     accept?: string;
     uploadedFile?: File;
-    uploadToAttachmentFile: (
-      file: File,
-      options?: AxiosRequestConfig
-    ) => Promise<Attachment>;
+    uploadToAttachmentFile: UploadFile;
   }>(),
   {
     accept: "*",
