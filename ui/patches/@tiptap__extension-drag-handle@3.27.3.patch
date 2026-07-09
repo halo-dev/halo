@@ -1,0 +1,174 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 67f4b0e..2f2e17e 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -36,9 +36,7 @@ var import_core2 = require("@tiptap/core");
+ // src/drag-handle-plugin.ts
+ var import_dom = require("@floating-ui/dom");
+ var import_core = require("@tiptap/core");
+-var import_extension_collaboration = require("@tiptap/extension-collaboration");
+ var import_state2 = require("@tiptap/pm/state");
+-var import_y_tiptap = require("@tiptap/y-tiptap");
+ 
+ // src/helpers/dragHandler.ts
+ var import_extension_node_range = require("@tiptap/extension-node-range");
+@@ -550,6 +548,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
+   });
+   wrapper.style.position = "absolute";
+   wrapper.style.top = "-10000px";
++  wrapper.style.paddingLeft = "12px";
++  wrapper.style.paddingTop = "12px";
++  const firstElement = view.nodeDOM(ranges[0].$from.pos);
++  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
++  wrapper.style.left = `${firstElementLeft}px`;
+   document.body.append(wrapper);
+   event.dataTransfer.clearData();
+   const wrapperRect = wrapper.getBoundingClientRect();
+@@ -671,23 +674,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+ 
+ // src/drag-handle-plugin.ts
+ var getRelativePos = (state, absolutePos) => {
+-  const ystate = import_y_tiptap.ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return null;
+-  }
+-  return (0, import_y_tiptap.absolutePositionToRelativePosition)(absolutePos, ystate.type, ystate.binding.mapping);
++  return null;
+ };
+ var getAbsolutePos = (state, relativePos) => {
+-  const ystate = import_y_tiptap.ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return -1;
+-  }
+-  return (0, import_y_tiptap.relativePositionToAbsolutePosition)(
+-    ystate.doc,
+-    ystate.type,
+-    relativePos,
+-    ystate.binding.mapping
+-  ) || 0;
++  return -1;
+ };
+ var getOuterDomNode = (view, domNode) => {
+   let tmpDomNode = domNode;
+@@ -730,8 +720,8 @@ var DragHandlePlugin = ({
+       return;
+     }
+     pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
+-      isChangeOrigin: (0, import_extension_collaboration.isChangeOrigin)(tr),
+-      getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
++      isChangeOrigin: false,
++      getAbsolutePos: () => -1
+     });
+   }
+   function buildRestoreTransaction(state) {
+@@ -873,17 +863,10 @@ var DragHandlePlugin = ({
+             return value;
+           }
+           if (tr.docChanged && currentNodePos !== -1 && element) {
+-            if ((0, import_extension_collaboration.isChangeOrigin)(tr)) {
+-              const newPos = getAbsolutePos(state, currentNodeRelPos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-              }
+-            } else {
+-              const newPos = tr.mapping.map(currentNodePos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-                currentNodeRelPos = getRelativePos(state, currentNodePos);
+-              }
++            const newPos = tr.mapping.map(currentNodePos);
++            if (newPos !== currentNodePos) {
++              currentNodePos = newPos;
++              currentNodeRelPos = getRelativePos(state, currentNodePos);
+             }
+           }
+           return value;
+diff --git a/dist/index.js b/dist/index.js
+index 8fec3ce..f572915 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
+ // src/drag-handle-plugin.ts
+ import { computePosition } from "@floating-ui/dom";
+ import { isFirefox } from "@tiptap/core";
+-import { isChangeOrigin } from "@tiptap/extension-collaboration";
+ import { Plugin, PluginKey } from "@tiptap/pm/state";
+-import {
+-  absolutePositionToRelativePosition,
+-  relativePositionToAbsolutePosition,
+-  ySyncPluginKey
+-} from "@tiptap/y-tiptap";
+ 
+ // src/helpers/dragHandler.ts
+ import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
+@@ -522,6 +516,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
+   });
+   wrapper.style.position = "absolute";
+   wrapper.style.top = "-10000px";
++  wrapper.style.paddingLeft = "12px";
++  wrapper.style.paddingTop = "12px";
++  const firstElement = view.nodeDOM(ranges[0].$from.pos);
++  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
++  wrapper.style.left = `${firstElementLeft}px`;
+   document.body.append(wrapper);
+   event.dataTransfer.clearData();
+   const wrapperRect = wrapper.getBoundingClientRect();
+@@ -643,23 +642,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+ 
+ // src/drag-handle-plugin.ts
+ var getRelativePos = (state, absolutePos) => {
+-  const ystate = ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return null;
+-  }
+-  return absolutePositionToRelativePosition(absolutePos, ystate.type, ystate.binding.mapping);
++  return null;
+ };
+ var getAbsolutePos = (state, relativePos) => {
+-  const ystate = ySyncPluginKey.getState(state);
+-  if (!ystate) {
+-    return -1;
+-  }
+-  return relativePositionToAbsolutePosition(
+-    ystate.doc,
+-    ystate.type,
+-    relativePos,
+-    ystate.binding.mapping
+-  ) || 0;
++  return -1;
+ };
+ var getOuterDomNode = (view, domNode) => {
+   let tmpDomNode = domNode;
+@@ -702,8 +688,8 @@ var DragHandlePlugin = ({
+       return;
+     }
+     pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
+-      isChangeOrigin: isChangeOrigin(tr),
+-      getAbsolutePos: (relativePos) => getAbsolutePos(state, relativePos)
++      isChangeOrigin: false,
++      getAbsolutePos: () => -1
+     });
+   }
+   function buildRestoreTransaction(state) {
+@@ -845,17 +831,10 @@ var DragHandlePlugin = ({
+             return value;
+           }
+           if (tr.docChanged && currentNodePos !== -1 && element) {
+-            if (isChangeOrigin(tr)) {
+-              const newPos = getAbsolutePos(state, currentNodeRelPos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-              }
+-            } else {
+-              const newPos = tr.mapping.map(currentNodePos);
+-              if (newPos !== currentNodePos) {
+-                currentNodePos = newPos;
+-                currentNodeRelPos = getRelativePos(state, currentNodePos);
+-              }
++            const newPos = tr.mapping.map(currentNodePos);
++            if (newPos !== currentNodePos) {
++              currentNodePos = newPos;
++              currentNodeRelPos = getRelativePos(state, currentNodePos);
+             }
+           }
+           return value;
