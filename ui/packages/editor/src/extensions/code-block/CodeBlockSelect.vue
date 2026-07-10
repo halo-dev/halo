@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VDropdown } from "@halo-dev/components";
-import { computed, ref, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import MingcuteDownLine from "~icons/mingcute/down-line";
 
 export interface Option {
@@ -61,7 +61,10 @@ const handleInputBlur = () => {
   }
 };
 
-const handleSelectOption = (option: Option) => {
+const handleSelectOption = (option?: Option) => {
+  if (!option) {
+    return;
+  }
   selectedOption.value = option;
   value.value = option.value;
   inputValue.value = "";
@@ -73,38 +76,50 @@ const selectedIndex = ref(-1);
 
 const handleOptionKeydown = (event: KeyboardEvent) => {
   const key = event.key;
+  if (!["ArrowUp", "ArrowDown", "Enter"].includes(key)) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const options = filterOptions.value;
+  if (!options.length) {
+    selectedIndex.value = -1;
+    return;
+  }
+
   if (key === "ArrowUp") {
     selectedIndex.value =
-      (selectedIndex.value - 1 + filterOptions.value.length) %
-      filterOptions.value.length;
-    return true;
+      selectedIndex.value <= 0 ? options.length - 1 : selectedIndex.value - 1;
+    return;
   }
 
   if (key === "ArrowDown") {
-    selectedIndex.value =
-      (selectedIndex.value + 1) % filterOptions.value.length;
-    return true;
+    selectedIndex.value = (selectedIndex.value + 1) % options.length;
+    return;
   }
 
   if (key === "Enter") {
-    if (selectedIndex.value === -1) {
-      return true;
-    }
-    handleSelectOption(filterOptions.value[selectedIndex.value]);
-    return true;
+    handleSelectOption(options[selectedIndex.value]);
   }
 };
 
 watch(
-  value,
-  (newValue) => {
-    if (newValue) {
-      selectedOption.value =
-        props.options.find((option) => option.value === newValue) || null;
-      selectedIndex.value = props.options.findIndex(
-        (option) => option.value === newValue
-      );
-    }
+  [value, filterOptions],
+  ([newValue, options]) => {
+    selectedOption.value = newValue
+      ? props.options.find((option) => option.value === newValue) || null
+      : null;
+
+    const currentIndex = options.findIndex(
+      (option) => option.value === newValue
+    );
+    selectedIndex.value =
+      currentIndex >= 0
+        ? currentIndex
+        : inputValue.value && options.length
+          ? 0
+          : -1;
   },
   {
     immediate: true,
@@ -123,13 +138,14 @@ watch(
   }
 );
 
+const selectRef = useTemplateRef<HTMLDivElement>("select");
+
 const handleScrollIntoView = () => {
-  if (selectedIndex.value === -1) {
+  const index = selectedIndex.value;
+  if (index < 0 || index >= filterOptions.value.length) {
     return;
   }
-  const optionElement = document.querySelector(
-    `.select > div:nth-child(${selectedIndex.value + 1})`
-  );
+  const optionElement = selectRef.value?.children.item(index);
   if (optionElement) {
     optionElement.scrollIntoView({
       behavior: "instant",
@@ -179,7 +195,7 @@ const handleScrollIntoView = () => {
 
     <template #popper>
       <div class="bg-white">
-        <div class="select max-h-64 cursor-pointer p-1">
+        <div ref="select" class="select max-h-64 cursor-pointer p-1">
           <template v-if="filterOptions && filterOptions.length > 0">
             <div
               v-for="(option, index) in filterOptions"
