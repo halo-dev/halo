@@ -231,6 +231,14 @@ class PostFinderImplTest {
             assertThat(result.getSort())
                     .isEqualTo(Sort.by(Sort.Order.desc("spec.publishTime")).and(PostFinderImpl.defaultSort()));
         }
+
+        @Test
+        void toListOptionsWithPinnedTest() {
+            var query = new PostFinderImpl.PostQuery();
+            query.setPinned(true);
+
+            assertThat(query.toListOptions().toCondition().toString()).isEqualTo("spec.pinned = true");
+        }
     }
 
     @Nested

@@ -2,7 +2,9 @@ package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
@@ -76,13 +78,15 @@ class PostFinderImplIntegrationTest {
         when(templateResourceComputer.compute(eq("post"))).thenReturn(new StringTemplateResource("""
             <span
               th:each="post : ${postFinder.list({page: 1, size: 10, tagName: 'fake-tag',
-               ownerName: 'fake-owner', sort: {'spec.publishTime,desc',
+               ownerName: 'fake-owner', pinned: true, sort: {'spec.publishTime,desc',
                 'metadata.creationTimestamp,asc'}})}"
             >
             </span>
             """));
         result = templateEngine.process("post", context);
         assertThat(result).isEqualToIgnoringWhitespace("");
+        verify(postPublicQueryService)
+                .list(argThat(options -> options.toCondition().toString().contains("spec.pinned = true")), any());
     }
 
     static class TestTemplateResolver extends StringTemplateResolver {

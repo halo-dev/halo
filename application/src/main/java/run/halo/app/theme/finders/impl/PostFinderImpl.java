@@ -391,6 +391,7 @@ class PostFinderImpl implements PostFinder {
         private String categoryName;
         private String tagName;
         private String owner;
+        private Boolean pinned;
         private List<String> sort;
 
         public ListOptions toListOptions() {
@@ -402,6 +403,10 @@ class PostFinderImpl implements PostFinder {
             }
             if (StringUtils.isNotBlank(tagName)) {
                 builder.andQuery(equal("spec.tags", tagName));
+                hasQuery = true;
+            }
+            if (pinned != null) {
+                builder.andQuery(equal("spec.pinned", pinned));
                 hasQuery = true;
             }
             // Exclude hidden posts when no query
