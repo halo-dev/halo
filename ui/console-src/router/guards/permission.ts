@@ -1,8 +1,6 @@
-import type { Role } from "@halo-dev/api-client";
 import { stores, utils } from "@halo-dev/ui-shared";
 import type { RouteLocationNormalized, Router } from "vue-router";
-import { rbacAnnotations } from "@/constants/annotations";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { isConsoleAccessDisallowed } from "@/utils/role";
 
 export function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, _, next) => {
@@ -24,20 +22,6 @@ export function setupPermissionGuard(router: Router) {
       next({ name: "Forbidden" });
     }
   });
-}
-
-function isConsoleAccessDisallowed(currentRoles?: Role[]): boolean {
-  if (currentRoles?.some((role) => role.metadata.name === SUPER_ROLE_NAME)) {
-    return false;
-  }
-
-  return (
-    currentRoles?.some(
-      (role) =>
-        role.metadata.annotations?.[rbacAnnotations.DISALLOW_ACCESS_CONSOLE] ===
-        "true"
-    ) || false
-  );
 }
 
 async function checkRoutePermissions(

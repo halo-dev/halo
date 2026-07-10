@@ -15,7 +15,7 @@ import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { rbacAnnotations } from "@/constants/annotations";
-import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { isConsoleAccessDisallowed } from "@/utils/role";
 
 const props = defineProps<{
   platform?: "console" | "uc";
@@ -37,23 +37,9 @@ const handleLogout = () => {
   });
 };
 
-const disallowAccessConsole = computed(() => {
-  if (
-    currentUser.value?.roles.some(
-      (role) => role.metadata.name === SUPER_ROLE_NAME
-    )
-  ) {
-    return false;
-  }
-
-  const hasDisallowAccessConsoleRole = currentUser.value?.roles.some((role) => {
-    return (
-      role.metadata.annotations?.[rbacAnnotations.DISALLOW_ACCESS_CONSOLE] ===
-      "true"
-    );
-  });
-  return !!hasDisallowAccessConsoleRole;
-});
+const disallowAccessConsole = computed(() =>
+  isConsoleAccessDisallowed(currentUser.value?.roles)
+);
 
 const actions = computed(() => {
   const items = [
