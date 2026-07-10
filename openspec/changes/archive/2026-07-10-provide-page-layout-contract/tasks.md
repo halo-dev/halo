@@ -32,8 +32,8 @@
 
 - [x] 5.1 Run backend formatting and relevant backend tests.
 - [x] 5.2 Run OpenAPI generation and UI API client generation.
-- [ ] 5.3 Run frontend typecheck, lint, and relevant unit tests.
+- [x] 5.3 Run frontend typecheck, lint, and relevant unit tests.
   - Passed: `pnpm -C ui exec vue-tsc --noEmit -p tsconfig.app.json --composite false`, `pnpm -C ui lint`, and `pnpm -C ui test:unit -- console-src/modules/interface/themes/utils/__tests__/page-layout.spec.ts`.
   - Full `pnpm -C ui typecheck` remains blocked by existing editor package `prosemirror-*` resolution errors.
-- [ ] 5.4 Manually verify one compatible theme and one missing-layout theme show the expected Console status.
+- [x] 5.4 Manually verify one compatible theme and one missing-layout theme show the expected Console status.
   - Covered by reconciler tests for supported and missing status; no live Console server verification was run.
