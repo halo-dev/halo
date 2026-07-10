@@ -19,11 +19,11 @@ const mediaType = computed(() => {
   <img
     v-if="isImage(mediaType)"
     :src="utils.attachment.getThumbnailUrl(url, GetThumbnailByUriSizeEnum.S)"
-    class="size-full object-cover"
+    class="size-full object-contain"
   />
   <LazyVideo
     v-else-if="mediaType?.startsWith('video/')"
-    classes="size-full object-cover"
+    classes="size-full object-contain"
     :src="url"
   />
   <AttachmentFileTypeIcon v-else :file-name="url" />
