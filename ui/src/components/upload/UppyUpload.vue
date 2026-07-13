@@ -73,7 +73,7 @@ const locales = {
 };
 
 function getUppyLocale(locale: string) {
-  return locales[locale] || locales[locale.split("-")[0]] || locales["zh-CN"];
+  return locales[locale] || locales[locale.split("-")[0]] || locales.en;
 }
 
 const defaultRestrictions: Restrictions = {

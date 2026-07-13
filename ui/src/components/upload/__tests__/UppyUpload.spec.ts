@@ -122,6 +122,7 @@ describe("UppyUpload", () => {
   it.each([
     ["zh-CN", "重置", "裁剪为横向（16:9）"],
     ["es-MX", "Revertir", "Recortar horizontal (16:9)"],
+    ["fr-FR", "Reset", "Crop landscape (16:9)"],
   ])(
     "uses the official Uppy locale for the Image Editor in %s",
     (locale, revert, aspectRatioLandscape) => {
