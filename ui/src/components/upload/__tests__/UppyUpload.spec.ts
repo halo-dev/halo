@@ -14,6 +14,7 @@ import UppyUpload from "../UppyUpload.vue";
 
 const mocks = vi.hoisted(() => ({
   createHTMLContentModal: vi.fn(),
+  locale: { value: "en-US" },
   toastError: vi.fn(),
 }));
 
@@ -26,7 +27,7 @@ vi.mock("@halo-dev/components", () => ({
 vi.mock("@/locales", () => ({
   i18n: {
     global: {
-      locale: { value: "en-US" },
+      locale: mocks.locale,
       t: (key: string) => key,
     },
   },
@@ -45,6 +46,7 @@ function getUppy(wrapper: ReturnType<typeof mount>) {
 describe("UppyUpload", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.locale.value = "en-US";
     vi.stubGlobal(
       "ResizeObserver",
       class {
@@ -116,6 +118,25 @@ describe("UppyUpload", () => {
 
     expect(wrapper.find(".uppy-Dashboard").exists()).toBe(true);
   });
+
+  it.each([
+    ["zh-CN", "重置", "裁剪为横向（16:9）"],
+    ["es-MX", "Revertir", "Recortar horizontal (16:9)"],
+  ])(
+    "uses the official Uppy locale for the Image Editor in %s",
+    (locale, revert, aspectRatioLandscape) => {
+      mocks.locale.value = locale;
+      const wrapper = mount(UppyUpload, {
+        props: { endpoint: "/upload" },
+      });
+      const imageEditor = getUppy(wrapper).getPlugin("ImageEditor");
+
+      expect(imageEditor?.i18n("revert")).toBe(revert);
+      expect(imageEditor?.i18n("aspectRatioLandscape")).toBe(
+        aspectRatioLandscape
+      );
+    }
+  );
 
   it("keeps the Dashboard mounted when upload options change", async () => {
     const wrapper = mount(UppyUpload, {

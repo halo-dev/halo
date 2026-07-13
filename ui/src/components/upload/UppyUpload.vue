@@ -7,6 +7,7 @@ import "@uppy/dashboard/css/style.css";
 import ImageEditor from "@uppy/image-editor";
 import "@uppy/image-editor/css/style.min.css";
 import en_US from "@uppy/locales/lib/en_US";
+import es_ES from "@uppy/locales/lib/es_ES";
 import zh_CN from "@uppy/locales/lib/zh_CN";
 import zh_TW from "@uppy/locales/lib/zh_TW";
 import Dashboard from "@uppy/vue/dashboard";
@@ -64,11 +65,16 @@ const emit = defineEmits<{
 
 const locales = {
   en: en_US,
+  es: es_ES,
   zh: zh_CN,
   "en-US": en_US,
   "zh-CN": zh_CN,
   "zh-TW": zh_TW,
 };
+
+function getUppyLocale(locale: string) {
+  return locales[locale] || locales[locale.split("-")[0]] || locales["zh-CN"];
+}
 
 const defaultRestrictions: Restrictions = {
   maxFileSize: null,
@@ -80,32 +86,9 @@ const defaultRestrictions: Restrictions = {
   requiredMetaFields: [],
 };
 
-function getImageEditorLocale() {
-  return {
-    strings: {
-      revert: i18n.global.t("core.components.uppy.image_editor.revert"),
-      rotate: i18n.global.t("core.components.uppy.image_editor.rotate"),
-      zoomIn: i18n.global.t("core.components.uppy.image_editor.zoom_in"),
-      zoomOut: i18n.global.t("core.components.uppy.image_editor.zoom_out"),
-      flipHorizontal: i18n.global.t(
-        "core.components.uppy.image_editor.flip_horizontal"
-      ),
-      aspectRatioSquare: i18n.global.t(
-        "core.components.uppy.image_editor.aspect_ratio_square"
-      ),
-      aspectRatioLandscape: i18n.global.t(
-        "core.components.uppy.image_editor.aspect_ratio_landscape"
-      ),
-      aspectRatioPortrait: i18n.global.t(
-        "core.components.uppy.image_editor.aspect_ratio_portrait"
-      ),
-    },
-  };
-}
-
 const uppy = markRaw(
   new Uppy<Record<string, unknown>, Record<string, unknown>>({
-    locale: locales[i18n.global.locale.value] || locales["zh-CN"],
+    locale: getUppyLocale(i18n.global.locale.value),
     meta: props.meta,
     restrictions: props.restrictions,
     autoProceed: props.autoProceed,
@@ -136,9 +119,7 @@ const uppy = markRaw(
         }
       },
     })
-    .use(ImageEditor, {
-      locale: getImageEditorLocale(),
-    })
+    .use(ImageEditor)
 );
 
 function getErrorResponse(
@@ -289,10 +270,7 @@ watch(
 watch(
   () => i18n.global.locale.value,
   (locale) => {
-    uppy.setOptions({ locale: locales[locale] || locales["zh-CN"] });
-    uppy
-      .getPlugin("ImageEditor")
-      ?.setOptions({ locale: getImageEditorLocale() });
+    uppy.setOptions({ locale: getUppyLocale(locale) });
   }
 );
 
