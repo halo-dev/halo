@@ -3,9 +3,13 @@ import type { Plugin } from "@halo-dev/api-client";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VAlert } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { ErrorResponse, SuccessResponse, UppyFile } from "@uppy/core";
 import { computed, inject, ref, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
+import type {
+  UppyUploadErrorResponse,
+  UppyUploadFile,
+  UppyUploadSuccessResponse,
+} from "@/components/upload/types";
 import { PLUGIN_ALREADY_EXISTS_TYPE } from "../../constants";
 import type { PluginInstallationErrorResponse } from "../../types";
 
@@ -28,7 +32,7 @@ const endpoint = computed(() => {
   return "/apis/api.console.halo.run/v1alpha1/plugins/install";
 });
 
-const onUploaded = async (response: SuccessResponse) => {
+const onUploaded = async (response: UppyUploadSuccessResponse) => {
   if (pluginToUpgrade.value) {
     Toast.success(t("core.common.toast.upgrade_success"));
     window.location.reload();
@@ -42,11 +46,14 @@ const onUploaded = async (response: SuccessResponse) => {
   handleShowActiveModalAfterInstall(response.body as Plugin);
 };
 
-const onError = (file: UppyFile, response: ErrorResponse) => {
-  const body = response.body as PluginInstallationErrorResponse;
+const onError = (
+  file: UppyUploadFile | undefined,
+  response: UppyUploadErrorResponse | undefined
+) => {
+  const body = response?.body as PluginInstallationErrorResponse | undefined;
 
-  if (body.type === PLUGIN_ALREADY_EXISTS_TYPE) {
-    handleCatchExistsException(body, file.data as File);
+  if (body?.type === PLUGIN_ALREADY_EXISTS_TYPE) {
+    handleCatchExistsException(body, file?.data as File | undefined);
   }
 };
 

@@ -20,12 +20,12 @@ import {
 } from "@halo-dev/components";
 import type { AttachmentLike } from "@halo-dev/ui-shared";
 import { useQuery } from "@tanstack/vue-query";
-import type { SuccessResponse } from "@uppy/core";
 import { useLocalStorage } from "@vueuse/core";
 import { throttle } from "es-toolkit/compat";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import AttachmentGridListItem from "@/components/attachment/AttachmentGridListItem.vue";
+import type { UppyUploadSuccessResponse } from "@/components/upload/types";
 import { matchMediaTypes } from "@/utils/media-type";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentSelectorListItem from "./components/AttachmentSelectorListItem.vue";
@@ -236,7 +236,7 @@ function onUploadDone() {
   handleFetchAttachments();
   uploadVisible.value = false;
 }
-function onUploaded(response: SuccessResponse) {
+function onUploaded(response: UppyUploadSuccessResponse) {
   if (response.body) {
     handleSelect(response.body as Attachment);
     page.value = 1;

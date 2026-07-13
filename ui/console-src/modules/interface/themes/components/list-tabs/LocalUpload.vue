@@ -3,10 +3,13 @@ import { useThemeStore } from "@console/stores/theme";
 import { consoleApiClient } from "@halo-dev/api-client";
 import { Dialog, Toast, VAlert } from "@halo-dev/components";
 import { useQueryClient } from "@tanstack/vue-query";
-import type { ErrorResponse, UppyFile } from "@uppy/core";
 import type { Ref } from "vue";
 import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import type {
+  UppyUploadErrorResponse,
+  UppyUploadFile,
+} from "@/components/upload/types";
 import { THEME_ALREADY_EXISTS_TYPE } from "../../constants";
 import type { ThemeInstallationErrorResponse } from "../../types";
 
@@ -27,11 +30,14 @@ const onUploaded = () => {
   activeTabId.value = "installed";
 };
 
-const onError = (file: UppyFile, response: ErrorResponse) => {
-  const body = response.body as ThemeInstallationErrorResponse;
+const onError = (
+  file: UppyUploadFile | undefined,
+  response: UppyUploadErrorResponse | undefined
+) => {
+  const body = response?.body as ThemeInstallationErrorResponse | undefined;
 
-  if (body.type === THEME_ALREADY_EXISTS_TYPE) {
-    handleCatchExistsException(body, file.data as File);
+  if (body?.type === THEME_ALREADY_EXISTS_TYPE) {
+    handleCatchExistsException(body, file?.data as File | undefined);
   }
 };
 

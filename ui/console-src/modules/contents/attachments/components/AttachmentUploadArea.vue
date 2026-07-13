@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { Attachment } from "@halo-dev/api-client";
 import { VTabItem, VTabs } from "@halo-dev/components";
-import type { SuccessResponse } from "@uppy/core";
 import { computed, ref } from "vue";
+import type { UppyUploadSuccessResponse } from "@/components/upload/types";
 import UploadFromUrl from "./UploadFromUrl.vue";
 
 const {
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 
 const activeTab = ref("upload");
 
-const onUploaded = (response: SuccessResponse) => {
+const onUploaded = (response: UppyUploadSuccessResponse) => {
   if (response.body) {
     emit("uploaded", response.body as Attachment);
   }
