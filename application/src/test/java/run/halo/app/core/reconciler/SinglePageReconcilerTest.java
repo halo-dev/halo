@@ -164,6 +164,18 @@ class SinglePageReconcilerTest {
     }
 
     @Test
+    void shouldNotSplitSurrogatePairInGeneratedExcerpt() {
+        var prefix = "a".repeat(149);
+        var context = new ExcerptGenerator.Context().setContent(prefix + "📘remaining");
+
+        var excerpt = new SinglePageReconciler.DefaultExcerptGenerator()
+                .generate(context)
+                .block();
+
+        assertThat(excerpt).isEqualTo(prefix + "📘");
+    }
+
+    @Test
     void createPermalink() {
         SinglePage page = pageV1();
         page.getSpec().setSlug("page-slug");

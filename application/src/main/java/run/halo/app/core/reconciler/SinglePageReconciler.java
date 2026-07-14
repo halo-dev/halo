@@ -376,8 +376,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         var cacheKey = contentChecksum + ":" + isAutoGenerate;
         var annotations = MetadataUtil.nullSafeAnnotations(singlePage);
         var oldCacheKey = annotations.get(Constant.CONTENT_CHECKSUM_ANNO);
-        if (Objects.equals(oldCacheKey, cacheKey)) {
-            return singlePage.getStatusOrDefault().getExcerpt();
+        var cachedExcerpt = singlePage.getStatusOrDefault().getExcerpt();
+        if (Objects.equals(oldCacheKey, cacheKey) && !ExcerptUtils.containsUnpairedSurrogate(cachedExcerpt)) {
+            return cachedExcerpt;
         }
         // update the checksum and generate new excerpt
         annotations.put(Constant.CONTENT_CHECKSUM_ANNO, cacheKey);
@@ -406,9 +407,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     static class DefaultExcerptGenerator implements ExcerptGenerator {
         @Override
         public Mono<String> generate(Context context) {
-            String shortHtmlContent = StringUtils.substring(context.getContent(), 0, 500);
+            String shortHtmlContent = ExcerptUtils.substringByCodePoints(context.getContent(), 500);
             String text = Jsoup.parse(shortHtmlContent).text();
-            return Mono.just(StringUtils.substring(text, 0, 150));
+            return Mono.just(ExcerptUtils.substringByCodePoints(text, 150));
         }
     }
 
