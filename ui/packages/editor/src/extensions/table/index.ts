@@ -200,9 +200,14 @@ class TableView implements NodeView {
   }
 
   handleHorizontalWheel(dom: HTMLElement, event: WheelEvent) {
-    const { scrollWidth, clientWidth } = dom;
+    const { scrollWidth, clientWidth, scrollLeft } = dom;
     const hasScrollWidth = scrollWidth > clientWidth;
-    if (hasScrollWidth) {
+    const maxScrollLeft = scrollWidth - clientWidth;
+    const canScrollHorizontally =
+      hasScrollWidth &&
+      ((event.deltaY < 0 && scrollLeft > 0) ||
+        (event.deltaY > 0 && scrollLeft < maxScrollLeft));
+    if (canScrollHorizontally) {
       event.stopPropagation();
       event.preventDefault();
       dom.scrollBy({ left: event.deltaY });
