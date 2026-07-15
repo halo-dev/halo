@@ -157,7 +157,7 @@
     "vite-plugin-static-copy": "^3.2.0",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "vue-tsc": "^3.2.4"
+    "vue-tsc": "^3.3.7"
   },
   "resolutions": {
     "axios": "^1.16.1"
