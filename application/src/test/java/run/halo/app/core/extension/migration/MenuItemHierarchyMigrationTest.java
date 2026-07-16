@@ -73,6 +73,68 @@ class MenuItemHierarchyMigrationTest {
     }
 
     @Test
+    void shouldMigrateLegacyMembershipWithoutCloningDescendants() {
+        var root = menuItem("root", children("child"));
+        var child = menuItem("child", children("grandchild"));
+        var grandchild = menuItem("grandchild", null);
+
+        StepVerifier.create(migration.migrate(
+                        List.of(menu("primary", children("root", "child", "grandchild"))),
+                        List.of(root, child, grandchild)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesCreated()).isZero();
+                    assertThat(createdItems).isEmpty();
+                    assertThat(root.getSpec().getParent()).isNull();
+                    assertThat(child.getSpec().getParent()).isEqualTo("root");
+                    assertThat(grandchild.getSpec().getParent()).isEqualTo("child");
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldMigrateLegacyMembershipWhenParentWasAddedAfterChildren() {
+        var promotion = menuItem("promotion", null);
+        var app = menuItem("app", null);
+        var aiSite = menuItem("ai-site", null);
+        var community = menuItem("community", children("promotion", "app", "ai-site"));
+
+        StepVerifier.create(migration.migrate(
+                        List.of(menu("primary", children("promotion", "app", "ai-site", "community"))),
+                        List.of(promotion, app, aiSite, community)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesCreated()).isZero();
+                    assertThat(createdItems).isEmpty();
+                    assertThat(community.getSpec().getParent()).isNull();
+                    assertThat(promotion.getSpec().getParent()).isEqualTo("community");
+                    assertThat(app.getSpec().getParent()).isEqualTo("community");
+                    assertThat(aiSite.getSpec().getParent()).isEqualTo("community");
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldNotRecreateDeletedCloneForMigratedLegacyMembership() {
+        var root = menuItem("root", children("child"));
+        var child = menuItem("child", null);
+        root.getSpec().setMenuName("primary");
+        child.getSpec().setMenuName("primary");
+        child.getSpec().setParent("root");
+        root.getMetadata().setLabels(new HashMap<>());
+        root.getMetadata().getLabels().put(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+        child.getMetadata().setLabels(new HashMap<>());
+        child.getMetadata().getLabels().put(MenuItem.HIERARCHY_MIGRATED_LABEL, "true");
+
+        StepVerifier.create(
+                        migration.migrate(List.of(menu("primary", children("root", "child"))), List.of(root, child)))
+                .assertNext(summary -> {
+                    assertThat(summary.getClonesCreated()).isZero();
+                    assertThat(createdItems).isEmpty();
+                    assertThat(child.getSpec().getParent()).isEqualTo("root");
+                })
+                .verifyComplete();
+    }
+
+    @Test
     void shouldNotOverwriteExistingNewFields() {
         var root = menuItem("root", null);
         root.getSpec().setMenuName("custom");
@@ -125,7 +187,8 @@ class MenuItemHierarchyMigrationTest {
         var leaf = menuItem("leaf", null);
 
         StepVerifier.create(migration.migrate(
-                        List.of(menu("primary", children("root-a", "root-b"))), List.of(rootA, rootB, shared, leaf)))
+                        List.of(menu("primary", children("root-a", "root-b", "shared", "leaf"))),
+                        List.of(rootA, rootB, shared, leaf)))
                 .assertNext(summary -> {
                     assertThat(summary.getClonesCreated()).isEqualTo(2);
                     assertThat(shared.getSpec().getParent()).isEqualTo("root-a");

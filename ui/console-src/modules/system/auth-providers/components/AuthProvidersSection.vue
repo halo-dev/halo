@@ -7,7 +7,7 @@ import AuthProviderListItem from "./AuthProviderListItem.vue";
 
 const queryClient = useQueryClient();
 
-const modelValue = defineModel<ListedAuthProvider[]>({ default: [] });
+const modelValue = defineModel<ListedAuthProvider[]>({ default: () => [] });
 
 const { loading = false } = defineProps<{
   loading?: boolean;

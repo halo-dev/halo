@@ -91,7 +91,7 @@
     "transliteration": "^2.3.5",
     "ua-parser-js": "^1.0.38",
     "visual-dom-diff": "^0.7.3",
-    "vue": "^3.5.27",
+    "vue": "^3.5.40",
     "vue-demi": "^0.14.10",
     "vue-draggable-plus": "^0.4.1",
     "vue-grid-layout": "3.0.0-beta1",
@@ -128,7 +128,7 @@
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/eslint-plugin": "^1.4.3",
     "@vitest/ui": "catalog:",
-    "@vue/compiler-sfc": "^3.5.27",
+    "@vue/compiler-sfc": "^3.5.40",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
@@ -157,7 +157,7 @@
     "vite-plugin-static-copy": "^3.2.0",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "vue-tsc": "^3.2.4"
+    "vue-tsc": "^3.3.7"
   },
   "resolutions": {
     "axios": "^1.16.1"

@@ -23,7 +23,7 @@ export interface PolicyList {
      */
     'first': boolean;
     /**
-     * Indicates whether current page has previous page.
+     * Indicates whether current page has next page.
      */
     'hasNext': boolean;
     /**
