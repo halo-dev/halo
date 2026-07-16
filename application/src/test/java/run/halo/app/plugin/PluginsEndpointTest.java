@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginState;
@@ -44,7 +45,7 @@ class PluginsEndpointTest {
 
             when(pluginManager.startedPlugins()).thenReturn(List.of(pluginWrapper));
             when(pluginManager.getExtensionClassNames("fake-plugin"))
-                    .thenReturn(List.of("run.halo.fake.FakeComponent"));
+                    .thenReturn(Set.of("run.halo.fake.FakeComponent"));
             when(pluginGetter.getPlugin("fake-plugin")).thenReturn(pluginExtension);
 
             var runtimeInfo = endpoint.plugins();
@@ -84,7 +85,7 @@ class PluginsEndpointTest {
         var endpoint = new PluginsEndpoint(pluginManager, pluginGetter);
 
         when(pluginManager.startedPlugins()).thenReturn(List.of(pluginWrapper));
-        when(pluginManager.getExtensionClassNames("fake-plugin")).thenReturn(List.of());
+        when(pluginManager.getExtensionClassNames("fake-plugin")).thenReturn(Set.of());
         when(pluginGetter.getPlugin("fake-plugin")).thenReturn(pluginExtension);
 
         var runtimeInfo = endpoint.plugins();
@@ -108,7 +109,7 @@ class PluginsEndpointTest {
         var endpoint = new PluginsEndpoint(pluginManager, pluginGetter);
 
         when(pluginManager.startedPlugins()).thenReturn(List.of(pluginWrapper));
-        when(pluginManager.getExtensionClassNames("fake-plugin")).thenReturn(List.of());
+        when(pluginManager.getExtensionClassNames("fake-plugin")).thenReturn(Set.of());
         when(pluginGetter.getPlugin("fake-plugin")).thenThrow(new NotFoundException("Plugin not found"));
 
         var runtimeInfo = endpoint.plugins();
@@ -158,7 +159,9 @@ class PluginsEndpointTest {
 
         @Bean
         RouterFunction<?> testRouterFunction() {
-            return RouterFunctions.route().build();
+            return RouterFunctions.route()
+                    .GET("/test", req -> org.springframework.web.reactive.function.server.ServerResponse.ok().build())
+                    .build();
         }
 
         @Bean
