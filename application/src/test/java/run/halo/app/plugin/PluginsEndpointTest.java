@@ -44,8 +44,7 @@ class PluginsEndpointTest {
             var endpoint = new PluginsEndpoint(pluginManager, pluginGetter);
 
             when(pluginManager.startedPlugins()).thenReturn(List.of(pluginWrapper));
-            when(pluginManager.getExtensionClassNames("fake-plugin"))
-                    .thenReturn(Set.of("run.halo.fake.FakeComponent"));
+            when(pluginManager.getExtensionClassNames("fake-plugin")).thenReturn(Set.of("run.halo.fake.FakeComponent"));
             when(pluginGetter.getPlugin("fake-plugin")).thenReturn(pluginExtension);
 
             var runtimeInfo = endpoint.plugins();
@@ -160,7 +159,10 @@ class PluginsEndpointTest {
         @Bean
         RouterFunction<?> testRouterFunction() {
             return RouterFunctions.route()
-                    .GET("/test", req -> org.springframework.web.reactive.function.server.ServerResponse.ok().build())
+                    .GET(
+                            "/test",
+                            req -> org.springframework.web.reactive.function.server.ServerResponse.ok()
+                                    .build())
                     .build();
         }
 
