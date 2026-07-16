@@ -72,8 +72,8 @@ export const ExtensionGallery = Node.create<
         parseHTML: (element) => {
           return Array.from(element.querySelectorAll("img")).map((img) => {
             const aspectRatio = Number(
-              img.getAttribute("data-aspect-ratio") ??
-                img.parentElement?.getAttribute("data-aspect-ratio")
+              img.parentElement?.getAttribute("data-aspect-ratio") ??
+                img.getAttribute("data-aspect-ratio")
             );
             return {
               src: img.getAttribute("src") || "",

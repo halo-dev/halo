@@ -52,6 +52,40 @@ describe("GalleryView", () => {
     expect(images).toEqual([{ src: "/image.jpg", aspectRatio: 2 }]);
   });
 
+  it("retains support for aspect ratios stored on image elements", () => {
+    const editor = createEditor(`
+      <div data-type="gallery">
+        <div>
+          <div>
+            <img src="/image.jpg" data-aspect-ratio="2" />
+          </div>
+        </div>
+      </div>
+    `);
+    const images = editor.state.doc.nodeAt(0)?.attrs
+      .images as ExtensionGalleryImageItem[];
+    editor.destroy();
+
+    expect(images).toEqual([{ src: "/image.jpg", aspectRatio: 2 }]);
+  });
+
+  it("prefers aspect ratios stored on image wrappers", () => {
+    const editor = createEditor(`
+      <div data-type="gallery">
+        <div>
+          <div data-aspect-ratio="2">
+            <img src="/image.jpg" data-aspect-ratio="1" />
+          </div>
+        </div>
+      </div>
+    `);
+    const images = editor.state.doc.nodeAt(0)?.attrs
+      .images as ExtensionGalleryImageItem[];
+    editor.destroy();
+
+    expect(images).toEqual([{ src: "/image.jpg", aspectRatio: 2 }]);
+  });
+
   it("does not update attributes when an existing image already has an aspect ratio", async () => {
     const { wrapper, updateAttributes } = mountGallery({
       src: "/image.jpg",
