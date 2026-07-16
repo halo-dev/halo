@@ -19,7 +19,7 @@ import run.halo.app.theme.finders.Finder;
  * Exposes read-only runtime diagnostics for plugins.
  *
  * @author webjing
- * @since 2.25.0
+ * @since 2.26.0
  */
 @WebEndpoint(id = "plugins")
 @Component
