@@ -3,6 +3,7 @@ package run.halo.app.theme;
 import org.pf4j.PluginManager;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.thymeleaf.autoconfigure.ThymeleafProperties;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ConcurrentLruCache;
 import org.thymeleaf.dialect.IDialect;
@@ -59,6 +60,8 @@ public class TemplateEngineManager {
 
     private final ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker;
 
+    private final ResourceLoader resourceLoader;
+
     public TemplateEngineManager(
             ThymeleafProperties thymeleafProperties,
             ExternalUrlSupplier externalUrlSupplier,
@@ -67,7 +70,8 @@ public class TemplateEngineManager {
             ObjectProvider<IDialect> dialects,
             ThemeResolver themeResolver,
             SystemVersionSupplier systemVersionSupplier,
-            ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker) {
+            ThemeLayoutCompatibilityChecker themeLayoutCompatibilityChecker,
+            ResourceLoader resourceLoader) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.pluginManager = pluginManager;
@@ -76,6 +80,7 @@ public class TemplateEngineManager {
         this.themeResolver = themeResolver;
         this.systemVersionSupplier = systemVersionSupplier;
         this.themeLayoutCompatibilityChecker = themeLayoutCompatibilityChecker;
+        this.resourceLoader = resourceLoader;
         engineCache = new ConcurrentLruCache<>(CACHE_SIZE_LIMIT, this::templateEngineGenerator);
     }
 
@@ -106,7 +111,14 @@ public class TemplateEngineManager {
 
     private ISpringWebFluxTemplateEngine templateEngineGenerator(CacheKey cacheKey) {
 
-        var engine = new HaloTemplateEngine(new ThemeMessageResolver(cacheKey.context()));
+        var engine = new HaloTemplateEngine(new ThemeMessageResolver(
+                cacheKey.context(),
+                resourceLoader,
+                thymeleafProperties.getPrefix(),
+                thymeleafProperties.getSuffix(),
+                thymeleafProperties.getEncoding() == null
+                        ? null
+                        : thymeleafProperties.getEncoding().name()));
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
         engine.setLinkBuilder(new ThemeLinkBuilder(cacheKey.context(), externalUrlSupplier));
         engine.setRenderHiddenMarkersBeforeCheckboxes(thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
