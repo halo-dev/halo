@@ -34,15 +34,20 @@ function removeImage(index: number) {
 }
 
 function handleImageLoad(event: Event, index: number) {
+  const currentImage = images.value[index];
+  if (!currentImage || currentImage.aspectRatio > 0) {
+    return;
+  }
+
   const img = event.target as HTMLImageElement;
   if (img.naturalWidth && img.naturalHeight) {
     const ratio = img.naturalWidth / img.naturalHeight;
     const newImages = [...images.value];
     newImages[index] = {
-      src: img.src,
+      ...currentImage,
       aspectRatio: ratio,
     };
-    images.value = [...newImages];
+    images.value = newImages;
   }
 }
 

@@ -67,7 +67,7 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return !hasNext();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.", requiredMode = REQUIRED)
+    @Schema(description = "Indicates whether current page has next page.", requiredMode = REQUIRED)
     @JsonProperty("hasNext")
     public boolean hasNext() {
         if (page <= 0) {

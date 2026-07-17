@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -338,11 +340,58 @@ class MenuItemHierarchyMigration {
                 if (spec == null || spec.getMenuItems() == null) {
                     continue;
                 }
-                spec.getMenuItems().stream()
-                        .filter(Objects::nonNull)
+                legacyRootNames(spec.getMenuItems()).stream()
                         .forEach(itemName -> paths.add(new LegacyPath(menuName, null, itemName, List.of(itemName))));
             }
             return paths;
+        }
+
+        private List<String> legacyRootNames(Iterable<String> menuItemNames) {
+            var members = new ArrayList<String>();
+            menuItemNames.forEach(itemName -> {
+                if (itemName != null) {
+                    members.add(itemName);
+                }
+            });
+            var memberSet = new HashSet<>(members);
+            var descendants = new HashSet<String>();
+            // Legacy Console stored every menu member, not only roots, in Menu.spec.menuItems.
+            for (var member : members) {
+                var memberDescendants = new HashSet<String>();
+                collectLegacyDescendants(member, memberDescendants);
+                memberDescendants.remove(member);
+                memberDescendants.retainAll(memberSet);
+                descendants.addAll(memberDescendants);
+            }
+
+            var roots = new ArrayList<String>();
+            members.stream().filter(itemName -> !descendants.contains(itemName)).forEach(roots::add);
+            var covered = new HashSet<String>();
+            roots.forEach(root -> {
+                covered.add(root);
+                collectLegacyDescendants(root, covered);
+            });
+            // A cyclic or otherwise disconnected component has no natural root. Pick one entry so
+            // migration can still visit it, without treating every member in the component as a root.
+            for (var member : members) {
+                if (covered.add(member)) {
+                    roots.add(member);
+                    collectLegacyDescendants(member, covered);
+                }
+            }
+            return roots;
+        }
+
+        private void collectLegacyDescendants(String itemName, Set<String> descendants) {
+            var item = getItem(itemName);
+            if (item == null) {
+                return;
+            }
+            for (var childName : legacyChildren(item)) {
+                if (descendants.add(childName)) {
+                    collectLegacyDescendants(childName, descendants);
+                }
+            }
         }
 
         @Nullable
