@@ -134,6 +134,7 @@
   "editor.common.superscript": "上角标",
   "editor.common.subscript": "下角标",
   "editor.common.codeblock.title": "代码块",
+  "editor.common.codeblock.language.none": "无",
   "editor.common.codeblock.copy_code": "复制代码",
   "editor.common.codeblock.copy_code_success": "复制成功",
   "editor.common.image": "图片",

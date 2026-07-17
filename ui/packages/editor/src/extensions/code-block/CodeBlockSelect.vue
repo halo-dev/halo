@@ -107,9 +107,8 @@ const handleOptionKeydown = (event: KeyboardEvent) => {
 watch(
   [value, filterOptions],
   ([newValue, options]) => {
-    selectedOption.value = newValue
-      ? props.options.find((option) => option.value === newValue) || null
-      : null;
+    selectedOption.value =
+      props.options.find((option) => option.value === newValue) || null;
 
     const currentIndex = options.findIndex(
       (option) => option.value === newValue

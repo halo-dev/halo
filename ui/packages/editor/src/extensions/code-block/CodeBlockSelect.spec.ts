@@ -64,4 +64,15 @@ describe("CodeBlockSelect", () => {
     expect(setupState.selectedIndex).toBe(0);
     wrapper.unmount();
   });
+
+  it("displays an option whose value is empty", () => {
+    const wrapper = mount(CodeBlockSelect, {
+      props: {
+        options: [{ label: "None", value: "" }, ...options],
+        modelValue: "",
+      },
+    });
+
+    expect(wrapper.get(".text-ellipsis.text-sm").text()).toBe("None");
+  });
 });
