@@ -1,6 +1,6 @@
 import type { Attachment } from "@halo-dev/api-client";
 import { Dialog } from "@halo-dev/components";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { ref } from "vue";
 import type { Editor, PMNode } from "@/tiptap";
 import type { MatchAttachmentPermalinks, Upload } from "@/utils";

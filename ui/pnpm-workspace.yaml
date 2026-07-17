@@ -1,10 +1,10 @@
 packages:
   - packages/**
 catalog:
-  "@vitest/ui": 4.1.9
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.2
-  vite-plus: 0.2.2
-  vitest: 4.1.9
+  "@vitest/ui": 4.1.10
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.5
+  vite-plus: 0.2.5
+  vitest: 4.1.10
 overrides:
   vite: "catalog:"
   vite-plus: "catalog:"

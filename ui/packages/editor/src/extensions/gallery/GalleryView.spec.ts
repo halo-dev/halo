@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { shallowMount, type VueWrapper } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { type Content, type NodeViewProps, VueEditor } from "@/tiptap";
 import { ExtensionDocument } from "../document";
 import { ExtensionText } from "../text";
