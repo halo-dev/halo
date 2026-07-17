@@ -7,7 +7,7 @@ import CodeBlockSelect from "./CodeBlockSelect.vue";
 import CodeBlockViewRenderer from "./CodeBlockViewRenderer.vue";
 
 describe("CodeBlockViewRenderer", () => {
-  it("removes the auto option without changing an existing value", async () => {
+  it("keeps plugin-provided auto option without changing its value", async () => {
     const updateAttributes = vi.fn();
     const wrapper = shallowMount(CodeBlockViewRenderer, {
       props: {
@@ -54,6 +54,7 @@ describe("CodeBlockViewRenderer", () => {
     const languageSelect = wrapper.findComponent(CodeBlockSelect);
     expect(languageSelect.props("options")).toEqual([
       { label: "None", value: "" },
+      { label: "Auto", value: "auto" },
       { label: "JavaScript", value: "javascript" },
     ]);
     expect(languageSelect.props("modelValue")).toBe("auto");

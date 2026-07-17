@@ -30,9 +30,7 @@ const languageOptions = computed(() => {
       label: i18n.global.t("editor.common.codeblock.language.none"),
       value: "",
     },
-    ...(languages || []).filter(
-      (language) => language.value !== "auto" && language.value !== ""
-    ),
+    ...(languages || []).filter((language) => language.value !== ""),
   ];
 });
 
