@@ -16,7 +16,11 @@ vi.mock("@halo-dev/components", () => ({
 vi.mock("@halo-dev/ui-shared", () => ({
   utils: {
     permission: { has: () => false },
-    attachment: { getUrl: () => undefined },
+    attachment: {
+      getUrl: () => undefined,
+      getThumbnailUrl: (url: string, size: string) =>
+        `${url}?thumbnail=${size}`,
+    },
   },
 }));
 
@@ -43,6 +47,9 @@ describe("GalleryView", () => {
     });
     const html = sourceEditor.getHTML();
     sourceEditor.destroy();
+
+    expect(html).toContain('src="/image.jpg"');
+    expect(html).not.toContain("thumbnail");
 
     const parsedEditor = createEditor(html);
     const images = parsedEditor.state.doc.nodeAt(0)?.attrs
@@ -109,6 +116,71 @@ describe("GalleryView", () => {
       images: [{ src: "/image.jpg", aspectRatio: 2 }],
     });
   });
+
+  it.each([
+    { count: 1, expectedSize: "XL" },
+    { count: 2, expectedSize: "M" },
+    { count: 3, expectedSize: "M" },
+    { count: 4, expectedSize: "S" },
+  ])(
+    "uses $expectedSize thumbnails for a row containing $count images",
+    ({ count, expectedSize }) => {
+      const images = Array.from({ length: count }, (_, index) => ({
+        src: `/image-${index + 1}.jpg`,
+        aspectRatio: 2,
+      }));
+      const { wrapper } = mountGallery(images, count);
+
+      expect(
+        wrapper.findAll("img").map((image) => image.attributes("src"))
+      ).toEqual(
+        images.map((image) => `${image.src}?thumbnail=${expectedSize}`)
+      );
+    }
+  );
+
+  it("recalculates thumbnail sizes from actual rows when group size changes", async () => {
+    const images = Array.from({ length: 4 }, (_, index) => ({
+      src: `/image-${index + 1}.jpg`,
+      aspectRatio: 2,
+    }));
+    const { wrapper } = mountGallery(images, 4);
+
+    expect(
+      wrapper.findAll("img").map((image) => image.attributes("src"))
+    ).toEqual(images.map((image) => `${image.src}?thumbnail=S`));
+
+    await wrapper.setProps({
+      node: {
+        attrs: {
+          images,
+          groupSize: 3,
+          layout: "auto",
+          gap: 8,
+        },
+      } as unknown as NodeViewProps["node"],
+    });
+
+    expect(
+      wrapper.findAll("img").map((image) => image.attributes("src"))
+    ).toEqual([
+      "/image-1.jpg?thumbnail=M",
+      "/image-2.jpg?thumbnail=M",
+      "/image-3.jpg?thumbnail=M",
+      "/image-4.jpg?thumbnail=XL",
+    ]);
+  });
+
+  it("eagerly loads images until their aspect ratio is known", () => {
+    const { wrapper } = mountGallery([
+      { src: "/known.jpg", aspectRatio: 2 },
+      { src: "/unknown.jpg", aspectRatio: 0 },
+    ]);
+
+    expect(
+      wrapper.findAll("img").map((image) => image.attributes("loading"))
+    ).toEqual(["lazy", "eager"]);
+  });
 });
 
 function createEditor(content: Content) {
@@ -118,14 +190,18 @@ function createEditor(content: Content) {
   });
 }
 
-function mountGallery(image: ExtensionGalleryImageItem) {
+function mountGallery(
+  image: ExtensionGalleryImageItem | ExtensionGalleryImageItem[],
+  groupSize = 3
+) {
+  const images = Array.isArray(image) ? image : [image];
   const updateAttributes = vi.fn();
   const wrapper = shallowMount(GalleryView, {
     props: {
       node: {
         attrs: {
-          images: [image],
-          groupSize: 3,
+          images,
+          groupSize,
           layout: "auto",
           gap: 8,
         },

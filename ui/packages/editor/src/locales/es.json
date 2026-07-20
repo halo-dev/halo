@@ -134,6 +134,7 @@
   "editor.common.superscript": "Superíndice",
   "editor.common.subscript": "Subíndice",
   "editor.common.codeblock.title": "Bloque de código",
+  "editor.common.codeblock.language.none": "Ninguno",
   "editor.common.codeblock.copy_code": "Copiar código",
   "editor.common.codeblock.copy_code_success": "Copiado con éxito",
   "editor.common.image": "Imagen",

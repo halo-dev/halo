@@ -13,6 +13,7 @@ import {
 import { ExtensionAudio } from "../audio";
 import { ExtensionImage } from "../image";
 import { ExtensionVideo } from "../video";
+import { getChangedAssetNodes } from "./changed-assets";
 
 export interface ExtensionUploadOptions {
   matchAttachmentPermalinks?: MatchAttachmentPermalinks;
@@ -80,11 +81,17 @@ export const ExtensionUpload = Extension.create<
               return false;
             }
 
-            void showExternalAssetTransferDialog(
-              editor,
-              storage,
-              getAllAssetNodes(slice)
-            );
+            const pastedAssetNodes = getAllAssetNodes(slice);
+            if (pastedAssetNodes.length) {
+              const docBeforePaste = view.state.doc;
+              queueMicrotask(() => {
+                void showExternalAssetTransferDialog(
+                  editor,
+                  storage,
+                  getChangedAssetNodes(docBeforePaste, editor.state.doc)
+                );
+              });
+            }
 
             const types = event.clipboardData.types;
             if (!containsFileClipboardIdentifier(types)) {

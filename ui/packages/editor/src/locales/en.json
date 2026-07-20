@@ -134,6 +134,7 @@
   "editor.common.superscript": "Superscript",
   "editor.common.subscript": "Subscript",
   "editor.common.codeblock.title": "Code block",
+  "editor.common.codeblock.language.none": "None",
   "editor.common.codeblock.copy_code": "Copy code",
   "editor.common.codeblock.copy_code_success": "Copy success",
   "editor.common.image": "Image",

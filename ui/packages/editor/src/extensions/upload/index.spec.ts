@@ -2,8 +2,9 @@ import type { Attachment } from "@halo-dev/api-client";
 import { Dialog } from "@halo-dev/components";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { ref } from "vue";
-import type { Editor, PMNode } from "@/tiptap";
+import { Schema, type Editor, type PMNode } from "@/tiptap";
 import type { MatchAttachmentPermalinks, Upload } from "@/utils";
+import { getChangedAssetNodes } from "./changed-assets";
 import {
   getUnmatchedExternalNodes,
   matchAttachmentPermalinks,
@@ -55,6 +56,32 @@ describe("ExtensionUpload external asset matching", () => {
     expect(storage.matchCache.get("https://remote.example.com/new.png")).toBe(
       false
     );
+  });
+
+  it("uses final document positions for assets inserted after existing content", () => {
+    const schema = new Schema({
+      nodes: {
+        doc: { content: "block+" },
+        paragraph: { content: "text*", group: "block" },
+        text: {},
+        image: {
+          group: "block",
+          attrs: { src: { default: null } },
+        },
+      },
+    });
+    const paragraph = schema.node("paragraph", null, [schema.text("before")]);
+    const beforePaste = schema.node("doc", null, [paragraph]);
+    const pastedImage = schema.node("image", {
+      src: "https://remote.example.com/new.png",
+    });
+    const afterPaste = schema.node("doc", null, [paragraph, pastedImage]);
+
+    const nodes = getChangedAssetNodes(beforePaste, afterPaste);
+
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0]?.pos).toBe(paragraph.nodeSize);
+    expect(nodes[0]?.node.attrs.src).toBe("https://remote.example.com/new.png");
   });
 
   it("does not show a dialog when URL transfer is unavailable", async () => {

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { GetThumbnailByUriSizeEnum } from "@halo-dev/api-client";
 import { VButton, VSpace } from "@halo-dev/components";
 import { utils, type AttachmentLike } from "@halo-dev/ui-shared";
 import { computed, ref } from "vue";
@@ -78,6 +79,16 @@ const groups = computed<ExtensionGalleryImageItem[][]>(() => {
     []
   );
 });
+
+function getThumbnailSize(groupLength: number) {
+  if (groupLength === 1) {
+    return GetThumbnailByUriSizeEnum.Xl;
+  }
+  if (groupLength <= 3) {
+    return GetThumbnailByUriSizeEnum.M;
+  }
+  return GetThumbnailByUriSizeEnum.S;
+}
 
 const draggedIndex = ref<number | null>(null);
 const dragOverIndex = ref<number | null>(null);
@@ -225,8 +236,14 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           @drop="handleDrop(groupIndex * groupSize + imgIndex, $event)"
         >
           <img
-            :src="image.src"
+            :src="
+              utils.attachment.getThumbnailUrl(
+                image.src,
+                getThumbnailSize(group.length)
+              )
+            "
             :alt="`Gallery image ${groupIndex * groupSize + imgIndex + 1}`"
+            :loading="image.aspectRatio > 0 ? 'lazy' : 'eager'"
             class="pointer-events-none block size-full object-cover"
             @load="handleImageLoad($event, groupIndex * groupSize + imgIndex)"
           />

@@ -25,23 +25,21 @@ const languageOptions = computed(() => {
   } else {
     languages = lang;
   }
-  languages = languages || [];
-  const languageValues = languages.map((language) => language.value);
-  if (languageValues.indexOf("auto") === -1) {
-    languages.unshift({
-      label: "Auto",
-      value: "auto",
-    });
-  }
-  return languages;
+  return [
+    {
+      label: i18n.global.t("editor.common.codeblock.language.none"),
+      value: "",
+    },
+    ...(languages || []).filter((language) => language.value !== ""),
+  ];
 });
 
 const selectedLanguage = computed({
   get: () => {
-    return props.node?.attrs.language || "auto";
+    return props.node?.attrs.language || "";
   },
   set: (language: string) => {
-    props.updateAttributes({ language: language });
+    props.updateAttributes({ language: language || null });
   },
 });
 
