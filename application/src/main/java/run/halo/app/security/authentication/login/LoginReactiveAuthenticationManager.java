@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsPassword
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.UserService;
@@ -37,12 +38,12 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        var username = authentication.getName();
+        var loginId = authentication.getName();
         var credentials = authentication.getCredentials();
         var password = credentials != null ? credentials.toString() : null;
 
-        return tryByUsername(username, password)
-                .switchIfEmpty(Mono.defer(() -> tryByEmail(username, password)))
+        return Flux.concat(tryByUsername(loginId, password), tryByEmail(loginId, password))
+                .next()
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(this::preAuthenticationChecks)
@@ -79,24 +80,29 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
     }
 
     /**
-     * Attempts to authenticate by username: loads the user and checks the password. Returns empty Mono if the user is
-     * not found or the password does not match.
+     * Attempts to authenticate by username. Since usernames do not contain {@code @}, this method immediately returns
+     * empty for email-like login identifiers.
      */
-    Mono<UserDetails> tryByUsername(String username, String password) {
+    Mono<UserDetails> tryByUsername(String loginId, String password) {
+        if (loginId.contains("@")) {
+            return Mono.empty();
+        }
         return userDetailsService
-                .findByUsername(username)
+                .findByUsername(loginId)
                 .onErrorResume(BadCredentialsException.class, e -> Mono.empty())
                 .filter(userDetails ->
                         password != null && passwordEncoder.matches(password, userDetails.getPassword()));
     }
 
     /**
-     * Attempts to authenticate by email: looks up the verified email to find the actual username, then delegates to
-     * {@link #tryByUsername(String, String)}.
+     * Attempts to authenticate by verified email. Only executes when the login identifier looks like an email address.
      */
-    Mono<UserDetails> tryByEmail(String email, String password) {
+    Mono<UserDetails> tryByEmail(String loginId, String password) {
+        if (!loginId.contains("@")) {
+            return Mono.empty();
+        }
         return userService
-                .findUserByVerifiedEmail(email)
+                .findUserByVerifiedEmail(loginId)
                 .flatMap(user -> tryByUsername(user.getMetadata().getName(), password));
     }
 
