@@ -95,7 +95,7 @@ dependencies {
     api 'org.apache.tika:tika-core'
     api 'net.coobird:thumbnailator'
 
-    api "io.github.resilience4j:resilience4j-spring-boot3"
+    api "io.github.resilience4j:resilience4j-spring-boot4"
     api "io.github.resilience4j:resilience4j-reactor"
 
     api "com.j256.two-factor-auth:two-factor-auth"
