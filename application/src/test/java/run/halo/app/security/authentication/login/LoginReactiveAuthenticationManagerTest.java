@@ -54,7 +54,7 @@ class LoginReactiveAuthenticationManagerTest {
                 .expectSubscription()
                 .assertNext(auth -> {
                     assertEquals(userDetails, auth.getPrincipal());
-                    assertEquals("password", auth.getCredentials());
+                    assertEquals("encoded-password", auth.getCredentials());
                 })
                 .verifyComplete();
 
@@ -174,7 +174,7 @@ class LoginReactiveAuthenticationManagerTest {
                 .expectSubscription()
                 .assertNext(auth -> {
                     assertEquals(upgradedUser, auth.getPrincipal());
-                    assertEquals("password", auth.getCredentials());
+                    assertEquals("new-encoded-password", auth.getCredentials());
                 })
                 .verifyComplete();
 

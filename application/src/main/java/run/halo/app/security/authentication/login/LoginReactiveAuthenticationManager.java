@@ -1,7 +1,11 @@
 package run.halo.app.security.authentication.login;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,6 +14,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.UserService;
 
 /**
@@ -33,18 +38,44 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         var username = authentication.getName();
-        var password = authentication.getCredentials().toString();
+        var credentials = authentication.getCredentials();
+        var password = credentials != null ? credentials.toString() : null;
 
         return tryByUsername(username, password)
                 .switchIfEmpty(Mono.defer(() -> tryByEmail(username, password)))
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(this::preAuthenticationChecks)
                 .flatMap(userDetails -> upgradePasswordIfNeeded(userDetails, password))
-                .map(userDetails -> {
-                    var result = new UsernamePasswordAuthenticationToken(
-                            userDetails, authentication.getCredentials(), userDetails.getAuthorities());
-                    result.setDetails(authentication.getDetails());
-                    return result;
-                });
+                .doOnNext(this::postAuthenticationChecks)
+                .map(userDetails -> UsernamePasswordAuthenticationToken.authenticated(
+                        userDetails, userDetails.getPassword(), userDetails.getAuthorities()));
+    }
+
+    /**
+     * Default pre-authentication checks: account locked, disabled, and expired. Mirrors
+     * {@code AbstractUserDetailsReactiveAuthenticationManager.defaultPreAuthenticationChecks}.
+     */
+    private void preAuthenticationChecks(UserDetails user) {
+        if (!user.isAccountNonLocked()) {
+            throw new LockedException("User account is locked");
+        }
+        if (!user.isEnabled()) {
+            throw new DisabledException("User is disabled");
+        }
+        if (!user.isAccountNonExpired()) {
+            throw new AccountExpiredException("User account has expired");
+        }
+    }
+
+    /**
+     * Default post-authentication checks: credentials expired. Mirrors
+     * {@code AbstractUserDetailsReactiveAuthenticationManager.defaultPostAuthenticationChecks}.
+     */
+    private void postAuthenticationChecks(UserDetails user) {
+        if (!user.isCredentialsNonExpired()) {
+            throw new CredentialsExpiredException("User credentials have expired");
+        }
     }
 
     /**
@@ -55,7 +86,8 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
         return userDetailsService
                 .findByUsername(username)
                 .onErrorResume(BadCredentialsException.class, e -> Mono.empty())
-                .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()));
+                .filter(userDetails ->
+                        password != null && passwordEncoder.matches(password, userDetails.getPassword()));
     }
 
     /**
