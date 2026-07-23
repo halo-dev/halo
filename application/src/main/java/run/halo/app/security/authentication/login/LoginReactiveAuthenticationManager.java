@@ -70,7 +70,12 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
 
     private Mono<UserDetails> upgradePasswordIfNeeded(UserDetails userDetails, String password) {
         if (passwordService != null) {
-            return passwordService.updatePassword(userDetails, password);
+            var upgradeEncoding =
+                    userDetails.getPassword() != null && passwordEncoder.upgradeEncoding(userDetails.getPassword());
+            if (upgradeEncoding) {
+                var newPassword = passwordEncoder.encode(password);
+                return passwordService.updatePassword(userDetails, newPassword);
+            }
         }
         return Mono.just(userDetails);
     }

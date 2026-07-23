@@ -128,12 +128,9 @@ public class WebServerSecurityConfig {
         // we can remove this code.
         var encodingId = "argon2@SpringSecurity_v5_8";
         var encoders = new HashMap<String, PasswordEncoder>();
-        var argon2Encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-        encoders.put(encodingId, argon2Encoder);
+        encoders.put(encodingId, Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
         encoders.put("bcrypt", new BCryptPasswordEncoder());
-        var passwordEncoder = new DelegatingPasswordEncoder(encodingId, encoders);
-        passwordEncoder.setDefaultPasswordEncoderForMatches(argon2Encoder);
-        return passwordEncoder;
+        return new DelegatingPasswordEncoder(encodingId, encoders);
     }
 
     @Bean

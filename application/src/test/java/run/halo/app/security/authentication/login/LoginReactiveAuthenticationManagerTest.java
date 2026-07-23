@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -160,8 +161,12 @@ class LoginReactiveAuthenticationManagerTest {
         when(userDetailsService.findByUsername("testuser")).thenReturn(Mono.just(userDetails));
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
 
+        when(passwordEncoder.upgradeEncoding("encoded-password")).thenReturn(true);
+        when(passwordEncoder.encode("password")).thenReturn("new-encoded-password");
+
         var upgradedUser = createUserDetails("testuser", "new-encoded-password");
-        when(passwordService.updatePassword(eq(userDetails), eq("password"))).thenReturn(Mono.just(upgradedUser));
+        when(passwordService.updatePassword(eq(userDetails), eq("new-encoded-password")))
+                .thenReturn(Mono.just(upgradedUser));
 
         var result = authenticate("testuser", "password");
 
@@ -173,7 +178,7 @@ class LoginReactiveAuthenticationManagerTest {
                 })
                 .verifyComplete();
 
-        verify(passwordService).updatePassword(userDetails, "password");
+        verify(passwordService).updatePassword(userDetails, "new-encoded-password");
     }
 
     @Test
@@ -250,7 +255,8 @@ class LoginReactiveAuthenticationManagerTest {
      * method.
      */
     private void stubPasswordService() {
-        when(passwordService.updatePassword(any(), anyString()))
+        lenient()
+                .when(passwordService.updatePassword(any(), anyString()))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
     }
 
