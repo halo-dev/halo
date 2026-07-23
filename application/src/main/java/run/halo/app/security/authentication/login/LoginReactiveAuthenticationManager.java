@@ -39,8 +39,12 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
                 .switchIfEmpty(Mono.defer(() -> tryByEmail(username, password)))
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
                 .flatMap(userDetails -> upgradePasswordIfNeeded(userDetails, password))
-                .map(userDetails -> new UsernamePasswordAuthenticationToken(
-                        userDetails, userDetails.getPassword(), userDetails.getAuthorities()));
+                .map(userDetails -> {
+                    var result = new UsernamePasswordAuthenticationToken(
+                            userDetails, authentication.getCredentials(), userDetails.getAuthorities());
+                    result.setDetails(authentication.getDetails());
+                    return result;
+                });
     }
 
     /**
