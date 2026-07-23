@@ -89,6 +89,7 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
         }
         return userDetailsService
                 .findByUsername(loginId)
+                .publishOn(Schedulers.boundedElastic())
                 .onErrorResume(BadCredentialsException.class, e -> Mono.empty())
                 .filter(userDetails ->
                         password != null && passwordEncoder.matches(password, userDetails.getPassword()));
