@@ -19,11 +19,9 @@ import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.UserService;
 
 /**
- * A {@link ReactiveAuthenticationManager} that authenticates by trying username first, then falling back to verified
- * email lookup if the username is not found or the password does not match.
- *
- * <p>This prevents ambiguous credential matching when a login identifier could be either a username or an email
- * address.
+ * A {@link ReactiveAuthenticationManager} that authenticates by trying multiple login strategies in order: username
+ * first, then verified email. Each strategy only executes when the login identifier matches its expected format (e.g.,
+ * email lookup only runs for identifiers containing {@code @}).
  */
 @RequiredArgsConstructor
 class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManager {
@@ -42,69 +40,53 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
         var credentials = authentication.getCredentials();
         var password = credentials != null ? credentials.toString() : null;
 
-        return Flux.concat(tryByUsername(loginId, password), tryByEmail(loginId, password))
+        return Flux.concat(lookupByUsername(loginId), lookupByEmail(loginId))
+                .publishOn(Schedulers.boundedElastic())
+                .filter(userDetails -> password != null && passwordEncoder.matches(password, userDetails.getPassword()))
                 .next()
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(this::preAuthenticationChecks)
+                .delayUntil(this::checkAccountStatus)
                 .flatMap(userDetails -> upgradePasswordIfNeeded(userDetails, password))
-                .doOnNext(this::postAuthenticationChecks)
                 .map(userDetails -> UsernamePasswordAuthenticationToken.authenticated(
                         userDetails, userDetails.getPassword(), userDetails.getAuthorities()));
     }
 
-    /**
-     * Default pre-authentication checks: account locked, disabled, and expired. Mirrors
-     * {@code AbstractUserDetailsReactiveAuthenticationManager.defaultPreAuthenticationChecks}.
-     */
-    private void preAuthenticationChecks(UserDetails user) {
+    private Mono<Void> checkAccountStatus(UserDetails user) {
         if (!user.isAccountNonLocked()) {
-            throw new LockedException("User account is locked");
+            return Mono.error(new LockedException("User account is locked"));
         }
         if (!user.isEnabled()) {
-            throw new DisabledException("User is disabled");
+            return Mono.error(new DisabledException("User is disabled"));
         }
         if (!user.isAccountNonExpired()) {
-            throw new AccountExpiredException("User account has expired");
+            return Mono.error(new AccountExpiredException("User account has expired"));
         }
-    }
-
-    /**
-     * Default post-authentication checks: credentials expired. Mirrors
-     * {@code AbstractUserDetailsReactiveAuthenticationManager.defaultPostAuthenticationChecks}.
-     */
-    private void postAuthenticationChecks(UserDetails user) {
         if (!user.isCredentialsNonExpired()) {
-            throw new CredentialsExpiredException("User credentials have expired");
+            return Mono.error(new CredentialsExpiredException("User credentials have expired"));
         }
+        return Mono.empty();
     }
 
-    /**
-     * Attempts to authenticate by username. Since usernames do not contain {@code @}, this method immediately returns
-     * empty for email-like login identifiers.
-     */
-    Mono<UserDetails> tryByUsername(String loginId, String password) {
+    /** Looks up the user by username. Skips email-like identifiers since usernames never contain {@code @}. */
+    Mono<UserDetails> lookupByUsername(String loginId) {
         if (loginId.contains("@")) {
             return Mono.empty();
         }
         return userDetailsService
                 .findByUsername(loginId)
-                .publishOn(Schedulers.boundedElastic())
-                .onErrorResume(BadCredentialsException.class, e -> Mono.empty())
-                .filter(userDetails ->
-                        password != null && passwordEncoder.matches(password, userDetails.getPassword()));
+                .onErrorResume(BadCredentialsException.class, e -> Mono.empty());
     }
 
-    /**
-     * Attempts to authenticate by verified email. Only executes when the login identifier looks like an email address.
-     */
-    Mono<UserDetails> tryByEmail(String loginId, String password) {
+    /** Looks up the user by verified email. Skips identifiers that don't look like email addresses. */
+    Mono<UserDetails> lookupByEmail(String loginId) {
         if (!loginId.contains("@")) {
             return Mono.empty();
         }
         return userService
                 .findUserByVerifiedEmail(loginId)
-                .flatMap(user -> tryByUsername(user.getMetadata().getName(), password));
+                .flatMap(user -> userDetailsService
+                        .findByUsername(user.getMetadata().getName())
+                        .onErrorResume(BadCredentialsException.class, e -> Mono.empty()));
     }
 
     private Mono<UserDetails> upgradePasswordIfNeeded(UserDetails userDetails, String password) {
