@@ -4912,7 +4912,8 @@
           "email": {
             "type": "string",
             "format": "email",
-            "description": "email address to verify"
+            "description": "email address to verify",
+            "minLength": 1
           }
         },
         "description": "Payload for sending an email verification code."

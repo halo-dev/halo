@@ -2530,6 +2530,7 @@
         "type": "object",
         "properties": {
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Current password of the authenticated user."
           },
@@ -3270,10 +3271,12 @@
             "description": "Current TOTP code, required when replacing an existing TOTP authenticator."
           },
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Current password of the authenticated user."
           },
           "secret": {
+            "minLength": 1,
             "type": "string",
             "description": "Raw TOTP secret returned by the auth-link endpoint."
           }

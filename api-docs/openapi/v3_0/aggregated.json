@@ -17787,7 +17787,8 @@
           "email": {
             "type": "string",
             "format": "email",
-            "description": "email address to verify"
+            "description": "email address to verify",
+            "minLength": 1
           }
         },
         "description": "Payload for sending an email verification code."
@@ -20061,6 +20062,7 @@
         "type": "object",
         "properties": {
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Current password of the authenticated user."
           },
@@ -23900,10 +23902,12 @@
             "description": "Current TOTP code, required when replacing an existing TOTP authenticator."
           },
           "password": {
+            "minLength": 1,
             "type": "string",
             "description": "Current password of the authenticated user."
           },
           "secret": {
+            "minLength": 1,
             "type": "string",
             "description": "Raw TOTP secret returned by the auth-link endpoint."
           }
