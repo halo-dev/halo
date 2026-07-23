@@ -41,16 +41,7 @@ public class DefaultUserDetailService implements ReactiveUserDetailsService, Rea
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        var getUser = Mono.defer(() -> {
-            var isEmail = username.contains("@");
-            if (isEmail) {
-                log.debug("Try to authenticate by email: {}", username);
-                return userService.findUserByVerifiedEmail(username);
-            } else {
-                log.debug("Try to authenticate by username: {}", username);
-                return userService.getUser(username);
-            }
-        });
+        var getUser = userService.getUser(username);
         return getUser.switchIfEmpty(Mono.error(() -> new UserNotFoundException(username)))
                 .onErrorMap(UserNotFoundException.class, ignored -> new BadCredentialsException("Invalid Credentials"))
                 .flatMap(user -> {

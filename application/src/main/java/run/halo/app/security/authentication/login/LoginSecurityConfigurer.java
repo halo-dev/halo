@@ -8,7 +8,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -22,6 +21,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.user.service.UserService;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.HaloUserDetails;
 import run.halo.app.security.LoginHandlerEnhancer;
@@ -41,6 +41,8 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
     private final ReactiveUserDetailsService userDetailsService;
 
     private final ReactiveUserDetailsPasswordService passwordService;
+
+    private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -92,9 +94,7 @@ public class LoginSecurityConfigurer implements SecurityConfigurer {
     }
 
     ReactiveAuthenticationManager defaultAuthenticationManager() {
-        var manager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        manager.setPasswordEncoder(passwordEncoder);
-        manager.setUserDetailsPasswordService(passwordService);
-        return manager;
+        return new LoginReactiveAuthenticationManager(
+                userDetailsService, userService, passwordEncoder, passwordService);
     }
 }
