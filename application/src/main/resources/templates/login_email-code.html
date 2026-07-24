@@ -1,0 +1,117 @@
+<div th:remove="tag" th:fragment="form">
+  <div class="form-item">
+    <label for="email" th:text="#{login-email-code.form.email.label}">Email</label>
+
+    <div class="form-input">
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
+        th:placeholder="#{login-email-code.form.email.placeholder}"
+        required
+        autofocus
+      />
+    </div>
+  </div>
+  <div class="form-item">
+    <label for="code" th:text="#{login-email-code.form.code.label}">Verification Code</label>
+
+    <div class="form-input-group">
+      <div class="form-input">
+        <input
+          id="code"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          maxlength="6"
+          minlength="6"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          th:placeholder="#{login-email-code.form.code.placeholder}"
+          required
+        />
+      </div>
+      <button type="button" id="send-code-btn" th:text="#{login-email-code.form.sendCode}">Send Code</button>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    (function () {
+      var sendBtn = document.getElementById("send-code-btn");
+      var emailInput = document.getElementById("email");
+      var cooldown = 60;
+
+      // CSRF token provided by Spring Security / Thymeleaf
+      var csrfHeaderName = /*[[${_csrf.headerName}]]*/ "X-XSRF-TOKEN";
+      var csrfToken = /*[[${_csrf.token}]]*/ "";
+
+      sendBtn.addEventListener("click", function () {
+        var email = emailInput.value.trim();
+        if (!email) {
+          alert(/*[[#{login-email-code.form.emailRequired}]]*/ "Please enter your email address.");
+          return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.textContent = /*[[#{login-email-code.form.sending}]]*/ "Sending...";
+
+        var headers = { "Content-Type": "application/json" };
+        headers[csrfHeaderName] = csrfToken;
+
+        fetch("login/email-code/send", {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ email: email }),
+        })
+          .then(function (response) {
+            if (response.status === 202) {
+              startCooldown();
+            } else if (response.status === 429) {
+              alert(/*[[#{login-email-code.form.rateLimited}]]*/ "Too many requests. Please try again later.");
+              resetButton();
+            } else {
+              response
+                .json()
+                .then(function (data) {
+                  alert(
+                    data.detail || /*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again."
+                  );
+                })
+                .catch(function () {
+                  alert(/*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again.");
+                });
+              resetButton();
+            }
+          })
+          .catch(function () {
+            alert(/*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again.");
+            resetButton();
+          });
+      });
+
+      function startCooldown() {
+        var remaining = cooldown;
+        sendBtn.disabled = true;
+        var interval = setInterval(function () {
+          remaining--;
+          sendBtn.textContent = /*[[#{login-email-code.form.resend}]]*/ "Resend" + " (" + remaining + "s)";
+          if (remaining <= 0) {
+            clearInterval(interval);
+            resetButton();
+          }
+        }, 1000);
+      }
+
+      function resetButton() {
+        sendBtn.disabled = false;
+        sendBtn.textContent = /*[[#{login-email-code.form.sendCode}]]*/ "Send Code";
+      }
+    })();
+  </script>
+</div>
