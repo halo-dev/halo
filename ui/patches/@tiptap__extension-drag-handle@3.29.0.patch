@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 67f4b0e..2f2e17e 100644
+index 67f4b0e59f69..2f2e17ea82d7 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -36,9 +36,7 @@ var import_core2 = require("@tiptap/core");
@@ -84,7 +84,7 @@ index 67f4b0e..2f2e17e 100644
            }
            return value;
 diff --git a/dist/index.js b/dist/index.js
-index 8fec3ce..f572915 100644
+index 8fec3ceacf3c..f57291597913 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
