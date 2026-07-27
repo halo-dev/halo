@@ -8,8 +8,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,16 +30,15 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.ReasonPayload;
-import run.halo.app.security.authentication.emailcode.EmailCodeServiceImpl.LoginCodeManager;
 
 /**
- * Tests for {@link EmailCodeServiceImpl}.
+ * Tests for {@link InMemoryEmailCodeService}.
  *
  * @author johnniang
  * @since 2.26.0
  */
 @ExtendWith(MockitoExtension.class)
-class EmailCodeServiceImplTest {
+class InMemoryEmailCodeServiceTest {
 
     @Mock
     UserService userService;
@@ -48,7 +50,15 @@ class EmailCodeServiceImplTest {
     NotificationCenter notificationCenter;
 
     @InjectMocks
-    EmailCodeServiceImpl emailCodeService;
+    InMemoryEmailCodeService emailCodeService;
+
+    Clock baseClock;
+
+    @BeforeEach
+    void setUp() {
+        baseClock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
+        emailCodeService.setClock(baseClock);
+    }
 
     // ── sendLoginCode ───────────────────────────────────────────────
 
@@ -58,12 +68,12 @@ class EmailCodeServiceImplTest {
         var user = createUser("johnniang", "test@example.com", true);
         when(userService.listByEmail("test@example.com")).thenReturn(Flux.just(user));
         when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
-        when(reasonEmitter.emit(eq(EmailCodeServiceImpl.LOGIN_EMAIL_CODE_REASON_TYPE), any(Consumer.class)))
+        when(reasonEmitter.emit(eq(InMemoryEmailCodeService.LOGIN_EMAIL_CODE_REASON_TYPE), any(Consumer.class)))
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(emailCodeService.sendLoginCode("test@example.com")).verifyComplete();
 
-        verify(reasonEmitter).emit(eq(EmailCodeServiceImpl.LOGIN_EMAIL_CODE_REASON_TYPE), any(Consumer.class));
+        verify(reasonEmitter).emit(eq(InMemoryEmailCodeService.LOGIN_EMAIL_CODE_REASON_TYPE), any(Consumer.class));
     }
 
     @Test
@@ -91,23 +101,21 @@ class EmailCodeServiceImplTest {
     @SuppressWarnings("unchecked")
     void shouldVerifyValidCodeAndReturnUser() {
         var user = createUser("johnniang", "test@example.com", true);
-        when(userService.listByEmail("test@example.com")).thenReturn(Flux.just(user));
         when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
         when(reasonEmitter.emit(anyString(), any(Consumer.class))).thenReturn(Mono.empty());
+        when(userService.listByEmail("test@example.com")).thenReturn(Flux.just(user));
 
         // send code first
         emailCodeService.sendLoginCode("test@example.com").block();
 
         // capture the code from the emitted reason
         var captor = ArgumentCaptor.forClass(Consumer.class);
-        verify(reasonEmitter).emit(eq(EmailCodeServiceImpl.LOGIN_EMAIL_CODE_REASON_TYPE), captor.capture());
-
+        verify(reasonEmitter).emit(eq(InMemoryEmailCodeService.LOGIN_EMAIL_CODE_REASON_TYPE), captor.capture());
         var builder = ReasonPayload.builder();
         captor.getValue().accept(builder);
         var code = builder.build().getAttributes().get("code").toString();
 
         // verify with the correct code
-        when(userService.listByEmail("test@example.com")).thenReturn(Flux.just(user));
         StepVerifier.create(emailCodeService.verifyLoginCode("test@example.com", code))
                 .assertNext(result -> assertThat(result.getMetadata().getName()).isEqualTo("johnniang"))
                 .verifyComplete();
@@ -120,64 +128,65 @@ class EmailCodeServiceImplTest {
                 .verify();
     }
 
-    // ── LoginCodeManager (inner class) ──────────────────────────────
+    @Test
+    void shouldFailWhenCodeIsWrong() {
+        stubNotifications();
+        // generate a code
+        emailCodeService
+                .sendLoginCodeNotification("johnniang", "test@example.com")
+                .block();
 
-    @Nested
-    class LoginCodeManagerTest {
+        StepVerifier.create(emailCodeService.verifyLoginCode("test@example.com", "000000"))
+                .expectError(BadCredentialsException.class)
+                .verify();
+    }
 
-        @Test
-        void shouldGenerateAndVerifyCode() {
-            var manager = new LoginCodeManager();
-            var code = manager.generateCode("test@example.com");
+    @Test
+    void shouldFailAfterMaxAttempts() {
+        stubNotifications();
+        // generate a code
+        emailCodeService
+                .sendLoginCodeNotification("johnniang", "test@example.com")
+                .block();
 
-            assertThat(code).hasSize(6);
-            assertThat(manager.verifyCode("test@example.com", code)).isTrue();
+        // exhaust all attempts
+        for (int i = 0; i < InMemoryEmailCodeService.MAX_ATTEMPTS; i++) {
+            StepVerifier.create(emailCodeService.verifyLoginCode("test@example.com", "wrong-" + i))
+                    .expectError(BadCredentialsException.class)
+                    .verify();
         }
 
-        @Test
-        void shouldFailWithWrongCode() {
-            var manager = new LoginCodeManager();
-            manager.generateCode("test@example.com");
+        // now even the correct code should fail (blacklisted)
+        StepVerifier.create(emailCodeService.verifyLoginCode("test@example.com", "any-code"))
+                .expectError(BadCredentialsException.class)
+                .verify();
+    }
 
-            assertThat(manager.verifyCode("test@example.com", "000000")).isFalse();
-        }
+    @Test
+    void shouldFailWhenCodeIsExpired() {
+        stubNotifications();
+        // generate a code at the base clock time
+        emailCodeService
+                .sendLoginCodeNotification("johnniang", "test@example.com")
+                .block();
 
-        @Test
-        void shouldFailAfterMaxAttempts() {
-            var manager = new LoginCodeManager();
-            var code = manager.generateCode("test@example.com");
+        // advance clock past CODE_TTL
+        var expiredInstant =
+                baseClock.instant().plus(InMemoryEmailCodeService.CODE_TTL).plusSeconds(1);
+        emailCodeService.setClock(Clock.fixed(expiredInstant, ZoneOffset.UTC));
 
-            for (int i = 0; i < EmailCodeServiceImpl.MAX_ATTEMPTS; i++) {
-                assertThat(manager.verifyCode("test@example.com", "wrong-" + i)).isFalse();
-            }
-
-            // even correct code fails after max attempts
-            assertThat(manager.verifyCode("test@example.com", code)).isFalse();
-        }
-
-        @Test
-        void shouldRemoveCode() {
-            var manager = new LoginCodeManager();
-            var code = manager.generateCode("test@example.com");
-
-            assertThat(manager.verifyCode("test@example.com", code)).isTrue();
-
-            manager.removeCode("test@example.com");
-            assertThat(manager.verifyCode("test@example.com", code)).isFalse();
-        }
-
-        @Test
-        void shouldBeCaseInsensitive() {
-            var manager = new LoginCodeManager();
-            var code = manager.generateCode("test@example.com");
-
-            // verifyCode is case-sensitive at the manager level — lowercasing is handled by
-            // EmailCodeServiceImpl before calling the manager
-            assertThat(manager.verifyCode("test@example.com", code)).isTrue();
-        }
+        StepVerifier.create(emailCodeService.verifyLoginCode("test@example.com", "any-code"))
+                .expectError(BadCredentialsException.class)
+                .verify();
     }
 
     // ── Helpers ────────────────────────────────────────────────────
+
+    @SuppressWarnings("unchecked")
+    private void stubNotifications() {
+        when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
+        when(reasonEmitter.emit(anyString(), any(Consumer.class))).thenReturn(Mono.empty());
+    }
 
     private User createUser(String name, String email, boolean emailVerified) {
         var metadata = new Metadata();
