@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.security.authentication.emailcode.EmailCodeService;
 
 /**
@@ -63,11 +64,9 @@ class PreAuthEmailCodeLoginEndpoint {
                                             var email = body.getEmail();
                                             return emailCodeService
                                                     .sendLoginCode(email)
-                                                    .transformDeferred(rateLimiterForSendingCode(request.exchange()
-                                                            .getRequest()
-                                                            .getRemoteAddress()
-                                                            .getAddress()
-                                                            .getHostAddress()))
+                                                    .transformDeferred(rateLimiterForSendingCode(
+                                                            IpAddressUtils.getClientIp(request.exchange()
+                                                                    .getRequest())))
                                                     .onErrorMap(
                                                             RequestNotPermitted.class, RateLimitExceededException::new);
                                         })
