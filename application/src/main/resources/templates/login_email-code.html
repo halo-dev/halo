@@ -1,4 +1,7 @@
 <div th:remove="tag" th:fragment="form">
+  <!-- Inline notification area — replaces alert() dialogs -->
+  <div id="email-code-notification" class="alert" role="alert" style="display: none"></div>
+
   <div class="form-item">
     <label for="email" th:text="#{login-email-code.form.email.label}">Email</label>
 
@@ -12,6 +15,7 @@
         autocorrect="off"
         autocapitalize="off"
         th:placeholder="#{login-email-code.form.email.placeholder}"
+        th:value="${email}"
         required
         autofocus
       />
@@ -39,27 +43,181 @@
       </div>
       <button type="button" id="send-code-btn" th:text="#{login-email-code.form.sendCode}">Send Code</button>
     </div>
+    <!-- Code expiration hint (hidden until code is sent) -->
+    <div id="code-expiration-hint" class="form-item-extra-link" style="display: none"></div>
   </div>
 
   <script th:inline="javascript">
     (function () {
       var sendBtn = document.getElementById("send-code-btn");
       var emailInput = document.getElementById("email");
-      var cooldown = 60;
+      var codeInput = document.getElementById("code");
+      var notification = document.getElementById("email-code-notification");
+      var expirationHint = document.getElementById("code-expiration-hint");
+      var originalButtonText = sendBtn.textContent;
+
+      // localStorage key for persisting cooldown across page refreshes
+      var STORAGE_KEY = "login-email-code-cooldown";
 
       // CSRF token provided by Spring Security / Thymeleaf
       var csrfHeaderName = /*[[${_csrf.headerName}]]*/ "X-XSRF-TOKEN";
       var csrfToken = /*[[${_csrf.token}]]*/ "";
 
+      // i18n strings evaluated by Thymeleaf at render time
+      var i18nCodeExpires = /*[[#{login-email-code.form.codeExpires}]]*/ "Code expires in {0}";
+      var i18nResendIn = /*[[#{login-email-code.form.resendIn}]]*/ "Resend in {0}s";
+      var i18nSending = /*[[#{login-email-code.form.sending}]]*/ "Sending...";
+      var i18nCodeSent = /*[[#{login-email-code.form.codeSent}]]*/ "Verification code sent";
+      var i18nRateLimited = /*[[#{login-email-code.form.rateLimited}]]*/ "Too many requests. Please try again later.";
+      var i18nSendFailed = /*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again.";
+
+      var cooldownInterval = null;
+      var notificationTimeout = null;
+      var expirationInterval = null;
+
+      // ---- Notification helpers ----
+
+      function showNotification(message, type) {
+        if (notificationTimeout) clearTimeout(notificationTimeout);
+        notification.textContent = message;
+        notification.className = "alert alert-" + type;
+        notification.style.display = "block";
+      }
+
+      function hideNotification() {
+        notification.style.display = "none";
+        notification.className = "alert";
+        if (notificationTimeout) clearTimeout(notificationTimeout);
+      }
+
+      function showSuccess(message) {
+        showNotification(message, "success");
+        // auto-hide success after 8 seconds
+        notificationTimeout = setTimeout(hideNotification, 8000);
+      }
+
+      function showError(message) {
+        showNotification(message, "error");
+      }
+
+      // Clear error notifications when user starts typing
+      emailInput.addEventListener("input", function () {
+        if (notification.className.indexOf("alert-error") >= 0) {
+          hideNotification();
+        }
+      });
+
+      // ---- localStorage cooldown persistence ----
+
+      function getPersistedCooldown(email) {
+        try {
+          var data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (data && data.email === email && data.until && data.until > Date.now()) {
+            return data;
+          }
+        } catch (e) {
+          // ignore
+        }
+        return null;
+      }
+
+      function persistCooldown(email, durationSeconds) {
+        var data = { email: email, until: Date.now() + durationSeconds * 1000 };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      function clearPersistedCooldown() {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // ---- Expiration hint ----
+
+      function showExpiration(ttlSeconds) {
+        var expiresAt = Date.now() + ttlSeconds * 1000;
+        updateExpirationText(expiresAt);
+        expirationHint.style.display = "block";
+
+        if (expirationInterval) clearInterval(expirationInterval);
+        expirationInterval = setInterval(function () {
+          var remaining = expiresAt - Date.now();
+          if (remaining <= 0) {
+            clearInterval(expirationInterval);
+            expirationInterval = null;
+            expirationHint.style.display = "none";
+            return;
+          }
+          updateExpirationText(expiresAt);
+        }, 10000); // update every 10s
+      }
+
+      function updateExpirationText(expiresAt) {
+        var remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+        var minutes = Math.floor(remaining / 60);
+        var seconds = remaining % 60;
+        var timeStr = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        expirationHint.textContent = i18nCodeExpires.replace("{0}", timeStr);
+      }
+
+      function hideExpiration() {
+        if (expirationInterval) clearInterval(expirationInterval);
+        expirationInterval = null;
+        expirationHint.style.display = "none";
+      }
+
+      // ---- Button / countdown management ----
+
+      function startCooldown(cooldownSeconds, ttlSeconds) {
+        var remaining = cooldownSeconds;
+        sendBtn.disabled = true;
+
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        cooldownInterval = setInterval(function () {
+          remaining--;
+          if (remaining <= 0) {
+            clearInterval(cooldownInterval);
+            cooldownInterval = null;
+            resetButton();
+            return;
+          }
+          sendBtn.textContent = i18nResendIn.replace("{0}", remaining.toString());
+        }, 1000);
+
+        // Show code expiration countdown if TTL is known
+        if (ttlSeconds && ttlSeconds > 0) {
+          showExpiration(ttlSeconds);
+        }
+      }
+
+      function resetButton() {
+        clearPersistedCooldown();
+        hideExpiration();
+        sendBtn.disabled = false;
+        sendBtn.textContent = originalButtonText;
+        if (cooldownInterval) {
+          clearInterval(cooldownInterval);
+          cooldownInterval = null;
+        }
+      }
+
+      // ---- Main click handler ----
+
       sendBtn.addEventListener("click", function () {
-        var email = emailInput.value.trim();
-        if (!email) {
-          alert(/*[[#{login-email-code.form.emailRequired}]]*/ "Please enter your email address.");
+        if (!emailInput.reportValidity()) {
           return;
         }
+        var email = emailInput.value.trim();
 
+        hideNotification();
         sendBtn.disabled = true;
-        sendBtn.textContent = /*[[#{login-email-code.form.sending}]]*/ "Sending...";
+        sendBtn.textContent = i18nSending;
 
         var headers = { "Content-Type": "application/json" };
         headers[csrfHeaderName] = csrfToken;
@@ -71,46 +229,49 @@
         })
           .then(function (response) {
             if (response.status === 202) {
-              startCooldown();
+              return response.json().then(function (data) {
+                var cooldown = data.cooldownSeconds || 60;
+                var ttl = data.ttlSeconds || 300;
+                persistCooldown(email, cooldown);
+                startCooldown(cooldown, ttl);
+                codeInput.focus();
+                showSuccess(i18nCodeSent);
+              });
             } else if (response.status === 429) {
-              alert(/*[[#{login-email-code.form.rateLimited}]]*/ "Too many requests. Please try again later.");
+              showError(i18nRateLimited);
               resetButton();
             } else {
-              response
+              return response
                 .json()
                 .then(function (data) {
-                  alert(
-                    data.detail || /*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again."
-                  );
+                  showError(data.detail || i18nSendFailed);
                 })
                 .catch(function () {
-                  alert(/*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again.");
+                  showError(i18nSendFailed);
                 });
-              resetButton();
             }
           })
           .catch(function () {
-            alert(/*[[#{login-email-code.form.sendFailed}]]*/ "Failed to send code. Please try again.");
-            resetButton();
+            showError(i18nSendFailed);
+          })
+          .finally(function () {
+            // Only reset if not in cooldown (success case handles its own state)
+            if (!cooldownInterval) {
+              resetButton();
+            }
           });
       });
 
-      function startCooldown() {
-        var remaining = cooldown;
-        sendBtn.disabled = true;
-        var interval = setInterval(function () {
-          remaining--;
-          sendBtn.textContent = /*[[#{login-email-code.form.resend}]]*/ "Resend" + " (" + remaining + "s)";
-          if (remaining <= 0) {
-            clearInterval(interval);
-            resetButton();
-          }
-        }, 1000);
-      }
+      // ---- Restore cooldown on page load ----
 
-      function resetButton() {
-        sendBtn.disabled = false;
-        sendBtn.textContent = /*[[#{login-email-code.form.sendCode}]]*/ "Send Code";
+      var saved = getPersistedCooldown(emailInput.value.trim());
+      if (saved) {
+        var remainingSeconds = Math.ceil((saved.until - Date.now()) / 1000);
+        if (remainingSeconds > 0) {
+          startCooldown(remainingSeconds, 0); // no TTL known on restore
+        } else {
+          clearPersistedCooldown();
+        }
       }
     })();
   </script>

@@ -39,11 +39,11 @@ import run.halo.app.notification.UserIdentity;
 @Component
 public class InMemoryEmailCodeService implements EmailCodeService {
 
-    static final int CODE_LENGTH = 6;
-    static final int MAX_ATTEMPTS = 3;
-    static final Duration CODE_TTL = Duration.ofMinutes(5);
-    static final Duration BLACKLIST_TTL = Duration.ofHours(1);
-    static final String LOGIN_EMAIL_CODE_REASON_TYPE = "login-email-code";
+    public static final int CODE_LENGTH = 6;
+    public static final int MAX_ATTEMPTS = 3;
+    public static final Duration CODE_TTL = Duration.ofMinutes(5);
+    public static final Duration BLACKLIST_TTL = Duration.ofHours(1);
+    public static final String LOGIN_EMAIL_CODE_REASON_TYPE = "login-email-code";
 
     private final ConcurrentHashMap<String, LoginCodeEntry> codeStore = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Instant> blacklistStore = new ConcurrentHashMap<>();
