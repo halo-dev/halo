@@ -184,6 +184,32 @@ class PluginServiceImplTest {
         }
 
         @Test
+        void shouldDeleteCopiedPluginWhenUpgradeUpdateFails() throws IOException {
+            var pluginRoot = tempDirectory.resolve("plugins");
+            Files.createDirectories(pluginRoot);
+            var oldPluginFile = Files.createFile(pluginRoot.resolve("fake-plugin-0.0.1.jar"));
+            var newPluginFile = pluginRoot.resolve("fake-plugin-0.0.2.jar");
+            when(pluginsRootGetter.get()).thenReturn(pluginRoot);
+
+            var oldFakePlugin = createPlugin("fake-plugin", plugin -> {
+                plugin.getSpec().setEnabled(true);
+                plugin.getSpec().setVersion("0.0.1");
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+            });
+            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.just(oldFakePlugin));
+            when(client.update(oldFakePlugin)).thenReturn(Mono.error(new IllegalStateException("Update failed")));
+
+            pluginService
+                    .upgrade("fake-plugin", fakePluginPath)
+                    .as(StepVerifier::create)
+                    .expectErrorMessage("Update failed")
+                    .verify();
+
+            assertTrue(Files.exists(oldPluginFile));
+            assertFalse(Files.exists(newPluginFile));
+        }
+
+        @Test
         void shouldNotReloadIfLoadLocationIsNotReady() {
             var pluginName = "test-plugin";
 

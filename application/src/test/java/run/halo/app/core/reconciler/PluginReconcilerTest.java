@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -59,6 +60,7 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.extension.controller.RequeueException;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
@@ -206,11 +208,46 @@ class PluginReconcilerTest {
         }
 
         @Test
-        void shouldReloadIfReloadAnnotationPresent() {
+        void shouldReloadIfReloadAnnotationPresent() throws IOException {
+            var oldPluginFile = Files.createFile(tempPath.resolve("fake-plugin-1.0.0.jar"));
+            var newPluginFile = tempPath.resolve("fake-plugin-1.2.3.jar");
             var fakePlugin = createPlugin(name, plugin -> {
                 var spec = plugin.getSpec();
                 spec.setVersion("1.2.3");
                 spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+                plugin.getMetadata()
+                        .setAnnotations(new HashMap<>(
+                                Map.of(RELOAD_ANNO, newPluginFile.toUri().toString())));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginWrapper.getPluginPath()).thenReturn(oldPluginFile);
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
+            when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of(pluginWrapper));
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of());
+            when(pluginManager.unloadPlugin(name)).thenReturn(true);
+
+            var result = reconciler.reconcile(new Request(name));
+            assertTrue(result.reEnqueue());
+
+            verify(pluginManager).unloadPlugin(name);
+            var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
+            verify(pluginManager).loadPlugin(loadLocation);
+            assertEquals(newPluginFile, loadLocation);
+            assertFalse(Files.exists(oldPluginFile));
+            assertFalse(fakePlugin.getMetadata().getAnnotations().containsKey(RELOAD_ANNO));
+        }
+
+        @Test
+        void shouldKeepReloadRequestWhenUnloadFails() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
                 spec.setEnabled(true);
                 plugin.getMetadata().setAnnotations(new HashMap<>(Map.of(RELOAD_ANNO, "true")));
             });
@@ -219,16 +256,74 @@ class PluginReconcilerTest {
             when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
             var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
             when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
-            when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
             when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of(pluginWrapper));
             when(pluginManager.getResolvedPlugins()).thenReturn(List.of());
+            when(pluginManager.unloadPlugin(name)).thenReturn(false);
 
             var result = reconciler.reconcile(new Request(name));
+
             assertTrue(result.reEnqueue());
+            assertTrue(fakePlugin.getMetadata().getAnnotations().containsKey(RELOAD_ANNO));
+            verify(pluginManager, never()).loadPlugin(any(Path.class));
+        }
+
+        @Test
+        void shouldKeepPreviousLoadLocationAndReloadRequestWhenLoadingNewPluginFails() throws IOException {
+            var oldPluginFile = Files.createFile(tempPath.resolve("fake-plugin-1.0.0.jar"));
+            var newPluginFile = tempPath.resolve("fake-plugin-1.2.3.jar");
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setEnabled(true);
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+                plugin.getMetadata()
+                        .setAnnotations(new HashMap<>(
+                                Map.of(RELOAD_ANNO, newPluginFile.toUri().toString())));
+            });
+            var pluginWrapper = mockPluginWrapper(PluginState.RESOLVED);
+            when(pluginWrapper.getPluginPath()).thenReturn(oldPluginFile);
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of(pluginWrapper));
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of());
+            when(pluginManager.unloadPlugin(name)).thenReturn(true);
+            doThrow(new IllegalStateException("Failed to load replacement"))
+                    .when(pluginManager)
+                    .loadPlugin(newPluginFile);
+
+            assertThrows(IllegalStateException.class, () -> reconciler.reconcile(new Request(name)));
+
+            assertEquals(oldPluginFile.toUri(), fakePlugin.getStatus().getLoadLocation());
+            assertTrue(fakePlugin.getMetadata().getAnnotations().containsKey(RELOAD_ANNO));
+        }
+
+        @Test
+        void shouldReloadWhenRuntimePathDiffersFromDesiredPath() throws IOException {
+            var oldPluginFile = Files.createFile(tempPath.resolve("fake-plugin-1.0.0.jar"));
+            var newPluginFile = tempPath.resolve("fake-plugin-1.2.3.jar");
+            var fakePlugin = createPlugin(name, plugin -> {
+                plugin.getSpec().setVersion("1.2.3");
+                plugin.getSpec().setEnabled(false);
+                plugin.getStatus().setLoadLocation(newPluginFile.toUri());
+            });
+            var pluginWrapper = mockPluginWrapper(PluginState.DISABLED);
+            when(pluginWrapper.getPluginPath()).thenReturn(oldPluginFile);
+            when(pluginWrapper.getPluginClassLoader()).thenReturn(mock(ClassLoader.class));
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.getUnresolvedPlugins()).thenReturn(List.of());
+            when(pluginManager.getResolvedPlugins()).thenReturn(List.of(pluginWrapper));
+            when(pluginManager.unloadPlugin(name)).thenReturn(true);
+
+            reconciler.reconcile(new Request(name));
 
             verify(pluginManager).unloadPlugin(name);
-            var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
-            verify(pluginManager).loadPlugin(loadLocation);
+            verify(pluginManager).loadPlugin(newPluginFile);
+            assertFalse(Files.exists(oldPluginFile));
         }
 
         @Test
@@ -479,6 +574,9 @@ class PluginReconcilerTest {
     @Nested
     class WhenDeleting {
 
+        @TempDir
+        Path tempPath;
+
         @Test
         void shouldDoNothingWithoutFinalizer() {
             var fakePlugin = createPlugin(name, plugin -> {
@@ -518,7 +616,7 @@ class PluginReconcilerTest {
             var result = reconciler.reconcile(new Request(name));
 
             assertFalse(result.reEnqueue());
-            // make sure the finalizer is removed.
+            // Remove the finalizer after all plugin resources have been deleted.
             assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
             assertNull(fakePlugin.getStatus().getLastProbeState());
             verify(pluginManager, times(2)).getPlugin(name);
@@ -527,6 +625,86 @@ class PluginReconcilerTest {
             verify(client).fetch(Setting.class, "fake-setting");
             verify(client).fetch(ReverseProxy.class, reverseProxyName);
             verify(client).update(fakePlugin);
+        }
+
+        @Test
+        void shouldDeleteManagedPluginFileWhenPluginIsNotLoaded() throws IOException {
+            var pluginFile = Files.createFile(tempPath.resolve("fake-plugin-1.2.3.jar"));
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLoadLocation(pluginFile.toUri());
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPlugin(name)).thenReturn(null);
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertFalse(Files.exists(pluginFile));
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            verify(client).update(fakePlugin);
+        }
+
+        @Test
+        void shouldKeepFinalizerWhenPluginManagerStillContainsPlugin() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+            });
+            var pluginWrapper = mock(PluginWrapper.class);
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPlugin(name)).thenReturn(pluginWrapper);
+            when(pluginManager.deletePlugin(name)).thenReturn(false);
+
+            var exception = assertThrows(RequeueException.class, () -> reconciler.reconcile(new Request(name)));
+
+            assertEquals(Reconciler.Result.requeue(null), exception.getResult());
+            assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            verify(client, never()).update(fakePlugin);
+        }
+
+        @Test
+        void shouldDeleteOnlyArtifactsOwnedByPlugin() throws Exception {
+            var fakePluginResource = Paths.get(getClass()
+                    .getClassLoader()
+                    .getResource("plugin/plugin-0.0.2")
+                    .toURI());
+            var unrelatedPluginResource = Paths.get(getClass()
+                    .getClassLoader()
+                    .getResource("plugin/plugin-0.0.1")
+                    .toURI());
+            var currentPluginFile = tempPath.resolve("fake-plugin-1.2.3.jar");
+            var stalePluginFile = tempPath.resolve("fake-plugin-1.0.0.jar");
+            var similarlyNamedPluginFile = tempPath.resolve("fake-plugin-extra-1.0.0.jar");
+            FileUtils.jar(fakePluginResource, currentPluginFile);
+            FileUtils.jar(fakePluginResource, stalePluginFile);
+            FileUtils.jar(unrelatedPluginResource, similarlyNamedPluginFile);
+
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLoadLocation(currentPluginFile.toUri());
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPlugin(name)).thenReturn(null);
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+
+            reconciler.reconcile(new Request(name));
+
+            assertFalse(Files.exists(currentPluginFile));
+            assertFalse(Files.exists(stalePluginFile));
+            assertTrue(Files.exists(similarlyNamedPluginFile));
         }
 
         @Test
@@ -549,8 +727,8 @@ class PluginReconcilerTest {
             assertEquals(Reconciler.Result.requeue(null), exception.getResult());
             assertEquals("Waiting for setting fake-setting to be deleted.", exception.getMessage());
 
-            // make sure the finalizer is removed.
-            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            // Keep the finalizer until all plugin resources have been deleted.
+            assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
             assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
             verify(pluginManager, never()).getPlugin(name);
             verify(pluginManager, never()).deletePlugin(name);
@@ -583,8 +761,8 @@ class PluginReconcilerTest {
             assertEquals(Reconciler.Result.requeue(null), exception.getResult());
             assertEquals("Waiting for reverse proxy " + reverseProxyName + " to be deleted.", exception.getMessage());
 
-            // make sure the finalizer is removed.
-            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            // Keep the finalizer until all plugin resources have been deleted.
+            assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
             assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
             verify(pluginManager, never()).getPlugin(name);
             verify(pluginManager, never()).deletePlugin(name);

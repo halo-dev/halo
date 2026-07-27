@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
@@ -75,6 +77,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
+import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
@@ -143,10 +146,10 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                             // Check dependents every 10 seconds
                             return Result.requeue(Duration.ofSeconds(10));
                         }
-                        // CleanUp resources and remove finalizer.
-                        if (removeFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME))) {
+                        var finalizers = plugin.getMetadata().getFinalizers();
+                        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
                             cleanupResources(plugin);
-                            syncPluginState(plugin);
+                            removeFinalizers(plugin.getMetadata(), Set.of(FINALIZER_NAME));
                             client.update(plugin);
                         }
                         return Result.doNotRetry();
@@ -243,16 +246,6 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         return false;
     }
 
-    private void syncPluginState(Plugin plugin) {
-        var pluginName = plugin.getMetadata().getName();
-        var p = pluginManager.getPlugin(pluginName);
-        if (p != null) {
-            plugin.statusNonNull().setLastProbeState(p.getPluginState());
-        } else {
-            plugin.statusNonNull().setLastProbeState(null);
-        }
-    }
-
     private static String requestToUnload(Plugin plugin) {
         var labels = plugin.getMetadata().getLabels();
         if (labels == null) {
@@ -291,12 +284,104 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                         Waiting for setting %s to be deleted.""", settingName));
             });
         }
-        if (pluginManager.getPlugin(pluginName) != null) {
+        var pluginWrapper = pluginManager.getPlugin(pluginName);
+        RuntimeException deletionError = null;
+        if (pluginWrapper != null) {
             log.info("Deleting plugin {} in plugin manager.", pluginName);
-            var deleted = pluginManager.deletePlugin(pluginName);
-            if (!deleted) {
-                log.warn("Failed to delete plugin {}", pluginName);
+            try {
+                var deleted = pluginManager.deletePlugin(pluginName);
+                if (!deleted) {
+                    log.warn("Plugin manager did not delete plugin {}.", pluginName);
+                }
+            } catch (RuntimeException e) {
+                deletionError = e;
+                log.warn("Plugin manager failed to delete plugin {}.", pluginName, e);
             }
+        }
+        var remainingPlugin = pluginManager.getPlugin(pluginName);
+        if (remainingPlugin != null) {
+            throw new RequeueException(
+                    Result.requeue(null),
+                    "Waiting for plugin %s to be deleted from plugin manager.".formatted(pluginName),
+                    deletionError);
+        }
+        if (!isDevelopmentMode(plugin)) {
+            deleteManagedPluginFile(pluginName, plugin.statusNonNull().getLoadLocation());
+            deleteManagedPluginFiles(pluginName, null);
+        }
+        plugin.statusNonNull().setLastProbeState(null);
+    }
+
+    private void deleteManagedPluginFile(String pluginName, URI loadLocation) {
+        if (loadLocation == null) {
+            return;
+        }
+        final Path pluginPath;
+        try {
+            pluginPath = Path.of(loadLocation).toAbsolutePath().normalize();
+        } catch (IllegalArgumentException | FileSystemNotFoundException e) {
+            log.warn("Skip deleting unsupported plugin path {} for plugin {}.", loadLocation, pluginName);
+            return;
+        }
+        var managed = pluginManager.getPluginsRoots().stream()
+                .map(path -> path.toAbsolutePath().normalize())
+                .anyMatch(root -> Objects.equals(pluginPath.getParent(), root));
+        if (!managed || !pluginPath.getFileName().toString().endsWith(".jar") || Files.isDirectory(pluginPath)) {
+            log.warn("Skip deleting unmanaged plugin path {} for plugin {}.", pluginPath, pluginName);
+            return;
+        }
+        try {
+            if (Files.deleteIfExists(pluginPath)) {
+                log.info("Deleted plugin file {} for plugin {}.", pluginPath, pluginName);
+            }
+        } catch (IOException e) {
+            throw new RequeueException(
+                    Result.requeue(Duration.ofSeconds(1)),
+                    "Failed to delete plugin file %s for plugin %s.".formatted(pluginPath, pluginName),
+                    e);
+        }
+    }
+
+    private void deleteManagedPluginFiles(String pluginName, URI retainedLocation) {
+        var retainedPath = toNormalizedPath(retainedLocation);
+        var pluginFinder = new YamlPluginFinder();
+        for (var pluginRoot : pluginManager.getPluginsRoots()) {
+            if (!Files.isDirectory(pluginRoot)) {
+                continue;
+            }
+            try (var paths = Files.list(pluginRoot)) {
+                paths.filter(path -> Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS))
+                        .filter(path -> path.getFileName().toString().endsWith(".jar"))
+                        .filter(path -> !Objects.equals(path.toAbsolutePath().normalize(), retainedPath))
+                        .filter(path -> isOwnedByPlugin(pluginFinder, path, pluginName))
+                        .forEach(path -> deleteManagedPluginFile(pluginName, path.toUri()));
+            } catch (IOException e) {
+                throw new RequeueException(
+                        Result.requeue(Duration.ofSeconds(1)),
+                        "Failed to scan plugin files for plugin %s.".formatted(pluginName),
+                        e);
+            }
+        }
+    }
+
+    private boolean isOwnedByPlugin(YamlPluginFinder pluginFinder, Path pluginPath, String pluginName) {
+        try {
+            var plugin = pluginFinder.find(pluginPath);
+            return Objects.equals(pluginName, plugin.getMetadata().getName());
+        } catch (RuntimeException e) {
+            log.warn("Skip unrecognized plugin file {} while cleaning up plugin {}.", pluginPath, pluginName, e);
+            return false;
+        }
+    }
+
+    private static Path toNormalizedPath(URI location) {
+        if (location == null) {
+            return null;
+        }
+        try {
+            return Path.of(location).toAbsolutePath().normalize();
+        } catch (IllegalArgumentException | FileSystemNotFoundException e) {
+            return null;
         }
     }
 
@@ -545,16 +630,23 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     private Result loadOrReload(Plugin plugin) {
         var pluginName = plugin.getMetadata().getName();
         var p = pluginManager.getPlugin(pluginName);
-        var conditions = plugin.getStatus().getConditions();
+        var status = plugin.statusNonNull();
+        var conditions = status.getConditions();
+        var desiredLoadLocation = resolveDesiredLoadLocation(plugin);
+        var currentPluginPath = p == null ? null : p.getPluginPath();
 
         var requestToUnloadBy = requestToUnload(plugin);
         var requestToUnload = requestToUnloadBy != null;
         var notFullyLoaded = p != null && pluginManager.getUnresolvedPlugins().contains(p);
         var alreadyLoaded = p != null && pluginManager.getResolvedPlugins().contains(p);
 
-        var requestToReload = requestToReload(plugin);
-        // TODO Check load location
-        var shouldUnload = requestToUnload || requestToReload || notFullyLoaded;
+        var reloadRequested = requestToReload(plugin);
+        var statusLoadLocationChanged =
+                status.getLoadLocation() != null && !isSamePath(status.getLoadLocation(), desiredLoadLocation);
+        var actualLoadLocationChanged =
+                currentPluginPath != null && !isSamePath(currentPluginPath.toUri(), desiredLoadLocation);
+        var shouldReload = reloadRequested || statusLoadLocationChanged || actualLoadLocationChanged;
+        var shouldUnload = requestToUnload || shouldReload || notFullyLoaded;
         if (shouldUnload) {
             // check if the plugin is already loaded or not fully loaded.
             if (alreadyLoaded || notFullyLoaded) {
@@ -576,7 +668,10 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 }
 
                 // unload the plugin exactly
-                pluginManager.unloadPlugin(pluginName);
+                if (!pluginManager.unloadPlugin(pluginName)) {
+                    log.warn("Failed to unload plugin {}, will retry.", pluginName);
+                    return Result.requeue(Duration.ofSeconds(1));
+                }
 
                 removeConditionBy(conditions, ConditionType.INITIALIZED);
                 removeConditionBy(conditions, ConditionType.PROGRESSING);
@@ -586,10 +681,8 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 p = null;
             }
 
-            // ensure removing the reload annotation after the plugin is unloaded
             if (requestToUnload) {
                 // skip loading and wait for removing the annotation by other plugins.
-                var status = plugin.getStatus();
                 status.getConditions()
                         .addAndEvictFIFO(Condition.builder()
                                 .type(ConditionType.INITIALIZED)
@@ -601,8 +694,14 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 return Result.doNotRetry();
             }
 
-            if (requestToReload) {
-                removeRequestToReload(plugin);
+            if (shouldReload && !isDevelopmentMode(plugin)) {
+                if (!isSamePath(status.getLoadLocation(), desiredLoadLocation)) {
+                    deleteManagedPluginFile(pluginName, status.getLoadLocation());
+                }
+                if (currentPluginPath != null && !isSamePath(currentPluginPath.toUri(), desiredLoadLocation)) {
+                    deleteManagedPluginFile(pluginName, currentPluginPath.toUri());
+                }
+                deleteManagedPluginFiles(pluginName, desiredLoadLocation);
             }
         }
 
@@ -625,11 +724,14 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         }
 
         if (p == null) {
-            var loadLocation = plugin.getStatus().getLoadLocation();
-            log.info("Loading plugin {} from {}", pluginName, loadLocation);
-            pluginManager.loadPlugin(Paths.get(loadLocation));
-            plugin.getStatus().setPhase(Plugin.Phase.RESOLVED);
-            log.info("Loaded plugin {} from {}", pluginName, loadLocation);
+            log.info("Loading plugin {} from {}", pluginName, desiredLoadLocation);
+            pluginManager.loadPlugin(Paths.get(desiredLoadLocation));
+            status.setLoadLocation(desiredLoadLocation);
+            status.setPhase(Plugin.Phase.RESOLVED);
+            if (shouldReload) {
+                removeRequestToReload(plugin);
+            }
+            log.info("Loaded plugin {} from {}", pluginName, desiredLoadLocation);
             conditions.addAndEvictFIFO(Condition.builder()
                     .type(ConditionType.INITIALIZED)
                     .status(ConditionStatus.TRUE)
@@ -639,6 +741,27 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
         }
 
         return null;
+    }
+
+    private URI resolveDesiredLoadLocation(Plugin plugin) {
+        if (isDevelopmentMode(plugin)) {
+            return plugin.statusNonNull().getLoadLocation();
+        }
+        var pluginPath = resolveManagedPluginPath(plugin);
+        return pluginPath == null ? plugin.statusNonNull().getLoadLocation() : pluginPath.toUri();
+    }
+
+    private static boolean isSamePath(URI left, URI right) {
+        if (left == null || right == null) {
+            return Objects.equals(left, right);
+        }
+        try {
+            return Objects.equals(
+                    Path.of(left).toAbsolutePath().normalize(),
+                    Path.of(right).toAbsolutePath().normalize());
+        } catch (IllegalArgumentException | FileSystemNotFoundException e) {
+            return Objects.equals(left, right);
+        }
     }
 
     private Result createOrUpdateSetting(Plugin plugin) {
@@ -771,12 +894,9 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             }
         } else {
             // reset annotation PLUGIN_PATH in non-dev mode
-            var pluginFilename = generateFileName(plugin);
-            var pluginRoot = pluginManager.getPluginsRoots().stream()
-                    .filter(root -> Files.exists(root.resolve(pluginFilename)))
-                    .findFirst()
-                    .orElse(null);
-            if (pluginRoot == null) {
+            var pluginPath = resolveManagedPluginPath(plugin);
+            if (pluginPath == null) {
+                var pluginFilename = generateFileName(plugin);
                 var condition = Condition.builder()
                         .type(ConditionType.INITIALIZED)
                         .status(ConditionStatus.FALSE)
@@ -788,33 +908,12 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                 status.setPhase(Plugin.Phase.UNKNOWN);
                 return Result.doNotRetry();
             }
-            var pluginPath = pluginRoot.resolve(pluginFilename);
+            var pluginRoot = pluginPath.getParent();
             annotations.put(PLUGIN_PATH, pluginRoot.relativize(pluginPath).toString());
 
-            // delete old load location if changed.
-            var oldLoadLocation = status.getLoadLocation();
             var newLoadLocation = pluginPath.toUri();
-            if (oldLoadLocation != null && !Objects.equals(oldLoadLocation, newLoadLocation)) {
-                // delete the old load location
-                log.info(
-                        "Deleting old plugin file {} for plugin {}, and new load location is {}.",
-                        oldLoadLocation,
-                        pluginName,
-                        newLoadLocation);
-                try {
-                    var deleted = Files.deleteIfExists(Path.of(oldLoadLocation));
-                    if (deleted) {
-                        log.info("Deleted old plugin file {} for plugin {}.", oldLoadLocation, pluginName);
-                    }
-                } catch (IOException e) {
-                    log.warn("Failed to delete old plugin file {} for plugin {}", oldLoadLocation, pluginName, e);
-                } catch (FileSystemNotFoundException e) {
-                    log.warn(
-                            "Failed to delete old plugin file {} for plugin {}: File system not found.",
-                            oldLoadLocation,
-                            pluginName,
-                            e);
-                }
+            if (status.getLoadLocation() == null) {
+                status.setLoadLocation(newLoadLocation);
                 status.setPhase(Plugin.Phase.RESOLVED);
                 status.getConditions()
                         .addAndEvictFIFO(Condition.builder()
@@ -823,11 +922,19 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
                                 .reason(ConditionReason.LOAD_LOCATION_RESOLVED)
                                 .lastTransitionTime(clock.instant())
                                 .build());
-                log.debug("Populated load location {} for plugin {}", status.getLoadLocation(), pluginName);
+                log.debug("Populated load location {} for plugin {}", newLoadLocation, pluginName);
             }
-            status.setLoadLocation(newLoadLocation);
         }
         return null;
+    }
+
+    private Path resolveManagedPluginPath(Plugin plugin) {
+        var pluginFilename = generateFileName(plugin);
+        return pluginManager.getPluginsRoots().stream()
+                .map(root -> root.resolve(pluginFilename))
+                .filter(Files::exists)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

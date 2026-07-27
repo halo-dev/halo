@@ -12,7 +12,9 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import io.swagger.v3.core.util.Json;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -215,10 +217,46 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                                     "The given plugin with name " + name + " was not found.")))
                             // copy plugin into plugin home
-                            .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).thenReturn(oldPlugin))
-                            .doOnNext(oldPlugin -> updatePlugin(oldPlugin, pluginInPath))
-                            .flatMap(client::update);
+                            .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).flatMap(copiedPluginPath -> {
+                                updatePlugin(oldPlugin, pluginInPath);
+                                return client.update(oldPlugin)
+                                        .onErrorResume(error -> deleteCopiedPluginOnError(
+                                                        copiedPluginPath,
+                                                        oldPlugin
+                                                                .statusNonNull()
+                                                                .getLoadLocation())
+                                                .then(Mono.error(error)));
+                            }));
                 });
+    }
+
+    private Mono<Void> deleteCopiedPluginOnError(Path copiedPluginPath, URI activeLoadLocation) {
+        if (activeLoadLocation != null) {
+            try {
+                var activePluginPath =
+                        Path.of(activeLoadLocation).toAbsolutePath().normalize();
+                if (Objects.equals(
+                        activePluginPath, copiedPluginPath.toAbsolutePath().normalize())) {
+                    return Mono.empty();
+                }
+            } catch (IllegalArgumentException | FileSystemNotFoundException e) {
+                log.warn(
+                        "Skip deleting copied plugin {} because active load location {} cannot be resolved.",
+                        copiedPluginPath,
+                        activeLoadLocation,
+                        e);
+                return Mono.empty();
+            }
+        }
+        return Mono.fromRunnable(() -> {
+                    try {
+                        Files.deleteIfExists(copiedPluginPath);
+                    } catch (IOException | RuntimeException e) {
+                        log.warn("Failed to delete copied plugin {} after upgrade failure.", copiedPluginPath, e);
+                    }
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     @Override
