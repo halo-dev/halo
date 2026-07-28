@@ -16,6 +16,40 @@ export const ExtensionFontSize =
   TiptapFontSize.extend<ExtensionFontSizeOptions>({
     name: "fontSize",
 
+    addHaloEditorMetadata() {
+      return {
+        contributions: (this.options.types ?? []).map((name) => ({
+          targets: [{ kind: "mark" as const, name }],
+          metadata: {
+            ai: {
+              attributeGuidance: {
+                fontSize: {
+                  description: "CSS font size for the inline text.",
+                  format: "CSS length",
+                  allowedValues: [
+                    "8px",
+                    "10px",
+                    "12px",
+                    "14px",
+                    "16px",
+                    "18px",
+                    "20px",
+                    "24px",
+                    "30px",
+                    "36px",
+                    "48px",
+                    "60px",
+                    "72px",
+                  ],
+                  omitWhen: ["The inherited font size is appropriate."],
+                },
+              },
+            },
+          },
+        })),
+      };
+    },
+
     addOptions() {
       return {
         ...this.parent?.(),

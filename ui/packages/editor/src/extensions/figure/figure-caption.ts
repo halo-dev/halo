@@ -16,6 +16,49 @@ export const ExtensionFigureCaption = Node.create({
   inline: false,
   group: "block",
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "An optional text caption belonging to a figure. It is not a top-level content block.",
+        aliases: ["figcaption"],
+        exposure: "recommended",
+        useWhen: ["A figure needs a concise explanatory caption."],
+        avoidWhen: ["There is no associated figure."],
+        contentGuidelines: [
+          "Keep the caption concise and directly related to the figure.",
+        ],
+        attributeGuidance: {
+          width: {
+            description:
+              "Editor-managed caption width synchronized with the associated media size.",
+            omitWhen: [
+              "Generating or editing article content; the editor maintains this value.",
+            ],
+          },
+          "data-placeholder": {
+            description:
+              "Editor placeholder text; omit it from generated article content.",
+            omitWhen: ["Generating article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          "<figure><figcaption>System architecture</figcaption></figure>",
+        ],
+      },
+      structure: {
+        allowedParents: ["figure"],
+        minPerParent: 0,
+        maxPerParent: 1,
+        description:
+          "figureCaption may appear only inside figure, is optional, and may occur at most once per figure.",
+      },
+    };
+  },
+
   addAttributes() {
     return {
       "data-placeholder": {

@@ -138,6 +138,53 @@ const TableCell = Node.create<TableCellOptions>({
   isolating: true,
   fakeSelection: true,
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A data cell inside a table row. It is not a top-level content block.",
+        aliases: ["td"],
+        exposure: "recommended",
+        useWhen: ["Adding an ordinary value to a table row."],
+        avoidWhen: [
+          "The cell labels a row or column and should be a header cell.",
+        ],
+        attributeGuidance: {
+          colspan: {
+            description: "Number of columns spanned by this cell.",
+            examples: [1, 2, 3],
+          },
+          rowspan: {
+            description: "Number of rows spanned by this cell.",
+            examples: [1, 2, 3],
+          },
+          colwidth: {
+            description: "Column widths associated with the cell.",
+            format: "array of pixel widths",
+            examples: [null],
+            omitWhen: ["Automatic table sizing is appropriate."],
+          },
+          style: {
+            description: "Optional CSS declarations for the cell.",
+            format: "CSS declarations",
+            omitWhen: ["Default cell styling is appropriate."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          "<table><tbody><tr><td><p>Value</p></td></tr></tbody></table>",
+          '<table><tbody><tr><td colspan="2"><p>Value across two columns</p></td></tr></tbody></table>',
+        ],
+      },
+      structure: {
+        allowedParents: ["tableRow"],
+        description: "tableCell may appear only inside tableRow.",
+      },
+    };
+  },
+
   addOptions() {
     return {
       HTMLAttributes: {},

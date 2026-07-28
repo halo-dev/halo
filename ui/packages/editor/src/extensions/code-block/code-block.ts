@@ -156,6 +156,61 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
 
   fakeSelection: true,
 
+  addHaloEditorMetadata() {
+    const languages = Array.isArray(this.options.languages)
+      ? this.options.languages.map(({ value }) => value)
+      : undefined;
+    const themes = Array.isArray(this.options.themes)
+      ? this.options.themes.map(({ value }) => value)
+      : undefined;
+    return {
+      ai: {
+        description:
+          "A multi-line code block with optional language, syntax theme, and collapsed presentation.",
+        aliases: ["fenced code block"],
+        exposure: "recommended",
+        useWhen: [
+          "Presenting source code, configuration, terminal commands, or other preformatted text.",
+        ],
+        avoidWhen: ["The code fragment is short enough to remain inline."],
+        contentGuidelines: [
+          "Keep the code text verbatim and do not encode it as nested HTML.",
+          "Set the language when it is known so a highlighting extension can render it correctly.",
+        ],
+        attributeGuidance: {
+          language: {
+            description:
+              "Language identifier used for syntax highlighting and labeling.",
+            ...(languages?.length ? { allowedValues: languages } : {}),
+            examples: ["javascript", "java", "yaml", "bash"],
+            omitWhen: ["The language cannot be determined reliably."],
+          },
+          collapsed: {
+            description:
+              "Whether the editor initially displays the code block in a collapsed state.",
+            allowedValues: [true, false],
+            omitWhen: ["The code should be visible by default."],
+          },
+          theme: {
+            description:
+              "Syntax-highlighting theme identifier. Plugins may extend the available themes.",
+            ...(themes?.length ? { allowedValues: themes } : {}),
+            examples: ["github-dark", "github-light"],
+            omitWhen: ["The editor default theme should be used."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          "<pre><code>Plain preformatted text</code></pre>",
+          '<pre><code class="language-javascript">const greeting = "Hello";</code></pre>',
+          '<pre theme="github-dark" collapsed="true"><code class="language-typescript">const enabled: boolean = true;</code></pre>',
+        ],
+      },
+    };
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),

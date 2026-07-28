@@ -34,6 +34,41 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
   // Priority must be higher than paragraph (1000) and code-block to ensure
   // the Backspace shortcut handles figure selection correctly.
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A semantic figure container for an optional single image, video, or audio item and an optional caption.",
+        exposure: "recommended",
+        useWhen: [
+          "An image, video, or audio item and its optional caption should form one semantic unit.",
+        ],
+        avoidWhen: ["The content is not media-related."],
+        contentGuidelines: [
+          "Use at most one media child, and use only image, video, or audio.",
+          "If present, place figureCaption after the media child.",
+          "Keep contentType consistent with the actual media child.",
+          "Do not generate an empty figure without media or a caption.",
+        ],
+        attributeGuidance: {
+          contentType: {
+            description: "The kind of media represented by this figure.",
+            allowedValues: ["image", "video", "audio", null],
+            omitWhen: ["The figure contains no media item."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          '<figure data-content-type="image"><img src="https://example.com/diagram.png" alt="Architecture diagram"><figcaption>System architecture</figcaption></figure>',
+          '<figure data-content-type="video"><video src="https://example.com/demo.mp4" width="100%" controls></video><figcaption>Product demonstration</figcaption></figure>',
+          '<figure data-content-type="audio"><audio src="https://example.com/interview.mp3" controls></audio><figcaption>Interview recording</figcaption></figure>',
+        ],
+      },
+    };
+  },
+
   addOptions() {
     return {
       HTMLAttributes: {},

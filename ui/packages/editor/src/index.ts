@@ -3,6 +3,7 @@ import "./styles/index.scss";
 import "./styles/tailwind.css";
 
 export * from "./components";
+export * from "./editor-metadata";
 export * from "./extensions";
 export * from "./tiptap";
 export * from "./types";

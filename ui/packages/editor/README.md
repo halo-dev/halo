@@ -50,6 +50,10 @@ onMounted(() => {
 - Vue 3.5.x or higher
 - Halo plugin environment
 
+## Extension development
+
+- [Editor extension AI metadata](./docs/ai-metadata.md)
+
 ## Links
 
 - [Halo](https://github.com/halo-dev/halo)

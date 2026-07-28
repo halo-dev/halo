@@ -65,6 +65,54 @@ export const ExtensionGallery = Node.create<
 
   allowGapCursor: true,
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A gallery that presents multiple images in configurable groups.",
+        exposure: "available",
+        useWhen: [
+          "Several related images should be presented as one visual set.",
+        ],
+        avoidWhen: ["Only one image is needed."],
+        attributeGuidance: {
+          images: {
+            description:
+              "Ordered gallery items, each containing a source URL and aspect ratio.",
+            format: "array of { src: string, aspectRatio: number }",
+          },
+          groupSize: {
+            description: "Maximum number of images in each visual group.",
+            examples: [2, 3, 4],
+          },
+          layout: {
+            description: "Gallery layout strategy.",
+            allowedValues: ["auto", "square"],
+          },
+          gap: {
+            description: "Gap between gallery images in pixels.",
+            examples: [0, 8, 16],
+          },
+          file: {
+            description:
+              "Editor-only upload state that is not part of persisted article HTML.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Use stable accessible image URLs; uploading local files requires a separate plugin capability.",
+          ],
+        },
+        examples: [
+          '<div data-type="gallery" data-group-size="2" data-layout="auto" data-gap="8"><div data-type="gallery-group"><div data-aspect-ratio="1.5"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div></div></div>',
+          '<div data-type="gallery" data-group-size="3" data-layout="square" data-gap="12"><div data-type="gallery-group"><div data-aspect-ratio="1"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div><div data-aspect-ratio="0.75"><img src="https://example.com/three.jpg"></div></div></div>',
+        ],
+      },
+    };
+  },
+
   addAttributes() {
     return {
       images: {
