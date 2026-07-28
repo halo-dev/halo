@@ -7,11 +7,6 @@ inputs:
     required: false
     default: "24"
 
-  pnpm-version:
-    description: pnpm version.
-    required: false
-    default: "10"
-
   java-version:
     description: Java version.
     required: false
@@ -20,10 +15,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: pnpm/action-setup@v5
+    - uses: pnpm/action-setup@v6
       name: Setup pnpm
       with:
-        version: ${{ inputs.pnpm-version }}
+        package_json_file: ui/package.json
 
     - name: Set up Node.js
       uses: actions/setup-node@v6
