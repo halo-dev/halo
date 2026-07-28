@@ -1,11 +1,15 @@
 packages:
   - packages/**
+dedupePeers: true
+autoInstallPeers: true
+strictPeerDependencies: false
 catalog:
   "@vitest/ui": 4.1.10
   vite: npm:@voidzero-dev/vite-plus-core@0.2.5
   vite-plus: 0.2.5
   vitest: 4.1.10
 overrides:
+  axios: ^1.16.1
   vite: "catalog:"
   vite-plus: "catalog:"
   vitest: "catalog:"
@@ -21,13 +25,13 @@ peerDependencyRules:
     vite: "*"
     vite-plus: 0.2.0
     vitest: "*"
-onlyBuiltDependencies:
-  - "@nestjs/core"
-  - "@openapitools/openapi-generator-cli"
-  - "@parcel/watcher"
-  - "@tailwindcss/oxide"
-  - core-js
-  - esbuild
-  - vue-demi
+allowBuilds:
+  "@nestjs/core": true
+  "@openapitools/openapi-generator-cli": true
+  "@parcel/watcher": true
+  "@tailwindcss/oxide": true
+  core-js: true
+  esbuild: true
+  vue-demi: true
 patchedDependencies:
   "@tiptap/extension-drag-handle@3.29.0": patches/@tiptap__extension-drag-handle@3.29.0.patch
