@@ -220,34 +220,27 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                             .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).flatMap(copiedPluginPath -> {
                                 updatePlugin(oldPlugin, pluginInPath);
                                 return client.update(oldPlugin)
-                                        .onErrorResume(error -> deleteCopiedPluginOnError(
-                                                        copiedPluginPath,
-                                                        oldPlugin
-                                                                .statusNonNull()
-                                                                .getLoadLocation())
+                                        .onErrorResume(error -> deleteCopiedPluginOnError(name, copiedPluginPath)
                                                 .then(Mono.error(error)));
                             }));
                 });
     }
 
-    private Mono<Void> deleteCopiedPluginOnError(Path copiedPluginPath, URI activeLoadLocation) {
-        if (activeLoadLocation != null) {
-            try {
-                var activePluginPath =
-                        Path.of(activeLoadLocation).toAbsolutePath().normalize();
-                if (Objects.equals(
-                        activePluginPath, copiedPluginPath.toAbsolutePath().normalize())) {
+    private Mono<Void> deleteCopiedPluginOnError(String pluginName, Path copiedPluginPath) {
+        return client.fetch(Plugin.class, pluginName)
+                .map(plugin -> referencesPluginFile(plugin, copiedPluginPath))
+                .defaultIfEmpty(false)
+                .flatMap(referenced -> referenced ? Mono.empty() : deleteCopiedPlugin(copiedPluginPath))
+                .onErrorResume(error -> {
+                    log.warn(
+                            "Skip deleting copied plugin {} because its current owner cannot be determined.",
+                            copiedPluginPath,
+                            error);
                     return Mono.empty();
-                }
-            } catch (IllegalArgumentException | FileSystemNotFoundException e) {
-                log.warn(
-                        "Skip deleting copied plugin {} because active load location {} cannot be resolved.",
-                        copiedPluginPath,
-                        activeLoadLocation,
-                        e);
-                return Mono.empty();
-            }
-        }
+                });
+    }
+
+    private Mono<Void> deleteCopiedPlugin(Path copiedPluginPath) {
         return Mono.fromRunnable(() -> {
                     try {
                         Files.deleteIfExists(copiedPluginPath);
@@ -257,6 +250,36 @@ public class PluginServiceImpl implements PluginService, InitializingBean, Dispo
                 })
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
+    }
+
+    private boolean referencesPluginFile(Plugin plugin, Path pluginPath) {
+        var status = plugin.getStatus();
+        if (status != null && isSamePath(pluginPath, status.getLoadLocation())) {
+            return true;
+        }
+        var annotations = plugin.getMetadata().getAnnotations();
+        var reloadLocation = annotations == null ? null : annotations.get(RELOAD_ANNO);
+        if (StringUtils.isBlank(reloadLocation)) {
+            return false;
+        }
+        try {
+            return isSamePath(pluginPath, URI.create(reloadLocation));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private boolean isSamePath(Path pluginPath, URI location) {
+        if (location == null) {
+            return false;
+        }
+        try {
+            return Objects.equals(
+                    pluginPath.toAbsolutePath().normalize(),
+                    Path.of(location).toAbsolutePath().normalize());
+        } catch (IllegalArgumentException | FileSystemNotFoundException e) {
+            return false;
+        }
     }
 
     @Override

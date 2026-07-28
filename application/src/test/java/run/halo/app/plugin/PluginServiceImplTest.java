@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -196,7 +197,14 @@ class PluginServiceImplTest {
                 plugin.getSpec().setVersion("0.0.1");
                 plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
             });
-            when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Mono.just(oldFakePlugin));
+            var persistedOldPlugin = createPlugin("fake-plugin", plugin -> {
+                plugin.getSpec().setEnabled(true);
+                plugin.getSpec().setVersion("0.0.1");
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+            });
+            when(client.fetch(Plugin.class, "fake-plugin"))
+                    .thenReturn(Mono.just(oldFakePlugin))
+                    .thenReturn(Mono.just(persistedOldPlugin));
             when(client.update(oldFakePlugin)).thenReturn(Mono.error(new IllegalStateException("Update failed")));
 
             pluginService
@@ -207,6 +215,41 @@ class PluginServiceImplTest {
 
             assertTrue(Files.exists(oldPluginFile));
             assertFalse(Files.exists(newPluginFile));
+        }
+
+        @Test
+        void shouldKeepCopiedPluginWhenConcurrentUpgradeHasCommittedIt() throws IOException {
+            var pluginRoot = tempDirectory.resolve("plugins");
+            Files.createDirectories(pluginRoot);
+            var oldPluginFile = Files.createFile(pluginRoot.resolve("fake-plugin-0.0.1.jar"));
+            var newPluginFile = pluginRoot.resolve("fake-plugin-0.0.2.jar");
+            when(pluginsRootGetter.get()).thenReturn(pluginRoot);
+
+            var losingPlugin = createPlugin("fake-plugin", plugin -> {
+                plugin.getSpec().setEnabled(true);
+                plugin.getSpec().setVersion("0.0.1");
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+            });
+            var persistedWinner = createPlugin("fake-plugin", plugin -> {
+                plugin.getSpec().setEnabled(true);
+                plugin.getSpec().setVersion("0.0.2");
+                plugin.getStatus().setLoadLocation(oldPluginFile.toUri());
+                plugin.getMetadata()
+                        .setAnnotations(Map.of(
+                                PluginConst.RELOAD_ANNO, newPluginFile.toUri().toString()));
+            });
+            when(client.fetch(Plugin.class, "fake-plugin"))
+                    .thenReturn(Mono.just(losingPlugin))
+                    .thenReturn(Mono.just(persistedWinner));
+            when(client.update(losingPlugin)).thenReturn(Mono.error(new IllegalStateException("Update failed")));
+
+            pluginService
+                    .upgrade("fake-plugin", fakePluginPath)
+                    .as(StepVerifier::create)
+                    .expectErrorMessage("Update failed")
+                    .verify();
+
+            assertTrue(Files.exists(newPluginFile));
         }
 
         @Test
