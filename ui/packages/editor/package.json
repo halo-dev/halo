@@ -51,6 +51,7 @@
     "@tiptap/extension-document": "^3.29.0",
     "@tiptap/extension-drag-handle": "^3.29.0",
     "@tiptap/extension-drag-handle-vue-3": "^3.29.0",
+    "@tiptap/extension-find-and-replace": "3.29.0",
     "@tiptap/extension-hard-break": "^3.29.0",
     "@tiptap/extension-heading": "^3.29.0",
     "@tiptap/extension-highlight": "^3.29.0",

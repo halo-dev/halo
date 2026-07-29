@@ -543,6 +543,9 @@ importers:
       '@tiptap/extension-drag-handle-vue-3':
         specifier: ^3.29.0
         version: 3.29.0(@tiptap/extension-drag-handle@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/vue-3@3.29.0)(vue@3.5.40)
+      '@tiptap/extension-find-and-replace':
+        specifier: 3.29.0
+        version: 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
       '@tiptap/extension-hard-break':
         specifier: ^3.29.0
         version: 3.29.0(@tiptap/core@3.29.0)
@@ -2665,6 +2668,12 @@ packages:
       '@tiptap/extension-node-range': 3.29.0
       '@tiptap/pm': 3.29.0
       '@tiptap/y-tiptap': ^3.0.7
+
+  '@tiptap/extension-find-and-replace@3.29.0':
+    resolution: {integrity: sha512-mbTZGKJ2QrkMobYIYLiXhVRcYQ6Hlno7tW+xbAa/gfHVmfkXWYQlGiv6/NggbyUjU9tU7hs69Wap+g+w5XVWnw==}
+    peerDependencies:
+      '@tiptap/core': 3.29.0
+      '@tiptap/pm': 3.29.0
 
   '@tiptap/extension-floating-menu@3.29.0':
     resolution: {integrity: sha512-/rFlN6T70HuT34kFvftKm56UX0IPff7vlII7Sqgs7DprKVYkItiU3lM7+AoeDRzCsWMg4z1yNHj70BPx7+EJ6Q==}
@@ -6268,6 +6277,10 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
+  re2js@2.8.6:
+    resolution: {integrity: sha512-xLgQil4kIUCrAzVk9fRSkxkFNwmygLFjVxXrLc65aE1F0+Zsb8rxumFBy4XKyvgMCTL6kilDq3EZ0piE2dP/Dg==}
+    engines: {node: '>=18.0.0'}
+
   react-dom@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
@@ -9380,6 +9393,12 @@ snapshots:
       '@tiptap/extension-node-range': 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
       '@tiptap/pm': 3.29.0
       '@tiptap/y-tiptap': 3.0.7(prosemirror-model@1.25.1)(prosemirror-state@1.4.4)(prosemirror-view@1.40.0)(y-protocols@1.0.6)(yjs@13.6.27)
+
+  '@tiptap/extension-find-and-replace@3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)':
+    dependencies:
+      '@tiptap/core': 3.29.0(@tiptap/pm@3.29.0)
+      '@tiptap/pm': 3.29.0
+      re2js: 2.8.6
 
   '@tiptap/extension-floating-menu@3.29.0(@floating-ui/dom@1.7.6)(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)':
     dependencies:
@@ -13223,6 +13242,8 @@ snapshots:
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  re2js@2.8.6: {}
 
   react-dom@18.2.0(react@18.2.0):
     dependencies:
