@@ -684,6 +684,8 @@
   "core.identity_authentication.detail.fields.authentication_url": "URL de inicio de sesión",
   "core.identity_authentication.fields.display_name.local": "Iniciar sesión con credenciales",
   "core.identity_authentication.fields.description.local": "Método de inicio de sesión predeterminado integrado en Halo",
+  "core.identity_authentication.fields.display_name.email-code": "Iniciar sesión con código de verificación de correo electrónico",
+  "core.identity_authentication.fields.description.email-code": "Iniciar sesión con el código de verificación enviado al correo electrónico vinculado",
   "core.identity_authentication.list.types.form": "Método de autenticación básica",
   "core.identity_authentication.list.types.oauth2": "Método de autenticación de terceros",
   "core.setting.title": "Configuraciones",
