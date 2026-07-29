@@ -1,6 +1,6 @@
 <div th:remove="tag" th:fragment="form">
   <div class="form-item">
-    <label for="email" th:text="#{login-email-code.form.email.label}">Email</label>
+    <label for="email" th:text="#{form.email.label}">Email</label>
 
     <div class="form-input">
       <input
@@ -11,7 +11,7 @@
         spellcheck="false"
         autocorrect="off"
         autocapitalize="off"
-        th:placeholder="#{login-email-code.form.email.placeholder}"
+        th:placeholder="#{form.email.placeholder}"
         th:value="${email}"
         required
         autofocus
@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="form-item">
-    <label for="code" th:text="#{login-email-code.form.code.label}">Verification Code</label>
+    <label for="code" th:text="#{form.emailCode.label}">Verification Code</label>
 
     <div class="form-input-group">
       <div class="form-input">
@@ -34,11 +34,11 @@
           spellcheck="false"
           autocorrect="off"
           autocapitalize="off"
-          th:placeholder="#{login-email-code.form.code.placeholder}"
+          th:placeholder="#{form.emailCode.placeholder}"
           required
         />
       </div>
-      <button id="emailCodeSendButton" type="button" th:text="#{login-email-code.form.sendCode}">Send Code</button>
+      <button id="emailCodeSendButton" type="button" th:text="#{form.emailCode.send.button}">Send Code</button>
     </div>
   </div>
 
@@ -50,7 +50,7 @@
       async function sendRequest() {
         const email = document.getElementById("email").value.trim();
         if (!email) {
-          throw new Error(/*[[#{login-email-code.form.emailRequired}]]*/ "");
+          throw new Error(/*[[#{form.emailCode.send.emptyValidation}]]*/ "");
         }
 
         const response = await fetch("/login/email-code/send", {
