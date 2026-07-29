@@ -1,3 +1,4 @@
+import { Audio, type AudioOptions } from "@tiptap/extension-audio";
 import { isEmpty } from "es-toolkit/compat";
 import { markRaw } from "vue";
 import MdiMotionPlay from "~icons/mdi/motion-play";
@@ -15,8 +16,6 @@ import {
   Editor,
   findParentNode,
   isActive,
-  mergeAttributes,
-  Node,
   nodeInputRule,
   PluginKey,
   VueNodeViewRenderer,
@@ -30,70 +29,18 @@ import AudioView from "./AudioView.vue";
 import BubbleItemAudioLink from "./BubbleItemAudioLink.vue";
 import BubbleItemAudioPosition from "./BubbleItemAudioPosition.vue";
 
-declare module "@/tiptap" {
-  interface Commands<ReturnType> {
-    audio: {
-      setAudio: (options: { src: string }) => ReturnType;
-    };
-  }
-}
-
 export const AUDIO_BUBBLE_MENU_KEY = new PluginKey("audioBubbleMenu");
 
-export interface ExtensionAudioOptions extends ExtensionOptions {
+export interface ExtensionAudioOptions extends AudioOptions, ExtensionOptions {
   uploadAudio?: UploadFile;
 }
 
-export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
-  name: "audio",
+export const ExtensionAudio = Audio.extend<ExtensionAudioOptions>({
   fakeSelection: true,
-
-  inline: false,
-
-  group: "block",
 
   addAttributes() {
     return {
       ...this.parent?.(),
-      src: {
-        default: null,
-        parseHTML: (element) => {
-          return element.getAttribute("src");
-        },
-      },
-      autoplay: {
-        default: null,
-        parseHTML: (element) => {
-          return element.getAttribute("autoplay");
-        },
-        renderHTML: (attributes) => {
-          return {
-            autoplay: attributes.autoplay,
-          };
-        },
-      },
-      controls: {
-        default: true,
-        parseHTML: (element) => {
-          return element.getAttribute("controls");
-        },
-        renderHTML: (attributes) => {
-          return {
-            controls: attributes.controls,
-          };
-        },
-      },
-      loop: {
-        default: null,
-        parseHTML: (element) => {
-          return element.getAttribute("loop");
-        },
-        renderHTML: (attributes) => {
-          return {
-            loop: attributes.loop,
-          };
-        },
-      },
       file: {
         default: null,
         renderHTML() {
@@ -103,31 +50,6 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
           return null;
         },
       },
-    };
-  },
-
-  parseHTML() {
-    return [
-      {
-        tag: "audio",
-      },
-    ];
-  },
-
-  renderHTML({ HTMLAttributes }) {
-    return ["audio", mergeAttributes(HTMLAttributes)];
-  },
-
-  addCommands() {
-    return {
-      setAudio:
-        (options) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: options,
-          });
-        },
     };
   },
 
@@ -149,7 +71,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
 
   addOptions() {
     return {
-      ...this.parent?.(),
+      ...this.parent!(),
       uploadAudio: undefined,
       getCommandMenuItems() {
         return {
@@ -227,7 +149,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
                     .updateAttributes(ExtensionAudio.name, {
                       autoplay: editor.getAttributes(ExtensionAudio.name)
                         .autoplay
-                        ? null
+                        ? false
                         : true,
                     })
                     .setNodeSelection(editor.state.selection.from)
@@ -260,7 +182,7 @@ export const ExtensionAudio = Node.create<ExtensionAudioOptions>({
                     .chain()
                     .updateAttributes(ExtensionAudio.name, {
                       loop: editor.getAttributes(ExtensionAudio.name).loop
-                        ? null
+                        ? false
                         : true,
                     })
                     .setNodeSelection(editor.state.selection.from)

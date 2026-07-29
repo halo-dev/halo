@@ -41,6 +41,7 @@
     "@halo-dev/components": "workspace:*",
     "@halo-dev/ui-shared": "workspace:*",
     "@tiptap/core": "^3.29.0",
+    "@tiptap/extension-audio": "3.29.0",
     "@tiptap/extension-blockquote": "^3.29.0",
     "@tiptap/extension-bold": "^3.29.0",
     "@tiptap/extension-code": "^3.29.0",

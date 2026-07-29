@@ -513,6 +513,9 @@ importers:
       '@tiptap/core':
         specifier: ^3.29.0
         version: 3.29.0(@tiptap/pm@3.29.0)
+      '@tiptap/extension-audio':
+        specifier: 3.29.0
+        version: 3.29.0(@tiptap/core@3.29.0)
       '@tiptap/extension-blockquote':
         specifier: ^3.29.0
         version: 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
@@ -2587,6 +2590,11 @@ packages:
     resolution: {integrity: sha512-A/lrhKpOYtl0V5pmPS00Zps8pgBe1qDOoD9fzsumDSZ3HP8W398C959Jgru75PNFokAya9COPD3iaKP3NWF25g==}
     peerDependencies:
       '@tiptap/pm': 3.29.0
+
+  '@tiptap/extension-audio@3.29.0':
+    resolution: {integrity: sha512-udekTbs3HgcUcE1dGTgwl2oSEs2y5WoDO7tZ9x+rXGfEWklsmwO5f/PO4SAOgppoM1jlc6wluFE71Wgy8i+qjQ==}
+    peerDependencies:
+      '@tiptap/core': 3.29.0
 
   '@tiptap/extension-blockquote@3.29.0':
     resolution: {integrity: sha512-k8NKHLEYOqre7guObZBeFM04CaTwmEceCmdIrIjd7H9KoHSbRODaBNved6j5G33x/FWMwIF/RQbE2BjWaFSgzA==}
@@ -9306,6 +9314,10 @@ snapshots:
   '@tiptap/core@3.29.0(@tiptap/pm@3.29.0)':
     dependencies:
       '@tiptap/pm': 3.29.0
+
+  '@tiptap/extension-audio@3.29.0(@tiptap/core@3.29.0)':
+    dependencies:
+      '@tiptap/core': 3.29.0(@tiptap/pm@3.29.0)
 
   '@tiptap/extension-blockquote@3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)':
     dependencies:
