@@ -53,22 +53,22 @@ export const setupLibraryExternal = (command?: string) => {
       rename: `vue-demi.[hash].js`,
     },
     {
-      src: "./node_modules/@vueuse/shared/index.iife.min.js",
+      src: "./node_modules/@vueuse/shared/dist/index.iife.min.js",
       dest: "vueuse",
       rename: `vueuse.shared.[hash].js`,
     },
     {
-      src: "./node_modules/@vueuse/core/index.iife.min.js",
+      src: "./node_modules/@vueuse/core/dist/index.iife.min.js",
       dest: "vueuse",
       rename: `vueuse.core.[hash].js`,
     },
     {
-      src: "./node_modules/@vueuse/components/index.iife.min.js",
+      src: "./node_modules/@vueuse/components/dist/index.iife.min.js",
       dest: "vueuse",
       rename: `vueuse.components.[hash].js`,
     },
     {
-      src: "./node_modules/@vueuse/router/index.iife.min.js",
+      src: "./node_modules/@vueuse/router/dist/index.iife.min.js",
       dest: "vueuse",
       rename: `vueuse.router.[hash].js`,
     },
