@@ -15,8 +15,11 @@ import type {
   GlobalSearchResult,
   LocalGlobalSearchProvider,
   RemoteGlobalSearchProvider,
-} from "./types";
-import { mergeGlobalSearchResults, useGlobalSearch } from "./use-global-search";
+} from "../types";
+import {
+  mergeGlobalSearchResults,
+  useGlobalSearch,
+} from "../use-global-search";
 
 function createResult(id: string, title = id): GlobalSearchResult {
   return {

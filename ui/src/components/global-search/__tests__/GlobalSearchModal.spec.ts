@@ -10,9 +10,9 @@ import {
 } from "vite-plus/test";
 import { defineComponent, h, ref } from "vue";
 import { createI18n } from "vue-i18n";
-import GlobalSearchModal from "./GlobalSearchModal.vue";
-import type { GlobalSearchResult } from "./types";
-import { useGlobalSearch } from "./use-global-search";
+import GlobalSearchModal from "../GlobalSearchModal.vue";
+import type { GlobalSearchResult } from "../types";
+import { useGlobalSearch } from "../use-global-search";
 
 const { pushMock, goMock, modalCloseMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock("vue-router", () => ({
   useRoute: () => ({ name: currentRouteName }),
 }));
 
-vi.mock("./use-global-search", () => ({
+vi.mock("../use-global-search", () => ({
   useGlobalSearch: vi.fn(),
 }));
 

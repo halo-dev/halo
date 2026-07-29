@@ -19,12 +19,12 @@ import {
   createGlobalSearchProviders,
   resolveContentMatchContext,
   type GlobalSearchProvidersContext,
-} from "./global-search-providers";
+} from "../global-search-providers";
 import type {
   CachedGlobalSearchProvider,
   LocalGlobalSearchProvider,
   RemoteGlobalSearchProvider,
-} from "./types";
+} from "../types";
 
 const {
   listPostsMock,
