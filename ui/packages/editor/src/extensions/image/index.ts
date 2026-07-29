@@ -95,12 +95,30 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
       href: {
         default: null,
         parseHTML: (element) => {
-          const href = element.getAttribute("href") || null;
+          const href =
+            element.getAttribute("href") ||
+            element.closest("a")?.getAttribute("href") ||
+            null;
           return href;
         },
         renderHTML: (attributes) => {
           return {
             href: attributes.href,
+          };
+        },
+      },
+      target: {
+        default: null,
+        parseHTML: (element) => {
+          return (
+            element.getAttribute("target") ||
+            element.closest("a")?.getAttribute("target") ||
+            null
+          );
+        },
+        renderHTML: (attributes) => {
+          return {
+            target: attributes.target,
           };
         },
       },
@@ -516,14 +534,11 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
     };
   },
   renderHTML({ HTMLAttributes }) {
-    if (HTMLAttributes.href) {
-      return [
-        "a",
-        { href: HTMLAttributes.href },
-        ["img", mergeAttributes(HTMLAttributes)],
-      ];
+    const { href, target, ...imageAttributes } = HTMLAttributes;
+    if (href) {
+      return ["a", { href, target }, ["img", mergeAttributes(imageAttributes)]];
     }
-    return ["img", mergeAttributes(HTMLAttributes)];
+    return ["img", mergeAttributes(imageAttributes)];
   },
 }).configure({
   inline: true,
