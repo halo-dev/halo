@@ -1,11 +1,7 @@
 package run.halo.app.security.authentication.login;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.security.authentication.UserAccountStatusChecker;
 
 /**
  * A {@link ReactiveAuthenticationManager} that authenticates by trying multiple login strategies in order: username
@@ -45,26 +42,10 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
                 .filter(userDetails -> password != null && passwordEncoder.matches(password, userDetails.getPassword()))
                 .next()
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
-                .delayUntil(this::checkAccountStatus)
+                .delayUntil(UserAccountStatusChecker::check)
                 .flatMap(userDetails -> upgradePasswordIfNeeded(userDetails, password))
                 .map(userDetails -> UsernamePasswordAuthenticationToken.authenticated(
                         userDetails, userDetails.getPassword(), userDetails.getAuthorities()));
-    }
-
-    private Mono<Void> checkAccountStatus(UserDetails user) {
-        if (!user.isAccountNonLocked()) {
-            return Mono.error(new LockedException("User account is locked"));
-        }
-        if (!user.isEnabled()) {
-            return Mono.error(new DisabledException("User is disabled"));
-        }
-        if (!user.isAccountNonExpired()) {
-            return Mono.error(new AccountExpiredException("User account has expired"));
-        }
-        if (!user.isCredentialsNonExpired()) {
-            return Mono.error(new CredentialsExpiredException("User credentials have expired"));
-        }
-        return Mono.empty();
     }
 
     /** Looks up the user by username. Skips email-like identifiers since usernames never contain {@code @}. */

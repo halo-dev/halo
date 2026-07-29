@@ -728,6 +728,8 @@
   "core.identity_authentication.operations.disable_privileged.tooltip": "The authentication method reserved by the system cannot be disabled",
   "core.identity_authentication.fields.display_name.local": "Login with credentials",
   "core.identity_authentication.fields.description.local": "Default login method built into Halo",
+  "core.identity_authentication.fields.display_name.email-code": "Login with email verification code",
+  "core.identity_authentication.fields.description.email-code": "Login using the verification code sent to your linked email address",
   "core.identity_authentication.list.types.form": "Basic authentication methods",
   "core.identity_authentication.list.types.oauth2": "Third-party authentication methods",
   "core.identity_authentication.detail.title": "Identity authentication details",

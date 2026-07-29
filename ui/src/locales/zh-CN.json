@@ -736,6 +736,8 @@
   "core.identity_authentication.operations.disable_privileged.tooltip": "系统保留的认证方式，无法禁用",
   "core.identity_authentication.fields.display_name.local": "账号密码登录",
   "core.identity_authentication.fields.description.local": "Halo 内置的默认登录方式",
+  "core.identity_authentication.fields.display_name.email-code": "邮箱验证码登录",
+  "core.identity_authentication.fields.description.email-code": "通过发送到绑定邮箱的验证码登录",
   "core.identity_authentication.list.types.form": "基础认证方式",
   "core.identity_authentication.list.types.oauth2": "三方认证方式",
   "core.identity_authentication.detail.title": "身份认证详情",

@@ -726,6 +726,8 @@
   "core.identity_authentication.operations.disable_privileged.tooltip": "系統保留的認證方式，無法禁用",
   "core.identity_authentication.fields.display_name.local": "帳號密碼登入",
   "core.identity_authentication.fields.description.local": "Halo 內建的默認登入方式",
+  "core.identity_authentication.fields.display_name.email-code": "電子郵件驗證碼登入",
+  "core.identity_authentication.fields.description.email-code": "透過傳送到已綁定電子郵件的驗證碼登入",
   "core.identity_authentication.list.types.form": "基礎認證方式",
   "core.identity_authentication.list.types.oauth2": "三方認證方式",
   "core.identity_authentication.detail.title": "身份認證詳情",

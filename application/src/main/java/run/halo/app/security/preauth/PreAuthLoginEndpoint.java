@@ -129,7 +129,9 @@ class PreAuthLoginEndpoint {
                                                                     exchange, REMEMBER_ME_PARAMETER_NAME),
                                                             "username",
                                                             parameterRequestCache.getParameter(
-                                                                    exchange, USERNAME_PARAMETER_NAME)
+                                                                    exchange, USERNAME_PARAMETER_NAME),
+                                                            "email",
+                                                            parameterRequestCache.getParameter(exchange, "email")
                                                             // TODO Add more models here
                                                             ))));
                         })

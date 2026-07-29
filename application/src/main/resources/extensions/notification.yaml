@@ -228,3 +228,23 @@ spec:
     - name: principalName
       type: string
       description: "The principal name of the device."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: login-email-code
+  labels:
+    halo.run/hidden: "true"
+spec:
+  displayName: "邮箱验证码登录"
+  description: "当你使用邮箱验证码登录时，会收到一条带有验证码的邮件。"
+  properties:
+    - name: username
+      type: string
+      description: "The username of the user."
+    - name: code
+      type: string
+      description: "The verification code."
+    - name: expirationAtMinutes
+      type: string
+      description: "The expiration minutes of the verification code."
