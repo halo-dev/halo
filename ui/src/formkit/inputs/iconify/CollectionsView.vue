@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { useFuse } from "@vueuse/integrations/useFuse.mjs";
+import { useFuse } from "@vueuse/integrations/useFuse";
 import { flatten } from "es-toolkit";
 import { values } from "es-toolkit/compat";
 import { computed, ref } from "vue";
