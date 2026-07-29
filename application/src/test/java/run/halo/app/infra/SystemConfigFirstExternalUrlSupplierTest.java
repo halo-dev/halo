@@ -1,5 +1,7 @@
 package run.halo.app.infra;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.webflux.autoconfigure.WebFluxProperties;
 import org.springframework.http.HttpRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.properties.HaloProperties;
 
@@ -127,10 +130,48 @@ class SystemConfigFirstExternalUrlSupplierTest {
             when(haloProperties.getExternalUrl()).thenReturn(null);
             assertNull(externalUrl.getRaw());
         }
+
+        @Test
+        void shouldNormalizeChineseDomainUrl() throws MalformedURLException {
+            // Simulate Spring Boot property binding: new URL("https://abcd.中国") stores non-ASCII host
+            var chineseUrl = new URL("https://abcd.中国");
+            when(haloProperties.getExternalUrl()).thenReturn(chineseUrl);
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(true);
+
+            var raw = externalUrl.getRaw();
+            assertThat(raw).isNotNull();
+            assertThat(raw.getHost()).isEqualTo("abcd.xn--fiqs8s");
+
+            // The returned URL must be parseable by UriComponentsBuilder without throwing
+            // (original bug: InvalidUrlException "Bad authority" with Chinese domains)
+            assertThatCode(() ->
+                            UriComponentsBuilder.fromUriString(raw.toString()).build())
+                    .doesNotThrowAnyException();
+
+            var uri = externalUrl.get();
+            assertThat(uri.toASCIIString()).doesNotContain("中国");
+            assertThatCode(() -> UriComponentsBuilder.fromUri(uri).build()).doesNotThrowAnyException();
+        }
     }
 
     @Nested
     class SystemConfigSupplier {
+
+        @Test
+        void shouldNormalizeChineseDomainFromSystemConfig() {
+            var basic = new SystemSetting.Basic();
+            basic.setExternalUrl("https://abcd.中国");
+            when(systemConfigFetcher.getBasic()).thenReturn(Mono.just(basic));
+            externalUrl.onExtensionInitialized(null);
+
+            var raw = externalUrl.getRaw();
+            assertThat(raw).isNotNull();
+            assertThat(raw.getHost()).isEqualTo("abcd.xn--fiqs8s");
+
+            assertThatCode(() ->
+                            UriComponentsBuilder.fromUriString(raw.toString()).build())
+                    .doesNotThrowAnyException();
+        }
 
         @Test
         void shouldGetUrlWhenUseAbsolutePermalink() throws Exception {

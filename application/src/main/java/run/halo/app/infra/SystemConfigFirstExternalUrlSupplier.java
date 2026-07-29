@@ -1,9 +1,12 @@
 package run.halo.app.infra;
 
+import java.net.IDN;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,16 +44,17 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
         this.haloProperties = haloProperties;
         this.webFluxProperties = webFluxProperties;
         this.systemConfigFetcher = systemConfigFetcher;
+        this.externalUrl = toSafeUrl(haloProperties.getExternalUrl());
     }
 
     @EventListener
     void onExtensionInitialized(ExtensionInitializedEvent ignored) {
-        refetchExternalUrl().ifPresent(externalUrl -> this.externalUrl = externalUrl);
+        refetchExternalUrl().ifPresent(externalUrl -> this.externalUrl = toSafeUrl(externalUrl));
     }
 
     @EventListener
     void onExternalUrlChanged(ExternalUrlChangedEvent event) {
-        this.externalUrl = event.getExternalUrl();
+        this.externalUrl = toSafeUrl(event.getExternalUrl());
     }
 
     Optional<URL> refetchExternalUrl() {
@@ -95,20 +99,58 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
         }
         var externalUrl = haloProperties.getExternalUrl();
         if (externalUrl != null) {
-            return externalUrl;
+            return toSafeUrl(externalUrl);
         }
         try {
-            externalUrl = request.getURI().resolve(getBasePath()).toURL();
+            return toSafeUrl(request.getURI().resolve(getBasePath()).toURL());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Cannot parse request URI to URL.", e);
         }
-        return externalUrl;
     }
 
     @Nullable
     @Override
     public URL getRaw() {
-        return externalUrl != null ? externalUrl : haloProperties.getExternalUrl();
+        var raw = externalUrl != null ? externalUrl : haloProperties.getExternalUrl();
+        return toSafeUrl(raw);
+    }
+
+    @Nullable
+    private URL toSafeUrl(@Nullable URL url) {
+        if (url == null) {
+            return null;
+        }
+        var host = url.getHost();
+        if (host == null) {
+            return url;
+        }
+        // Some JVMs percent-encode non-ASCII hosts; decode first, then convert to Punycode
+        String asciiHost;
+        try {
+            var decodedHost = URLDecoder.decode(host, StandardCharsets.UTF_8);
+            asciiHost = IDN.toASCII(decodedHost);
+        } catch (IllegalArgumentException e) {
+            log.warn("Failed to normalize URL host {}", url, e);
+            return url;
+        }
+        if (asciiHost.equals(host)) {
+            return url;
+        }
+        // Rebuild via URI to preserve fragment and userinfo
+        try {
+            return new URI(
+                            url.getProtocol(),
+                            url.getUserInfo(),
+                            asciiHost,
+                            url.getPort(),
+                            url.getPath(),
+                            url.getQuery(),
+                            url.getRef())
+                    .toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
+            log.warn("Failed to rebuild normalized URL {}", url, e);
+            return url;
+        }
     }
 
     private String getBasePath() {
