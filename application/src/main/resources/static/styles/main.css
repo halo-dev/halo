@@ -274,33 +274,6 @@
   background: #f9fafb;
 }
 
-.halo-form .form-input-group button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed !important;
-}
-
-.halo-form #code-expiration-hint {
-  color: var(--color-text);
-  font-size: var(--text-sm);
-  opacity: 0.7;
-  margin-top: var(--spacing-xs);
-}
-
-.halo-form #email-code-notification {
-  animation: alert-slide-in 0.2s ease-out;
-}
-
-@keyframes alert-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .pill-items {
   all: unset;
   gap: var(--spacing-sm);

@@ -25,7 +25,6 @@ import run.halo.app.infra.exception.RequestBodyValidationException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.security.authentication.emailcode.EmailCodeService;
-import run.halo.app.security.authentication.emailcode.InMemoryEmailCodeService;
 
 /**
  * Pre-auth endpoint for sending email login verification codes.
@@ -71,10 +70,7 @@ class PreAuthEmailCodeLoginEndpoint {
                                                     .onErrorMap(
                                                             RequestNotPermitted.class, RateLimitExceededException::new);
                                         })
-                                        .then(ServerResponse.accepted()
-                                                .contentType(APPLICATION_JSON)
-                                                .bodyValue(new SendLoginCodeResponse(
-                                                        InMemoryEmailCodeService.CODE_TTL.toSeconds(), 60))))
+                                        .then(ServerResponse.accepted().build()))
                         .before(HaloUtils.noCache())
                         .build());
     }
@@ -92,6 +88,4 @@ class PreAuthEmailCodeLoginEndpoint {
         @NotBlank
         String email;
     }
-
-    record SendLoginCodeResponse(long ttlSeconds, long cooldownSeconds) {}
 }
