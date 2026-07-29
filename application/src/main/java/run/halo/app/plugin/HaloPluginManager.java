@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Stack;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.*;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Lazy;
@@ -20,7 +21,7 @@ import run.halo.app.plugin.event.PluginStartedEvent;
  * @since 2.0.0
  */
 @Slf4j
-class HaloPluginManager extends DefaultPluginManager implements SpringPluginManager, InitializingBean {
+class HaloPluginManager extends DefaultPluginManager implements SpringPluginManager, InitializingBean, DisposableBean {
 
     private final ApplicationContext rootContext;
 
@@ -124,7 +125,54 @@ class HaloPluginManager extends DefaultPluginManager implements SpringPluginMana
 
     @Override
     public void stopPlugins() {
-        throw new UnsupportedOperationException("The operation of stopping all plugins is not supported.");
+        // Stop started plugins one by one. PF4J's stopPlugin stops a plugin's
+        // dependents first and ignores plugins that are not started, so the
+        // dependency order is handled by PF4J itself. Copy the list because
+        // stopping a plugin mutates it. A failure of one plugin must not
+        // prevent the others from being stopped.
+        var pluginsToStop = new ArrayList<>(startedPlugins());
+        log.debug(
+                "Stopping {} started plugin(s): {}",
+                pluginsToStop.size(),
+                pluginsToStop.stream().map(PluginWrapper::getPluginId).toList());
+        for (var pw : pluginsToStop) {
+            try {
+                var pluginState = stopPlugin(pw.getPluginId());
+                log.debug("Plugin '{}' stop result: {}.", pw.getPluginId(), pluginState);
+            } catch (Exception e) {
+                log.warn("Error stopping plugin '{}' during shutdown.", pw.getPluginId(), e);
+            }
+        }
+    }
+
+    @Override
+    public void unloadPlugins() {
+        // Unload resolved plugins one by one to release their class loaders.
+        // PF4J's unloadPlugin unloads a plugin's dependents first and ignores
+        // plugins that are not loaded. Copy the list because unloading a plugin
+        // mutates it. A failure of one plugin must not prevent the others from
+        // being unloaded.
+        var pluginsToUnload = new ArrayList<>(getResolvedPlugins());
+        log.debug(
+                "Unloading {} resolved plugin(s): {}",
+                pluginsToUnload.size(),
+                pluginsToUnload.stream().map(PluginWrapper::getPluginId).toList());
+        for (var pw : pluginsToUnload) {
+            try {
+                var unloaded = unloadPlugin(pw.getPluginId());
+                log.debug("Plugin '{}' unload result: {}.", pw.getPluginId(), unloaded);
+            } catch (Exception e) {
+                log.warn("Error unloading plugin '{}' during shutdown.", pw.getPluginId(), e);
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        log.info("Stopping and unloading all plugins before application context shutdown...");
+        stopPlugins();
+        unloadPlugins();
+        log.info("All plugins stopped and unloaded.");
     }
 
     @Override
