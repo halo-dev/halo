@@ -1,6 +1,7 @@
-<script setup lang="ts" name="BubbleMenu">
+<script setup lang="ts">
 import { vTooltip } from "@halo-dev/components";
-import { computed, nextTick, ref, watch, type PropType } from "vue";
+import { FindAndReplacePluginKey } from "@tiptap/extension-find-and-replace";
+import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from "vue";
 import LucideReplace from "~icons/lucide/replace";
 import LucideReplaceAll from "~icons/lucide/replace-all";
 import MdiFormatLetterCase from "~icons/mdi/format-letter-case";
@@ -11,144 +12,100 @@ import MingcuteArrowUpLine from "~icons/mingcute/arrow-up-line";
 import MingcuteCloseLine from "~icons/mingcute/close-line";
 import { i18n } from "@/locales";
 import type { Editor } from "@/tiptap";
-import { PluginKey } from "@/tiptap/pm";
 import IconButton from "./IconButton.vue";
 import MatchToggleButton from "./MatchToggleButton.vue";
-import type { SearchAndReplacePluginState } from "./SearchAndReplacePlugin";
+import type { SearchAndReplacePanelState } from "./types";
 
-const props = defineProps({
-  editor: {
-    type: Object as PropType<Editor>,
-    required: true,
-  },
-  pluginKey: {
-    type: Object as PropType<PluginKey<SearchAndReplacePluginState>>,
-    required: true,
-  },
-  visible: {
-    type: Boolean,
-    default: false,
-  },
+const props = defineProps<{
+  editor: Editor;
+  panel: SearchAndReplacePanelState;
+}>();
+
+const emit = defineEmits<{
+  searchTermChange: [value: string];
+  replaceTermChange: [value: string];
+  caseSensitiveChange: [value: boolean];
+  useRegexChange: [value: boolean];
+  wholeWordChange: [value: boolean];
+}>();
+
+const searchTerm = shallowRef(props.panel.searchTerm);
+const replaceTerm = shallowRef(props.panel.replaceTerm);
+const caseSensitive = shallowRef(props.panel.caseSensitive);
+const useRegex = shallowRef(props.panel.useRegex);
+const wholeWord = shallowRef(props.panel.wholeWord);
+const transactionVersion = shallowRef(0);
+
+const handleTransaction = () => {
+  transactionVersion.value += 1;
+};
+
+props.editor.on("transaction", handleTransaction);
+onBeforeUnmount(() => {
+  props.editor.off("transaction", handleTransaction);
 });
 
-const searchTerm = ref<string>("");
-const replaceTerm = ref<string>("");
-const regex = ref<boolean>(false);
-const caseSensitive = ref<boolean>(false);
-const matchWord = ref<boolean>(false);
-const flag = ref<boolean>(false);
-
 const findState = computed(() => {
-  void flag.value;
-  const { editor, pluginKey } = props;
-  if (!editor || !pluginKey) {
-    return {
-      findIndex: 0,
-      findCount: 0,
-    };
-  }
-  const state = pluginKey.getState(editor.state);
+  void transactionVersion.value;
+  const state = FindAndReplacePluginKey.getState(props.editor.state);
+
   return {
-    findIndex: state?.findIndex || 0,
-    findCount: state?.findCount || 0,
+    findIndex: state?.currentIndex ?? 0,
+    findCount: state?.results.length ?? 0,
   };
 });
 
 const findNextSearchResult = () => {
-  props.editor.commands.findNext();
+  props.editor.commands.goToNextResult();
 };
 
 const findPreviousSearchResult = () => {
-  props.editor.commands.findPrevious();
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateSearchReplace = (value: any) => {
-  const { editor, pluginKey } = props;
-  if (!editor || !pluginKey) {
-    return;
-  }
-  const tr = editor.state.tr;
-  tr.setMeta(pluginKey, value);
-  editor.view.dispatch(tr);
-  flag.value = !flag.value;
+  props.editor.commands.goToPreviousResult();
 };
 
 const replace = () => {
   props.editor.commands.replace();
-  flag.value = !flag.value;
 };
 
 const replaceAll = () => {
   props.editor.commands.replaceAll();
-  flag.value = !flag.value;
 };
 
 const handleCloseSearch = () => {
   props.editor.commands.closeSearch();
 };
 
-watch(
-  () => searchTerm.value.trim(),
-  (val, oldVal) => {
-    if (val !== oldVal) {
-      updateSearchReplace({
-        setSearchTerm: val,
-      });
-    }
-  }
-);
+watch(searchTerm, (value) => {
+  emit("searchTermChange", value);
+  props.editor.commands.setSearchTerm(value);
+});
+
+watch(replaceTerm, (value) => {
+  emit("replaceTermChange", value);
+  props.editor.commands.setReplaceTerm(value);
+});
+
+watch(caseSensitive, (value) => {
+  emit("caseSensitiveChange", value);
+  props.editor.commands.setCaseSensitive(value);
+});
+
+watch(useRegex, (value) => {
+  emit("useRegexChange", value);
+  props.editor.commands.setUseRegex(value);
+});
+
+watch(wholeWord, (value) => {
+  emit("wholeWordChange", value);
+  props.editor.commands.setWholeWord(value);
+});
+
+const searchInput = shallowRef<HTMLInputElement | null>(null);
 
 watch(
-  () => replaceTerm.value.trim(),
-  (val, oldVal) => {
-    if (val !== oldVal) {
-      updateSearchReplace({
-        setReplaceTerm: val,
-      });
-    }
-  }
-);
-
-watch(
-  () => regex.value,
-  (val, oldVal) => {
-    if (val !== oldVal) {
-      updateSearchReplace({
-        setRegex: val,
-      });
-    }
-  }
-);
-
-watch(
-  () => caseSensitive.value,
-  (val, oldVal) => {
-    if (val !== oldVal) {
-      updateSearchReplace({
-        setCaseSensitive: val,
-      });
-    }
-  }
-);
-
-watch(
-  () => matchWord.value,
-  (val, oldVal) => {
-    if (val !== oldVal) {
-      updateSearchReplace({
-        setMatchWord: val,
-      });
-    }
-  }
-);
-
-const searchInput = ref<HTMLInputElement | null>(null);
-
-watch(
-  () => props.visible,
-  (val) => {
-    if (val) {
+  () => props.panel.visible,
+  (visible) => {
+    if (visible) {
       nextTick(() => {
         searchInput.value?.focus();
       });
@@ -157,7 +114,7 @@ watch(
 );
 </script>
 <template>
-  <Transition v-show="visible" appear name="slide">
+  <Transition v-show="panel.visible" appear name="slide">
     <div
       class="absolute right-5 top-0 z-50 float-right flex min-w-[500px] justify-end rounded bg-white p-1 !pt-2 shadow"
       @keydown.escape.prevent="handleCloseSearch"
@@ -196,8 +153,8 @@ watch(
                     'editor.extensions.search_and_replace.match_word'
                   )
                 "
-                :is-active="matchWord"
-                @click="matchWord = !matchWord"
+                :is-active="wholeWord"
+                @click="wholeWord = !wholeWord"
               >
                 <MdiFormatLetterMatches />
               </MatchToggleButton>
@@ -207,8 +164,8 @@ watch(
                     'editor.extensions.search_and_replace.use_regex'
                   )
                 "
-                :is-active="regex"
-                @click="regex = !regex"
+                :is-active="useRegex"
+                @click="useRegex = !useRegex"
               >
                 <MdiRegex />
               </MatchToggleButton>
