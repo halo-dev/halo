@@ -39,6 +39,7 @@ import BubbleItemImageHref from "./BubbleItemImageHref.vue";
 import BubbleItemImageLink from "./BubbleItemImageLink.vue";
 import BubbleItemImagePosition from "./BubbleItemImagePosition.vue";
 import BubbleItemImageSize from "./BubbleItemImageSize.vue";
+import { IMAGE_LINK_TARGET_BLANK, IMAGE_LINK_TARGETS } from "./constants";
 import ImageView from "./ImageView.vue";
 
 export const IMAGE_BUBBLE_MENU_KEY = new PluginKey("imageBubbleMenu");
@@ -96,6 +97,12 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
           href: {
             description: "Optional URL opened when the image is activated.",
             format: "absolute or site-relative URL",
+            omitWhen: ["The image should not act as a link."],
+          },
+          target: {
+            description:
+              "Browsing context used when the linked image is activated.",
+            allowedValues: [...IMAGE_LINK_TARGETS, null],
             omitWhen: ["The image should not act as a link."],
           },
           file: {
@@ -481,7 +488,7 @@ export const ExtensionImage = TiptapImage.extend<ExtensionImageOptions>({
                 action: () => {
                   window.open(
                     editor.getAttributes(ExtensionImage.name).src,
-                    "_blank"
+                    IMAGE_LINK_TARGET_BLANK
                   );
                 },
               },
