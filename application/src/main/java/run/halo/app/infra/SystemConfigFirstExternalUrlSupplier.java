@@ -86,7 +86,7 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
             if (externalUrl != null) {
                 return externalUrl.toURI();
             }
-            return haloProperties.getExternalUrl().toURI();
+            return toSafeUrl(haloProperties.getExternalUrl()).toURI();
         } catch (URISyntaxException e) {
             throw Exceptions.propagate(e);
         }
@@ -124,31 +124,48 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
         if (host == null) {
             return url;
         }
+        if (host.indexOf('%') < 0 && host.chars().allMatch(character -> character < 128)) {
+            return url;
+        }
         // Some JVMs percent-encode non-ASCII hosts; decode first, then convert to Punycode
         String asciiHost;
         try {
             var decodedHost = URLDecoder.decode(host, StandardCharsets.UTF_8);
             asciiHost = IDN.toASCII(decodedHost);
         } catch (IllegalArgumentException e) {
-            log.warn("Failed to normalize URL host {}", url, e);
+            log.warn("Failed to normalize URL host {}", host, e);
             return url;
         }
         if (asciiHost.equals(host)) {
             return url;
         }
-        // Rebuild via URI to preserve fragment and userinfo
+        // Replace only the host in the original URL form to preserve already encoded components.
         try {
-            return new URI(
-                            url.getProtocol(),
-                            url.getUserInfo(),
-                            asciiHost,
-                            url.getPort(),
-                            url.getPath(),
-                            url.getQuery(),
-                            url.getRef())
+            var authority = url.getAuthority();
+            if (authority == null) {
+                return url;
+            }
+            var hostIndex = authority.lastIndexOf(host);
+            if (hostIndex < 0) {
+                throw new IllegalArgumentException("Cannot locate host in URL authority");
+            }
+            var asciiAuthority =
+                    authority.substring(0, hostIndex) + asciiHost + authority.substring(hostIndex + host.length());
+            var externalForm = url.toExternalForm();
+            var authorityIndex =
+                    externalForm.indexOf(authority, url.getProtocol().length() + 1);
+            if (authorityIndex < 0) {
+                throw new IllegalArgumentException("Cannot locate authority in URL");
+            }
+            return URI.create(externalForm.substring(0, authorityIndex)
+                            + asciiAuthority
+                            + externalForm.substring(authorityIndex + authority.length()))
                     .toURL();
-        } catch (URISyntaxException | MalformedURLException e) {
-            log.warn("Failed to rebuild normalized URL {}", url, e);
+        } catch (IllegalArgumentException | MalformedURLException e) {
+            log.warn(
+                    "Failed to rebuild URL with normalized host {}: {}",
+                    host,
+                    e.getClass().getSimpleName());
             return url;
         }
     }

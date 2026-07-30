@@ -132,7 +132,7 @@ class SystemConfigFirstExternalUrlSupplierTest {
         }
 
         @Test
-        void shouldNormalizeChineseDomainUrl() throws MalformedURLException {
+        void shouldNormalizeChineseDomainUrlFromFallback() throws MalformedURLException {
             // Simulate Spring Boot property binding: new URL("https://abcd.中国") stores non-ASCII host
             var chineseUrl = new URL("https://abcd.中国");
             when(haloProperties.getExternalUrl()).thenReturn(chineseUrl);
@@ -149,8 +149,35 @@ class SystemConfigFirstExternalUrlSupplierTest {
                     .doesNotThrowAnyException();
 
             var uri = externalUrl.get();
-            assertThat(uri.toASCIIString()).doesNotContain("中国");
+            assertThat(uri.getHost()).isEqualTo("abcd.xn--fiqs8s");
             assertThatCode(() -> UriComponentsBuilder.fromUri(uri).build()).doesNotThrowAnyException();
+        }
+
+        @Test
+        void shouldNormalizeChineseDomainUrlFromConstructor() throws MalformedURLException {
+            var chineseUrl = new URL("https://abcd.中国");
+            when(haloProperties.getExternalUrl()).thenReturn(chineseUrl);
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(true);
+
+            var supplier =
+                    new SystemConfigFirstExternalUrlSupplier(haloProperties, webFluxProperties, systemConfigFetcher);
+
+            var raw = supplier.getRaw();
+            assertThat(raw).isNotNull();
+            assertThat(raw.getHost()).isEqualTo("abcd.xn--fiqs8s");
+            assertThat(supplier.get().getHost()).isEqualTo("abcd.xn--fiqs8s");
+        }
+
+        @Test
+        void shouldPreserveEncodedComponentsWhenNormalizingChineseDomain() throws MalformedURLException {
+            var chineseUrl = new URL("https://user%40name:pass%25word@abcd.中国:8443/a%20b?x=%25#f%20g");
+            when(haloProperties.getExternalUrl()).thenReturn(chineseUrl);
+
+            var raw = externalUrl.getRaw();
+
+            assertThat(raw).isNotNull();
+            assertThat(raw.toExternalForm())
+                    .isEqualTo("https://user%40name:pass%25word@abcd.xn--fiqs8s:8443/a%20b?x=%25#f%20g");
         }
     }
 
