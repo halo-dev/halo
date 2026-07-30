@@ -60,6 +60,7 @@
     "@tiptap/extension-italic": "^3.29.0",
     "@tiptap/extension-link": "^3.29.0",
     "@tiptap/extension-list": "^3.29.0",
+    "@tiptap/extension-node-range": "3.29.0",
     "@tiptap/extension-paragraph": "^3.29.0",
     "@tiptap/extension-strike": "^3.29.0",
     "@tiptap/extension-subscript": "^3.29.0",

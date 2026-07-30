@@ -74,7 +74,10 @@ import {
   type ExtensionParagraphOptions,
 } from "./paragraph";
 import { ExtensionPlaceholder } from "./placeholder";
-import { ExtensionRangeSelection } from "./range-selection";
+import {
+  ExtensionRangeSelection,
+  type ExtensionRangeSelectionOptions,
+} from "./range-selection";
 import {
   ExtensionSearchAndReplace,
   type ExtensionSearchAndReplaceOptions,
@@ -143,7 +146,7 @@ export interface ExtensionsKitOptions {
   orderedList: Partial<ExtensionOrderedListOptions> | false;
   paragraph: Partial<ExtensionParagraphOptions> | false;
   placeholder: Partial<PlaceholderOptions> | false;
-  rangeSelection?: boolean;
+  rangeSelection?: boolean | Partial<ExtensionRangeSelectionOptions>;
   searchAndReplace?: boolean | Partial<ExtensionSearchAndReplaceOptions>;
   smartScroll: Partial<SmartScrollOptions> | false;
   strike: Partial<ExtensionStrikeOptions> | false;
@@ -338,7 +341,11 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
     }
 
     if (this.options.rangeSelection !== false) {
-      internalExtensions.push(ExtensionRangeSelection);
+      internalExtensions.push(
+        typeof this.options.rangeSelection === "object"
+          ? ExtensionRangeSelection.configure(this.options.rangeSelection)
+          : ExtensionRangeSelection
+      );
     }
 
     if (this.options.searchAndReplace !== false) {

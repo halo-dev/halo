@@ -1,13 +1,19 @@
 .halo-rich-text-editor {
   $editorRangeFakeSelection: rgba(27, 162, 227, 0.2);
 
+  .ProseMirror-noderangeselection,
   .no-selection {
     *::selection {
       background-color: transparent;
       color: inherit;
     }
+
+    * {
+      caret-color: transparent;
+    }
   }
 
+  .ProseMirror-selectednoderange,
   .range-fake-selection {
     position: relative;
 

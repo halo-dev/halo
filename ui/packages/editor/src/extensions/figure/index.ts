@@ -9,7 +9,7 @@ import {
 } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 import { ExtensionParagraph } from "../paragraph";
-import { RangeSelection } from "../range-selection";
+import { NodeRangeSelection } from "../range-selection";
 import { ExtensionFigureCaption } from "./figure-caption";
 
 declare module "@/tiptap" {
@@ -157,7 +157,7 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
           const node = beforeResolve.node(depth);
           if (node.type.name === this.name) {
             const figurePos = beforeResolve.before(depth);
-            const rangeSelection = RangeSelection.create(
+            const rangeSelection = NodeRangeSelection.create(
               doc,
               figurePos,
               figurePos + node.nodeSize

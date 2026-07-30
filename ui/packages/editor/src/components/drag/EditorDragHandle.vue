@@ -21,6 +21,7 @@ import type {
 } from "@/types";
 import { isBlockEmpty } from "@/utils";
 import defaultDragItems from "./default-drag";
+import { topLevelDragHandleOptions } from "./drag-handle-options";
 import EditorDragMenu from "./EditorDragMenu.vue";
 
 const { editor } = defineProps({
@@ -407,6 +408,7 @@ const sortDragButtonItems = (items: DragButtonType[]): DragButtonType[] => {
   <!-- @vue-ignore-->
   <DragHandle
     :editor="editor"
+    :nested="topLevelDragHandleOptions"
     :compute-position-config="{
       middleware: [offset(5)],
     }"
