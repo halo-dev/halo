@@ -9,6 +9,8 @@ import { i18n } from "@/locales";
 import { type Editor } from "@/tiptap";
 import type { ExtensionOptions } from "@/types";
 
+const FONT_SIZES = [8, 10, 12, 14, 16, 18, 20, 24, 30, 36, 48, 60, 72] as const;
+
 export type ExtensionFontSizeOptions = Partial<FontSizeOptions> &
   ExtensionOptions;
 
@@ -26,21 +28,7 @@ export const ExtensionFontSize =
                 fontSize: {
                   description: "CSS font size for the inline text.",
                   format: "CSS length",
-                  allowedValues: [
-                    "8px",
-                    "10px",
-                    "12px",
-                    "14px",
-                    "16px",
-                    "18px",
-                    "20px",
-                    "24px",
-                    "30px",
-                    "36px",
-                    "48px",
-                    "60px",
-                    "72px",
-                  ],
+                  allowedValues: FONT_SIZES.map((size) => `${size}px`),
                   omitWhen: ["The inherited font size is appropriate."],
                 },
               },
@@ -75,26 +63,24 @@ export const ExtensionFontSize =
                   action: () => editor.chain().focus().unsetFontSize().run(),
                 },
               },
-              ...[8, 10, 12, 14, 16, 18, 20, 24, 30, 36, 48, 60, 72].map(
-                (size) => {
-                  return {
-                    priority: size,
-                    component: markRaw(ToolbarSubItem),
-                    props: {
-                      editor,
-                      isActive: false,
-                      title: `${size} px`,
-                      action: () => {
-                        return editor
-                          .chain()
-                          .focus()
-                          .setFontSize(`${size}px`)
-                          .run();
-                      },
+              ...FONT_SIZES.map((size) => {
+                return {
+                  priority: size,
+                  component: markRaw(ToolbarSubItem),
+                  props: {
+                    editor,
+                    isActive: false,
+                    title: `${size} px`,
+                    action: () => {
+                      return editor
+                        .chain()
+                        .focus()
+                        .setFontSize(`${size}px`)
+                        .run();
                     },
-                  };
-                }
-              ),
+                  },
+                };
+              }),
             ],
           };
         },

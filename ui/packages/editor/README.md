@@ -52,7 +52,7 @@ onMounted(() => {
 
 ## Extension development
 
-- [Editor extension AI metadata](./docs/ai-metadata.md)
+- [Editor extension runtime metadata](./docs/runtime-metadata.md)
 
 ## Links
 

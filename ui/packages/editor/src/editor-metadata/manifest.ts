@@ -1,4 +1,3 @@
-import { utf8ByteLength } from "@halo-dev/ui-shared";
 import type { AnyExtension, Editor } from "@tiptap/core";
 import {
   DOMParser as ProseMirrorDOMParser,
@@ -35,6 +34,11 @@ const MAX_HTML_EXAMPLES = 3;
 const MAX_HTML_EXAMPLE_BYTES = 4 * 1024;
 const MAX_COMPONENT_AI_BYTES = 16 * 1024;
 const MAX_MANIFEST_AI_BYTES = 128 * 1024;
+const textEncoder = new TextEncoder();
+
+function utf8ByteLength(value: string) {
+  return textEncoder.encode(value).byteLength;
+}
 
 interface ResolvedDeclaration {
   self: HaloEditorComponentMetadataPatch;

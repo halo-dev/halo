@@ -1,7 +1,7 @@
 # editor-extension-ai-metadata Specification
 
 ## Purpose
-Define how Halo editor extensions expose advisory metadata so AI consumers can understand the final editor schema, component usage, placement constraints, attributes, generation capabilities, and representative HTML without changing editor runtime behavior.
+Define how Halo editor extensions expose runtime advisory metadata that describes the final editor schema, component usage, placement constraints, attributes, generation capabilities, and representative HTML to consumers such as AI agents without changing editor behavior.
 
 ## Requirements
 ### Requirement: Native Tiptap metadata declaration
@@ -184,7 +184,7 @@ Every Node and Mark in Halo's default `ExtensionsKit` SHALL explicitly resolve t
 - **AND** the existing three-column HTML form SHALL preserve `cols: 3`
 
 ### Requirement: Third-party integration documentation
-The public editor package SHALL document how plugins declare and consume editor AI metadata.
+The public editor package SHALL document how plugins declare and consume editor runtime metadata, including its AI-specific usage guidance.
 
 #### Scenario: Plugin author examples
 - **WHEN** a plugin developer reads the documentation

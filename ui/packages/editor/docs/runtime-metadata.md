@@ -1,7 +1,9 @@
-# 编辑器扩展的 AI 元数据
+# 编辑器扩展的运行期元数据
 
 `@halo-dev/richtext-editor` 允许 Tiptap 的 Node、Mark 和 Extension
-声明供 AI 消费的组件说明。元数据只描述最终编辑器中已有组件的用法，不会对组件功能有任何影响。
+声明运行期组件元数据，用于描述最终 Editor 实例中的 schema、组件用法、结构关系、
+属性和示例。这些信息从 Editor 当前注册的扩展及最终 schema 中同步解析；AI Agent
+是目前的主要消费者，但元数据本身是对运行期组件能力的描述，不会改变或约束组件行为。
 
 ## 声明新组件
 
@@ -31,7 +33,7 @@ export const MathBlock = Node.create({
     return ["div", { ...HTMLAttributes, "data-type": "math-block" }];
   },
 
-  // 添加供 AI 理解能力的 元数据
+  // 声明运行期元数据中的 AI 使用说明
   addHaloEditorMetadata() {
     return {
       ai: {
@@ -182,7 +184,7 @@ addHaloEditorMetadata() {
 4 KiB；单组件 AI 元数据最多 16 KiB；单个 Manifest 的 AI 元数据最多
 128 KiB。
 
-## 生成 Manifest
+## 读取运行期 Manifest
 
 在 Editor 创建完成后同步生成最终快照：
 
@@ -198,6 +200,6 @@ function editorManifest(editor: VueEditor): HaloEditorManifest {
 }
 ```
 
-Manifest 包含编辑器中全部的 Node 和 Mark、规范化元数据、`version: 1`
-以及稳定的 `signature`。AI 插件自行决定怎样把它加入模型上下文，以及是否根据
-其中的建议进行额外校验。
+Manifest 是当前 Editor 实例的运行期快照，包含全部 Node 和 Mark、规范化元数据、
+`version: 1` 以及稳定的 `signature`。AI 插件可以把它加入模型上下文，其他消费者
+也可以用它了解当前编辑器实际注册的组件；消费者自行决定是否根据其中的建议进行额外校验。

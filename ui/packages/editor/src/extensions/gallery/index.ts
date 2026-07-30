@@ -21,6 +21,13 @@ import BubbleItemAddImage from "./BubbleItemAddImage.vue";
 import BubbleItemGap from "./BubbleItemGap.vue";
 import BubbleItemGroupSize from "./BubbleItemGroupSize.vue";
 import BubbleItemLayout from "./BubbleItemLayout.vue";
+import {
+  DEFAULT_GALLERY_GAP,
+  DEFAULT_GALLERY_GROUP_SIZE,
+  DEFAULT_GALLERY_LAYOUT,
+  GALLERY_LAYOUT_SQUARE,
+  GALLERY_LAYOUTS,
+} from "./constants";
 import { ExtensionGalleryBubble } from "./gallery-bubble";
 import GalleryView from "./GalleryView.vue";
 
@@ -83,15 +90,15 @@ export const ExtensionGallery = Node.create<
           },
           groupSize: {
             description: "Maximum number of images in each visual group.",
-            examples: [2, 3, 4],
+            examples: [2, DEFAULT_GALLERY_GROUP_SIZE, 4],
           },
           layout: {
             description: "Gallery layout strategy.",
-            allowedValues: ["auto", "square"],
+            allowedValues: [...GALLERY_LAYOUTS],
           },
           gap: {
             description: "Gap between gallery images in pixels.",
-            examples: [0, 8, 16],
+            examples: [0, DEFAULT_GALLERY_GAP, 16],
           },
           file: {
             description:
@@ -106,8 +113,8 @@ export const ExtensionGallery = Node.create<
           ],
         },
         examples: [
-          '<div data-type="gallery" data-group-size="2" data-layout="auto" data-gap="8"><div data-type="gallery-group"><div data-aspect-ratio="1.5"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div></div></div>',
-          '<div data-type="gallery" data-group-size="3" data-layout="square" data-gap="12"><div data-type="gallery-group"><div data-aspect-ratio="1"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div><div data-aspect-ratio="0.75"><img src="https://example.com/three.jpg"></div></div></div>',
+          `<div data-type="gallery" data-group-size="2" data-layout="${DEFAULT_GALLERY_LAYOUT}" data-gap="${DEFAULT_GALLERY_GAP}"><div data-type="gallery-group"><div data-aspect-ratio="1.5"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div></div></div>`,
+          `<div data-type="gallery" data-group-size="${DEFAULT_GALLERY_GROUP_SIZE}" data-layout="${GALLERY_LAYOUT_SQUARE}" data-gap="12"><div data-type="gallery-group"><div data-aspect-ratio="1"><img src="https://example.com/one.jpg"></div><div data-aspect-ratio="1.5"><img src="https://example.com/two.jpg"></div><div data-aspect-ratio="0.75"><img src="https://example.com/three.jpg"></div></div></div>`,
         ],
       },
     };
@@ -131,19 +138,22 @@ export const ExtensionGallery = Node.create<
         },
       },
       groupSize: {
-        default: 3,
+        default: DEFAULT_GALLERY_GROUP_SIZE,
         parseHTML: (element) => {
-          return Number(element.getAttribute("data-group-size")) || 3;
+          return (
+            Number(element.getAttribute("data-group-size")) ||
+            DEFAULT_GALLERY_GROUP_SIZE
+          );
         },
       },
       layout: {
-        default: "auto",
+        default: DEFAULT_GALLERY_LAYOUT,
         parseHTML: (element) => {
-          return element.getAttribute("data-layout") || "auto";
+          return element.getAttribute("data-layout") || DEFAULT_GALLERY_LAYOUT;
         },
       },
       gap: {
-        default: 8,
+        default: DEFAULT_GALLERY_GAP,
         parseHTML: (element) => {
           const gap = Number(element.getAttribute("data-gap"));
           if (isNaN(gap) || gap < 0) {
@@ -174,8 +184,11 @@ export const ExtensionGallery = Node.create<
 
   renderHTML({ node }) {
     const images: ExtensionGalleryImageItem[] = node.attrs.images || [];
-    const groupSize = node.attrs.groupSize || this.options?.groupSize || 3;
-    const layout = node.attrs.layout || "auto";
+    const groupSize =
+      node.attrs.groupSize ||
+      this.options?.groupSize ||
+      DEFAULT_GALLERY_GROUP_SIZE;
+    const layout = node.attrs.layout || DEFAULT_GALLERY_LAYOUT;
     const gap = node.attrs.gap || this.options?.gap || 0;
     const imageGroups: ExtensionGalleryImageItem[][] = images.reduce(
       (
@@ -201,7 +214,7 @@ export const ExtensionGallery = Node.create<
           return [
             "div",
             {
-              style: `flex: ${layout === "square" ? "1" : image.aspectRatio} 1 0%;${layout === "square" ? "aspect-ratio: 1/1;" : ""}`,
+              style: `flex: ${layout === GALLERY_LAYOUT_SQUARE ? "1" : image.aspectRatio} 1 0%;${layout === GALLERY_LAYOUT_SQUARE ? "aspect-ratio: 1/1;" : ""}`,
               "data-aspect-ratio": image.aspectRatio.toString(),
             },
             [

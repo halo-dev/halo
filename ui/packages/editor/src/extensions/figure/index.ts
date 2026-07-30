@@ -12,6 +12,8 @@ import { ExtensionParagraph } from "../paragraph";
 import { RangeSelection } from "../range-selection";
 import { ExtensionFigureCaption } from "./figure-caption";
 
+const FIGURE_MEDIA_TYPES = ["image", "video", "audio"] as const;
+
 declare module "@/tiptap" {
   interface Commands<ReturnType> {
     figure: {
@@ -29,7 +31,7 @@ export interface ExtensionFigureOptions extends ExtensionOptions {
 export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
   name: "figure",
   group: "block",
-  content: "(image|video|audio)? figureCaption?",
+  content: `(${FIGURE_MEDIA_TYPES.join("|")})? figureCaption?`,
   isolating: true,
   // Priority must be higher than paragraph (1000) and code-block to ensure
   // the Backspace shortcut handles figure selection correctly.
@@ -53,7 +55,7 @@ export const ExtensionFigure = Node.create<ExtensionFigureOptions>({
         attributeGuidance: {
           contentType: {
             description: "The kind of media represented by this figure.",
-            allowedValues: ["image", "video", "audio", null],
+            allowedValues: [...FIGURE_MEDIA_TYPES, null],
             omitWhen: ["The figure contains no media item."],
           },
         },

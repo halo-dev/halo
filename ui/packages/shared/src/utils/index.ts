@@ -3,8 +3,6 @@ import { DateUtils } from "./date";
 import { IdUtils } from "./id";
 import { PermissionUtils } from "./permission";
 
-export { utf8ByteLength } from "./string";
-
 export const utils = {
   date: new DateUtils(),
   attachment: new AttachmentUtils(),
