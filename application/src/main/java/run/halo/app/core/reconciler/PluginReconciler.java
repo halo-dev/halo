@@ -42,6 +42,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -295,9 +296,59 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             log.info("Deleting plugin {} in plugin manager.", pluginName);
             var deleted = pluginManager.deletePlugin(pluginName);
             if (!deleted) {
-                log.warn("Failed to delete plugin {}", pluginName);
+                throw new RequeueException(
+                        Result.requeue(Duration.ofSeconds(10)),
+                        "Failed to delete plugin " + pluginName + " in plugin manager");
             }
         }
+        // Clean up orphaned JARs (historical leftovers from failed upgrades/uninstalls)
+        cleanUpOrphanedJars(pluginName);
+    }
+
+    private void cleanUpOrphanedJars(String pluginName) {
+        var prefix = pluginName + "-";
+        for (var pluginRoot : pluginManager.getPluginsRoots()) {
+            if (!Files.exists(pluginRoot)) {
+                continue;
+            }
+            try (var files = Files.list(pluginRoot)) {
+                files.filter(f -> {
+                            var fn = f.getFileName().toString();
+                            return fn.startsWith(prefix) && fn.endsWith(".jar");
+                        })
+                        .forEach(jar -> {
+                            var name = readPluginNameFromJar(jar);
+                            if (pluginName.equals(name)) {
+                                try {
+                                    log.info("Deleting orphaned plugin JAR {}", jar);
+                                    Files.deleteIfExists(jar);
+                                } catch (IOException e) {
+                                    throw new RequeueException(
+                                            Result.requeue(Duration.ofSeconds(10)),
+                                            "Failed to delete orphaned JAR " + jar + " for plugin " + pluginName);
+                                }
+                            }
+                        });
+            } catch (IOException e) {
+                log.warn("Failed to list plugins directory {} for cleanup", pluginRoot, e);
+            }
+        }
+    }
+
+    private String readPluginNameFromJar(Path jarPath) {
+        try {
+            var manifestPath = org.pf4j.util.FileUtils.getPath(jarPath, "plugin.yaml");
+            var resource = new FileSystemResource(manifestPath);
+            var loader = new YamlUnstructuredLoader(resource);
+            var unstructuredList = loader.load();
+            if (unstructuredList.size() == 1) {
+                var metadata = unstructuredList.get(0).getMetadata();
+                return metadata != null ? metadata.getName() : null;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to read manifest from {}", jarPath, e);
+        }
+        return null;
     }
 
     private Result enablePlugin(Plugin plugin) {
