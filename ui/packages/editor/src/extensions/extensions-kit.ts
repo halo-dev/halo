@@ -146,7 +146,7 @@ export interface ExtensionsKitOptions {
   orderedList: Partial<ExtensionOrderedListOptions> | false;
   paragraph: Partial<ExtensionParagraphOptions> | false;
   placeholder: Partial<PlaceholderOptions> | false;
-  rangeSelection?: boolean | Partial<ExtensionRangeSelectionOptions>;
+  rangeSelection: Partial<ExtensionRangeSelectionOptions> | false;
   searchAndReplace?: boolean | Partial<ExtensionSearchAndReplaceOptions>;
   smartScroll: Partial<SmartScrollOptions> | false;
   strike: Partial<ExtensionStrikeOptions> | false;
@@ -342,9 +342,7 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
 
     if (this.options.rangeSelection !== false) {
       internalExtensions.push(
-        typeof this.options.rangeSelection === "object"
-          ? ExtensionRangeSelection.configure(this.options.rangeSelection)
-          : ExtensionRangeSelection
+        ExtensionRangeSelection.configure(this.options.rangeSelection)
       );
     }
 
