@@ -157,7 +157,7 @@ export interface ExtensionsKitOptions {
   text: Partial<ExtensionTextOptions> | false;
   textAlign: Partial<ExtensionTextAlignOptions> | false;
   textStyle: Partial<ExtensionTextStyleOptions> | false;
-  trailingNode?: boolean | Partial<TrailingNodeOptions>;
+  trailingNode: Partial<TrailingNodeOptions> | false;
   underline: Partial<ExtensionUnderlineOptions> | false;
   upload: Partial<ExtensionUploadOptions> | false;
   video: Partial<ExtensionVideoOptions> | false;
@@ -402,9 +402,7 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
 
     if (this.options.trailingNode !== false) {
       internalExtensions.push(
-        typeof this.options.trailingNode === "object"
-          ? ExtensionTrailingNode.configure(this.options.trailingNode)
-          : ExtensionTrailingNode
+        ExtensionTrailingNode.configure(this.options.trailingNode)
       );
     }
 
