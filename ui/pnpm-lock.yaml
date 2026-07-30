@@ -22,7 +22,7 @@ overrides:
   prosemirror-view: 1.40.0
 
 patchedDependencies:
-  '@tiptap/extension-drag-handle@3.29.0': 9ac918f7853d887889eecfa21fef4a2653abebf50b2bb9e8ce7488057e0e280f
+  '@tiptap/extension-drag-handle@3.29.0': 4f18ee6bd0ef5fc2dc97fd4993f083c205f9dc61e156104b1b5b6da879717b3c
 
 importers:
 
@@ -539,7 +539,7 @@ importers:
         version: 3.29.0(@tiptap/core@3.29.0)
       '@tiptap/extension-drag-handle':
         specifier: ^3.29.0
-        version: 3.29.0(patch_hash=9ac918f7853d887889eecfa21fef4a2653abebf50b2bb9e8ce7488057e0e280f)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)
+        version: 3.29.0(patch_hash=4f18ee6bd0ef5fc2dc97fd4993f083c205f9dc61e156104b1b5b6da879717b3c)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)
       '@tiptap/extension-drag-handle-vue-3':
         specifier: ^3.29.0
         version: 3.29.0(@tiptap/extension-drag-handle@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/vue-3@3.29.0)(vue@3.5.40)
@@ -569,6 +569,9 @@ importers:
         version: 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
       '@tiptap/extension-list':
         specifier: ^3.29.0
+        version: 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
+      '@tiptap/extension-node-range':
+        specifier: 3.29.0
         version: 3.29.0(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)
       '@tiptap/extension-paragraph':
         specifier: ^3.29.0
@@ -9380,12 +9383,12 @@ snapshots:
 
   '@tiptap/extension-drag-handle-vue-3@3.29.0(@tiptap/extension-drag-handle@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/vue-3@3.29.0)(vue@3.5.40)':
     dependencies:
-      '@tiptap/extension-drag-handle': 3.29.0(patch_hash=9ac918f7853d887889eecfa21fef4a2653abebf50b2bb9e8ce7488057e0e280f)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)
+      '@tiptap/extension-drag-handle': 3.29.0(patch_hash=4f18ee6bd0ef5fc2dc97fd4993f083c205f9dc61e156104b1b5b6da879717b3c)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)
       '@tiptap/pm': 3.29.0
       '@tiptap/vue-3': 3.29.0(@floating-ui/dom@1.7.6)(@tiptap/core@3.29.0)(@tiptap/pm@3.29.0)(vue@3.5.40)
       vue: 3.5.40(typescript@5.9.3)
 
-  '@tiptap/extension-drag-handle@3.29.0(patch_hash=9ac918f7853d887889eecfa21fef4a2653abebf50b2bb9e8ce7488057e0e280f)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)':
+  '@tiptap/extension-drag-handle@3.29.0(patch_hash=4f18ee6bd0ef5fc2dc97fd4993f083c205f9dc61e156104b1b5b6da879717b3c)(@tiptap/core@3.29.0)(@tiptap/extension-collaboration@3.29.0)(@tiptap/extension-node-range@3.29.0)(@tiptap/pm@3.29.0)(@tiptap/y-tiptap@3.0.7)':
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@tiptap/core': 3.29.0(@tiptap/pm@3.29.0)
