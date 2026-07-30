@@ -100,7 +100,10 @@ import {
   ExtensionTextStyle,
   type ExtensionTextStyleOptions,
 } from "./text-style";
-import { ExtensionTrailingNode } from "./trailing-node";
+import {
+  ExtensionTrailingNode,
+  type TrailingNodeOptions,
+} from "./trailing-node";
 import {
   ExtensionUnderline,
   type ExtensionUnderlineOptions,
@@ -154,7 +157,7 @@ export interface ExtensionsKitOptions {
   text: Partial<ExtensionTextOptions> | false;
   textAlign: Partial<ExtensionTextAlignOptions> | false;
   textStyle: Partial<ExtensionTextStyleOptions> | false;
-  trailingNode?: boolean;
+  trailingNode?: boolean | Partial<TrailingNodeOptions>;
   underline: Partial<ExtensionUnderlineOptions> | false;
   upload: Partial<ExtensionUploadOptions> | false;
   video: Partial<ExtensionVideoOptions> | false;
@@ -398,7 +401,11 @@ export const ExtensionsKit = Extension.create<ExtensionsKitOptions>({
     }
 
     if (this.options.trailingNode !== false) {
-      internalExtensions.push(ExtensionTrailingNode);
+      internalExtensions.push(
+        typeof this.options.trailingNode === "object"
+          ? ExtensionTrailingNode.configure(this.options.trailingNode)
+          : ExtensionTrailingNode
+      );
     }
 
     if (this.options.underline !== false) {
