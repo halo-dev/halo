@@ -17,9 +17,11 @@ import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 import static run.halo.app.plugin.PluginConst.RUNTIME_MODE_ANNO;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -479,6 +483,14 @@ class PluginReconcilerTest {
     @Nested
     class WhenDeleting {
 
+        @TempDir
+        Path tempDir;
+
+        @BeforeEach
+        void setUpDeleting() {
+            lenient().when(pluginManager.getPluginsRoots()).thenReturn(List.of());
+        }
+
         @Test
         void shouldDoNothingWithoutFinalizer() {
             var fakePlugin = createPlugin(name, plugin -> {
@@ -510,6 +522,7 @@ class PluginReconcilerTest {
             when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
             when(client.fetch(Setting.class, "fake-setting")).thenReturn(Optional.empty());
             when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.deletePlugin(name)).thenReturn(true);
 
             when(pluginManager.getPlugin(name))
                     .thenReturn(mock(PluginWrapper.class))
@@ -527,6 +540,114 @@ class PluginReconcilerTest {
             verify(client).fetch(Setting.class, "fake-setting");
             verify(client).fetch(ReverseProxy.class, reverseProxyName);
             verify(client).update(fakePlugin);
+        }
+
+        @Test
+        void shouldRequeueWhenDeletePluginFails() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPlugin(name)).thenReturn(mock(PluginWrapper.class));
+            when(pluginManager.deletePlugin(name)).thenReturn(false);
+
+            assertThrows(RequeueException.class, () -> reconciler.reconcile(new Request(name)));
+
+            // finalizer was removed from in-memory object by removeFinalizers,
+            // but client.update was never called, so the store still has it.
+            verify(pluginManager).deletePlugin(name);
+            verify(client, never()).update(fakePlugin);
+        }
+
+        @Test
+        void shouldCleanUpOrphanedJars() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+            });
+
+            // Create orphaned JARs in plugins root
+            var pluginRoot = tempDir.resolve("plugins");
+            Files.createDirectories(pluginRoot);
+            var jar1 = createTestJar(pluginRoot, name, "1.0.0");
+            var jar2 = createTestJar(pluginRoot, name, "2.0.0");
+            var jarOther = createTestJar(pluginRoot, "other-plugin", "1.0.0");
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(pluginRoot));
+
+            // plugin not loaded in PF4J
+            when(pluginManager.getPlugin(name)).thenReturn(null);
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            // orphaned JARs of the plugin should be deleted
+            assertFalse(Files.exists(jar1));
+            assertFalse(Files.exists(jar2));
+            // other plugin's JAR should NOT be deleted
+            assertTrue(Files.exists(jarOther));
+        }
+
+        @Test
+        void shouldCleanUpWhenPf4jDeleteSucceeds() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+            });
+
+            // Create an old JAR as well
+            var pluginRoot = tempDir.resolve("plugins");
+            Files.createDirectories(pluginRoot);
+            var oldJar = createTestJar(pluginRoot, name, "1.0.0");
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName)).thenReturn(Optional.empty());
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(pluginRoot));
+
+            // plugin IS loaded in PF4J, delete succeeds
+            when(pluginManager.getPlugin(name))
+                    .thenReturn(mock(PluginWrapper.class))
+                    .thenReturn(null);
+            when(pluginManager.deletePlugin(name)).thenReturn(true);
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            verify(pluginManager).deletePlugin(name);
+            // old JAR should also be cleaned up
+            assertFalse(Files.exists(oldJar));
+        }
+
+        /** Create a JAR file with a plugin.yaml manifest for testing. */
+        private Path createTestJar(Path dir, String pluginName, String version) throws IOException {
+            var jar = dir.resolve(pluginName + "-" + version + ".jar");
+            try (var jos = new JarOutputStream(new FileOutputStream(jar.toFile()))) {
+                jos.putNextEntry(new JarEntry("plugin.yaml"));
+                var manifest = """
+                        apiVersion: v1alpha1
+                        kind: Plugin
+                        metadata:
+                          name: %s
+                        spec:
+                          version: %s
+                        """.formatted(pluginName, version);
+                jos.write(manifest.getBytes(StandardCharsets.UTF_8));
+                jos.closeEntry();
+            }
+            return jar;
         }
 
         @Test
