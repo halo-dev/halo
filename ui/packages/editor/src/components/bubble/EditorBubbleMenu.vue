@@ -1,21 +1,59 @@
 <script lang="ts" setup>
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { type PropType } from "vue";
-import {
-  Editor,
-  EditorState,
-  EditorView,
-  PluginKey,
-  VueEditor,
-} from "@/tiptap";
+import { onBeforeUnmount, onMounted, shallowRef, type PropType } from "vue";
+import { isNodeRangeMouseSelectionActive } from "@/extensions/range-selection";
+import { PluginKey, VueEditor } from "@/tiptap";
 import type { BubbleItemType, NodeBubbleMenuType } from "@/types";
 import BubbleItem from "./BubbleItem.vue";
+import { shouldShowBubbleMenu } from "./should-show";
 
 const props = defineProps({
   editor: {
     type: Object as PropType<VueEditor>,
     required: true,
   },
+});
+
+const isPointerSelectionActive = shallowRef(false);
+let pointerSelectionReleaseTimer: number | undefined;
+
+const updatePointerSelectionState = () => {
+  const isActive = isNodeRangeMouseSelectionActive(props.editor.state);
+
+  if (isActive) {
+    if (pointerSelectionReleaseTimer !== undefined) {
+      window.clearTimeout(pointerSelectionReleaseTimer);
+      pointerSelectionReleaseTimer = undefined;
+    }
+    isPointerSelectionActive.value = true;
+    return;
+  }
+
+  if (
+    !isPointerSelectionActive.value ||
+    pointerSelectionReleaseTimer !== undefined
+  ) {
+    return;
+  }
+
+  // Clicking inside an existing text selection collapses it after mouseup.
+  // Keep the menu hidden through that native click to avoid a one-frame flash.
+  pointerSelectionReleaseTimer = window.setTimeout(() => {
+    pointerSelectionReleaseTimer = undefined;
+    isPointerSelectionActive.value = false;
+  });
+};
+
+onMounted(() => {
+  updatePointerSelectionState();
+  props.editor.on("transaction", updatePointerSelectionState);
+});
+
+onBeforeUnmount(() => {
+  if (pointerSelectionReleaseTimer !== undefined) {
+    window.clearTimeout(pointerSelectionReleaseTimer);
+  }
+  props.editor.off("transaction", updatePointerSelectionState);
 });
 
 const getBubbleMenuFromExtensions = (): NodeBubbleMenuType[] => {
@@ -132,31 +170,16 @@ const mergeBubbleMenu = (
 const sortBubbleMenuItems = (items: BubbleItemType[] | undefined) => {
   return items?.sort((a, b) => a.priority - b.priority);
 };
-
-const shouldShow = (
-  props: {
-    editor: Editor;
-    element: HTMLElement;
-    view: EditorView;
-    state: EditorState;
-    oldState?: EditorState;
-    from: number;
-    to: number;
-  },
-  bubbleMenu: NodeBubbleMenuType
-) => {
-  if (!props.editor.isEditable) {
-    return false;
-  }
-  return bubbleMenu.shouldShow?.(props);
-};
 </script>
 <template>
   <bubble-menu
     v-for="(bubbleMenu, index) in getBubbleMenuFromExtensions()"
     :key="index"
     :plugin-key="bubbleMenu?.pluginKey"
-    :should-show="(prop) => shouldShow(prop, bubbleMenu) ?? false"
+    :class="{
+      'bubble-menu-pointer-selection-active': isPointerSelectionActive,
+    }"
+    :should-show="(prop) => shouldShowBubbleMenu(prop, bubbleMenu) ?? false"
     :editor="editor"
     :options="{
       ...(bubbleMenu.options as any),
@@ -192,5 +215,10 @@ const shouldShow = (
 .bubble-menu {
   max-width: calc(100vw - 30px);
   overflow-x: auto;
+}
+
+.bubble-menu-pointer-selection-active {
+  visibility: hidden !important;
+  pointer-events: none;
 }
 </style>

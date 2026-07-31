@@ -1,5 +1,4 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 67f4b0e59f69..2f2e17ea82d7 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -36,9 +36,7 @@ var import_core2 = require("@tiptap/core");
@@ -12,19 +11,7 @@ index 67f4b0e59f69..2f2e17ea82d7 100644
  
  // src/helpers/dragHandler.ts
  var import_extension_node_range = require("@tiptap/extension-node-range");
-@@ -550,6 +548,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
-   });
-   wrapper.style.position = "absolute";
-   wrapper.style.top = "-10000px";
-+  wrapper.style.paddingLeft = "12px";
-+  wrapper.style.paddingTop = "12px";
-+  const firstElement = view.nodeDOM(ranges[0].$from.pos);
-+  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
-+  wrapper.style.left = `${firstElementLeft}px`;
-   document.body.append(wrapper);
-   event.dataTransfer.clearData();
-   const wrapperRect = wrapper.getBoundingClientRect();
-@@ -671,23 +674,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+@@ -671,23 +669,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
  
  // src/drag-handle-plugin.ts
  var getRelativePos = (state, absolutePos) => {
@@ -50,7 +37,7 @@ index 67f4b0e59f69..2f2e17ea82d7 100644
  };
  var getOuterDomNode = (view, domNode) => {
    let tmpDomNode = domNode;
-@@ -730,8 +720,8 @@ var DragHandlePlugin = ({
+@@ -730,8 +715,8 @@ var DragHandlePlugin = ({
        return;
      }
      pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
@@ -61,7 +48,7 @@ index 67f4b0e59f69..2f2e17ea82d7 100644
      });
    }
    function buildRestoreTransaction(state) {
-@@ -873,17 +863,10 @@ var DragHandlePlugin = ({
+@@ -873,17 +858,10 @@ var DragHandlePlugin = ({
              return value;
            }
            if (tr.docChanged && currentNodePos !== -1 && element) {
@@ -84,7 +71,6 @@ index 67f4b0e59f69..2f2e17ea82d7 100644
            }
            return value;
 diff --git a/dist/index.js b/dist/index.js
-index 8fec3ceacf3c..f57291597913 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -4,13 +4,7 @@ import { Extension } from "@tiptap/core";
@@ -101,19 +87,7 @@ index 8fec3ceacf3c..f57291597913 100644
  
  // src/helpers/dragHandler.ts
  import { getSelectionRanges, NodeRangeSelection } from "@tiptap/extension-node-range";
-@@ -522,6 +516,11 @@ function dragHandler(event, editor, nestedOptions, dragContext, dragImagePropert
-   });
-   wrapper.style.position = "absolute";
-   wrapper.style.top = "-10000px";
-+  wrapper.style.paddingLeft = "12px";
-+  wrapper.style.paddingTop = "12px";
-+  const firstElement = view.nodeDOM(ranges[0].$from.pos);
-+  const firstElementLeft = firstElement instanceof Element ? firstElement.getBoundingClientRect().left : 0;
-+  wrapper.style.left = `${firstElementLeft}px`;
-   document.body.append(wrapper);
-   event.dataTransfer.clearData();
-   const wrapperRect = wrapper.getBoundingClientRect();
-@@ -643,23 +642,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
+@@ -643,23 +637,10 @@ function createDroppedNodeRangeSelection(doc, anchorPos, nodeCount, depth) {
  
  // src/drag-handle-plugin.ts
  var getRelativePos = (state, absolutePos) => {
@@ -139,7 +113,7 @@ index 8fec3ceacf3c..f57291597913 100644
  };
  var getOuterDomNode = (view, domNode) => {
    let tmpDomNode = domNode;
-@@ -702,8 +688,8 @@ var DragHandlePlugin = ({
+@@ -702,8 +683,8 @@ var DragHandlePlugin = ({
        return;
      }
      pendingRestore = mapPendingRestoreAnchor(pendingRestore, tr, {
@@ -150,7 +124,7 @@ index 8fec3ceacf3c..f57291597913 100644
      });
    }
    function buildRestoreTransaction(state) {
-@@ -845,17 +831,10 @@ var DragHandlePlugin = ({
+@@ -845,17 +826,10 @@ var DragHandlePlugin = ({
              return value;
            }
            if (tr.docChanged && currentNodePos !== -1 && element) {

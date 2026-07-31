@@ -265,7 +265,10 @@ export const ExtensionCodeBlock = TiptapCodeBlock.extend<
             return false;
           }
           const head = codeBlack.start;
-          const anchor = codeBlack.start + codeBlack.node.nodeSize - 1;
+          const anchor = codeBlack.start + codeBlack.node.content.size;
+          if (selection.from === head && selection.to === anchor) {
+            return false;
+          }
           const $head = tr.doc.resolve(head);
           const $anchor = tr.doc.resolve(anchor);
           this.editor.view.dispatch(
