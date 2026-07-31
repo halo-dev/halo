@@ -1,3 +1,9 @@
-import { Document as ExtensionDocument } from "@tiptap/extension-document";
+import { Document as TiptapDocument } from "@tiptap/extension-document";
 
-export { ExtensionDocument };
+export const ExtensionDocument = TiptapDocument.extend({
+  addHaloEditorMetadata() {
+    return {
+      ai: false,
+    };
+  },
+});

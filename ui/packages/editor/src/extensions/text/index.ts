@@ -44,6 +44,26 @@ export const TEXT_BUBBLE_MENU_KEY = new PluginKey("textBubbleMenu");
 export type ExtensionTextOptions = ExtensionOptions;
 
 export const ExtensionText = TiptapText.extend<ExtensionTextOptions>({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "Plain text content inside text-bearing nodes such as paragraphs, headings, and captions.",
+        exposure: "recommended",
+        useWhen: [
+          "Writing ordinary textual content inside a node that accepts inline text.",
+        ],
+        contentGuidelines: [
+          "Place text inside a valid text-bearing parent rather than as a top-level node.",
+        ],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: ["<p>Plain text content</p>"],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),

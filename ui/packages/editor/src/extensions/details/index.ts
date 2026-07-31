@@ -25,7 +25,89 @@ export const DETAILS_BUBBLE_MENU_KEY = new PluginKey("detailsBubbleMenu");
 export type ExtensionDetailsOptions = Partial<DetailsOptions> &
   ExtensionOptions;
 
+const ExtensionDetailsSummary = DetailsSummary.extend({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "The visible summary label for a details disclosure. It is not a top-level content block.",
+        exposure: "recommended",
+        useWhen: ["Labeling the content hidden or shown by a details element."],
+        avoidWhen: ["There is no containing details element."],
+        contentGuidelines: ["Keep the summary short and descriptive."],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          '<details><summary>More information</summary><div data-type="detailsContent"><p>Additional details.</p></div></details>',
+        ],
+      },
+      structure: {
+        allowedParents: ["details"],
+        minPerParent: 1,
+        maxPerParent: 1,
+        description:
+          "detailsSummary may appear only inside details, exactly once per details element.",
+      },
+    };
+  },
+});
+
+const ExtensionDetailsContent = DetailsContent.extend({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "The expandable block content of a details disclosure. It is not a top-level content block.",
+        exposure: "recommended",
+        useWhen: ["Providing the body controlled by a details summary."],
+        avoidWhen: ["There is no containing details element."],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          '<details><summary>More information</summary><div data-type="detailsContent"><p>Additional details.</p></div></details>',
+        ],
+      },
+      structure: {
+        allowedParents: ["details"],
+        minPerParent: 1,
+        maxPerParent: 1,
+        description:
+          "detailsContent may appear only inside details, exactly once per details element.",
+      },
+    };
+  },
+});
+
 export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A collapsible disclosure with a summary and block-level details content.",
+        exposure: "available",
+        useWhen: ["Secondary information should be expandable on demand."],
+        avoidWhen: [
+          "The content is essential and should always remain visible.",
+        ],
+        attributeGuidance: {
+          open: {
+            description: "Whether the details content is initially expanded.",
+            allowedValues: [true, false],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          '<details><summary>More information</summary><div data-type="detailsContent"><p>Initially collapsed details.</p></div></details>',
+          '<details open><summary>More information</summary><div data-type="detailsContent"><p>Additional details.</p></div></details>',
+        ],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),
@@ -119,7 +201,7 @@ export const ExtensionDetails = TiptapDetails.extend<ExtensionDetailsOptions>({
     };
   },
   addExtensions() {
-    return [DetailsSummary, DetailsContent];
+    return [ExtensionDetailsSummary, ExtensionDetailsContent];
   },
 }).configure({
   persist: true,

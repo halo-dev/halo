@@ -5,6 +5,7 @@ import { ExtensionImage, ExtensionLink } from "@/extensions";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
 import { isAllowedUri } from "@/utils/is-allowed-uri";
+import { IMAGE_LINK_TARGET_BLANK, IMAGE_LINK_TARGET_SELF } from "./constants";
 
 const props = defineProps<BubbleItemComponentProps>();
 
@@ -38,20 +39,20 @@ const href = computed({
     updateImageLinkAttributes({
       href,
       target: currentAttributes.href
-        ? currentAttributes.target || "_self"
-        : "_blank",
+        ? currentAttributes.target || IMAGE_LINK_TARGET_SELF
+        : IMAGE_LINK_TARGET_BLANK,
     });
   },
 });
 
 const target = computed({
   get() {
-    return getImageLinkAttributes().target === "_blank";
+    return getImageLinkAttributes().target === IMAGE_LINK_TARGET_BLANK;
   },
   set(value) {
     updateImageLinkAttributes({
       href: href.value,
-      target: value ? "_blank" : "_self",
+      target: value ? IMAGE_LINK_TARGET_BLANK : IMAGE_LINK_TARGET_SELF,
     });
   },
 });

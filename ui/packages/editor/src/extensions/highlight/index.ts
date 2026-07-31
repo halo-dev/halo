@@ -12,6 +12,33 @@ export type ExtensionHighlightOptions = ExtensionOptions &
 
 export const ExtensionHighlight =
   TiptapHighlight.extend<ExtensionHighlightOptions>({
+    addHaloEditorMetadata() {
+      return {
+        ai: {
+          description:
+            "Highlighted inline text with an optional background color.",
+          exposure: "available",
+          useWhen: ["Drawing attention to a short, especially notable phrase."],
+          avoidWhen: ["Highlighting large sections of text."],
+          attributeGuidance: {
+            color: {
+              description: "CSS color used as the highlight background.",
+              format: "CSS color",
+              examples: ["#fff3a3", "yellow"],
+              omitWhen: ["The default highlight color is appropriate."],
+            },
+          },
+          generation: {
+            mode: "direct-html",
+          },
+          examples: [
+            "<p>This is <mark>highlighted with the default color</mark>.</p>",
+            '<p>This is <mark data-color="#fff3a3" style="background-color: #fff3a3">notable</mark>.</p>',
+          ],
+        },
+      };
+    },
+
     addOptions() {
       return {
         ...this.parent?.(),

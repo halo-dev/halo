@@ -7,6 +7,7 @@ import DropdownItem from "@/components/base/DropdownItem.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
+import { DEFAULT_GALLERY_GROUP_SIZE } from "./constants";
 import { ExtensionGallery } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();
@@ -14,7 +15,10 @@ const props = defineProps<BubbleItemComponentProps>();
 const dropdownRef = ref();
 
 const groupSize = computed(() => {
-  return props.editor.getAttributes(ExtensionGallery.name).groupSize || 3;
+  return (
+    props.editor.getAttributes(ExtensionGallery.name).groupSize ||
+    DEFAULT_GALLERY_GROUP_SIZE
+  );
 });
 
 function handleSetGroupSize(size: number) {

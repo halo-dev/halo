@@ -11,6 +11,27 @@ import ColorToolbarItem from "./ColorToolbarItem.vue";
 export type ExtensionColorOptions = Partial<ColorOptions> & ExtensionOptions;
 
 export const ExtensionColor = TiptapColor.extend<ExtensionColorOptions>({
+  addHaloEditorMetadata() {
+    return {
+      contributions: (this.options.types ?? []).map((name) => ({
+        targets: [{ kind: "mark" as const, name }],
+        metadata: {
+          ai: {
+            attributeGuidance: {
+              color: {
+                description:
+                  "CSS foreground color. Use a value from the active editor palette when one is known.",
+                format: "CSS color",
+                examples: ["#1f2937", "#2563eb"],
+                omitWhen: ["The inherited text color is appropriate."],
+              },
+            },
+          },
+        },
+      })),
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),

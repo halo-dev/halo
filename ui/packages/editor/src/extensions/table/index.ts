@@ -222,6 +222,30 @@ export type ExtensionTableOptions = ExtensionOptions & Partial<TableOptions>;
 export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
   allowGapCursor: true,
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description: "A table of rows containing header or data cells.",
+        exposure: "recommended",
+        useWhen: ["Comparing structured values across rows and columns."],
+        avoidWhen: [
+          "The information is a simple list or the table would be used only for visual layout.",
+        ],
+        contentGuidelines: [
+          "Use header cells where they clarify row or column meaning.",
+          "Keep each cell focused on one value or concise piece of content.",
+        ],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          "<table><tbody><tr><th><p>Name</p></th><th><p>Status</p></th></tr><tr><td><p>Halo</p></td><td><p>Active</p></td></tr></tbody></table>",
+          '<table><tbody><tr><th colspan="2"><p>Quarterly results</p></th></tr><tr><td rowspan="2"><p>Revenue</p></td><td><p>Q1</p></td></tr><tr><td><p>Q2</p></td></tr></tbody></table>',
+        ],
+      },
+    };
+  },
+
   addExtensions() {
     return [TableCell, TableRow, TableHeader];
   },

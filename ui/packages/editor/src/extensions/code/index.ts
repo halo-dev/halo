@@ -11,6 +11,22 @@ export type ExtensionCodeOptions = Partial<CodeOptions> & ExtensionOptions;
 
 export const ExtensionCode = TiptapCode.extend<ExtensionCodeOptions>({
   exitable: true,
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "Inline code for identifiers, commands, short expressions, and file names.",
+        exposure: "recommended",
+        useWhen: ["Including a short code fragment within prose."],
+        avoidWhen: ["Presenting a multi-line code sample."],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: ["<p>Run <code>pnpm install</code> first.</p>"],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),

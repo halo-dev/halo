@@ -13,6 +13,21 @@ export type ExtensionUnderlineOptions = ExtensionOptions &
 
 export const ExtensionUnderline =
   TiptapUnderline.extend<ExtensionUnderlineOptions>({
+    addHaloEditorMetadata() {
+      return {
+        ai: {
+          description: "Underlined inline text.",
+          exposure: "available",
+          useWhen: ["Underline is explicitly requested."],
+          avoidWhen: ["The text could be mistaken for a hyperlink."],
+          generation: {
+            mode: "direct-html",
+          },
+          examples: ["<p><u>Underlined text</u></p>"],
+        },
+      };
+    },
+
     addOptions() {
       return {
         ...this.parent?.(),
