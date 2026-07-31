@@ -2,12 +2,15 @@ package run.halo.app.infra;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -115,6 +118,40 @@ public class SystemSetting {
         String protectedUsernames;
 
         List<String> requiredAgreementPages;
+
+        /**
+         * Checks whether the given username is allowed by the user settings, i.e. not in the protected list.
+         *
+         * @param setting the user settings
+         * @param username the username to check
+         * @return true if the username is allowed
+         */
+        public static boolean isUsernameAllowed(SystemSetting.User setting, String username) {
+            return !getProtectedNames(setting).contains(username.trim().toLowerCase());
+        }
+
+        /**
+         * Checks whether the given display name is allowed by the user settings, i.e. not in the protected list.
+         *
+         * @param setting the user settings
+         * @param displayName the display name to check
+         * @return true if the display name is allowed
+         */
+        public static boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
+            return !getProtectedNames(setting).contains(displayName.trim().toLowerCase());
+        }
+
+        private static Set<String> getProtectedNames(SystemSetting.User setting) {
+            String protectedUsernamesStr = setting.getProtectedUsernames();
+            if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
+                return Set.of();
+            }
+            return Arrays.stream(protectedUsernamesStr.split(","))
+                    .map(String::trim)
+                    .filter(name -> !name.isEmpty())
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toUnmodifiableSet());
+        }
     }
 
     @Data

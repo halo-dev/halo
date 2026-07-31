@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{gateway_fragments/layout :: layout(title = |#{oauth2.choice.title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
+>
+  <th:block th:fragment="head">
+    <style>
+      .oauth2-choice-wrapper {
+        max-width: 30em;
+      }
+
+      .oauth2-choice-wrapper .form-subtitle {
+        margin: 0 0 1.25em;
+        font-size: var(--text-sm);
+        color: #6b7280;
+      }
+
+      .oauth2-choice-wrapper .provider-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        margin-bottom: 1.25em;
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: var(--rounded-base);
+        padding: 0.625em 0.875em;
+      }
+
+      .oauth2-choice-wrapper .choice-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+      }
+
+      .oauth2-choice-wrapper .choice-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375em;
+        width: 100%;
+        text-align: left;
+        background: #fff;
+        border: 1px solid var(--color-border);
+        border-radius: var(--rounded-lg);
+        padding: 1em;
+        color: inherit;
+        text-decoration: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+
+      .oauth2-choice-wrapper .choice-card:hover,
+      .oauth2-choice-wrapper .choice-card:focus-visible {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(76, 203, 160, 0.2);
+      }
+
+      .oauth2-choice-wrapper .choice-card h3 {
+        margin: 0;
+        font-size: var(--text-base);
+        font-weight: 600;
+        color: var(--color-secondary);
+      }
+
+      .oauth2-choice-wrapper .choice-card p {
+        margin: 0;
+        font-size: var(--text-sm);
+        color: #6b7280;
+      }
+
+      .oauth2-choice-wrapper .choice-card .choice-action {
+        margin-top: 0.25em;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--color-link);
+      }
+
+      .oauth2-choice-wrapper .choice-card.disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .oauth2-choice-wrapper .gateway-links {
+        margin-top: 1.5em;
+        text-align: center;
+        font-size: var(--text-sm);
+      }
+
+      .oauth2-choice-wrapper .gateway-links a {
+        color: var(--color-link);
+        text-decoration: none;
+      }
+    </style>
+  </th:block>
+  <th:block th:fragment="body">
+    <div class="gateway-wrapper oauth2-choice-wrapper">
+      <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+
+      <div class="halo-form-wrapper">
+        <h1 class="form-title" th:text="#{oauth2.choice.title}"></h1>
+        <p class="form-subtitle" th:text="#{oauth2.choice.subtitle}"></p>
+
+        <div class="provider-badge" th:if="${displayName != null or email != null}">
+          <span th:text="#{oauth2.choice.providerLabel}"></span>
+          <span th:if="${displayName != null}" th:text="${displayName}"></span>
+          <span th:if="${email != null}" th:text="|(${email})|"></span>
+        </div>
+
+        <div class="choice-list">
+          <a class="choice-card" th:href="@{/login?oauth2_bind}">
+            <h3 th:text="#{oauth2.choice.bind.title}"></h3>
+            <p th:text="#{oauth2.choice.bind.description}"></p>
+            <span class="choice-action" th:text="#{oauth2.choice.bind.action}"></span>
+          </a>
+
+          <a
+            class="choice-card"
+            th:href="@{/login/oauth2/register}"
+            th:classappend="${!allowRegistration} ? 'disabled'"
+          >
+            <h3 th:text="#{oauth2.choice.register.title}"></h3>
+            <p th:text="#{oauth2.choice.register.description}"></p>
+            <span class="choice-action" th:text="#{oauth2.choice.register.action}"></span>
+            <span th:if="${!allowRegistration}" class="choice-hint" th:text="#{oauth2.choice.register.disabled}"></span>
+          </a>
+        </div>
+      </div>
+
+      <div class="gateway-links">
+        <a th:href="@{/login}" th:text="#{oauth2.choice.otherLogin}"></a>
+      </div>
+
+      <div th:replace="~{gateway_fragments/common::returnToSiteContent}"></div>
+      <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
+    </div>
+  </th:block>
+</html>

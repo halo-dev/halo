@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{gateway_fragments/layout :: layout(title = |#{oauth2.register.title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
+>
+  <th:block th:fragment="head">
+    <style>
+      .oauth2-register-wrapper {
+        max-width: 30em;
+      }
+
+      .oauth2-register-wrapper .form-subtitle {
+        margin: 0 0 1.25em;
+        font-size: var(--text-sm);
+        color: #6b7280;
+      }
+
+      .oauth2-register-wrapper .provider-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        margin-bottom: 1.25em;
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: var(--rounded-base);
+        padding: 0.625em 0.875em;
+      }
+
+      .oauth2-register-wrapper .help-text {
+        margin: 0.375em 0 0;
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .oauth2-register-wrapper .field-error {
+        margin: 0.375em 0 0;
+        font-size: 12px;
+        color: #dc2626;
+      }
+
+      .oauth2-register-wrapper .gateway-links {
+        margin-top: 1.5em;
+        text-align: center;
+        font-size: var(--text-sm);
+      }
+
+      .oauth2-register-wrapper .gateway-links a {
+        color: var(--color-link);
+        text-decoration: none;
+      }
+
+      .oauth2-register-wrapper .gateway-links a + a {
+        margin-left: 1em;
+      }
+    </style>
+  </th:block>
+  <th:block th:fragment="body">
+    <div class="gateway-wrapper oauth2-register-wrapper">
+      <div th:replace="~{gateway_fragments/common::haloLogo}"></div>
+
+      <div class="halo-form-wrapper">
+        <h1 class="form-title" th:text="#{oauth2.register.title}"></h1>
+        <p class="form-subtitle" th:text="#{oauth2.register.subtitle}"></p>
+
+        <div class="provider-badge" th:if="${displayName != null or email != null}">
+          <span th:text="#{oauth2.choice.providerLabel}"></span>
+          <span th:if="${displayName != null}" th:text="${displayName}"></span>
+          <span th:if="${email != null}" th:text="|(${email})|"></span>
+        </div>
+
+        <div class="alert alert-error" role="alert" th:if="${error == 'registration-disallowed'}">
+          <strong th:text="#{oauth2.register.error.registration-disallowed}"></strong>
+        </div>
+        <div class="alert alert-error" role="alert" th:if="${error == 'restricted-username'}">
+          <strong th:text="#{oauth2.register.error.restricted-username}"></strong>
+        </div>
+        <div class="alert alert-error" role="alert" th:if="${error == 'restricted-display-name'}">
+          <strong th:text="#{oauth2.register.error.restricted-display-name}"></strong>
+        </div>
+        <div class="alert alert-error" role="alert" th:if="${error == 'no-default-role'}">
+          <strong th:text="#{oauth2.register.error.no-default-role}"></strong>
+        </div>
+        <div class="alert alert-error" role="alert" th:if="${error == 'oauth2-already-bound'}">
+          <strong th:text="#{oauth2.register.error.oauth2-already-bound}"></strong>
+        </div>
+        <div class="alert alert-error" role="alert" th:if="${error == 'unknown'}">
+          <strong th:text="#{oauth2.register.error.unknown}"></strong>
+        </div>
+
+        <form class="halo-form" th:action="@{/login/oauth2/register}" th:object="${form}" method="post">
+          <div class="form-item">
+            <label for="username" th:text="#{oauth2.register.username.label}"></label>
+            <div class="form-input">
+              <input
+                type="text"
+                id="username"
+                name="username"
+                th:field="*{username}"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                autofocus
+                required
+              />
+            </div>
+            <p class="help-text" th:text="#{oauth2.register.username.help}"></p>
+            <p class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+          </div>
+
+          <div class="form-item">
+            <label for="displayName" th:text="#{oauth2.register.displayName.label}"></label>
+            <div class="form-input">
+              <input type="text" id="displayName" name="displayName" th:field="*{displayName}" required />
+            </div>
+            <p class="field-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
+          </div>
+
+          <div class="form-item">
+            <label for="email" th:text="#{oauth2.register.email.label}"></label>
+            <div class="form-input">
+              <input type="email" id="email" name="email" th:field="*{email}" />
+            </div>
+            <p class="help-text" th:text="#{oauth2.register.email.help}"></p>
+            <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+          </div>
+
+          <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
+            <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" />
+            <label for="agreedToTerms">
+              <span th:text="#{oauth2.register.agreedToTerms.label}"></span>
+              <th:block th:each="page, iterStat : ${agreementPages}">
+                <a
+                  th:if="${page.permalink != null}"
+                  th:href="${page.permalink}"
+                  target="_blank"
+                  th:text="${page.title}"
+                ></a>
+                <span th:if="${page.permalink == null}" th:text="${page.title}"></span>
+                <span th:if="${!iterStat.last}">, </span>
+              </th:block>
+            </label>
+          </div>
+          <p class="field-error" th:if="${#fields.hasErrors('agreedToTerms')}" th:errors="*{agreedToTerms}"></p>
+
+          <div class="form-item">
+            <button type="submit" th:text="#{oauth2.register.submit}"></button>
+          </div>
+        </form>
+      </div>
+
+      <div class="gateway-links">
+        <a th:href="@{/login/oauth2}" th:text="#{oauth2.register.back}"></a>
+        <a th:href="@{/login}" th:text="#{oauth2.register.otherLogin}"></a>
+      </div>
+
+      <div th:replace="~{gateway_fragments/common::returnToSiteContent}"></div>
+      <div th:replace="~{gateway_fragments/common::languageSwitcher}"></div>
+    </div>
+  </th:block>
+</html>

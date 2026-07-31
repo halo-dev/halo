@@ -5,14 +5,12 @@ import static run.halo.app.extension.index.query.Queries.equal;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -262,12 +260,12 @@ public class UserServiceImpl implements UserService {
                 .filter(SystemSetting.User::isAllowRegistration)
                 .switchIfEmpty(Mono.error(
                         () -> new ServerWebInputException("The registration is not allowed by the administrator.")))
-                .filter(setting -> isUsernameAllowed(setting, signUpData.getUsername()))
+                .filter(setting -> SystemSetting.User.isUsernameAllowed(setting, signUpData.getUsername()))
                 .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
                         "The username is restricted.",
                         "problemDetail.user.username.restricted",
                         new Object[] {signUpData.getUsername()})))
-                .filter(setting -> isDisplayNameAllowed(setting, signUpData.getDisplayName()))
+                .filter(setting -> SystemSetting.User.isDisplayNameAllowed(setting, signUpData.getDisplayName()))
                 .switchIfEmpty(Mono.error(() -> new RestrictedNameException(
                         "The display name is restricted.",
                         "problemDetail.user.displayName.restricted",
@@ -413,27 +411,5 @@ public class UserServiceImpl implements UserService {
 
     void publishPasswordChangedEvent(String username) {
         eventPublisher.publishEvent(new PasswordChangedEvent(this, username));
-    }
-
-    private Set<String> getProtectedUsernamesSet(SystemSetting.User setting) {
-        String protectedUsernamesStr = setting.getProtectedUsernames();
-        if (protectedUsernamesStr == null || protectedUsernamesStr.trim().isEmpty()) {
-            return Set.of();
-        }
-        return Arrays.stream(protectedUsernamesStr.split(","))
-                .map(String::trim)
-                .filter(n -> !n.isEmpty())
-                .map(String::toLowerCase)
-                .collect(Collectors.toUnmodifiableSet());
-    }
-
-    private boolean isUsernameAllowed(SystemSetting.User setting, String username) {
-        Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
-        return !protectedLowerSet.contains(username.trim().toLowerCase());
-    }
-
-    private boolean isDisplayNameAllowed(SystemSetting.User setting, String displayName) {
-        Set<String> protectedLowerSet = getProtectedUsernamesSet(setting);
-        return !protectedLowerSet.contains(displayName.trim().toLowerCase());
     }
 }
