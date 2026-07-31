@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
+import org.pf4j.util.FileUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
@@ -336,8 +337,11 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     }
 
     private String readPluginNameFromJar(Path jarPath) {
+        Path manifestPath = null;
         try {
-            var manifestPath = org.pf4j.util.FileUtils.getPath(jarPath, "plugin.yaml");
+            // FileUtils.getPath opens a zip FileSystem that must be closed via closePath,
+            // otherwise the JAR stays locked (deletion would fail on Windows) and fds leak.
+            manifestPath = FileUtils.getPath(jarPath, "plugin.yaml");
             var resource = new FileSystemResource(manifestPath);
             var loader = new YamlUnstructuredLoader(resource);
             var unstructuredList = loader.load();
@@ -347,6 +351,8 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
             }
         } catch (Exception e) {
             log.warn("Failed to read manifest from {}", jarPath, e);
+        } finally {
+            FileUtils.closePath(manifestPath);
         }
         return null;
     }
