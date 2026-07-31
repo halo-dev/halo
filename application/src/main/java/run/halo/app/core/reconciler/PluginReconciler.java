@@ -41,9 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
-import org.pf4j.util.FileUtils;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -77,6 +75,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginService;
 import run.halo.app.plugin.SpringPluginManager;
+import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
@@ -337,24 +336,13 @@ class PluginReconciler implements Reconciler<Request>, DisposableBean {
     }
 
     private String readPluginNameFromJar(Path jarPath) {
-        Path manifestPath = null;
         try {
-            // FileUtils.getPath opens a zip FileSystem that must be closed via closePath,
-            // otherwise the JAR stays locked (deletion would fail on Windows) and fds leak.
-            manifestPath = FileUtils.getPath(jarPath, "plugin.yaml");
-            var resource = new FileSystemResource(manifestPath);
-            var loader = new YamlUnstructuredLoader(resource);
-            var unstructuredList = loader.load();
-            if (unstructuredList.size() == 1) {
-                var metadata = unstructuredList.get(0).getMetadata();
-                return metadata != null ? metadata.getName() : null;
-            }
+            // YamlPluginFinder properly closes the zip FileSystem opened for the JAR.
+            return new YamlPluginFinder().find(jarPath).getMetadata().getName();
         } catch (Exception e) {
             log.warn("Failed to read manifest from {}", jarPath, e);
-        } finally {
-            FileUtils.closePath(manifestPath);
+            return null;
         }
-        return null;
     }
 
     private Result enablePlugin(Plugin plugin) {
