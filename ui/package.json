@@ -119,7 +119,7 @@
     "@types/object-hash": "^3.0.6",
     "@types/sanitize-html": "^2.16.0",
     "@types/ua-parser-js": "^0.7.39",
-    "@typescript/native-preview": "7.0.0-dev.20250619.1",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitejs/plugin-vue-jsx": "^5.1.6",
     "@vitest/eslint-plugin": "^1.6.24",
