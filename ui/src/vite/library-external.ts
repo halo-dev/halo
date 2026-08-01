@@ -8,7 +8,8 @@ import {
 } from "vite-plugin-static-copy";
 import type { HtmlTagDescriptor, Plugin } from "vite-plus";
 
-type LibraryTarget = Omit<Target, "rename"> & {
+type LibraryTarget = Omit<Target, "rename" | "src"> & {
+  src: string;
   rename: string;
 };
 
