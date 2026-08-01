@@ -8,6 +8,10 @@ import {
 } from "vite-plugin-static-copy";
 import type { HtmlTagDescriptor, Plugin } from "vite-plus";
 
+type LibraryTarget = Omit<Target, "rename"> & {
+  rename: string;
+};
+
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
  *
@@ -22,7 +26,7 @@ export const setupLibraryExternal = (command?: string) => {
 
   const isProduction = command === "build";
 
-  const staticTargets: Target[] = [
+  const libraryTargets: LibraryTarget[] = [
     {
       src: `./node_modules/vue/dist/vue.global${
         isProduction ? ".prod" : ""
@@ -103,14 +107,13 @@ export const setupLibraryExternal = (command?: string) => {
       dest: "editor",
       rename: `editor.[hash].js`,
     },
-  ].map((target) => {
+  ];
+
+  const staticTargets = libraryTargets.map((target) => {
     return {
       ...target,
       dest: `ui-assets/${target.dest}`,
-      rename: `${target.rename.replace(
-        "[hash]",
-        computeLibraryHash(target.src)
-      )}`,
+      rename: target.rename.replace("[hash]", computeLibraryHash(target.src)),
     };
   });
 
@@ -145,7 +148,13 @@ export const setupLibraryExternal = (command?: string) => {
       "@halo-dev/api-client": "HaloApiClient",
     }),
     ViteStaticCopy({
-      targets: staticTargets,
+      targets: staticTargets.map((target) => ({
+        ...target,
+        rename: {
+          name: target.rename,
+          stripBase: true,
+        },
+      })),
     }),
     createInjectExternalTagsPlugin(injectTags),
   ];
