@@ -15,7 +15,7 @@ export default defineConfig({
     Dts({
       tsconfigPath: "./tsconfig.app.json",
       entryRoot: "./src",
-      outDir: "./dist",
+      outDirs: "./dist",
       insertTypesEntry: true,
     }) as Plugin,
   ],
