@@ -40,8 +40,7 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
 
     private final ServerSecurityContextRepository securityContextRepository;
 
-    @Setter
-    private OAuth2AuthenticationTokenCache authenticationCache = new WebSessionOAuth2AuthenticationTokenCache();
+    private final OAuth2AuthenticationTokenCache authenticationCache;
 
     private final ReactiveUserDetailsService userDetailsService;
 
@@ -58,11 +57,13 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
             ServerSecurityContextRepository securityContextRepository,
             UserConnectionService connectionService,
             ReactiveUserDetailsService userDetailsService,
-            LoginHandlerEnhancer loginHandlerEnhancer) {
+            LoginHandlerEnhancer loginHandlerEnhancer,
+            OAuth2AuthenticationTokenCache authenticationCache) {
         this.connectionService = connectionService;
         this.securityContextRepository = securityContextRepository;
         this.userDetailsService = userDetailsService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
+        this.authenticationCache = authenticationCache;
         var logoutHandler = new SecurityContextServerLogoutHandler();
         logoutHandler.setSecurityContextRepository(securityContextRepository);
         this.logoutHandler = logoutHandler;

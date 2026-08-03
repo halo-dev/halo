@@ -28,21 +28,29 @@ class OAuth2SecurityConfigurer implements SecurityConfigurer {
 
     private final LoginHandlerEnhancer loginHandlerEnhancer;
 
+    private final OAuth2AuthenticationTokenCache authenticationTokenCache;
+
     public OAuth2SecurityConfigurer(
             ServerSecurityContextRepository securityContextRepository,
             UserConnectionService connectionService,
             ReactiveUserDetailsService userDetailsService,
-            LoginHandlerEnhancer loginHandlerEnhancer) {
+            LoginHandlerEnhancer loginHandlerEnhancer,
+            OAuth2AuthenticationTokenCache authenticationTokenCache) {
         this.securityContextRepository = securityContextRepository;
         this.connectionService = connectionService;
         this.userDetailsService = userDetailsService;
         this.loginHandlerEnhancer = loginHandlerEnhancer;
+        this.authenticationTokenCache = authenticationTokenCache;
     }
 
     @Override
     public void configure(ServerHttpSecurity http) {
         var mapOAuth2Filter = new MapOAuth2AuthenticationFilter(
-                securityContextRepository, connectionService, userDetailsService, loginHandlerEnhancer);
+                securityContextRepository,
+                connectionService,
+                userDetailsService,
+                loginHandlerEnhancer,
+                authenticationTokenCache);
         http.addFilterBefore(mapOAuth2Filter, SecurityWebFiltersOrder.AUTHENTICATION);
     }
 }
