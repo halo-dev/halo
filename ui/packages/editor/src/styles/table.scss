@@ -332,37 +332,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .table-menu-popper {
-    --halo-table-menu-background: #111827;
-    --halo-table-menu-border: #4b5563;
-    --halo-table-menu-text: #d1d5db;
-    --halo-table-menu-text-active: #f9fafb;
-    --halo-table-menu-muted: #9ca3af;
-    --halo-table-menu-hover: #374151;
-    --halo-table-menu-segment-background: #1f2937;
-    --halo-table-menu-segment-hover: rgb(55 65 81 / 72%);
-    --halo-table-menu-segment-active-border: #4b5563;
-  }
-
-  .halo-rich-text-editor {
-    --halo-table-border-color: #4b5563;
-    --halo-table-header-background: #1f2937;
-    --halo-table-cell-background: #111827;
-    --halo-table-control-background: #374151;
-    --halo-table-menu-background: #111827;
-    --halo-table-menu-border: #4b5563;
-    --halo-table-menu-text: #d1d5db;
-    --halo-table-menu-text-active: #f9fafb;
-    --halo-table-menu-muted: #9ca3af;
-    --halo-table-menu-hover: #374151;
-    --halo-table-menu-segment-background: #1f2937;
-    --halo-table-menu-segment-hover: rgb(55 65 81 / 72%);
-    --halo-table-menu-segment-active-border: #4b5563;
-    --halo-table-selection-soft: #1e3a5f;
-  }
-}
-
 @media (hover: none), (pointer: coarse) {
   .halo-rich-text-editor .ProseMirror {
     .grip-column,
