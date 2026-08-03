@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { Editor } from "@/tiptap";
 import { TableMap } from "@/tiptap/pm";
-import { sanitizePastedTableHTML } from "./index";
+import { sanitizePastedTableHTML, transformPastedTableHTML } from "./index";
 import { createTableEditor, getTableNode, insertTable } from "./test-editor";
 
 describe("ExtensionTable model and HTML contract", () => {
@@ -94,5 +94,17 @@ describe("ExtensionTable model and HTML contract", () => {
     expect(sanitized).not.toContain("script");
     expect(sanitized).not.toContain("onclick");
     expect(sanitized).not.toContain("javascript:");
+  });
+
+  it("sanitizes only pasted HTML that contains a table", () => {
+    const iframe = '<iframe src="https://example.com/embed"></iframe>';
+
+    expect(transformPastedTableHTML(iframe)).toBe(iframe);
+    expect(transformPastedTableHTML("<p>hello</p>")).toBe("<p>hello</p>");
+    expect(
+      transformPastedTableHTML(
+        "<TABLE><tr><td><script>bad()</script></td></tr></TABLE>"
+      )
+    ).not.toContain("script");
   });
 });

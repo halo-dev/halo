@@ -63,15 +63,20 @@ onBeforeUnmount(() => {
       ref="trigger"
       type="button"
       role="menuitem"
-      class="flex w-full cursor-pointer items-center gap-3 rounded p-1.5 text-left hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none"
+      class="group flex w-full cursor-pointer items-center gap-3 rounded p-1.5 text-left hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none"
       :aria-label="title"
       :title="title"
     >
-      <span class="size-7 flex-none rounded bg-gray-100 p-1.5">
+      <span
+        class="size-7 flex-none rounded bg-gray-100 p-1.5 group-hover:bg-white"
+      >
         <component :is="icon" class="size-full" />
       </span>
       <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span class="truncate text-sm text-gray-600">{{ title }}</span>
+        <span
+          class="truncate text-sm text-gray-600 group-hover:font-medium group-hover:text-gray-900"
+          >{{ title }}</span
+        >
         <span v-if="description" class="text-xs text-gray-500">
           {{ description }}
         </span>

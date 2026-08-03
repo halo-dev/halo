@@ -327,9 +327,7 @@ export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
     ];
   },
 
-  transformPastedHTML(html) {
-    return sanitizePastedTableHTML(html);
-  },
+  transformPastedHTML: transformPastedTableHTML,
 
   renderHTML({ node, HTMLAttributes }) {
     const layoutMode =
@@ -420,6 +418,15 @@ export function getTableBubbleMenuVirtualElement(editor: Editor) {
   };
 }
 
+export function transformPastedTableHTML(html: string) {
+  // Only sanitize markup that actually contains a table; leave other
+  // pasted HTML (e.g. iframe embeds) to their own extensions.
+  if (!/<table[\s>]/i.test(html)) {
+    return html;
+  }
+  return sanitizePastedTableHTML(html);
+}
+
 export function sanitizePastedTableHTML(html: string) {
   const document = new DOMParser().parseFromString(html, "text/html");
   document
@@ -444,6 +451,16 @@ function handleTabSeparatedPaste(view: EditorView, event: ClipboardEvent) {
   const html = clipboard?.getData("text/html");
   const text = clipboard?.getData("text/plain");
   if (html || !text?.includes("\t")) {
+    return false;
+  }
+
+  // Don't hijack pastes that belong to code blocks: pasting into an
+  // existing code block, or code copied from VSCode (handled by the
+  // code block extension's own paste plugin).
+  if (view.state.selection.$from.parent.type.spec.code) {
+    return false;
+  }
+  if (clipboard?.getData("vscode-editor-data")) {
     return false;
   }
 
