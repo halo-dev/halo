@@ -95,16 +95,16 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
         if (this.externalUrl != null) {
             return normalizeUrl(this.externalUrl);
         }
-        var externalUrl = normalizeUrl(haloProperties.getExternalUrl());
-        if (externalUrl != null) {
-            return externalUrl;
+        var url = normalizeUrl(haloProperties.getExternalUrl());
+        if (url != null) {
+            return url;
         }
         try {
-            externalUrl = normalizeUrl(request.getURI().resolve(getBasePath()).toURL());
+            url = normalizeUrl(request.getURI().resolve(getBasePath()).toURL());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Cannot parse request URI to URL.", e);
         }
-        return externalUrl;
+        return url;
     }
 
     @Nullable
@@ -114,21 +114,21 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     }
 
     @Nullable
-    private static URL normalizeUrl(@Nullable URL externalUrl) {
-        if (externalUrl == null) {
+    private static URL normalizeUrl(@Nullable URL url) {
+        if (url == null) {
             return null;
         }
-        var externalUrlString = externalUrl.toString();
+        var externalUrlString = url.toString();
         var normalizedUrlString = ExternalUrlUtils.toAscii(externalUrlString);
         if (normalizedUrlString.equals(externalUrlString)) {
-            return externalUrl;
+            return url;
         }
         try {
             return URI.create(normalizedUrlString).toURL();
         } catch (IllegalArgumentException | MalformedURLException e) {
             // Keep the original URL if the normalized URL cannot be parsed as a URI.
             log.debug("Failed to normalize external URL: {}", externalUrlString, e);
-            return externalUrl;
+            return url;
         }
     }
 
