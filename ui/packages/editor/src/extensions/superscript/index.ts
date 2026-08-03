@@ -13,6 +13,21 @@ export type ExtensionSuperscriptOptions = Partial<SuperscriptExtensionOptions> &
 
 export const ExtensionSuperscript =
   TiptapSuperscript.extend<ExtensionSuperscriptOptions>({
+    addHaloEditorMetadata() {
+      return {
+        ai: {
+          description:
+            "Inline superscript text for exponents, ordinals, and references.",
+          exposure: "available",
+          useWhen: ["Writing an exponent or superscript annotation."],
+          generation: {
+            mode: "direct-html",
+          },
+          examples: ["<p>x<sup>2</sup></p>"],
+        },
+      };
+    },
+
     addOptions() {
       return {
         ...this.parent?.(),

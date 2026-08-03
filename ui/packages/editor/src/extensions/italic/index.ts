@@ -9,6 +9,20 @@ import type { ExtensionOptions } from "@/types";
 export type ExtensionItalicOptions = ExtensionOptions & Partial<ItalicOptions>;
 
 export const ExtensionItalic = TiptapItalic.extend<ExtensionItalicOptions>({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description: "Emphasis for inline text, usually rendered in italics.",
+        exposure: "recommended",
+        useWhen: ["Adding semantic emphasis or marking a title or term."],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: ["<p>This point is <em>especially relevant</em>.</p>"],
+      },
+    };
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),

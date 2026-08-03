@@ -2,9 +2,10 @@
   "include": ["src"],
   "exclude": ["**/*.spec.ts"],
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist",
     "target": "ES2020",
-    "module": "ES2020",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
     "declaration": true,
@@ -12,7 +13,8 @@
     "noImplicitOverride": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"]
   }
 }

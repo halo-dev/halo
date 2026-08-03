@@ -37,6 +37,38 @@ export const ExtensionIndent = Extension.create<ExtensionIndentOptions>({
   name: "indent",
   priority: 800,
 
+  addHaloEditorMetadata() {
+    return {
+      contributions: this.options.names.map((name) => ({
+        targets: [{ kind: "node" as const, name }],
+        metadata: {
+          ai: {
+            attributeGuidance: {
+              indent: {
+                description: "Left indentation in pixels.",
+                examples: [
+                  this.options.minIndentLevel,
+                  this.options.indentRange,
+                  this.options.maxIndentLevel,
+                ],
+                guidelines: [
+                  `Use values between ${this.options.minIndentLevel} and ${this.options.maxIndentLevel}, normally in increments of ${this.options.indentRange}.`,
+                ],
+                omitWhen: ["No block indentation is needed."],
+              },
+              lineIndent: {
+                description:
+                  "Whether the first line uses the editor's standard first-line indentation.",
+                allowedValues: [true, false],
+                omitWhen: ["No first-line indentation is needed."],
+              },
+            },
+          },
+        },
+      })),
+    };
+  },
+
   addOptions() {
     return {
       names: ["heading", "paragraph"],

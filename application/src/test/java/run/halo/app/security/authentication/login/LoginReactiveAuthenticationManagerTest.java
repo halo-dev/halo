@@ -1,6 +1,7 @@
 package run.halo.app.security.authentication.login;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -94,12 +96,15 @@ class LoginReactiveAuthenticationManagerTest {
 
     @Test
     void shouldAuthenticateByEmailWithCorrectPassword() {
-        // tryByUsername skips @ input, goes directly to tryByEmail
+        // email lookup is attempted first for @ input
         var emailUser = createUserExtension("actualuser");
         when(userService.findUserByVerifiedEmail("test@example.com")).thenReturn(Mono.just(emailUser));
 
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
+        // the username fallback is subscribed after the email strategy completes, but its result is
+        // discarded once the email-resolved user wins
+        when(userDetailsService.findByUsername("test@example.com")).thenReturn(Mono.empty());
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
         stubPasswordService();
 
@@ -109,13 +114,16 @@ class LoginReactiveAuthenticationManagerTest {
                 .assertNext(auth -> assertEquals(userDetails, auth.getPrincipal()))
                 .verifyComplete();
 
-        // @ input bypasses username lookup entirely
-        verify(userDetailsService, never()).findByUsername("test@example.com");
+        // a resolved email lookup wins, although the username fallback has already been subscribed
+        verify(userDetailsService).findByUsername("test@example.com");
     }
 
     @Test
     void shouldFailWhenEmailNotFound() {
         when(userService.findUserByVerifiedEmail("test@example.com")).thenReturn(Mono.empty());
+        // username lookup acts as the generic fallback, and missing usernames error with BadCredentialsException
+        when(userDetailsService.findByUsername("test@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("test@example.com", "password");
 
@@ -130,10 +138,32 @@ class LoginReactiveAuthenticationManagerTest {
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(false);
+        // wrong password on the email strategy falls through to the username strategy, which cannot
+        // resolve an email address and errors with BadCredentialsException
+        when(userDetailsService.findByUsername("test@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("test@example.com", "password");
 
         StepVerifier.create(result).expectError(BadCredentialsException.class).verify();
+
+        verify(userDetailsService).findByUsername("test@example.com");
+    }
+
+    @Test
+    void shouldFallBackToUsernameLookupWhenEmailNotVerified() {
+        when(userService.findUserByVerifiedEmail("alice@example.com")).thenReturn(Mono.empty());
+
+        var userDetails = createUserDetails("alice@example.com", "encoded-password");
+        when(userDetailsService.findByUsername("alice@example.com")).thenReturn(Mono.just(userDetails));
+        when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
+        stubPasswordService();
+
+        var result = authenticate("alice@example.com", "password");
+
+        StepVerifier.create(result)
+                .assertNext(auth -> assertEquals(userDetails, auth.getPrincipal()))
+                .verifyComplete();
     }
 
     // ── Password upgrade ───────────────────────────────────────────
@@ -171,6 +201,8 @@ class LoginReactiveAuthenticationManagerTest {
 
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
+        // the username fallback is subscribed after the email strategy completes
+        when(userDetailsService.findByUsername("test@example.com")).thenReturn(Mono.empty());
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
 
         when(passwordEncoder.upgradeEncoding("encoded-password")).thenReturn(true);
@@ -192,6 +224,36 @@ class LoginReactiveAuthenticationManagerTest {
         verify(passwordService).updatePassword(userDetails, "new-encoded-password");
     }
 
+    @Test
+    void shouldRunPasswordEncoderOperationsOnBoundedElasticThread() {
+        var matchingThread = new AtomicReference<Thread>();
+        var encodingThread = new AtomicReference<Thread>();
+
+        var userDetails = createUserDetails("testuser", "encoded-password");
+        when(userDetailsService.findByUsername("testuser")).thenReturn(Mono.just(userDetails));
+        when(passwordEncoder.matches("password", "encoded-password")).thenAnswer(invocation -> {
+            matchingThread.set(Thread.currentThread());
+            return true;
+        });
+
+        when(passwordEncoder.upgradeEncoding("encoded-password")).thenReturn(true);
+        when(passwordEncoder.encode("password")).thenAnswer(invocation -> {
+            encodingThread.set(Thread.currentThread());
+            return "new-encoded-password";
+        });
+
+        var upgradedUser = createUserDetails("testuser", "new-encoded-password");
+        when(passwordService.updatePassword(eq(userDetails), eq("new-encoded-password")))
+                .thenReturn(Mono.just(upgradedUser));
+
+        var result = authenticate("testuser", "password");
+
+        StepVerifier.create(result).expectNextCount(1).verifyComplete();
+
+        assertBoundedElasticThread(matchingThread.get());
+        assertBoundedElasticThread(encodingThread.get());
+    }
+
     // ── Exception handling ─────────────────────────────────────────
 
     @Test
@@ -209,6 +271,8 @@ class LoginReactiveAuthenticationManagerTest {
     @Test
     void shouldFailWhenAllStrategiesExhaustedForEmail() {
         when(userService.findUserByVerifiedEmail("unknown@example.com")).thenReturn(Mono.empty());
+        when(userDetailsService.findByUsername("unknown@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("unknown@example.com", "password");
 
@@ -228,6 +292,12 @@ class LoginReactiveAuthenticationManagerTest {
         lenient()
                 .when(passwordService.updatePassword(any(), anyString()))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+    }
+
+    private static void assertBoundedElasticThread(Thread thread) {
+        assertTrue(
+                thread != null && thread.getName().startsWith("boundedElastic-"),
+                () -> "Expected a boundedElastic thread, but got " + thread);
     }
 
     private UserDetails createUserDetails(String username, String password) {

@@ -38,6 +38,79 @@ export interface ExtensionAudioOptions extends AudioOptions, ExtensionOptions {
 export const ExtensionAudio = Audio.extend<ExtensionAudioOptions>({
   fakeSelection: true,
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "An audio player for a referenced audio resource, used directly as a block or as the media child of a figure.",
+        exposure: "available",
+        useWhen: ["Embedding a relevant audio recording with a known URL."],
+        avoidWhen: ["No accessible audio source is available."],
+        attributeGuidance: {
+          src: {
+            description: "URL of the audio resource.",
+            format: "absolute or site-relative URL",
+          },
+          autoplay: {
+            description: "Whether playback starts automatically.",
+            allowedValues: [true, false],
+            omitWhen: ["User-initiated playback is preferred."],
+          },
+          controls: {
+            description: "Whether native playback controls are visible.",
+            allowedValues: [true, false],
+          },
+          loop: {
+            description: "Whether playback restarts after reaching the end.",
+            allowedValues: [true, false],
+            omitWhen: ["The audio should play once."],
+          },
+          muted: {
+            description: "Whether audio output is initially muted.",
+            allowedValues: [true, false],
+            omitWhen: ["The audio should start with normal volume."],
+          },
+          preload: {
+            description: "Browser preload strategy for the audio resource.",
+            allowedValues: ["auto", "metadata", "none", null],
+          },
+          controlslist: {
+            description:
+              "Space-separated browser controls restrictions such as nodownload.",
+            examples: ["nodownload", "nodownload noplaybackrate"],
+            omitWhen: ["No native control restrictions are needed."],
+          },
+          crossorigin: {
+            description: "CORS mode used when fetching the audio resource.",
+            allowedValues: ["", "anonymous", "use-credentials"],
+            omitWhen: ["The audio does not require a CORS request."],
+          },
+          disableremoteplayback: {
+            description:
+              "Whether browsers should prevent remote playback of the audio.",
+            allowedValues: [true, false],
+            omitWhen: ["Remote playback may remain available."],
+          },
+          file: {
+            description:
+              "Editor-only upload state that is not part of persisted article HTML.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Use a stable accessible URL; uploading a local file requires a separate plugin capability.",
+          ],
+        },
+        examples: [
+          '<audio src="https://example.com/audio.mp3" controls></audio>',
+          '<audio src="https://example.com/ambient.ogg" controls loop></audio>',
+        ],
+      },
+    };
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),

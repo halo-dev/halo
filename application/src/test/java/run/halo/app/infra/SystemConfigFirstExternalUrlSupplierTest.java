@@ -127,6 +127,31 @@ class SystemConfigFirstExternalUrlSupplierTest {
             when(haloProperties.getExternalUrl()).thenReturn(null);
             assertNull(externalUrl.getRaw());
         }
+
+        @Test
+        void shouldConvertHostToAsciiWhenExternalUrlContainsIDN() throws MalformedURLException {
+            var fakeUri = URI.create("https://abcd.中国");
+            when(haloProperties.getExternalUrl()).thenReturn(fakeUri.toURL());
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(true);
+
+            var expectedUri = URI.create("https://abcd.xn--fiqs8s");
+            assertEquals(expectedUri.toURL(), externalUrl.getRaw());
+            assertEquals(expectedUri, externalUrl.get());
+
+            var mockRequest = mock(HttpRequest.class);
+            assertEquals(expectedUri.toURL(), externalUrl.getURL(mockRequest));
+        }
+
+        @Test
+        void shouldKeepOriginalUrlWhenNormalizedUrlCannotBeParsed() throws MalformedURLException {
+            var fakeUrl = new URL("https://abcd.中国/path with space");
+            when(haloProperties.getExternalUrl()).thenReturn(fakeUrl);
+
+            assertEquals(fakeUrl, externalUrl.getRaw());
+
+            var mockRequest = mock(HttpRequest.class);
+            assertEquals(fakeUrl, externalUrl.getURL(mockRequest));
+        }
     }
 
     @Nested
@@ -159,6 +184,22 @@ class SystemConfigFirstExternalUrlSupplierTest {
             assertEquals(URI.create("/fake"), externalUrl.get());
             var mockRequest = mock(HttpRequest.class);
             assertEquals(URI.create("https://www.halo.run").toURL(), externalUrl.getURL(mockRequest));
+        }
+
+        @Test
+        void shouldConvertHostToAsciiWhenExternalUrlContainsIDN() throws MalformedURLException {
+            var basic = new SystemSetting.Basic();
+            basic.setExternalUrl("https://abcd.中国");
+            when(systemConfigFetcher.getBasic()).thenReturn(Mono.just(basic));
+            when(haloProperties.isUseAbsolutePermalink()).thenReturn(true);
+            externalUrl.onExtensionInitialized(null);
+
+            var expectedUri = URI.create("https://abcd.xn--fiqs8s");
+            assertEquals(expectedUri.toURL(), externalUrl.getRaw());
+            assertEquals(expectedUri, externalUrl.get());
+
+            var mockRequest = mock(HttpRequest.class);
+            assertEquals(expectedUri.toURL(), externalUrl.getURL(mockRequest));
         }
     }
 }

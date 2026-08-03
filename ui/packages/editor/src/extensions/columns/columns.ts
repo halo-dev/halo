@@ -195,6 +195,41 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
   content: "column{1,}",
   fakeSelection: false,
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description: "A multi-column layout containing one or more columns.",
+        exposure: "available",
+        useWhen: ["Related block content benefits from a side-by-side layout."],
+        avoidWhen: [
+          "The content must remain easy to read on narrow screens or has a natural linear order.",
+        ],
+        attributeGuidance: {
+          cols: {
+            description:
+              "Number of column children in the layout; it must match the actual child count.",
+            examples: [2, 3],
+          },
+          style: {
+            description: "CSS declarations controlling the columns container.",
+            format: "CSS declarations",
+          },
+        },
+        contentGuidelines: [
+          "Keep cols equal to the number of column children.",
+          "Order column children by sequential zero-based index.",
+        ],
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          '<div class="columns" cols="2"><div class="column" index="0"><p>Left column</p></div><div class="column" index="1"><p>Right column</p></div></div>',
+          '<div class="columns" cols="3"><div class="column" index="0"><p>First column</p></div><div class="column" index="1"><p>Second column</p></div><div class="column" index="2"><p>Third column</p></div></div>',
+        ],
+      },
+    };
+  },
+
   addOptions() {
     return {
       HTMLAttributes: {
@@ -329,13 +364,24 @@ export const ExtensionColumns = Node.create<ExtensionColumnsOptions>({
     return {
       cols: {
         default: 2,
-        parseHTML: (element) => element.getAttribute("cols"),
+        parseHTML: (element) => {
+          const cols = Number(element.getAttribute("cols"));
+          return Number.isInteger(cols) && cols > 0 ? cols : 2;
+        },
       },
       style: {
         default: "display: flex;width: 100%;gap: 1em;",
         parseHTML: (element) => element.getAttribute("style"),
       },
     };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: "div.columns",
+      },
+    ];
   },
 
   renderHTML({ HTMLAttributes }) {

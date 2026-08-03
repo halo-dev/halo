@@ -26,6 +26,44 @@ import { generateAnchorId } from "@/utils";
 export type ExtensionHeadingOptions = ExtensionOptions & HeadingOptions;
 
 export const ExtensionHeading = TiptapHeading.extend<ExtensionHeadingOptions>({
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A section heading whose level communicates document hierarchy.",
+        exposure: "recommended",
+        useWhen: ["Introducing a titled section or subsection."],
+        avoidWhen: ["Styling ordinary body text without creating a section."],
+        contentGuidelines: [
+          "Keep heading levels hierarchical and avoid skipping levels without a structural reason.",
+          "Keep the heading text concise.",
+        ],
+        attributeGuidance: {
+          level: {
+            description: "Heading level rendered as h1 through h6.",
+            allowedValues: this.options.levels,
+          },
+          id: {
+            description:
+              "Editor-managed anchor identifier regenerated from the heading text.",
+            format: "HTML id",
+            omitWhen: [
+              "Generating or editing article content; the editor maintains this value.",
+            ],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+        },
+        examples: [
+          "<h1>Guide</h1>",
+          "<h2>Installation</h2>",
+          "<h3>Configuration options</h3>",
+        ],
+      },
+    };
+  },
+
   renderHTML({ node, HTMLAttributes }) {
     const hasLevel = this.options.levels.includes(node.attrs.level);
     const level = hasLevel ? node.attrs.level : this.options.levels[0];

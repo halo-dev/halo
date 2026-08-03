@@ -23,6 +23,27 @@ export type ExtensionParagraphOptions = ExtensionOptions &
 
 export const ExtensionParagraph =
   TiptapParagraph.extend<ExtensionParagraphOptions>({
+    addHaloEditorMetadata() {
+      return {
+        ai: {
+          description: "A standard paragraph of body text.",
+          exposure: "recommended",
+          useWhen: ["Writing ordinary prose or separating ideas into blocks."],
+          attributeGuidance: {
+            lineHeight: {
+              description: "CSS line-height applied to this paragraph.",
+              examples: [1.5, 2, "1.6"],
+              omitWhen: ["The default line height is sufficient."],
+            },
+          },
+          generation: {
+            mode: "direct-html",
+          },
+          examples: ["<p>A concise paragraph of body text.</p>"],
+        },
+      };
+    },
+
     addAttributes() {
       return {
         lineHeight: {

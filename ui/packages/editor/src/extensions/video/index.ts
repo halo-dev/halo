@@ -61,6 +61,64 @@ export const ExtensionVideo = Node.create<ExtensionVideoOptions>({
 
   group: "block",
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "A video player for a referenced video resource, normally used as the media child of a figure. Standalone videos are legacy content that the editor may normalize into a figure.",
+        exposure: "available",
+        useWhen: ["Embedding a relevant video with a known URL."],
+        avoidWhen: ["No accessible video source is available."],
+        attributeGuidance: {
+          src: {
+            description: "URL of the video resource.",
+            format: "absolute or site-relative URL",
+          },
+          width: {
+            description: "Rendered video width.",
+            format: "HTML dimension or CSS length",
+            examples: ["100%", "720px"],
+          },
+          height: {
+            description: "Rendered video height.",
+            format: "HTML dimension or CSS length",
+            examples: ["auto", "405px"],
+          },
+          autoplay: {
+            description: "Whether playback starts automatically.",
+            allowedValues: [true, false],
+            omitWhen: ["User-initiated playback is preferred."],
+          },
+          controls: {
+            description: "Whether native playback controls are visible.",
+            allowedValues: [true, false],
+          },
+          loop: {
+            description: "Whether playback restarts after reaching the end.",
+            allowedValues: [true, false],
+            omitWhen: ["The video should play once."],
+          },
+          file: {
+            description:
+              "Editor-only upload state that is not part of persisted article HTML.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Use a stable accessible URL; uploading a local file requires a separate plugin capability.",
+            "Place the video inside a figure and keep the figure contentType set to video.",
+          ],
+        },
+        examples: [
+          '<figure data-content-type="video"><video src="https://example.com/video.mp4" width="100%" controls></video></figure>',
+          '<figure data-content-type="video"><video src="https://example.com/loop.mp4" width="640px" height="360px" controls loop></video></figure>',
+        ],
+      },
+    };
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),

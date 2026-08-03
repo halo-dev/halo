@@ -8,6 +8,7 @@ import DropdownItem from "@/components/base/DropdownItem.vue";
 import BubbleButton from "@/components/bubble/BubbleButton.vue";
 import { i18n } from "@/locales";
 import type { BubbleItemComponentProps } from "@/types";
+import { DEFAULT_GALLERY_LAYOUT, GALLERY_LAYOUT_SQUARE } from "./constants";
 import { ExtensionGallery } from "./index";
 
 const props = defineProps<BubbleItemComponentProps>();
@@ -15,18 +16,21 @@ const props = defineProps<BubbleItemComponentProps>();
 const dropdownRef = ref();
 
 const layout = computed(() => {
-  return props.editor.getAttributes(ExtensionGallery.name).layout || "auto";
+  return (
+    props.editor.getAttributes(ExtensionGallery.name).layout ||
+    DEFAULT_GALLERY_LAYOUT
+  );
 });
 
 const options = [
   {
     label: i18n.global.t("editor.extensions.gallery.layout.auto"),
-    value: "auto",
+    value: DEFAULT_GALLERY_LAYOUT,
     icon: MingcuteLayout10Line,
   },
   {
     label: i18n.global.t("editor.extensions.gallery.layout.square"),
-    value: "square",
+    value: GALLERY_LAYOUT_SQUARE,
     icon: MingcuteLayoutGridLine,
   },
 ];

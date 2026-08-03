@@ -13,6 +13,21 @@ export type ExtensionSubscriptOptions = Partial<SubscriptExtensionOptions> &
 
 export const ExtensionSubscript =
   TiptapSubscript.extend<ExtensionSubscriptOptions>({
+    addHaloEditorMetadata() {
+      return {
+        ai: {
+          description:
+            "Inline subscript text for chemical formulas and similar notation.",
+          exposure: "available",
+          useWhen: ["Writing a subscript such as the 2 in H2O."],
+          generation: {
+            mode: "direct-html",
+          },
+          examples: ["<p>H<sub>2</sub>O</p>"],
+        },
+      };
+    },
+
     addOptions() {
       return {
         ...this.parent?.(),

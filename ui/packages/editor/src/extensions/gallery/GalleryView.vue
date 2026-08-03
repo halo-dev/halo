@@ -6,6 +6,11 @@ import { computed, ref } from "vue";
 import MingcuteDelete2Line from "@/components/icon/MingcuteDelete2Line.vue";
 import { i18n } from "@/locales";
 import { NodeViewWrapper, type NodeViewProps } from "@/tiptap";
+import {
+  DEFAULT_GALLERY_GROUP_SIZE,
+  DEFAULT_GALLERY_LAYOUT,
+  GALLERY_LAYOUT_SQUARE,
+} from "./constants";
 import type { ExtensionGalleryImageItem } from "./index";
 import { useUploadGalleryImage } from "./useGalleryImages";
 
@@ -53,11 +58,15 @@ function handleImageLoad(event: Event, index: number) {
 }
 
 const groupSize = computed<number>(() => {
-  return props.node?.attrs.groupSize || props.extension.options?.groupSize || 3;
+  return (
+    props.node?.attrs.groupSize ||
+    props.extension.options?.groupSize ||
+    DEFAULT_GALLERY_GROUP_SIZE
+  );
 });
 
 const layout = computed<string>(() => {
-  return props.node?.attrs.layout || "auto";
+  return props.node?.attrs.layout || DEFAULT_GALLERY_LAYOUT;
 });
 
 const gap = computed<number>(() => {
@@ -219,10 +228,10 @@ function onAttachmentSelect(attachments: AttachmentLike[]) {
           draggable="true"
           class="group/image relative cursor-grab transition-all active:cursor-grabbing"
           :class="{
-            'aspect-1': layout === 'square',
+            'aspect-1': layout === GALLERY_LAYOUT_SQUARE,
           }"
           :style="{
-            flex: `${layout === 'square' ? '1' : image.aspectRatio} 1 0%`,
+            flex: `${layout === GALLERY_LAYOUT_SQUARE ? '1' : image.aspectRatio} 1 0%`,
           }"
           @dragstart="
             handleDragStart(groupIndex * groupSize + imgIndex, $event)

@@ -51,6 +51,70 @@ export const ExtensionIframe = Node.create<ExtensionOptions>({
     return "inline";
   },
 
+  addHaloEditorMetadata() {
+    return {
+      ai: {
+        description:
+          "An inline iframe embed for a trusted external page or application inside a text block.",
+        aliases: ["embed"],
+        exposure: "available",
+        useWhen: [
+          "Embedding a trusted page that cannot be represented natively.",
+        ],
+        avoidWhen: [
+          "The source is untrusted or a native link or media component is sufficient.",
+        ],
+        attributeGuidance: {
+          src: {
+            description: "Trusted URL loaded by the iframe.",
+            format: "allowed absolute URL",
+          },
+          width: {
+            description: "Rendered iframe width.",
+            format: "HTML dimension or CSS length",
+            examples: ["100%", "720px"],
+          },
+          height: {
+            description: "Rendered iframe height.",
+            format: "HTML dimension or CSS length",
+            examples: ["300px", "480px"],
+          },
+          scrolling: {
+            description: "Legacy iframe scrolling behavior.",
+            allowedValues: ["yes", "no", "auto", null],
+            omitWhen: ["Browser defaults are appropriate."],
+          },
+          frameborder: {
+            description: "Legacy iframe border setting.",
+            allowedValues: ["0", "1"],
+          },
+          allowfullscreen: {
+            description: "Whether embedded content may enter fullscreen.",
+            allowedValues: [true, false],
+          },
+          framespacing: {
+            description: "Legacy spacing around the iframe in pixels.",
+            examples: [0],
+            omitWhen: ["Modern CSS layout controls spacing."],
+          },
+          style: {
+            description: "Editor-managed display style for the iframe element.",
+            omitWhen: ["Generating or editing persisted article content."],
+          },
+        },
+        generation: {
+          mode: "direct-html",
+          guidelines: [
+            "Only use a trusted URL accepted by the editor's URI policy.",
+          ],
+        },
+        examples: [
+          '<p><iframe src="https://example.com/embed" width="100%" height="300px" frameborder="0" allowfullscreen></iframe></p>',
+        ],
+      },
+    };
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),
