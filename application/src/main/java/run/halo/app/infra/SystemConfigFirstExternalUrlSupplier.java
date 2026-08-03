@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import reactor.core.Exceptions;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.utils.ExternalUrlUtils;
 
 /**
  * Default implementation for getting external url from system config first, halo properties second.
@@ -50,7 +51,7 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
 
     @EventListener
     void onExternalUrlChanged(ExternalUrlChangedEvent event) {
-        this.externalUrl = event.getExternalUrl();
+        this.externalUrl = normalizeUrl(event.getExternalUrl());
     }
 
     Optional<URL> refetchExternalUrl() {
@@ -60,7 +61,8 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
                 .filter(StringUtils::hasText)
                 .mapNotNull(externalUrlString -> {
                     try {
-                        return URI.create(externalUrlString).toURL();
+                        return URI.create(ExternalUrlUtils.toAscii(externalUrlString))
+                                .toURL();
                     } catch (MalformedURLException e) {
                         log.error("""
                         Cannot parse external URL {} from system config. Fallback to default \
@@ -80,9 +82,9 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
                 return URI.create(getBasePath());
             }
             if (externalUrl != null) {
-                return externalUrl.toURI();
+                return normalizeUrl(externalUrl).toURI();
             }
-            return haloProperties.getExternalUrl().toURI();
+            return normalizeUrl(haloProperties.getExternalUrl()).toURI();
         } catch (URISyntaxException e) {
             throw Exceptions.propagate(e);
         }
@@ -91,14 +93,14 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     @Override
     public URL getURL(HttpRequest request) {
         if (this.externalUrl != null) {
-            return this.externalUrl;
+            return normalizeUrl(this.externalUrl);
         }
-        var externalUrl = haloProperties.getExternalUrl();
+        var externalUrl = normalizeUrl(haloProperties.getExternalUrl());
         if (externalUrl != null) {
             return externalUrl;
         }
         try {
-            externalUrl = request.getURI().resolve(getBasePath()).toURL();
+            externalUrl = normalizeUrl(request.getURI().resolve(getBasePath()).toURL());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Cannot parse request URI to URL.", e);
         }
@@ -108,7 +110,26 @@ class SystemConfigFirstExternalUrlSupplier implements ExternalUrlSupplier {
     @Nullable
     @Override
     public URL getRaw() {
-        return externalUrl != null ? externalUrl : haloProperties.getExternalUrl();
+        return normalizeUrl(externalUrl != null ? externalUrl : haloProperties.getExternalUrl());
+    }
+
+    @Nullable
+    private static URL normalizeUrl(@Nullable URL externalUrl) {
+        if (externalUrl == null) {
+            return null;
+        }
+        var externalUrlString = externalUrl.toString();
+        var normalizedUrlString = ExternalUrlUtils.toAscii(externalUrlString);
+        if (normalizedUrlString.equals(externalUrlString)) {
+            return externalUrl;
+        }
+        try {
+            return URI.create(normalizedUrlString).toURL();
+        } catch (IllegalArgumentException | MalformedURLException e) {
+            // Keep the original URL if the normalized URL cannot be parsed as a URI.
+            log.debug("Failed to normalize external URL: {}", externalUrlString, e);
+            return externalUrl;
+        }
     }
 
     private String getBasePath() {
