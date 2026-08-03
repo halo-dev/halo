@@ -94,7 +94,7 @@ class LoginReactiveAuthenticationManagerTest {
 
     @Test
     void shouldAuthenticateByEmailWithCorrectPassword() {
-        // tryByUsername skips @ input, goes directly to tryByEmail
+        // email lookup is attempted first for @ input
         var emailUser = createUserExtension("actualuser");
         when(userService.findUserByVerifiedEmail("test@example.com")).thenReturn(Mono.just(emailUser));
 
@@ -109,13 +109,16 @@ class LoginReactiveAuthenticationManagerTest {
                 .assertNext(auth -> assertEquals(userDetails, auth.getPrincipal()))
                 .verifyComplete();
 
-        // @ input bypasses username lookup entirely
+        // a resolved email lookup wins, so the raw identifier is never treated as a username
         verify(userDetailsService, never()).findByUsername("test@example.com");
     }
 
     @Test
     void shouldFailWhenEmailNotFound() {
         when(userService.findUserByVerifiedEmail("test@example.com")).thenReturn(Mono.empty());
+        // username lookup acts as the generic fallback, and missing usernames error with BadCredentialsException
+        when(userDetailsService.findByUsername("test@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("test@example.com", "password");
 
@@ -130,10 +133,32 @@ class LoginReactiveAuthenticationManagerTest {
         var userDetails = createUserDetails("actualuser", "encoded-password");
         when(userDetailsService.findByUsername("actualuser")).thenReturn(Mono.just(userDetails));
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(false);
+        // wrong password on the email strategy falls through to the username strategy, which cannot
+        // resolve an email address and errors with BadCredentialsException
+        when(userDetailsService.findByUsername("test@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("test@example.com", "password");
 
         StepVerifier.create(result).expectError(BadCredentialsException.class).verify();
+
+        verify(userDetailsService).findByUsername("test@example.com");
+    }
+
+    @Test
+    void shouldFallBackToUsernameLookupWhenEmailNotVerified() {
+        when(userService.findUserByVerifiedEmail("alice@example.com")).thenReturn(Mono.empty());
+
+        var userDetails = createUserDetails("alice@example.com", "encoded-password");
+        when(userDetailsService.findByUsername("alice@example.com")).thenReturn(Mono.just(userDetails));
+        when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
+        stubPasswordService();
+
+        var result = authenticate("alice@example.com", "password");
+
+        StepVerifier.create(result)
+                .assertNext(auth -> assertEquals(userDetails, auth.getPrincipal()))
+                .verifyComplete();
     }
 
     // ── Password upgrade ───────────────────────────────────────────
@@ -209,6 +234,8 @@ class LoginReactiveAuthenticationManagerTest {
     @Test
     void shouldFailWhenAllStrategiesExhaustedForEmail() {
         when(userService.findUserByVerifiedEmail("unknown@example.com")).thenReturn(Mono.empty());
+        when(userDetailsService.findByUsername("unknown@example.com"))
+                .thenReturn(Mono.error(new BadCredentialsException("Invalid Credentials")));
 
         var result = authenticate("unknown@example.com", "password");
 
