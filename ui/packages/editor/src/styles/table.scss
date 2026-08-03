@@ -1,72 +1,114 @@
+.halo-table-wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+
+  > table {
+    display: table;
+  }
+
+  > table[data-table-layout="auto"] {
+    width: 100%;
+    min-width: 100%;
+    table-layout: auto;
+
+    > colgroup > col {
+      width: auto !important;
+    }
+
+    tr > :last-child > .table-add-column:not(.table-add-leading) {
+      right: 0;
+    }
+  }
+
+  > table[data-table-layout="fixed"] {
+    table-layout: fixed;
+  }
+}
+
+.table-menu-popper {
+  --halo-table-menu-background: #fff;
+  --halo-table-menu-border: #d1d5db;
+  --halo-table-menu-text: #4b5563;
+  --halo-table-menu-text-active: #111827;
+  --halo-table-menu-muted: #6b7280;
+  --halo-table-menu-hover: #f3f4f6;
+  --halo-table-menu-segment-background: #f3f4f6;
+  --halo-table-menu-segment-hover: rgb(255 255 255 / 72%);
+  --halo-table-menu-segment-active-border: #d1d5db;
+  --halo-table-control-active: #2584ff;
+
+  .v-popper__inner {
+    overflow: hidden;
+    border-color: var(--halo-table-menu-border) !important;
+    border-radius: 0.5rem !important;
+    background: var(--halo-table-menu-background) !important;
+    color: var(--halo-table-menu-text);
+    padding: 0 !important;
+  }
+}
+
 .halo-rich-text-editor {
-  $tableBorderColor: #d8d8d8;
-  $tableHeaderBgColor: #f6f8fa;
-  $tableSelectedBorderColor: rgb(0 101 255);
-  $tableSelectedCellBgColor: transparent;
-  $tableResizeHandleBgColor: #adf;
+  --halo-table-border-color: #d8d8d8;
+  --halo-table-header-background: #f6f8fa;
+  --halo-table-cell-background: #fff;
+  --halo-table-control-background: #e5e7eb;
+  --halo-table-control-active: #2584ff;
+  --halo-table-control-active-soft: rgb(37 132 255 / 16%);
+  --halo-table-selection: #0065ff;
+  --halo-table-selection-soft: #dbeafe;
+  --halo-table-resize-handle: #adf;
+  --halo-table-menu-background: #fff;
+  --halo-table-menu-border: #d1d5db;
+  --halo-table-menu-text: #4b5563;
+  --halo-table-menu-text-active: #111827;
+  --halo-table-menu-muted: #6b7280;
+  --halo-table-menu-hover: #f3f4f6;
+  --halo-table-menu-segment-background: #f3f4f6;
+  --halo-table-menu-segment-hover: rgb(255 255 255 / 72%);
+  --halo-table-menu-segment-active-border: #d1d5db;
 
   .ProseMirror {
-    .table-container {
+    .halo-table-wrapper {
       position: relative;
-
-      &.table-right-shadow {
-        &::after {
-          bottom: 15px;
-          background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08));
-          right: 0;
-          content: " ";
-          position: absolute;
-          pointer-events: none;
-          top: 0;
-          width: 8px;
-          margin-top: 27px;
-        }
-      }
-
-      &.table-left-shadow {
-        &::before {
-          bottom: 15px;
-          background: linear-gradient(-90deg, transparent, rgba(0, 0, 0, 0.08));
-          left: 0;
-          content: " ";
-          position: absolute;
-          pointer-events: none;
-          top: 0;
-          width: 8px;
-          margin-top: 27px;
-        }
-      }
-    }
-
-    .tableWrapper {
-      position: relative;
-      overflow-x: auto;
-      overflow-y: hidden;
+      margin-block: 1rem;
+      padding-block-start: 1.125rem;
+      padding-inline-start: 1.125rem;
       cursor: default;
 
-      &.has-focus {
-        .scrollWrapper {
-          margin-top: -20px;
-        }
+      &.table-right-shadow::after,
+      &.table-left-shadow::before {
+        position: sticky;
+        z-index: 3;
+        top: 0;
+        bottom: 0;
+        display: block;
+        width: 0.5rem;
+        height: 100%;
+        content: "";
+        pointer-events: none;
       }
-    }
 
-    .scrollWrapper {
-      width: max-content;
-      border-left: 1px solid transparent;
-      border-right: 1px solid transparent;
-      -webkit-transition: border 250ms ease-in-out 0s;
-      transition: border 250ms ease-in-out 0s;
+      &.table-right-shadow::after {
+        right: 0;
+        float: right;
+        background: linear-gradient(90deg, transparent, rgb(0 0 0 / 8%));
+      }
+
+      &.table-left-shadow::before {
+        left: 0;
+        float: left;
+        background: linear-gradient(-90deg, transparent, rgb(0 0 0 / 8%));
+      }
     }
 
     table {
-      width: 100%;
       border-collapse: collapse;
-      border-radius: 4px;
-      overflow: initial;
-      padding-left: 12px;
-      padding-top: 12px;
-
+      border-radius: 0.25rem;
       box-sizing: border-box;
 
       * {
@@ -75,260 +117,210 @@
 
       tr {
         position: relative;
-        border-bottom: 1px solid $tableBorderColor;
         cursor: text;
       }
 
       th {
-        background: $tableHeaderBgColor;
+        background: var(--halo-table-header-background);
       }
 
       td {
-        background: #fff;
+        background: var(--halo-table-cell-background);
       }
 
       td,
       th {
         position: relative;
-        vertical-align: top;
-        border: 1px solid $tableBorderColor;
-        position: relative;
-        padding: 12px 8px;
+        min-width: 1.5rem;
+        border: 1px solid var(--halo-table-border-color);
+        padding: 0.75rem 0.5rem;
         text-align: left;
-        min-width: 100px;
+        vertical-align: top;
 
         > * {
-          margin-top: 0;
-          margin-bottom: 0;
+          margin-block: 0;
         }
       }
 
       .selectedCell {
         position: relative;
-        border: 1px solid $tableSelectedBorderColor;
 
         &::after {
-          box-sizing: content-box;
-          height: 100%;
-          width: 100%;
-          border: 1px solid $tableSelectedBorderColor;
-          content: "";
           position: absolute;
-          left: -1px;
-          top: -1px;
-          bottom: 0px;
-          display: inline-block;
+          inset: -1px;
+          display: block;
+          border: 2px solid var(--halo-table-selection);
+          content: "";
           pointer-events: none;
         }
       }
     }
 
-    .grip-column {
+    .grip-column,
+    .grip-row,
+    .grip-table,
+    .table-add-control,
+    .row-resize-handle {
       position: absolute;
-      top: -12px;
-      left: -1px;
+      z-index: 4;
+      margin: 0;
+      border: 1px solid transparent;
+      background: var(--halo-table-control-background);
+      opacity: 0.68;
+      transition:
+        background-color 120ms,
+        border-color 120ms,
+        opacity 120ms,
+        box-shadow 120ms;
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--halo-table-control-active);
+        background: var(--halo-table-control-active-soft);
+        opacity: 1;
+        outline: none;
+      }
+
+      &.selected {
+        border-color: var(--halo-table-control-active);
+        background: var(--halo-table-control-active-soft);
+        opacity: 1;
+      }
+
+      &.dragging,
+      &.drag-target {
+        border-color: var(--halo-table-control-active);
+        background: var(--halo-table-control-active);
+        opacity: 1;
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 2px rgb(37 132 255 / 30%);
+      }
+    }
+
+    .grip-column {
+      top: -0.875rem;
+      left: 0;
       width: 100%;
+      height: 0.375rem;
+      border-radius: 0.25rem;
+      cursor: grab;
 
-      > div {
-        position: absolute;
-        top: -18px;
-        left: 100%;
-        transform: translateX(-8px);
-
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-
-        font-size: 0;
-        cursor: pointer;
-
-        .plus-icon {
-          font-size: inherit;
-        }
+      &.first {
+        border-start-start-radius: 0.25rem;
       }
 
-      &::before {
-        content: "";
-        position: absolute;
-        left: 100%;
-        bottom: 4px;
-        transform: translateX(-1px);
-
-        width: 4px;
-        height: 4px;
-        background-color: #d8d8d8;
-        border-radius: 50%;
-        display: block;
-      }
-
-      &::after {
-        box-sizing: content-box;
-        content: "";
-        cursor: pointer;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 10px;
-        background: #f6f8fa;
-        border: 1px solid #d8d8d8;
-        display: block;
-      }
-
-      &:hover {
-        color: rgb(0 101 255);
-
-        > div {
-          font-size: 14px;
-        }
-
-        &::before {
-          display: none;
-        }
-
-        &::after {
-          background: #2584ff;
-          border-color: #2584ff;
-        }
-      }
-
-      &.last::after {
-        border-top-right-radius: 3px;
-      }
-
-      &.selected::after {
-        background: #2584ff;
-        border-color: #2584ff;
+      &.last {
+        border-start-end-radius: 0.25rem;
       }
     }
 
     .grip-row {
-      position: absolute;
-      left: -12px;
-      top: -1px;
+      top: 0;
+      left: -0.875rem;
+      width: 0.375rem;
       height: 100%;
+      border-radius: 0.25rem;
+      cursor: grab;
 
-      > div {
-        transform: translateY(8px);
-        position: absolute;
-        left: -16px;
-        bottom: 4px;
-
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-
-        font-size: 0;
-        cursor: pointer;
-
-        .plus-icon {
-          font-size: inherit;
-        }
+      &.first {
+        border-start-start-radius: 0.25rem;
       }
 
-      &::before {
-        content: "";
-        position: absolute;
-        left: -10px;
-        bottom: -2px;
-        width: 4px;
-        height: 4px;
-        background-color: #d8d8d8;
-        border-radius: 50%;
-        display: block;
-      }
-
-      &::after {
-        box-sizing: content-box;
-        content: "";
-        cursor: pointer;
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 10px;
-        background: #f6f8fa;
-        border: 1px solid #d8d8d8;
-        display: block;
-      }
-
-      &:hover {
-        color: rgb(0 101 255);
-
-        > div {
-          font-size: 14px;
-        }
-
-        &::before {
-          display: none;
-        }
-
-        &::after {
-          background: #2584ff;
-          border-color: rgb(0 101 255);
-        }
-      }
-
-      &.last::after {
-        border-bottom-left-radius: 3px;
-      }
-
-      &.selected::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
-      }
-    }
-
-    .row-resize-handle {
-      position: absolute;
-      left: 0;
-      right: -2px;
-      bottom: -2px;
-      z-index: 2;
-      height: 4px;
-      background-color: transparent;
-      cursor: row-resize;
-
-      &:hover,
-      &.active {
-        background-color: $tableResizeHandleBgColor;
+      &.last {
+        border-end-start-radius: 0.25rem;
       }
     }
 
     .grip-table {
+      top: -0.9375rem;
+      left: -0.9375rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+    }
+
+    .table-add-control {
+      z-index: 5;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      opacity: 0;
+
+      &::before,
       &::after {
-        box-sizing: content-box;
-        content: "";
-        cursor: pointer;
         position: absolute;
-        top: -12px;
-        left: -12px;
-        display: block;
-        background: #f6f8fa;
-        width: 10px;
-        height: 10px;
-        border: 1px solid #d8d8d8;
-        border-top-left-radius: 3px;
+        top: 50%;
+        left: 50%;
+        width: 0.5rem;
+        height: 1px;
+        background: currentColor;
+        content: "";
+        transform: translate(-50%, -50%);
       }
 
-      &:hover::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
+      &::after {
+        transform: translate(-50%, -50%) rotate(90deg);
       }
 
-      &.selected::after {
-        background: #2584ff;
-        border-color: rgb(0 101 255);
+      &:focus-visible {
+        opacity: 1;
+      }
+    }
+
+    td:hover > .table-add-control,
+    th:hover > .table-add-control {
+      opacity: 1;
+    }
+
+    .table-add-column {
+      top: -1.1875rem;
+      right: -0.5rem;
+
+      &.table-add-leading {
+        right: auto;
+        left: -0.5rem;
+      }
+    }
+
+    .table-add-row {
+      right: auto;
+      bottom: -0.5rem;
+      left: -1.1875rem;
+
+      &.table-add-leading {
+        top: -0.5rem;
+        bottom: auto;
+      }
+    }
+
+    .row-resize-handle {
+      right: 0;
+      bottom: -2px;
+      left: 0;
+      height: 4px;
+      border: 0;
+      background: transparent;
+      cursor: row-resize;
+      opacity: 1;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--halo-table-resize-handle);
       }
     }
 
     .column-resize-handle {
       position: absolute;
+      z-index: 5;
       top: 0;
       right: -2px;
       bottom: -2px;
       width: 4px;
-      background-color: $tableResizeHandleBgColor;
+      background: var(--halo-table-resize-handle);
       cursor: col-resize;
     }
 
@@ -336,6 +328,59 @@
     &.table-row-resizing * {
       cursor: row-resize !important;
       user-select: none;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .table-menu-popper {
+    --halo-table-menu-background: #111827;
+    --halo-table-menu-border: #4b5563;
+    --halo-table-menu-text: #d1d5db;
+    --halo-table-menu-text-active: #f9fafb;
+    --halo-table-menu-muted: #9ca3af;
+    --halo-table-menu-hover: #374151;
+    --halo-table-menu-segment-background: #1f2937;
+    --halo-table-menu-segment-hover: rgb(55 65 81 / 72%);
+    --halo-table-menu-segment-active-border: #4b5563;
+  }
+
+  .halo-rich-text-editor {
+    --halo-table-border-color: #4b5563;
+    --halo-table-header-background: #1f2937;
+    --halo-table-cell-background: #111827;
+    --halo-table-control-background: #374151;
+    --halo-table-menu-background: #111827;
+    --halo-table-menu-border: #4b5563;
+    --halo-table-menu-text: #d1d5db;
+    --halo-table-menu-text-active: #f9fafb;
+    --halo-table-menu-muted: #9ca3af;
+    --halo-table-menu-hover: #374151;
+    --halo-table-menu-segment-background: #1f2937;
+    --halo-table-menu-segment-hover: rgb(55 65 81 / 72%);
+    --halo-table-menu-segment-active-border: #4b5563;
+    --halo-table-selection-soft: #1e3a5f;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .halo-rich-text-editor .ProseMirror {
+    .grip-column,
+    .grip-row,
+    .grip-table,
+    .table-add-control {
+      min-width: 1.25rem;
+      min-height: 1.25rem;
+      opacity: 0.9;
+    }
+
+    .table-add-control {
+      opacity: 1;
+    }
+
+    .halo-table-wrapper {
+      padding-block-start: 1.75rem;
+      padding-inline-start: 1.5rem;
     }
   }
 }

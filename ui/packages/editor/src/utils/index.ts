@@ -7,5 +7,6 @@ export * from "./is-allowed-uri";
 export * from "./is-list-active";
 export * from "./is-node-empty";
 export * from "./keyboard";
+export * from "./table";
 export * from "./upload";
 export * from "./get-cursor-coords";

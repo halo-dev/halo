@@ -1,6 +1,11 @@
-import { TableRow as BuiltInTableRow } from "@tiptap/extension-table";
+import {
+  TableRow as TiptapTableRow,
+  type TableRowOptions,
+} from "@tiptap/extension-table";
+import { mergeAttributes } from "@/tiptap";
+import { joinStyles, parseRowHeight } from "./attributes";
 
-const TableRow = BuiltInTableRow.extend({
+export const TableRow = TiptapTableRow.extend<TableRowOptions>({
   allowGapCursor: false,
 
   addHaloEditorMetadata() {
@@ -13,11 +18,10 @@ const TableRow = BuiltInTableRow.extend({
         useWhen: ["Adding one record or header row to a table."],
         avoidWhen: ["There is no containing table."],
         attributeGuidance: {
-          style: {
-            description:
-              "CSS declarations for row presentation, including height.",
-            format: "CSS declarations",
-            examples: ["height: 60px;"],
+          rowHeight: {
+            description: "Height of the row in pixels.",
+            format: "number of pixels",
+            examples: [60],
             omitWhen: ["Default row sizing is appropriate."],
           },
         },
@@ -40,11 +44,32 @@ const TableRow = BuiltInTableRow.extend({
 
   addAttributes() {
     return {
-      style: {
-        default: "height: 60px;",
-        parseHTML: (element: HTMLElement) => element.getAttribute("style"),
+      ...this.parent?.(),
+      rowHeight: {
+        default: null,
+        parseHTML: parseRowHeight,
+        renderHTML: () => ({}),
       },
     };
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    const rowHeight = node.attrs.rowHeight as number | null;
+    const attributes = mergeAttributes(
+      this.options.HTMLAttributes,
+      HTMLAttributes,
+      rowHeight
+        ? {
+            "data-row-height": String(rowHeight),
+            style: joinStyles(
+              HTMLAttributes.style as string | undefined,
+              `height: ${rowHeight}px`
+            ),
+          }
+        : {}
+    );
+
+    return ["tr", attributes, 0];
   },
 });
 
