@@ -251,7 +251,7 @@ class PreAuthOAuth2Endpoint {
         spec.setEmailVerified(true);
         spec.setRegisteredAt(clock.instant());
 
-        Mono<Void> emailCheck = Mono.empty();
+        Mono<Void> emailCheck;
         if (StringUtils.hasText(email)) {
             emailCheck = userService
                     .findUserByVerifiedEmail(email)
@@ -259,21 +259,26 @@ class PreAuthOAuth2Endpoint {
                     .filter(has -> !has)
                     .switchIfEmpty(Mono.error(() -> new EmailAlreadyTakenException("Email already taken")))
                     .then();
+        } else {
+            emailCheck = Mono.empty();
         }
-        return emailCheck
-                .then(Mono.defer(() -> userService.createUser(user, Set.of(setting.getDefaultRole()))))
-                .flatMap(created -> connectionService.createUserConnection(
-                        created.getMetadata().getName(), registrationId, oauth2User))
-                .flatMap(connection ->
-                        userDetailsService.findByUsername(connection.getSpec().getUsername()))
-                .map(userDetails -> authenticated(userDetails, token))
-                .flatMap(haloOAuth2Token -> {
-                    var securityContext = new SecurityContextImpl(haloOAuth2Token);
-                    return securityContextRepository
-                            .save(exchange, securityContext)
-                            .then(loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token))
-                            .then(authenticationCache.removeToken(exchange));
-                })
+        return connectionService
+                .getByProviderUserId(registrationId, oauth2User.getName())
+                .flatMap(connection -> Mono.<Void>error(() -> new OAuth2UserAlreadyBoundException(connection)))
+                .switchIfEmpty(Mono.defer(() -> emailCheck
+                        .then(Mono.defer(() -> userService.createUser(user, Set.of(setting.getDefaultRole()))))
+                        .flatMap(created -> connectionService.createUserConnection(
+                                created.getMetadata().getName(), registrationId, oauth2User))
+                        .flatMap(connection -> userDetailsService.findByUsername(
+                                connection.getSpec().getUsername()))
+                        .map(userDetails -> authenticated(userDetails, token))
+                        .flatMap(haloOAuth2Token -> {
+                            var securityContext = new SecurityContextImpl(haloOAuth2Token);
+                            return securityContextRepository
+                                    .save(exchange, securityContext)
+                                    .then(loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token))
+                                    .then(authenticationCache.removeToken(exchange));
+                        })))
                 .then();
     }
 

@@ -102,6 +102,7 @@ class PreAuthOAuth2EndpointTest {
         when(agreementPageFetcher.fetchAgreementPages()).thenReturn(Mono.just(List.of()));
         when(authenticationCache.getToken(any())).thenReturn(Mono.empty());
         when(userService.findUserByVerifiedEmail(anyString())).thenReturn(Mono.empty());
+        when(connectionService.getByProviderUserId(anyString(), anyString())).thenReturn(Mono.empty());
         when(securityContextRepository.save(any(), any())).thenReturn(Mono.empty());
         when(loginHandlerEnhancer.onLoginSuccess(any(), any())).thenReturn(Mono.empty());
         when(authenticationCache.removeToken(any())).thenReturn(Mono.empty());
@@ -250,6 +251,57 @@ class PreAuthOAuth2EndpointTest {
         verify(securityContextRepository).save(any(), any());
         verify(loginHandlerEnhancer).onLoginSuccess(any(), any());
         verify(authenticationCache).removeToken(any());
+    }
+
+    @Test
+    void shouldNotCreateUserWhenConnectionAlreadyBound() {
+        when(authenticationCache.getToken(any())).thenReturn(Mono.just(token()));
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(userSetting(true)));
+
+        var existingConnection = new UserConnection();
+        existingConnection.setMetadata(new Metadata());
+        existingConnection.getMetadata().setName("existing-conn");
+        var spec = new UserConnection.UserConnectionSpec();
+        spec.setUsername("other-user");
+        spec.setProviderUserId("johnniang");
+        spec.setRegistrationId("github");
+        spec.setUpdatedAt(Instant.parse("2026-07-31T09:00:00Z"));
+        existingConnection.setSpec(spec);
+        when(connectionService.getByProviderUserId(eq("github"), eq("johnniang")))
+                .thenReturn(Mono.just(existingConnection));
+
+        var createdUser = new User();
+        createdUser.setMetadata(new Metadata());
+        createdUser.getMetadata().setName("johnniang");
+        when(userService.createUser(any(User.class), anySet())).thenReturn(Mono.just(createdUser));
+
+        var connection = new UserConnection();
+        connection.setMetadata(new Metadata());
+        connection.getMetadata().setName("conn-1");
+        var connectionSpec = new UserConnection.UserConnectionSpec();
+        connectionSpec.setUsername("johnniang");
+        connection.setSpec(connectionSpec);
+        when(connectionService.createUserConnection(eq("johnniang"), eq("github"), any()))
+                .thenReturn(Mono.just(connection));
+
+        var userDetails = org.springframework.security.core.userdetails.User.withUsername("johnniang")
+                .password("")
+                .authorities("ROLE_test-role")
+                .build();
+        when(userDetailsService.findByUsername("johnniang")).thenReturn(Mono.just(userDetails));
+
+        webClient
+                .post()
+                .uri("/login/oauth2/register")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("username=johnniang&displayName=John+Niang")
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(userService, never()).createUser(any(), anySet());
+        verify(connectionService, never()).createUserConnection(anyString(), anyString(), any());
     }
 
     @Test
