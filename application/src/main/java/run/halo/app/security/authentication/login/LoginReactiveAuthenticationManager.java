@@ -39,9 +39,8 @@ class LoginReactiveAuthenticationManager implements ReactiveAuthenticationManage
         var credentials = authentication.getCredentials();
         var password = credentials != null ? credentials.toString() : null;
 
-        return Flux.concat(
-                        Mono.defer(() -> lookupByEmail(loginId)).publishOn(Schedulers.boundedElastic()),
-                        Mono.defer(() -> lookupByUsername(loginId)).publishOn(Schedulers.boundedElastic()))
+        return Flux.concat(Mono.defer(() -> lookupByEmail(loginId)), Mono.defer(() -> lookupByUsername(loginId)))
+                .publishOn(Schedulers.boundedElastic())
                 .filter(userDetails -> password != null && passwordEncoder.matches(password, userDetails.getPassword()))
                 .next()
                 .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
