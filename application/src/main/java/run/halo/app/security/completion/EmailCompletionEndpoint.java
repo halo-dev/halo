@@ -144,6 +144,9 @@ class EmailCompletionEndpoint {
                     });
         }
         user.getSpec().setEmail(email);
+        // The new email has not been verified; reset the flag so the user must verify it
+        // before it can be used for password reset.
+        user.getSpec().setEmailVerified(false);
         return client.update(user).then(redirectToTarget(exchange));
     }
 

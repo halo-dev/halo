@@ -42,6 +42,7 @@
     <p class="alert alert-error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></p>
   </div>
 
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
   <div class="form-item">
     <button type="submit" th:text="#{form.submit}"></button>
   </div>

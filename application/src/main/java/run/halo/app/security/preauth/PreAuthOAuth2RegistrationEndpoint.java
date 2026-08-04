@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -42,6 +43,7 @@ import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
 
 /** Pre-auth endpoints for OAuth2 selection page and registration. */
 @Component
+@Slf4j
 class PreAuthOAuth2RegistrationEndpoint {
 
     private final OAuth2RegistrationService registrationService;
@@ -136,6 +138,7 @@ class PreAuthOAuth2RegistrationEndpoint {
                 .switchIfEmpty(Mono.defer(() -> ServerResponse.status(HttpStatus.FOUND)
                         .location(URI.create("/login"))
                         .build()))
+                .doOnError(e -> log.warn("Registration failed for OAuth2 user", e))
                 .onErrorResume(e -> ServerResponse.status(HttpStatus.FOUND)
                         .location(URI.create("/login?oauth2_select&error=registration-failed"))
                         .build());

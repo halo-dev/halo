@@ -20,6 +20,7 @@
       </th:block>
     </label>
   </div>
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
   <div class="form-item">
     <button type="submit" th:disabled="${!allowRegistration}" th:text="#{form.register}"></button>
   </div>

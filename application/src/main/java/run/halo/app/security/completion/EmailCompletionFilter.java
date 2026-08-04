@@ -2,6 +2,7 @@ package run.halo.app.security.completion;
 
 import java.net.URI;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /** Redirects or rejects authenticated users who must complete a verified email. */
+@Slf4j
 public class EmailCompletionFilter implements WebFilter {
 
     private static final URI EMAIL_NOT_SET_TYPE = URI.create("email-not-set");
@@ -93,6 +95,10 @@ public class EmailCompletionFilter implements WebFilter {
                     return userService
                             .getUser(authentication.getName())
                             .map(user -> !user.getSpec().isEmailVerified())
+                            .doOnError(e -> log.warn(
+                                    "Failed to check email verification status for user '{}'",
+                                    authentication.getName(),
+                                    e))
                             .onErrorReturn(false);
                 });
     }

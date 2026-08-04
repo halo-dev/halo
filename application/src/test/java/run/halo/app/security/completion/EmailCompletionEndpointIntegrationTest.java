@@ -120,6 +120,36 @@ class EmailCompletionEndpointIntegrationTest {
     }
 
     @Test
+    void shouldResetEmailVerifiedWhenSavingNewEmailWithoutCode() {
+        var setting = new SystemSetting.User();
+        setting.setMustVerifyEmailOnRegistration(false);
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting));
+
+        // Give the existing fake-user a verified email.
+        var user = client.fetch(User.class, "fake-user").block();
+        user.getSpec().setEmail("old@example.com");
+        user.getSpec().setEmailVerified(true);
+        client.update(user).block();
+
+        webClient
+                .post()
+                .uri("/complete-profile")
+                .bodyValue("email=new%40example.com")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .exchange()
+                .expectStatus()
+                .isFound()
+                .expectHeader()
+                .location("/uc");
+
+        var updated = client.fetch(User.class, "fake-user").block();
+        org.assertj.core.api.Assertions.assertThat(updated.getSpec().getEmail()).isEqualTo("new@example.com");
+        org.assertj.core.api.Assertions.assertThat(updated.getSpec().isEmailVerified())
+                .isFalse();
+    }
+
+    @Test
     void shouldSendEmailCode() {
         when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
                 .thenReturn(Mono.empty());
