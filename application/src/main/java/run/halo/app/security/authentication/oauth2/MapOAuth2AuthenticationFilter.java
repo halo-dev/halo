@@ -103,7 +103,7 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                                                     return logoutHandler.logout(webFilterExchange, oauth2Token);
                                                 }))
                                                 .then(Mono.defer(() -> redirectStrategy.sendRedirect(
-                                                        exchange, URI.create("/login?oauth2_bind"))))
+                                                        exchange, URI.create("/login?oauth2_select"))))
                                                 // skip handling
                                                 .then(Mono.empty());
                                     }))
