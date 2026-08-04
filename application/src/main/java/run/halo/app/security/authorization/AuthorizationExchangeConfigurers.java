@@ -53,6 +53,8 @@ class AuthorizationExchangeConfigurers {
     SecurityConfigurer preAuthenticationAuthorizationConfigurer() {
         return http -> http.authorizeExchange(spec -> spec.pathMatchers("/login/impersonate")
                 .hasRole(AuthorityUtils.SUPER_ROLE_NAME)
+                .pathMatchers("/complete-profile/**")
+                .authenticated()
                 .pathMatchers("/logout/impersonate")
                 .hasAuthority(SwitchUserWebFilter.ROLE_PREVIOUS_ADMINISTRATOR)
                 .pathMatchers("/challenges/**")
