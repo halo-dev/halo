@@ -2,6 +2,7 @@ package run.halo.app.infra.config;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
+import java.time.Clock;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -30,6 +31,8 @@ import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.impl.RsaKeyService;
+import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.WebSessionOAuth2AuthenticationTokenCache;
 import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
@@ -136,5 +139,15 @@ public class WebServerSecurityConfig {
     @Bean
     CryptoService cryptoService(HaloProperties haloProperties) {
         return new RsaKeyService(haloProperties.getWorkDir().resolve("keys"));
+    }
+
+    @Bean
+    OAuth2AuthenticationTokenCache oauth2AuthenticationTokenCache() {
+        return new WebSessionOAuth2AuthenticationTokenCache();
+    }
+
+    @Bean
+    Clock clock() {
+        return Clock.systemDefaultZone();
     }
 }
