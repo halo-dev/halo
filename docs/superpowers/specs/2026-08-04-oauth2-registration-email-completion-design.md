@@ -79,14 +79,14 @@
 
 ### 组件
 
-| 组件 | 职责 |
-| --- | --- |
-| `OAuth2RegistrationService`（新） | 注册核心逻辑：用户名/显示名/邮箱推导、随机兜底、幂等、创建用户与连接。可独立单元测试。 |
-| 预认证端点（新，`/login` 下） | 渲染 `/login?oauth2_select`；处理 `POST /login/oauth2/register`。 |
-| `EmailCompletionFilter`（新） | 门禁 WebFilter，插在认证过滤器之后。 |
-| 补邮箱端点（新，`/complete-profile` 下） | 渲染页面、发送验证码、提交邮箱与验证码。 |
-| 网关模板（新） | `oauth2_select` 片段、`complete_profile` 页面。 |
-| 前端 | 本期无逻辑改动；重新生成 api-client（`User.email` 变为可选）。 |
+|               组件               |                             职责                              |
+|--------------------------------|-------------------------------------------------------------|
+| `OAuth2RegistrationService`（新） | 注册核心逻辑：用户名/显示名/邮箱推导、随机兜底、幂等、创建用户与连接。可独立单元测试。                |
+| 预认证端点（新，`/login` 下）            | 渲染 `/login?oauth2_select`；处理 `POST /login/oauth2/register`。 |
+| `EmailCompletionFilter`（新）     | 门禁 WebFilter，插在认证过滤器之后。                                     |
+| 补邮箱端点（新，`/complete-profile` 下） | 渲染页面、发送验证码、提交邮箱与验证码。                                        |
+| 网关模板（新）                        | `oauth2_select` 片段、`complete_profile` 页面。                   |
+| 前端                             | 本期无逻辑改动；重新生成 api-client（`User.email` 变为可选）。                 |
 
 ### 选择页渲染
 
@@ -166,3 +166,4 @@ Session 中没有缓存身份时，重定向回 `/login`。
 
 - 前端拦截器消费 `email-not-set`（本期仅后端拦截）。
 - 手机号补充：页面 URL 与命名已为“完善资料”预留，后续可扩展字段或分步提交。
+

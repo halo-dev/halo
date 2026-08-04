@@ -14,31 +14,31 @@
 
 **新增文件**
 
-| 文件 | 职责 |
-| --- | --- |
-| `api/src/main/java/run/halo/app/core/extension/User.java`（修改） | `spec.email` 改为可选 |
-| `api/src/main/java/run/halo/app/core/user/service/UserService.java`（修改） | 新增 `checkEmailInUse(username, email)` |
-| `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java`（修改） | 实现 `checkEmailInUse` |
-| `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2RegistrationService.java`（新增） | 注册服务接口 + `RegistrationResult` |
-| `application/src/main/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationService.java`（新增） | 注册核心逻辑 |
-| `application/src/main/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpoint.java`（新增） | `/login?oauth2_select` 渲染 + `POST /login/oauth2/register` |
-| `application/src/main/java/run/halo/app/security/completion/EmailCompletionFilter.java`（新增） | 门禁 WebFilter |
-| `application/src/main/java/run/halo/app/security/completion/EmailCompletionSecurityConfigurer.java`（新增） | 注册门禁过滤器到安全链 |
-| `application/src/main/java/run/halo/app/security/completion/EmailCompletionEndpoint.java`（新增） | `/complete-profile` 页面与接口 |
-| `application/src/main/resources/templates/login_oauth2_select.html`（新增） | 选择页根模板 |
-| `application/src/main/resources/templates/gateway_fragments/oauth2_select.html`（新增） | 选择页表单片段 |
-| `application/src/main/resources/templates/complete_profile.html`（新增） | 补邮箱页根模板 |
-| `application/src/main/resources/templates/gateway_fragments/complete_profile.html`（新增） | 补邮箱表单片段 |
-| 4 个 `login_oauth2_select*.properties` + 4 个 `complete_profile*.properties`（新增） | 页面文案 |
-| 对应测试文件（见各任务） | 测试 |
+|                                                        文件                                                         |                            职责                             |
+|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `api/src/main/java/run/halo/app/core/extension/User.java`（修改）                                                     | `spec.email` 改为可选                                         |
+| `api/src/main/java/run/halo/app/core/user/service/UserService.java`（修改）                                           | 新增 `checkEmailInUse(username, email)`                     |
+| `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java`（修改）                          | 实现 `checkEmailInUse`                                      |
+| `application/src/main/java/run/halo/app/security/authentication/oauth2/OAuth2RegistrationService.java`（新增）        | 注册服务接口 + `RegistrationResult`                             |
+| `application/src/main/java/run/halo/app/security/authentication/oauth2/DefaultOAuth2RegistrationService.java`（新增） | 注册核心逻辑                                                    |
+| `application/src/main/java/run/halo/app/security/preauth/PreAuthOAuth2RegistrationEndpoint.java`（新增）              | `/login?oauth2_select` 渲染 + `POST /login/oauth2/register` |
+| `application/src/main/java/run/halo/app/security/completion/EmailCompletionFilter.java`（新增）                       | 门禁 WebFilter                                              |
+| `application/src/main/java/run/halo/app/security/completion/EmailCompletionSecurityConfigurer.java`（新增）           | 注册门禁过滤器到安全链                                               |
+| `application/src/main/java/run/halo/app/security/completion/EmailCompletionEndpoint.java`（新增）                     | `/complete-profile` 页面与接口                                 |
+| `application/src/main/resources/templates/login_oauth2_select.html`（新增）                                           | 选择页根模板                                                    |
+| `application/src/main/resources/templates/gateway_fragments/oauth2_select.html`（新增）                               | 选择页表单片段                                                   |
+| `application/src/main/resources/templates/complete_profile.html`（新增）                                              | 补邮箱页根模板                                                   |
+| `application/src/main/resources/templates/gateway_fragments/complete_profile.html`（新增）                            | 补邮箱表单片段                                                   |
+| 4 个 `login_oauth2_select*.properties` + 4 个 `complete_profile*.properties`（新增）                                    | 页面文案                                                      |
+| 对应测试文件（见各任务）                                                                                                      | 测试                                                        |
 
 **修改文件**
 
-| 文件 | 修改点 |
-| --- | --- |
-| `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` | 未绑定重定向改为 `/login?oauth2_select` |
-| `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java` | 新增 `OAuth2AuthenticationTokenCache` Bean |
-| `application/src/main/java/run/halo/app/security/authorization/AuthorizationExchangeConfigurers.java` | `/complete-profile/**` 要求已认证 |
+|                                                     文件                                                     |                   修改点                    |
+|------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` | 未绑定重定向改为 `/login?oauth2_select`          |
+| `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java`                         | 新增 `OAuth2AuthenticationTokenCache` Bean |
+| `application/src/main/java/run/halo/app/security/authorization/AuthorizationExchangeConfigurers.java`      | `/complete-profile/**` 要求已认证             |
 
 ---
 
@@ -87,8 +87,8 @@ Expected: FAIL，`required` 中包含 `email`。
 修改 `api/src/main/java/run/halo/app/core/extension/User.java`，删除 `spec.email` 上的 `@Schema(requiredMode = REQUIRED)`：
 
 ```java
-        /** Email address used for sign-in and notifications. */
-        private String email;
+/** Email address used for sign-in and notifications. */
+private String email;
 ```
 
 保留 `displayName` 的 `@Schema(requiredMode = REQUIRED)` 不变。
@@ -1008,10 +1008,10 @@ Expected: FAIL，编译错误（端点类不存在）。
 修改 `application/src/main/java/run/halo/app/infra/config/WebServerSecurityConfig.java`，在类内新增：
 
 ```java
-    @Bean
-    OAuth2AuthenticationTokenCache oauth2AuthenticationTokenCache() {
-        return new WebSessionOAuth2AuthenticationTokenCache();
-    }
+@Bean
+OAuth2AuthenticationTokenCache oauth2AuthenticationTokenCache() {
+    return new WebSessionOAuth2AuthenticationTokenCache();
+}
 ```
 
 并在文件头部补充 import：
@@ -1377,8 +1377,8 @@ Expected: FAIL，实际 Location 为 `/login?oauth2_bind`。
 修改 `application/src/main/java/run/halo/app/security/authentication/oauth2/MapOAuth2AuthenticationFilter.java` 第 106 行附近：
 
 ```java
-                                        .then(Mono.defer(() -> redirectStrategy.sendRedirect(
-                                                exchange, URI.create("/login?oauth2_select"))))
+.then(Mono.defer(() -> redirectStrategy.sendRedirect(
+        exchange, URI.create("/login?oauth2_select"))))
 ```
 
 - [ ] **Step 4: 运行测试确认通过**
@@ -1464,26 +1464,26 @@ Expected: FAIL，编译错误（`checkEmailInUse` 不存在）。
 在 `api/src/main/java/run/halo/app/core/user/service/UserService.java` 的 `checkEmailAlreadyVerified` 后追加：
 
 ```java
-    /**
-     * Check if the given email is already verified and used by another user.
-     *
-     * @param username username of the user to exclude
-     * @param email email to check
-     * @return true if the email is verified and used by another user
-     */
-    Mono<Boolean> checkEmailInUse(String username, String email);
+/**
+ * Check if the given email is already verified and used by another user.
+ *
+ * @param username username of the user to exclude
+ * @param email email to check
+ * @return true if the email is verified and used by another user
+ */
+Mono<Boolean> checkEmailInUse(String username, String email);
 ```
 
 在 `application/src/main/java/run/halo/app/core/user/service/impl/UserServiceImpl.java` 的 `checkEmailAlreadyVerified` 后追加：
 
 ```java
-    @Override
-    public Mono<Boolean> checkEmailInUse(String username, String email) {
-        return listByEmail(email)
-                .filter(u -> u.getSpec().isEmailVerified())
-                .filter(u -> !u.getMetadata().getName().equals(username))
-                .hasElements();
-    }
+@Override
+public Mono<Boolean> checkEmailInUse(String username, String email) {
+    return listByEmail(email)
+            .filter(u -> u.getSpec().isEmailVerified())
+            .filter(u -> !u.getMetadata().getName().equals(username))
+            .hasElements();
+}
 ```
 
 - [ ] **Step 4: 运行测试确认通过**
@@ -2469,8 +2469,8 @@ class EmailCompletionSecurityConfigurer implements SecurityConfigurer {
 修改 `application/src/main/java/run/halo/app/security/authorization/AuthorizationExchangeConfigurers.java` 的 `preAuthenticationAuthorizationConfigurer`，在 `/login/impersonate` 规则后追加：
 
 ```java
-                .pathMatchers("/complete-profile/**")
-                .authenticated()
+.pathMatchers("/complete-profile/**")
+.authenticated()
 ```
 
 - [ ] **Step 4: 运行单元测试确认通过**
@@ -2631,3 +2631,4 @@ git commit -m "chore: regenerate api client for optional user email"
 - Spec 覆盖：选择页（Task 3/4）、注册规则（Task 2）、门禁（Task 9）、补邮箱页（Task 7/8）、`email` 可选（Task 1）、重定向变更（Task 5）、`checkEmailInUse`（Task 6）、api-client（Task 10）全部有对应任务。
 - 无占位符：所有步骤均含可执行代码与命令。
 - 类型一致：`RegistrationResult(username, needsEmailCompletion)` 在服务与端点中一致；`checkEmailInUse` 签名一致；过滤器构造函数与测试一致。
+
