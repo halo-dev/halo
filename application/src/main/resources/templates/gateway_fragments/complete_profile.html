@@ -47,6 +47,10 @@
     <button type="submit" th:text="#{form.submit}"></button>
   </div>
 
+  <div class="form-item">
+    <a th:href="@{/logout}" class="form-item-extra-link" th:text="#{form.logout}"></a>
+  </div>
+
   <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
       const headerName = /*[[${_csrf.headerName}]]*/ "";
@@ -66,9 +70,7 @@
         });
         if (!response.ok) {
           const json = await response.json();
-          if (json.errors && json.errors.length) {
-            throw new Error(json.errors[0]);
-          }
+          throw new Error(json.detail || /*[[#{form.error.sendCodeFailed}]]*/ "");
         }
         return response;
       }
