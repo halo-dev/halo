@@ -1,17 +1,14 @@
-<form
-  th:fragment="form"
-  class="halo-form"
-  id="oauth2-select-form"
-  th:action="@{/login/oauth2/register}"
-  method="post"
->
+<form th:fragment="form" class="halo-form" id="oauth2-select-form" th:action="@{/login/oauth2/register}" method="post">
   <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
     <strong th:text="#{form.error}"></strong>
   </div>
   <div class="form-item">
     <p th:text="#{form.hint}"></p>
   </div>
-  <p th:if="${authProvider != null and authProvider.spec != null}" th:text="|#{form.providerHint}: ${authProvider.spec.displayName}|"></p>
+  <p
+    th:if="${authProvider != null and authProvider.spec != null}"
+    th:text="|#{form.providerHint}: ${authProvider.spec.displayName}|"
+  ></p>
   <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
     <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
     <label for="agreedToTerms">
