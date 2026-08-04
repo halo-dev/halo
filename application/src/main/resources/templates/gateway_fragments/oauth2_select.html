@@ -1,0 +1,32 @@
+<form
+  th:fragment="form"
+  class="halo-form"
+  id="oauth2-select-form"
+  th:action="@{/login/oauth2/register}"
+  method="post"
+>
+  <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
+    <strong th:text="#{form.error}"></strong>
+  </div>
+  <div class="form-item">
+    <p th:text="#{form.hint}"></p>
+  </div>
+  <p th:if="${authProvider != null and authProvider.spec != null}" th:text="|#{form.providerHint}: ${authProvider.spec.displayName}|"></p>
+  <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
+    <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
+    <label for="agreedToTerms">
+      <span th:text="#{form.agreedToTerms.label}"></span>
+      <th:block th:each="page, iterStat : ${agreementPages}">
+        <a th:if="${page.permalink != null}" th:href="${page.permalink}" target="_blank" th:text="${page.title}"></a>
+        <span th:if="${page.permalink == null}" th:text="${page.title}"></span>
+        <span th:if="${!iterStat.last}">,</span>
+      </th:block>
+    </label>
+  </div>
+  <div class="form-item">
+    <button type="submit" th:disabled="${!allowRegistration}" th:text="#{form.register}"></button>
+  </div>
+  <div class="form-item">
+    <a class="form-item-extra-link" th:href="@{/login?oauth2_bind}" th:text="#{form.bind}"></a>
+  </div>
+</form>
