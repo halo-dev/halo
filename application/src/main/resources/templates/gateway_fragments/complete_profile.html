@@ -1,0 +1,78 @@
+<form
+  th:fragment="form"
+  class="halo-form"
+  id="complete-profile-form"
+  th:action="@{/complete-profile}"
+  th:object="${form}"
+  method="post"
+>
+  <div class="form-item">
+    <label for="email" th:text="#{form.email.label}"></label>
+    <div class="form-input">
+      <input
+        type="email"
+        id="email"
+        name="email"
+        autocomplete="off"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
+        required
+        th:field="*{email}"
+      />
+    </div>
+    <p class="alert alert-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+  </div>
+
+  <div class="form-item">
+    <label for="code" th:text="#{form.code.label}"></label>
+    <div class="form-input-group">
+      <div class="form-input">
+        <input
+          type="text"
+          inputmode="numeric"
+          pattern="\d*"
+          id="code"
+          name="code"
+          th:required="${mustVerifyEmailOnRegistration}"
+        />
+      </div>
+      <button id="codeSendButton" type="button" th:text="#{form.code.sendButton}"></button>
+    </div>
+    <p class="alert alert-error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></p>
+  </div>
+
+  <div class="form-item">
+    <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      const headerName = /*[[${_csrf.headerName}]]*/ "";
+      const token = /*[[${_csrf.token}]]*/ "";
+      async function sendRequest() {
+        const email = document.getElementById("email").value;
+        if (!email) {
+          throw new Error(/*[[#{form.email.emptyValidation}]]*/ "");
+        }
+        const response = await fetch("/complete-profile/send-email-code", {
+          method: "POST",
+          body: JSON.stringify({ email: email }),
+          headers: {
+            "Content-Type": "application/json",
+            [headerName]: token,
+          },
+        });
+        if (!response.ok) {
+          const json = await response.json();
+          if (json.errors && json.errors.length) {
+            throw new Error(json.errors[0]);
+          }
+        }
+        return response;
+      }
+      const emailCodeSendButton = document.getElementById("codeSendButton");
+      sendVerificationCode(emailCodeSendButton, sendRequest);
+    });
+  </script>
+</form>
