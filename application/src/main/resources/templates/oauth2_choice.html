@@ -4,28 +4,10 @@
   th:replace="~{gateway_fragments/layout :: layout(title = |#{oauth2.choice.title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
 >
   <th:block th:fragment="head">
+    <th:block th:replace="~{gateway_fragments/common::oauth2PageStyles}"></th:block>
     <style>
       .oauth2-choice-wrapper {
         max-width: 30em;
-      }
-
-      .oauth2-choice-wrapper .form-subtitle {
-        margin: 0 0 1.25em;
-        font-size: var(--text-sm);
-        color: #6b7280;
-      }
-
-      .oauth2-choice-wrapper .provider-badge {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        margin-bottom: 1.25em;
-        font-size: var(--text-sm);
-        color: var(--color-text);
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        border-radius: var(--rounded-base);
-        padding: 0.625em 0.875em;
       }
 
       .oauth2-choice-wrapper .choice-list {
@@ -75,21 +57,16 @@
         color: var(--color-link);
       }
 
+      .oauth2-choice-wrapper .choice-card .choice-hint {
+        margin-top: 0.25em;
+        font-size: var(--text-sm);
+        color: #6b7280;
+      }
+
       .oauth2-choice-wrapper .choice-card.disabled {
         opacity: 0.55;
         cursor: not-allowed;
         pointer-events: none;
-      }
-
-      .oauth2-choice-wrapper .gateway-links {
-        margin-top: 1.5em;
-        text-align: center;
-        font-size: var(--text-sm);
-      }
-
-      .oauth2-choice-wrapper .gateway-links a {
-        color: var(--color-link);
-        text-decoration: none;
       }
     </style>
   </th:block>
@@ -116,8 +93,10 @@
 
           <a
             class="choice-card"
-            th:href="@{/login/oauth2/register}"
+            th:href="${allowRegistration} ? @{/login/oauth2/register} : null"
             th:classappend="${!allowRegistration} ? 'disabled'"
+            th:aria-disabled="${!allowRegistration} ? 'true' : null"
+            th:tabindex="${!allowRegistration} ? '-1' : null"
           >
             <h3 th:text="#{oauth2.choice.register.title}"></h3>
             <p th:text="#{oauth2.choice.register.description}"></p>

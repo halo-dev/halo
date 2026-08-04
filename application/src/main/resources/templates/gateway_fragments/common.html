@@ -44,6 +44,44 @@
   <link rel="stylesheet" th:href="|/styles/main.css?v=${site.version}|" />
 </th:block>
 
+<th:block th:fragment="oauth2PageStyles">
+  <style>
+    .provider-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-bottom: 1.25em;
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: var(--rounded-base);
+      padding: 0.625em 0.875em;
+    }
+
+    .form-subtitle {
+      margin: 0 0 1.25em;
+      font-size: var(--text-sm);
+      color: #6b7280;
+    }
+
+    .gateway-links {
+      margin-top: 1.5em;
+      text-align: center;
+      font-size: var(--text-sm);
+    }
+
+    .gateway-links a {
+      color: var(--color-link);
+      text-decoration: none;
+    }
+
+    .gateway-links a + a {
+      margin-left: 1em;
+    }
+  </style>
+</th:block>
+
 <div th:remove="tag" th:fragment="languageSwitcher">
   <style>
     .language-switcher {

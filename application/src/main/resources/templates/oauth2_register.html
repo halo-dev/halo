@@ -4,55 +4,22 @@
   th:replace="~{gateway_fragments/layout :: layout(title = |#{oauth2.register.title} - ${site.title}|, head = ~{::head}, body = ~{::body})}"
 >
   <th:block th:fragment="head">
+    <th:block th:replace="~{gateway_fragments/common::oauth2PageStyles}"></th:block>
     <style>
       .oauth2-register-wrapper {
         max-width: 30em;
       }
 
-      .oauth2-register-wrapper .form-subtitle {
-        margin: 0 0 1.25em;
-        font-size: var(--text-sm);
-        color: #6b7280;
-      }
-
-      .oauth2-register-wrapper .provider-badge {
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        margin-bottom: 1.25em;
-        font-size: var(--text-sm);
-        color: var(--color-text);
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        border-radius: var(--rounded-base);
-        padding: 0.625em 0.875em;
-      }
-
       .oauth2-register-wrapper .help-text {
         margin: 0.375em 0 0;
-        font-size: 12px;
+        font-size: var(--text-sm);
         color: #6b7280;
       }
 
       .oauth2-register-wrapper .field-error {
         margin: 0.375em 0 0;
-        font-size: 12px;
-        color: #dc2626;
-      }
-
-      .oauth2-register-wrapper .gateway-links {
-        margin-top: 1.5em;
-        text-align: center;
         font-size: var(--text-sm);
-      }
-
-      .oauth2-register-wrapper .gateway-links a {
-        color: var(--color-link);
-        text-decoration: none;
-      }
-
-      .oauth2-register-wrapper .gateway-links a + a {
-        margin-left: 1em;
+        color: #dc2626;
       }
     </style>
   </th:block>
@@ -113,7 +80,17 @@
           <div class="form-item">
             <label for="displayName" th:text="#{oauth2.register.displayName.label}"></label>
             <div class="form-input">
-              <input type="text" id="displayName" name="displayName" th:field="*{displayName}" required />
+              <input
+                type="text"
+                id="displayName"
+                name="displayName"
+                th:field="*{displayName}"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                required
+              />
             </div>
             <p class="field-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
           </div>
@@ -128,7 +105,7 @@
           </div>
 
           <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
-            <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" />
+            <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
             <label for="agreedToTerms">
               <span th:text="#{oauth2.register.agreedToTerms.label}"></span>
               <th:block th:each="page, iterStat : ${agreementPages}">
@@ -136,6 +113,7 @@
                   th:if="${page.permalink != null}"
                   th:href="${page.permalink}"
                   target="_blank"
+                  rel="noopener noreferrer"
                   th:text="${page.title}"
                 ></a>
                 <span th:if="${page.permalink == null}" th:text="${page.title}"></span>
