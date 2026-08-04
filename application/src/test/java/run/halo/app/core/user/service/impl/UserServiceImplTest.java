@@ -601,4 +601,50 @@ class UserServiceImplTest {
                 .expectNext(true)
                 .verifyComplete();
     }
+
+    @Test
+    void shouldCheckEmailInUseExcludingSelf() {
+        var otherUser = new User();
+        otherUser.setMetadata(new Metadata());
+        otherUser.getMetadata().setName("other");
+        var otherSpec = new User.UserSpec();
+        otherSpec.setEmail("user@example.com");
+        otherSpec.setEmailVerified(true);
+        otherUser.setSpec(otherSpec);
+
+        var self = new User();
+        self.setMetadata(new Metadata());
+        self.getMetadata().setName("self");
+        var selfSpec = new User.UserSpec();
+        selfSpec.setEmail("user@example.com");
+        selfSpec.setEmailVerified(true);
+        self.setSpec(selfSpec);
+
+        when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(self, otherUser));
+
+        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+                .expectNext(true)
+                .verifyComplete();
+
+        StepVerifier.create(userService.checkEmailInUse("other", "user@example.com"))
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnFalseWhenEmailNotVerified() {
+        var otherUser = new User();
+        otherUser.setMetadata(new Metadata());
+        otherUser.getMetadata().setName("other");
+        var otherSpec = new User.UserSpec();
+        otherSpec.setEmail("user@example.com");
+        otherSpec.setEmailVerified(false);
+        otherUser.setSpec(otherSpec);
+
+        when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(otherUser));
+
+        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+                .expectNext(false)
+                .verifyComplete();
+    }
 }

@@ -54,6 +54,15 @@ public interface UserService {
 
     Mono<Boolean> checkEmailAlreadyVerified(String email);
 
+    /**
+     * Check if the given email is already verified and used by another user.
+     *
+     * @param username username of the user to exclude
+     * @param email email to check
+     * @return true if the email is verified and used by another user
+     */
+    Mono<Boolean> checkEmailInUse(String username, String email);
+
     String encryptPassword(String rawPassword);
 
     Mono<User> disable(String username);

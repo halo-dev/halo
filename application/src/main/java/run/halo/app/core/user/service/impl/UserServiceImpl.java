@@ -388,6 +388,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Mono<Boolean> checkEmailInUse(String username, String email) {
+        return listByEmail(email)
+                .filter(u -> u.getSpec().isEmailVerified())
+                .filter(u -> !u.getMetadata().getName().equals(username))
+                .hasElements();
+    }
+
+    @Override
     public String encryptPassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
