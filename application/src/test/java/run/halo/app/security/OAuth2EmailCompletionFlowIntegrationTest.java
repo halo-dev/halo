@@ -185,7 +185,7 @@ class OAuth2EmailCompletionFlowIntegrationTest {
 
         webClient
                 .get()
-                .uri("/uc")
+                .uri("/uc?source=saved")
                 .cookie(session.getName(), session.getValue())
                 .accept(MediaType.TEXT_HTML)
                 .exchange()
@@ -205,7 +205,7 @@ class OAuth2EmailCompletionFlowIntegrationTest {
                 .expectStatus()
                 .isFound()
                 .expectHeader()
-                .location("/uc");
+                .location("/uc?source=saved");
 
         assertThat(user.getSpec().isEmailVerified()).isTrue();
         expectUserCenter(session);

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -75,6 +77,15 @@ class UserEndpointTest {
     @BeforeEach
     void setUp() {
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
+                .webFilter((exchange, chain) -> chain.filter(exchange)
+                        .onErrorResume(ServerWebInputException.class, error -> {
+                            var response = exchange.getResponse();
+                            response.setStatusCode(error.getStatusCode());
+                            response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+                            var body = JsonUtils.objectToJson(error.getBody()).getBytes(StandardCharsets.UTF_8);
+                            return response.writeWith(
+                                    Mono.just(response.bufferFactory().wrap(body)));
+                        }))
                 .apply(springSecurity())
                 .build()
                 .mutateWith(mockUser("fake-user").password("fake-password").roles("fake-super-role"));
@@ -401,6 +412,24 @@ class UserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    void shouldRejectCreateWhenEmailIsBlank() {
+        var userRequest = new UserEndpoint.CreateUserRequest("fake-user", " ", "", "", "", "", "", Map.of(), Set.of());
+
+        webClient
+                .post()
+                .uri("/users")
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
+                .isEqualTo("Email is required");
+
+        verify(userService, never()).createUser(any(User.class), anySet());
     }
 
     @Nested
