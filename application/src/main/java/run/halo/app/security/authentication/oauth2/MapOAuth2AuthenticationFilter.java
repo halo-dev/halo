@@ -1,7 +1,5 @@
 package run.halo.app.security.authentication.oauth2;
 
-import static run.halo.app.security.authentication.oauth2.HaloOAuth2AuthenticationToken.authenticated;
-
 import java.net.URI;
 import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -9,8 +7,6 @@ import org.springframework.security.authentication.AuthenticationTrustResolverIm
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
@@ -23,7 +19,6 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.UserConnectionService;
-import run.halo.app.security.LoginHandlerEnhancer;
 
 /**
  * A filter to map OAuth2 authentication to authenticated user.
@@ -40,14 +35,12 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
 
     private final ServerSecurityContextRepository securityContextRepository;
 
+    private final OAuth2AuthenticationSession authenticationSession;
+
     @Setter
     private OAuth2AuthenticationTokenCache authenticationCache = new WebSessionOAuth2AuthenticationTokenCache();
 
-    private final ReactiveUserDetailsService userDetailsService;
-
     private final ServerLogoutHandler logoutHandler;
-
-    private final LoginHandlerEnhancer loginHandlerEnhancer;
 
     private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
@@ -57,12 +50,10 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
     public MapOAuth2AuthenticationFilter(
             ServerSecurityContextRepository securityContextRepository,
             UserConnectionService connectionService,
-            ReactiveUserDetailsService userDetailsService,
-            LoginHandlerEnhancer loginHandlerEnhancer) {
+            OAuth2AuthenticationSession authenticationSession) {
         this.connectionService = connectionService;
         this.securityContextRepository = securityContextRepository;
-        this.userDetailsService = userDetailsService;
-        this.loginHandlerEnhancer = loginHandlerEnhancer;
+        this.authenticationSession = authenticationSession;
         var logoutHandler = new SecurityContextServerLogoutHandler();
         logoutHandler.setSecurityContextRepository(securityContextRepository);
         this.logoutHandler = logoutHandler;
@@ -113,17 +104,11 @@ class MapOAuth2AuthenticationFilter implements WebFilter {
                                                 .then(Mono.empty());
                                     }))
                                     // user bound and remap the authentication
-                                    .flatMap(connection -> userDetailsService.findByUsername(
-                                            connection.getSpec().getUsername()))
-                                    .map(userDetails -> authenticated(userDetails, oauth2Token))
-                                    .flatMap(haloOAuth2Token -> {
-                                        var securityContext = new SecurityContextImpl(haloOAuth2Token);
-                                        return securityContextRepository
-                                                .save(exchange, securityContext)
-                                                .then(loginHandlerEnhancer.onLoginSuccess(exchange, haloOAuth2Token));
-                                        // because this happens after the filter, there is no need to
-                                        // write SecurityContext to the context
-                                    });
+                                    .flatMap(connection -> authenticationSession.establish(
+                                            exchange, connection.getSpec().getUsername(), oauth2Token))
+                            // because this happens after the filter, there is no need to
+                            // write SecurityContext to the context
+                            ;
                         })
                         .then()));
     }

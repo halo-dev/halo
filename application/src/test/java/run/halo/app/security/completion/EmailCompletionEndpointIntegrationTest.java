@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -103,6 +105,9 @@ class EmailCompletionEndpointIntegrationTest {
 
     @Test
     void shouldVerifyEmailAndRedirect() {
+        var user = client.fetch(User.class, "fake-user").block();
+        MetadataUtil.nullSafeAnnotations(user).put(User.EMAIL_TO_VERIFY, "fake@example.com");
+        client.update(user).block();
         when(emailVerificationService.verify(eq("fake-user"), eq("123456"))).thenReturn(Mono.empty());
 
         webClient
@@ -147,6 +152,67 @@ class EmailCompletionEndpointIntegrationTest {
         org.assertj.core.api.Assertions.assertThat(updated.getSpec().getEmail()).isEqualTo("new@example.com");
         org.assertj.core.api.Assertions.assertThat(updated.getSpec().isEmailVerified())
                 .isFalse();
+    }
+
+    @Test
+    void shouldRejectEmailInUse() {
+        createUser("other-user", "taken@example.com", true);
+
+        webClient
+                .post()
+                .uri("/complete-profile")
+                .bodyValue("email=taken%40example.com")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> org.assertj.core.api.Assertions.assertThat(body).contains("Email is already in use"));
+    }
+
+    @Test
+    void shouldRejectEmailNotMatchingCodeRecipient() {
+        var user = client.fetch(User.class, "fake-user").block();
+        MetadataUtil.nullSafeAnnotations(user).put(User.EMAIL_TO_VERIFY, "sent-to@example.com");
+        client.update(user).block();
+
+        webClient
+                .post()
+                .uri("/complete-profile")
+                .bodyValue("email=other%40example.com&code=123456")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> org.assertj.core.api.Assertions.assertThat(body)
+                        .contains("The email does not match the address the code was sent to"));
+
+        verify(emailVerificationService, org.mockito.Mockito.never()).verify(anyString(), anyString());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenRateLimitedOnSendingCode() {
+        var config = RateLimiterConfig.custom()
+                .limitRefreshPeriod(Duration.ofSeconds(10))
+                .limitForPeriod(1)
+                .build();
+        var exhaustedRateLimiter = RateLimiterRegistry.of(config).rateLimiter("send-email-verification-code");
+        org.assertj.core.api.Assertions.assertThat(exhaustedRateLimiter.acquirePermission())
+                .isTrue();
+        when(rateLimiterRegistry.rateLimiter(anyString(), eq("send-email-verification-code")))
+                .thenReturn(exhaustedRateLimiter);
+        when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
+                .thenReturn(Mono.empty());
+
+        webClient
+                .post()
+                .uri("/complete-profile/send-email-code")
+                .bodyValue("{\"email\":\"fake@example.com\"}")
+                .header("Content-Type", "application/json")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @Test

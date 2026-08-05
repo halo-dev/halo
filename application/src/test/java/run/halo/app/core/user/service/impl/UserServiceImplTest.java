@@ -622,11 +622,11 @@ class UserServiceImplTest {
 
         when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(self, otherUser));
 
-        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("self", "user@example.com"))
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(userService.checkEmailInUse("other", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("other", "user@example.com"))
                 .expectNext(true)
                 .verifyComplete();
     }
@@ -643,7 +643,7 @@ class UserServiceImplTest {
 
         when(client.listAll(eq(User.class), any(), any())).thenReturn(Flux.just(otherUser));
 
-        StepVerifier.create(userService.checkEmailInUse("self", "user@example.com"))
+        StepVerifier.create(userService.checkVerifiedEmailInUse("self", "user@example.com"))
                 .expectNext(false)
                 .verifyComplete();
     }

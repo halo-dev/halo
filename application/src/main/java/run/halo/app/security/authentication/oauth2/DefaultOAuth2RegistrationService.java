@@ -58,14 +58,13 @@ public class DefaultOAuth2RegistrationService implements OAuth2RegistrationServi
                         .getByProviderUserId(registrationId, oauth2User.getName())
                         .map(connection -> connection.getSpec().getUsername())
                         .switchIfEmpty(Mono.defer(() -> createUser(setting, registrationId, oauth2User)
-                                .map(user -> user.getMetadata().getName()))))
-                .flatMap(username -> Mono.zip(
-                                userService.getUser(username),
-                                systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
-                        .map(tuple -> new RegistrationResult(
-                                username,
-                                tuple.getT2().isMustVerifyEmailOnRegistration()
-                                        && !tuple.getT1().getSpec().isEmailVerified())));
+                                .map(user -> user.getMetadata().getName())))
+                        .flatMap(username -> userService
+                                .getUser(username)
+                                .map(user -> new RegistrationResult(
+                                        username,
+                                        setting.isMustVerifyEmailOnRegistration()
+                                                && !user.getSpec().isEmailVerified()))));
     }
 
     private Mono<Void> checkAgreement(SystemSetting.User setting, boolean agreedToTerms) {

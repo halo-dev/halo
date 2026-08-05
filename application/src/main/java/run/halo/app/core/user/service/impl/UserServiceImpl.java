@@ -388,7 +388,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<Boolean> checkEmailInUse(String username, String email) {
+    public Mono<Boolean> checkVerifiedEmailInUse(String username, String email) {
         return listByEmail(email)
                 .filter(u -> u.getSpec().isEmailVerified())
                 .filter(u -> !u.getMetadata().getName().equals(username))

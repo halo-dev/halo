@@ -2,6 +2,7 @@ package run.halo.app.security.completion;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static run.halo.app.infra.ValidationUtils.validate;
+import static run.halo.app.security.RedirectUtils.redirectToSavedRequest;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -16,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.EmailVerificationService;
 import run.halo.app.core.user.service.UserService;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -78,12 +79,7 @@ class EmailCompletionEndpoint {
                         .flatMap(setting -> {
                             var form = new CompleteProfileForm(user.getSpec().getEmail(), null);
                             var bindingResult = new BeanPropertyBindingResult(form, "form");
-                            var model = bindingResult.getModel();
-                            model.put(
-                                    "globalInfo",
-                                    globalInfoService.getGlobalInfo().cache());
-                            model.put("mustVerifyEmailOnRegistration", setting.isMustVerifyEmailOnRegistration());
-                            return ServerResponse.ok().render("complete_profile", model);
+                            return renderPage(request.exchange(), setting, form, bindingResult);
                         }));
     }
 
@@ -109,7 +105,7 @@ class EmailCompletionEndpoint {
                         return renderPage(exchange, setting, form, bindingResult);
                     }
                     var email = form.email().toLowerCase(Locale.ROOT);
-                    return userService.checkEmailInUse(username, email).flatMap(inUse -> {
+                    return userService.checkVerifiedEmailInUse(username, email).flatMap(inUse -> {
                         if (inUse) {
                             bindingResult.rejectValue(
                                     "email", "complete-profile.error.email-in-use", "Email is already in use");
@@ -120,23 +116,30 @@ class EmailCompletionEndpoint {
                                     "code", "complete-profile.error.code-required", "Email code is required");
                             return renderPage(exchange, setting, form, bindingResult);
                         }
-                        return verifyOrSave(exchange, username, user, email, form.code(), setting, form, bindingResult);
+                        return verifyOrSave(exchange, user, setting, form, bindingResult);
                     });
                 });
     }
 
     private Mono<ServerResponse> verifyOrSave(
             ServerWebExchange exchange,
-            String username,
             User user,
-            String email,
-            String code,
             SystemSetting.User setting,
             CompleteProfileForm form,
             BindingResult bindingResult) {
-        if (StringUtils.isNotBlank(code)) {
+        var username = user.getMetadata().getName();
+        var email = form.email().toLowerCase(Locale.ROOT);
+        if (StringUtils.isNotBlank(form.code())) {
+            var emailToVerify = MetadataUtil.nullSafeAnnotations(user).get(User.EMAIL_TO_VERIFY);
+            if (!StringUtils.equalsIgnoreCase(emailToVerify, email)) {
+                bindingResult.rejectValue(
+                        "email",
+                        "complete-profile.error.email-mismatch",
+                        "The email does not match the address the code was sent to");
+                return renderPage(exchange, setting, form, bindingResult);
+            }
             return emailVerificationService
-                    .verify(username, code)
+                    .verify(username, form.code())
                     .then(redirectToTarget(exchange))
                     .onErrorResume(EmailVerificationFailed.class, e -> {
                         bindingResult.rejectValue("code", "complete-profile.error.invalid-code", "Invalid email code");
@@ -161,7 +164,7 @@ class EmailCompletionEndpoint {
                     var email = body.email().toLowerCase(Locale.ROOT);
                     return currentUsername(exchange)
                             .flatMap(username -> userService
-                                    .checkEmailInUse(username, email)
+                                    .checkVerifiedEmailInUse(username, email)
                                     .flatMap(inUse -> {
                                         if (inUse) {
                                             return Mono.error(new EmailVerificationFailed(
@@ -192,11 +195,7 @@ class EmailCompletionEndpoint {
     }
 
     private Mono<ServerResponse> redirectToTarget(ServerWebExchange exchange) {
-        return requestCache
-                .getRedirectUri(exchange)
-                .defaultIfEmpty(URI.create("/uc"))
-                .flatMap(uri ->
-                        ServerResponse.status(HttpStatus.FOUND).location(uri).build());
+        return redirectToSavedRequest(requestCache, exchange, URI.create("/uc"));
     }
 
     private Mono<String> currentUsername(ServerWebExchange exchange) {

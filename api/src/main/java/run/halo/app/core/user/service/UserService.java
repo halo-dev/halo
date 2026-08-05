@@ -61,7 +61,7 @@ public interface UserService {
      * @param email email to check
      * @return true if the email is verified and used by another user
      */
-    Mono<Boolean> checkEmailInUse(String username, String email);
+    Mono<Boolean> checkVerifiedEmailInUse(String username, String email);
 
     String encryptPassword(String rawPassword);
 

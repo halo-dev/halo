@@ -128,6 +128,50 @@ class EmailCompletionFilterTest {
     }
 
     @Test
+    void shouldRedirectNonGetHtmlRequestToCompleteProfile() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting(true)));
+        when(userService.getUser("user")).thenReturn(Mono.just(user(false)));
+        when(requestCache.saveRequest(any())).thenReturn(Mono.empty());
+
+        var exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.post("/console").accept(MediaType.TEXT_HTML));
+        var chain = mock(WebFilterChain.class);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                        new TestingAuthenticationToken("user", "password", "ROLE_authenticated")))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(exchange.getResponse().getHeaders().getLocation()).isEqualTo(URI.create("/complete-profile"));
+        verify(chain, never()).filter(exchange);
+    }
+
+    @Test
+    void shouldInterceptWhenUserLookupFails() {
+        when(systemConfigFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(setting(true)));
+        when(userService.getUser("user")).thenReturn(Mono.error(new RuntimeException("boom")));
+        when(requestCache.saveRequest(any())).thenReturn(Mono.empty());
+
+        var exchange =
+                MockServerWebExchange.from(MockServerHttpRequest.get("/console").accept(MediaType.TEXT_HTML));
+        var chain = mock(WebFilterChain.class);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                        new TestingAuthenticationToken("user", "password", "ROLE_authenticated")))
+                .block();
+
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(exchange.getResponse().getHeaders().getLocation()).isEqualTo(URI.create("/complete-profile"));
+        verify(chain, never()).filter(exchange);
+    }
+
+    @Test
     void shouldSkipForSuperAdmin() {
         var exchange =
                 MockServerWebExchange.from(MockServerHttpRequest.get("/console").accept(MediaType.TEXT_HTML));

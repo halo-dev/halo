@@ -2,6 +2,7 @@ package run.halo.app.security.preauth;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -14,19 +15,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.actuator.GlobalInfoService;
 import run.halo.app.security.AuthProviderService;
-import run.halo.app.security.LoginHandlerEnhancer;
+import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationSession;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
 import run.halo.app.security.authentication.oauth2.OAuth2RegistrationService;
 
@@ -40,13 +37,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
     OAuth2AuthenticationTokenCache tokenCache;
 
     @Mock
-    ServerSecurityContextRepository securityContextRepository;
-
-    @Mock
-    ReactiveUserDetailsService userDetailsService;
-
-    @Mock
-    LoginHandlerEnhancer loginHandlerEnhancer;
+    OAuth2AuthenticationSession authenticationSession;
 
     @Mock
     ServerRequestCache requestCache;
@@ -61,7 +52,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
     SystemConfigFetcher systemConfigFetcher;
 
     @Mock
-    ReactiveExtensionClient extensionClient;
+    AgreementPageFetcher agreementPageFetcher;
 
     WebTestClient webClient;
 
@@ -70,14 +61,12 @@ class PreAuthOAuth2RegistrationEndpointTest {
         var endpoint = new PreAuthOAuth2RegistrationEndpoint(
                 registrationService,
                 tokenCache,
-                securityContextRepository,
-                userDetailsService,
-                loginHandlerEnhancer,
+                authenticationSession,
                 requestCache,
                 globalInfoService,
                 authProviderService,
                 systemConfigFetcher,
-                extensionClient);
+                agreementPageFetcher);
         webClient = WebTestClient.bindToRouterFunction(endpoint.preAuthOAuth2RegistrationEndpoints())
                 .build();
     }
@@ -95,11 +84,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
         when(tokenCache.getToken(any())).thenReturn(Mono.just(token()));
         when(registrationService.register(any(), eq(false)))
                 .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", true)));
-        var userDetails =
-                User.withUsername("alice").password("").roles("authenticated").build();
-        when(userDetailsService.findByUsername("alice")).thenReturn(Mono.just(userDetails));
-        when(securityContextRepository.save(any(), any())).thenReturn(Mono.empty());
-        when(loginHandlerEnhancer.onLoginSuccess(any(), any())).thenReturn(Mono.empty());
+        when(authenticationSession.establish(any(), eq("alice"), any())).thenReturn(Mono.empty());
 
         webClient
                 .post()
@@ -111,6 +96,8 @@ class PreAuthOAuth2RegistrationEndpointTest {
                 .isFound()
                 .expectHeader()
                 .location("/complete-profile");
+
+        verify(authenticationSession).establish(any(), eq("alice"), any());
     }
 
     @Test
@@ -118,11 +105,7 @@ class PreAuthOAuth2RegistrationEndpointTest {
         when(tokenCache.getToken(any())).thenReturn(Mono.just(token()));
         when(registrationService.register(any(), eq(false)))
                 .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
-        var userDetails =
-                User.withUsername("alice").password("").roles("authenticated").build();
-        when(userDetailsService.findByUsername("alice")).thenReturn(Mono.just(userDetails));
-        when(securityContextRepository.save(any(), any())).thenReturn(Mono.empty());
-        when(loginHandlerEnhancer.onLoginSuccess(any(), any())).thenReturn(Mono.empty());
+        when(authenticationSession.establish(any(), eq("alice"), any())).thenReturn(Mono.empty());
         when(requestCache.getRedirectUri(any())).thenReturn(Mono.just(URI.create("/uc")));
 
         webClient

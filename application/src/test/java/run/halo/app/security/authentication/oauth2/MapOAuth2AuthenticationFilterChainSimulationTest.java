@@ -93,7 +93,9 @@ class MapOAuth2AuthenticationFilterChainSimulationTest {
         var tokenCache = mock(OAuth2AuthenticationTokenCache.class);
 
         var mapFilter = new MapOAuth2AuthenticationFilter(
-                sessionRepository, connectionService, userDetailsService, loginHandlerEnhancer);
+                sessionRepository,
+                connectionService,
+                new OAuth2AuthenticationSession(userDetailsService, sessionRepository, loginHandlerEnhancer));
         mapFilter.setAuthenticationCache(tokenCache);
 
         WebFilter mockOAuth2LoginFilter = (requestExchange, chain) -> {
@@ -151,7 +153,9 @@ class MapOAuth2AuthenticationFilterChainSimulationTest {
         when(tokenCache.saveToken(any(), any())).thenReturn(Mono.empty());
 
         var mapFilter = new MapOAuth2AuthenticationFilter(
-                sessionRepository, connectionService, userDetailsService, loginHandlerEnhancer);
+                sessionRepository,
+                connectionService,
+                new OAuth2AuthenticationSession(userDetailsService, sessionRepository, loginHandlerEnhancer));
         mapFilter.setAuthenticationCache(tokenCache);
 
         WebFilter mockOAuth2LoginFilter = (requestExchange, chain) -> {

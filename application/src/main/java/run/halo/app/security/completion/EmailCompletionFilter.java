@@ -3,7 +3,6 @@ package run.halo.app.security.completion;
 import java.net.URI;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -96,10 +95,11 @@ public class EmailCompletionFilter implements WebFilter {
                             .getUser(authentication.getName())
                             .map(user -> !user.getSpec().isEmailVerified())
                             .doOnError(e -> log.warn(
-                                    "Failed to check email verification status for user '{}'",
+                                    "Failed to check email verification status for user '{}',"
+                                            + " intercepting the request",
                                     authentication.getName(),
                                     e))
-                            .onErrorReturn(false);
+                            .onErrorReturn(true);
                 });
     }
 
@@ -123,9 +123,6 @@ public class EmailCompletionFilter implements WebFilter {
     }
 
     private boolean isHtmlRequest(ServerWebExchange exchange) {
-        if (!HttpMethod.GET.equals(exchange.getRequest().getMethod())) {
-            return false;
-        }
         if (HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
             return false;
         }

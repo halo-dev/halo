@@ -15,14 +15,12 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.user.service.UserConnectionService;
-import run.halo.app.security.LoginHandlerEnhancer;
 
 class MapOAuth2AuthenticationFilterTest {
 
@@ -42,10 +40,9 @@ class MapOAuth2AuthenticationFilterTest {
         var securityContextRepository = mock(ServerSecurityContextRepository.class);
         when(securityContextRepository.save(any(), any())).thenReturn(Mono.empty());
         when(securityContextRepository.load(any())).thenReturn(Mono.empty());
-        var userDetailsService = mock(ReactiveUserDetailsService.class);
-        var loginHandlerEnhancer = mock(LoginHandlerEnhancer.class);
-        var filter = new MapOAuth2AuthenticationFilter(
-                securityContextRepository, connectionService, userDetailsService, loginHandlerEnhancer);
+        var authenticationSession = mock(OAuth2AuthenticationSession.class);
+        var filter =
+                new MapOAuth2AuthenticationFilter(securityContextRepository, connectionService, authenticationSession);
         var tokenCache = mock(OAuth2AuthenticationTokenCache.class);
         when(tokenCache.saveToken(eq(exchange), any())).thenReturn(Mono.empty());
         filter.setAuthenticationCache(tokenCache);
