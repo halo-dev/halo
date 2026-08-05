@@ -743,13 +743,78 @@ git commit -m "feat: add OAuth2 registration service"
   th:action="@{/login/oauth2/register}"
   method="post"
 >
+  <style>
+    .oauth2-provider-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: var(--spacing-2xl);
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--rounded-lg);
+      background: #f9fafb;
+    }
+
+    .oauth2-provider-info img {
+      width: 2em;
+      height: 2em;
+      border-radius: 9999px;
+      flex-shrink: 0;
+    }
+
+    .oauth2-provider-info-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1em;
+    }
+
+    .oauth2-provider-info-name {
+      color: var(--color-text);
+      font-size: var(--text-base);
+      font-weight: 500;
+    }
+
+    .oauth2-provider-info-hint {
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      opacity: 0.75;
+    }
+
+    .oauth2-bind-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 2.5em;
+      border: 1px solid var(--color-border);
+      border-radius: var(--rounded-base);
+      color: var(--color-text);
+      font-size: var(--text-base);
+      text-decoration: none;
+      background: #fff;
+    }
+
+    .oauth2-bind-button:hover {
+      background: #f3f4f6;
+    }
+  </style>
+
   <div class="alert alert-error" role="alert" th:if="${param.error.size() > 0}">
     <strong th:text="#{form.error}"></strong>
   </div>
+
   <div class="form-item">
     <p th:text="#{form.hint}"></p>
   </div>
-  <p th:if="${authProvider != null and authProvider.spec != null}" th:text="|#{form.providerHint}: ${authProvider.spec.displayName}|"></p>
+
+  <div class="oauth2-provider-info" th:if="${authProvider != null and authProvider.spec != null}">
+    <img th:if="${authProvider.spec.logo != null}" th:src="${authProvider.spec.logo}" alt="" />
+    <div class="oauth2-provider-info-text">
+      <span class="oauth2-provider-info-name" th:text="${authProvider.spec.displayName}"></span>
+      <span class="oauth2-provider-info-hint" th:text="#{form.providerHint}"></span>
+    </div>
+  </div>
+
   <div class="form-item-compact" th:if="${agreementPages != null and !agreementPages.isEmpty()}">
     <input type="checkbox" id="agreedToTerms" name="agreedToTerms" value="true" required />
     <label for="agreedToTerms">
@@ -761,11 +826,19 @@ git commit -m "feat: add OAuth2 registration service"
       </th:block>
     </label>
   </div>
+
+  <div class="alert alert-warning" th:if="${!allowRegistration}">
+    <strong th:text="#{form.registrationClosed}"></strong>
+  </div>
+
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
   <div class="form-item">
     <button type="submit" th:disabled="${!allowRegistration}" th:text="#{form.register}"></button>
   </div>
+
   <div class="form-item">
-    <a class="form-item-extra-link" th:href="@{/login?oauth2_bind}" th:text="#{form.bind}"></a>
+    <a class="oauth2-bind-button" th:href="@{/login?oauth2_bind}" th:text="#{form.bind}"></a>
   </div>
 </form>
 ```
@@ -777,22 +850,24 @@ git commit -m "feat: add OAuth2 registration service"
 ```properties
 title=选择登录方式
 form.hint=检测到您尚未绑定账号，请选择以下方式继续：
-form.bind=绑定已有用户
-form.register=注册新用户
+form.bind=绑定已有账号
+form.register=注册新账号
 form.agreedToTerms.label=我已阅读并同意
-form.providerHint=正在通过以下方式登录
-form.error=注册失败，请稍后重试，或选择绑定已有用户。
+form.providerHint=将使用此账号完成操作
+form.registrationClosed=开放注册已关闭，当前仅支持绑定已有账号。
+form.error=注册失败，请稍后重试，或选择绑定已有账号。
 ```
 
 `login_oauth2_select_en.properties`：
 
 ```properties
 title=Choose How to Continue
-form.hint=Your account has not been bound. Please choose how to continue:
+form.hint=Your account has not been bound yet. Please choose how to continue:
 form.bind=Bind an Existing Account
 form.register=Register a New Account
 form.agreedToTerms.label=I have read and agree to
-form.providerHint=You are signing in with
+form.providerHint=You will continue with this account
+form.registrationClosed=Registration is closed. You can only bind an existing account.
 form.error=Registration failed. Please try again later or bind an existing account.
 ```
 
@@ -800,11 +875,12 @@ form.error=Registration failed. Please try again later or bind an existing accou
 
 ```properties
 title=Elige cómo continuar
-form.hint=Tu cuenta no está vinculada. Elige cómo continuar:
+form.hint=Tu cuenta no está vinculada todavía. Elige cómo continuar:
 form.bind=Vincular una cuenta existente
 form.register=Registrar una cuenta nueva
 form.agreedToTerms.label=He leído y acepto
-form.providerHint=Estás iniciando sesión con
+form.providerHint=Continuarás con esta cuenta
+form.registrationClosed=El registro está cerrado. Solo puedes vincular una cuenta existente.
 form.error=El registro falló. Inténtalo de nuevo más tarde o vincula una cuenta existente.
 ```
 
@@ -816,7 +892,8 @@ form.hint=偵測到您尚未綁定帳號，請選擇以下方式繼續：
 form.bind=綁定既有帳號
 form.register=註冊新帳號
 form.agreedToTerms.label=我已閱讀並同意
-form.providerHint=正在透過以下方式登入
+form.providerHint=將使用此帳號完成操作
+form.registrationClosed=開放註冊已關閉，目前僅支援綁定既有帳號。
 form.error=註冊失敗，請稍後重試，或選擇綁定既有帳號。
 ```
 
@@ -1547,6 +1624,20 @@ git commit -m "feat: add user service method to check email in use excluding sel
   th:object="${form}"
   method="post"
 >
+  <style>
+    .form-hint {
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      opacity: 0.8;
+      margin: 0 0 var(--spacing-2xl);
+    }
+  </style>
+
+  <p
+    class="form-hint"
+    th:text="${mustVerifyEmailOnRegistration} ? #{form.hint.verify} : #{form.hint.save}"
+  ></p>
+
   <div class="form-item">
     <label for="email" th:text="#{form.email.label}"></label>
     <div class="form-input">
@@ -1554,10 +1645,11 @@ git commit -m "feat: add user service method to check email in use excluding sel
         type="email"
         id="email"
         name="email"
-        autocomplete="off"
+        autocomplete="email"
         spellcheck="false"
         autocorrect="off"
         autocapitalize="off"
+        autofocus
         required
         th:field="*{email}"
       />
@@ -1566,13 +1658,22 @@ git commit -m "feat: add user service method to check email in use excluding sel
   </div>
 
   <div class="form-item">
-    <label for="code" th:text="#{form.code.label}"></label>
+    <div class="form-label-group">
+      <label for="code" th:text="#{form.code.label}"></label>
+      <span class="form-item-extra-link" th:if="${!mustVerifyEmailOnRegistration}" th:text="#{form.code.optional}"></span>
+    </div>
     <div class="form-input-group">
       <div class="form-input">
         <input
           type="text"
           inputmode="numeric"
           pattern="\d*"
+          autocomplete="one-time-code"
+          maxlength="6"
+          minlength="6"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
           id="code"
           name="code"
           th:required="${mustVerifyEmailOnRegistration}"
@@ -1583,8 +1684,13 @@ git commit -m "feat: add user service method to check email in use excluding sel
     <p class="alert alert-error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></p>
   </div>
 
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
   <div class="form-item">
     <button type="submit" th:text="#{form.submit}"></button>
+  </div>
+
+  <div class="form-item">
+    <a th:href="@{/logout}" class="form-item-extra-link" th:text="#{form.logout}"></a>
   </div>
 
   <script th:inline="javascript">
@@ -1592,7 +1698,7 @@ git commit -m "feat: add user service method to check email in use excluding sel
       const headerName = /*[[${_csrf.headerName}]]*/ "";
       const token = /*[[${_csrf.token}]]*/ "";
       async function sendRequest() {
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim();
         if (!email) {
           throw new Error(/*[[#{form.email.emptyValidation}]]*/ "");
         }
@@ -1606,9 +1712,7 @@ git commit -m "feat: add user service method to check email in use excluding sel
         });
         if (!response.ok) {
           const json = await response.json();
-          if (json.errors && json.errors.length) {
-            throw new Error(json.errors[0]);
-          }
+          throw new Error(json.detail || /*[[#{form.error.sendCodeFailed}]]*/ "");
         }
         return response;
       }
@@ -1625,56 +1729,66 @@ git commit -m "feat: add user service method to check email in use excluding sel
 
 ```properties
 title=完善资料
+form.hint.verify=为保证账号安全，请验证您的邮箱后继续。
+form.hint.save=请填写您的邮箱地址，以便接收系统通知。
 form.email.label=邮箱
 form.code.label=验证码
+form.code.optional=选填
 form.code.sendButton=发送验证码
-form.submit=提交
+form.submit=保存并继续
 form.email.emptyValidation=请输入邮箱
-form.error.invalidCode=验证码错误或已过期
-form.error.codeRequired=请先发送并填写验证码
-form.error.emailInUse=邮箱已被其他用户使用
+form.error.sendCodeFailed=发送验证码失败，请稍后重试。
+form.logout=退出登录
 ```
+
+字段错误文案（`complete-profile.error.email-in-use`、`complete-profile.error.code-required`、`complete-profile.error.invalid-code`）需要添加到 `config/i18n/messages*.properties`，因为 `th:errors` 通过 Spring MessageSource 解析错误码，模板内 `form.error.*` 键不会被 `#fields.errors` 使用。
 
 `complete_profile_en.properties`：
 
 ```properties
 title=Complete Your Profile
+form.hint.verify=For account security, please verify your email address to continue.
+form.hint.save=Add your email address to receive notifications from the site.
 form.email.label=Email
 form.code.label=Verification Code
+form.code.optional=Optional
 form.code.sendButton=Send Code
-form.submit=Submit
+form.submit=Save and Continue
 form.email.emptyValidation=Please enter your email
-form.error.invalidCode=The verification code is invalid or expired
-form.error.codeRequired=Please send and enter the verification code
-form.error.emailInUse=This email is already in use
+form.error.sendCodeFailed=Failed to send verification code. Please try again later.
+form.logout=Logout
 ```
 
 `complete_profile_es.properties`：
 
 ```properties
 title=Completa tu perfil
+form.hint.verify=Por seguridad de tu cuenta, verifica tu correo electrónico para continuar.
+form.hint.save=Añade tu correo electrónico para recibir notificaciones del sitio.
 form.email.label=Correo electrónico
 form.code.label=Código de verificación
+form.code.optional=Opcional
 form.code.sendButton=Enviar código
-form.submit=Enviar
+form.submit=Guardar y continuar
 form.email.emptyValidation=Introduce tu correo electrónico
-form.error.invalidCode=El código de verificación no es válido o ha caducado
-form.error.codeRequired=Envía e introduce el código de verificación
-form.error.emailInUse=Este correo electrónico ya está en uso
+form.error.sendCodeFailed=Error al enviar el código de verificación. Inténtalo de nuevo más tarde.
+form.logout=Cerrar sesión
 ```
 
 `complete_profile_zh_TW.properties`：
 
 ```properties
 title=完善資料
+form.hint.verify=為確保帳號安全，請驗證您的電子郵件後繼續。
+form.hint.save=請填寫您的電子郵件地址，以便接收網站通知。
 form.email.label=電子郵件
 form.code.label=驗證碼
+form.code.optional=選填
 form.code.sendButton=發送驗證碼
-form.submit=送出
+form.submit=儲存並繼續
 form.email.emptyValidation=請輸入電子郵件
-form.error.invalidCode=驗證碼錯誤或已過期
-form.error.codeRequired=請先發送並填寫驗證碼
-form.error.emailInUse=此電子郵件已被其他使用者使用
+form.error.sendCodeFailed=發送驗證碼失敗，請稍後重試。
+form.logout=登出
 ```
 
 - [ ] **Step 4: 提交**

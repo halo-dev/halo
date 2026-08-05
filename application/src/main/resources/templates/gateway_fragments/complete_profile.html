@@ -6,6 +6,17 @@
   th:object="${form}"
   method="post"
 >
+  <style>
+    .form-hint {
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      opacity: 0.8;
+      margin: 0 0 var(--spacing-2xl);
+    }
+  </style>
+
+  <p class="form-hint" th:text="${mustVerifyEmailOnRegistration} ? #{form.hint.verify} : #{form.hint.save}"></p>
+
   <div class="form-item">
     <label for="email" th:text="#{form.email.label}"></label>
     <div class="form-input">
@@ -13,10 +24,11 @@
         type="email"
         id="email"
         name="email"
-        autocomplete="off"
+        autocomplete="email"
         spellcheck="false"
         autocorrect="off"
         autocapitalize="off"
+        autofocus
         required
         th:field="*{email}"
       />
@@ -25,13 +37,26 @@
   </div>
 
   <div class="form-item">
-    <label for="code" th:text="#{form.code.label}"></label>
+    <div class="form-label-group">
+      <label for="code" th:text="#{form.code.label}"></label>
+      <span
+        class="form-item-extra-link"
+        th:if="${!mustVerifyEmailOnRegistration}"
+        th:text="#{form.code.optional}"
+      ></span>
+    </div>
     <div class="form-input-group">
       <div class="form-input">
         <input
           type="text"
           inputmode="numeric"
           pattern="\d*"
+          autocomplete="one-time-code"
+          maxlength="6"
+          minlength="6"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
           id="code"
           name="code"
           th:required="${mustVerifyEmailOnRegistration}"
@@ -56,7 +81,7 @@
       const headerName = /*[[${_csrf.headerName}]]*/ "";
       const token = /*[[${_csrf.token}]]*/ "";
       async function sendRequest() {
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.trim();
         if (!email) {
           throw new Error(/*[[#{form.email.emptyValidation}]]*/ "");
         }
