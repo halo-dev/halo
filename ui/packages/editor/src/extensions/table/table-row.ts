@@ -1,8 +1,6 @@
 import { TableRow as BuiltInTableRow } from "@tiptap/extension-table";
 
 const TableRow = BuiltInTableRow.extend({
-  allowGapCursor: false,
-
   addHaloEditorMetadata() {
     return {
       ai: {

@@ -70,8 +70,6 @@ export const ExtensionGallery = Node.create<
 
   fakeSelection: true,
 
-  allowGapCursor: true,
-
   addHaloEditorMetadata() {
     return {
       ai: {

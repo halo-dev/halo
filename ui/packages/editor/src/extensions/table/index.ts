@@ -137,6 +137,7 @@ class TableView implements NodeView {
     this.containerDOM = this.dom.appendChild(document.createElement("div"));
 
     this.containerDOM.className = "tableWrapper";
+    this.containerDOM.dataset.gapCursorClickArea = "";
     this.containerDOM.addEventListener("wheel", (e) => {
       return this.handleHorizontalWheel(this.containerDOM, e);
     });
@@ -151,6 +152,7 @@ class TableView implements NodeView {
 
     this.scrollDom = document.createElement("div");
     this.scrollDom.className = "scrollWrapper";
+    this.scrollDom.dataset.gapCursorAnchor = "";
     this.containerDOM.appendChild(this.scrollDom);
 
     this.table = this.scrollDom.appendChild(document.createElement("table"));
@@ -220,8 +222,6 @@ export const TABLE_BUBBLE_MENU_KEY = new PluginKey("tableBubbleMenu");
 export type ExtensionTableOptions = ExtensionOptions & Partial<TableOptions>;
 
 export const ExtensionTable = TiptapTable.extend<ExtensionTableOptions>({
-  allowGapCursor: true,
-
   addHaloEditorMetadata() {
     return {
       ai: {
