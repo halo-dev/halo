@@ -19,11 +19,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.user.service.RoleService;
+import run.halo.app.core.user.service.UserPreCreatingHandler;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListOptions;
@@ -40,7 +43,7 @@ import run.halo.app.infra.utils.ReactiveUtils;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserReconciler implements Reconciler<Request> {
+public class UserReconciler implements Reconciler<Request>, UserPreCreatingHandler {
 
     private static final Duration BLOCKING_TIMEOUT = ReactiveUtils.DEFAULT_TIMEOUT;
 
@@ -52,10 +55,17 @@ public class UserReconciler implements Reconciler<Request> {
     private final UserService userService;
 
     @Override
+    public Mono<Void> preCreating(User user) {
+        addFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
+        return Mono.empty();
+    }
+
+    @Override
     public Result reconcile(Request request) {
         client.fetch(User.class, request.name()).ifPresent(user -> {
             if (isDeleted(user)) {
                 deleteUserConnections(request.name());
+                deleteUserRoleBindings(request.name());
                 removeFinalizers(user.getMetadata(), Set.of(FINALIZER_NAME));
                 client.update(user);
                 return;
@@ -183,6 +193,27 @@ public class UserReconciler implements Reconciler<Request> {
         var listOptions =
                 ListOptions.builder().andQuery(equal("spec.username", username)).build();
         return client.listAll(UserConnection.class, listOptions, defaultSort());
+    }
+
+    void deleteUserRoleBindings(String username) {
+        var subject = new RoleBinding.Subject(User.KIND, username, User.GROUP);
+        var roleBindings = roleService
+                .listRoleBindings(subject)
+                .collectList()
+                .blockOptional(BLOCKING_TIMEOUT)
+                .orElseGet(List::of);
+        if (CollectionUtils.isEmpty(roleBindings)) {
+            return;
+        }
+        roleBindings.forEach(binding -> {
+            binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
+            if (CollectionUtils.isEmpty(binding.getSubjects())) {
+                client.delete(binding);
+            } else {
+                client.update(binding);
+            }
+        });
+        throw new RequeueException(new Result(true, null), "User role bindings are not updated yet");
     }
 
     @Override
