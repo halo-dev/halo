@@ -148,7 +148,6 @@ export const CODE_BLOCK_BUBBLE_MENU_KEY = new PluginKey("codeBlockBubbleMenu");
 export const ExtensionCodeBlock = TiptapCodeBlock.extend<
   ExtensionOptions & Partial<ExtensionCodeBlockOptions>
 >({
-  allowGapCursor: true,
   // It needs to have a higher priority than range-selection (100),
   // otherwise the Mod-a shortcut key will be overridden.
   // But it should be lower than paragraph (1000) to avoid Backspace issues.
