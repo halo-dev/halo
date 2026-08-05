@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.user.service.UserConnectionService;
 import run.halo.app.core.user.service.UserService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -38,6 +40,7 @@ public class OAuth2RegistrationService {
 
     static final int RANDOM_USERNAME_MAX_ATTEMPTS = 20;
     static final String RANDOM_USERNAME_PREFIX = "user-";
+    static final String REGISTRATION_CLAIM_ANNO = "auth.halo.run/oauth2-registration-claim";
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
@@ -83,9 +86,11 @@ public class OAuth2RegistrationService {
             String registrationId, OAuth2User oauth2User, SystemSetting.User setting) {
         return resolveUsername(oauth2User, setting)
                 .flatMap(username -> resolveEmail(oauth2User).flatMap(email -> {
+                    var claim = UUID.randomUUID().toString();
                     var user = new User();
                     user.setMetadata(new Metadata());
                     user.getMetadata().setName(username);
+                    MetadataUtil.nullSafeAnnotations(user).put(REGISTRATION_CLAIM_ANNO, claim);
                     var spec = user.getSpec();
                     spec.setDisplayName(resolveDisplayName(oauth2User, username, setting));
                     spec.setEmail(email.email());
@@ -93,15 +98,52 @@ public class OAuth2RegistrationService {
                     spec.setRegisteredAt(clock.instant());
                     return userService
                             .createUser(user, Set.of(setting.getDefaultRole()))
-                            .flatMap(created -> connectionService
-                                    .createUserConnection(username, registrationId, oauth2User)
-                                    .thenReturn(username)
-                                    .onErrorResume(original -> client.delete(created)
-                                            .then(connectionService.getByProviderUserId(
-                                                    registrationId, oauth2User.getName()))
-                                            .map(existing -> existing.getSpec().getUsername())
-                                            .switchIfEmpty(Mono.error(original))));
+                            .thenReturn(username)
+                            .onErrorResume(original -> compensateOwnedUser(username, claim)
+                                    .then(Mono.defer(() ->
+                                            existingConnectionOrError(registrationId, oauth2User.getName(), original))))
+                            .flatMap(resolvedUsername -> Objects.equals(resolvedUsername, username)
+                                    ? createConnection(username, claim, registrationId, oauth2User)
+                                    : Mono.just(resolvedUsername));
                 }));
+    }
+
+    private Mono<String> createConnection(String username, String claim, String registrationId, OAuth2User oauth2User) {
+        return connectionService
+                .createUserConnection(username, registrationId, oauth2User)
+                .thenReturn(username)
+                .onErrorResume(original -> compensateOwnedUser(username, claim)
+                        .then(Mono.defer(
+                                () -> existingConnectionOrError(registrationId, oauth2User.getName(), original))))
+                .flatMap(resolvedUsername -> Objects.equals(resolvedUsername, username)
+                        ? clearRegistrationClaim(username, claim).thenReturn(username)
+                        : Mono.just(resolvedUsername));
+    }
+
+    private Mono<String> existingConnectionOrError(String registrationId, String providerUserId, Throwable original) {
+        return connectionService
+                .getByProviderUserId(registrationId, providerUserId)
+                .map(existing -> existing.getSpec().getUsername())
+                .switchIfEmpty(Mono.error(original));
+    }
+
+    private Mono<Void> compensateOwnedUser(String username, String claim) {
+        return client.fetch(User.class, username)
+                .filter(user ->
+                        Objects.equals(MetadataUtil.nullSafeAnnotations(user).get(REGISTRATION_CLAIM_ANNO), claim))
+                .flatMap(client::delete)
+                .then();
+    }
+
+    private Mono<Void> clearRegistrationClaim(String username, String claim) {
+        return client.fetch(User.class, username)
+                .filter(user ->
+                        Objects.equals(MetadataUtil.nullSafeAnnotations(user).get(REGISTRATION_CLAIM_ANNO), claim))
+                .flatMap(user -> {
+                    MetadataUtil.nullSafeAnnotations(user).remove(REGISTRATION_CLAIM_ANNO);
+                    return client.update(user);
+                })
+                .then();
     }
 
     private Mono<String> resolveUsername(OAuth2User oauth2User, SystemSetting.User setting) {

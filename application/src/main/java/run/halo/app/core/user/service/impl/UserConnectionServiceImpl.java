@@ -4,8 +4,12 @@ import static run.halo.app.extension.ExtensionUtil.defaultSort;
 import static run.halo.app.extension.ExtensionUtil.notDeleting;
 import static run.halo.app.extension.index.query.Queries.equal;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -53,14 +57,18 @@ public class UserConnectionServiceImpl implements UserConnectionService {
                     connection.setMetadata(new Metadata());
                     var metadata = connection.getMetadata();
                     updateUserInfo(metadata, oauth2User);
-                    metadata.setGenerateName(username + "-");
+                    metadata.setName(connectionName(registrationId, oauth2User.getName()));
                     connection.setSpec(new UserConnectionSpec());
                     var spec = connection.getSpec();
                     spec.setUsername(username);
                     spec.setProviderUserId(oauth2User.getName());
                     spec.setRegistrationId(registrationId);
                     spec.setUpdatedAt(clock.instant());
-                    return client.create(connection);
+                    return client.create(connection)
+                            .onErrorResume(original -> getByProviderUserId(registrationId, oauth2User.getName())
+                                    .flatMap(existing ->
+                                            Mono.<UserConnection>error(new OAuth2UserAlreadyBoundException(existing)))
+                                    .switchIfEmpty(Mono.error(original)));
                 }));
     }
 
@@ -113,5 +121,15 @@ public class UserConnectionServiceImpl implements UserConnectionService {
         var annotations = Optional.ofNullable(metadata.getAnnotations()).orElseGet(HashMap::new);
         metadata.setAnnotations(annotations);
         annotations.put("auth.halo.run/oauth2-user-info", mapper.writeValueAsString(oauth2User.getAttributes()));
+    }
+
+    private static String connectionName(String registrationId, String providerUserId) {
+        try {
+            var digest = MessageDigest.getInstance("SHA-256")
+                    .digest((registrationId + '\0' + providerUserId).getBytes(StandardCharsets.UTF_8));
+            return "oauth2-" + HexFormat.of().formatHex(digest, 0, 28);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
     }
 }

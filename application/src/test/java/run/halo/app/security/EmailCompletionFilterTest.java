@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
@@ -138,11 +141,23 @@ class EmailCompletionFilterTest {
         verifyNoInteractions(systemConfigFetcher, userService, requestCache);
     }
 
+    @Test
+    void shouldNotResolveRawOAuth2SubjectAsHaloUsername() {
+        var principal = new DefaultOAuth2User(List.of(), Map.of("sub", USERNAME), "sub");
+        var authentication = new OAuth2AuthenticationToken(principal, List.of(), "github");
+        var exchange = exchange(MockServerHttpRequest.get("/uc").accept(MediaType.TEXT_HTML));
+
+        pass(exchange, authentication);
+
+        verifyNoInteractions(systemConfigFetcher, userService, requestCache);
+    }
+
     @ParameterizedTest
     @ValueSource(
             strings = {
                 "/oauth2/authorization/github",
                 "/login",
+                "/login/oauth2/code/github",
                 "/login/oauth2/register",
                 "/signup",
                 "/password-reset/email/send",
@@ -204,6 +219,17 @@ class EmailCompletionFilterTest {
         var exchange = exchange(MockServerHttpRequest.get("/archives")
                 .accept(MediaType.TEXT_HTML)
                 .header("X-Requested-With", "XMLHttpRequest"));
+        requireEmailVerification();
+        when(userService.getUser(USERNAME)).thenReturn(Mono.just(user("alice@example.com", false)));
+
+        assertBlockedWithProblemDetail(exchange, authenticatedUser());
+        verifyNoInteractions(requestCache);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/v1alpha1/users", "/apis/api.console.halo.run/v1alpha1/users", "/actuator/health"})
+    void shouldReturnProblemDetailForApiRequestAcceptingHtml(String path) {
+        var exchange = exchange(MockServerHttpRequest.get(path).accept(MediaType.TEXT_HTML));
         requireEmailVerification();
         when(userService.getUser(USERNAME)).thenReturn(Mono.just(user("alice@example.com", false)));
 

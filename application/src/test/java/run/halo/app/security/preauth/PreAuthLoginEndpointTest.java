@@ -20,6 +20,7 @@ import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.OAuth2BindIntent;
 
 @ExtendWith(MockitoExtension.class)
 class PreAuthLoginEndpointTest {
@@ -39,6 +40,9 @@ class PreAuthLoginEndpointTest {
     @Mock
     OAuth2AuthenticationTokenCache tokenCache;
 
+    @Mock
+    OAuth2BindIntent bindIntent;
+
     WebTestClient webClient;
 
     @BeforeEach
@@ -48,7 +52,7 @@ class PreAuthLoginEndpointTest {
         when(authProviderService.getEnabledProviders()).thenReturn(Flux.empty());
         when(parameterRequestCache.getParameter(any(), any())).thenReturn(Mono.empty());
         var endpoint = new PreAuthLoginEndpoint(
-                cryptoService, globalInfoService, authProviderService, parameterRequestCache, tokenCache);
+                cryptoService, globalInfoService, authProviderService, parameterRequestCache, tokenCache, bindIntent);
         var viewResolver = (org.springframework.web.reactive.result.view.ViewResolver)
                 (viewName, locale) -> Mono.just((model, contentType, exchange) -> Mono.empty());
         webClient = WebTestClient.bindToRouterFunction(endpoint.preAuthLoginEndpoints())
@@ -61,17 +65,32 @@ class PreAuthLoginEndpointTest {
     @ValueSource(strings = {"/login", "/login?signup", "/login?error=invalid-credential"})
     void shouldClearCachedOAuth2TokenForOrdinaryLogin(String uri) {
         when(tokenCache.removeToken(any())).thenReturn(Mono.empty());
+        when(bindIntent.clear(any())).thenReturn(Mono.empty());
 
         webClient.get().uri(uri).exchange().expectStatus().isOk();
 
         verify(tokenCache).removeToken(any());
+        verify(bindIntent).clear(any());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/login?oauth2_bind", "/login?oauth2_select"})
-    void shouldPreserveCachedOAuth2TokenWhileContinuingOAuth2Flow(String uri) {
+    @ValueSource(strings = {"/login?oauth2_select"})
+    void shouldPreserveCachedOAuth2TokenWhileSelectingOAuth2Registration(String uri) {
+        when(bindIntent.clear(any())).thenReturn(Mono.empty());
+
+        webClient.get().uri(uri).exchange().expectStatus().isOk();
+        verify(tokenCache, never()).removeToken(any());
+        verify(bindIntent).clear(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/login?oauth2_bind"})
+    void shouldRecordExplicitBindIntentWhilePreservingCachedToken(String uri) {
+        when(bindIntent.save(any())).thenReturn(Mono.empty());
+
         webClient.get().uri(uri).exchange().expectStatus().isOk();
 
         verify(tokenCache, never()).removeToken(any());
+        verify(bindIntent).save(any());
     }
 }

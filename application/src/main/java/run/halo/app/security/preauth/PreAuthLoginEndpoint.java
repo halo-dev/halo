@@ -32,6 +32,7 @@ import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.CryptoService;
 import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
+import run.halo.app.security.authentication.oauth2.OAuth2BindIntent;
 
 /**
  * Pre-auth login endpoints.
@@ -54,6 +55,8 @@ class PreAuthLoginEndpoint {
     private final LoginParameterRequestCache parameterRequestCache;
 
     private final OAuth2AuthenticationTokenCache oauth2TokenCache;
+
+    private final OAuth2BindIntent bindIntent;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
@@ -108,7 +111,7 @@ class PreAuthLoginEndpoint {
                                             ap.getMetadata().getName())))
                                     .cache();
 
-                            return clearOAuth2TokenUnlessContinuing(request)
+                            return prepareOAuth2Continuation(request)
                                     .then(serverRequestCache.saveRequest(exchange))
                                     .then(Mono.defer(() -> ServerResponse.ok()
                                             .render(
@@ -163,9 +166,13 @@ class PreAuthLoginEndpoint {
                         .build());
     }
 
-    private Mono<Void> clearOAuth2TokenUnlessContinuing(ServerRequest request) {
-        var preserve = request.queryParam("oauth2_select").isPresent()
-                || request.queryParam("oauth2_bind").isPresent();
-        return preserve ? Mono.empty() : oauth2TokenCache.removeToken(request.exchange());
+    private Mono<Void> prepareOAuth2Continuation(ServerRequest request) {
+        if (request.queryParam("oauth2_bind").isPresent()) {
+            return bindIntent.save(request.exchange());
+        }
+        if (request.queryParam("oauth2_select").isPresent()) {
+            return bindIntent.clear(request.exchange());
+        }
+        return Mono.when(oauth2TokenCache.removeToken(request.exchange()), bindIntent.clear(request.exchange()));
     }
 }

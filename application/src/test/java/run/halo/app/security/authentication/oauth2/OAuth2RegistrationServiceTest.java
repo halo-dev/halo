@@ -131,6 +131,9 @@ class OAuth2RegistrationServiceTest {
                     users.remove(user.getMetadata().getName());
                     return user;
                 }));
+        lenient()
+                .when(client.update(any(User.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, User.class)));
 
         service = new OAuth2RegistrationService(
                 client, userService, connectionService, systemConfigFetcher, validatorFactory.getValidator());
@@ -453,6 +456,21 @@ class OAuth2RegistrationServiceTest {
     }
 
     @Test
+    void shouldNotDeleteCollidingUserThatDoesNotOwnRegistrationClaim() {
+        var original = new IllegalStateException("user creation raced");
+        var collidingUser = user("alice", true);
+        when(client.fetch(User.class, "alice")).thenReturn(Mono.empty(), Mono.just(collidingUser));
+        when(userService.createUser(any(User.class), eq(Set.of("guest")))).thenReturn(Mono.error(original));
+
+        StepVerifier.create(service.register(token(Map.of("sub", "alice")), false))
+                .expectErrorSatisfies(error -> assertThat(error).isSameAs(original))
+                .verify();
+
+        verify(client, never()).delete(collidingUser);
+        verify(connectionService, never()).createUserConnection(anyString(), anyString(), any());
+    }
+
+    @Test
     void shouldDeleteCreatedUserThenReturnConcurrentWinnerInRequiredOrder() {
         setting.setMustVerifyEmailOnRegistration(true);
         var original = new IllegalStateException("connection collision");
@@ -482,6 +500,7 @@ class OAuth2RegistrationServiceTest {
         verify(userService).createUser(createdCaptor.capture(), eq(Set.of("guest")));
         var createdUser = createdCaptor.getValue();
         var inOrder = inOrder(userService, connectionService, client);
+        inOrder.verify(connectionService).getByProviderUserId("github", "provider-user-id");
         inOrder.verify(userService).createUser(any(User.class), eq(Set.of("guest")));
         inOrder.verify(connectionService).createUserConnection(eq("alice"), eq("github"), eq(oauth2User));
         inOrder.verify(client).delete(createdUser);

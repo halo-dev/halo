@@ -12,9 +12,12 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.server.DefaultServerRedirectStrategy;
 import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
+import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -50,7 +53,7 @@ class EmailCompletionFilter implements WebFilter {
 
     private final ServerWebExchangeMatcher exemptMatcher = createExemptMatcher();
 
-    private final ServerWebExchangeMatcher htmlMatcher = WebExchangeMatchers.ignoringMediaTypeAll(MediaType.TEXT_HTML);
+    private final ServerWebExchangeMatcher navigationMatcher = createNavigationMatcher();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -67,6 +70,7 @@ class EmailCompletionFilter implements WebFilter {
         return ReactiveSecurityContextHolder.getContext()
                 .map(context -> context.getAuthentication())
                 .filter(authenticationTrustResolver::isAuthenticated)
+                .filter(authentication -> !(authentication instanceof OAuth2AuthenticationToken))
                 .filter(authentication -> !hasSuperRole(authentication))
                 .flatMap(authentication -> systemConfigFetcher
                         .fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
@@ -77,7 +81,7 @@ class EmailCompletionFilter implements WebFilter {
     }
 
     private Mono<Void> handleIncompleteUser(ServerWebExchange exchange) {
-        return htmlMatcher.matches(exchange).flatMap(result -> {
+        return navigationMatcher.matches(exchange).flatMap(result -> {
             if (result.isMatch() && !HaloUtils.isXhr(exchange.getRequest().getHeaders())) {
                 return requestCache
                         .saveRequest(exchange)
@@ -101,8 +105,7 @@ class EmailCompletionFilter implements WebFilter {
     private static ServerWebExchangeMatcher createExemptMatcher() {
         var paths = pathMatchers(
                 "/oauth2/authorization/**",
-                "/login",
-                "/login/oauth2/register",
+                "/login/**",
                 "/signup",
                 "/password-reset/email/send",
                 "/logout",
@@ -124,5 +127,12 @@ class EmailCompletionFilter implements WebFilter {
                 "/halo-tracker.js",
                 "/images/**");
         return new OrServerWebExchangeMatcher(paths, staticResources);
+    }
+
+    private static ServerWebExchangeMatcher createNavigationMatcher() {
+        return new AndServerWebExchangeMatcher(
+                pathMatchers(HttpMethod.GET, "/**"),
+                WebExchangeMatchers.ignoringMediaTypeAll(MediaType.TEXT_HTML),
+                new NegatedServerWebExchangeMatcher(pathMatchers("/api/**", "/apis/**", "/actuator/**")));
     }
 }

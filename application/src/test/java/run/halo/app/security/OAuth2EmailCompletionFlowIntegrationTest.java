@@ -5,8 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockAuthentication;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
@@ -150,6 +153,42 @@ class OAuth2EmailCompletionFlowIntegrationTest {
     }
 
     @Test
+    void shouldRejectUnverifiedUserApiRequestAcceptingHtmlWithoutRedirect() {
+        webClient
+                .mutateWith(mockUser(USERNAME).roles("authenticated"))
+                .get()
+                .uri("/apis/api.console.halo.run/v1alpha1/users/-")
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectStatus()
+                .isForbidden()
+                .expectHeader()
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .expectBody()
+                .jsonPath("$.type")
+                .isEqualTo("email-not-set");
+    }
+
+    @Test
+    void shouldNotInterceptRawOAuth2CallbackOrResolveExternalSubjectAsHaloUser() {
+        var principal = new DefaultOAuth2User(List.of(), Map.of("id", USERNAME), "id");
+        var rawOAuth2 = new OAuth2AuthenticationToken(principal, List.of(), "test-provider");
+
+        webClient
+                .mutateWith(mockAuthentication(rawOAuth2))
+                .get()
+                .uri("/login/oauth2/code/test-provider")
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectStatus()
+                .isFound()
+                .expectHeader()
+                .location("/login?oauth2_select");
+
+        verify(userService, never()).getUser(USERNAME);
+    }
+
+    @Test
     void shouldReleaseVerifiedOAuth2UserToOriginalRoute() {
         user.getSpec().setEmailVerified(true);
         var session = establishOAuth2Session();
@@ -273,6 +312,7 @@ class OAuth2EmailCompletionFlowIntegrationTest {
                             request -> authenticationSession
                                     .establish(request.exchange(), USERNAME, oauth2Token())
                                     .then(ServerResponse.noContent().build()))
+                    .GET("/login/oauth2/code/test-provider", request -> Mono.empty())
                     .GET(
                             "/uc",
                             request -> ServerResponse.ok()

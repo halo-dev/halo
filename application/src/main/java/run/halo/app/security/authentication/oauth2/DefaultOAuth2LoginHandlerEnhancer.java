@@ -23,12 +23,17 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
 
     private final OAuth2AuthenticationTokenCache oauth2TokenCache;
 
+    private final OAuth2BindIntent bindIntent;
+
     private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     public DefaultOAuth2LoginHandlerEnhancer(
-            UserConnectionService connectionService, OAuth2AuthenticationTokenCache oauth2TokenCache) {
+            UserConnectionService connectionService,
+            OAuth2AuthenticationTokenCache oauth2TokenCache,
+            OAuth2BindIntent bindIntent) {
         this.connectionService = connectionService;
         this.oauth2TokenCache = oauth2TokenCache;
+        this.bindIntent = bindIntent;
     }
 
     @Override
@@ -36,9 +41,16 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
         if (!authenticationTrustResolver.isFullyAuthenticated(authentication)) {
             // Should never happen
             // Remove token directly if not fully authenticated
-            return oauth2TokenCache.removeToken(exchange).then();
+            return Mono.when(oauth2TokenCache.removeToken(exchange), bindIntent.clear(exchange));
         }
-        return oauth2TokenCache.getToken(exchange).flatMap(oauth2Token -> {
+        return bindIntent
+                .consume(exchange)
+                .flatMap(shouldBind ->
+                        shouldBind ? bind(exchange, authentication) : oauth2TokenCache.removeToken(exchange));
+    }
+
+    private Mono<Void> bind(ServerWebExchange exchange, Authentication authentication) {
+        var binding = oauth2TokenCache.getToken(exchange).flatMap(oauth2Token -> {
             var oauth2User = oauth2Token.getPrincipal();
             var username = authentication.getName();
             var registrationId = oauth2Token.getAuthorizedClientRegistrationId();
@@ -51,7 +63,10 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
                     })
                     .switchIfEmpty(Mono.defer(
                             () -> connectionService.createUserConnection(username, registrationId, oauth2User)))
-                    .then(oauth2TokenCache.removeToken(exchange));
+                    .then();
         });
+        return binding.then(Mono.defer(() -> oauth2TokenCache.removeToken(exchange)))
+                .onErrorResume(error ->
+                        Mono.defer(() -> oauth2TokenCache.removeToken(exchange)).then(Mono.error(error)));
     }
 }
