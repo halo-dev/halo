@@ -217,6 +217,33 @@ class PreAuthOAuth2RegistrationEndpointTest {
     }
 
     @Test
+    void shouldPropagateSessionEstablishmentFailureWithoutRenderingSelectionPage() {
+        givenSelectionModel(List.of());
+        when(registrationService.register(token, false))
+                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", true)));
+        when(authenticationSession.establish(any(), eq("alice"), eq(token)))
+                .thenReturn(Mono.error(new IllegalStateException("session establishment failed")));
+
+        post("agreedToTerms=false").expectStatus().is5xxServerError();
+
+        assertThat(renderedView.get()).isNull();
+    }
+
+    @Test
+    void shouldPropagateRequestCacheFailureWithoutRenderingSelectionPage() {
+        givenSelectionModel(List.of());
+        when(registrationService.register(token, false))
+                .thenReturn(Mono.just(new OAuth2RegistrationService.RegistrationResult("alice", false)));
+        when(authenticationSession.establish(any(), eq("alice"), eq(token))).thenReturn(Mono.empty());
+        when(requestCache.getRedirectUri(any()))
+                .thenReturn(Mono.error(new IllegalStateException("request cache failed")));
+
+        post("agreedToTerms=false").expectStatus().is5xxServerError();
+
+        assertThat(renderedView.get()).isNull();
+    }
+
+    @Test
     void shouldRenderDefaultRoleMissingError() {
         givenSelectionModel(List.of());
         when(registrationService.register(token, false))

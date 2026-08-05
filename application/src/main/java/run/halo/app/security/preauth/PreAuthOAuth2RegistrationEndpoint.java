@@ -87,7 +87,7 @@ class PreAuthOAuth2RegistrationEndpoint {
                     return selectionModel(token)
                             .flatMap(model -> registrationService
                                     .register(token, agreedToTerms)
-                                    .flatMap(result -> authenticationSession
+                                    .map(result -> Mono.defer(() -> authenticationSession
                                             .establish(request.exchange(), result.username(), token)
                                             .then(
                                                     result.needsEmailCompletion()
@@ -95,8 +95,9 @@ class PreAuthOAuth2RegistrationEndpoint {
                                                             : requestCache
                                                                     .getRedirectUri(request.exchange())
                                                                     .defaultIfEmpty(URI.create("/uc"))
-                                                                    .flatMap(uri -> redirect(uri.toString()))))
-                                    .onErrorResume(error -> renderRegistrationError(error, model)));
+                                                                    .flatMap(uri -> redirect(uri.toString())))))
+                                    .onErrorResume(error -> Mono.just(renderRegistrationError(error, model)))
+                                    .flatMap(response -> response));
                 }))
                 .switchIfEmpty(redirect("/login"));
     }
