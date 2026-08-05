@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -133,6 +134,23 @@ class OAuth2EmailCompletionFlowIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    void shouldRenderLogoutOptionOnCompletionPage() {
+        var session = establishOAuth2Session();
+
+        webClient
+                .get()
+                .uri("/complete-profile")
+                .cookie(session.getName(), session.getValue())
+                .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
+                .accept(MediaType.TEXT_HTML)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("href=\"/logout\"").contains(">Log out</a>"));
     }
 
     @Test

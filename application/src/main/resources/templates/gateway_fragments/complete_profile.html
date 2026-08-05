@@ -61,6 +61,10 @@
     <button type="submit" th:text="#{form.submit}"></button>
   </div>
 
+  <div class="form-item">
+    <a th:href="@{/logout}" class="cancel-link" th:text="#{form.logout}"></a>
+  </div>
+
   <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
       const headerName = /*[[${_csrf.headerName}]]*/ "";
