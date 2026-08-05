@@ -24345,8 +24345,7 @@
       },
       "UserSpec": {
         "required": [
-          "displayName",
-          "email"
+          "displayName"
         ],
         "type": "object",
         "properties": {
