@@ -14,6 +14,9 @@ import CommandsView from "./CommandsView.vue";
 
 export const ExtensionCommandsMenu = Extension.create({
   name: "commands-menu",
+  // Suggestion popovers must get the first chance to handle navigation keys.
+  // Structural editor plugins should only run when the menu is inactive.
+  priority: 1000,
 
   addProseMirrorPlugins() {
     const commandMenuItems = getToolbarItemsFromExtensions(this.editor);

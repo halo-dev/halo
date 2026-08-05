@@ -11,12 +11,10 @@ import {
   EditorState,
   ResolvedPos,
   TextSelection,
-  isActive,
   type Dispatch,
 } from "@/tiptap";
 import type { ExtensionOptions, ToolbarItemType } from "@/types";
-import { deleteNodeByPos } from "@/utils";
-import { isListActive } from "@/utils/is-list-active";
+import { deleteNodeByPos, isGapCursorTargetNode } from "@/utils";
 
 export type ExtensionParagraphOptions = ExtensionOptions &
   Partial<ParagraphOptions>;
@@ -104,45 +102,11 @@ export const ExtensionParagraph =
         },
       };
     },
-
-    addKeyboardShortcuts() {
-      return {
-        Backspace: ({ editor }: { editor: Editor }) => {
-          const { state, view } = editor;
-          const { selection } = state;
-          if (
-            isListActive(editor) ||
-            !isActive(state, ExtensionParagraph.name)
-          ) {
-            return false;
-          }
-
-          if (!(selection instanceof TextSelection) || !selection.empty) {
-            return false;
-          }
-
-          const { $from } = selection;
-
-          if ($from.parentOffset !== 0) {
-            return false;
-          }
-
-          const beforePos = $from.before($from.depth);
-          if (beforePos === 0) {
-            return true;
-          }
-
-          return handleDeletePreviousNode(
-            $from,
-            beforePos,
-            state,
-            view.dispatch
-          );
-        },
-      };
-    },
   });
 
+/**
+ * @deprecated GapCursor now owns staged deletion around structural blocks.
+ */
 export function deleteCurrentNodeAndSetSelection(
   $from: ResolvedPos,
   beforePos: number,
@@ -150,16 +114,23 @@ export function deleteCurrentNodeAndSetSelection(
   dispatch: Dispatch
 ) {
   const { tr } = state;
-  if (deleteNodeByPos($from)(tr) && dispatch) {
-    if (beforePos !== 0) {
-      tr.setSelection(TextSelection.near(tr.doc.resolve(beforePos - 1), -1));
-    }
-    dispatch(tr);
-    return true;
+  const deleted = deleteNodeByPos($from)(tr);
+  if (!deleted) {
+    return false;
   }
-  return false;
+  if (!dispatch) {
+    return false;
+  }
+  if (beforePos !== 0) {
+    tr.setSelection(TextSelection.near(tr.doc.resolve(beforePos - 1), -1));
+  }
+  dispatch(tr);
+  return true;
 }
 
+/**
+ * @deprecated GapCursor now owns staged deletion around structural blocks.
+ */
 export function handleDeletePreviousNode(
   $from: ResolvedPos,
   beforePos: number,
@@ -173,24 +144,26 @@ export function handleDeletePreviousNode(
 
   const $beforePos = $from.doc.resolve(beforePos);
   const nodeBefore = $beforePos.nodeBefore;
-
-  if (
-    !nodeBefore ||
-    !nodeBefore.type.isBlock ||
-    nodeBefore.type.isText ||
-    nodeBefore.type.name === ExtensionParagraph.name
-  ) {
+  if (!nodeBefore) {
+    return false;
+  }
+  if (!nodeBefore.type.isBlock) {
+    return false;
+  }
+  if (nodeBefore.type.isText) {
+    return false;
+  }
+  if (nodeBefore.type.name === ExtensionParagraph.name) {
+    return false;
+  }
+  if (!isGapCursorTargetNode(nodeBefore)) {
     return false;
   }
 
-  const allowGapCursor = nodeBefore.type.spec.allowGapCursor;
-  if (!allowGapCursor) {
+  const deleted = deleteNodeByPos($from.doc.resolve(beforePos - 1))(tr);
+  if (!deleted) {
     return false;
   }
-
-  if (deleteNodeByPos($from.doc.resolve(beforePos - 1))(tr)) {
-    dispatch(tr);
-    return true;
-  }
-  return false;
+  dispatch(tr);
+  return true;
 }
