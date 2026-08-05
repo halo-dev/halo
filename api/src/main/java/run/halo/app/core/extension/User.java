@@ -61,7 +61,6 @@ public class User extends AbstractExtension {
         private String avatar;
 
         /** Email address used for sign-in and notifications. */
-        @Schema(requiredMode = REQUIRED)
         private String email;
 
         /** Whether the email address has been verified. */
