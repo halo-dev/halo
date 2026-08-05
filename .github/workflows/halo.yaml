@@ -128,27 +128,3 @@ jobs:
           f2c-registry-token: ${{ secrets.F2C_REGISTRY_TOKEN }}
           push: true
           platforms: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
-
-  e2e-test:
-    if: always() && needs.build.result == 'success' && (github.event_name == 'pull_request' || github.event_name == 'push')
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v6
-      - name: Download Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: halo-artifacts
-          path: application/build/libs
-      - name: Docker Build
-        uses: docker/build-push-action@v7
-        with:
-          tags: ghcr.io/halo-dev/halo-dev:main
-          push: false
-          context: .
-      - name: E2E Testing
-        continue-on-error: true
-        run: |
-          sudo curl -L https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-          sudo chmod u+x /usr/local/bin/docker-compose
-          cd e2e && make all

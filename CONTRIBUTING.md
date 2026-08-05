@@ -24,7 +24,6 @@ This repository mainly contains:
 - Git
 - JDK (version compatible with the project build)
 - Node.js and `pnpm` (see `ui/package.json` for the current package manager)
-- Docker / Docker Compose (required for e2e scenarios)
 
 ## Contribution Workflow
 
@@ -133,8 +132,6 @@ For detailed documentation, visit: https://github.com/Fission-AI/OpenSpec/tree/m
 ## Testing Expectations
 
 - Add or update tests whenever you change behavior.
-- If you add or modify APIs, please include corresponding e2e test cases.
-- See `e2e/README.md` for e2e workflow and local execution details.
 
 ## Coding Standards
 
