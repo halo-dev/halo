@@ -19,6 +19,7 @@ import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
@@ -30,6 +31,7 @@ import run.halo.app.security.AuthProviderService;
 import run.halo.app.security.HaloServerRequestCache;
 import run.halo.app.security.LoginParameterRequestCache;
 import run.halo.app.security.authentication.CryptoService;
+import run.halo.app.security.authentication.oauth2.OAuth2AuthenticationTokenCache;
 
 /**
  * Pre-auth login endpoints.
@@ -50,6 +52,8 @@ class PreAuthLoginEndpoint {
     private final ServerRequestCache serverRequestCache = new HaloServerRequestCache();
 
     private final LoginParameterRequestCache parameterRequestCache;
+
+    private final OAuth2AuthenticationTokenCache oauth2TokenCache;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 100)
@@ -104,8 +108,8 @@ class PreAuthLoginEndpoint {
                                             ap.getMetadata().getName())))
                                     .cache();
 
-                            return serverRequestCache
-                                    .saveRequest(exchange)
+                            return clearOAuth2TokenUnlessContinuing(request)
+                                    .then(serverRequestCache.saveRequest(exchange))
                                     .then(Mono.defer(() -> ServerResponse.ok()
                                             .render(
                                                     "login",
@@ -157,5 +161,11 @@ class PreAuthLoginEndpoint {
                         })
                         .before(HaloUtils.noCache())
                         .build());
+    }
+
+    private Mono<Void> clearOAuth2TokenUnlessContinuing(ServerRequest request) {
+        var preserve = request.queryParam("oauth2_select").isPresent()
+                || request.queryParam("oauth2_bind").isPresent();
+        return preserve ? Mono.empty() : oauth2TokenCache.removeToken(request.exchange());
     }
 }

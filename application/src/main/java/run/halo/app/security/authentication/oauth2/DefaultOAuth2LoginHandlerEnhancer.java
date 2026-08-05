@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.oauth2;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -22,13 +21,14 @@ public class DefaultOAuth2LoginHandlerEnhancer implements OAuth2LoginHandlerEnha
 
     private final UserConnectionService connectionService;
 
-    @Setter
-    private OAuth2AuthenticationTokenCache oauth2TokenCache = new WebSessionOAuth2AuthenticationTokenCache();
+    private final OAuth2AuthenticationTokenCache oauth2TokenCache;
 
     private final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
-    public DefaultOAuth2LoginHandlerEnhancer(UserConnectionService connectionService) {
+    public DefaultOAuth2LoginHandlerEnhancer(
+            UserConnectionService connectionService, OAuth2AuthenticationTokenCache oauth2TokenCache) {
         this.connectionService = connectionService;
+        this.oauth2TokenCache = oauth2TokenCache;
     }
 
     @Override
